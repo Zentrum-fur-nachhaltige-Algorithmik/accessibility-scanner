@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good EAA Compliance Example - Government Agency</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: #f4f4f4;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: #007cba;
+        }
+        
+        nav a:hover, nav a:focus {
+            text-decoration: underline;
+        }
+        
+        .content-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        .contact-info {
+            background: #e8f5e8;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .monitoring-section {
+            background: #e3f2fd;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        footer {
+            background: #333;
+            color: white;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        footer a {
+            color: #ccc;
+        }
+        
+        .feedback-form {
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: 8px 12px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover, button:focus {
+            background: #0056a3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Federal Accessibility Office</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="accessibility-statement.html">Accessibility Statement</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <h1>Welcome to Federal Accessibility Office</h1>
+            <p>We are committed to ensuring digital accessibility for all citizens.</p>
+            
+            <div class="content-section">
+                <h2>Our Services</h2>
+                <ul>
+                    <li>Accessibility compliance consulting</li>
+                    <li>Digital accessibility audits</li>
+                    <li>Training and education programs</li>
+                    <li>Policy development support</li>
+                </ul>
+            </div>
+            
+            <div class="content-section">
+                <h2 id="contact">Contact Information</h2>
+                <div class="contact-info">
+                    <h3>Accessibility Support</h3>
+                    <p>We respond to accessibility issues within <strong>2 business days</strong>.</p>
+                    
+                    <h4>Contact Methods</h4>
+                    <ul>
+                        <li><strong>Email:</strong> <a href="mailto:accessibility@federal-office.gov">accessibility@federal-office.gov</a></li>
+                        <li><strong>Phone:</strong> <a href="tel:+4930123456">+49 (0)30 123-456</a></li>
+                        <li><strong>Online Form:</strong> <a href="#feedback-form">Accessibility Feedback Form</a> (below)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h2>Accessibility Monitoring Procedures</h2>
+                <div class="monitoring-section">
+                    <h3>Regular Audits</h3>
+                    <p>We conduct comprehensive accessibility audits <strong>quarterly</strong> using automated tools and manual testing by certified accessibility experts.</p>
+                    
+                    <h3>Issue Tracking</h3>
+                    <p>All accessibility issues are tracked in our <a href="/accessibility-issues">public accessibility issue tracker</a> for full transparency.</p>
+                    
+                    <h3>User Feedback Integration</h3>
+                    <p>User accessibility feedback is reviewed <strong>weekly</strong> by our accessibility team and integrated into our improvement roadmap within 30 days.</p>
+                    
+                    <h3>Continuous Improvement</h3>
+                    <p>See our <a href="/accessibility-improvements">accessibility improvements log</a> for recent updates and our ongoing enhancement roadmap.</p>
+                </div>
+            </div>
+            
+            <div class="feedback-form" id="feedback-form">
+                <h2>Accessibility Feedback Form</h2>
+                <p>Help us improve accessibility by reporting issues or suggestions.</p>
+                
+                <form action="/submit-feedback" method="post">
+                    <div class="form-group">
+                        <label for="name">Your Name (Optional)</label>
+                        <input type="text" id="name" name="name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email (Optional - for follow-up)</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="issue-type">Type of Issue</label>
+                        <select id="issue-type" name="issue-type">
+                            <option value="navigation">Navigation Problem</option>
+                            <option value="content">Content Not Accessible</option>
+                            <option value="form">Form Issue</option>
+                            <option value="media">Audio/Video Issue</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Issue Description</label>
+                        <textarea id="description" name="description" rows="5" required></textarea>
+                    </div>
+                    
+                    <button type="submit">Submit Feedback</button>
+                </form>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Federal Accessibility Office. All rights reserved.</p>
+            <nav>
+                <a href="/privacy">Privacy Policy</a> |
+                <a href="accessibility-statement.html">Accessibility Statement</a> |
+                <a href="/contact">Contact Us</a>
+            </nav>
+        </footer>
+    </div>
+    
+    <script>
+        // Simulate form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your feedback! We will review it within 2 business days.');
+        });
+    </script>
+</body>
+</html>

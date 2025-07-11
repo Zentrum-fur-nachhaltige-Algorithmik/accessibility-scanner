@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6C Good Example - Responsive Design</title>
+    <style>
+        /* Good responsive design example for Phase 6C testing */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Good responsive container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Responsive navigation - works well on all viewports */
+        nav {
+            background: #2c3e50;
+            padding: 1rem 0;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        nav li {
+            margin: 0.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            /* Good contrast: white on dark blue */
+            background: #34495e;
+            border: 2px solid transparent;
+        }
+
+        nav a:hover,
+        nav a:focus {
+            background: #3498db;
+            border-color: #fff;
+            outline: none;
+        }
+
+        /* Good heading structure that reflows properly */
+        h1 {
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 1.5rem 0 1rem;
+            color: #2c3e50;
+        }
+
+        /* Responsive grid that reflows correctly */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+
+        /* Good buttons with proper contrast */
+        .btn {
+            background: #3498db;
+            color: white;
+            border: 2px solid #3498db;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem 0;
+        }
+
+        .btn:hover,
+        .btn:focus {
+            background: #2980b9;
+            border-color: #2980b9;
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        /* Responsive images */
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        /* Form elements with good contrast */
+        .form-group {
+            margin: 1rem 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Text spacing that works with user customizations */
+        p {
+            margin: 1rem 0;
+        }
+
+        /* Icons with good contrast */
+        .icon {
+            background: #2c3e50;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Tooltip that appears on hover/focus with good contrast */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 2px solid #34495e;
+            font-size: 0.875rem;
+        }
+
+        .tooltip:hover .tooltip-text,
+        .tooltip:focus .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Responsive Design Excellence</h1>
+        <p>This page demonstrates good responsive design practices that comply with WCAG 2.1 criteria 1.4.4, 1.4.10, 1.4.11, 1.4.12, and 1.4.13.</p>
+
+        <div class="content-grid">
+            <div class="card">
+                <h3><span class="icon">✓</span>Reflow (1.4.10)</h3>
+                <p>Content reflows properly at 320px width and 400% zoom without horizontal scrolling.</p>
+                <a href="#" class="btn">Learn More</a>
+            </div>
+
+            <div class="card">
+                <h3><span class="icon">✓</span>Resize Text (1.4.4)</h3>
+                <p>Text can be zoomed to 200% without loss of functionality or readability.</p>
+                <a href="#" class="btn">Test Zoom</a>
+            </div>
+
+            <div class="card">
+                <h3><span class="icon">✓</span>Non-text Contrast (1.4.11)</h3>
+                <p>UI components and icons have sufficient contrast ratios (3:1 minimum).</p>
+                <div class="tooltip" tabindex="0">
+                    <a href="#" class="btn">Hover Me</a>
+                    <span class="tooltip-text">This tooltip has good contrast!</span>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h2>Text Spacing Example</h2>
+            <p>This paragraph demonstrates proper text spacing that works well even when users customize spacing using CSS. Line height is 1.6 times the font size, paragraph spacing is 2 times the font size, letter spacing can be increased to 0.12 times the font size, and word spacing can be increased to 0.16 times the font size.</p>
+        </section>
+
+        <section>
+            <h2>Interactive Elements</h2>
+            <form>
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4"></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Submit Form</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Visual Elements</h2>
+            <p>These icons and UI elements maintain good contrast:</p>
+            <div style="margin: 1rem 0;">
+                <span class="icon">🏠</span>
+                <span class="icon">📧</span>
+                <span class="icon">📞</span>
+                <span class="icon">ℹ️</span>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

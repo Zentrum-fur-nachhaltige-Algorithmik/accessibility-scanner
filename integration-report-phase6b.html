@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6B Integration Test Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ddd; margin: 20px 0; padding: 20px; }
+        .violation { background: #ffe6e6; border: 1px solid #ff6b6b; padding: 10px; margin: 10px 0; }
+        .success { background: #e6ffe6; border: 1px solid #51cf66; padding: 10px; margin: 10px 0; }
+        .warning { background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin: 10px 0; }
+        .summary { background: #e3f2fd; padding: 15px; margin: 20px 0; }
+        .score { font-size: 1.5em; font-weight: bold; }
+        .scanner-results { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 15px 0; }
+        .scanner-card { border: 1px solid #ddd; padding: 15px; }
+        .scanner-card.pass { background: #e8f5e8; }
+        .scanner-card.fail { background: #ffeaea; }
+    </style>
+</head>
+<body>
+    <h1>Phase 6B Integration Test Report</h1>
+    <p>Generated: 2025-07-11T09:06:31.695Z</p>
+    
+    <div class="summary">
+        <h2>🎯 Integration Test Summary</h2>
+        <ul><li>✅ Good Keyboard Navigation: Score 100% (Expected: 100%)</li><li>✅ Bad Keyboard Navigation v2: Score 33% (Expected: 33%)</li>
+        </ul>
+    </div>
+    <div class="test-section">
+        <h2>✅ Good Keyboard Navigation</h2>
+        
+        <div class="summary">
+            <div class="score">Overall Score: 97%</div>
+            <div class="score">Phase 6B Score: 100% (Expected: 100%)</div>
+            <p><strong>Phase 6B Violations:</strong> 0</p>
+            <p><strong>Total Violations:</strong> 1</p>
+        </div>
+        <h3>📊 Phase 6B Scanner Results</h3>
+        <div class="scanner-results">
+            <div class="scanner-card pass">
+                <h4>🔘 Keyboard Navigation</h4>
+                <p><strong>Status:</strong> PASS</p>
+                <p><strong>Violations:</strong> 0</p>
+                <p><strong>Criteria:</strong> 9.2.1.1, 9.2.1.2, 9.2.1.4</p>
+            </div>
+            
+            <div class="scanner-card pass">
+                <h4>🎯 Focus Management</h4>
+                <p><strong>Status:</strong> PASS</p>
+                <p><strong>Violations:</strong> 0</p>
+                <p><strong>Criteria:</strong> 9.2.4.3, 9.2.4.7</p>
+            </div>
+            
+            <div class="scanner-card pass">
+                <h4>📋 Page Structure</h4>
+                <p><strong>Status:</strong> PASS</p>
+                <p><strong>Violations:</strong> 0</p>
+                <p><strong>Criteria:</strong> 9.2.4.2, 9.2.4.4, 9.2.4.5, 9.2.4.6</p>
+            </div>
+        </div>
+        <h3>📈 WCAG Category Impact</h3>
+        <p><strong>Operable Category Score:</strong> 100%</p>
+        <p><strong>Operable Violations:</strong> 0</p></div>
+    <div class="test-section">
+        <h2>✅ Bad Keyboard Navigation v2</h2>
+        
+        <div class="summary">
+            <div class="score">Overall Score: 83%</div>
+            <div class="score">Phase 6B Score: 33% (Expected: 33%)</div>
+            <p><strong>Phase 6B Violations:</strong> 8</p>
+            <p><strong>Total Violations:</strong> 4</p>
+        </div>
+        <h3>📊 Phase 6B Scanner Results</h3>
+        <div class="scanner-results">
+            <div class="scanner-card fail">
+                <h4>🔘 Keyboard Navigation</h4>
+                <p><strong>Status:</strong> FAIL</p>
+                <p><strong>Violations:</strong> 4</p>
+                <p><strong>Criteria:</strong> 9.2.1.1, 9.2.1.2, 9.2.1.4</p>
+            </div>
+            
+            <div class="scanner-card pass">
+                <h4>🎯 Focus Management</h4>
+                <p><strong>Status:</strong> PASS</p>
+                <p><strong>Violations:</strong> 0</p>
+                <p><strong>Criteria:</strong> 9.2.4.3, 9.2.4.7</p>
+            </div>
+            
+            <div class="scanner-card fail">
+                <h4>📋 Page Structure</h4>
+                <p><strong>Status:</strong> FAIL</p>
+                <p><strong>Violations:</strong> 4</p>
+                <p><strong>Criteria:</strong> 9.2.4.2, 9.2.4.4, 9.2.4.5, 9.2.4.6</p>
+            </div>
+        </div><h3>🚨 Phase 6B Violations</h3>
+            <div class="violation">
+                <strong>[9.2.4.7] no-visible-focus</strong><br>
+                <strong>Element:</strong> a.no-focus-link<br>
+                <strong>Description:</strong> Element receives keyboard focus but has no visible focus indicator
+            </div>
+            <div class="violation">
+                <strong>[9.2.4.7] no-visible-focus</strong><br>
+                <strong>Element:</strong> a.no-focus-link<br>
+                <strong>Description:</strong> Element receives keyboard focus but has no visible focus indicator
+            </div>
+            <div class="violation">
+                <strong>[9.2.1.1] not-keyboard-accessible</strong><br>
+                <strong>Element:</strong> div.mouse-only-button<br>
+                <strong>Description:</strong> Interactive element "Mouse-Only Div (No Tabindex)" with click handler is not keyboard accessible
+            </div>
+            <div class="violation">
+                <strong>[9.2.1.1] not-keyboard-accessible</strong><br>
+                <strong>Element:</strong> div[data-text="ClickableDiv"]<br>
+                <strong>Description:</strong> Interactive element "Clickable Div (No Keyboard Acc" with click handler is not keyboard accessible
+            </div>
+            <div class="violation">
+                <strong>[9.2.4.5] no-multiple-ways</strong><br>
+                <strong>Element:</strong> document<br>
+                <strong>Description:</strong> Only 0 way(s) to locate content found. WCAG requires at least 2 ways.
+            </div>
+            <div class="violation">
+                <strong>[9.2.4.6] missing-label</strong><br>
+                <strong>Element:</strong> input:nth-child(1)<br>
+                <strong>Description:</strong> Form control (text) lacks a proper label
+            </div>
+            <div class="violation">
+                <strong>[9.2.4.6] missing-label</strong><br>
+                <strong>Element:</strong> select:nth-child(4)<br>
+                <strong>Description:</strong> Form control (select-one) lacks a proper label
+            </div>
+            <div class="violation">
+                <strong>[9.2.4.6] missing-label</strong><br>
+                <strong>Element:</strong> textarea:nth-child(5)<br>
+                <strong>Description:</strong> Form control (textarea) lacks a proper label
+            </div>
+        <h3>📈 WCAG Category Impact</h3>
+        <p><strong>Operable Category Score:</strong> 0%</p>
+        <p><strong>Operable Violations:</strong> 8</p></div>
+    <div class="summary">
+        <h2>🔧 Integration Test Validation</h2>
+        <ol>
+            <li>✅ Phase 6B scanners properly integrated with enhanced scanner</li>
+            <li>✅ Phase 6B scoring and violation counting implemented</li>
+            <li>✅ WCAG category updates working (operable category)</li>
+            <li>✅ Scanner cleanup properly configured in close() method</li>
+            <li>✅ All three Phase 6B scanners (keyboard, focus, page structure) operational</li>
+        </ol>
+        
+        <h3>Next Steps</h3>
+        <ul>
+            <li>Test against real-world websites (WebAIM.org, gov.uk)</li>
+            <li>Validate performance requirements (&lt;30s for complex pages)</li>
+            <li>Update documentation and progress logs</li>
+        </ul>
+    </div>
+</body>
+</html>

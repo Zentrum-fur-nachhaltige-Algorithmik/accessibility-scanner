@@ -1,0 +1,83 @@
+{
+  "id": "952c906a-d11d-41aa-a3bd-a51bdfd8b0d0",
+  "timestamp": "2025-07-10T21:22:24.005Z",
+  "url": "https://example.com",
+  "pageTitle": "Example Domain",
+  "headingStructure": {
+    "valid": true,
+    "issues": [],
+    "hierarchy": [
+      {
+        "level": 1,
+        "text": "Example Domain",
+        "line": 133,
+        "tagName": "H1",
+        "id": "",
+        "isEmpty": false
+      }
+    ],
+    "totalHeadings": 1,
+    "h1Count": 1
+  },
+  "landmarks": {
+    "main": false,
+    "navigation": false,
+    "banner": false,
+    "contentinfo": false,
+    "complementary": false,
+    "search": false,
+    "issues": [
+      "No main landmark found",
+      "No navigation landmark found",
+      "Content found outside of landmarks"
+    ],
+    "landmarkCount": 0
+  },
+  "images": {
+    "total": 0,
+    "withAlt": 0,
+    "decorative": 0,
+    "problematic": []
+  },
+  "forms": {
+    "totalForms": 0,
+    "totalInputs": 0,
+    "labelsCorrect": true,
+    "errorHandling": false,
+    "requiredFields": []
+  },
+  "ariaUsage": {
+    "totalAriaElements": 0,
+    "correctUsage": 0,
+    "misusedAttributes": [],
+    "recommendations": []
+  },
+  "euCompliance": {
+    "en301549": {
+      "compliant": false,
+      "score": 90,
+      "violations": [
+        {
+          "clause": "9.2.4.1",
+          "description": "Bypass Blocks - No main landmark",
+          "severity": "high",
+          "details": [
+            "Missing main landmark for content navigation"
+          ]
+        }
+      ]
+    },
+    "eaaCompliance": {
+      "ready": false,
+      "missingRequirements": [
+        "No accessibility statement found",
+        "Contact mechanism not provided"
+      ]
+    }
+  },
+  "metadata": {
+    "generatedBy": "Web Accessibility Checker v3.0",
+    "format": "html",
+    "includePDF": false
+  }
+}

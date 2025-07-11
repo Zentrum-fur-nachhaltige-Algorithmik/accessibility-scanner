@@ -1,0 +1,22 @@
+{
+  "testCase": "good-accessibility",
+  "url": "http://localhost:8085/good-accessibility.html",
+  "timestamp": "2025-07-11T08:17:28.136Z",
+  "results": {
+    "colorContrast": {
+      "error": "ImprovedColorContrastScanner is not defined"
+    },
+    "useOfColor": {
+      "error": "ImprovedUseOfColorScanner is not defined"
+    },
+    "imagesOfText": {
+      "error": "ImprovedImagesOfTextScanner is not defined"
+    }
+  },
+  "summary": {
+    "totalViolations": 0,
+    "colorContrastViolations": 0,
+    "useOfColorViolations": 0,
+    "imagesOfTextViolations": 0
+  }
+}

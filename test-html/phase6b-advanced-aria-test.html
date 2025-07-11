@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6B Test: Advanced ARIA Complex Widgets (WCAG 4.1.2) - Good and Bad Examples</title>
+    <style>
+        /* Styling for test sections */
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .test-good {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .test-bad {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .aria-info {
+            background-color: #e7f3ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        /* Widget styling */
+        .widget-container {
+            max-width: 800px;
+            margin: 20px 0;
+        }
+        
+        /* Tree view styling */
+        .tree {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .tree li {
+            margin: 5px 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .tree li[aria-expanded="true"] > .tree {
+            display: block;
+        }
+        
+        .tree li[aria-expanded="false"] > .tree {
+            display: none;
+        }
+        
+        /* Data grid styling */
+        .grid {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #ccc;
+        }
+        
+        .grid th, .grid td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .grid th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        /* Combobox styling */
+        .combobox-container {
+            position: relative;
+            width: 200px;
+        }
+        
+        .combobox {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #4a90e2;
+            border-radius: 4px;
+        }
+        
+        .listbox {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .listbox[aria-hidden="true"] {
+            display: none;
+        }
+        
+        .option {
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .option:hover, .option[aria-selected="true"] {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        /* Tab panel styling */
+        .tablist {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            margin-right: 2px;
+        }
+        
+        .tab[aria-selected="true"] {
+            background: white;
+            border-bottom: 2px solid white;
+            margin-bottom: -2px;
+        }
+        
+        .tabpanel {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        
+        .tabpanel[hidden] {
+            display: none;
+        }
+        
+        /* Dialog styling */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .dialog {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dialog-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        /* Button styling */
+        .btn {
+            padding: 10px 16px;
+            margin: 5px;
+            border: 2px solid #4a90e2;
+            border-radius: 4px;
+            background: white;
+            color: #4a90e2;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        /* Accordion styling */
+        .accordion {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .accordion-item {
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .accordion-header {
+            width: 100%;
+            padding: 15px;
+            background: #f8f9fa;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .accordion-header:hover {
+            background: #e9ecef;
+        }
+        
+        .accordion-panel {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .accordion-panel[hidden] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="aria-info">
+        <h1>🧩 Phase 6B: Advanced ARIA Complex Widgets Test</h1>
+        <p><strong>WCAG Criterion:</strong> 4.1.2 - Name, Role, Value</p>
+        <p><strong>Purpose:</strong> Test complex ARIA widget patterns for proper implementation</p>
+        <p><strong>Coverage:</strong> Trees, Data Grids, Comboboxes, Carousels, Tabs, Accordions, Dialogs</p>
+        <p><strong>User Impact:</strong> Essential for single-page applications and modern web interfaces</p>
+        <p><strong>Testing:</strong> Use screen readers (NVDA, JAWS, VoiceOver) and keyboard navigation</p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Properly implemented tree view -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Properly Implemented Tree View</h2>
+        <p><strong>Features:</strong> Correct ARIA roles, proper keyboard navigation, state management</p>
+        
+        <div class="widget-container">
+            <ul role="tree" aria-label="File system navigation" class="tree">
+                <li role="treeitem" tabindex="0" aria-expanded="true" aria-label="Documents folder">
+                    📁 Documents
+                    <ul role="group" class="tree">
+                        <li role="treeitem" tabindex="-1" aria-expanded="false" aria-label="Projects folder">
+                            📁 Projects
+                            <ul role="group" class="tree">
+                                <li role="treeitem" tabindex="-1">📄 project1.txt</li>
+                                <li role="treeitem" tabindex="-1">📄 project2.txt</li>
+                            </ul>
+                        </li>
+                        <li role="treeitem" tabindex="-1">📄 readme.txt</li>
+                    </ul>
+                </li>
+                <li role="treeitem" tabindex="-1" aria-expanded="false" aria-label="Images folder">
+                    📁 Images
+                    <ul role="group" class="tree">
+                        <li role="treeitem" tabindex="-1">🖼️ photo1.jpg</li>
+                        <li role="treeitem" tabindex="-1">🖼️ photo2.jpg</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <p><em>✅ Screen reader announces: "File system navigation tree" and provides proper navigation</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Improperly implemented tree view -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Improperly Implemented Tree View</h2>
+        <p><strong>Issues:</strong> Missing ARIA attributes, no keyboard support, unclear structure</p>
+        
+        <div class="widget-container">
+            <!-- Missing role="tree", aria-label, and proper structure -->
+            <ul class="tree">
+                <li onclick="toggleFolder(this)">
+                    📁 Documents
+                    <ul class="tree">
+                        <li onclick="toggleFolder(this)">
+                            📁 Projects
+                            <ul class="tree">
+                                <li>📄 project1.txt</li>
+                                <li>📄 project2.txt</li>
+                            </ul>
+                        </li>
+                        <li>📄 readme.txt</li>
+                    </ul>
+                </li>
+                <li onclick="toggleFolder(this)">
+                    📁 Images
+                    <ul class="tree">
+                        <li>🖼️ photo1.jpg</li>
+                        <li>🖼️ photo2.jpg</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <p><em>❌ Screen reader cannot identify this as a tree or navigate properly</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Properly implemented data grid -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Properly Implemented Data Grid</h2>
+        <p><strong>Features:</strong> Correct grid roles, column/row headers, keyboard navigation</p>
+        
+        <div class="widget-container">
+            <table role="grid" aria-label="Employee data grid" class="grid">
+                <tr role="row">
+                    <th role="columnheader" tabindex="-1">Name</th>
+                    <th role="columnheader" tabindex="-1">Department</th>
+                    <th role="columnheader" tabindex="-1">Salary</th>
+                    <th role="columnheader" tabindex="-1">Actions</th>
+                </tr>
+                <tr role="row">
+                    <th role="rowheader" tabindex="-1">John Doe</th>
+                    <td role="gridcell" tabindex="-1">Engineering</td>
+                    <td role="gridcell" tabindex="-1">$75,000</td>
+                    <td role="gridcell" tabindex="0">
+                        <button class="btn">Edit</button>
+                    </td>
+                </tr>
+                <tr role="row">
+                    <th role="rowheader" tabindex="-1">Jane Smith</th>
+                    <td role="gridcell" tabindex="-1">Marketing</td>
+                    <td role="gridcell" tabindex="-1">$65,000</td>
+                    <td role="gridcell" tabindex="-1">
+                        <button class="btn">Edit</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <p><em>✅ Screen reader announces grid structure and allows proper navigation</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Table without grid semantics -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Table Without Grid Semantics</h2>
+        <p><strong>Issues:</strong> Missing grid roles, no keyboard navigation, unclear structure</p>
+        
+        <div class="widget-container">
+            <table class="grid">
+                <tr>
+                    <td>Name</td>
+                    <td>Department</td>
+                    <td>Salary</td>
+                    <td>Actions</td>
+                </tr>
+                <tr>
+                    <td>John Doe</td>
+                    <td>Engineering</td>
+                    <td>$75,000</td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>Jane Smith</td>
+                    <td>Marketing</td>
+                    <td>$65,000</td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+            </table>
+        </div>
+        <p><em>❌ Screen reader treats as simple table, no grid navigation available</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Properly implemented combobox -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Properly Implemented Combobox</h2>
+        <p><strong>Features:</strong> Correct combobox pattern, proper states, keyboard support</p>
+        
+        <div class="widget-container">
+            <label for="good-combobox">Choose a country:</label>
+            <div class="combobox-container">
+                <input 
+                    type="text" 
+                    id="good-combobox"
+                    role="combobox" 
+                    aria-expanded="false"
+                    aria-controls="good-listbox"
+                    aria-autocomplete="list"
+                    aria-label="Country selection"
+                    class="combobox"
+                    placeholder="Type to search..."
+                >
+                <ul id="good-listbox" role="listbox" aria-hidden="true" class="listbox">
+                    <li role="option" id="option1" class="option">Germany</li>
+                    <li role="option" id="option2" class="option">France</li>
+                    <li role="option" id="option3" class="option">Spain</li>
+                    <li role="option" id="option4" class="option">Italy</li>
+                </ul>
+            </div>
+        </div>
+        <p><em>✅ Screen reader announces combobox state and available options</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Input without combobox semantics -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Input Without Combobox Semantics</h2>
+        <p><strong>Issues:</strong> Missing combobox role, no aria-expanded, unclear relationship</p>
+        
+        <div class="widget-container">
+            <label for="bad-combobox">Choose a country:</label>
+            <div class="combobox-container">
+                <input 
+                    type="text" 
+                    id="bad-combobox"
+                    class="combobox"
+                    placeholder="Type to search..."
+                >
+                <ul class="listbox">
+                    <li class="option">Germany</li>
+                    <li class="option">France</li>
+                    <li class="option">Spain</li>
+                    <li class="option">Italy</li>
+                </ul>
+            </div>
+        </div>
+        <p><em>❌ Screen reader cannot identify dropdown relationship or states</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Properly implemented tabs -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Properly Implemented Tab Panel</h2>
+        <p><strong>Features:</strong> Correct tab roles, proper selection states, keyboard navigation</p>
+        
+        <div class="widget-container">
+            <ul role="tablist" aria-label="Product information tabs" class="tablist">
+                <li role="tab" id="tab1" aria-selected="true" aria-controls="panel1" tabindex="0" class="tab">
+                    Description
+                </li>
+                <li role="tab" id="tab2" aria-selected="false" aria-controls="panel2" tabindex="-1" class="tab">
+                    Specifications
+                </li>
+                <li role="tab" id="tab3" aria-selected="false" aria-controls="panel3" tabindex="-1" class="tab">
+                    Reviews
+                </li>
+            </ul>
+            
+            <div id="panel1" role="tabpanel" aria-labelledby="tab1" class="tabpanel">
+                <h3>Product Description</h3>
+                <p>This is a high-quality product designed for professionals.</p>
+            </div>
+            
+            <div id="panel2" role="tabpanel" aria-labelledby="tab2" class="tabpanel" hidden>
+                <h3>Technical Specifications</h3>
+                <ul>
+                    <li>Weight: 2.5kg</li>
+                    <li>Dimensions: 30x20x10cm</li>
+                    <li>Material: Aluminum</li>
+                </ul>
+            </div>
+            
+            <div id="panel3" role="tabpanel" aria-labelledby="tab3" class="tabpanel" hidden>
+                <h3>Customer Reviews</h3>
+                <p>⭐⭐⭐⭐⭐ "Excellent product, highly recommended!"</p>
+            </div>
+        </div>
+        <p><em>✅ Screen reader announces tab interface and allows proper navigation</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Tabs without proper ARIA -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Tabs Without Proper ARIA</h2>
+        <p><strong>Issues:</strong> Missing tab roles, no selection states, unclear relationships</p>
+        
+        <div class="widget-container">
+            <ul class="tablist">
+                <li class="tab active" onclick="showTab(1)">Description</li>
+                <li class="tab" onclick="showTab(2)">Specifications</li>
+                <li class="tab" onclick="showTab(3)">Reviews</li>
+            </ul>
+            
+            <div id="content1" class="tabpanel">
+                <h3>Product Description</h3>
+                <p>This is a high-quality product designed for professionals.</p>
+            </div>
+            
+            <div id="content2" class="tabpanel" style="display: none;">
+                <h3>Technical Specifications</h3>
+                <ul>
+                    <li>Weight: 2.5kg</li>
+                    <li>Dimensions: 30x20x10cm</li>
+                    <li>Material: Aluminum</li>
+                </ul>
+            </div>
+            
+            <div id="content3" class="tabpanel" style="display: none;">
+                <h3>Customer Reviews</h3>
+                <p>⭐⭐⭐⭐⭐ "Excellent product, highly recommended!"</p>
+            </div>
+        </div>
+        <p><em>❌ Screen reader cannot identify tab interface or navigate properly</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Properly implemented accordion -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Properly Implemented Accordion</h2>
+        <p><strong>Features:</strong> Correct button roles, aria-expanded states, proper relationships</p>
+        
+        <div class="widget-container">
+            <div class="accordion">
+                <div class="accordion-item">
+                    <button 
+                        type="button"
+                        aria-expanded="true"
+                        aria-controls="section1"
+                        id="header1"
+                        class="accordion-header"
+                    >
+                        Shipping Information
+                    </button>
+                    <div 
+                        id="section1" 
+                        role="region" 
+                        aria-labelledby="header1" 
+                        class="accordion-panel"
+                    >
+                        <p>We offer free shipping on orders over $50. Standard delivery takes 3-5 business days.</p>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <button 
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="section2"
+                        id="header2"
+                        class="accordion-header"
+                    >
+                        Return Policy
+                    </button>
+                    <div 
+                        id="section2" 
+                        role="region" 
+                        aria-labelledby="header2" 
+                        class="accordion-panel"
+                        hidden
+                    >
+                        <p>Returns are accepted within 30 days of purchase. Items must be in original condition.</p>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <button 
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="section3"
+                        id="header3"
+                        class="accordion-header"
+                    >
+                        Warranty
+                    </button>
+                    <div 
+                        id="section3" 
+                        role="region" 
+                        aria-labelledby="header3" 
+                        class="accordion-panel"
+                        hidden
+                    >
+                        <p>All products come with a 2-year manufacturer warranty covering defects.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p><em>✅ Screen reader announces accordion structure and expansion states</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Accordion without proper ARIA -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Accordion Without Proper ARIA</h2>
+        <p><strong>Issues:</strong> Missing aria-expanded, no region roles, unclear relationships</p>
+        
+        <div class="widget-container">
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Shipping Information
+                    </div>
+                    <div class="accordion-panel">
+                        <p>We offer free shipping on orders over $50. Standard delivery takes 3-5 business days.</p>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Return Policy
+                    </div>
+                    <div class="accordion-panel" style="display: none;">
+                        <p>Returns are accepted within 30 days of purchase. Items must be in original condition.</p>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Warranty
+                    </div>
+                    <div class="accordion-panel" style="display: none;">
+                        <p>All products come with a 2-year manufacturer warranty covering defects.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p><em>❌ Screen reader cannot identify accordion structure or expansion states</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Properly implemented dialog -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Properly Implemented Dialog</h2>
+        <p><strong>Features:</strong> Correct dialog role, modal behavior, proper labeling</p>
+        
+        <div class="widget-container">
+            <button type="button" class="btn btn-primary" onclick="openGoodDialog()">
+                Open Settings Dialog
+            </button>
+            
+            <div id="good-dialog-overlay" class="dialog-overlay" style="display: none;">
+                <div 
+                    id="good-dialog"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="good-dialog-title"
+                    aria-describedby="good-dialog-desc"
+                    class="dialog"
+                >
+                    <div id="good-dialog-title" class="dialog-header">
+                        Settings
+                    </div>
+                    <div id="good-dialog-desc">
+                        <p>Configure your application preferences:</p>
+                        <label for="email-notifications">
+                            <input type="checkbox" id="email-notifications"> Email notifications
+                        </label><br>
+                        <label for="theme-select">
+                            Theme: 
+                            <select id="theme-select">
+                                <option>Light</option>
+                                <option>Dark</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-primary" onclick="closeGoodDialog()">
+                            Save
+                        </button>
+                        <button type="button" class="btn" onclick="closeGoodDialog()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p><em>✅ Screen reader announces dialog, traps focus, and manages modal behavior</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Modal without proper ARIA -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Modal Without Proper ARIA</h2>
+        <p><strong>Issues:</strong> Missing dialog role, no aria-modal, unclear labeling</p>
+        
+        <div class="widget-container">
+            <button type="button" class="btn btn-primary" onclick="openBadDialog()">
+                Open Settings Modal
+            </button>
+            
+            <div id="bad-dialog-overlay" class="dialog-overlay" style="display: none;">
+                <div id="bad-dialog" class="dialog">
+                    <div class="dialog-header">
+                        Settings
+                    </div>
+                    <div>
+                        <p>Configure your application preferences:</p>
+                        <label for="bad-email-notifications">
+                            <input type="checkbox" id="bad-email-notifications"> Email notifications
+                        </label><br>
+                        <label for="bad-theme-select">
+                            Theme: 
+                            <select id="bad-theme-select">
+                                <option>Light</option>
+                                <option>Dark</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button type="button" class="btn btn-primary" onclick="closeBadDialog()">
+                            Save
+                        </button>
+                        <button type="button" class="btn" onclick="closeBadDialog()">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p><em>❌ Screen reader cannot identify modal dialog or proper focus management</em></p>
+    </div>
+
+    <!-- Live region for status messages -->
+    <div aria-live="polite" id="status-region" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
+
+    <script>
+        // Basic functionality for interactive examples
+        
+        function toggleFolder(element) {
+            const sublist = element.querySelector('.tree');
+            if (sublist) {
+                sublist.style.display = sublist.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        function showTab(tabNumber) {
+            // Hide all panels
+            for (let i = 1; i <= 3; i++) {
+                const panel = document.getElementById('content' + i);
+                if (panel) panel.style.display = 'none';
+            }
+            
+            // Show selected panel
+            const selectedPanel = document.getElementById('content' + tabNumber);
+            if (selectedPanel) selectedPanel.style.display = 'block';
+            
+            // Update tab styling (simplified)
+            document.querySelectorAll('.test-bad .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.test-bad .tab')[tabNumber - 1].classList.add('active');
+        }
+        
+        function toggleAccordion(header) {
+            const panel = header.nextElementSibling;
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        function openGoodDialog() {
+            document.getElementById('good-dialog-overlay').style.display = 'flex';
+            document.getElementById('good-dialog').focus();
+        }
+        
+        function closeGoodDialog() {
+            document.getElementById('good-dialog-overlay').style.display = 'none';
+        }
+        
+        function openBadDialog() {
+            document.getElementById('bad-dialog-overlay').style.display = 'flex';
+        }
+        
+        function closeBadDialog() {
+            document.getElementById('bad-dialog-overlay').style.display = 'none';
+        }
+        
+        // Status announcements
+        function announceStatus(message) {
+            document.getElementById('status-region').textContent = message;
+        }
+        
+        // Add some keyboard support for good examples
+        document.addEventListener('keydown', function(e) {
+            // Escape to close dialogs
+            if (e.key === 'Escape') {
+                closeGoodDialog();
+                closeBadDialog();
+            }
+        });
+        
+        // Initialize proper focus management for good tab example
+        document.querySelectorAll('.test-good [role="tab"]').forEach((tab, index) => {
+            tab.addEventListener('click', function() {
+                // Update aria-selected states
+                document.querySelectorAll('.test-good [role="tab"]').forEach(t => {
+                    t.setAttribute('aria-selected', 'false');
+                    t.setAttribute('tabindex', '-1');
+                });
+                
+                this.setAttribute('aria-selected', 'true');
+                this.setAttribute('tabindex', '0');
+                
+                // Show/hide panels
+                document.querySelectorAll('.test-good [role="tabpanel"]').forEach(panel => {
+                    panel.hidden = true;
+                });
+                
+                const targetPanel = document.getElementById(this.getAttribute('aria-controls'));
+                if (targetPanel) {
+                    targetPanel.hidden = false;
+                }
+            });
+        });
+        
+        // Initialize accordion functionality for good example
+        document.querySelectorAll('.test-good .accordion-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !isExpanded);
+                
+                const panel = document.getElementById(this.getAttribute('aria-controls'));
+                if (panel) {
+                    panel.hidden = isExpanded;
+                }
+            });
+        });
+        
+        // Initialize combobox functionality for good example
+        const goodCombobox = document.getElementById('good-combobox');
+        const goodListbox = document.getElementById('good-listbox');
+        
+        if (goodCombobox && goodListbox) {
+            goodCombobox.addEventListener('focus', function() {
+                this.setAttribute('aria-expanded', 'true');
+                goodListbox.setAttribute('aria-hidden', 'false');
+            });
+            
+            goodCombobox.addEventListener('blur', function(e) {
+                // Small delay to allow option selection
+                setTimeout(() => {
+                    this.setAttribute('aria-expanded', 'false');
+                    goodListbox.setAttribute('aria-hidden', 'true');
+                }, 150);
+            });
+            
+            // Option selection
+            goodListbox.querySelectorAll('[role="option"]').forEach(option => {
+                option.addEventListener('click', function() {
+                    goodCombobox.value = this.textContent;
+                    goodCombobox.setAttribute('aria-expanded', 'false');
+                    goodListbox.setAttribute('aria-hidden', 'true');
+                    
+                    // Clear previous selections
+                    goodListbox.querySelectorAll('[role="option"]').forEach(opt => {
+                        opt.setAttribute('aria-selected', 'false');
+                    });
+                    
+                    this.setAttribute('aria-selected', 'true');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

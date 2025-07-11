@@ -186,6 +186,16 @@ class HTMLValidationScanner {
     console.log('Checking for duplicate IDs...');
 
     const duplicateIdInfo = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? '#' + element.id : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? '.' + element.className.split(' ')[0] 
+          : '';
+        return tagName + id + className;
+      }
+      
       const allElements = document.querySelectorAll('*[id]');
       const idCounts = {};
       const duplicates = [];
@@ -760,11 +770,21 @@ class HTMLValidationScanner {
     console.log('Validating link names...');
     
     const linkIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? `#${element.id}` : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? `.${element.className.split(' ')[0]}` 
+          : '';
+        return `${tagName}${id}${className}`;
+      }
+      
       const issues = [];
       const links = document.querySelectorAll('a[href], [role="link"]');
       
       links.forEach((link, index) => {
-        const selector = this.getElementSelector(link);
+        const selector = getElementSelector(link);
         let accessibleName = '';
         
         // Get accessible name from various sources
@@ -826,11 +846,21 @@ class HTMLValidationScanner {
     console.log('Validating frame titles...');
     
     const frameIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? `#${element.id}` : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? `.${element.className.split(' ')[0]}` 
+          : '';
+        return `${tagName}${id}${className}`;
+      }
+      
       const issues = [];
       const frames = document.querySelectorAll('iframe, frame');
       
       frames.forEach((frame, index) => {
-        const selector = this.getElementSelector(frame);
+        const selector = getElementSelector(frame);
         const title = frame.getAttribute('title');
         
         if (!title || !title.trim()) {
@@ -866,12 +896,22 @@ class HTMLValidationScanner {
     console.log('Validating media alternatives...');
     
     const mediaIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? `#${element.id}` : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? `.${element.className.split(' ')[0]}` 
+          : '';
+        return `${tagName}${id}${className}`;
+      }
+      
       const issues = [];
       
       // Check area elements in image maps
       const areas = document.querySelectorAll('area');
       areas.forEach(area => {
-        const selector = this.getElementSelector(area);
+        const selector = getElementSelector(area);
         const alt = area.getAttribute('alt');
         
         if (!alt && alt !== '') {
@@ -888,7 +928,7 @@ class HTMLValidationScanner {
       // Check object elements
       const objects = document.querySelectorAll('object');
       objects.forEach(obj => {
-        const selector = this.getElementSelector(obj);
+        const selector = getElementSelector(obj);
         const hasTextContent = obj.textContent.trim().length > 0;
         const hasTitle = obj.hasAttribute('title') && obj.getAttribute('title').trim();
         const hasAriaLabel = obj.hasAttribute('aria-label') && obj.getAttribute('aria-label').trim();
@@ -907,7 +947,7 @@ class HTMLValidationScanner {
       // Check input type="image"
       const imageInputs = document.querySelectorAll('input[type="image"]');
       imageInputs.forEach(input => {
-        const selector = this.getElementSelector(input);
+        const selector = getElementSelector(input);
         const alt = input.getAttribute('alt');
         
         if (!alt || !alt.trim()) {
@@ -943,6 +983,16 @@ class HTMLValidationScanner {
     console.log('Validating ARIA attributes...');
     
     const ariaIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? `#${element.id}` : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? `.${element.className.split(' ')[0]}` 
+          : '';
+        return `${tagName}${id}${className}`;
+      }
+      
       const issues = [];
       
       // Valid ARIA attributes
@@ -963,7 +1013,7 @@ class HTMLValidationScanner {
       // Get all elements with any aria attribute
       const allElements = document.querySelectorAll('*');
       allElements.forEach(element => {
-        const selector = this.getElementSelector(element);
+        const selector = getElementSelector(element);
         
         // Check each attribute
         Array.from(element.attributes).forEach(attr => {
@@ -1017,6 +1067,16 @@ class HTMLValidationScanner {
     console.log('Validating ARIA roles...');
     
     const roleIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? `#${element.id}` : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? `.${element.className.split(' ')[0]}` 
+          : '';
+        return `${tagName}${id}${className}`;
+      }
+      
       const issues = [];
       
       // Valid ARIA roles
@@ -1036,7 +1096,7 @@ class HTMLValidationScanner {
       const elementsWithRole = document.querySelectorAll('[role]');
       
       elementsWithRole.forEach(element => {
-        const selector = this.getElementSelector(element);
+        const selector = getElementSelector(element);
         const role = element.getAttribute('role');
         
         if (role && !validRoles.includes(role)) {
@@ -1073,12 +1133,22 @@ class HTMLValidationScanner {
     console.log('Validating ARIA relationships...');
     
     const relationshipIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? `#${element.id}` : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? `.${element.className.split(' ')[0]}` 
+          : '';
+        return `${tagName}${id}${className}`;
+      }
+      
       const issues = [];
       
       // Check aria-labelledby references
       const labelledByElements = document.querySelectorAll('[aria-labelledby]');
       labelledByElements.forEach(element => {
-        const selector = this.getElementSelector(element);
+        const selector = getElementSelector(element);
         const labelledBy = element.getAttribute('aria-labelledby');
         
         if (labelledBy) {
@@ -1103,7 +1173,7 @@ class HTMLValidationScanner {
       // Check aria-describedby references
       const describedByElements = document.querySelectorAll('[aria-describedby]');
       describedByElements.forEach(element => {
-        const selector = this.getElementSelector(element);
+        const selector = getElementSelector(element);
         const describedBy = element.getAttribute('aria-describedby');
         
         if (describedBy) {
@@ -1147,6 +1217,17 @@ class HTMLValidationScanner {
     console.log('Validating meta tags...');
     
     const metaIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? '#' + element.id : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? '.' + element.className.split(' ')[0] 
+          : '';
+        return tagName + id + className;
+      }
+      
+
       const issues = [];
       
       // Check meta viewport
@@ -1204,6 +1285,17 @@ class HTMLValidationScanner {
     console.log('Validating duplicate IDs...');
     
     const duplicateIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? '#' + element.id : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? '.' + element.className.split(' ')[0] 
+          : '';
+        return tagName + id + className;
+      }
+      
+
       const issues = [];
       const idCounts = {};
       const activeElements = [];
@@ -1235,7 +1327,7 @@ class HTMLValidationScanner {
       // Check for duplicates
       Object.entries(idCounts).forEach(([id, elements]) => {
         if (elements.length > 1) {
-          const selector = this.getElementSelector(elements[0]);
+          const selector = getElementSelector(elements[0]);
           
           // General duplicate ID
           issues.push({
@@ -1306,6 +1398,17 @@ class HTMLValidationScanner {
     console.log('Validating language attributes...');
     
     const langIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? '#' + element.id : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? '.' + element.className.split(' ')[0] 
+          : '';
+        return tagName + id + className;
+      }
+      
+
       const issues = [];
       
       // Valid language codes (ISO 639-1)
@@ -1356,7 +1459,7 @@ class HTMLValidationScanner {
       // Check all elements with lang attributes
       const elementsWithLang = document.querySelectorAll('[lang]');
       elementsWithLang.forEach(element => {
-        const selector = this.getElementSelector(element);
+        const selector = getElementSelector(element);
         const lang = element.getAttribute('lang');
         
         if (lang) {
@@ -1396,13 +1499,24 @@ class HTMLValidationScanner {
     console.log('Validating form accessibility...');
     
     const formIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? '#' + element.id : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? '.' + element.className.split(' ')[0] 
+          : '';
+        return tagName + id + className;
+      }
+      
+
       const issues = [];
       
       // Check form controls for proper labeling
       const formControls = document.querySelectorAll('input:not([type="hidden"]), textarea, select');
       
       formControls.forEach(control => {
-        const selector = this.getElementSelector(control);
+        const selector = getElementSelector(control);
         const type = control.getAttribute('type');
         
         // Skip submit, button, reset types
@@ -1495,6 +1609,17 @@ class HTMLValidationScanner {
     console.log('Validating heading structure...');
     
     const headingIssues = await page.evaluate(() => {
+      // Helper function for element selector generation (browser context)
+      function getElementSelector(element) {
+        const tagName = element.tagName.toLowerCase();
+        const id = element.id ? '#' + element.id : '';
+        const className = element.className && typeof element.className === 'string' 
+          ? '.' + element.className.split(' ')[0] 
+          : '';
+        return tagName + id + className;
+      }
+      
+
       const issues = [];
       const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"]');
       
@@ -1502,7 +1627,7 @@ class HTMLValidationScanner {
       let previousLevel = 0;
       
       headings.forEach((heading, index) => {
-        const selector = this.getElementSelector(heading);
+        const selector = getElementSelector(heading);
         let level;
         
         if (heading.hasAttribute('role') && heading.getAttribute('role') === 'heading') {

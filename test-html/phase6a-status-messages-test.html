@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6A Test: Status Messages (WCAG 4.1.3) - Good and Bad Examples</title>
+    <style>
+        /* Styling for test sections */
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .test-good {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .test-bad {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .aria-live-info {
+            background-color: #e7f3ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        /* Button and form styling */
+        .test-button {
+            padding: 12px 24px;
+            margin: 8px;
+            border: 2px solid #4a90e2;
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .test-button:hover {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .test-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+            max-width: 400px;
+        }
+        
+        .test-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+        
+        /* Status message styling */
+        .status-message {
+            padding: 16px;
+            border-radius: 6px;
+            margin: 12px 0;
+            border-left: 5px solid;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left-color: #ffc107;
+        }
+        
+        .status-info {
+            background-color: #cce7ff;
+            color: #004085;
+            border-left-color: #007bff;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Hidden elements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Shopping cart styling */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #ddd;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        
+        .cart-count {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .progress-bar {
+            height: 24px;
+            background-color: #28a745;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Phase 6A Test: Status Messages (WCAG 4.1.3)</h1>
+    </header>
+    
+    <div class="aria-live-info">
+        <h2>📢 Status Messages Requirements</h2>
+        <p><strong>WCAG 4.1.3 Success Criteria:</strong> Status messages are programmatically determinable through role or properties so they can be presented to the user by assistive technologies without receiving focus.</p>
+        <p><strong>Critical for:</strong> Screen reader users who need to be informed of status changes</p>
+        <p><strong>Key ARIA attributes:</strong></p>
+        <ul>
+            <li><strong>aria-live="polite"</strong> - Announces when user is idle</li>
+            <li><strong>aria-live="assertive"</strong> - Announces immediately (use sparingly)</li>
+            <li><strong>aria-atomic="true"</strong> - Reads entire region when changed</li>
+            <li><strong>aria-relevant="additions removals text"</strong> - What changes to announce</li>
+            <li><strong>role="status"</strong> - Equivalent to aria-live="polite"</li>
+            <li><strong>role="alert"</strong> - Equivalent to aria-live="assertive"</li>
+        </ul>
+        <p><strong>Status message types:</strong> Form validation, loading states, operation results, progress updates, cart changes</p>
+    </div>
+    
+    <main>
+        <!-- GOOD EXAMPLES SECTION -->
+        <section class="test-section test-good">
+            <h2>✅ GOOD: Proper Status Message Implementation</h2>
+            
+            <h3>✅ Form Validation with Live Regions</h3>
+            <form class="test-form" onsubmit="return submitGoodForm(event)">
+                <label for="good-email">Email Address:</label>
+                <input type="email" id="good-email" name="email" required 
+                       onblur="validateGoodEmail()" aria-describedby="good-email-status">
+                
+                <!-- GOOD: Proper live region for validation feedback -->
+                <div id="good-email-status" aria-live="polite" aria-atomic="true" class="status-message" style="display: none;"></div>
+                
+                <label for="good-password">Password:</label>
+                <input type="password" id="good-password" name="password" required
+                       oninput="validateGoodPassword()" aria-describedby="good-password-status">
+                
+                <!-- GOOD: Live region for real-time feedback -->
+                <div id="good-password-status" aria-live="polite" aria-atomic="true" class="status-message" style="display: none;"></div>
+                
+                <button type="submit" class="test-button">Submit Form</button>
+                
+                <!-- GOOD: Form submission status with role="status" -->
+                <div id="good-form-status" role="status" aria-atomic="true" class="status-message" style="display: none;"></div>
+            </form>
+            
+            <h3>✅ Loading States with Announcements</h3>
+            <button class="test-button" onclick="startGoodLoading()">Load Data</button>
+            
+            <!-- GOOD: Loading status with aria-live -->
+            <div id="good-loading-status" aria-live="polite" aria-atomic="true" class="status-message" style="display: none;"></div>
+            
+            <!-- GOOD: Progress with live updates -->
+            <div id="good-progress-container" style="display: none;">
+                <div class="progress-container">
+                    <div id="good-progress-bar" class="progress-bar" style="width: 0%;">0%</div>
+                </div>
+                <!-- Screen reader progress announcements -->
+                <div id="good-progress-status" aria-live="polite" aria-atomic="false" class="sr-only"></div>
+            </div>
+            
+            <h3>✅ Shopping Cart Updates</h3>
+            <div style="display: flex; gap: 16px; align-items: center; margin: 16px 0;">
+                <span>Cart items: <span class="cart-count" id="good-cart-count">0</span></span>
+                <button class="test-button" onclick="addToGoodCart()">Add Item</button>
+                <button class="test-button" onclick="removeFromGoodCart()">Remove Item</button>
+            </div>
+            
+            <!-- GOOD: Cart status announcements -->
+            <div id="good-cart-status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+            
+            <h3>✅ Search Results Status</h3>
+            <div style="margin: 16px 0;">
+                <input type="search" id="good-search" placeholder="Search products..." 
+                       oninput="debounceGoodSearch()" style="width: 250px; padding: 8px;">
+                <button class="test-button" onclick="performGoodSearch()">Search</button>
+            </div>
+            
+            <!-- GOOD: Search results count announcement -->
+            <div id="good-search-status" role="status" aria-atomic="true" class="status-info" style="display: none;"></div>
+            
+            <h3>✅ Timer/Countdown Announcements</h3>
+            <button class="test-button" onclick="startGoodTimer()">Start 10 Second Timer</button>
+            <button class="test-button" onclick="stopGoodTimer()">Stop Timer</button>
+            
+            <!-- GOOD: Timer status with appropriate announcements -->
+            <div id="good-timer-display" style="font-size: 18px; font-weight: bold; margin: 16px 0;">Timer: 10 seconds</div>
+            <div id="good-timer-status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+            
+            <h3>✅ Error Recovery Messages</h3>
+            <button class="test-button" onclick="simulateGoodError()">Simulate Network Error</button>
+            <button class="test-button" onclick="simulateGoodRecovery()">Simulate Recovery</button>
+            
+            <!-- GOOD: Error and recovery announcements -->
+            <div id="good-error-status" role="alert" aria-atomic="true" class="status-message" style="display: none;"></div>
+        </section>
+        
+        <!-- BAD EXAMPLES SECTION -->
+        <section class="test-section test-bad">
+            <h2>❌ BAD: Missing or Improper Status Messages</h2>
+            
+            <h3>❌ Form Validation Without Live Regions</h3>
+            <form class="test-form" onsubmit="return submitBadForm(event)">
+                <label for="bad-email">Email Address:</label>
+                <input type="email" id="bad-email" name="email" required 
+                       onblur="validateBadEmail()">
+                
+                <!-- BAD: No aria-live, status not announced -->
+                <div id="bad-email-status" class="status-message" style="display: none;"></div>
+                
+                <label for="bad-password">Password:</label>
+                <input type="password" id="bad-password" name="password" required
+                       oninput="validateBadPassword()">
+                
+                <!-- BAD: Status updates not announced to screen readers -->
+                <div id="bad-password-status" class="status-message" style="display: none;"></div>
+                
+                <button type="submit" class="test-button">Submit Form</button>
+                
+                <!-- BAD: Form submission status without proper announcement -->
+                <div id="bad-form-status" class="status-message" style="display: none;"></div>
+            </form>
+            
+            <h3>❌ Loading States Without Announcements</h3>
+            <button class="test-button" onclick="startBadLoading()">Load Data</button>
+            
+            <!-- BAD: Loading status not announced -->
+            <div id="bad-loading-status" class="status-message" style="display: none;"></div>
+            
+            <!-- BAD: Progress without accessibility announcements -->
+            <div id="bad-progress-container" style="display: none;">
+                <div class="progress-container">
+                    <div id="bad-progress-bar" class="progress-bar" style="width: 0%;">0%</div>
+                </div>
+                <!-- No screen reader announcements -->
+            </div>
+            
+            <h3>❌ Shopping Cart Without Status Updates</h3>
+            <div style="display: flex; gap: 16px; align-items: center; margin: 16px 0;">
+                <span>Cart items: <span class="cart-count" id="bad-cart-count">0</span></span>
+                <button class="test-button" onclick="addToBadCart()">Add Item</button>
+                <button class="test-button" onclick="removeFromBadCart()">Remove Item</button>
+            </div>
+            
+            <!-- BAD: No announcements for cart changes -->
+            <!-- Screen readers won't know cart was updated -->
+            
+            <h3>❌ Search Results Without Status</h3>
+            <div style="margin: 16px 0;">
+                <input type="search" id="bad-search" placeholder="Search products..." 
+                       oninput="debounceBadSearch()" style="width: 250px; padding: 8px;">
+                <button class="test-button" onclick="performBadSearch()">Search</button>
+            </div>
+            
+            <!-- BAD: Search results shown but not announced -->
+            <div id="bad-search-results" class="status-info" style="display: none;"></div>
+            
+            <h3>❌ Timer Without Announcements</h3>
+            <button class="test-button" onclick="startBadTimer()">Start 10 Second Timer</button>
+            <button class="test-button" onclick="stopBadTimer()">Stop Timer</button>
+            
+            <!-- BAD: Timer updates not announced -->
+            <div id="bad-timer-display" style="font-size: 18px; font-weight: bold; margin: 16px 0;">Timer: 10 seconds</div>
+            <!-- No aria-live region for timer updates -->
+            
+            <h3>❌ Errors Without Proper Alerts</h3>
+            <button class="test-button" onclick="simulateBadError()">Simulate Network Error</button>
+            <button class="test-button" onclick="simulateBadRecovery()">Simulate Recovery</button>
+            
+            <!-- BAD: Errors shown visually but not announced -->
+            <div id="bad-error-display" class="status-message" style="display: none;"></div>
+            
+            <h3>❌ Dynamic Content Changes Without Status</h3>
+            <button class="test-button" onclick="updateBadContent()">Update Content</button>
+            
+            <!-- BAD: Content changes without accessibility announcements -->
+            <div id="bad-dynamic-content" style="padding: 16px; background-color: #f8f9fa; margin: 16px 0; border-radius: 4px;">
+                Click the button to update this content. Screen readers won't be notified of changes.
+            </div>
+            
+            <h3>❌ Modal/Toast Messages Without Proper Roles</h3>
+            <button class="test-button" onclick="showBadToast()">Show Toast Message</button>
+            
+            <!-- BAD: Toast/notification without proper accessibility -->
+            <div id="bad-toast" style="position: fixed; top: 20px; right: 20px; background-color: #28a745; color: white; padding: 16px; border-radius: 4px; display: none; z-index: 1000;">
+                Operation completed successfully!
+            </div>
+        </section>
+        
+        <!-- TESTING GUIDELINES SECTION -->
+        <section class="test-section" style="border-color: #0066cc; background-color: #f0f8ff;">
+            <h2>🧪 Scanner Testing Guidelines</h2>
+            <h3>Expected Scanner Behavior:</h3>
+            <ul>
+                <li><strong>Status Messages Scanner (4.1.3)</strong> should detect:
+                    <ul>
+                        <li>❌ Dynamic content updates without aria-live regions</li>
+                        <li>❌ Form validation feedback without status announcements</li>
+                        <li>❌ Loading states without accessibility feedback</li>
+                        <li>❌ Progress updates without screen reader notifications</li>
+                        <li>❌ Shopping cart/count changes without announcements</li>
+                        <li>❌ Error messages without role="alert" or aria-live</li>
+                        <li>❌ Search results without status communication</li>
+                        <li>❌ Timer/countdown updates without accessibility</li>
+                        <li>✅ Proper aria-live regions for status communication</li>
+                        <li>✅ Appropriate use of role="status" and role="alert"</li>
+                        <li>✅ Status messages that don't receive focus</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <h3>Detection Patterns:</h3>
+            <ul>
+                <li><strong>Form validation:</strong> Error/success messages near form fields</li>
+                <li><strong>Loading states:</strong> Spinners, progress bars, "Loading..." text</li>
+                <li><strong>Dynamic counts:</strong> Cart items, search results, notifications</li>
+                <li><strong>Operation feedback:</strong> "Saved", "Deleted", "Added" messages</li>
+                <li><strong>Progress updates:</strong> Upload/download progress, multi-step flows</li>
+                <li><strong>Timer displays:</strong> Countdowns, session timeouts</li>
+                <li><strong>Error recovery:</strong> Network error messages, retry notifications</li>
+            </ul>
+            
+            <h3>Required ARIA Attributes:</h3>
+            <ul>
+                <li><strong>aria-live="polite"</strong> - For non-urgent status updates</li>
+                <li><strong>aria-live="assertive"</strong> - For urgent alerts (use sparingly)</li>
+                <li><strong>role="status"</strong> - Equivalent to aria-live="polite"</li>
+                <li><strong>role="alert"</strong> - Equivalent to aria-live="assertive"</li>
+                <li><strong>aria-atomic="true"</strong> - Read entire region when changed</li>
+                <li><strong>aria-relevant</strong> - Specify what changes to announce</li>
+            </ul>
+            
+            <h3>Testing Procedure:</h3>
+            <ol>
+                <li>Identify elements that show status/feedback messages</li>
+                <li>Check for aria-live, role="status", or role="alert" attributes</li>
+                <li>Verify messages don't receive focus inappropriately</li>
+                <li>Test with screen reader to confirm announcements</li>
+                <li>Check timing - messages should be announced when shown</li>
+                <li>Verify appropriate urgency level (polite vs assertive)</li>
+            </ol>
+            
+            <h3>Common Violations:</h3>
+            <ul>
+                <li>Form validation messages without aria-live</li>
+                <li>Loading spinners without status announcements</li>
+                <li>Cart/count updates without accessibility feedback</li>
+                <li>Error messages that only appear visually</li>
+                <li>Progress bars without verbal progress updates</li>
+                <li>Toast/notification without proper ARIA roles</li>
+                <li>Dynamic content updates without live regions</li>
+            </ul>
+            
+            <h3>Success Criteria:</h3>
+            <p><strong>PASS:</strong> All status messages have appropriate ARIA live regions or roles</p>
+            <p><strong>FAIL:</strong> Status information only available visually without programmatic announcements</p>
+        </section>
+    </main>
+    
+    <footer style="margin-top: 40px; padding: 20px; background-color: #2c3e50; color: white;">
+        <p>Phase 6A Test File: Status Messages (WCAG 4.1.3) - Critical for screen reader user experience</p>
+        <p>This test file provides comprehensive examples for status message accessibility validation.</p>
+    </footer>
+    
+    <script>
+        // Good form validation with announcements
+        function validateGoodEmail() {
+            const input = document.getElementById('good-email');
+            const status = document.getElementById('good-email-status');
+            const email = input.value;
+            
+            if (email && !email.includes('@')) {
+                status.className = 'status-message status-error';
+                status.textContent = 'Please enter a valid email address with @';
+                status.style.display = 'block';
+            } else if (email && email.includes('@')) {
+                status.className = 'status-message status-success';
+                status.textContent = 'Email format is valid';
+                status.style.display = 'block';
+            } else {
+                status.style.display = 'none';
+            }
+        }
+        
+        function validateGoodPassword() {
+            const input = document.getElementById('good-password');
+            const status = document.getElementById('good-password-status');
+            const password = input.value;
+            
+            if (password.length > 0 && password.length < 8) {
+                status.className = 'status-message status-warning';
+                status.textContent = 'Password should be at least 8 characters';
+                status.style.display = 'block';
+            } else if (password.length >= 8) {
+                status.className = 'status-message status-success';
+                status.textContent = 'Password length is sufficient';
+                status.style.display = 'block';
+            } else {
+                status.style.display = 'none';
+            }
+        }
+        
+        function submitGoodForm(event) {
+            event.preventDefault();
+            const status = document.getElementById('good-form-status');
+            status.className = 'status-message status-success';
+            status.textContent = 'Form submitted successfully!';
+            status.style.display = 'block';
+            return false;
+        }
+        
+        // Bad form validation without announcements
+        function validateBadEmail() {
+            const input = document.getElementById('bad-email');
+            const status = document.getElementById('bad-email-status');
+            const email = input.value;
+            
+            if (email && !email.includes('@')) {
+                status.className = 'status-message status-error';
+                status.textContent = 'Please enter a valid email address with @';
+                status.style.display = 'block';
+                // BAD: No aria-live announcement
+            } else if (email && email.includes('@')) {
+                status.className = 'status-message status-success';
+                status.textContent = 'Email format is valid';
+                status.style.display = 'block';
+                // BAD: Change not announced
+            }
+        }
+        
+        function validateBadPassword() {
+            const input = document.getElementById('bad-password');
+            const status = document.getElementById('bad-password-status');
+            const password = input.value;
+            
+            if (password.length > 0 && password.length < 8) {
+                status.className = 'status-message status-warning';
+                status.textContent = 'Password should be at least 8 characters';
+                status.style.display = 'block';
+                // BAD: Status not announced to screen readers
+            }
+        }
+        
+        function submitBadForm(event) {
+            event.preventDefault();
+            const status = document.getElementById('bad-form-status');
+            status.className = 'status-message status-success';
+            status.textContent = 'Form submitted successfully!';
+            status.style.display = 'block';
+            // BAD: Success not announced
+            return false;
+        }
+        
+        // Good loading with announcements
+        function startGoodLoading() {
+            const status = document.getElementById('good-loading-status');
+            const progressContainer = document.getElementById('good-progress-container');
+            const progressBar = document.getElementById('good-progress-bar');
+            const progressStatus = document.getElementById('good-progress-status');
+            
+            status.className = 'status-message status-info';
+            status.innerHTML = '<span class="spinner"></span>Loading data, please wait...';
+            status.style.display = 'block';
+            
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                
+                // Announce progress at key milestones
+                if (progress % 25 === 0) {
+                    progressStatus.textContent = `Loading progress: ${progress}% complete`;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    status.className = 'status-message status-success';
+                    status.textContent = 'Data loaded successfully!';
+                    progressStatus.textContent = 'Loading complete';
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                        progressContainer.style.display = 'none';
+                    }, 3000);
+                }
+            }, 300);
+        }
+        
+        // Bad loading without announcements
+        function startBadLoading() {
+            const status = document.getElementById('bad-loading-status');
+            const progressContainer = document.getElementById('bad-progress-container');
+            const progressBar = document.getElementById('bad-progress-bar');
+            
+            status.className = 'status-message status-info';
+            status.innerHTML = '<span class="spinner"></span>Loading data, please wait...';
+            status.style.display = 'block';
+            // BAD: Status change not announced
+            
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                // BAD: Progress changes not announced
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    status.className = 'status-message status-success';
+                    status.textContent = 'Data loaded successfully!';
+                    // BAD: Completion not announced
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                        progressContainer.style.display = 'none';
+                    }, 3000);
+                }
+            }, 300);
+        }
+        
+        // Cart functionality
+        let goodCartCount = 0;
+        let badCartCount = 0;
+        
+        function addToGoodCart() {
+            goodCartCount++;
+            document.getElementById('good-cart-count').textContent = goodCartCount;
+            document.getElementById('good-cart-status').textContent = `Item added to cart. Cart now contains ${goodCartCount} item${goodCartCount !== 1 ? 's' : ''}.`;
+        }
+        
+        function removeFromGoodCart() {
+            if (goodCartCount > 0) {
+                goodCartCount--;
+                document.getElementById('good-cart-count').textContent = goodCartCount;
+                document.getElementById('good-cart-status').textContent = `Item removed from cart. Cart now contains ${goodCartCount} item${goodCartCount !== 1 ? 's' : ''}.`;
+            }
+        }
+        
+        function addToBadCart() {
+            badCartCount++;
+            document.getElementById('bad-cart-count').textContent = badCartCount;
+            // BAD: No announcement of cart change
+        }
+        
+        function removeFromBadCart() {
+            if (badCartCount > 0) {
+                badCartCount--;
+                document.getElementById('bad-cart-count').textContent = badCartCount;
+                // BAD: No announcement of cart change
+            }
+        }
+        
+        // Search functionality
+        function performGoodSearch() {
+            const query = document.getElementById('good-search').value;
+            const status = document.getElementById('good-search-status');
+            
+            if (query.trim()) {
+                const resultCount = Math.floor(Math.random() * 50) + 1;
+                status.textContent = `Found ${resultCount} results for "${query}"`;
+                status.style.display = 'block';
+            } else {
+                status.textContent = 'Please enter a search term';
+                status.style.display = 'block';
+            }
+        }
+        
+        function performBadSearch() {
+            const query = document.getElementById('bad-search').value;
+            const results = document.getElementById('bad-search-results');
+            
+            if (query.trim()) {
+                const resultCount = Math.floor(Math.random() * 50) + 1;
+                results.textContent = `Found ${resultCount} results for "${query}"`;
+                results.style.display = 'block';
+                // BAD: Results not announced
+            }
+        }
+        
+        // Debounced search
+        let goodSearchTimeout, badSearchTimeout;
+        
+        function debounceGoodSearch() {
+            clearTimeout(goodSearchTimeout);
+            goodSearchTimeout = setTimeout(performGoodSearch, 1000);
+        }
+        
+        function debounceBadSearch() {
+            clearTimeout(badSearchTimeout);
+            badSearchTimeout = setTimeout(performBadSearch, 1000);
+        }
+        
+        // Timer functionality
+        let goodTimerInterval, badTimerInterval;
+        let goodTimerSeconds = 10, badTimerSeconds = 10;
+        
+        function startGoodTimer() {
+            stopGoodTimer();
+            goodTimerSeconds = 10;
+            const display = document.getElementById('good-timer-display');
+            const status = document.getElementById('good-timer-status');
+            
+            status.textContent = 'Timer started for 10 seconds';
+            
+            goodTimerInterval = setInterval(() => {
+                goodTimerSeconds--;
+                display.textContent = `Timer: ${goodTimerSeconds} seconds`;
+                
+                // Announce at specific intervals
+                if (goodTimerSeconds === 5) {
+                    status.textContent = '5 seconds remaining';
+                } else if (goodTimerSeconds === 0) {
+                    status.textContent = 'Timer finished';
+                    clearInterval(goodTimerInterval);
+                }
+            }, 1000);
+        }
+        
+        function stopGoodTimer() {
+            clearInterval(goodTimerInterval);
+            const status = document.getElementById('good-timer-status');
+            status.textContent = 'Timer stopped';
+        }
+        
+        function startBadTimer() {
+            stopBadTimer();
+            badTimerSeconds = 10;
+            const display = document.getElementById('bad-timer-display');
+            
+            // BAD: No announcement of timer start
+            
+            badTimerInterval = setInterval(() => {
+                badTimerSeconds--;
+                display.textContent = `Timer: ${badTimerSeconds} seconds`;
+                // BAD: Timer updates not announced
+                
+                if (badTimerSeconds === 0) {
+                    // BAD: Timer completion not announced
+                    clearInterval(badTimerInterval);
+                }
+            }, 1000);
+        }
+        
+        function stopBadTimer() {
+            clearInterval(badTimerInterval);
+            // BAD: No announcement of timer stop
+        }
+        
+        // Error simulation
+        function simulateGoodError() {
+            const status = document.getElementById('good-error-status');
+            status.className = 'status-message status-error';
+            status.textContent = 'Network error: Unable to connect to server. Retrying in 5 seconds...';
+            status.style.display = 'block';
+        }
+        
+        function simulateGoodRecovery() {
+            const status = document.getElementById('good-error-status');
+            status.className = 'status-message status-success';
+            status.textContent = 'Connection restored successfully';
+            status.style.display = 'block';
+        }
+        
+        function simulateBadError() {
+            const display = document.getElementById('bad-error-display');
+            display.className = 'status-message status-error';
+            display.textContent = 'Network error: Unable to connect to server';
+            display.style.display = 'block';
+            // BAD: Error not announced
+        }
+        
+        function simulateBadRecovery() {
+            const display = document.getElementById('bad-error-display');
+            display.className = 'status-message status-success';
+            display.textContent = 'Connection restored successfully';
+            display.style.display = 'block';
+            // BAD: Recovery not announced
+        }
+        
+        // Dynamic content updates
+        function updateBadContent() {
+            const content = document.getElementById('bad-dynamic-content');
+            const timestamp = new Date().toLocaleTimeString();
+            content.textContent = `Content updated at ${timestamp}. This change was not announced to screen readers.`;
+            // BAD: Content change not announced
+        }
+        
+        // Toast messages
+        function showBadToast() {
+            const toast = document.getElementById('bad-toast');
+            toast.style.display = 'block';
+            // BAD: Toast shown but not announced
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

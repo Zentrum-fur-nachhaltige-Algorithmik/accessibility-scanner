@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: CSS Background Images Zugänglich (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* GOOD: CTA mit Text im DOM */
+        .cta-accessible {
+            background-color: #007cba;
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 15px 0;
+            /* Background kann dekorativ sein, aber Text im DOM */
+        }
+        
+        .cta-accessible:hover {
+            background-color: #005a8a;
+        }
+        
+        /* GOOD: Icon mit Text */
+        .phone-accessible {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f0f8ff;
+            border: 1px solid #007cba;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007cba;
+            margin: 10px;
+        }
+        
+        .phone-icon-svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            fill: currentColor;
+        }
+        
+        /* GOOD: Status mit Text und ARIA */
+        .status-accessible {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: #4caf50; }
+        .status-offline { background-color: #f44336; }
+        
+        /* GOOD: Navigation als echte Links */
+        .nav-accessible {
+            background-color: #333;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .nav-accessible ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        
+        .nav-accessible li {
+            margin: 0;
+        }
+        
+        .nav-accessible a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+        }
+        
+        .nav-accessible a:hover {
+            background-color: #555;
+        }
+        
+        /* GOOD: Preis-Box mit strukturiertem Text */
+        .price-accessible {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+            max-width: 200px;
+            margin: 15px;
+        }
+        
+        .price-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        
+        .price-period {
+            font-size: 16px;
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .price-note {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        /* GOOD: Chart mit Datentabelle */
+        .chart-container {
+            margin: 15px 0;
+        }
+        
+        .chart-visual {
+            width: 400px;
+            height: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .chart-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .chart-table th,
+        .chart-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .chart-table th {
+            background-color: #f2f2f2;
+        }
+        
+        /* GOOD: Social Media mit echten Links */
+        .social-accessible {
+            margin: 15px 0;
+        }
+        
+        .social-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .social-facebook { background-color: #3b5998; }
+        .social-twitter { background-color: #1da1f2; }
+        .social-instagram { background-color: #e1306c; }
+        
+        /* GOOD: Benachrichtigung mit ARIA */
+        .notification-accessible {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .notification-accessible h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .user-list {
+            margin: 15px 0;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e8f5e8;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: CSS Background Images Zugänglich (GOOD)</h1>
+    <p><strong>WCAG 1.1.1 Konforme Implementierung:</strong> Informative Inhalte mit zugänglichen Alternativen</p>
+    
+    <!-- GOOD 1: Call-to-Action mit zugänglichem Text -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Call-to-Action mit DOM-Text</div>
+        <p><strong>Lösung:</strong> Text im DOM, Background nur dekorativ</p>
+        <div class="interactive-area">
+            <button class="cta-accessible" onclick="alert('CTA geklickt!')">
+                Jetzt anrufen!
+            </button>
+            <p>✅ Button-Text ist im DOM - Screen Reader kann ihn lesen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Icons mit zugänglichem Text -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Funktionale Icons mit Text und ARIA</div>
+        <p><strong>Lösung:</strong> SVG mit title + sichtbarer Text</p>
+        <div class="interactive-area">
+            <p>Kontakt:</p>
+            <a href="tel:+49123456789" class="phone-accessible">
+                <svg class="phone-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <title>Telefon</title>
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+                +49 123 456789
+            </a>
+            <p>✅ Icon hat title-Attribut + sichtbarer Text erklärt Funktion</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Status-Indikatoren mit ARIA -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Status-Indikatoren mit programmatischem Status</div>
+        <p><strong>Lösung:</strong> ARIA-Attribute + Screenreader-Text</p>
+        <div class="interactive-area">
+            <div class="user-list">
+                <div class="user-item">
+                    <div class="status-accessible">
+                        <div class="status-indicator status-online" aria-hidden="true"></div>
+                        <span class="sr-only">Online: </span>
+                        <span>Max Mustermann</span>
+                        <span aria-label="Status: Online" class="sr-only"></span>
+                    </div>
+                </div>
+                <div class="user-item">
+                    <div class="status-accessible">
+                        <div class="status-indicator status-offline" aria-hidden="true"></div>
+                        <span class="sr-only">Offline: </span>
+                        <span>Anna Schmidt</span>
+                        <span aria-label="Status: Offline" class="sr-only"></span>
+                    </div>
+                </div>
+                <div class="user-item">
+                    <div class="status-accessible">
+                        <div class="status-indicator status-online" aria-hidden="true"></div>
+                        <span class="sr-only">Online: </span>
+                        <span>Peter Wagner</span>
+                        <span aria-label="Status: Online" class="sr-only"></span>
+                    </div>
+                </div>
+            </div>
+            <p>✅ Status wird durch Screen Reader Text kommuniziert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Navigation mit echten Links -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Navigation mit semantischen Links</div>
+        <p><strong>Lösung:</strong> Echte HTML-Links statt Image-Map</p>
+        <div class="interactive-area">
+            <nav class="nav-accessible" aria-label="Hauptnavigation">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+            <p>✅ Jeder Link einzeln fokussierbar und semantisch korrekt</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Preise mit strukturiertem Text -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Preisinformationen strukturiert</div>
+        <p><strong>Lösung:</strong> HTML-Struktur mit semantischen Elementen</p>
+        <div class="interactive-area">
+            <div class="price-accessible">
+                <div class="price-amount">€29.99</div>
+                <div class="price-period">Pro Monat</div>
+                <div class="price-note">Keine Einrichtungsgebühr</div>
+                <button style="margin-top: 15px; padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 4px;">
+                    Jetzt bestellen
+                </button>
+            </div>
+            <p>✅ Alle Preisinformationen sind strukturierter HTML-Text</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Chart mit Datentabelle -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Diagramm mit zugänglicher Datentabelle</div>
+        <p><strong>Lösung:</strong> Visuelles Chart + Datentabelle + Beschreibung</p>
+        <div class="interactive-area">
+            <div class="chart-container">
+                <h4>Verkaufszahlen 2024</h4>
+                <svg class="chart-visual" viewBox="0 0 400 200" aria-labelledby="chart-title" aria-describedby="chart-desc">
+                    <title id="chart-title">Verkaufszahlen-Balkendiagramm</title>
+                    <desc id="chart-desc">Balkendiagramm zeigt steigende Verkaufszahlen von Januar bis April 2024</desc>
+                    <rect x="50" y="150" width="40" height="30" fill="#4caf50"/>
+                    <rect x="100" y="120" width="40" height="60" fill="#4caf50"/>
+                    <rect x="150" y="100" width="40" height="80" fill="#4caf50"/>
+                    <rect x="200" y="80" width="40" height="100" fill="#4caf50"/>
+                    <text x="70" y="195" font-size="12">Jan</text>
+                    <text x="120" y="195" font-size="12">Feb</text>
+                    <text x="170" y="195" font-size="12">Mar</text>
+                    <text x="220" y="195" font-size="12">Apr</text>
+                </svg>
+                
+                <table class="chart-table">
+                    <caption>Detaillierte Verkaufszahlen 2024</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Monat</th>
+                            <th scope="col">Verkäufe</th>
+                            <th scope="col">Wachstum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Januar</th>
+                            <td>150 Einheiten</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Februar</th>
+                            <td>300 Einheiten</td>
+                            <td>+100%</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">März</th>
+                            <td>400 Einheiten</td>
+                            <td>+33%</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">April</th>
+                            <td>500 Einheiten</td>
+                            <td>+25%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>✅ Chart hat Datentabelle + ARIA-Beschreibung für vollständige Zugänglichkeit</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Social Media mit echten Links -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Social Media Links semantisch korrekt</div>
+        <p><strong>Lösung:</strong> Echte Links mit zugänglichen Namen</p>
+        <div class="interactive-area">
+            <div class="social-accessible">
+                <p>Folgen Sie uns:</p>
+                <div class="social-links">
+                    <a href="#facebook" class="social-link social-facebook" aria-label="Facebook folgen">
+                        <span aria-hidden="true">f</span>
+                    </a>
+                    <a href="#twitter" class="social-link social-twitter" aria-label="Twitter folgen">
+                        <span aria-hidden="true">t</span>
+                    </a>
+                    <a href="#instagram" class="social-link social-instagram" aria-label="Instagram folgen">
+                        <span aria-hidden="true">i</span>
+                    </a>
+                </div>
+            </div>
+            <p>✅ Jeder Social Link einzeln fokussierbar mit klarer Beschreibung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Kritische Benachrichtigung mit ARIA -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Kritische Information mit ARIA</div>
+        <p><strong>Lösung:</strong> Role="alert" + strukturierter HTML-Text</p>
+        <div class="interactive-area">
+            <div class="notification-accessible" role="alert" aria-live="assertive">
+                <h3>⚠️ Wichtiger Hinweis</h3>
+                <p>Ihr Konto läuft in <strong>3 Tagen</strong> ab.</p>
+                <p>
+                    <a href="#renew" style="background: #ff9800; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px;">
+                        Jetzt verlängern
+                    </a>
+                    um Datenverlust zu vermeiden.
+                </p>
+            </div>
+            <p>✅ Kritische Nachricht wird sofort vom Screen Reader angekündigt</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das besser ist</div>
+        <p><strong>Screen Reader Zugänglichkeit:</strong></p>
+        <ul>
+            <li>✅ Alle Informationen sind im DOM verfügbar</li>
+            <li>✅ Semantische HTML-Struktur</li>
+            <li>✅ ARIA-Attribute für zusätzlichen Kontext</li>
+            <li>✅ Fokussierbare und tastatur-zugängliche Elemente</li>
+            <li>✅ Screen Reader Text für visuelle Indikatoren</li>
+        </ul>
+        
+        <p><strong>Zusätzliche Vorteile:</strong></p>
+        <ul>
+            <li>🔍 SEO-freundlich: Suchmaschinen können Inhalte indizieren</li>
+            <li>📱 Mobile-freundlich: Text skaliert mit Zoom</li>
+            <li>⚡ Performance: Weniger Bildladezeiten</li>
+            <li>🎨 Responsive: Text passt sich verschiedenen Bildschirmgrößen an</li>
+            <li>🌐 Übersetzbar: Automatische Übersetzungstools funktionieren</li>
+        </ul>
+    </div>
+
+    <script>
+        // Demonstration: Vergleich der Zugänglichkeit
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ACCESSIBILITY ANALYSIS ===');
+            
+            // Prüfe alle interaktiven Elemente
+            const interactiveElements = document.querySelectorAll('button, a, [onclick], [role="button"]');
+            console.log(`Found ${interactiveElements.length} interactive elements`);
+            
+            interactiveElements.forEach((element, index) => {
+                const accessibleName = element.getAttribute('aria-label') || 
+                                     element.textContent.trim() || 
+                                     element.getAttribute('title') || 
+                                     'No accessible name';
+                
+                console.log(`Element ${index + 1}:`, {
+                    tagName: element.tagName,
+                    accessibleName: accessibleName,
+                    hasTextContent: element.textContent.trim().length > 0,
+                    hasAriaLabel: !!element.getAttribute('aria-label'),
+                    focusable: element.tabIndex >= 0 || ['A', 'BUTTON', 'INPUT'].includes(element.tagName)
+                });
+            });
+            
+            // Prüfe ARIA-Elemente
+            const ariaElements = document.querySelectorAll('[role], [aria-label], [aria-labelledby], [aria-describedby]');
+            console.log(`Found ${ariaElements.length} elements with ARIA attributes`);
+        });
+    </script>
+</body>
+</html>

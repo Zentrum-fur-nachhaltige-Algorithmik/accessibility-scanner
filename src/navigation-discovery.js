@@ -103,10 +103,12 @@ class NavigationDiscovery {
       // Strategy 1: Semantic navigation elements
       const semanticNavs = document.querySelectorAll('nav, [role="navigation"]');
       
-      // Strategy 2: Common CSS navigation patterns
+      // Strategy 2: Common CSS navigation patterns  
       const cssNavs = document.querySelectorAll(`
         .nav, .navigation, .menu, .header-nav, .main-nav, .primary-nav,
-        .navbar, .site-nav, .top-nav, .nav-menu, .mega-menu, .nav-bar
+        .navbar, .site-nav, .top-nav, .nav-menu, .mega-menu, .nav-bar,
+        .navigation-menu, .nav-links, .main-menu, .primary-menu, .header-menu,
+        .footer-nav, .footer-menu, .sidebar-nav, .mobile-nav, .dropdown-menu
       `);
       
       // Strategy 3: Header area links (top 200px)
@@ -191,18 +193,25 @@ class NavigationDiscovery {
         });
       });
 
-      // Fallback: If no navigation found, get all header links
+      // Fallback: If no navigation found, get all relevant links
       if (results.length === 0) {
-        console.log('No navigation found, using fallback strategy');
+        console.log('No navigation found, using expanded fallback strategy');
         const allLinks = document.querySelectorAll('a[href]');
-        const topLinks = Array.from(allLinks)
+        const candidateLinks = Array.from(allLinks)
           .filter(link => {
             const rect = link.getBoundingClientRect();
-            return rect.top < 200 && rect.width > 0 && rect.height > 0;
+            const text = (link.textContent || '').trim().toLowerCase();
+            
+            // Include header links, footer links, and important page links
+            const isHeaderLink = rect.top < 300;
+            const isFooterLink = rect.top > window.innerHeight - 200;
+            const isImportantLink = ['home', 'about', 'contact', 'blog', 'services', 'products', 'shop', 'portfolio', 'team', 'careers', 'news', 'support', 'help', 'login', 'register'].some(keyword => text.includes(keyword));
+            
+            return (isHeaderLink || isFooterLink || isImportantLink) && rect.width > 0 && rect.height > 0;
           })
-          .slice(0, 10); // Limit to top 10 links
+          .slice(0, 20); // Increased limit
 
-        topLinks.forEach((link, index) => {
+        candidateLinks.forEach((link, index) => {
           try {
             const href = link.getAttribute('href');
             const fullUrl = new URL(href, baseUrl).href;

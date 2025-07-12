@@ -84,19 +84,19 @@ class SiteAccessibilityReport {
     // Process data for template
     const processedData = this.processSiteData(siteData);
     
-    // Replace template variables
+    // Replace template variables (use global replace)
     let html = template
-      .replace('{{REPORT_STYLES}}', styles)
-      .replace('{{SITE_URL}}', siteData.baseUrl)
-      .replace('{{SCAN_DATE}}', new Date(siteData.scanDate).toLocaleString())
-      .replace('{{REPORT_ID}}', siteData.reportId)
-      .replace('{{OVERVIEW_DATA}}', JSON.stringify(processedData.overview))
-      .replace('{{CSP_ANALYSIS}}', this.generateCspAnalysisHtml(siteData.cspAnalysis))
-      .replace('{{SITE_TRENDS}}', this.generateSiteTrendsHtml(siteData.siteWideTrends))
-      .replace('{{PAGE_RESULTS}}', this.generatePageResultsHtml(siteData.pageResults))
-      .replace('{{RECOMMENDATIONS}}', this.generateRecommendationsHtml(siteData.recommendations))
-      .replace('{{OPTIMIZATION_REPORT}}', this.generateOptimizationHtml(siteData.optimization))
-      .replace('{{TECHNICAL_METADATA}}', this.generateMetadataHtml(siteData.metadata));
+      .replace(/\{\{REPORT_STYLES\}\}/g, styles)
+      .replace(/\{\{SITE_URL\}\}/g, siteData.baseUrl)
+      .replace(/\{\{SCAN_DATE\}\}/g, new Date(siteData.scanDate).toLocaleString())
+      .replace(/\{\{REPORT_ID\}\}/g, siteData.reportId)
+      .replace(/\{\{OVERVIEW_DATA\}\}/g, JSON.stringify(processedData.overview))
+      .replace(/\{\{CSP_ANALYSIS\}\}/g, this.generateCspAnalysisHtml(siteData.cspAnalysis))
+      .replace(/\{\{SITE_TRENDS\}\}/g, this.generateSiteTrendsHtml(siteData.siteWideTrends))
+      .replace(/\{\{PAGE_RESULTS\}\}/g, this.generatePageResultsHtml(siteData.pageResults))
+      .replace(/\{\{RECOMMENDATIONS\}\}/g, this.generateRecommendationsHtml(siteData.recommendations))
+      .replace(/\{\{OPTIMIZATION_REPORT\}\}/g, this.generateOptimizationHtml(siteData.optimization))
+      .replace(/\{\{TECHNICAL_METADATA\}\}/g, this.generateMetadataHtml(siteData.metadata));
     
     return html;
   }

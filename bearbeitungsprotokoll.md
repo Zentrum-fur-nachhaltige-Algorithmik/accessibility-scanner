@@ -131,3 +131,28 @@
 ### Modifiziert:
 - [x] src/enhanced-scanner.js (Phase 6A integration)
 - [x] package.json (test:phase6a script)
+
+## Multi-Page Scanning Development
+
+### Iteration 1: Real-World Test HTML Creation
+- [x] Setup test-html/multi-page-sites/ structure - completed
+- [x] Create corporate-site with navigation patterns - completed
+- [x] Create ecommerce-site with mega menu - completed
+- [ ] Create news-site with article patterns  
+- [ ] Create complex-site with multiple nav types
+
+#### Erstellt:
+- [x] corporate-site/index.html
+- [x] corporate-site/about.html  
+- [x] corporate-site/contact.html
+- [x] corporate-site/products/index.html
+- [x] corporate-site/products/product-a.html
+- [x] corporate-site/products/product-b.html
+- [x] corporate-site/support/help.html
+- [x] corporate-site/support/faq.html
+- [x] ecommerce-site/index.html
+- [x] ecommerce-site/login.html
+- [x] ecommerce-site/checkout.html
+- [x] ecommerce-site/cart.html
+- [x] ecommerce-site/account/profile.html
+- [x] ecommerce-site/account/orders.html

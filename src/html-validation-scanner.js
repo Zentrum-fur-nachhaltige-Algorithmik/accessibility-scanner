@@ -271,9 +271,12 @@ class HTMLValidationScanner {
       
       allElements.forEach(element => {
         const tagName = element.tagName.toLowerCase();
+        const className = element.className && typeof element.className === 'string' 
+          ? element.className 
+          : (element.className && element.className.baseVal ? element.className.baseVal : '');
         const selector = tagName + 
                         (element.id ? `#${element.id}` : '') + 
-                        (element.className ? `.${element.className.split(' ')[0]}` : '');
+                        (className ? `.${className.split(' ')[0]}` : '');
 
         // Check for invalid nesting
         if (tagName === 'div' && element.closest('span, em, strong, a')) {

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - TechCorp Solutions</title>
+    <!-- Moderate CSP Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline';">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Header styles */
+        .site-header {
+            background: #1a365d;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .main-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .main-nav a:hover,
+        .main-nav a:focus {
+            background-color: #2d3748;
+            outline: 2px solid #63b3ed;
+        }
+        
+        .main-nav a[aria-current="page"] {
+            background-color: #2d3748;
+            font-weight: bold;
+        }
+        
+        /* Page header */
+        .page-header {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Search section */
+        .help-search {
+            background: white;
+            padding: 2rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+        
+        /* Content */
+        .content {
+            padding: 3rem 0;
+        }
+        
+        .help-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+        }
+        
+        /* Sidebar navigation */
+        .help-sidebar {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+        
+        .help-sidebar h3 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .help-categories {
+            list-style: none;
+        }
+        
+        .help-categories li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .help-categories a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            display: block;
+            transition: color 0.3s;
+        }
+        
+        .help-categories a:hover,
+        .help-categories a:focus {
+            color: #3182ce;
+            text-decoration: underline;
+        }
+        
+        .help-categories a.active {
+            color: #3182ce;
+            font-weight: 600;
+        }
+        
+        /* Main help content */
+        .help-main h2 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .help-section {
+            margin-bottom: 3rem;
+        }
+        
+        .help-section h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .faq-list {
+            margin-top: 2rem;
+        }
+        
+        .faq-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            background: #f7fafc;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .faq-question:hover,
+        .faq-question:focus {
+            background: #edf2f7;
+            outline: 2px solid #3182ce;
+        }
+        
+        .faq-answer {
+            padding: 1.5rem;
+            display: none;
+        }
+        
+        .faq-answer.active {
+            display: block;
+        }
+        
+        /* Contact cards */
+        .contact-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: box-shadow 0.3s;
+        }
+        
+        .contact-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-card .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #3182ce;
+        }
+        
+        .contact-card h4 {
+            color: #1a365d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-card a {
+            display: inline-block;
+            background: #3182ce;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .contact-card a:hover,
+        .contact-card a:focus {
+            background: #2c5282;
+        }
+        
+        /* Accessibility issues for testing */
+        .help-tip {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .help-tip.bad-contrast {
+            color: #ddd; /* Poor contrast */
+            background: #fff;
+        }
+        
+        /* Missing heading hierarchy - accessibility issue */
+        .content-jump h4 {
+            font-size: 1.8rem; /* Should be h3, not h4 after h2 */
+            color: #1a365d;
+            margin: 2rem 0 1rem 0;
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-nav {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-nav a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-nav a:hover,
+        .footer-nav a:focus {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 999;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .help-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script>
+        // Simple FAQ toggle functionality
+        function toggleFAQ(button) {
+            const answer = button.nextElementSibling;
+            const isOpen = answer.classList.contains('active');
+            
+            // Close all other FAQs
+            document.querySelectorAll('.faq-answer').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Toggle current FAQ
+            if (!isOpen) {
+                answer.classList.add('active');
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="container">
+            <div class="header-content">
+                <a href="../index.html" class="logo" aria-label="TechCorp Solutions Homepage">TechCorp Solutions</a>
+                
+                <!-- Main Navigation -->
+                <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../about.html">About</a></li>
+                        <li><a href="../products/index.html">Products</a></li>
+                        <li><a href="help.html" aria-current="page">Support</a></li>
+                        <li><a href="../contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="../index.html">Home</a> &gt; Support
+            </nav>
+            <h1>Help Center</h1>
+            <p>Find answers to your questions and get the support you need</p>
+        </div>
+    </div>
+    
+    <!-- Search Section -->
+    <div class="help-search">
+        <div class="container">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="search" placeholder="Search for help articles, FAQs, and guides..." aria-label="Search help content">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <div class="content">
+            <div class="container">
+                <div class="help-layout">
+                    <!-- Sidebar -->
+                    <aside class="help-sidebar">
+                        <h3>Help Categories</h3>
+                        <ul class="help-categories">
+                            <li><a href="#getting-started" class="active">Getting Started</a></li>
+                            <li><a href="#products">Product Information</a></li>
+                            <li><a href="#technical">Technical Support</a></li>
+                            <li><a href="#billing">Billing & Pricing</a></li>
+                            <li><a href="#security">Security & Privacy</a></li>
+                            <li><a href="faq.html">Frequently Asked Questions</a></li>
+                        </ul>
+                        
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+                            <h4>Quick Links</h4>
+                            <ul style="list-style: none; margin-top: 1rem;">
+                                <li style="margin-bottom: 0.5rem;"><a href="../contact.html" style="color: #3182ce; text-decoration: none;">Contact Support</a></li>
+                                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #3182ce; text-decoration: none;">Download Resources</a></li>
+                                <li><a href="#" style="color: #3182ce; text-decoration: none;">System Status</a></li>
+                            </ul>
+                        </div>
+                    </aside>
+                    
+                    <!-- Main Help Content -->
+                    <div class="help-main">
+                        <section class="help-section">
+                            <h2>Getting Started</h2>
+                            <p>Welcome to TechCorp Solutions! Here you'll find everything you need to get started with our products and services.</p>
+                            
+                            <div class="help-tip">
+                                <strong>💡 Tip:</strong> New customers can schedule a free onboarding session with our technical team.
+                            </div>
+                            
+                            <!-- Intentional accessibility issue: poor contrast -->
+                            <div class="help-tip bad-contrast">
+                                <strong>Important:</strong> Make sure to review our security guidelines before implementation.
+                            </div>
+                            
+                            <!-- Intentional accessibility issue: improper heading hierarchy -->
+                            <div class="content-jump">
+                                <h4>Quick Setup Guide</h4>
+                                <ol>
+                                    <li><strong>Account Setup:</strong> Create your TechCorp account and verify your email address</li>
+                                    <li><strong>Team Invitation:</strong> Invite team members and assign appropriate roles</li>
+                                    <li><strong>Initial Configuration:</strong> Configure your primary settings and preferences</li>
+                                    <li><strong>Integration:</strong> Connect with your existing tools and systems</li>
+                                    <li><strong>Testing:</strong> Run initial tests to ensure everything is working correctly</li>
+                                </ol>
+                            </div>
+                        </section>
+                        
+                        <section class="help-section">
+                            <h3>Frequently Asked Questions</h3>
+                            <div class="faq-list">
+                                <div class="faq-item">
+                                    <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                        How do I reset my password?
+                                    </button>
+                                    <div class="faq-answer">
+                                        <p>To reset your password:</p>
+                                        <ol>
+                                            <li>Go to the login page and click "Forgot Password"</li>
+                                            <li>Enter your email address</li>
+                                            <li>Check your email for a reset link</li>
+                                            <li>Click the link and create a new password</li>
+                                        </ol>
+                                        <p>If you don't receive the email within 10 minutes, check your spam folder or contact support.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                        What are your service level agreements (SLAs)?
+                                    </button>
+                                    <div class="faq-answer">
+                                        <p>Our SLAs vary by service tier:</p>
+                                        <ul>
+                                            <li><strong>Enterprise:</strong> 99.9% uptime, 1-hour response time</li>
+                                            <li><strong>Professional:</strong> 99.5% uptime, 4-hour response time</li>
+                                            <li><strong>Standard:</strong> 99% uptime, 24-hour response time</li>
+                                        </ul>
+                                        <p>All SLAs include 24/7 monitoring and automatic failover capabilities.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                        How do I upgrade my subscription?
+                                    </button>
+                                    <div class="faq-answer">
+                                        <p>To upgrade your subscription:</p>
+                                        <ol>
+                                            <li>Log into your account dashboard</li>
+                                            <li>Navigate to "Billing & Subscriptions"</li>
+                                            <li>Click "Upgrade Plan"</li>
+                                            <li>Select your desired plan and confirm</li>
+                                        </ol>
+                                        <p>Upgrades take effect immediately, and you'll be billed pro-rata for the current billing period.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+                                        Is my data secure with TechCorp?
+                                    </button>
+                                    <div class="faq-answer">
+                                        <p>Yes, we take data security very seriously:</p>
+                                        <ul>
+                                            <li>All data is encrypted in transit and at rest</li>
+                                            <li>We maintain SOC 2 Type II compliance</li>
+                                            <li>Regular security audits and penetration testing</li>
+                                            <li>GDPR and HIPAA compliance available</li>
+                                            <li>Multi-factor authentication required</li>
+                                        </ul>
+                                        <p>For detailed security information, please review our <a href="#" style="color: #3182ce;">Security Whitepaper</a>.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <section class="help-section">
+                            <h3>Contact Support</h3>
+                            <p>Can't find what you're looking for? Our support team is here to help.</p>
+                            
+                            <div class="contact-options">
+                                <div class="contact-card">
+                                    <div class="icon">💬</div>
+                                    <h4>Live Chat</h4>
+                                    <p>Get instant help from our support team</p>
+                                    <a href="#">Start Chat</a>
+                                </div>
+                                
+                                <div class="contact-card">
+                                    <div class="icon">📧</div>
+                                    <h4>Email Support</h4>
+                                    <p>Send us a detailed message about your issue</p>
+                                    <a href="../contact.html">Send Email</a>
+                                </div>
+                                
+                                <div class="contact-card">
+                                    <div class="icon">📞</div>
+                                    <h4>Phone Support</h4>
+                                    <p>Speak directly with a technical specialist</p>
+                                    <a href="tel:+15551234567">Call Now</a>
+                                </div>
+                                
+                                <div class="contact-card">
+                                    <div class="icon">📚</div>
+                                    <h4>Documentation</h4>
+                                    <p>Comprehensive guides and API documentation</p>
+                                    <a href="#">View Docs</a>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="help.html">Help</a>
+                <a href="../privacy.html">Privacy Policy</a>
+                <a href="../terms.html">Terms of Service</a>
+            </nav>
+            <p>&copy; 2024 TechCorp Solutions. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

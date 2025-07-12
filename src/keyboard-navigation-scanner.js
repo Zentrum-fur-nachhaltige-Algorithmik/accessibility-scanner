@@ -114,10 +114,13 @@ class KeyboardNavigationScanner {
           if (!el.hasAttribute('disabled') && !el.hidden) {
             const rect = el.getBoundingClientRect();
             if (rect.width > 0 && rect.height > 0) {
+              const className = el.className && typeof el.className === 'string' 
+                ? el.className 
+                : (el.className && el.className.baseVal ? el.className.baseVal : '');
               elements.push({
                 selector: el.tagName.toLowerCase() + 
                          (el.id ? `#${el.id}` : '') + 
-                         (el.className ? `.${el.className.split(' ').join('.')}` : ''),
+                         (className ? `.${className.split(' ').join('.')}` : ''),
                 tagName: el.tagName,
                 type: el.type || '',
                 role: el.getAttribute('role') || '',

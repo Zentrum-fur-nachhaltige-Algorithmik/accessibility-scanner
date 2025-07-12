@@ -1,0 +1,100 @@
+{
+  "reportId": "site-scan-1752306595261",
+  "baseUrl": "https://beeproduced.com",
+  "scanDate": "2025-07-12T07:49:55.261Z",
+  "overview": {
+    "totalPages": 1,
+    "scannedPages": 1,
+    "skippedPages": 0,
+    "successRate": 100,
+    "totalScanTime": -1752306580132,
+    "averagePageScanTime": 10852
+  },
+  "cspAnalysis": {
+    "mostEffectiveStrategy": "standard",
+    "strategyPerformance": {
+      "standard": {
+        "successRate": 100,
+        "averageTime": 10852,
+        "usageCount": 1
+      }
+    },
+    "totalStrategiesUsed": 1
+  },
+  "pageResults": [
+    {
+      "url": "https://beeproduced.com",
+      "pageType": "other",
+      "priority": 24,
+      "accessibilityScore": 0,
+      "violations": [],
+      "cspStrategy": "standard",
+      "scanDuration": 10852,
+      "timestamp": "2025-07-12T07:49:55.260Z"
+    }
+  ],
+  "siteWideTrends": {
+    "commonViolations": [],
+    "accessibilityByPageType": {
+      "other": {
+        "avgScore": 0,
+        "count": 1
+      }
+    },
+    "averageAccessibilityScore": 0
+  },
+  "optimization": {
+    "reductionPercentage": 0,
+    "originalCount": 1,
+    "optimizedCount": 1,
+    "removedCount": 0,
+    "priorityDistribution": {
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "average": 24
+    },
+    "containerDistribution": {
+      "homepage": 1
+    },
+    "patternStats": {
+      "originalPages": 1,
+      "optimizedPages": 1,
+      "reductionPercentage": 0,
+      "pagesSaved": 0,
+      "patterns": 1,
+      "largestPattern": 1
+    },
+    "efficiency": {
+      "avgPriorityScore": 24,
+      "criticalPagesIncluded": 0,
+      "accessibilityBalance": {
+        "good": 0,
+        "poor": 0,
+        "unknown": 1,
+        "balanceScore": 0
+      }
+    },
+    "recommendations": []
+  },
+  "patterns": {
+    "/": [
+      "https://beeproduced.com"
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "overall-quality",
+      "issue": "Multiple pages with low accessibility scores",
+      "affectedPages": 1,
+      "solution": "Implement comprehensive accessibility review and testing process"
+    }
+  ],
+  "metadata": {
+    "scannerVersion": "1.0.0",
+    "pagesDiscovered": 1,
+    "cspStrategiesUsed": {},
+    "errors": []
+  }
+}

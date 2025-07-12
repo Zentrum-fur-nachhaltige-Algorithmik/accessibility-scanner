@@ -57,6 +57,149 @@ const TEST_SITES = {
             ],
             expectedConfidence: 'medium', // 60-80% aufgrund Heuristiken
             description: 'Text content rendered as images instead of HTML text'
+        },
+        
+        // === NEW PHASE 1: SAFETY CRITICAL ===
+        {
+            name: 'Seizure Risk Violations',
+            file: 'bad-seizure-risk.html',
+            expectedViolations: [
+                'flashing_content_10hz',
+                'strobe_effect_dangerous',
+                'rapid_color_changes',
+                'blinking_text_fast',
+                'canvas_dangerous_patterns',
+                'video_flashing_content',
+                'background_flashing'
+            ],
+            expectedConfidence: 'high',
+            description: 'Content flashing >3Hz causing seizure risk - SAFETY CRITICAL'
+        },
+        {
+            name: 'Label in Name Violations',
+            file: 'bad-label-in-name.html',
+            expectedViolations: [
+                'aria_label_mismatch_button',
+                'aria_label_mismatch_link',
+                'aria_label_mismatch_input',
+                'aria_labelledby_wrong_reference',
+                'voice_control_failure',
+                'inconsistent_naming_multiple'
+            ],
+            expectedConfidence: 'high',
+            description: 'Voice control incompatible - visible text ≠ accessible name'
+        },
+        {
+            name: 'Status Messages Violations',
+            file: 'bad-status-messages.html',
+            expectedViolations: [
+                'silent_status_updates',
+                'hidden_status_changes',
+                'missing_aria_live',
+                'missing_role_alert',
+                'form_errors_silent',
+                'dynamic_content_silent',
+                'critical_messages_silent'
+            ],
+            expectedConfidence: 'high',
+            description: 'Screen reader users miss critical status updates'
+        },
+        
+        // === NEW PHASE 2: CORE FUNCTIONALITY ===
+        {
+            name: 'Non-Text Contrast Violations',
+            file: 'bad-nontext-contrast.html',
+            expectedViolations: [
+                'button_border_contrast_low',
+                'input_border_invisible',
+                'focus_indicator_poor',
+                'ui_component_contrast_fail',
+                'checkbox_border_invisible',
+                'dropdown_contrast_poor',
+                'icon_contrast_insufficient'
+            ],
+            expectedConfidence: 'high',
+            description: 'UI components with contrast <3:1 invisible to low vision users'
+        },
+        {
+            name: 'Timing Controls Violations',
+            file: 'bad-timing-controls.html',
+            expectedViolations: [
+                'autoplay_video_no_controls',
+                'autoplay_audio_no_controls',
+                'auto_refresh_no_pause',
+                'carousel_auto_advance',
+                'session_timeout_no_extension',
+                'form_timeout_no_warning',
+                'moving_content_no_pause'
+            ],
+            expectedConfidence: 'high',
+            description: 'Auto-play and timing without user controls - motor disability barrier'
+        },
+        {
+            name: 'Form Error Handling Violations',
+            file: 'bad-form-errors.html',
+            expectedViolations: [
+                'missing_error_identification',
+                'poor_error_descriptions',
+                'missing_error_suggestions',
+                'visual_only_errors',
+                'unlinked_error_messages',
+                'missing_required_indicators',
+                'dangerous_actions_no_confirmation'
+            ],
+            expectedConfidence: 'high',
+            description: 'Poor form error handling prevents successful completion'
+        },
+        
+        // === NEW PHASE 3: ADVANCED COVERAGE ===
+        {
+            name: 'Complex ARIA Violations',
+            file: 'bad-complex-aria.html',
+            expectedViolations: [
+                'tree_missing_aria_expanded',
+                'grid_missing_row_col_index',
+                'combobox_missing_controls',
+                'tabs_missing_aria_selected',
+                'accordion_missing_expanded',
+                'dialog_missing_modal',
+                'menu_missing_haspopup',
+                'listbox_missing_selected'
+            ],
+            expectedConfidence: 'high',
+            description: 'Complex ARIA widgets with incomplete implementations'
+        },
+        {
+            name: 'Input Modalities Violations',
+            file: 'bad-input-modalities.html',
+            expectedViolations: [
+                'swipe_only_navigation',
+                'pinch_only_zoom',
+                'drag_only_reorder',
+                'multi_touch_only',
+                'long_press_only',
+                'mouse_only_interactions',
+                'down_event_only_actions',
+                'motion_only_controls'
+            ],
+            expectedConfidence: 'medium',
+            description: 'Gesture-dependent interactions without alternatives'
+        },
+        {
+            name: 'HTML Validation Violations',
+            file: 'bad-html-validation.html',
+            expectedViolations: [
+                'invalid_aria_references',
+                'duplicate_ids',
+                'invalid_nesting',
+                'broken_table_structure',
+                'broken_list_structure',
+                'broken_heading_hierarchy',
+                'invalid_aria_combinations',
+                'missing_required_attributes'
+            ],
+            expectedConfidence: 'high',
+            description: 'Invalid HTML structure breaking accessibility features'
         }
     ],
     
@@ -68,6 +211,20 @@ const TEST_SITES = {
             expectedViolations: [], // Keine Verletzungen erwartet
             expectedConfidence: 'high',
             description: 'Proper implementation of WCAG 2.1 Level AA standards'
+        },
+        {
+            name: 'Good Seizure Safe Content',
+            file: 'good-seizure-safe.html',
+            expectedViolations: [],
+            expectedConfidence: 'high',
+            description: 'Seizure-safe animations with user controls <3Hz'
+        },
+        {
+            name: 'Good Label in Name Implementation',
+            file: 'good-label-in-name.html',
+            expectedViolations: [],
+            expectedConfidence: 'high',
+            description: 'Voice control compatible - visible text matches accessible name'
         }
     ]
 };
@@ -104,6 +261,102 @@ const EXPECTED_RESULTS = {
             colorContrast: { count: 0, confidence: 'none' },
             useOfColor: { count: 0, confidence: 'none' },
             imagesOfText: { count: 0, confidence: 'none' }
+        }
+    },
+    
+    // === NEW PHASE 1: SAFETY CRITICAL EXPECTED RESULTS ===
+    'bad-seizure-risk.html': {
+        overallScore: 'FAIL',
+        violations: {
+            seizurePrevention: { count: '>=7', confidence: 'high' },
+            flashing: { count: '>=5', confidence: 'high' },
+            animation: { count: '>=3', confidence: 'high' }
+        }
+    },
+    'bad-label-in-name.html': {
+        overallScore: 'FAIL',
+        violations: {
+            labelInName: { count: '>=6', confidence: 'high' },
+            voiceControl: { count: '>=4', confidence: 'high' },
+            ariaLabeling: { count: '>=8', confidence: 'high' }
+        }
+    },
+    'bad-status-messages.html': {
+        overallScore: 'FAIL',
+        violations: {
+            statusMessages: { count: '>=7', confidence: 'high' },
+            ariaLive: { count: '>=5', confidence: 'high' },
+            screenReader: { count: '>=6', confidence: 'high' }
+        }
+    },
+    
+    // === NEW PHASE 2: CORE FUNCTIONALITY EXPECTED RESULTS ===
+    'bad-nontext-contrast.html': {
+        overallScore: 'FAIL',
+        violations: {
+            nonTextContrast: { count: '>=7', confidence: 'high' },
+            uiComponents: { count: '>=10', confidence: 'high' },
+            focusIndicators: { count: '>=3', confidence: 'high' }
+        }
+    },
+    'bad-timing-controls.html': {
+        overallScore: 'FAIL',
+        violations: {
+            timingControls: { count: '>=7', confidence: 'high' },
+            autoPlay: { count: '>=4', confidence: 'high' },
+            userControl: { count: '>=6', confidence: 'high' }
+        }
+    },
+    'bad-form-errors.html': {
+        overallScore: 'FAIL',
+        violations: {
+            errorHandling: { count: '>=7', confidence: 'high' },
+            formValidation: { count: '>=5', confidence: 'high' },
+            errorPrevention: { count: '>=4', confidence: 'high' }
+        }
+    },
+    
+    // === NEW PHASE 3: ADVANCED COVERAGE EXPECTED RESULTS ===
+    'bad-complex-aria.html': {
+        overallScore: 'FAIL',
+        violations: {
+            complexAria: { count: '>=8', confidence: 'high' },
+            ariaWidgets: { count: '>=6', confidence: 'high' },
+            roleImplementation: { count: '>=5', confidence: 'high' }
+        }
+    },
+    'bad-input-modalities.html': {
+        overallScore: 'FAIL',
+        violations: {
+            inputModalities: { count: '>=8', confidence: 'medium' },
+            gestureAlternatives: { count: '>=6', confidence: 'medium' },
+            keyboardAccess: { count: '>=4', confidence: 'high' }
+        }
+    },
+    'bad-html-validation.html': {
+        overallScore: 'FAIL',
+        violations: {
+            htmlValidation: { count: '>=8', confidence: 'high' },
+            structuralIntegrity: { count: '>=6', confidence: 'high' },
+            ariaReferences: { count: '>=5', confidence: 'high' }
+        }
+    },
+    
+    // === NEW GOOD EXAMPLES EXPECTED RESULTS ===
+    'good-seizure-safe.html': {
+        overallScore: 'PASS',
+        violations: {
+            seizurePrevention: { count: 0, confidence: 'none' },
+            flashing: { count: 0, confidence: 'none' },
+            animation: { count: 0, confidence: 'none' }
+        }
+    },
+    'good-label-in-name.html': {
+        overallScore: 'PASS',
+        violations: {
+            labelInName: { count: 0, confidence: 'none' },
+            voiceControl: { count: 0, confidence: 'none' },
+            ariaLabeling: { count: 0, confidence: 'none' }
         }
     }
 };

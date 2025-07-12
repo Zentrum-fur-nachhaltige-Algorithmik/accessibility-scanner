@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: HTML-Validierung Verletzungen (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .code-example {
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        
+        .structural-example {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* Broken Table Styles */
+        .broken-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .broken-table th, .broken-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .broken-table th {
+            background-color: #f2f2f2;
+        }
+        
+        /* Form Styles */
+        .broken-form {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .form-group {
+            margin: 10px 0;
+        }
+        
+        input, select, textarea {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007cba;
+            color: white;
+        }
+        
+        .list-example {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+        
+        .media-example {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: HTML-Validierung Verletzungen (BAD)</h1>
+    <p><strong>HTML-Struktur Verletzungen:</strong> Ungültiges HTML, das Accessibility-Features beeinträchtigt</p>
+    
+    <!-- VIOLATION 1: Ungültige ARIA-Referenzen -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Ungültige ARIA-Referenzen</div>
+        <p><strong>Problem:</strong> aria-describedby, aria-labelledby verweisen auf nicht-existierende IDs</p>
+        <div class="structural-example">
+            <h4>Formular mit gebrochenen ARIA-Referenzen</h4>
+            <!-- SCHLECHT: aria-describedby verweist auf nicht-existierende ID -->
+            <label for="broken-input-1">Benutzername:</label>
+            <input type="text" id="broken-input-1" aria-describedby="nonexistent-help-1" required>
+            
+            <!-- SCHLECHT: aria-labelledby verweist auf falsche ID -->
+            <input type="password" aria-labelledby="wrong-label-id" required>
+            
+            <!-- SCHLECHT: aria-controls verweist auf nicht-existierende ID -->
+            <button aria-controls="nonexistent-panel" aria-expanded="false">Toggle Panel</button>
+            
+            <!-- SCHLECHT: aria-activedescendant verweist auf ungültige ID -->
+            <div role="listbox" aria-activedescendant="missing-option-id">
+                <div role="option" id="option-1">Option 1</div>
+                <div role="option" id="option-2">Option 2</div>
+            </div>
+        </div>
+        <div class="code-example">Problematische Referenzen:
+- aria-describedby="nonexistent-help-1" (ID existiert nicht)
+- aria-labelledby="wrong-label-id" (ID existiert nicht)
+- aria-controls="nonexistent-panel" (ID existiert nicht)
+- aria-activedescendant="missing-option-id" (ID existiert nicht)</div>
+    </div>
+    
+    <!-- VIOLATION 2: Duplicate IDs -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Doppelte IDs</div>
+        <p><strong>Problem:</strong> Mehrere Elemente mit derselben ID brechen ARIA-Verknüpfungen</p>
+        <div class="structural-example">
+            <h4>Formular mit doppelten IDs</h4>
+            <!-- SCHLECHT: Doppelte ID "user-input" -->
+            <label for="user-input">Vorname:</label>
+            <input type="text" id="user-input" required>
+            
+            <label for="user-input">Nachname:</label>
+            <input type="text" id="user-input" required>
+            
+            <!-- SCHLECHT: Doppelte ID "submit-btn" -->
+            <button id="submit-btn">Vorschau</button>
+            <button id="submit-btn">Absenden</button>
+            
+            <!-- SCHLECHT: Doppelte ID "error-msg" -->
+            <div id="error-msg" style="color: red; display: none;">Vorname-Fehler</div>
+            <div id="error-msg" style="color: red; display: none;">Nachname-Fehler</div>
+        </div>
+        <div class="code-example">Doppelte IDs:
+- id="user-input" (2x verwendet)
+- id="submit-btn" (2x verwendet) 
+- id="error-msg" (2x verwendet)</div>
+    </div>
+    
+    <!-- VIOLATION 3: Ungültige Verschachtelung -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Ungültige HTML-Verschachtelung</div>
+        <p><strong>Problem:</strong> Falsche Element-Verschachtelung bricht Screenreader-Navigation</p>
+        <div class="structural-example">
+            <h4>Gebrochene HTML-Struktur</h4>
+            
+            <!-- SCHLECHT: div als Kind von p -->
+            <p>Dies ist ein Absatz mit 
+                <div>einem div darin - UNGÜLTIG!</div>
+            </p>
+            
+            <!-- SCHLECHT: Heading in anderem Heading -->
+            <h2>Hauptüberschrift 
+                <h3>mit Sub-Heading drin - UNGÜLTIG!</h3>
+            </h2>
+            
+            <!-- SCHLECHT: Form in anderem Form -->
+            <form>
+                Äußeres Formular
+                <form>
+                    <input type="text" placeholder="Inneres Form - UNGÜLTIG!">
+                </form>
+            </form>
+            
+            <!-- SCHLECHT: Button in Button -->
+            <button>
+                Äußerer Button
+                <button>Innerer Button - UNGÜLTIG!</button>
+            </button>
+        </div>
+        <div class="code-example">Ungültige Verschachtelungen:
+- &lt;div&gt; innerhalb &lt;p&gt; (nicht erlaubt)
+- &lt;h3&gt; innerhalb &lt;h2&gt; (nicht erlaubt)
+- &lt;form&gt; innerhalb &lt;form&gt; (nicht erlaubt)
+- &lt;button&gt; innerhalb &lt;button&gt; (nicht erlaubt)</div>
+    </div>
+    
+    <!-- VIOLATION 4: Gebrochene Tabellen-Struktur -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Gebrochene Tabellen-Struktur</div>
+        <p><strong>Problem:</strong> Ungültige Tabellen-HTML bricht Screenreader-Navigation</p>
+        <div class="structural-example">
+            <h4>Kaputte Tabellen-Beispiele</h4>
+            
+            <!-- SCHLECHT: td ohne tr -->
+            <table class="broken-table">
+                <td>Zelle ohne Row - UNGÜLTIG!</td>
+                <td>Noch eine Zelle ohne Row</td>
+            </table>
+            
+            <!-- SCHLECHT: th außerhalb von thead/tbody -->
+            <table class="broken-table">
+                <tr>
+                    <td>Normale Zelle</td>
+                    <th>Header außerhalb thead - PROBLEMATISCH!</th>
+                </tr>
+                <th>Floating Header - UNGÜLTIG!</th>
+            </table>
+            
+            <!-- SCHLECHT: tbody vor thead -->
+            <table class="broken-table">
+                <tbody>
+                    <tr><td>Body vor Head</td></tr>
+                </tbody>
+                <thead>
+                    <tr><th>Header nach Body - FALSCHE REIHENFOLGE!</th></tr>
+                </thead>
+            </table>
+        </div>
+        <div class="code-example">Tabellen-Probleme:
+- &lt;td&gt; direkt in &lt;table&gt; ohne &lt;tr&gt;
+- &lt;th&gt; außerhalb von &lt;thead&gt;/&lt;tbody&gt;
+- &lt;tbody&gt; vor &lt;thead&gt; (falsche Reihenfolge)</div>
+    </div>
+    
+    <!-- VIOLATION 5: Gebrochene Listen-Struktur -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Gebrochene Listen-Struktur</div>
+        <p><strong>Problem:</strong> Ungültige Listen-HTML bricht Screenreader-Listennavigation</p>
+        <div class="list-example">
+            <h4>Kaputte Listen-Beispiele</h4>
+            
+            <!-- SCHLECHT: li ohne ul/ol -->
+            <li>Listen-Item ohne Liste - UNGÜLTIG!</li>
+            <li>Noch ein Item ohne Liste</li>
+            
+            <!-- SCHLECHT: div in ul (ohne li) -->
+            <ul>
+                <div>Div direkt in UL - UNGÜLTIG!</div>
+                <li>Normales Listen-Item</li>
+                <span>Span direkt in UL - UNGÜLTIG!</span>
+            </ul>
+            
+            <!-- SCHLECHT: Verschachtelte Listen ohne li -->
+            <ul>
+                <li>Item 1</li>
+                <ul>
+                    <li>Sub-Item ohne Parent-LI - PROBLEMATISCH!</li>
+                </ul>
+                <li>Item 2</li>
+            </ul>
+        </div>
+        <div class="code-example">Listen-Probleme:
+- &lt;li&gt; ohne &lt;ul&gt; oder &lt;ol&gt; Container
+- &lt;div&gt;/&lt;span&gt; direkt in &lt;ul&gt; statt &lt;li&gt;
+- Verschachtelte Listen nicht in &lt;li&gt;</div>
+    </div>
+    
+    <!-- VIOLATION 6: Gebrochene Heading-Hierarchie -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Gebrochene Heading-Hierarchie</div>
+        <p><strong>Problem:</strong> Falsche Heading-Reihenfolge bricht Screenreader-Navigation</p>
+        <div class="structural-example">
+            <h4>Kaputte Heading-Struktur</h4>
+            
+            <!-- SCHLECHT: Übersprungene Heading-Ebenen -->
+            <h1>Haupttitel (H1)</h1>
+            <h4>Übersprungene Ebene - sollte H2 sein!</h4>
+            <h6>Noch weiter übersprungen - sollte H3/H4/H5 sein!</h6>
+            <h2>Zurück zu H2 nach H6 - verwirrend!</h2>
+            
+            <!-- SCHLECHT: Mehrere H1 auf einer Seite -->
+            <h1>Erster H1</h1>
+            <h1>Zweiter H1 - sollte H2 sein!</h1>
+            
+            <!-- SCHLECHT: Leere Headings -->
+            <h2></h2>
+            <h3>   </h3>
+        </div>
+        <div class="code-example">Heading-Probleme:
+- H1 → H4 (übersprungene H2, H3 Ebenen)
+- H4 → H6 (übersprungene H5 Ebene)
+- Mehrere H1 auf einer Seite
+- Leere Headings ohne Inhalt</div>
+    </div>
+    
+    <!-- VIOLATION 7: Ungültige ARIA-Kombinationen -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Ungültige ARIA-Role/Attribut-Kombinationen</div>
+        <p><strong>Problem:</strong> Falsche ARIA-Kombinationen verwirren Screenreader</p>
+        <div class="structural-example">
+            <h4>Ungültige ARIA-Kombinationen</h4>
+            
+            <!-- SCHLECHT: role="button" ohne tabindex auf div -->
+            <div role="button" onclick="alert('clicked')">
+                Button ohne Keyboard-Zugang
+            </div>
+            
+            <!-- SCHLECHT: aria-checked auf Element ohne checkbox/radio role -->
+            <div aria-checked="true">
+                Kein checkbox/radio aber aria-checked
+            </div>
+            
+            <!-- SCHLECHT: aria-selected auf Element ohne option/tab role -->
+            <span aria-selected="true">
+                Kein option/tab aber aria-selected
+            </span>
+            
+            <!-- SCHLECHT: aria-expanded ohne entsprechende Role -->
+            <span aria-expanded="false">
+                Kein expandierbares Element
+            </span>
+            
+            <!-- SCHLECHT: Falsche Role für Element -->
+            <input type="text" role="button">
+            <button role="textbox">Falscher Role</button>
+        </div>
+        <div class="code-example">ARIA-Probleme:
+- role="button" ohne tabindex (nicht keyboard-zugänglich)
+- aria-checked ohne checkbox/radio role
+- aria-selected ohne option/tab role  
+- aria-expanded ohne expandierbare role
+- Falsche roles für native Elemente</div>
+    </div>
+    
+    <!-- VIOLATION 8: Fehlende Required-Attribute -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Fehlende Required-Attribute für ARIA-Roles</div>
+        <p><strong>Problem:</strong> ARIA-Roles ohne notwendige begleitende Attribute</p>
+        <div class="structural-example">
+            <h4>Unvollständige ARIA-Implementierungen</h4>
+            
+            <!-- SCHLECHT: slider ohne aria-valuemin, aria-valuemax, aria-valuenow -->
+            <div role="slider">
+                Slider ohne Wert-Attribute
+            </div>
+            
+            <!-- SCHLECHT: progressbar ohne aria-valuenow -->
+            <div role="progressbar">
+                Progress ohne Wert
+            </div>
+            
+            <!-- SCHLECHT: textbox ohne aria-multiline info -->
+            <div role="textbox" contenteditable="true">
+                Textbox ohne multiline info
+            </div>
+            
+            <!-- SCHLECHT: combobox ohne aria-expanded -->
+            <div role="combobox">
+                <input type="text">
+                Combobox ohne expanded state
+            </div>
+            
+            <!-- SCHLECHT: tablist ohne aria-orientation -->
+            <div role="tablist">
+                <div role="tab">Tab ohne Orientation</div>
+            </div>
+        </div>
+        <div class="code-example">Fehlende ARIA-Attribute:
+- slider: aria-valuemin, aria-valuemax, aria-valuenow
+- progressbar: aria-valuenow
+- textbox: aria-multiline
+- combobox: aria-expanded
+- tablist: aria-orientation</div>
+    </div>
+    
+    <!-- VIOLATION 9: Gebrochene Media-Elemente -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Gebrochene Media-Elemente</div>
+        <p><strong>Problem:</strong> Ungültige Audio/Video/Img-Implementierungen</p>
+        <div class="media-example">
+            <h4>Kaputte Media-Beispiele</h4>
+            
+            <!-- SCHLECHT: img ohne src -->
+            <img alt="Bild ohne src-Attribute">
+            
+            <!-- SCHLECHT: img mit leerem alt und fehlendem src -->
+            <img alt="">
+            
+            <!-- SCHLECHT: video mit source aber ohne type -->
+            <video controls>
+                <source src="video.mp4">
+                Source ohne type-Attribute
+            </video>
+            
+            <!-- SCHLECHT: audio ohne controls und autoplay -->
+            <audio autoplay>
+                <source src="audio.mp3" type="audio/mp3">
+                Autoplay ohne controls
+            </audio>
+            
+            <!-- SCHLECHT: iframe ohne title -->
+            <iframe src="about:blank" width="300" height="200">
+                Iframe ohne title
+            </iframe>
+        </div>
+        <div class="code-example">Media-Probleme:
+- &lt;img&gt; ohne src-Attribut
+- &lt;source&gt; ohne type-Attribut
+- &lt;audio&gt; autoplay ohne controls
+- &lt;iframe&gt; ohne title-Attribut</div>
+    </div>
+    
+    <!-- VIOLATION 10: Gebrochene Formular-Struktur -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 10: Gebrochene Formular-Struktur</div>
+        <p><strong>Problem:</strong> Ungültige Formular-HTML bricht Accessibility</p>
+        <div class="broken-form">
+            <h4>Kaputte Formular-Beispiele</h4>
+            
+            <!-- SCHLECHT: label ohne for und ohne Input-Verknüpfung -->
+            <label>Unverknüpftes Label</label>
+            <input type="text">
+            
+            <!-- SCHLECHT: input ohne name-Attribut in form -->
+            <form>
+                <input type="text" placeholder="Ohne name-Attribut">
+                <input type="submit" value="Absenden">
+            </form>
+            
+            <!-- SCHLECHT: fieldset ohne legend -->
+            <fieldset>
+                <input type="radio" name="broken-radio" value="1"> Option 1
+                <input type="radio" name="broken-radio" value="2"> Option 2
+            </fieldset>
+            
+            <!-- SCHLECHT: select ohne option-Labels -->
+            <select>
+                <option value="1"></option>
+                <option value="2">   </option>
+                <option value="3">Option 3</option>
+            </select>
+        </div>
+        <div class="code-example">Formular-Probleme:
+- &lt;label&gt; ohne for-Attribut oder Input-Verschachtelung
+- &lt;input&gt; ohne name-Attribut in &lt;form&gt;
+- &lt;fieldset&gt; ohne &lt;legend&gt;
+- &lt;option&gt; ohne Text-Inhalt</div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Testhilfe: HTML-Validierung-Checks</div>
+        <p><strong>Erwartete Scanner-Erkennungen:</strong></p>
+        <ul>
+            <li>✗ Ungültige ARIA-Referenzen (aria-describedby auf nicht-existierende IDs)</li>
+            <li>✗ Doppelte IDs die ARIA-Verknüpfungen brechen</li>
+            <li>✗ Ungültige HTML-Verschachtelung (div in p, form in form, etc.)</li>
+            <li>✗ Gebrochene Tabellen-Struktur (td ohne tr, tbody vor thead)</li>
+            <li>✗ Ungültige Listen-Struktur (li ohne ul, div direkt in ul)</li>
+            <li>✗ Gebrochene Heading-Hierarchie (H1→H4, mehrere H1)</li>
+            <li>✗ Ungültige ARIA-Kombinationen (role ohne required attributes)</li>
+            <li>✗ Fehlende Required-Attribute für ARIA-Roles</li>
+            <li>✗ Gebrochene Media-Elemente (img ohne src, iframe ohne title)</li>
+            <li>✗ Ungültige Formular-Struktur (label ohne for, fieldset ohne legend)</li>
+        </ul>
+    </div>
+
+    <script>
+        // Demonstration der Probleme durch JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Zeige Beispiele für JavaScript-generierte HTML-Validierungsfehler
+            
+            // SCHLECHT: Dynamisch erstellte Elemente mit doppelten IDs
+            const container = document.querySelector('.structural-example');
+            
+            // Erstelle mehrere Elemente mit derselben ID (SCHLECHT)
+            for (let i = 0; i < 3; i++) {
+                const div = document.createElement('div');
+                div.id = 'dynamic-duplicate-id'; // SCHLECHT: Doppelte ID
+                div.textContent = `Dynamisches Element ${i + 1} mit doppelter ID`;
+                div.style.margin = '5px 0';
+                div.style.padding = '5px';
+                div.style.background = '#ffebee';
+                div.style.border = '1px solid #f44336';
+            }
+            
+            // SCHLECHT: ARIA-Referenz auf Element das später entfernt wird
+            const input = document.getElementById('broken-input-1');
+            if (input) {
+                // Erstelle describedby-Element
+                const helpText = document.createElement('div');
+                helpText.id = 'nonexistent-help-1';
+                helpText.textContent = 'Hilfetext erstellt...';
+                input.parentNode.appendChild(helpText);
+                
+                // Entferne es nach 3 Sekunden (bricht ARIA-Referenz)
+                setTimeout(() => {
+                    helpText.remove();
+                    console.log('Hilfetext entfernt - aria-describedby Referenz ist jetzt gebrochen!');
+                }, 3000);
+            }
+            
+            // SCHLECHT: Ungültige ARIA-Attribute durch JavaScript
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (button.textContent.includes('Toggle Panel')) {
+                    // Setze aria-controls auf nicht-existierende ID
+                    button.setAttribute('aria-controls', 'panel-' + Math.random());
+                }
+            });
+        });
+        
+        // SCHLECHT: Event-Handler die HTML-Struktur brechen
+        function demonstrateDynamicValidationErrors() {
+            // Erstelle ungültige HTML-Struktur dynamisch
+            const body = document.body;
+            
+            // SCHLECHT: Nested forms
+            const outerForm = document.createElement('form');
+            const innerForm = document.createElement('form');
+            outerForm.appendChild(innerForm);
+            
+            // SCHLECHT: div in p
+            const paragraph = document.createElement('p');
+            const div = document.createElement('div');
+            div.textContent = 'Div in Paragraph - ungültig!';
+            paragraph.appendChild(div);
+            
+            console.log('Ungültige HTML-Strukturen dynamisch erstellt');
+        }
+        
+        // Simuliere Validierungsfehler
+        demonstrateDynamicValidationErrors();
+    </script>
+</body>
+</html>

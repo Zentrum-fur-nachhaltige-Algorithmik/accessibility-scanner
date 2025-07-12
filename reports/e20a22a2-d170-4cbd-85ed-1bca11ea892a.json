@@ -1,0 +1,104 @@
+{
+  "id": "e20a22a2-d170-4cbd-85ed-1bca11ea892a",
+  "timestamp": "2025-07-12T07:34:52.800Z",
+  "url": "https://example.com",
+  "accessibilityScore": 79,
+  "violations": [
+    {
+      "id": "html-has-lang",
+      "impact": "serious",
+      "description": "Ensure every HTML document has a lang attribute",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/html-has-lang?application=axeAPI",
+      "nodes": [
+        "html"
+      ],
+      "wcagCriteria": [
+        "wcag2a",
+        "wcag311"
+      ]
+    },
+    {
+      "id": "landmark-one-main",
+      "impact": "moderate",
+      "description": "Ensure the document has a main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=axeAPI",
+      "nodes": [
+        "html"
+      ],
+      "wcagCriteria": []
+    },
+    {
+      "id": "region",
+      "impact": "moderate",
+      "description": "Ensure all page content is contained by landmarks",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=axeAPI",
+      "nodes": [
+        "div"
+      ],
+      "wcagCriteria": []
+    }
+  ],
+  "passes": 11,
+  "pageTitle": "Example Domain",
+  "wcagCompliance": {
+    "level": "AA",
+    "criteria": []
+  },
+  "categories": {
+    "perceivable": {
+      "score": 100,
+      "violations": 0,
+      "passes": 0
+    },
+    "operable": {
+      "score": 100,
+      "violations": 0,
+      "passes": 0
+    },
+    "understandable": {
+      "score": 100,
+      "violations": 0,
+      "passes": 0
+    },
+    "robust": {
+      "score": 0,
+      "violations": 3,
+      "passes": 0
+    }
+  },
+  "pa11yIssues": [
+    {
+      "code": "WCAG2AA.Principle3.Guideline3_1.3_1_1.H57.2",
+      "type": "error",
+      "typeCode": 1,
+      "message": "The html element should have a lang or xml:lang attribute which describes the language of the document.",
+      "context": "<html><head>\n    <title>Example Domai...</html>",
+      "selector": "html",
+      "runner": "htmlcs",
+      "runnerExtras": {}
+    }
+  ],
+  "scanOptions": {
+    "wcagLevel": "AA",
+    "includeWarnings": true,
+    "testKeyboardNav": true,
+    "includePhase6A": false,
+    "includePhase6B": false,
+    "includePhase6D": false,
+    "includePhase6E": false,
+    "includePhase6F": false,
+    "timeout": 30000
+  },
+  "keyboardNavigation": {
+    "tabbableElements": 1,
+    "logicalTabOrder": true,
+    "keyboardTraps": [
+      "BODY"
+    ]
+  },
+  "metadata": {
+    "generatedBy": "Web Accessibility Checker v3.0",
+    "format": "html",
+    "includePDF": false
+  }
+}

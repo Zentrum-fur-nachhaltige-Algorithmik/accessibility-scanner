@@ -1,0 +1,5218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Accessibility Report - file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html</title>
+    <style>
+        
+        /* Interactive Accessibility Report Styles - Phase 1 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .report-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .report-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .report-meta {
+            position: relative;
+            z-index: 1;
+        }
+
+        .report-meta p {
+            margin: 0.75rem 0;
+            opacity: 0.95;
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .report-meta a {
+            color: white;
+        }
+
+        .summary-section, .controls-section, .screenshot-section, .violations-list {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 6px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card.critical { border-left-color: #dc2626; }
+        .stat-card.serious { border-left-color: #ea580c; }
+        .stat-card.moderate { border-left-color: #ca8a04; }
+        .stat-card.minor { border-left-color: #059669; }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .screenshot-container {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: auto;
+            max-height: 80vh;
+            background: white;
+        }
+
+        .website-screenshot {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .violation-overlays {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .violation-overlay {
+            pointer-events: all;
+            transition: all 0.2s;
+            border-style: solid;
+        }
+
+        .violation-overlay:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .violation-overlay.hidden {
+            display: none;
+        }
+
+        .violation-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 10000;
+            max-width: 350px;
+            white-space: normal;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .violation-tooltip::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #1a1a1a;
+        }
+
+        .violation-overlay:hover .violation-tooltip {
+            opacity: 1;
+        }
+
+        .tooltip-header {
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        .violation-id {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .tooltip-content > div {
+            margin-bottom: 0.75rem;
+        }
+
+        .tooltip-content > div:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-description, .tooltip-help, .tooltip-element {
+            line-height: 1.4;
+        }
+
+        .tooltip-element code {
+            background: rgba(255,255,255,0.1);
+            padding: 0.125rem 0.25rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .tooltip-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .tooltip-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tooltip-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .impact-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .impact-badge.critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .impact-badge.serious {
+            background: #ea580c;
+            color: white;
+        }
+
+        .impact-badge.moderate {
+            background: #ca8a04;
+            color: white;
+        }
+
+        .impact-badge.minor {
+            background: #059669;
+            color: white;
+        }
+
+        .wcag-tags {
+            margin-top: 0.5rem;
+        }
+
+        .wcag-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.125rem 0.25rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+        }
+
+        .violations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .violations-table th,
+        .violations-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .violations-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .violation-row:hover {
+            background: #f8f9fa;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .report-container {
+                padding: 10px;
+            }
+
+            .report-header {
+                padding: 1rem;
+            }
+
+            .report-header h1 {
+                font-size: 2rem;
+            }
+
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-controls {
+                justify-content: center;
+            }
+
+            .view-controls {
+                justify-content: center;
+            }
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <header class="report-header">
+            <h1>🔍 Interactive Accessibility Report</h1>
+            <div class="report-meta">
+                <p><strong>URL:</strong> <a href="file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html" target="_blank">file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html</a></p>
+                <p><strong>Scan Date:</strong> 7/13/2025, 3:28:15 PM</p>
+                <p><strong>Report ID:</strong> interactive-3917532d-3733-46d7-8d10-c0348edc0ab2</p>
+            </div>
+        </header>
+
+        <section class="summary-section">
+            <h2>📊 Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-value">100</div>
+                    <div class="stat-label">Accessibility Score</div>
+                </div>
+                <div class="stat-card critical">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+                <div class="stat-card serious">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Serious</div>
+                </div>
+                <div class="stat-card moderate">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Moderate</div>
+                </div>
+                <div class="stat-card minor">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Minor</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="controls-section">
+            <h2>🎛️ Controls</h2>
+            <div class="controls">
+                <div class="filter-controls">
+                    <label>
+                        <input type="checkbox" id="show-critical" checked> Critical Issues
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-serious" checked> Serious Issues
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-moderate" checked> Moderate Issues
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-minor" checked> Minor Issues
+                    </label>
+                </div>
+                <div class="view-controls">
+                    <button id="zoom-fit" class="control-btn">🔍 Fit to Screen</button>
+                    <button id="zoom-100" class="control-btn">🎯 100%</button>
+                    <button id="toggle-overlays" class="control-btn">👁️ Toggle Overlays</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="screenshot-section">
+            <h2>📸 Interactive Website View</h2>
+            <div class="screenshot-container" id="screenshot-container">
+                <img src="data/screenshot.png" 
+                     alt="Website screenshot" 
+                     class="website-screenshot" 
+                     id="website-screenshot">
+                
+                <div class="violation-overlays" id="violation-overlays">
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="violations-list">
+            <h2>📋 Violations List</h2>
+            <div class="violations-table">
+                
+        <table class="violations-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Impact</th>
+                    <th>Description</th>
+                    <th>WCAG</th>
+                    <th>Elements</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    
+            </div>
+        </section>
+    </div>
+
+    <script>
+        
+        // Interactive Accessibility Report JavaScript - Phase 1
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Interactive Accessibility Report loaded');
+            
+            // Initialize filter controls
+            initializeFilters();
+            
+            // Initialize view controls
+            initializeViewControls();
+            
+            // Initialize overlay interactions
+            initializeOverlayInteractions();
+            
+            // Log complete report data for debugging and inspection
+            window.reportData = {
+  "reportId": "interactive-3917532d-3733-46d7-8d10-c0348edc0ab2",
+  "timestamp": "2025-07-13T13:28:15.399Z",
+  "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html",
+  "scanMetadata": {
+    "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html",
+    "testFile": "test-sites/good-accessibility.html",
+    "scanDate": "2025-07-13T13:28:15.061Z",
+    "totalViolations": 0
+  },
+  "screenshotData": {
+    "screenshotPath": "data/screenshot.png",
+    "elementMap": [
+      {
+        "id": "element-0",
+        "selector": "html",
+        "tagName": "html",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 3783.671875,
+          "left": 0,
+          "top": 0,
+          "right": 800,
+          "bottom": 3783.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Test: Gute Barrierefreiheit (GOOD)\n    \n        body {\n            font-family: Arial, sans-serif;\n ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-7",
+        "selector": "body",
+        "tagName": "body",
+        "bounds": {
+          "x": 20,
+          "y": 21.4375,
+          "width": 760,
+          "height": 3742.234375,
+          "left": 20,
+          "top": 21.4375,
+          "right": 780,
+          "bottom": 3763.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Zum Hauptinhalt springen\n    \n    \n        Test Website: Gute Barrierefreiheit (SOLL ALS GUT ERKANNT",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-8",
+        "selector": "a.skip-link",
+        "tagName": "a",
+        "bounds": {
+          "x": 6,
+          "y": -40,
+          "width": 199.21875,
+          "height": 41.59375,
+          "left": 6,
+          "top": -40,
+          "right": 205.21875,
+          "bottom": 1.59375
+        },
+        "attributes": {
+          "id": "",
+          "class": "skip-link",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Zum Hauptinhalt springen",
+        "isVisible": true,
+        "zIndex": "1000"
+      },
+      {
+        "id": "element-9",
+        "selector": "header",
+        "tagName": "header",
+        "bounds": {
+          "x": 20,
+          "y": 21.4375,
+          "width": 760,
+          "height": 149.40625,
+          "left": 20,
+          "top": 21.4375,
+          "right": 780,
+          "bottom": 170.84375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Test Website: Gute Barrierefreiheit (SOLL ALS GUT ERKANNT WERDEN)\n        Diese Website demonstriert",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-10",
+        "selector": "h1",
+        "tagName": "h1",
+        "bounds": {
+          "x": 20,
+          "y": 21.4375,
+          "width": 760,
+          "height": 102.375,
+          "left": 20,
+          "top": 21.4375,
+          "right": 780,
+          "bottom": 123.8125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Test Website: Gute Barrierefreiheit (SOLL ALS GUT ERKANNT WERDEN)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-11",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 20,
+          "y": 145.25,
+          "width": 760,
+          "height": 25.59375,
+          "left": 20,
+          "top": 145.25,
+          "right": 780,
+          "bottom": 170.84375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Diese Website demonstriert beste Praktiken für WCAG 2.1 Level AA Konformität.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-12",
+        "selector": "nav.good-navigation",
+        "tagName": "nav",
+        "bounds": {
+          "x": 20,
+          "y": 190.84375,
+          "width": 760,
+          "height": 79.59375,
+          "left": 20,
+          "top": 190.84375,
+          "right": 780,
+          "bottom": 270.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-navigation",
+          "aria-label": "Hauptnavigation",
+          "aria-labelledby": null,
+          "role": "navigation",
+          "alt": null,
+          "title": null
+        },
+        "text": "Startseite\n            Produkte\n            Services\n            Über uns\n            Kontakt",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-13",
+        "selector": "ul",
+        "tagName": "ul",
+        "bounds": {
+          "x": 35,
+          "y": 205.84375,
+          "width": 730,
+          "height": 49.59375,
+          "left": 35,
+          "top": 205.84375,
+          "right": 765,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Startseite\n            Produkte\n            Services\n            Über uns\n            Kontakt",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-14",
+        "selector": "li:nth-child(1)",
+        "tagName": "li",
+        "bounds": {
+          "x": 35,
+          "y": 205.84375,
+          "width": 206.90625,
+          "height": 49.59375,
+          "left": 35,
+          "top": 205.84375,
+          "right": 241.90625,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Startseite",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-15",
+        "selector": "a.active",
+        "tagName": "a",
+        "bounds": {
+          "x": 35,
+          "y": 205.84375,
+          "width": 206.90625,
+          "height": 49.59375,
+          "left": 35,
+          "top": 205.84375,
+          "right": 241.90625,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "active",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Startseite",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-16",
+        "selector": "li:nth-child(2)",
+        "tagName": "li",
+        "bounds": {
+          "x": 261.90625,
+          "y": 205.84375,
+          "width": 98.046875,
+          "height": 49.59375,
+          "left": 261.90625,
+          "top": 205.84375,
+          "right": 359.953125,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Produkte",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-17",
+        "selector": "a",
+        "tagName": "a",
+        "bounds": {
+          "x": 261.90625,
+          "y": 205.84375,
+          "width": 98.046875,
+          "height": 49.59375,
+          "left": 261.90625,
+          "top": 205.84375,
+          "right": 359.953125,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Produkte",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-18",
+        "selector": "li:nth-child(3)",
+        "tagName": "li",
+        "bounds": {
+          "x": 379.953125,
+          "y": 205.84375,
+          "width": 95.359375,
+          "height": 49.59375,
+          "left": 379.953125,
+          "top": 205.84375,
+          "right": 475.3125,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Services",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-19",
+        "selector": "a",
+        "tagName": "a",
+        "bounds": {
+          "x": 379.953125,
+          "y": 205.84375,
+          "width": 95.359375,
+          "height": 49.59375,
+          "left": 379.953125,
+          "top": 205.84375,
+          "right": 475.3125,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Services",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-20",
+        "selector": "li:nth-child(4)",
+        "tagName": "li",
+        "bounds": {
+          "x": 495.3125,
+          "y": 205.84375,
+          "width": 98.921875,
+          "height": 49.59375,
+          "left": 495.3125,
+          "top": 205.84375,
+          "right": 594.234375,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Über uns",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-21",
+        "selector": "a",
+        "tagName": "a",
+        "bounds": {
+          "x": 495.3125,
+          "y": 205.84375,
+          "width": 98.921875,
+          "height": 49.59375,
+          "left": 495.3125,
+          "top": 205.84375,
+          "right": 594.234375,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Über uns",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-22",
+        "selector": "li:nth-child(5)",
+        "tagName": "li",
+        "bounds": {
+          "x": 614.234375,
+          "y": 205.84375,
+          "width": 88.265625,
+          "height": 49.59375,
+          "left": 614.234375,
+          "top": 205.84375,
+          "right": 702.5,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Kontakt",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-23",
+        "selector": "a",
+        "tagName": "a",
+        "bounds": {
+          "x": 614.234375,
+          "y": 205.84375,
+          "width": 88.265625,
+          "height": 49.59375,
+          "left": 614.234375,
+          "top": 205.84375,
+          "right": 702.5,
+          "bottom": 255.4375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Kontakt",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-24",
+        "selector": "#main-content",
+        "tagName": "main",
+        "bounds": {
+          "x": 20,
+          "y": 290.4375,
+          "width": 760,
+          "height": 3294.046875,
+          "left": 20,
+          "top": 290.4375,
+          "right": 780,
+          "bottom": 3584.484375
+        },
+        "attributes": {
+          "id": "main-content",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 1: Ausgezeichnete Farbkontraste\n            Dieser Text hat einen Kontrast von 8.8:1 u",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-25",
+        "selector": "section.good-contrast-text:nth-child(1)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 290.4375,
+          "width": 760,
+          "height": 175.390625,
+          "left": 20,
+          "top": 290.4375,
+          "right": 780,
+          "bottom": 465.828125
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-contrast-text",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 1: Ausgezeichnete Farbkontraste\n            Dieser Text hat einen Kontrast von 8.8:1 u",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-26",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 35,
+          "y": 325.34375,
+          "width": 730,
+          "height": 38.390625,
+          "left": 35,
+          "top": 325.34375,
+          "right": 765,
+          "bottom": 363.734375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 1: Ausgezeichnete Farbkontraste",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-27",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 35,
+          "y": 383.640625,
+          "width": 730,
+          "height": 51.1875,
+          "left": 35,
+          "top": 383.640625,
+          "right": 765,
+          "bottom": 434.828125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Dieser Text hat einen Kontrast von 8.8:1 und ist daher sehr gut lesbar. Alle Texte auf dieser Seite ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-28",
+        "selector": "section.good-contrast-light:nth-child(2)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 475.828125,
+          "width": 760,
+          "height": 149.796875,
+          "left": 20,
+          "top": 475.828125,
+          "right": 780,
+          "bottom": 625.625
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-contrast-light",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE: Weißer Text auf dunklem Hintergrund\n            Dieser weiße Text auf dunklem Hinterg",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-29",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 35,
+          "y": 510.734375,
+          "width": 730,
+          "height": 38.390625,
+          "left": 35,
+          "top": 510.734375,
+          "right": 765,
+          "bottom": 549.125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE: Weißer Text auf dunklem Hintergrund",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-30",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 35,
+          "y": 569.03125,
+          "width": 730,
+          "height": 25.59375,
+          "left": 35,
+          "top": 569.03125,
+          "right": 765,
+          "bottom": 594.625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Dieser weiße Text auf dunklem Hintergrund hat einen ausgezeichneten Kontrast von 15.3:1.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-31",
+        "selector": "section.good-contrast-large-text:nth-child(3)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 635.625,
+          "width": 760,
+          "height": 183.59375,
+          "left": 20,
+          "top": 635.625,
+          "right": 780,
+          "bottom": 819.21875
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-contrast-large-text",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE: Großer Text mit gutem Kontrast\n            Dieser große, fette Text hat einen Kontras",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-32",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 30,
+          "y": 668.03125,
+          "width": 740,
+          "height": 43.1875,
+          "left": 30,
+          "top": 668.03125,
+          "right": 770,
+          "bottom": 711.21875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE: Großer Text mit gutem Kontrast",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-33",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 30,
+          "y": 733.625,
+          "width": 740,
+          "height": 57.59375,
+          "left": 30,
+          "top": 733.625,
+          "right": 770,
+          "bottom": 791.21875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Dieser große, fette Text hat einen Kontrast von 7.0:1, was weit über dem WCAG AA Minimum von 3:1 für",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-34",
+        "selector": "section.good-links:nth-child(4)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 839.125,
+          "width": 760,
+          "height": 109.484375,
+          "left": 20,
+          "top": 839.125,
+          "right": 780,
+          "bottom": 948.609375
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-links",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 2: Links mit mehreren visuellen Hinweisen\n            Diese Links sind unterstrichen u",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-35",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 839.125,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 839.125,
+          "right": 780,
+          "bottom": 877.515625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 2: Links mit mehreren visuellen Hinweisen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-36",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 20,
+          "y": 897.421875,
+          "width": 760,
+          "height": 51.1875,
+          "left": 20,
+          "top": 897.421875,
+          "right": 780,
+          "bottom": 948.609375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Diese Links sind unterstrichen und haben eine andere Farbe als der normale Text. Sie sind auch durch",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-37",
+        "selector": "a:nth-child(1)",
+        "tagName": "a",
+        "bounds": {
+          "x": 65.359375,
+          "y": 901.421875,
+          "width": 168.09375,
+          "height": 17,
+          "left": 65.359375,
+          "top": 901.421875,
+          "right": 233.453125,
+          "bottom": 918.421875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Links sind unterstrichen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-38",
+        "selector": "a:nth-child(2)",
+        "tagName": "a",
+        "bounds": {
+          "x": 20,
+          "y": 901.421875,
+          "width": 757.515625,
+          "height": 42.59375,
+          "left": 20,
+          "top": 901.421875,
+          "right": 777.515625,
+          "bottom": 944.015625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "durch ihre Farbe UND Unterstreichung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-39",
+        "selector": "a:nth-child(3)",
+        "tagName": "a",
+        "bounds": {
+          "x": 486.890625,
+          "y": 927.015625,
+          "width": 239.234375,
+          "height": 17,
+          "left": 486.890625,
+          "top": 927.015625,
+          "right": 726.125,
+          "bottom": 944.015625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "zusätzliche visuelle Rückmeldung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-40",
+        "selector": "section:nth-child(5)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 968.515625,
+          "width": 760,
+          "height": 501.15625,
+          "left": 20,
+          "top": 968.515625,
+          "right": 780,
+          "bottom": 1469.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 3: Zugängliche Formulare\n            \n                \n                    Vollständig",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-41",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 968.515625,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 968.515625,
+          "right": 780,
+          "bottom": 1006.90625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 3: Zugängliche Formulare",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-42",
+        "selector": "form.good-form",
+        "tagName": "form",
+        "bounds": {
+          "x": 20,
+          "y": 1026.90625,
+          "width": 760,
+          "height": 442.765625,
+          "left": 20,
+          "top": 1026.90625,
+          "right": 780,
+          "bottom": 1469.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-form",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Vollständiger Name\n                    \n                    \n                        Bitte geben Sie",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-43",
+        "selector": "div:nth-child(1)",
+        "tagName": "div",
+        "bounds": {
+          "x": 40,
+          "y": 1046.90625,
+          "width": 720,
+          "height": 98.984375,
+          "left": 40,
+          "top": 1046.90625,
+          "right": 760,
+          "bottom": 1145.890625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Vollständiger Name\n                    \n                    \n                        Bitte geben Sie",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-44",
+        "selector": "label.required",
+        "tagName": "label",
+        "bounds": {
+          "x": 40,
+          "y": 1046.90625,
+          "width": 720,
+          "height": 25.59375,
+          "left": 40,
+          "top": 1046.90625,
+          "right": 760,
+          "bottom": 1072.5
+        },
+        "attributes": {
+          "id": "",
+          "class": "required",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Vollständiger Name",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-45",
+        "selector": "#name",
+        "tagName": "input",
+        "bounds": {
+          "x": 40,
+          "y": 1077.5,
+          "width": 324,
+          "height": 42,
+          "left": 40,
+          "top": 1077.5,
+          "right": 364,
+          "bottom": 1119.5
+        },
+        "attributes": {
+          "id": "name",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-46",
+        "selector": "#name-help",
+        "tagName": "div",
+        "bounds": {
+          "x": 40,
+          "y": 1123.5,
+          "width": 720,
+          "height": 22.390625,
+          "left": 40,
+          "top": 1123.5,
+          "right": 760,
+          "bottom": 1145.890625
+        },
+        "attributes": {
+          "id": "name-help",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Bitte geben Sie Ihren vollständigen Namen ein.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-47",
+        "selector": "div:nth-child(2)",
+        "tagName": "div",
+        "bounds": {
+          "x": 40,
+          "y": 1160.890625,
+          "width": 720,
+          "height": 119.1875,
+          "left": 40,
+          "top": 1160.890625,
+          "right": 760,
+          "bottom": 1280.078125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "E-Mail Adresse\n                    \n                    \n                        Bitte geben Sie ein",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-48",
+        "selector": "label.required",
+        "tagName": "label",
+        "bounds": {
+          "x": 40,
+          "y": 1160.890625,
+          "width": 720,
+          "height": 25.59375,
+          "left": 40,
+          "top": 1160.890625,
+          "right": 760,
+          "bottom": 1186.484375
+        },
+        "attributes": {
+          "id": "",
+          "class": "required",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "E-Mail Adresse",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-49",
+        "selector": "#email",
+        "tagName": "input",
+        "bounds": {
+          "x": 40,
+          "y": 1191.484375,
+          "width": 324,
+          "height": 42,
+          "left": 40,
+          "top": 1191.484375,
+          "right": 364,
+          "bottom": 1233.484375
+        },
+        "attributes": {
+          "id": "email",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-50",
+        "selector": "#email-error",
+        "tagName": "div",
+        "bounds": {
+          "x": 40,
+          "y": 1238.484375,
+          "width": 720,
+          "height": 41.59375,
+          "left": 40,
+          "top": 1238.484375,
+          "right": 760,
+          "bottom": 1280.078125
+        },
+        "attributes": {
+          "id": "email-error",
+          "class": "error-message",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": "alert",
+          "alt": null,
+          "title": null
+        },
+        "text": "Bitte geben Sie eine gültige E-Mail Adresse ein.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-51",
+        "selector": "div:nth-child(3)",
+        "tagName": "div",
+        "bounds": {
+          "x": 40,
+          "y": 1295.078125,
+          "width": 720,
+          "height": 72.59375,
+          "left": 40,
+          "top": 1295.078125,
+          "right": 760,
+          "bottom": 1367.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Telefonnummer (optional)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-52",
+        "selector": "label",
+        "tagName": "label",
+        "bounds": {
+          "x": 40,
+          "y": 1295.078125,
+          "width": 720,
+          "height": 25.59375,
+          "left": 40,
+          "top": 1295.078125,
+          "right": 760,
+          "bottom": 1320.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Telefonnummer (optional)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-53",
+        "selector": "#phone",
+        "tagName": "input",
+        "bounds": {
+          "x": 40,
+          "y": 1325.671875,
+          "width": 324,
+          "height": 42,
+          "left": 40,
+          "top": 1325.671875,
+          "right": 364,
+          "bottom": 1367.671875
+        },
+        "attributes": {
+          "id": "phone",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-54",
+        "selector": "div:nth-child(4)",
+        "tagName": "div",
+        "bounds": {
+          "x": 40,
+          "y": 1387.671875,
+          "width": 720,
+          "height": 62,
+          "left": 40,
+          "top": 1387.671875,
+          "right": 760,
+          "bottom": 1449.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Formular absenden\n                    Zurücksetzen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-55",
+        "selector": "button.good-button:nth-child(1)",
+        "tagName": "button",
+        "bounds": {
+          "x": 48,
+          "y": 1395.671875,
+          "width": 200.484375,
+          "height": 46,
+          "left": 48,
+          "top": 1395.671875,
+          "right": 248.484375,
+          "bottom": 1441.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-button",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Formular absenden",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-56",
+        "selector": "button.good-button.good-button-secondary:nth-child(2)",
+        "tagName": "button",
+        "bounds": {
+          "x": 268.9375,
+          "y": 1395.671875,
+          "width": 155.140625,
+          "height": 46,
+          "left": 268.9375,
+          "top": 1395.671875,
+          "right": 424.078125,
+          "bottom": 1441.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-button good-button-secondary",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Zurücksetzen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-57",
+        "selector": "section:nth-child(6)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 1489.671875,
+          "width": 760,
+          "height": 227.078125,
+          "left": 20,
+          "top": 1489.671875,
+          "right": 780,
+          "bottom": 1716.75
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 4: Status-Nachrichten mit Icon und Text\n            \n                Ihre Daten wurden",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-58",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 1489.671875,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 1489.671875,
+          "right": 780,
+          "bottom": 1528.0625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 4: Status-Nachrichten mit Icon und Text",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-59",
+        "selector": "div.status-message.status-success:nth-child(1)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1547.96875,
+          "width": 760,
+          "height": 49.59375,
+          "left": 20,
+          "top": 1547.96875,
+          "right": 780,
+          "bottom": 1597.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "status-message status-success",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": "status",
+          "alt": null,
+          "title": null
+        },
+        "text": "Ihre Daten wurden erfolgreich gespeichert.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-60",
+        "selector": "div.status-message.status-warning:nth-child(2)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1607.5625,
+          "width": 760,
+          "height": 49.59375,
+          "left": 20,
+          "top": 1607.5625,
+          "right": 780,
+          "bottom": 1657.15625
+        },
+        "attributes": {
+          "id": "",
+          "class": "status-message status-warning",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": "status",
+          "alt": null,
+          "title": null
+        },
+        "text": "Bitte überprüfen Sie Ihre E-Mail Adresse.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-61",
+        "selector": "div.status-message.status-error:nth-child(3)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1667.15625,
+          "width": 760,
+          "height": 49.59375,
+          "left": 20,
+          "top": 1667.15625,
+          "right": 780,
+          "bottom": 1716.75
+        },
+        "attributes": {
+          "id": "",
+          "class": "status-message status-error",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": "alert",
+          "alt": null,
+          "title": null
+        },
+        "text": "Es ist ein Fehler beim Speichern aufgetreten.",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-62",
+        "selector": "section:nth-child(7)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 1736.65625,
+          "width": 760,
+          "height": 225.578125,
+          "left": 20,
+          "top": 1736.65625,
+          "right": 780,
+          "bottom": 1962.234375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 5: Fortschrittsanzeige mit Textbeschreibung\n            \n                Projektfortsc",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-63",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 1736.65625,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 1736.65625,
+          "right": 780,
+          "bottom": 1775.046875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 5: Fortschrittsanzeige mit Textbeschreibung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-64",
+        "selector": "div.progress-container:nth-child(1)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1795.046875,
+          "width": 760,
+          "height": 73.59375,
+          "left": 20,
+          "top": 1795.046875,
+          "right": 780,
+          "bottom": 1868.640625
+        },
+        "attributes": {
+          "id": "",
+          "class": "progress-container",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Projektfortschritt A: 75% abgeschlossen\n                \n                    75%",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-65",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 20,
+          "y": 1795.046875,
+          "width": 760,
+          "height": 25.59375,
+          "left": 20,
+          "top": 1795.046875,
+          "right": 780,
+          "bottom": 1820.640625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Projektfortschritt A: 75% abgeschlossen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-66",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 20,
+          "y": 1799.046875,
+          "width": 150.53125,
+          "height": 17,
+          "left": 20,
+          "top": 1799.046875,
+          "right": 170.53125,
+          "bottom": 1816.046875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Projektfortschritt A:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-67",
+        "selector": "div.progress-bar",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1836.640625,
+          "width": 762,
+          "height": 32,
+          "left": 20,
+          "top": 1836.640625,
+          "right": 782,
+          "bottom": 1868.640625
+        },
+        "attributes": {
+          "id": "",
+          "class": "progress-bar",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "75%",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-68",
+        "selector": "div.progress-fill",
+        "tagName": "div",
+        "bounds": {
+          "x": 21,
+          "y": 1837.640625,
+          "width": 570,
+          "height": 30,
+          "left": 21,
+          "top": 1837.640625,
+          "right": 591,
+          "bottom": 1867.640625
+        },
+        "attributes": {
+          "id": "",
+          "class": "progress-fill",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "75%",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-69",
+        "selector": "div.progress-container:nth-child(2)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1888.640625,
+          "width": 760,
+          "height": 73.59375,
+          "left": 20,
+          "top": 1888.640625,
+          "right": 780,
+          "bottom": 1962.234375
+        },
+        "attributes": {
+          "id": "",
+          "class": "progress-container",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Projektfortschritt B: 45% abgeschlossen\n                \n                    45%",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-70",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 20,
+          "y": 1888.640625,
+          "width": 760,
+          "height": 25.59375,
+          "left": 20,
+          "top": 1888.640625,
+          "right": 780,
+          "bottom": 1914.234375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Projektfortschritt B: 45% abgeschlossen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-71",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 20,
+          "y": 1892.640625,
+          "width": 151.125,
+          "height": 17,
+          "left": 20,
+          "top": 1892.640625,
+          "right": 171.125,
+          "bottom": 1909.640625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Projektfortschritt B:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-72",
+        "selector": "div.progress-bar",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 1930.234375,
+          "width": 762,
+          "height": 32,
+          "left": 20,
+          "top": 1930.234375,
+          "right": 782,
+          "bottom": 1962.234375
+        },
+        "attributes": {
+          "id": "",
+          "class": "progress-bar",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "45%",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-73",
+        "selector": "div.progress-fill",
+        "tagName": "div",
+        "bounds": {
+          "x": 21,
+          "y": 1931.234375,
+          "width": 342,
+          "height": 30,
+          "left": 21,
+          "top": 1931.234375,
+          "right": 363,
+          "bottom": 1961.234375
+        },
+        "attributes": {
+          "id": "",
+          "class": "progress-fill",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "45%",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-74",
+        "selector": "section:nth-child(8)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 1982.234375,
+          "width": 760,
+          "height": 231.46875,
+          "left": 20,
+          "top": 1982.234375,
+          "right": 780,
+          "bottom": 2213.703125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 6: Verfügbarkeit mit Text und visuellen Hinweisen\n            \n                \n      ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-75",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 1982.234375,
+          "width": 760,
+          "height": 76.78125,
+          "left": 20,
+          "top": 1982.234375,
+          "right": 780,
+          "bottom": 2059.015625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 6: Verfügbarkeit mit Text und visuellen Hinweisen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-76",
+        "selector": "ul",
+        "tagName": "ul",
+        "bounds": {
+          "x": 20,
+          "y": 2078.921875,
+          "width": 760,
+          "height": 134.78125,
+          "left": 20,
+          "top": 2078.921875,
+          "right": 780,
+          "bottom": 2213.703125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "✓ Produkt A - Verfügbar (23 Stück auf Lager)\n                \n                \n                    ✗",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-77",
+        "selector": "li:nth-child(1)",
+        "tagName": "li",
+        "bounds": {
+          "x": 20,
+          "y": 2078.921875,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2078.921875,
+          "right": 780,
+          "bottom": 2120.515625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "✓ Produkt A - Verfügbar (23 Stück auf Lager)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-78",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 50.859375,
+          "y": 2090.921875,
+          "width": 75.859375,
+          "height": 17,
+          "left": 50.859375,
+          "top": 2090.921875,
+          "right": 126.71875,
+          "bottom": 2107.921875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Produkt A",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-79",
+        "selector": "li:nth-child(2)",
+        "tagName": "li",
+        "bounds": {
+          "x": 20,
+          "y": 2125.515625,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2125.515625,
+          "right": 780,
+          "bottom": 2167.109375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "✗ Produkt B - Nicht verfügbar (Nachbestellung läuft)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-80",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 50.859375,
+          "y": 2137.515625,
+          "width": 76.453125,
+          "height": 17,
+          "left": 50.859375,
+          "top": 2137.515625,
+          "right": 127.3125,
+          "bottom": 2154.515625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Produkt B",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-81",
+        "selector": "li:nth-child(3)",
+        "tagName": "li",
+        "bounds": {
+          "x": 20,
+          "y": 2172.109375,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2172.109375,
+          "right": 780,
+          "bottom": 2213.703125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "⚠ Produkt C - Begrenzt verfügbar (nur noch 3 Stück)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-82",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 51.796875,
+          "y": 2184.109375,
+          "width": 76.453125,
+          "height": 17,
+          "left": 51.796875,
+          "top": 2184.109375,
+          "right": 128.25,
+          "bottom": 2201.109375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Produkt C",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-83",
+        "selector": "section:nth-child(9)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 2233.609375,
+          "width": 760,
+          "height": 297.359375,
+          "left": 20,
+          "top": 2233.609375,
+          "right": 780,
+          "bottom": 2530.96875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 7: Tabelle mit Sortierung und Beschreibung\n            \n                \n             ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-84",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 2233.609375,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 2233.609375,
+          "right": 780,
+          "bottom": 2272
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 7: Tabelle mit Sortierung und Beschreibung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-85",
+        "selector": "table.good-table",
+        "tagName": "table",
+        "bounds": {
+          "x": 20,
+          "y": 2292,
+          "width": 760,
+          "height": 238.96875,
+          "left": 20,
+          "top": 2292,
+          "right": 780,
+          "bottom": 2530.96875
+        },
+        "attributes": {
+          "id": "",
+          "class": "good-table",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Mitarbeiterliste (sortiert nach Name, aufsteigend)\n                \n                \n               ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-86",
+        "selector": "caption",
+        "tagName": "caption",
+        "bounds": {
+          "x": 20,
+          "y": 2292,
+          "width": 760,
+          "height": 25.59375,
+          "left": 20,
+          "top": 2292,
+          "right": 780,
+          "bottom": 2317.59375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Mitarbeiterliste (sortiert nach Name, aufsteigend)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-87",
+        "selector": "thead",
+        "tagName": "thead",
+        "bounds": {
+          "x": 20.5,
+          "y": 2328.09375,
+          "width": 759,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2328.09375,
+          "right": 779.5,
+          "bottom": 2378.6875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Name\n                        Alter\n                        Abteilung\n                        Status",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-88",
+        "selector": "tr",
+        "tagName": "tr",
+        "bounds": {
+          "x": 20.5,
+          "y": 2328.09375,
+          "width": 759,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2328.09375,
+          "right": 779.5,
+          "bottom": 2378.6875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Name\n                        Alter\n                        Abteilung\n                        Status",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-89",
+        "selector": "th.sort-asc:nth-child(1)",
+        "tagName": "th",
+        "bounds": {
+          "x": 20.5,
+          "y": 2328.09375,
+          "width": 348.078125,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2328.09375,
+          "right": 368.578125,
+          "bottom": 2378.6875
+        },
+        "attributes": {
+          "id": "",
+          "class": "sort-asc",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Name",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-90",
+        "selector": "th:nth-child(2)",
+        "tagName": "th",
+        "bounds": {
+          "x": 368.578125,
+          "y": 2328.09375,
+          "width": 99.140625,
+          "height": 50.59375,
+          "left": 368.578125,
+          "top": 2328.09375,
+          "right": 467.71875,
+          "bottom": 2378.6875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Alter",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-91",
+        "selector": "th:nth-child(3)",
+        "tagName": "th",
+        "bounds": {
+          "x": 467.71875,
+          "y": 2328.09375,
+          "width": 159.34375,
+          "height": 50.59375,
+          "left": 467.71875,
+          "top": 2328.09375,
+          "right": 627.0625,
+          "bottom": 2378.6875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Abteilung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-92",
+        "selector": "th:nth-child(4)",
+        "tagName": "th",
+        "bounds": {
+          "x": 627.0625,
+          "y": 2328.09375,
+          "width": 152.4375,
+          "height": 50.59375,
+          "left": 627.0625,
+          "top": 2328.09375,
+          "right": 779.5,
+          "bottom": 2378.6875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Status",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-93",
+        "selector": "tbody",
+        "tagName": "tbody",
+        "bounds": {
+          "x": 20.5,
+          "y": 2378.6875,
+          "width": 759,
+          "height": 151.78125,
+          "left": 20.5,
+          "top": 2378.6875,
+          "right": 779.5,
+          "bottom": 2530.46875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Anna Schmidt\n                        29\n                        Marketing\n                        ● ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-94",
+        "selector": "tr:nth-child(1)",
+        "tagName": "tr",
+        "bounds": {
+          "x": 20.5,
+          "y": 2378.6875,
+          "width": 759,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2378.6875,
+          "right": 779.5,
+          "bottom": 2429.28125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Anna Schmidt\n                        29\n                        Marketing\n                        ● ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-95",
+        "selector": "td:nth-child(1)",
+        "tagName": "td",
+        "bounds": {
+          "x": 20.5,
+          "y": 2378.6875,
+          "width": 348.078125,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2378.6875,
+          "right": 368.578125,
+          "bottom": 2429.28125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Anna Schmidt",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-96",
+        "selector": "td:nth-child(2)",
+        "tagName": "td",
+        "bounds": {
+          "x": 368.578125,
+          "y": 2378.6875,
+          "width": 99.140625,
+          "height": 50.59375,
+          "left": 368.578125,
+          "top": 2378.6875,
+          "right": 467.71875,
+          "bottom": 2429.28125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "29",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-97",
+        "selector": "td:nth-child(3)",
+        "tagName": "td",
+        "bounds": {
+          "x": 467.71875,
+          "y": 2378.6875,
+          "width": 159.34375,
+          "height": 50.59375,
+          "left": 467.71875,
+          "top": 2378.6875,
+          "right": 627.0625,
+          "bottom": 2429.28125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Marketing",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-98",
+        "selector": "td:nth-child(4)",
+        "tagName": "td",
+        "bounds": {
+          "x": 627.0625,
+          "y": 2378.6875,
+          "width": 152.4375,
+          "height": 50.59375,
+          "left": 627.0625,
+          "top": 2378.6875,
+          "right": 779.5,
+          "bottom": 2429.28125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "● Aktiv",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-99",
+        "selector": "tr:nth-child(2)",
+        "tagName": "tr",
+        "bounds": {
+          "x": 20.5,
+          "y": 2429.28125,
+          "width": 759,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2429.28125,
+          "right": 779.5,
+          "bottom": 2479.875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Bob Müller\n                        34\n                        IT\n                        ● Aktiv",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-100",
+        "selector": "td:nth-child(1)",
+        "tagName": "td",
+        "bounds": {
+          "x": 20.5,
+          "y": 2429.28125,
+          "width": 348.078125,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2429.28125,
+          "right": 368.578125,
+          "bottom": 2479.875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Bob Müller",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-101",
+        "selector": "td:nth-child(2)",
+        "tagName": "td",
+        "bounds": {
+          "x": 368.578125,
+          "y": 2429.28125,
+          "width": 99.140625,
+          "height": 50.59375,
+          "left": 368.578125,
+          "top": 2429.28125,
+          "right": 467.71875,
+          "bottom": 2479.875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "34",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-102",
+        "selector": "td:nth-child(3)",
+        "tagName": "td",
+        "bounds": {
+          "x": 467.71875,
+          "y": 2429.28125,
+          "width": 159.34375,
+          "height": 50.59375,
+          "left": 467.71875,
+          "top": 2429.28125,
+          "right": 627.0625,
+          "bottom": 2479.875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "IT",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-103",
+        "selector": "td:nth-child(4)",
+        "tagName": "td",
+        "bounds": {
+          "x": 627.0625,
+          "y": 2429.28125,
+          "width": 152.4375,
+          "height": 50.59375,
+          "left": 627.0625,
+          "top": 2429.28125,
+          "right": 779.5,
+          "bottom": 2479.875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "● Aktiv",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-104",
+        "selector": "tr:nth-child(3)",
+        "tagName": "tr",
+        "bounds": {
+          "x": 20.5,
+          "y": 2479.875,
+          "width": 759,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2479.875,
+          "right": 779.5,
+          "bottom": 2530.46875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Clara Weber\n                        27\n                        Design\n                        ⚠ Urla",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-105",
+        "selector": "td:nth-child(1)",
+        "tagName": "td",
+        "bounds": {
+          "x": 20.5,
+          "y": 2479.875,
+          "width": 348.078125,
+          "height": 50.59375,
+          "left": 20.5,
+          "top": 2479.875,
+          "right": 368.578125,
+          "bottom": 2530.46875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Clara Weber",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-106",
+        "selector": "td:nth-child(2)",
+        "tagName": "td",
+        "bounds": {
+          "x": 368.578125,
+          "y": 2479.875,
+          "width": 99.140625,
+          "height": 50.59375,
+          "left": 368.578125,
+          "top": 2479.875,
+          "right": 467.71875,
+          "bottom": 2530.46875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "27",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-107",
+        "selector": "td:nth-child(3)",
+        "tagName": "td",
+        "bounds": {
+          "x": 467.71875,
+          "y": 2479.875,
+          "width": 159.34375,
+          "height": 50.59375,
+          "left": 467.71875,
+          "top": 2479.875,
+          "right": 627.0625,
+          "bottom": 2530.46875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Design",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-108",
+        "selector": "td:nth-child(4)",
+        "tagName": "td",
+        "bounds": {
+          "x": 627.0625,
+          "y": 2479.875,
+          "width": 152.4375,
+          "height": 50.59375,
+          "left": 627.0625,
+          "top": 2479.875,
+          "right": 779.5,
+          "bottom": 2530.46875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "⚠ Urlaub",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-109",
+        "selector": "section:nth-child(10)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 2550.96875,
+          "width": 760,
+          "height": 339.015625,
+          "left": 20,
+          "top": 2550.96875,
+          "right": 780,
+          "bottom": 2889.984375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 8: Chart/Diagramm mit zugänglicher Legende\n            \n                Quartalsumsätz",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-110",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 2550.96875,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 2550.96875,
+          "right": 780,
+          "bottom": 2589.359375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 8: Chart/Diagramm mit zugänglicher Legende",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-111",
+        "selector": "div.chart-container",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2609.359375,
+          "width": 760,
+          "height": 280.625,
+          "left": 20,
+          "top": 2609.359375,
+          "right": 780,
+          "bottom": 2889.984375
+        },
+        "attributes": {
+          "id": "",
+          "class": "chart-container",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Quartalsumsätze 2024\n                \n                    \n                        Q1 2024: 125.000 ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-112",
+        "selector": "h3",
+        "tagName": "h3",
+        "bounds": {
+          "x": 20,
+          "y": 2609.359375,
+          "width": 760,
+          "height": 29.9375,
+          "left": 20,
+          "top": 2609.359375,
+          "right": 780,
+          "bottom": 2639.296875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Quartalsumsätze 2024",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-113",
+        "selector": "div.chart-legend",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2658.015625,
+          "width": 760,
+          "height": 190.375,
+          "left": 20,
+          "top": 2658.015625,
+          "right": 780,
+          "bottom": 2848.390625
+        },
+        "attributes": {
+          "id": "",
+          "class": "chart-legend",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q1 2024: 125.000 € (rot dargestellt im Diagramm)\n                    \n                    \n         ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-114",
+        "selector": "div.legend-item.legend-q1:nth-child(1)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2658.015625,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2658.015625,
+          "right": 780,
+          "bottom": 2699.609375
+        },
+        "attributes": {
+          "id": "",
+          "class": "legend-item legend-q1",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q1 2024: 125.000 € (rot dargestellt im Diagramm)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-115",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 33,
+          "y": 2670.015625,
+          "width": 66.71875,
+          "height": 17,
+          "left": 33,
+          "top": 2670.015625,
+          "right": 99.71875,
+          "bottom": 2687.015625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q1 2024:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-116",
+        "selector": "div.legend-item.legend-q2:nth-child(2)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2707.609375,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2707.609375,
+          "right": 780,
+          "bottom": 2749.203125
+        },
+        "attributes": {
+          "id": "",
+          "class": "legend-item legend-q2",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q2 2024: 142.000 € (türkis dargestellt im Diagramm)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-117",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 33,
+          "y": 2719.609375,
+          "width": 66.71875,
+          "height": 17,
+          "left": 33,
+          "top": 2719.609375,
+          "right": 99.71875,
+          "bottom": 2736.609375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q2 2024:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-118",
+        "selector": "div.legend-item.legend-q3:nth-child(3)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2757.203125,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2757.203125,
+          "right": 780,
+          "bottom": 2798.796875
+        },
+        "attributes": {
+          "id": "",
+          "class": "legend-item legend-q3",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q3 2024: 138.000 € (blau dargestellt im Diagramm)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-119",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 33,
+          "y": 2769.203125,
+          "width": 66.71875,
+          "height": 17,
+          "left": 33,
+          "top": 2769.203125,
+          "right": 99.71875,
+          "bottom": 2786.203125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q3 2024:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-120",
+        "selector": "div.legend-item.legend-q4:nth-child(4)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2806.796875,
+          "width": 760,
+          "height": 41.59375,
+          "left": 20,
+          "top": 2806.796875,
+          "right": 780,
+          "bottom": 2848.390625
+        },
+        "attributes": {
+          "id": "",
+          "class": "legend-item legend-q4",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q4 2024: 155.000 € (gelb dargestellt im Diagramm)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-121",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 33,
+          "y": 2818.796875,
+          "width": 66.71875,
+          "height": 17,
+          "left": 33,
+          "top": 2818.796875,
+          "right": 99.71875,
+          "bottom": 2835.796875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Q4 2024:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-122",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 20,
+          "y": 2864.390625,
+          "width": 760,
+          "height": 25.59375,
+          "left": 20,
+          "top": 2864.390625,
+          "right": 780,
+          "bottom": 2889.984375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Gesamtumsatz 2024: 560.000 € (+12% gegenüber Vorjahr)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-123",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 20,
+          "y": 2868.390625,
+          "width": 159.1875,
+          "height": 17,
+          "left": 20,
+          "top": 2868.390625,
+          "right": 179.1875,
+          "bottom": 2885.390625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Gesamtumsatz 2024:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-124",
+        "selector": "section:nth-child(11)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 2909.984375,
+          "width": 760,
+          "height": 177.171875,
+          "left": 20,
+          "top": 2909.984375,
+          "right": 780,
+          "bottom": 3087.15625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 9: Kalender mit Textbeschreibungen\n            \n                \n                    1",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-125",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 20,
+          "y": 2909.984375,
+          "width": 760,
+          "height": 38.390625,
+          "left": 20,
+          "top": 2909.984375,
+          "right": 780,
+          "bottom": 2948.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "GOOD PRACTICE 9: Kalender mit Textbeschreibungen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-126",
+        "selector": "div",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2968.375,
+          "width": 760,
+          "height": 73.1875,
+          "left": 20,
+          "top": 2968.375,
+          "right": 780,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "1\n                \n                \n                    2\n                \n                \n        ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-127",
+        "selector": "div:nth-child(1)",
+        "tagName": "div",
+        "bounds": {
+          "x": 20,
+          "y": 2968.375,
+          "width": 106.84375,
+          "height": 73.1875,
+          "left": 20,
+          "top": 2968.375,
+          "right": 126.84375,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "1",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-128",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 68.96875,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 68.96875,
+          "top": 2983.375,
+          "right": 77.875,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "1",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-129",
+        "selector": "div:nth-child(2)",
+        "tagName": "div",
+        "bounds": {
+          "x": 128.84375,
+          "y": 2968.375,
+          "width": 106.859375,
+          "height": 73.1875,
+          "left": 128.84375,
+          "top": 2968.375,
+          "right": 235.703125,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "2",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-130",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 177.8125,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 177.8125,
+          "top": 2983.375,
+          "right": 186.71875,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "2",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-131",
+        "selector": "div:nth-child(3)",
+        "tagName": "div",
+        "bounds": {
+          "x": 237.703125,
+          "y": 2968.375,
+          "width": 106.859375,
+          "height": 73.1875,
+          "left": 237.703125,
+          "top": 2968.375,
+          "right": 344.5625,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "3\n                    📅 Meeting",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-132",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 288.671875,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 288.671875,
+          "top": 2983.375,
+          "right": 297.578125,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "3",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-134",
+        "selector": "small",
+        "tagName": "small",
+        "bounds": {
+          "x": 265.125,
+          "y": 3010.96875,
+          "width": 56,
+          "height": 15,
+          "left": 265.125,
+          "top": 3010.96875,
+          "right": 321.125,
+          "bottom": 3025.96875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "📅 Meeting",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-135",
+        "selector": "div:nth-child(4)",
+        "tagName": "div",
+        "bounds": {
+          "x": 346.5625,
+          "y": 2968.375,
+          "width": 106.859375,
+          "height": 73.1875,
+          "left": 346.5625,
+          "top": 2968.375,
+          "right": 453.421875,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "4",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-136",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 395.53125,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 395.53125,
+          "top": 2983.375,
+          "right": 404.4375,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "4",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-137",
+        "selector": "div:nth-child(5)",
+        "tagName": "div",
+        "bounds": {
+          "x": 455.421875,
+          "y": 2968.375,
+          "width": 106.859375,
+          "height": 73.1875,
+          "left": 455.421875,
+          "top": 2968.375,
+          "right": 562.28125,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "5\n                    🏖 Urlaub",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-138",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 506.390625,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 506.390625,
+          "top": 2983.375,
+          "right": 515.296875,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "5",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-140",
+        "selector": "small",
+        "tagName": "small",
+        "bounds": {
+          "x": 486.921875,
+          "y": 3010.96875,
+          "width": 47.84375,
+          "height": 15,
+          "left": 486.921875,
+          "top": 3010.96875,
+          "right": 534.765625,
+          "bottom": 3025.96875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "🏖 Urlaub",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-141",
+        "selector": "div:nth-child(6)",
+        "tagName": "div",
+        "bounds": {
+          "x": 564.28125,
+          "y": 2968.375,
+          "width": 106.859375,
+          "height": 73.1875,
+          "left": 564.28125,
+          "top": 2968.375,
+          "right": 671.140625,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "6",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-142",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 613.25,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 613.25,
+          "top": 2983.375,
+          "right": 622.15625,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "6",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-143",
+        "selector": "div:nth-child(7)",
+        "tagName": "div",
+        "bounds": {
+          "x": 673.140625,
+          "y": 2968.375,
+          "width": 106.84375,
+          "height": 73.1875,
+          "left": 673.140625,
+          "top": 2968.375,
+          "right": 779.984375,
+          "bottom": 3041.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "7\n                    ⏰ Deadline",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-144",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 724.109375,
+          "y": 2983.375,
+          "width": 8.90625,
+          "height": 17,
+          "left": 724.109375,
+          "top": 2983.375,
+          "right": 733.015625,
+          "bottom": 3000.375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "7",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-146",
+        "selector": "small",
+        "tagName": "small",
+        "bounds": {
+          "x": 697.96875,
+          "y": 3010.96875,
+          "width": 61.1875,
+          "height": 15,
+          "left": 697.96875,
+          "top": 3010.96875,
+          "right": 759.15625,
+          "bottom": 3025.96875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "⏰ Deadline",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-147",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 20,
+          "y": 3061.5625,
+          "width": 760,
+          "height": 25.59375,
+          "left": 20,
+          "top": 3061.5625,
+          "right": 780,
+          "bottom": 3087.15625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Legende: Grün mit 📅 = Meeting | Gelb mit 🏖 = Urlaub | Rot mit ⏰ = Deadline",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-148",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 20,
+          "y": 3065.5625,
+          "width": 71.125,
+          "height": 17,
+          "left": 20,
+          "top": 3065.5625,
+          "right": 91.125,
+          "bottom": 3082.5625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Legende:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-149",
+        "selector": "section:nth-child(12)",
+        "tagName": "section",
+        "bounds": {
+          "x": 20,
+          "y": 3127.15625,
+          "width": 760,
+          "height": 457.328125,
+          "left": 20,
+          "top": 3127.15625,
+          "right": 780,
+          "bottom": 3584.484375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "✓ Zusammenfassung der guten Praktiken\n            \n                Farbkontraste: Alle Texte haben m",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-150",
+        "selector": "h2",
+        "tagName": "h2",
+        "bounds": {
+          "x": 45,
+          "y": 3167.0625,
+          "width": 715,
+          "height": 38.390625,
+          "left": 45,
+          "top": 3167.0625,
+          "right": 760,
+          "bottom": 3205.453125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "✓ Zusammenfassung der guten Praktiken",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-151",
+        "selector": "ul",
+        "tagName": "ul",
+        "bounds": {
+          "x": 45,
+          "y": 3225.359375,
+          "width": 715,
+          "height": 255.9375,
+          "left": 45,
+          "top": 3225.359375,
+          "right": 760,
+          "bottom": 3481.296875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Farbkontraste: Alle Texte haben mindestens 4.5:1 Kontrast (7.0:1+ für großen Text)\n                L",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-152",
+        "selector": "li:nth-child(1)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3225.359375,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3225.359375,
+          "right": 760,
+          "bottom": 3250.953125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Farbkontraste: Alle Texte haben mindestens 4.5:1 Kontrast (7.0:1+ für großen Text)",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-153",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3229.359375,
+          "width": 112.03125,
+          "height": 17,
+          "left": 85,
+          "top": 3229.359375,
+          "right": 197.03125,
+          "bottom": 3246.359375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Farbkontraste:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-154",
+        "selector": "li:nth-child(2)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3250.953125,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3250.953125,
+          "right": 760,
+          "bottom": 3276.546875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Links: Unterstrichen UND farblich unterschieden",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-155",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3254.953125,
+          "width": 47.125,
+          "height": 17,
+          "left": 85,
+          "top": 3254.953125,
+          "right": 132.125,
+          "bottom": 3271.953125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Links:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-156",
+        "selector": "li:nth-child(3)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3276.546875,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3276.546875,
+          "right": 760,
+          "bottom": 3302.140625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Formular-Fehler: Rot + Text + Icon + Rahmen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-157",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3280.546875,
+          "width": 128.015625,
+          "height": 17,
+          "left": 85,
+          "top": 3280.546875,
+          "right": 213.015625,
+          "bottom": 3297.546875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Formular-Fehler:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-158",
+        "selector": "li:nth-child(4)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3302.140625,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3302.140625,
+          "right": 760,
+          "bottom": 3327.734375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Pflichtfelder: Text \"(erforderlich)\" statt nur Sterne",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-159",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3306.140625,
+          "width": 97.796875,
+          "height": 17,
+          "left": 85,
+          "top": 3306.140625,
+          "right": 182.796875,
+          "bottom": 3323.140625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Pflichtfelder:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-160",
+        "selector": "li:nth-child(5)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3327.734375,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3327.734375,
+          "right": 760,
+          "bottom": 3353.328125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Status-Nachrichten: Icon + Text + Hintergrundfarbe + Rahmen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-161",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3331.734375,
+          "width": 152.03125,
+          "height": 17,
+          "left": 85,
+          "top": 3331.734375,
+          "right": 237.03125,
+          "bottom": 3348.734375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Status-Nachrichten:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-162",
+        "selector": "li:nth-child(6)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3353.328125,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3353.328125,
+          "right": 760,
+          "bottom": 3378.921875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Navigation: Aktiver Zustand durch Text + Farbe + Rahmen",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-163",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3357.328125,
+          "width": 87.125,
+          "height": 17,
+          "left": 85,
+          "top": 3357.328125,
+          "right": 172.125,
+          "bottom": 3374.328125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Navigation:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-164",
+        "selector": "li:nth-child(7)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3378.921875,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3378.921875,
+          "right": 760,
+          "bottom": 3404.515625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Diagramme: Legende mit Text und Farbbeschreibung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-165",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3382.921875,
+          "width": 92.484375,
+          "height": 17,
+          "left": 85,
+          "top": 3382.921875,
+          "right": 177.484375,
+          "bottom": 3399.921875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Diagramme:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-166",
+        "selector": "li:nth-child(8)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3404.515625,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3404.515625,
+          "right": 760,
+          "bottom": 3430.109375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Verfügbarkeit: Symbol + Text + Hintergrundfarbe",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-167",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3408.515625,
+          "width": 107.59375,
+          "height": 17,
+          "left": 85,
+          "top": 3408.515625,
+          "right": 192.59375,
+          "bottom": 3425.515625
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Verfügbarkeit:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-168",
+        "selector": "li:nth-child(9)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3430.109375,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3430.109375,
+          "right": 760,
+          "bottom": 3455.703125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Tabellen: Textuelle Sortierbeschreibung",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-169",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3434.109375,
+          "width": 69.046875,
+          "height": 17,
+          "left": 85,
+          "top": 3434.109375,
+          "right": 154.046875,
+          "bottom": 3451.109375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Tabellen:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-170",
+        "selector": "li:nth-child(10)",
+        "tagName": "li",
+        "bounds": {
+          "x": 85,
+          "y": 3455.703125,
+          "width": 675,
+          "height": 25.59375,
+          "left": 85,
+          "top": 3455.703125,
+          "right": 760,
+          "bottom": 3481.296875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Kalender: Icons + Text + Farbcodes mit Legende",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-171",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 85,
+          "y": 3459.703125,
+          "width": 73.796875,
+          "height": 17,
+          "left": 85,
+          "top": 3459.703125,
+          "right": 158.796875,
+          "bottom": 3476.703125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Kalender:",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-172",
+        "selector": "p",
+        "tagName": "p",
+        "bounds": {
+          "x": 45,
+          "y": 3497.296875,
+          "width": 715,
+          "height": 51.1875,
+          "left": 45,
+          "top": 3497.296875,
+          "right": 760,
+          "bottom": 3548.484375
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Diese Website sollte von Phase6a als GUT erkannt werden da sie alle WCAG 2.1 Level AA Kriterien für ",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-173",
+        "selector": "strong",
+        "tagName": "strong",
+        "bounds": {
+          "x": 45,
+          "y": 3501.296875,
+          "width": 444.3125,
+          "height": 17,
+          "left": 45,
+          "top": 3501.296875,
+          "right": 489.3125,
+          "bottom": 3518.296875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Diese Website sollte von Phase6a als GUT erkannt werden",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-174",
+        "selector": "footer",
+        "tagName": "footer",
+        "bounds": {
+          "x": 20,
+          "y": 3624.484375,
+          "width": 760,
+          "height": 139.1875,
+          "left": 20,
+          "top": 3624.484375,
+          "right": 780,
+          "bottom": 3763.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "© 2024 Test Website für Phase6a Accessibility Scanner\n        Alle Inhalte sind vollständig barriere",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-175",
+        "selector": "p:nth-child(1)",
+        "tagName": "p",
+        "bounds": {
+          "x": 40,
+          "y": 3660.484375,
+          "width": 720,
+          "height": 25.59375,
+          "left": 40,
+          "top": 3660.484375,
+          "right": 760,
+          "bottom": 3686.078125
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "© 2024 Test Website für Phase6a Accessibility Scanner",
+        "isVisible": true,
+        "zIndex": "auto"
+      },
+      {
+        "id": "element-176",
+        "selector": "p:nth-child(2)",
+        "tagName": "p",
+        "bounds": {
+          "x": 40,
+          "y": 3702.078125,
+          "width": 720,
+          "height": 25.59375,
+          "left": 40,
+          "top": 3702.078125,
+          "right": 760,
+          "bottom": 3727.671875
+        },
+        "attributes": {
+          "id": "",
+          "class": "",
+          "aria-label": null,
+          "aria-labelledby": null,
+          "role": null,
+          "alt": null,
+          "title": null
+        },
+        "text": "Alle Inhalte sind vollständig barrierefrei gestaltet mit HTML-Text und CSS-Styling.",
+        "isVisible": true,
+        "zIndex": "auto"
+      }
+    ],
+    "viewport": {
+      "width": 800,
+      "height": 600
+    },
+    "pageHeight": 3742,
+    "pageWidth": 762
+  },
+  "violations": [],
+  "violationOverlays": [],
+  "summary": {
+    "total": 0,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "accessibilityScore": 100
+  }
+};
+            console.log('📊 Report data loaded:', {
+                violations: 0,
+                overlays: 0,
+                elements: 168
+            });
+        });
+
+        function initializeFilters() {
+            const filterCheckboxes = document.querySelectorAll('.filter-controls input[type="checkbox"]');
+            
+            filterCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const impactLevel = this.id.replace('show-', '');
+                    const overlays = document.querySelectorAll('.violation-overlay.' + impactLevel);
+                    const rows = document.querySelectorAll('.violation-row.' + impactLevel);
+                    
+                    overlays.forEach(overlay => {
+                        overlay.classList.toggle('hidden', !this.checked);
+                    });
+                    
+                    rows.forEach(row => {
+                        row.style.display = this.checked ? '' : 'none';
+                    });
+                    
+                    console.log((this.checked ? 'Showing' : 'Hiding') + ' ' + impactLevel + ' violations');
+                });
+            });
+        }
+
+        function initializeViewControls() {
+            const zoomFitBtn = document.getElementById('zoom-fit');
+            const zoom100Btn = document.getElementById('zoom-100');
+            const toggleOverlaysBtn = document.getElementById('toggle-overlays');
+            const screenshotContainer = document.getElementById('screenshot-container');
+            const screenshot = document.getElementById('website-screenshot');
+            const overlaysContainer = document.getElementById('violation-overlays');
+
+            if (zoomFitBtn) {
+                zoomFitBtn.addEventListener('click', function() {
+                    screenshot.style.width = '100%';
+                    screenshot.style.height = 'auto';
+                    console.log('🔍 Zoomed to fit container');
+                });
+            }
+
+            if (zoom100Btn) {
+                zoom100Btn.addEventListener('click', function() {
+                    screenshot.style.width = 'auto';
+                    screenshot.style.height = 'auto';
+                    console.log('🎯 Zoomed to 100%');
+                });
+            }
+
+            if (toggleOverlaysBtn) {
+                let overlaysVisible = true;
+                toggleOverlaysBtn.addEventListener('click', function() {
+                    overlaysVisible = !overlaysVisible;
+                    overlaysContainer.style.display = overlaysVisible ? 'block' : 'none';
+                    this.textContent = overlaysVisible ? '👁️ Toggle Overlays' : '👁️‍🗨️ Show Overlays';
+                    console.log((overlaysVisible ? 'Showing' : 'Hiding') + ' overlays');
+                });
+            }
+        }
+
+        function initializeOverlayInteractions() {
+            const overlays = document.querySelectorAll('.violation-overlay');
+            
+            overlays.forEach(overlay => {
+                overlay.addEventListener('click', function() {
+                    const violationId = this.dataset.violationId;
+                    const impact = this.dataset.impact;
+                    
+                    console.log('🎯 Clicked violation: ' + violationId + ' (' + impact + ')');
+                    
+                    // Highlight corresponding table row
+                    const codeElements = document.querySelectorAll('.violation-row code');
+                    let tableRow = null;
+                    for (let i = 0; i < codeElements.length; i++) {
+                        if (codeElements[i].textContent.includes(violationId)) {
+                            tableRow = codeElements[i].closest('tr');
+                            break;
+                        }
+                    }
+                    
+                    if (tableRow) {
+                        // Remove previous highlights
+                        document.querySelectorAll('.violation-row.highlighted').forEach(row => {
+                            row.classList.remove('highlighted');
+                        });
+                        
+                        // Add highlight
+                        tableRow.classList.add('highlighted');
+                        tableRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // Add temporary highlight style
+                        const originalBackground = tableRow.style.background;
+                        tableRow.style.background = '#fff3cd';
+                        setTimeout(() => {
+                            tableRow.style.background = originalBackground;
+                        }, 2000);
+                    }
+                    
+                    // Future: Open inspector panel (Phase 2)
+                });
+                
+                overlay.addEventListener('mouseenter', function() {
+                    const violationId = this.dataset.violationId;
+                    console.log('🔍 Hovering over violation: ' + violationId);
+                });
+            });
+        }
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            const loadTime = performance.now();
+            console.log('⚡ Report loaded in ' + Math.round(loadTime) + 'ms');
+            
+            // Check for JavaScript errors
+            window.addEventListener('error', function(e) {
+                console.error('❌ JavaScript error:', e.error);
+            });
+        });
+    
+    </script>
+</body>
+</html>

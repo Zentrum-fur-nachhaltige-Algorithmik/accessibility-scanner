@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-d624c245-6485-4ae0-8e61-c946579bd5a7",
+  "timestamp": "2025-07-13T13:24:19.808Z",
+  "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-keyboard-access.html",
+  "summary": {
+    "total": 4,
+    "critical": 0,
+    "serious": 1,
+    "moderate": 3,
+    "minor": 0,
+    "accessibilityScore": 55
+  },
+  "scanMetadata": {
+    "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-keyboard-access.html",
+    "testFile": "test-sites/bad-keyboard-access.html",
+    "scanDate": "2025-07-13T13:24:19.497Z",
+    "totalViolations": 4
+  }
+}

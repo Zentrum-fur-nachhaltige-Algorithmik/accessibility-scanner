@@ -1,0 +1,1024 @@
+[
+  {
+    "id": "color-contrast",
+    "impact": "serious",
+    "tags": [
+      "cat.color",
+      "wcag2aa",
+      "wcag143",
+      "TTv5",
+      "TT13.c",
+      "EN-301-549",
+      "EN-9.1.4.3",
+      "ACT"
+    ],
+    "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#cccccc",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.6,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-1"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Extrem schlechter Kontrast</h2>",
+        "target": [
+          ".poor-contrast-1 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#cccccc",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.6,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-1"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>",
+        "target": [
+          ".poor-contrast-1 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffff00",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.07,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-2"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Gelber Text Problem</h2>",
+        "target": [
+          ".poor-contrast-2 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffff00",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.07,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-2"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>",
+        "target": [
+          ".poor-contrast-2 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#87ceeb",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.74,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-3"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Hellblauer Text</h2>",
+        "target": [
+          ".poor-contrast-3 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#87ceeb",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.74,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-3"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>",
+        "target": [
+          ".poor-contrast-3 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#333333",
+              "bgColor": "#000000",
+              "contrastRatio": 1.66,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-4"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.66 (foreground color: #333333, background color: #000000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Links sind kaum sichtbar</a>",
+        "target": [
+          "p > a"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #333333, background color: #000000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ff8c00",
+              "bgColor": "#ff0000",
+              "contrastRatio": 1.71,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-5"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Orange auf Rot</h2>",
+        "target": [
+          ".poor-contrast-5 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ff8c00",
+              "bgColor": "#ff0000",
+              "contrastRatio": 1.71,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-5"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>",
+        "target": [
+          ".poor-contrast-5 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#f0f0f0",
+              "bgColor": "#e0e0e0",
+              "contrastRatio": 1.15,
+              "fontSize": "10.0pt (13.3333px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<button class=\"poor-button\">Unsichtbarer Button</button>",
+                "target": [
+                  "button"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.15 (foreground color: #f0f0f0, background color: #e0e0e0, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<button class=\"poor-button\">Unsichtbarer Button</button>",
+        "target": [
+          "button"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.15 (foreground color: #f0f0f0, background color: #e0e0e0, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#cccccc",
+              "bgColor": "#f8f8f8",
+              "contrastRatio": 1.51,
+              "fontSize": "14.0pt (18.72px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<form class=\"poor-form\">",
+                "target": [
+                  "form"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.51 (foreground color: #cccccc, background color: #f8f8f8, font size: 14.0pt (18.72px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+        "target": [
+          "form > h3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.51 (foreground color: #cccccc, background color: #f8f8f8, font size: 14.0pt (18.72px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d0d0d0",
+              "bgColor": "#f8f8f8",
+              "contrastRatio": 1.45,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<form class=\"poor-form\">",
+                "target": [
+                  "form"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<label for=\"name\">Name (kaum sichtbar):</label>",
+        "target": [
+          "label[for=\"name\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#e8e8e8",
+              "bgColor": "#fafafa",
+              "contrastRatio": 1.17,
+              "fontSize": "10.0pt (13.3333px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+                "target": [
+                  "#name"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+        "target": [
+          "#name"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d0d0d0",
+              "bgColor": "#f8f8f8",
+              "contrastRatio": 1.45,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<form class=\"poor-form\">",
+                "target": [
+                  "form"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<label for=\"email\">E-Mail:</label>",
+        "target": [
+          "label[for=\"email\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#e8e8e8",
+              "bgColor": "#fafafa",
+              "contrastRatio": 1.17,
+              "fontSize": "10.0pt (13.3333px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<input type=\"email\" id=\"email\" name=\"email\">",
+                "target": [
+                  "#email"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<input type=\"email\" id=\"email\" name=\"email\">",
+        "target": [
+          "#email"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Home</a>",
+        "target": [
+          "nav > a:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Über uns</a>",
+        "target": [
+          "a:nth-child(2)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Kontakt</a>",
+        "target": [
+          "a:nth-child(3)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Service</a>",
+        "target": [
+          "a:nth-child(4)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#999999",
+              "bgColor": "#bbbbbb",
+              "contrastRatio": 1.48,
+              "fontSize": "9.0pt (12px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+                "target": [
+                  ".poor-small-text"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.48 (foreground color: #999999, background color: #bbbbbb, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+        "target": [
+          ".poor-small-text"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.48 (foreground color: #999999, background color: #bbbbbb, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#f2f2f2",
+              "bgColor": "#f9f9f9",
+              "contrastRatio": 1.06,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">",
+                "target": [
+                  "footer"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>",
+        "target": [
+          "p:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#f2f2f2",
+              "bgColor": "#f9f9f9",
+              "contrastRatio": 1.06,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">",
+                "target": [
+                  "footer"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>",
+        "target": [
+          "footer > p:nth-child(2)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "tags": [
+      "cat.semantics",
+      "best-practice"
+    ],
+    "description": "Ensure the document has a main landmark",
+    "help": "Document should have one main landmark",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=axeAPI",
+    "nodes": [
+      {
+        "any": [],
+        "all": [
+          {
+            "id": "page-has-main",
+            "data": null,
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Document does not have a main landmark"
+          }
+        ],
+        "none": [],
+        "impact": "moderate",
+        "html": "<html lang=\"de\">",
+        "target": [
+          "html"
+        ],
+        "failureSummary": "Fix all of the following:\n  Document does not have a main landmark"
+      }
+    ]
+  },
+  {
+    "id": "region",
+    "impact": "moderate",
+    "tags": [
+      "cat.keyboard",
+      "best-practice"
+    ],
+    "description": "Ensure all page content is contained by landmarks",
+    "help": "All page content should be contained by landmarks",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+        "target": [
+          "h1"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+        "target": [
+          "body > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+        "target": [
+          ".poor-contrast-1"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+        "target": [
+          ".poor-contrast-2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+        "target": [
+          ".poor-contrast-3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+        "target": [
+          ".poor-contrast-4"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+        "target": [
+          ".poor-contrast-5"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<form class=\"poor-form\">",
+        "target": [
+          "form"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+        "target": [
+          ".poor-small-text"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+        "target": [
+          ".poor-gradient"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      }
+    ]
+  }
+]

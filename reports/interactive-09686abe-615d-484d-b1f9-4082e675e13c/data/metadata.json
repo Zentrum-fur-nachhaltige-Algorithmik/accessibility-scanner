@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-09686abe-615d-484d-b1f9-4082e675e13c",
+  "timestamp": "2025-07-13T13:29:52.026Z",
+  "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-color-contrast.html",
+  "summary": {
+    "total": 3,
+    "critical": 0,
+    "serious": 1,
+    "moderate": 2,
+    "minor": 0,
+    "accessibilityScore": 65
+  },
+  "scanMetadata": {
+    "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-color-contrast.html",
+    "testFile": "test-sites/bad-color-contrast.html",
+    "scanDate": "2025-07-13T13:29:51.863Z",
+    "totalViolations": 3
+  }
+}

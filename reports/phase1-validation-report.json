@@ -1,0 +1,72 @@
+{
+  "testFiles": [
+    {
+      "testFile": "test-sites/bad-image-alt.html",
+      "violations": 6,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-12ee876b-02a3-42d4-a9fd-7099c9d22402/index.html",
+      "reportLoadTime": 674,
+      "testDuration": 1586,
+      "pageErrors": [],
+      "reportScreenshot": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-12ee876b-02a3-42d4-a9fd-7099c9d22402/validation-screenshot.png",
+      "success": true
+    },
+    {
+      "testFile": "test-sites/bad-form-labels.html",
+      "violations": 6,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-2c096576-8f6d-4844-88fd-bf0835a9162d/index.html",
+      "reportLoadTime": 1160,
+      "testDuration": 1892,
+      "pageErrors": [],
+      "reportScreenshot": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-2c096576-8f6d-4844-88fd-bf0835a9162d/validation-screenshot.png",
+      "success": true
+    },
+    {
+      "testFile": "test-sites/good-accessibility.html",
+      "violations": 0,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-c28e8b27-ac6f-4b70-b8ba-e5c20fe4d1cb/index.html",
+      "reportLoadTime": 610,
+      "testDuration": 2813,
+      "pageErrors": [],
+      "reportScreenshot": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-c28e8b27-ac6f-4b70-b8ba-e5c20fe4d1cb/validation-screenshot.png",
+      "success": true
+    },
+    {
+      "testFile": "test-sites/bad-keyboard-access.html",
+      "violations": 4,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-33c1776b-a851-4a8c-8305-010be95f3339/index.html",
+      "reportLoadTime": 889,
+      "testDuration": 2768,
+      "pageErrors": [],
+      "reportScreenshot": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-33c1776b-a851-4a8c-8305-010be95f3339/validation-screenshot.png",
+      "success": true
+    },
+    {
+      "testFile": "test-sites/bad-color-contrast.html",
+      "violations": 3,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-09686abe-615d-484d-b1f9-4082e675e13c/index.html",
+      "reportLoadTime": 804,
+      "testDuration": 2446,
+      "pageErrors": [],
+      "reportScreenshot": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-09686abe-615d-484d-b1f9-4082e675e13c/validation-screenshot.png",
+      "success": true
+    }
+  ],
+  "screenshots": [],
+  "violations": [],
+  "errors": [],
+  "performance": {
+    "avgLoadTime": 827,
+    "totalTests": 5,
+    "successfulTests": 5,
+    "totalErrors": 0
+  },
+  "validationCriteria": {
+    "screenshotsCaptured": true,
+    "overlaysPositioned": true,
+    "noConsoleErrors": true,
+    "loadTimeUnder2s": true,
+    "mobileResponsive": true,
+    "crossBrowserCompatible": true,
+    "allTestsPassed": true
+  }
+}

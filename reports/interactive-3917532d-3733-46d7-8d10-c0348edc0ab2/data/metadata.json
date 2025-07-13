@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-3917532d-3733-46d7-8d10-c0348edc0ab2",
+  "timestamp": "2025-07-13T13:28:15.399Z",
+  "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html",
+  "summary": {
+    "total": 0,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "accessibilityScore": 100
+  },
+  "scanMetadata": {
+    "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/good-accessibility.html",
+    "testFile": "test-sites/good-accessibility.html",
+    "scanDate": "2025-07-13T13:28:15.061Z",
+    "totalViolations": 0
+  }
+}

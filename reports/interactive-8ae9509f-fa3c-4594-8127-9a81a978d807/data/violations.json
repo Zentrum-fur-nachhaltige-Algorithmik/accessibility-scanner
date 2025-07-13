@@ -1,0 +1,1538 @@
+[
+  {
+    "id": "color-contrast",
+    "impact": "serious",
+    "tags": [
+      "cat.color",
+      "wcag2aa",
+      "wcag143",
+      "TTv5",
+      "TT13.c",
+      "EN-301-549",
+      "EN-9.1.4.3",
+      "ACT"
+    ],
+    "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(3)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 1: DIV elements styled as buttons</div>",
+        "target": [
+          ".violation-section:nth-child(3) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"alert('Create folder clicked')\">Create Folder</div>",
+                "target": [
+                  "div[onclick=\"alert('Create folder clicked')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"alert('Create folder clicked')\">Create Folder</div>",
+        "target": [
+          "div[onclick=\"alert('Create folder clicked')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"alert('Upload file clicked')\">Upload File</div>",
+                "target": [
+                  "div[onclick=\"alert('Upload file clicked')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"alert('Upload file clicked')\">Upload File</div>",
+        "target": [
+          "div[onclick=\"alert('Upload file clicked')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"alert('Delete selected clicked')\">Delete Selected</div>",
+                "target": [
+                  ".interactive-example > .fake-button:nth-child(4)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"alert('Delete selected clicked')\">Delete Selected</div>",
+        "target": [
+          ".interactive-example > .fake-button:nth-child(4)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"alert('Share clicked')\">Share</div>",
+                "target": [
+                  "div[onclick=\"alert('Share clicked')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"alert('Share clicked')\">Share</div>",
+        "target": [
+          "div[onclick=\"alert('Share clicked')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"playPrevious()\">⏪ Previous</div>",
+                "target": [
+                  "div[onclick=\"playPrevious()\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"playPrevious()\">⏪ Previous</div>",
+        "target": [
+          "div[onclick=\"playPrevious()\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"togglePlay()\">▶️ Play</div>",
+                "target": [
+                  "div[onclick=\"togglePlay()\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"togglePlay()\">▶️ Play</div>",
+        "target": [
+          "div[onclick=\"togglePlay()\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"playNext()\">⏩ Next</div>",
+                "target": [
+                  "div[onclick=\"playNext()\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"playNext()\">⏩ Next</div>",
+        "target": [
+          "div[onclick=\"playNext()\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"toggleMute()\">🔊 Volume</div>",
+                "target": [
+                  "div[onclick=\"toggleMute()\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"toggleMute()\">🔊 Volume</div>",
+        "target": [
+          "div[onclick=\"toggleMute()\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(4)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 2: Interactive images without keyboard support</div>",
+        "target": [
+          ".violation-section:nth-child(4) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"background: #2196f3; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 1</div>",
+                "target": [
+                  "div[onclick=\"viewProduct(1)\"] > div:nth-child(1)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"background: #2196f3; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 1</div>",
+        "target": [
+          "div[onclick=\"viewProduct(1)\"] > div:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#4caf50",
+              "contrastRatio": 2.77,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"background: #4caf50; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 2</div>",
+                "target": [
+                  "div[onclick=\"viewProduct(2)\"] > div:nth-child(1)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"background: #4caf50; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 2</div>",
+        "target": [
+          "div[onclick=\"viewProduct(2)\"] > div:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#ff9800",
+              "contrastRatio": 2.15,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"background: #ff9800; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 3</div>",
+                "target": [
+                  "div[onclick=\"viewProduct(3)\"] > div:nth-child(1)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.15 (foreground color: #ffffff, background color: #ff9800, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"background: #ff9800; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 3</div>",
+        "target": [
+          "div[onclick=\"viewProduct(3)\"] > div:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.15 (foreground color: #ffffff, background color: #ff9800, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#e91e63",
+              "contrastRatio": 4.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"background: #e91e63; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 4</div>",
+                "target": [
+                  "div[onclick=\"viewProduct(4)\"] > div:nth-child(1)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.34 (foreground color: #ffffff, background color: #e91e63, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"background: #e91e63; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;\">Product 4</div>",
+        "target": [
+          "div[onclick=\"viewProduct(4)\"] > div:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.34 (foreground color: #ffffff, background color: #e91e63, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(5)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 3: Custom dropdowns without keyboard navigation</div>",
+        "target": [
+          ".violation-section:nth-child(5) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#ff9800",
+              "contrastRatio": 2.15,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"dropdown-trigger\" onclick=\"toggleDropdown('category')\">\n                        Select Category ▼\n                    </div>",
+                "target": [
+                  "div[onclick=\"toggleDropdown('category')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.15 (foreground color: #ffffff, background color: #ff9800, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"dropdown-trigger\" onclick=\"toggleDropdown('category')\">\n                        Select Category ▼\n                    </div>",
+        "target": [
+          "div[onclick=\"toggleDropdown('category')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.15 (foreground color: #ffffff, background color: #ff9800, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#ff9800",
+              "contrastRatio": 2.15,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"dropdown-trigger\" onclick=\"toggleDropdown('sort')\">\n                        Choose Sort Order ▼\n                    </div>",
+                "target": [
+                  "div[onclick=\"toggleDropdown('sort')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.15 (foreground color: #ffffff, background color: #ff9800, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"dropdown-trigger\" onclick=\"toggleDropdown('sort')\">\n                        Choose Sort Order ▼\n                    </div>",
+        "target": [
+          "div[onclick=\"toggleDropdown('sort')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.15 (foreground color: #ffffff, background color: #ff9800, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(6)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 4: Clickable map regions without keyboard access</div>",
+        "target": [
+          ".violation-section:nth-child(6) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#f44336",
+              "contrastRatio": 3.68,
+              "fontSize": "9.0pt (12px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"position: absolute; top: 50px; left: 80px; width: 60px; height: 40px; background: #f44336; cursor: pointer;\" onclick=\"showOffice('new-york')\" title=\"New York Office\">",
+                "target": [
+                  "div[onclick=\"showOffice('new-york')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.68 (foreground color: #ffffff, background color: #f44336, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"color: white; text-align: center; padding-top: 12px; font-size: 12px;\">NYC</div>",
+        "target": [
+          "div[onclick=\"showOffice('new-york')\"] > div"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.68 (foreground color: #ffffff, background color: #f44336, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "9.0pt (12px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"position: absolute; top: 120px; left: 200px; width: 60px; height: 40px; background: #2196f3; cursor: pointer;\" onclick=\"showOffice('london')\" title=\"London Office\">",
+                "target": [
+                  "div[onclick=\"showOffice('london')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"color: white; text-align: center; padding-top: 12px; font-size: 12px;\">LON</div>",
+        "target": [
+          "div[onclick=\"showOffice('london')\"] > div"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#4caf50",
+              "contrastRatio": 2.77,
+              "fontSize": "9.0pt (12px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div style=\"position: absolute; top: 180px; left: 320px; width: 60px; height: 40px; background: #4caf50; cursor: pointer;\" onclick=\"showOffice('tokyo')\" title=\"Tokyo Office\">",
+                "target": [
+                  "div[onclick=\"showOffice('tokyo')\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div style=\"color: white; text-align: center; padding-top: 12px; font-size: 12px;\">TYO</div>",
+        "target": [
+          "div[onclick=\"showOffice('tokyo')\"] > div"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(7)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 5: Custom sliders without keyboard control</div>",
+        "target": [
+          ".violation-section:nth-child(7) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(8)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 6: SPAN elements with click handlers</div>",
+        "target": [
+          ".violation-section:nth-child(8) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(9)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 7: Modal dialogs with poor keyboard handling</div>",
+        "target": [
+          ".violation-section:nth-child(9) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#2196f3",
+              "contrastRatio": 3.12,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"fake-button\" onclick=\"openModal()\">Edit Profile</div>",
+                "target": [
+                  "div[onclick=\"openModal()\"]"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"fake-button\" onclick=\"openModal()\">Edit Profile</div>",
+        "target": [
+          "div[onclick=\"openModal()\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.12 (foreground color: #ffffff, background color: #2196f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d32f2f",
+              "bgColor": "#ffebee",
+              "contrastRatio": 4.35,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"violation-section\">",
+                "target": [
+                  ".violation-section:nth-child(10)"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"violation-title\">VIOLATION 8: Drag and drop without keyboard alternative</div>",
+        "target": [
+          ".violation-section:nth-child(10) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.35 (foreground color: #d32f2f, background color: #ffebee, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#4caf50",
+              "contrastRatio": 2.77,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task1\">\n                        Task 1: Review documents\n                    </div>",
+                "target": [
+                  "#task1"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task1\">\n                        Task 1: Review documents\n                    </div>",
+        "target": [
+          "#task1"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#4caf50",
+              "contrastRatio": 2.77,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task2\">\n                        Task 2: Update website\n                    </div>",
+                "target": [
+                  "#task2"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task2\">\n                        Task 2: Update website\n                    </div>",
+        "target": [
+          "#task2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#4caf50",
+              "contrastRatio": 2.77,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task3\">\n                        Task 3: Database migration\n                    </div>",
+                "target": [
+                  "#task3"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task3\">\n                        Task 3: Database migration\n                    </div>",
+        "target": [
+          "#task3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffffff",
+              "bgColor": "#4caf50",
+              "contrastRatio": 2.77,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task4\">\n                        Task 4: Fix security issue\n                    </div>",
+                "target": [
+                  "#task4"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"clickable-div\" draggable=\"true\" ondragstart=\"drag(event)\" id=\"task4\">\n                        Task 4: Fix security issue\n                    </div>",
+        "target": [
+          "#task4"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.77 (foreground color: #ffffff, background color: #4caf50, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "id": "heading-order",
+    "impact": "moderate",
+    "tags": [
+      "cat.semantics",
+      "best-practice"
+    ],
+    "description": "Ensure the order of headings is semantically correct",
+    "help": "Heading levels should only increase by one",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/heading-order?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "heading-order",
+            "data": null,
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Heading order invalid"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<h3>File Management Interface</h3>",
+        "target": [
+          ".violation-section:nth-child(3) > .interactive-example > h3:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Heading order invalid"
+      }
+    ]
+  },
+  {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "tags": [
+      "cat.semantics",
+      "best-practice"
+    ],
+    "description": "Ensure the document has a main landmark",
+    "help": "Document should have one main landmark",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=axeAPI",
+    "nodes": [
+      {
+        "any": [],
+        "all": [
+          {
+            "id": "page-has-main",
+            "data": null,
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Document does not have a main landmark"
+          }
+        ],
+        "none": [],
+        "impact": "moderate",
+        "html": "<html lang=\"en\">",
+        "target": [
+          "html"
+        ],
+        "failureSummary": "Fix all of the following:\n  Document does not have a main landmark"
+      }
+    ]
+  },
+  {
+    "id": "region",
+    "impact": "moderate",
+    "tags": [
+      "cat.keyboard",
+      "best-practice"
+    ],
+    "description": "Ensure all page content is contained by landmarks",
+    "help": "All page content should be contained by landmarks",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<h1>Bad Keyboard Access - Multiple WCAG 2.1.1 &amp; 2.1.3 Violations</h1>",
+        "target": [
+          "h1"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<p>This page demonstrates keyboard accessibility failures that prevent users from operating interactive elements using only a keyboard.</p>",
+        "target": [
+          "body > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-section\">",
+        "target": [
+          ".violation-section:nth-child(3)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-section\">",
+        "target": [
+          ".violation-section:nth-child(4)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-title\">VIOLATION 3: Custom dropdowns without keyboard navigation</div>",
+        "target": [
+          ".violation-section:nth-child(5) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<h3>Filter and Sort Options</h3>",
+        "target": [
+          ".violation-section:nth-child(5) > .interactive-example > h3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<label>Category: </label>",
+        "target": [
+          ".violation-section:nth-child(5) > .interactive-example > div:nth-child(2) > label"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"dropdown-trigger\" onclick=\"toggleDropdown('category')\">\n                        Select Category ▼\n                    </div>",
+        "target": [
+          "div[onclick=\"toggleDropdown('category')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<label>Sort by: </label>",
+        "target": [
+          ".violation-section:nth-child(5) > .interactive-example > div:nth-child(3) > label"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"dropdown-trigger\" onclick=\"toggleDropdown('sort')\">\n                        Choose Sort Order ▼\n                    </div>",
+        "target": [
+          "div[onclick=\"toggleDropdown('sort')\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<p><strong>Problem:</strong> Custom dropdowns lack ARIA patterns and keyboard navigation!</p>",
+        "target": [
+          ".violation-section:nth-child(5) > .interactive-example > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-section\">",
+        "target": [
+          ".violation-section:nth-child(6)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-section\">",
+        "target": [
+          ".violation-section:nth-child(7)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-section\">",
+        "target": [
+          ".violation-section:nth-child(8)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-title\">VIOLATION 7: Modal dialogs with poor keyboard handling</div>",
+        "target": [
+          ".violation-section:nth-child(9) > .violation-title"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<h3>User Profile Modal</h3>",
+        "target": [
+          ".violation-section:nth-child(9) > .interactive-example > h3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"fake-button\" onclick=\"openModal()\">Edit Profile</div>",
+        "target": [
+          "div[onclick=\"openModal()\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<p><strong>Problem:</strong> Modal lacks focus management and Escape key handling!</p>",
+        "target": [
+          ".violation-section:nth-child(9) > .interactive-example > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"violation-section\">",
+        "target": [
+          ".violation-section:nth-child(10)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div style=\"background-color: #fff3e0; border: 2px solid #ff9800; padding: 20px; margin-top: 30px;\">",
+        "target": [
+          "div:nth-child(11)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      }
+    ]
+  }
+]

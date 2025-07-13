@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-12ee876b-02a3-42d4-a9fd-7099c9d22402",
+  "timestamp": "2025-07-13T13:29:33.271Z",
+  "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-image-alt.html",
+  "summary": {
+    "total": 6,
+    "critical": 1,
+    "serious": 2,
+    "moderate": 3,
+    "minor": 0,
+    "accessibilityScore": 15
+  },
+  "scanMetadata": {
+    "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-image-alt.html",
+    "testFile": "test-sites/bad-image-alt.html",
+    "scanDate": "2025-07-13T13:29:32.977Z",
+    "totalViolations": 6
+  }
+}

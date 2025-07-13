@@ -1,0 +1,4754 @@
+[
+  {
+    "id": "element-0",
+    "selector": "html",
+    "tagName": "html",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 5362.6875,
+      "left": 0,
+      "top": 0,
+      "right": 800,
+      "bottom": 5362.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Bad Form Labels - Accessibility Test\n    \n        body {\n            font-family: Arial, sans-serif;",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-7",
+    "selector": "body",
+    "tagName": "body",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 5362.6875,
+      "left": 0,
+      "top": 0,
+      "right": 800,
+      "bottom": 5362.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Bad Form Labels - Multiple WCAG 3.3.2 & 1.3.1 Violations\n    This page demonstrates common form labe",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-8",
+    "selector": "h1",
+    "tagName": "h1",
+    "bounds": {
+      "x": 20,
+      "y": 41.4375,
+      "width": 760,
+      "height": 102.375,
+      "left": 20,
+      "top": 41.4375,
+      "right": 780,
+      "bottom": 143.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Bad Form Labels - Multiple WCAG 3.3.2 & 1.3.1 Violations",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-9",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 20,
+      "y": 165.25,
+      "width": 760,
+      "height": 51.1875,
+      "left": 20,
+      "top": 165.25,
+      "right": 780,
+      "bottom": 216.4375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "This page demonstrates common form labeling failures that prevent screen reader users from understan",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-10",
+    "selector": "div.violation-section:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 236.4375,
+      "width": 760,
+      "height": 596.15625,
+      "left": 20,
+      "top": 236.4375,
+      "right": 780,
+      "bottom": 832.59375
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 1: Labels not programmatically linked to inputs\n        \n            Contact Form with Unl",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-11",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 253.4375,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 253.4375,
+      "right": 763,
+      "bottom": 279.03125
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 1: Labels not programmatically linked to inputs",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-12",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 294.03125,
+      "width": 726,
+      "height": 506.5625,
+      "left": 37,
+      "top": 294.03125,
+      "right": 763,
+      "bottom": 800.59375
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Contact Form with Unlinked Labels\n            \n                \n                    Full Name\n      ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-13",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 333.75,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 333.75,
+      "right": 742,
+      "bottom": 363.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Contact Form with Unlinked Labels",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-14",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 382.40625,
+      "width": 684,
+      "height": 339.59375,
+      "left": 58,
+      "top": 382.40625,
+      "right": 742,
+      "bottom": 722
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Full Name\n                    \n                \n                \n                    Email Address\n ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-15",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 382.40625,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 382.40625,
+      "right": 742,
+      "bottom": 425.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Full Name",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-16",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 394.40625,
+      "width": 72.90625,
+      "height": 17,
+      "left": 58,
+      "top": 394.40625,
+      "right": 130.90625,
+      "bottom": 411.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Full Name",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-17",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 135.359375,
+      "y": 387.40625,
+      "width": 187,
+      "height": 33,
+      "left": 135.359375,
+      "top": 387.40625,
+      "right": 322.359375,
+      "bottom": 420.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-18",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 440.40625,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 440.40625,
+      "right": 742,
+      "bottom": 483.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Email Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-19",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 452.40625,
+      "width": 102.265625,
+      "height": 17,
+      "left": 58,
+      "top": 452.40625,
+      "right": 160.265625,
+      "bottom": 469.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Email Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-20",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 164.71875,
+      "y": 445.40625,
+      "width": 187,
+      "height": 33,
+      "left": 164.71875,
+      "top": 445.40625,
+      "right": 351.71875,
+      "bottom": 478.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-21",
+    "selector": "div.form-row:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 498.40625,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 498.40625,
+      "right": 742,
+      "bottom": 541.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Phone Number",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-22",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 510.40625,
+      "width": 107.625,
+      "height": 17,
+      "left": 58,
+      "top": 510.40625,
+      "right": 165.625,
+      "bottom": 527.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Phone Number",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-23",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 170.078125,
+      "y": 503.40625,
+      "width": 187,
+      "height": 33,
+      "left": 170.078125,
+      "top": 503.40625,
+      "right": 357.078125,
+      "bottom": 536.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-24",
+    "selector": "div.form-row:nth-child(4)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 556.40625,
+      "width": 684,
+      "height": 95.59375,
+      "left": 58,
+      "top": 556.40625,
+      "right": 742,
+      "bottom": 652
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Message",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-25",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 630.40625,
+      "width": 64.921875,
+      "height": 17,
+      "left": 58,
+      "top": 630.40625,
+      "right": 122.921875,
+      "bottom": 647.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Message",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-26",
+    "selector": "textarea",
+    "tagName": "textarea",
+    "bounds": {
+      "x": 127.375,
+      "y": 561.40625,
+      "width": 435,
+      "height": 78,
+      "left": 127.375,
+      "top": 561.40625,
+      "right": 562.375,
+      "bottom": 639.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-27",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 677,
+      "width": 128.921875,
+      "height": 35,
+      "left": 63,
+      "top": 677,
+      "right": 191.921875,
+      "bottom": 712
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Send Message",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-28",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 738,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 738,
+      "right": 742,
+      "bottom": 763.59375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Labels lack 'for' attributes and inputs lack 'id' attributes!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-29",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 742,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 742,
+      "right": 127.34375,
+      "bottom": 759
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-30",
+    "selector": "div.violation-section:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 852.59375,
+      "width": 760,
+      "height": 485.5625,
+      "left": 20,
+      "top": 852.59375,
+      "right": 780,
+      "bottom": 1338.15625
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 2: Placeholder text as only label\n        \n            Login Form - Placeholder Only\n     ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-31",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 869.59375,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 869.59375,
+      "right": 763,
+      "bottom": 895.1875
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 2: Placeholder text as only label",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-32",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 910.1875,
+      "width": 726,
+      "height": 395.96875,
+      "left": 37,
+      "top": 910.1875,
+      "right": 763,
+      "bottom": 1306.15625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Login Form - Placeholder Only\n            \n                \n                    \n                \n  ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-33",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 949.90625,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 949.90625,
+      "right": 742,
+      "bottom": 979.84375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Login Form - Placeholder Only",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-34",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 998.5625,
+      "width": 684,
+      "height": 229,
+      "left": 58,
+      "top": 998.5625,
+      "right": 742,
+      "bottom": 1227.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Log In",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-35",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 998.5625,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 998.5625,
+      "right": 742,
+      "bottom": 1041.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-36",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 1003.5625,
+      "width": 187,
+      "height": 33,
+      "left": 58,
+      "top": 1003.5625,
+      "right": 245,
+      "bottom": 1036.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-37",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1056.5625,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 1056.5625,
+      "right": 742,
+      "bottom": 1099.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-38",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 1061.5625,
+      "width": 187,
+      "height": 33,
+      "left": 58,
+      "top": 1061.5625,
+      "right": 245,
+      "bottom": 1094.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-39",
+    "selector": "div.form-row:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1114.5625,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 1114.5625,
+      "right": 742,
+      "bottom": 1157.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-40",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 1119.5625,
+      "width": 187,
+      "height": 33,
+      "left": 58,
+      "top": 1119.5625,
+      "right": 245,
+      "bottom": 1152.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-41",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 1182.5625,
+      "width": 77.0625,
+      "height": 35,
+      "left": 63,
+      "top": 1182.5625,
+      "right": 140.0625,
+      "bottom": 1217.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Log In",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-42",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 1243.5625,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 1243.5625,
+      "right": 742,
+      "bottom": 1269.15625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Placeholders disappear when typing and aren't labels!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-43",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 1247.5625,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 1247.5625,
+      "right": 127.34375,
+      "bottom": 1264.5625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-44",
+    "selector": "div.violation-section:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 1358.15625,
+      "width": 760,
+      "height": 615.078125,
+      "left": 20,
+      "top": 1358.15625,
+      "right": 780,
+      "bottom": 1973.234375
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 3: Visual labels using wrong elements\n        \n            Registration Form - Wrong Eleme",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-45",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 1375.15625,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 1375.15625,
+      "right": 763,
+      "bottom": 1400.75
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 3: Visual labels using wrong elements",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-46",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 1415.75,
+      "width": 726,
+      "height": 525.484375,
+      "left": 37,
+      "top": 1415.75,
+      "right": 763,
+      "bottom": 1941.234375
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Registration Form - Wrong Elements\n            \n                \n                    First Name:\n   ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-47",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 1455.46875,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 1455.46875,
+      "right": 742,
+      "bottom": 1485.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Registration Form - Wrong Elements",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-48",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 1504.125,
+      "width": 684,
+      "height": 358.515625,
+      "left": 58,
+      "top": 1504.125,
+      "right": 742,
+      "bottom": 1862.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "First Name:\n                    \n                \n                \n                    Last Name:\n  ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-49",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1504.125,
+      "width": 684,
+      "height": 84.59375,
+      "left": 58,
+      "top": 1504.125,
+      "right": 742,
+      "bottom": 1588.71875
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "First Name:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-50",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 1504.125,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 1504.125,
+      "right": 742,
+      "bottom": 1529.71875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "First Name:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-51",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 1550.71875,
+      "width": 187,
+      "height": 33,
+      "left": 58,
+      "top": 1550.71875,
+      "right": 245,
+      "bottom": 1583.71875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-52",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1603.71875,
+      "width": 684,
+      "height": 68.59375,
+      "left": 58,
+      "top": 1603.71875,
+      "right": 742,
+      "bottom": 1672.3125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Last Name:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-53",
+    "selector": "div",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1603.71875,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 1603.71875,
+      "right": 742,
+      "bottom": 1629.3125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Last Name:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-54",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 1634.3125,
+      "width": 187,
+      "height": 33,
+      "left": 58,
+      "top": 1634.3125,
+      "right": 245,
+      "bottom": 1667.3125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-55",
+    "selector": "div.form-row:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1687.3125,
+      "width": 684,
+      "height": 45.328125,
+      "left": 58,
+      "top": 1687.3125,
+      "right": 742,
+      "bottom": 1732.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Date of Birth:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-56",
+    "selector": "span",
+    "tagName": "span",
+    "bounds": {
+      "x": 58,
+      "y": 1700.46875,
+      "width": 93.375,
+      "height": 17,
+      "left": 58,
+      "top": 1700.46875,
+      "right": 151.375,
+      "bottom": 1717.46875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Date of Birth:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-57",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 155.828125,
+      "y": 1692.3125,
+      "width": 138.328125,
+      "height": 35.328125,
+      "left": 155.828125,
+      "top": 1692.3125,
+      "right": 294.15625,
+      "bottom": 1727.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-58",
+    "selector": "div.form-row:nth-child(4)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 1747.640625,
+      "width": 684,
+      "height": 45,
+      "left": 58,
+      "top": 1747.640625,
+      "right": 742,
+      "bottom": 1792.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Choose Your Country:\n                    \n                        Select...\n                        ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-59",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 1760.640625,
+      "width": 169.1875,
+      "height": 17,
+      "left": 58,
+      "top": 1760.640625,
+      "right": 227.1875,
+      "bottom": 1777.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Choose Your Country:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-60",
+    "selector": "select",
+    "tagName": "select",
+    "bounds": {
+      "x": 231.640625,
+      "y": 1752.640625,
+      "width": 133,
+      "height": 35,
+      "left": 231.640625,
+      "top": 1752.640625,
+      "right": 364.640625,
+      "bottom": 1787.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Select...\n                        United States\n                        Canada\n                     ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-65",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 1817.640625,
+      "width": 89.640625,
+      "height": 35,
+      "left": 63,
+      "top": 1817.640625,
+      "right": 152.640625,
+      "bottom": 1852.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Register",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-66",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 1878.640625,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 1878.640625,
+      "right": 742,
+      "bottom": 1904.234375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Using p, div, span instead of label elements!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-67",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 1882.640625,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 1882.640625,
+      "right": 127.34375,
+      "bottom": 1899.640625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-68",
+    "selector": "div.violation-section:nth-child(4)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 1993.234375,
+      "width": 760,
+      "height": 603.75,
+      "left": 20,
+      "top": 1993.234375,
+      "right": 780,
+      "bottom": 2596.984375
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 4: Required fields not programmatically indicated\n        \n            Order Form - Visual",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-69",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 2010.234375,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 2010.234375,
+      "right": 763,
+      "bottom": 2035.828125
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 4: Required fields not programmatically indicated",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-70",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 2050.828125,
+      "width": 726,
+      "height": 514.15625,
+      "left": 37,
+      "top": 2050.828125,
+      "right": 763,
+      "bottom": 2564.984375
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Order Form - Visual Only Required Indicators\n            \n                \n                    Produ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-71",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 2090.546875,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 2090.546875,
+      "right": 742,
+      "bottom": 2120.484375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Order Form - Visual Only Required Indicators",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-72",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 2139.203125,
+      "width": 684,
+      "height": 347.1875,
+      "left": 58,
+      "top": 2139.203125,
+      "right": 742,
+      "bottom": 2486.390625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Product Name *\n                    \n                \n                \n                    Quantity *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-73",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2139.203125,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 2139.203125,
+      "right": 742,
+      "bottom": 2182.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Product Name *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-74",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2151.203125,
+      "width": 112.953125,
+      "height": 17,
+      "left": 58,
+      "top": 2151.203125,
+      "right": 170.953125,
+      "bottom": 2168.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Product Name *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-75",
+    "selector": "span.required",
+    "tagName": "span",
+    "bounds": {
+      "x": 164.71875,
+      "y": 2151.203125,
+      "width": 6.234375,
+      "height": 17,
+      "left": 164.71875,
+      "top": 2151.203125,
+      "right": 170.953125,
+      "bottom": 2168.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "required",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "*",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-76",
+    "selector": "#product-name",
+    "tagName": "input",
+    "bounds": {
+      "x": 175.40625,
+      "y": 2144.203125,
+      "width": 187,
+      "height": 33,
+      "left": 175.40625,
+      "top": 2144.203125,
+      "right": 362.40625,
+      "bottom": 2177.203125
+    },
+    "attributes": {
+      "id": "product-name",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-77",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2197.203125,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 2197.203125,
+      "right": 742,
+      "bottom": 2240.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Quantity *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-78",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2209.203125,
+      "width": 70.265625,
+      "height": 17,
+      "left": 58,
+      "top": 2209.203125,
+      "right": 128.265625,
+      "bottom": 2226.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Quantity *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-79",
+    "selector": "span.required",
+    "tagName": "span",
+    "bounds": {
+      "x": 122.03125,
+      "y": 2209.203125,
+      "width": 6.234375,
+      "height": 17,
+      "left": 122.03125,
+      "top": 2209.203125,
+      "right": 128.265625,
+      "bottom": 2226.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "required",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "*",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-80",
+    "selector": "#quantity",
+    "tagName": "input",
+    "bounds": {
+      "x": 132.71875,
+      "y": 2202.203125,
+      "width": 187,
+      "height": 33,
+      "left": 132.71875,
+      "top": 2202.203125,
+      "right": 319.71875,
+      "bottom": 2235.203125
+    },
+    "attributes": {
+      "id": "quantity",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-81",
+    "selector": "div.form-row:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2255.203125,
+      "width": 684,
+      "height": 80.59375,
+      "left": 58,
+      "top": 2255.203125,
+      "right": 742,
+      "bottom": 2335.796875
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Delivery Address *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-82",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2314.203125,
+      "width": 130.734375,
+      "height": 17,
+      "left": 58,
+      "top": 2314.203125,
+      "right": 188.734375,
+      "bottom": 2331.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Delivery Address *",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-83",
+    "selector": "span.required",
+    "tagName": "span",
+    "bounds": {
+      "x": 182.5,
+      "y": 2314.203125,
+      "width": 6.234375,
+      "height": 17,
+      "left": 182.5,
+      "top": 2314.203125,
+      "right": 188.734375,
+      "bottom": 2331.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "required",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "*",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-84",
+    "selector": "#delivery-address",
+    "tagName": "textarea",
+    "bounds": {
+      "x": 193.1875,
+      "y": 2260.203125,
+      "width": 194,
+      "height": 63,
+      "left": 193.1875,
+      "top": 2260.203125,
+      "right": 387.1875,
+      "bottom": 2323.203125
+    },
+    "attributes": {
+      "id": "delivery-address",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-85",
+    "selector": "div.form-row:nth-child(4)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2350.796875,
+      "width": 684,
+      "height": 65.59375,
+      "left": 58,
+      "top": 2350.796875,
+      "right": 742,
+      "bottom": 2416.390625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Special Instructions",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-86",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2394.796875,
+      "width": 138.734375,
+      "height": 17,
+      "left": 58,
+      "top": 2394.796875,
+      "right": 196.734375,
+      "bottom": 2411.796875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Special Instructions",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-87",
+    "selector": "#special-instructions",
+    "tagName": "textarea",
+    "bounds": {
+      "x": 201.1875,
+      "y": 2355.796875,
+      "width": 194,
+      "height": 48,
+      "left": 201.1875,
+      "top": 2355.796875,
+      "right": 395.1875,
+      "bottom": 2403.796875
+    },
+    "attributes": {
+      "id": "special-instructions",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-88",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 2441.390625,
+      "width": 111.125,
+      "height": 35,
+      "left": 63,
+      "top": 2441.390625,
+      "right": 174.125,
+      "bottom": 2476.390625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Place Order",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-89",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 2502.390625,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 2502.390625,
+      "right": 742,
+      "bottom": 2527.984375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Missing 'required' attributes or aria-required=\"true\"!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-90",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 2506.390625,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 2506.390625,
+      "right": 127.34375,
+      "bottom": 2523.390625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-91",
+    "selector": "div.violation-section:nth-child(5)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 2616.984375,
+      "width": 760,
+      "height": 558.125,
+      "left": 20,
+      "top": 2616.984375,
+      "right": 780,
+      "bottom": 3175.109375
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 5: Instructions not linked to form controls\n        \n            Account Setup - Unlinked ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-92",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 2633.984375,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 2633.984375,
+      "right": 763,
+      "bottom": 2659.578125
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 5: Instructions not linked to form controls",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-93",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 2674.578125,
+      "width": 726,
+      "height": 468.53125,
+      "left": 37,
+      "top": 2674.578125,
+      "right": 763,
+      "bottom": 3143.109375
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Account Setup - Unlinked Instructions\n            \n                \n                    Username\n   ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-94",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 2714.296875,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 2714.296875,
+      "right": 742,
+      "bottom": 2744.234375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Account Setup - Unlinked Instructions",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-95",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 2762.953125,
+      "width": 684,
+      "height": 301.5625,
+      "left": 58,
+      "top": 2762.953125,
+      "right": 742,
+      "bottom": 3064.515625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Username\n                    \n                    Must be 3-20 characters, letters and numbers only\n",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-96",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2762.953125,
+      "width": 684,
+      "height": 67.1875,
+      "left": 58,
+      "top": 2762.953125,
+      "right": 742,
+      "bottom": 2830.140625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Username\n                    \n                    Must be 3-20 characters, letters and numbers only",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-97",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2774.953125,
+      "width": 73.8125,
+      "height": 17,
+      "left": 58,
+      "top": 2774.953125,
+      "right": 131.8125,
+      "bottom": 2791.953125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Username",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-98",
+    "selector": "#username-input",
+    "tagName": "input",
+    "bounds": {
+      "x": 136.265625,
+      "y": 2767.953125,
+      "width": 187,
+      "height": 33,
+      "left": 136.265625,
+      "top": 2767.953125,
+      "right": 323.265625,
+      "bottom": 2800.953125
+    },
+    "attributes": {
+      "id": "username-input",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-99",
+    "selector": "div.instructions",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2810.953125,
+      "width": 684,
+      "height": 19.1875,
+      "left": 58,
+      "top": 2810.953125,
+      "right": 742,
+      "bottom": 2830.140625
+    },
+    "attributes": {
+      "id": "",
+      "class": "instructions",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Must be 3-20 characters, letters and numbers only",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-100",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2845.140625,
+      "width": 684,
+      "height": 67.1875,
+      "left": 58,
+      "top": 2845.140625,
+      "right": 742,
+      "bottom": 2912.328125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Password\n                    \n                    Minimum 8 characters with at least one number and ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-101",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2857.140625,
+      "width": 70.25,
+      "height": 17,
+      "left": 58,
+      "top": 2857.140625,
+      "right": 128.25,
+      "bottom": 2874.140625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Password",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-102",
+    "selector": "#password-input",
+    "tagName": "input",
+    "bounds": {
+      "x": 132.703125,
+      "y": 2850.140625,
+      "width": 187,
+      "height": 33,
+      "left": 132.703125,
+      "top": 2850.140625,
+      "right": 319.703125,
+      "bottom": 2883.140625
+    },
+    "attributes": {
+      "id": "password-input",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-103",
+    "selector": "div.instructions",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2893.140625,
+      "width": 684,
+      "height": 19.1875,
+      "left": 58,
+      "top": 2893.140625,
+      "right": 742,
+      "bottom": 2912.328125
+    },
+    "attributes": {
+      "id": "",
+      "class": "instructions",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Minimum 8 characters with at least one number and special character",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-104",
+    "selector": "div.form-row:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2927.328125,
+      "width": 684,
+      "height": 67.1875,
+      "left": 58,
+      "top": 2927.328125,
+      "right": 742,
+      "bottom": 2994.515625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Start Date\n                    \n                    Format: YYYY-MM-DD (e.g., 2024-03-15)",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-105",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 2939.328125,
+      "width": 72.03125,
+      "height": 17,
+      "left": 58,
+      "top": 2939.328125,
+      "right": 130.03125,
+      "bottom": 2956.328125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Start Date",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-106",
+    "selector": "#date-input",
+    "tagName": "input",
+    "bounds": {
+      "x": 134.484375,
+      "y": 2932.328125,
+      "width": 187,
+      "height": 33,
+      "left": 134.484375,
+      "top": 2932.328125,
+      "right": 321.484375,
+      "bottom": 2965.328125
+    },
+    "attributes": {
+      "id": "date-input",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-107",
+    "selector": "div.instructions",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 2975.328125,
+      "width": 684,
+      "height": 19.1875,
+      "left": 58,
+      "top": 2975.328125,
+      "right": 742,
+      "bottom": 2994.515625
+    },
+    "attributes": {
+      "id": "",
+      "class": "instructions",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Format: YYYY-MM-DD (e.g., 2024-03-15)",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-108",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 3019.515625,
+      "width": 131.140625,
+      "height": 35,
+      "left": 63,
+      "top": 3019.515625,
+      "right": 194.140625,
+      "bottom": 3054.515625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Create Account",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-109",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 3080.515625,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 3080.515625,
+      "right": 742,
+      "bottom": 3106.109375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Instructions lack aria-describedby associations!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-110",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 3084.515625,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 3084.515625,
+      "right": 127.34375,
+      "bottom": 3101.515625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-111",
+    "selector": "div.violation-section:nth-child(6)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 3195.109375,
+      "width": 760,
+      "height": 522.75,
+      "left": 20,
+      "top": 3195.109375,
+      "right": 780,
+      "bottom": 3717.859375
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 6: Conflicting ARIA labels\n        \n            Survey Form - ARIA Label Conflicts\n       ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-112",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 3212.109375,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 3212.109375,
+      "right": 763,
+      "bottom": 3237.703125
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 6: Conflicting ARIA labels",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-113",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 3252.703125,
+      "width": 726,
+      "height": 433.15625,
+      "left": 37,
+      "top": 3252.703125,
+      "right": 763,
+      "bottom": 3685.859375
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Survey Form - ARIA Label Conflicts\n            \n                \n                    Overall Satisfa",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-114",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 3292.421875,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 3292.421875,
+      "right": 742,
+      "bottom": 3322.359375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Survey Form - ARIA Label Conflicts",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-115",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 3341.078125,
+      "width": 684,
+      "height": 266.1875,
+      "left": 58,
+      "top": 3341.078125,
+      "right": 742,
+      "bottom": 3607.265625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Overall Satisfaction\n                    \n                        Choose rating...\n                 ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-116",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 3341.078125,
+      "width": 684,
+      "height": 45,
+      "left": 58,
+      "top": 3341.078125,
+      "right": 742,
+      "bottom": 3386.078125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Overall Satisfaction\n                    \n                        Choose rating...\n                 ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-117",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 3354.078125,
+      "width": 137.84375,
+      "height": 17,
+      "left": 58,
+      "top": 3354.078125,
+      "right": 195.84375,
+      "bottom": 3371.078125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Overall Satisfaction",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-118",
+    "selector": "#satisfaction",
+    "tagName": "select",
+    "bounds": {
+      "x": 200.296875,
+      "y": 3346.078125,
+      "width": 135,
+      "height": 35,
+      "left": 200.296875,
+      "top": 3346.078125,
+      "right": 335.296875,
+      "bottom": 3381.078125
+    },
+    "attributes": {
+      "id": "satisfaction",
+      "class": "",
+      "aria-label": "Rate your experience",
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Choose rating...\n                        Very Unsatisfied\n                        Unsatisfied\n      ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-125",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 3401.078125,
+      "width": 684,
+      "height": 95.59375,
+      "left": 58,
+      "top": 3401.078125,
+      "right": 742,
+      "bottom": 3496.671875
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Additional Comments",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-126",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 3475.078125,
+      "width": 152.078125,
+      "height": 17,
+      "left": 58,
+      "top": 3475.078125,
+      "right": 210.078125,
+      "bottom": 3492.078125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Additional Comments",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-127",
+    "selector": "#feedback",
+    "tagName": "textarea",
+    "bounds": {
+      "x": 214.53125,
+      "y": 3406.078125,
+      "width": 194,
+      "height": 78,
+      "left": 214.53125,
+      "top": 3406.078125,
+      "right": 408.53125,
+      "bottom": 3484.078125
+    },
+    "attributes": {
+      "id": "feedback",
+      "class": "",
+      "aria-label": "Tell us more about your experience",
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-128",
+    "selector": "div.form-row.side-by-side:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 3511.671875,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 3511.671875,
+      "right": 742,
+      "bottom": 3537.265625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row side-by-side",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Subscribe to Newsletter",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-129",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 3511.671875,
+      "width": 168.96875,
+      "height": 25.59375,
+      "left": 58,
+      "top": 3511.671875,
+      "right": 226.96875,
+      "bottom": 3537.265625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Subscribe to Newsletter",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-130",
+    "selector": "#newsletter",
+    "tagName": "input",
+    "bounds": {
+      "x": 246.96875,
+      "y": 3517.96875,
+      "width": 13,
+      "height": 13,
+      "left": 246.96875,
+      "top": 3517.96875,
+      "right": 259.96875,
+      "bottom": 3530.96875
+    },
+    "attributes": {
+      "id": "newsletter",
+      "class": "",
+      "aria-label": "Get our weekly updates",
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-131",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 3562.265625,
+      "width": 126.671875,
+      "height": 35,
+      "left": 63,
+      "top": 3562.265625,
+      "right": 189.671875,
+      "bottom": 3597.265625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Submit Survey",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-132",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 3623.265625,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 3623.265625,
+      "right": 742,
+      "bottom": 3648.859375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: aria-label overrides visible label text!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-133",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 3627.265625,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 3627.265625,
+      "right": 127.34375,
+      "bottom": 3644.265625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-134",
+    "selector": "div.violation-section:nth-child(7)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 3737.859375,
+      "width": 760,
+      "height": 674.9375,
+      "left": 20,
+      "top": 3737.859375,
+      "right": 780,
+      "bottom": 4412.796875
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 7: Ambiguous labels for similar inputs\n        \n            Address Form - Ambiguous Label",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-135",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 3754.859375,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 3754.859375,
+      "right": 763,
+      "bottom": 3780.453125
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 7: Ambiguous labels for similar inputs",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-136",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 3795.453125,
+      "width": 726,
+      "height": 585.34375,
+      "left": 37,
+      "top": 3795.453125,
+      "right": 763,
+      "bottom": 4380.796875
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Address Form - Ambiguous Labels\n            \n                \n                    Billing Address\n  ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-137",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 3835.171875,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 3835.171875,
+      "right": 742,
+      "bottom": 3865.109375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Address Form - Ambiguous Labels",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-138",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 3883.828125,
+      "width": 684,
+      "height": 418.375,
+      "left": 58,
+      "top": 3883.828125,
+      "right": 742,
+      "bottom": 4302.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Billing Address\n                    \n                        Address\n                        \n      ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-139",
+    "selector": "fieldset:nth-child(1)",
+    "tagName": "fieldset",
+    "bounds": {
+      "x": 60,
+      "y": 3883.828125,
+      "width": 680,
+      "height": 116.1875,
+      "left": 60,
+      "top": 3883.828125,
+      "right": 740,
+      "bottom": 4000.015625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Billing Address\n                    \n                        Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-140",
+    "selector": "legend",
+    "tagName": "legend",
+    "bounds": {
+      "x": 74,
+      "y": 3883.828125,
+      "width": 108.953125,
+      "height": 25.59375,
+      "left": 74,
+      "top": 3883.828125,
+      "right": 182.953125,
+      "bottom": 3909.421875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Billing Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-141",
+    "selector": "div.form-row",
+    "tagName": "div",
+    "bounds": {
+      "x": 74,
+      "y": 3930.015625,
+      "width": 652,
+      "height": 43,
+      "left": 74,
+      "top": 3930.015625,
+      "right": 726,
+      "bottom": 3973.015625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-142",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 74,
+      "y": 3942.015625,
+      "width": 58.703125,
+      "height": 17,
+      "left": 74,
+      "top": 3942.015625,
+      "right": 132.703125,
+      "bottom": 3959.015625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-143",
+    "selector": "#address1",
+    "tagName": "input",
+    "bounds": {
+      "x": 137.15625,
+      "y": 3935.015625,
+      "width": 187,
+      "height": 33,
+      "left": 137.15625,
+      "top": 3935.015625,
+      "right": 324.15625,
+      "bottom": 3968.015625
+    },
+    "attributes": {
+      "id": "address1",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-144",
+    "selector": "fieldset:nth-child(2)",
+    "tagName": "fieldset",
+    "bounds": {
+      "x": 60,
+      "y": 4000.015625,
+      "width": 680,
+      "height": 116.1875,
+      "left": 60,
+      "top": 4000.015625,
+      "right": 740,
+      "bottom": 4116.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Shipping Address\n                    \n                        Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-145",
+    "selector": "legend",
+    "tagName": "legend",
+    "bounds": {
+      "x": 74,
+      "y": 4000.015625,
+      "width": 128.53125,
+      "height": 25.59375,
+      "left": 74,
+      "top": 4000.015625,
+      "right": 202.53125,
+      "bottom": 4025.609375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Shipping Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-146",
+    "selector": "div.form-row",
+    "tagName": "div",
+    "bounds": {
+      "x": 74,
+      "y": 4046.203125,
+      "width": 652,
+      "height": 43,
+      "left": 74,
+      "top": 4046.203125,
+      "right": 726,
+      "bottom": 4089.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-147",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 74,
+      "y": 4058.203125,
+      "width": 58.703125,
+      "height": 17,
+      "left": 74,
+      "top": 4058.203125,
+      "right": 132.703125,
+      "bottom": 4075.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-148",
+    "selector": "#address2",
+    "tagName": "input",
+    "bounds": {
+      "x": 137.15625,
+      "y": 4051.203125,
+      "width": 187,
+      "height": 33,
+      "left": 137.15625,
+      "top": 4051.203125,
+      "right": 324.15625,
+      "bottom": 4084.203125
+    },
+    "attributes": {
+      "id": "address2",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-149",
+    "selector": "div.form-row:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 4131.203125,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 4131.203125,
+      "right": 742,
+      "bottom": 4174.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Phone",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-150",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 4143.203125,
+      "width": 46.265625,
+      "height": 17,
+      "left": 58,
+      "top": 4143.203125,
+      "right": 104.265625,
+      "bottom": 4160.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Phone",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-151",
+    "selector": "#phone1",
+    "tagName": "input",
+    "bounds": {
+      "x": 108.71875,
+      "y": 4136.203125,
+      "width": 187,
+      "height": 33,
+      "left": 108.71875,
+      "top": 4136.203125,
+      "right": 295.71875,
+      "bottom": 4169.203125
+    },
+    "attributes": {
+      "id": "phone1",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-152",
+    "selector": "div.form-row:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 4189.203125,
+      "width": 684,
+      "height": 43,
+      "left": 58,
+      "top": 4189.203125,
+      "right": 742,
+      "bottom": 4232.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Phone",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-153",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 58,
+      "y": 4201.203125,
+      "width": 46.265625,
+      "height": 17,
+      "left": 58,
+      "top": 4201.203125,
+      "right": 104.265625,
+      "bottom": 4218.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Phone",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-154",
+    "selector": "#phone2",
+    "tagName": "input",
+    "bounds": {
+      "x": 108.71875,
+      "y": 4194.203125,
+      "width": 187,
+      "height": 33,
+      "left": 108.71875,
+      "top": 4194.203125,
+      "right": 295.71875,
+      "bottom": 4227.203125
+    },
+    "attributes": {
+      "id": "phone2",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-155",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 63,
+      "y": 4257.203125,
+      "width": 136.328125,
+      "height": 35,
+      "left": 63,
+      "top": 4257.203125,
+      "right": 199.328125,
+      "bottom": 4292.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Save Addresses",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-156",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 4318.203125,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 4318.203125,
+      "right": 742,
+      "bottom": 4343.796875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Multiple \"Address\" and \"Phone\" labels are confusing!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-157",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 4322.203125,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 4322.203125,
+      "right": 127.34375,
+      "bottom": 4339.203125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-158",
+    "selector": "div.violation-section:nth-child(8)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 4432.796875,
+      "width": 760,
+      "height": 412.15625,
+      "left": 20,
+      "top": 4432.796875,
+      "right": 780,
+      "bottom": 4844.953125
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-section",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 8: Form controls with no labels at all\n        \n            Search and Filter - Unlabeled ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-159",
+    "selector": "div.violation-title:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 4449.796875,
+      "width": 726,
+      "height": 25.59375,
+      "left": 37,
+      "top": 4449.796875,
+      "right": 763,
+      "bottom": 4475.390625
+    },
+    "attributes": {
+      "id": "",
+      "class": "violation-title",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "VIOLATION 8: Form controls with no labels at all",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-160",
+    "selector": "div.form-example:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 37,
+      "y": 4490.390625,
+      "width": 726,
+      "height": 322.5625,
+      "left": 37,
+      "top": 4490.390625,
+      "right": 763,
+      "bottom": 4812.953125
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-example",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Search and Filter - Unlabeled Controls\n            \n                \n                    \n          ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-161",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 58,
+      "y": 4530.109375,
+      "width": 684,
+      "height": 29.9375,
+      "left": 58,
+      "top": 4530.109375,
+      "right": 742,
+      "bottom": 4560.046875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Search and Filter - Unlabeled Controls",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-162",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 58,
+      "y": 4578.765625,
+      "width": 684,
+      "height": 155.59375,
+      "left": 58,
+      "top": 4578.765625,
+      "right": 742,
+      "bottom": 4734.359375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "🔍\n                \n                \n                    \n                        All Categories\n   ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-163",
+    "selector": "div.form-row.side-by-side:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 4578.765625,
+      "width": 684,
+      "height": 55,
+      "left": 58,
+      "top": 4578.765625,
+      "right": 742,
+      "bottom": 4633.765625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row side-by-side",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "🔍",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-164",
+    "selector": "input",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 4589.765625,
+      "width": 187,
+      "height": 33,
+      "left": 58,
+      "top": 4589.765625,
+      "right": 245,
+      "bottom": 4622.765625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-165",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 270,
+      "y": 4588.765625,
+      "width": 44.875,
+      "height": 35,
+      "left": 270,
+      "top": 4588.765625,
+      "right": 314.875,
+      "bottom": 4623.765625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "🔍",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-166",
+    "selector": "div.form-row.side-by-side:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 4648.765625,
+      "width": 684,
+      "height": 45,
+      "left": 58,
+      "top": 4648.765625,
+      "right": 742,
+      "bottom": 4693.765625
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row side-by-side",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "All Categories\n                        Electronics\n                        Clothing\n                ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-167",
+    "selector": "select:nth-child(1)",
+    "tagName": "select",
+    "bounds": {
+      "x": 58,
+      "y": 4653.765625,
+      "width": 121,
+      "height": 35,
+      "left": 58,
+      "top": 4653.765625,
+      "right": 179,
+      "bottom": 4688.765625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "All Categories\n                        Electronics\n                        Clothing\n                ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-172",
+    "selector": "select:nth-child(2)",
+    "tagName": "select",
+    "bounds": {
+      "x": 199,
+      "y": 4653.765625,
+      "width": 147,
+      "height": 35,
+      "left": 199,
+      "top": 4653.765625,
+      "right": 346,
+      "bottom": 4688.765625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Sort by\n                        Price: Low to High\n                        Price: High to Low\n      ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-177",
+    "selector": "div.form-row.side-by-side:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 58,
+      "y": 4708.765625,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 4708.765625,
+      "right": 742,
+      "bottom": 4734.359375
+    },
+    "attributes": {
+      "id": "",
+      "class": "form-row side-by-side",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "In Stock Only\n                     Free Shipping\n                     On Sale",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-178",
+    "selector": "input:nth-child(1)",
+    "tagName": "input",
+    "bounds": {
+      "x": 58,
+      "y": 4715.0625,
+      "width": 13,
+      "height": 13,
+      "left": 58,
+      "top": 4715.0625,
+      "right": 71,
+      "bottom": 4728.0625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-179",
+    "selector": "input:nth-child(2)",
+    "tagName": "input",
+    "bounds": {
+      "x": 206.15625,
+      "y": 4715.0625,
+      "width": 13,
+      "height": 13,
+      "left": 206.15625,
+      "top": 4715.0625,
+      "right": 219.15625,
+      "bottom": 4728.0625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-180",
+    "selector": "input:nth-child(3)",
+    "tagName": "input",
+    "bounds": {
+      "x": 358.78125,
+      "y": 4715.0625,
+      "width": 13,
+      "height": 13,
+      "left": 358.78125,
+      "top": 4715.0625,
+      "right": 371.78125,
+      "bottom": 4728.0625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-181",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 58,
+      "y": 4750.359375,
+      "width": 684,
+      "height": 25.59375,
+      "left": 58,
+      "top": 4750.359375,
+      "right": 742,
+      "bottom": 4775.953125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem: Multiple form controls lack any accessible names!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-182",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 58,
+      "y": 4754.359375,
+      "width": 69.34375,
+      "height": 17,
+      "left": 58,
+      "top": 4754.359375,
+      "right": 127.34375,
+      "bottom": 4771.359375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Problem:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-183",
+    "selector": "div:nth-child(9)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 4874.953125,
+      "width": 760,
+      "height": 467.734375,
+      "left": 20,
+      "top": 4874.953125,
+      "right": 780,
+      "bottom": 5342.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Expected Scanner Results\n        WCAG 3.3.2 & 1.3.1 Violations Found:\n        \n            8 unlinke",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-184",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 42,
+      "y": 4916.859375,
+      "width": 716,
+      "height": 38.390625,
+      "left": 42,
+      "top": 4916.859375,
+      "right": 758,
+      "bottom": 4955.25
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Expected Scanner Results",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-185",
+    "selector": "p:nth-child(1)",
+    "tagName": "p",
+    "bounds": {
+      "x": 42,
+      "y": 4975.15625,
+      "width": 716,
+      "height": 25.59375,
+      "left": 42,
+      "top": 4975.15625,
+      "right": 758,
+      "bottom": 5000.75
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "WCAG 3.3.2 & 1.3.1 Violations Found:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-186",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 42,
+      "y": 4979.15625,
+      "width": 285.96875,
+      "height": 17,
+      "left": 42,
+      "top": 4979.15625,
+      "right": 327.96875,
+      "bottom": 4996.15625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "WCAG 3.3.2 & 1.3.1 Violations Found:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-187",
+    "selector": "ul",
+    "tagName": "ul",
+    "bounds": {
+      "x": 42,
+      "y": 5016.75,
+      "width": 716,
+      "height": 204.75,
+      "left": 42,
+      "top": 5016.75,
+      "right": 758,
+      "bottom": 5221.5
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "8 unlinked labels (missing for/id associations)\n            6 placeholder-only form controls\n       ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-188",
+    "selector": "li:nth-child(1)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5016.75,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5016.75,
+      "right": 758,
+      "bottom": 5042.34375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "8 unlinked labels (missing for/id associations)",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-189",
+    "selector": "li:nth-child(2)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5042.34375,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5042.34375,
+      "right": 758,
+      "bottom": 5067.9375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "6 placeholder-only form controls",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-190",
+    "selector": "li:nth-child(3)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5067.9375,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5067.9375,
+      "right": 758,
+      "bottom": 5093.53125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "8 visual labels using wrong elements (p, div, span)",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-191",
+    "selector": "li:nth-child(4)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5093.53125,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5093.53125,
+      "right": 758,
+      "bottom": 5119.125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "6 required fields without programmatic indicators",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-192",
+    "selector": "li:nth-child(5)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5119.125,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5119.125,
+      "right": 758,
+      "bottom": 5144.71875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "6 instructions not linked via aria-describedby",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-193",
+    "selector": "li:nth-child(6)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5144.71875,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5144.71875,
+      "right": 758,
+      "bottom": 5170.3125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "4 conflicting aria-label and visible labels",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-194",
+    "selector": "li:nth-child(7)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5170.3125,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5170.3125,
+      "right": 758,
+      "bottom": 5195.90625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "8 ambiguous labels for similar controls",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-195",
+    "selector": "li:nth-child(8)",
+    "tagName": "li",
+    "bounds": {
+      "x": 82,
+      "y": 5195.90625,
+      "width": 676,
+      "height": 25.59375,
+      "left": 82,
+      "top": 5195.90625,
+      "right": 758,
+      "bottom": 5221.5
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "10 form controls with no labels at all",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-196",
+    "selector": "p:nth-child(2)",
+    "tagName": "p",
+    "bounds": {
+      "x": 42,
+      "y": 5237.5,
+      "width": 716,
+      "height": 25.59375,
+      "left": 42,
+      "top": 5237.5,
+      "right": 758,
+      "bottom": 5263.09375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Total Expected Violations: 56+ form labeling failures",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-197",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 42,
+      "y": 5241.5,
+      "width": 198.5625,
+      "height": 17,
+      "left": 42,
+      "top": 5241.5,
+      "right": 240.5625,
+      "bottom": 5258.5
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Total Expected Violations:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-198",
+    "selector": "p:nth-child(3)",
+    "tagName": "p",
+    "bounds": {
+      "x": 42,
+      "y": 5279.09375,
+      "width": 716,
+      "height": 25.59375,
+      "left": 42,
+      "top": 5279.09375,
+      "right": 758,
+      "bottom": 5304.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Confidence Level: High (programmatically detectable)",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-199",
+    "selector": "strong",
+    "tagName": "strong",
+    "bounds": {
+      "x": 42,
+      "y": 5283.09375,
+      "width": 137.8125,
+      "height": 17,
+      "left": 42,
+      "top": 5283.09375,
+      "right": 179.8125,
+      "bottom": 5300.09375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Confidence Level:",
+    "isVisible": true,
+    "zIndex": "auto"
+  }
+]

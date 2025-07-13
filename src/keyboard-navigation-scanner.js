@@ -1592,15 +1592,16 @@ class KeyboardNavigationScanner {
       const clickableElements = document.querySelectorAll('*');
       
       clickableElements.forEach(element => {
-        // Check if element has click handler
+        // Check if element has click handler - be more specific to avoid false positives
         const hasClickHandler = element.onclick || 
                                element.hasAttribute('onclick') ||
-                               element.addEventListener || 
                                element.hasAttribute('ng-click') ||
                                element.hasAttribute('@click') ||
                                element.classList.contains('clickable') ||
                                element.classList.contains('btn') ||
-                               element.hasAttribute('role') && element.getAttribute('role') === 'button';
+                               element.classList.contains('fake-button') ||
+                               (element.hasAttribute('role') && element.getAttribute('role') === 'button') ||
+                               element.style.cursor === 'pointer';
         
         if (hasClickHandler) {
           const selector = getElementSelector(element);

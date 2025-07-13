@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Motion and Vestibular Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        /* GUT: Respektiert prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Static alternative to parallax */
+        .good-parallax-container {
+            height: 400px;
+            position: relative;
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            border-radius: 8px;
+            /* GUT: Statischer Hintergrund als Standard */
+        }
+        
+        .good-parallax-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(33, 150, 243, 0.3) 20%, transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.3) 15%, transparent 15%),
+                radial-gradient(circle at 40% 80%, rgba(255, 152, 0, 0.3) 25%, transparent 25%);
+            /* GUT: Keine Animation standardmäßig */
+        }
+        
+        .good-parallax-layer.animated {
+            animation: goodParallaxMove 8s infinite linear;
+        }
+        
+        @keyframes goodParallaxMove {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        
+        .good-parallax-content {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            margin: 50px 20px;
+            border-radius: 8px;
+        }
+        
+        .motion-controls {
+            background-color: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            /* GUT: Bewegungskontrollen für Benutzer */
+        }
+        
+        .motion-controls h4 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        /* GOOD 2: Video with pause controls */
+        .good-video-container {
+            width: 100%;
+            height: 300px;
+            background-color: #000;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .good-video-simulator {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff5722, #ff9800, #ffc107, #8bc34a);
+            background-size: 400% 400%;
+            position: relative;
+            /* GUT: Pausiert bis Benutzer startet */
+        }
+        
+        .good-video-simulator.playing {
+            animation: goodColorShift 8s infinite;
+        }
+        
+        @keyframes goodColorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .good-video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            text-align: center;
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .video-controls button {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .video-controls button:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        /* GOOD 3: Alternative navigation to tilt */
+        .good-navigation-container {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .good-nav-object {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #ff4444;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .navigation-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .nav-button {
+            width: 40px;
+            height: 40px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .nav-button:hover {
+            background: #388e3c;
+        }
+        
+        .nav-button:disabled {
+            background: #ccc;
+        }
+        
+        /* GOOD 4: Carousel with pause controls */
+        .good-carousel {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #f5f5f5;
+        }
+        
+        .good-carousel-track {
+            display: flex;
+            width: 500%;
+            height: 100%;
+            transition: transform 0.3s ease;
+            /* GUT: Nur Transition, keine automatische Animation */
+        }
+        
+        .good-carousel-slide {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .good-carousel-slide:nth-child(1) { background: #e91e63; }
+        .good-carousel-slide:nth-child(2) { background: #9c27b0; }
+        .good-carousel-slide:nth-child(3) { background: #673ab7; }
+        .good-carousel-slide:nth-child(4) { background: #3f51b5; }
+        .good-carousel-slide:nth-child(5) { background: #2196f3; }
+        
+        .carousel-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .carousel-controls button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .carousel-controls button:hover {
+            background: #388e3c;
+        }
+        
+        .carousel-controls button:disabled {
+            background: #ccc;
+        }
+        
+        .slide-indicators {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .slide-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+        
+        .slide-indicator.active {
+            background: white;
+        }
+        
+        /* GOOD 5: Optional scroll animations */
+        .good-scroll-trigger {
+            height: 200px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            margin: 20px 0;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .good-scroll-element {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #ff4444;
+            border-radius: 50%;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            /* GUT: Statisch bis aktiviert */
+        }
+        
+        .good-scroll-element.animated {
+            animation: goodScrollMove 3s ease-in-out;
+        }
+        
+        @keyframes goodScrollMove {
+            0% { left: 20px; }
+            50% { left: calc(100% - 80px); }
+            100% { left: 20px; }
+        }
+        
+        /* GOOD 6: Static background option */
+        .good-background {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: white;
+            /* GUT: Statischer Hintergrund als Standard */
+        }
+        
+        .good-background.animated {
+            background-size: 400% 400%;
+            animation: goodBackgroundMove 8s ease infinite;
+        }
+        
+        @keyframes goodBackgroundMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* GOOD 7: Button-based zoom alternative */
+        .good-zoom-interface {
+            width: 100%;
+            height: 250px;
+            background: #f0f0f0;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .good-zoom-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .zoom-controls button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .zoom-controls button:hover {
+            background: #1976d2;
+        }
+        
+        /* GOOD 8: Motion with consent */
+        .good-motion-sensor {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+        }
+        
+        .good-motion-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            position: relative;
+            min-height: 80px;
+        }
+        
+        .good-motion-ball {
+            width: 30px;
+            height: 30px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .motion-permission {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Control panels */
+        .control-panel {
+            background-color: #e8f5e8;
+            border: 2px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .control-group {
+            margin: 10px 0;
+        }
+        
+        .control-group label {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        
+        .control-group input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+        
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #388e3c;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        button.secondary {
+            background-color: #757575;
+        }
+        
+        button.secondary:hover {
+            background-color: #616161;
+        }
+        
+        button.warning {
+            background-color: #ff9800;
+        }
+        
+        button.warning:hover {
+            background-color: #f57c00;
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .accessibility-notice {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .accessibility-notice h4 {
+            color: #f57c00;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Motion and Vestibular Accessible (GOOD)</h1>
+    <p><strong>WCAG 2.3.3 & 2.5.4 Konform:</strong> Bewegungsbasierte Interaktionen mit alternativer Steuerung und Benutzer-Kontrolle über Animationen</p>
+    
+    <!-- Global motion controls -->
+    <div class="control-panel">
+        <h3>🎛️ Globale Bewegungseinstellungen</h3>
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="globalMotionEnabled" onchange="goodToggleGlobalMotion()">
+                Alle Animationen aktivieren (respektiert System-Einstellungen)
+            </label>
+            <label>
+                <input type="checkbox" id="reduceMotionEnabled" checked onchange="goodToggleReducedMotion()">
+                Bewegungen reduzieren (empfohlen für vestibulare Empfindlichkeit)
+            </label>
+            <label>
+                <input type="checkbox" id="allowAutoplay" onchange="goodToggleAutoplay()">
+                Automatische Wiedergabe erlauben
+            </label>
+        </div>
+        
+        <div class="accessibility-notice">
+            <h4>♿ Accessibility-Hinweis</h4>
+            <p>Diese Seite respektiert Ihre System-Einstellung "prefers-reduced-motion". Alle Animationen können individuell kontrolliert werden.</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 1: Static alternative to parallax -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Parallax mit Benutzer-Kontrolle</div>
+        <p><strong>Lösung:</strong> Statischer Hintergrund mit optionaler, kontrollierter Animation</p>
+        <div class="interactive-area">
+            <div class="motion-controls">
+                <h4>🎮 Parallax-Kontrollen</h4>
+                <button onclick="goodToggleParallax()" id="parallaxToggle">▶️ Parallax-Effekt aktivieren</button>
+                <button onclick="goodResetParallax()" class="secondary">🔄 Zurücksetzen</button>
+                <div style="margin-top: 10px;">
+                    <small>✅ Standardmäßig statisch - Animation nur auf Benutzer-Anfrage</small>
+                </div>
+            </div>
+            
+            <div class="good-parallax-container">
+                <!-- GUT: Standardmäßig keine Animation -->
+                <div class="good-parallax-layer" id="goodParallaxLayer"></div>
+                <div class="good-parallax-content">
+                    <h4>🌊 Kontrollierte Parallax-Demo</h4>
+                    <p>Diese Animation ist standardmäßig deaktiviert und respektiert Ihre Bewegungs-Präferenzen. Sie können sie optional aktivieren.</p>
+                    <p>✅ Benutzer-Kontrolle über alle Bewegungen</p>
+                    <p>✅ Statischer Fallback verfügbar</p>
+                    <p>✅ Respektiert prefers-reduced-motion</p>
+                </div>
+            </div>
+            <p>✅ Benutzer kontrolliert alle Parallax-Bewegungen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Video with pause controls -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Video mit vollständiger Benutzer-Kontrolle</div>
+        <p><strong>Lösung:</strong> Kein Auto-Play, vollständige Wiedergabe-Kontrollen</p>
+        <div class="interactive-area">
+            <div class="good-video-container">
+                <!-- GUT: Pausiert bis Benutzer startet -->
+                <div class="good-video-simulator" id="goodVideoSimulator">
+                    <div class="good-video-overlay">
+                        <div id="goodVideoStatus">🎬 VIDEO PAUSIERT</div>
+                        <div style="font-size: 14px; margin-top: 10px;">Keine schnellen Bewegungen</div>
+                    </div>
+                </div>
+                
+                <div class="video-controls">
+                    <button onclick="goodToggleVideo()" id="videoPlayButton">▶️ Abspielen</button>
+                    <button onclick="goodStopVideo()" id="videoStopButton">⏹️ Stoppen</button>
+                    <button onclick="goodToggleMotionReduction()" id="motionReductionButton">🐌 Langsam</button>
+                </div>
+            </div>
+            
+            <div class="status-display">
+                ✅ <strong>Benutzer-freundlich:</strong> Kein Auto-Play, vollständige Kontrollen, Option für reduzierte Bewegung
+            </div>
+            <p>✅ Vollständige Wiedergabe-Kontrolle ohne Auto-Play</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Alternative navigation to tilt -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Navigation mit mehreren Eingabemethoden</div>
+        <p><strong>Lösung:</strong> Tastatur, Maus und optionale Bewegungssteuerung</p>
+        <div class="interactive-area">
+            <div class="motion-controls">
+                <h4>🎮 Eingabemethoden</h4>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="keyboardNavEnabled" checked onchange="goodToggleKeyboardNav()">
+                        Tastaturnavigation (Pfeiltasten)
+                    </label>
+                    <label>
+                        <input type="checkbox" id="buttonNavEnabled" checked onchange="goodToggleButtonNav()">
+                        Button-Navigation
+                    </label>
+                    <label>
+                        <input type="checkbox" id="tiltNavEnabled" onchange="goodToggleTiltNav()">
+                        Bewegungssteuerung (optional)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="good-navigation-container">
+                <!-- GUT: Mehrere Steuerungsmethoden -->
+                <div class="good-nav-object" id="goodNavObject" tabindex="0"></div>
+                
+                <div class="navigation-buttons" id="navButtons">
+                    <button class="nav-button" onclick="goodMoveObject('nw')">↖</button>
+                    <button class="nav-button" onclick="goodMoveObject('n')">↑</button>
+                    <button class="nav-button" onclick="goodMoveObject('ne')">↗</button>
+                    <button class="nav-button" onclick="goodMoveObject('w')">←</button>
+                    <button class="nav-button" onclick="goodMoveObject('center')">⚫</button>
+                    <button class="nav-button" onclick="goodMoveObject('e')">→</button>
+                    <button class="nav-button" onclick="goodMoveObject('sw')">↙</button>
+                    <button class="nav-button" onclick="goodMoveObject('s')">↓</button>
+                    <button class="nav-button" onclick="goodMoveObject('se')">↘</button>
+                </div>
+            </div>
+            
+            <div class="status-display">
+                📱 <strong>Anweisungen:</strong> Verwenden Sie Pfeiltasten, Buttons oder (optional) Geräteneigung zur Steuerung.
+            </div>
+            <p>✅ Multiple Eingabemethoden - niemand ist ausgeschlossen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Carousel with pause controls -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Karussell mit vollständiger Benutzer-Kontrolle</div>
+        <p><strong>Lösung:</strong> Manuelle Navigation ohne automatische Rotation</p>
+        <div class="interactive-area">
+            <div class="good-carousel">
+                <!-- GUT: Nur manuelle Navigation -->
+                <div class="good-carousel-track" id="goodCarouselTrack">
+                    <div class="good-carousel-slide">Slide 1</div>
+                    <div class="good-carousel-slide">Slide 2</div>
+                    <div class="good-carousel-slide">Slide 3</div>
+                    <div class="good-carousel-slide">Slide 4</div>
+                    <div class="good-carousel-slide">Slide 5</div>
+                </div>
+                
+                <div class="slide-indicators" id="slideIndicators">
+                    <div class="slide-indicator active" onclick="goodGoToSlide(0)"></div>
+                    <div class="slide-indicator" onclick="goodGoToSlide(1)"></div>
+                    <div class="slide-indicator" onclick="goodGoToSlide(2)"></div>
+                    <div class="slide-indicator" onclick="goodGoToSlide(3)"></div>
+                    <div class="slide-indicator" onclick="goodGoToSlide(4)"></div>
+                </div>
+                
+                <div class="carousel-controls">
+                    <button onclick="goodPrevSlide()" id="prevButton">◀ Zurück</button>
+                    <button onclick="goodToggleAutoSlide()" id="autoSlideButton">▶️ Auto-Modus</button>
+                    <button onclick="goodNextSlide()" id="nextButton">Weiter ▶</button>
+                </div>
+            </div>
+            
+            <div class="status-display">
+                📖 <strong>Benutzer-gesteuert:</strong> Keine automatische Rotation - Sie bestimmen das Tempo
+            </div>
+            <p>✅ Vollständige Benutzer-Kontrolle ohne automatische Bewegung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Optional scroll animations -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Optionale Scroll-Animationen</div>
+        <p><strong>Lösung:</strong> Animationen nur auf Benutzer-Anfrage</p>
+        <div class="interactive-area">
+            <div class="motion-controls">
+                <h4>📜 Scroll-Animation Kontrollen</h4>
+                <button onclick="goodTriggerScrollAnimation()" id="scrollAnimButton">🚀 Animation starten</button>
+                <button onclick="goodResetScrollAnimation()" class="secondary">🔄 Zurücksetzen</button>
+                <div style="margin-top: 10px;">
+                    <small>✅ Animationen nur auf explizite Benutzer-Anfrage</small>
+                </div>
+            </div>
+            
+            <div class="good-scroll-trigger">
+                <!-- GUT: Statisch bis aktiviert -->
+                <div class="good-scroll-element" id="goodScrollElement"></div>
+            </div>
+            <p>✅ Scroll-Animationen unter vollständiger Benutzer-Kontrolle</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Static background option -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Hintergrund mit Animationskontrolle</div>
+        <p><strong>Lösung:</strong> Statischer Hintergrund mit optionaler Animation</p>
+        <div class="interactive-area">
+            <div class="motion-controls">
+                <h4>🎨 Hintergrund-Kontrollen</h4>
+                <button onclick="goodToggleBackground()" id="backgroundToggle">🌈 Animation aktivieren</button>
+                <button onclick="goodResetBackground()" class="secondary">🔄 Statisch</button>
+            </div>
+            
+            <div class="good-background" id="goodBackground">
+                <h4>🎨 Kontrollierter Hintergrund</h4>
+                <p>Dieser Bereich hat einen statischen Gradient-Hintergrund. Die Animation kann optional aktiviert werden.</p>
+                <p>✅ Respektiert prefers-reduced-motion</p>
+                <p>✅ Benutzer-kontrollierte Animation</p>
+                <p>✅ Kein ablenkender Dauerbetrieb</p>
+            </div>
+            <p>✅ Statische Hintergründe mit optionaler, kontrollierter Animation</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Button-based zoom alternative -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Zoom-Alternative mit Buttons</div>
+        <p><strong>Lösung:</strong> Button-basierte Größenänderung statt Gestik-abhängiger Steuerung</p>
+        <div class="interactive-area">
+            <div class="good-zoom-interface">
+                <!-- GUT: Button-basierte Zoom-Alternative -->
+                <div class="good-zoom-content" id="goodZoomContent">
+                    Größe anpassen
+                </div>
+                
+                <div class="zoom-controls">
+                    <button onclick="goodZoomOut()">🔍- Verkleinern</button>
+                    <button onclick="goodZoomReset()">🔄 Reset</button>
+                    <button onclick="goodZoomIn()">🔍+ Vergrößern</button>
+                </div>
+            </div>
+            
+            <div class="status-display">
+                🔧 <strong>Zugänglich:</strong> Button-basierte Größenänderung - keine Gestik erforderlich
+            </div>
+            <p>✅ Alternative zu Pinch-Zoom Gesten verfügbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Motion with consent -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Gerätebewegung mit Zustimmung</div>
+        <p><strong>Lösung:</strong> Explizite Berechtigung vor Bewegungssensor-Zugriff</p>
+        <div class="interactive-area">
+            <div class="good-motion-sensor">
+                <!-- GUT: Bewegungssensoren nur mit Erlaubnis -->
+                <h4>📱 Bewegungssensor-Demo</h4>
+                
+                <div class="motion-permission">
+                    <h5>🔒 Berechtigung erforderlich</h5>
+                    <p>Diese Funktion möchte auf Ihre Gerätebewegung zugreifen.</p>
+                    <p><strong>Zweck:</strong> Interactive Demo der Bewegungssteuerung</p>
+                    <p><strong>Sie können:</strong></p>
+                    <ul style="text-align: left; display: inline-block;">
+                        <li>Jederzeit ablehnen oder deaktivieren</li>
+                        <li>Alternative Steuerung verwenden</li>
+                        <li>Sensitivität anpassen</li>
+                    </ul>
+                </div>
+                
+                <div class="good-motion-display">
+                    <div class="good-motion-ball" id="goodMotionBall"></div>
+                    <p style="margin-top: 50px;" id="motionStatus">Bewegungssensor inaktiv</p>
+                </div>
+                
+                <div style="margin: 15px 0;">
+                    <button onclick="goodRequestMotionPermission()" id="motionPermissionButton">📱 Bewegung aktivieren</button>
+                    <button onclick="goodDisableMotion()" class="secondary" id="motionDisableButton" disabled>❌ Deaktivieren</button>
+                    <button onclick="goodSimulateMotion()" class="warning">🎮 Bewegung simulieren</button>
+                </div>
+            </div>
+            <p>✅ Gerätebewegung nur mit expliziter Benutzer-Zustimmung</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das zugänglich ist</div>
+        <p><strong>WCAG 2.3.3 & 2.5.4 Konformität:</strong></p>
+        <ul>
+            <li>✅ Alternative Steuerung für alle bewegungsbasierten Interaktionen</li>
+            <li>✅ Benutzer-Kontrolle über alle Animationen und Auto-Play</li>
+            <li>✅ Respektiert System-Einstellung "prefers-reduced-motion"</li>
+            <li>✅ Explizite Zustimmung vor Bewegungssensor-Zugriff</li>
+            <li>✅ Statische Alternativen für alle dynamischen Inhalte</li>
+        </ul>
+        
+        <p><strong>Unterstützte Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Vestibulare Störungen: Können alle Bewegungen kontrollieren oder deaktivieren</li>
+            <li>👥 Epilepsie/Anfälle: Sichere, kontrollierte Animationen ohne Überraschungen</li>
+            <li>👥 Motion Sickness: Statische Alternativen für alle bewegten Inhalte</li>
+            <li>👥 Motor-Beeinträchtigungen: Multiple Eingabemethoden verfügbar</li>
+            <li>👥 ADHS: Können störende Animationen deaktivieren</li>
+            <li>👥 Ältere Benutzer: Einfache, vorhersagbare Steuerung</li>
+        </ul>
+    </div>
+
+    <script>
+        let goodGlobalMotionEnabled = false;
+        let goodReducedMotionEnabled = true;
+        let goodAutoplayEnabled = false;
+        let goodCurrentSlide = 0;
+        let goodAutoSlideInterval = null;
+        let goodVideoPlaying = false;
+        let goodMotionPermissionGranted = false;
+        let goodZoomLevel = 1;
+        let goodNavPosition = { x: 50, y: 50 };
+        
+        // Check system preference for reduced motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        
+        // GOOD: Initialize based on system preferences
+        function goodInitializeMotionSettings() {
+            if (prefersReducedMotion.matches) {
+                goodReducedMotionEnabled = true;
+                document.getElementById('reduceMotionEnabled').checked = true;
+                document.getElementById('globalMotionEnabled').checked = false;
+                console.log('ACCESSIBILITY SUCCESS: Respecting user\'s reduced motion preference');
+            }
+        }
+        
+        // GOOD 1: Parallax with user control
+        function goodToggleParallax() {
+            const layer = document.getElementById('goodParallaxLayer');
+            const button = document.getElementById('parallaxToggle');
+            
+            if (goodReducedMotionEnabled) {
+                alert('⚠️ Bewegungen sind reduziert!\n\nSie haben reduzierte Bewegungen aktiviert. Möchten Sie diese Einstellung für diese Animation ändern?');
+                return;
+            }
+            
+            if (layer.classList.contains('animated')) {
+                layer.classList.remove('animated');
+                button.textContent = '▶️ Parallax-Effekt aktivieren';
+            } else {
+                layer.classList.add('animated');
+                button.textContent = '⏸️ Parallax-Effekt pausieren';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User controls parallax animation');
+        }
+        
+        function goodResetParallax() {
+            const layer = document.getElementById('goodParallaxLayer');
+            const button = document.getElementById('parallaxToggle');
+            
+            layer.classList.remove('animated');
+            button.textContent = '▶️ Parallax-Effekt aktivieren';
+            
+            console.log('ACCESSIBILITY SUCCESS: Parallax reset to static state');
+        }
+        
+        // GOOD 2: Video with pause controls
+        function goodToggleVideo() {
+            const simulator = document.getElementById('goodVideoSimulator');
+            const status = document.getElementById('goodVideoStatus');
+            const button = document.getElementById('videoPlayButton');
+            
+            if (!goodAutoplayEnabled) {
+                if (confirm('🎬 Video abspielen?\n\nDieses Video enthält sanfte Bewegungen. Möchten Sie es abspielen?')) {
+                    goodVideoPlaying = !goodVideoPlaying;
+                } else {
+                    return;
+                }
+            } else {
+                goodVideoPlaying = !goodVideoPlaying;
+            }
+            
+            if (goodVideoPlaying) {
+                if (!goodReducedMotionEnabled) {
+                    simulator.classList.add('playing');
+                }
+                status.textContent = '🎬 VIDEO SPIELT AB';
+                button.textContent = '⏸️ Pausieren';
+            } else {
+                simulator.classList.remove('playing');
+                status.textContent = '🎬 VIDEO PAUSIERT';
+                button.textContent = '▶️ Abspielen';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User controls video playback');
+        }
+        
+        function goodStopVideo() {
+            const simulator = document.getElementById('goodVideoSimulator');
+            const status = document.getElementById('goodVideoStatus');
+            const button = document.getElementById('videoPlayButton');
+            
+            goodVideoPlaying = false;
+            simulator.classList.remove('playing');
+            status.textContent = '🎬 VIDEO GESTOPPT';
+            button.textContent = '▶️ Abspielen';
+            
+            console.log('ACCESSIBILITY SUCCESS: User can stop video');
+        }
+        
+        function goodToggleMotionReduction() {
+            const button = document.getElementById('motionReductionButton');
+            goodReducedMotionEnabled = !goodReducedMotionEnabled;
+            
+            if (goodReducedMotionEnabled) {
+                button.textContent = '🐌 Reduziert';
+                alert('🐌 Bewegung reduziert!\n\nAlle Animationen sind verlangsamt oder deaktiviert.');
+                // Apply reduced motion to all elements
+                document.body.classList.add('reduced-motion');
+            } else {
+                button.textContent = '🚀 Normal';
+                document.body.classList.remove('reduced-motion');
+            }
+            
+            document.getElementById('reduceMotionEnabled').checked = goodReducedMotionEnabled;
+            console.log('ACCESSIBILITY SUCCESS: User controls motion reduction');
+        }
+        
+        // GOOD 3: Alternative navigation
+        function goodMoveObject(direction) {
+            const object = document.getElementById('goodNavObject');
+            
+            const directions = {
+                'nw': { x: 20, y: 20 },
+                'n': { x: 50, y: 20 },
+                'ne': { x: 80, y: 20 },
+                'w': { x: 20, y: 50 },
+                'center': { x: 50, y: 50 },
+                'e': { x: 80, y: 50 },
+                'sw': { x: 20, y: 80 },
+                's': { x: 50, y: 80 },
+                'se': { x: 80, y: 80 }
+            };
+            
+            if (directions[direction]) {
+                goodNavPosition = directions[direction];
+                object.style.left = goodNavPosition.x + '%';
+                object.style.top = goodNavPosition.y + '%';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Button-based navigation');
+        }
+        
+        function goodToggleKeyboardNav() {
+            const enabled = document.getElementById('keyboardNavEnabled').checked;
+            const object = document.getElementById('goodNavObject');
+            
+            if (enabled) {
+                object.addEventListener('keydown', goodHandleKeyboardNav);
+                object.setAttribute('tabindex', '0');
+            } else {
+                object.removeEventListener('keydown', goodHandleKeyboardNav);
+                object.removeAttribute('tabindex');
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Keyboard navigation toggled');
+        }
+        
+        function goodHandleKeyboardNav(event) {
+            const step = 10; // Move 10% each time
+            
+            switch(event.key) {
+                case 'ArrowUp':
+                    goodNavPosition.y = Math.max(20, goodNavPosition.y - step);
+                    break;
+                case 'ArrowDown':
+                    goodNavPosition.y = Math.min(80, goodNavPosition.y + step);
+                    break;
+                case 'ArrowLeft':
+                    goodNavPosition.x = Math.max(20, goodNavPosition.x - step);
+                    break;
+                case 'ArrowRight':
+                    goodNavPosition.x = Math.min(80, goodNavPosition.x + step);
+                    break;
+                case 'Home':
+                    goodNavPosition = { x: 50, y: 50 };
+                    break;
+                default:
+                    return;
+            }
+            
+            event.preventDefault();
+            const object = document.getElementById('goodNavObject');
+            object.style.left = goodNavPosition.x + '%';
+            object.style.top = goodNavPosition.y + '%';
+            
+            console.log('ACCESSIBILITY SUCCESS: Keyboard navigation used');
+        }
+        
+        function goodToggleButtonNav() {
+            const enabled = document.getElementById('buttonNavEnabled').checked;
+            const buttons = document.getElementById('navButtons');
+            
+            buttons.style.display = enabled ? 'grid' : 'none';
+            console.log('ACCESSIBILITY SUCCESS: Button navigation toggled');
+        }
+        
+        function goodToggleTiltNav() {
+            const enabled = document.getElementById('tiltNavEnabled').checked;
+            
+            if (enabled) {
+                if (confirm('📱 Bewegungssteuerung aktivieren?\n\nDies aktiviert die Geräteneigung zur Steuerung. Sie können es jederzeit deaktivieren.')) {
+                    goodRequestMotionForNav();
+                } else {
+                    document.getElementById('tiltNavEnabled').checked = false;
+                }
+            } else {
+                alert('📱 Bewegungssteuerung deaktiviert');
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Tilt navigation with user consent');
+        }
+        
+        // GOOD 4: Carousel with pause controls
+        function goodGoToSlide(index) {
+            goodCurrentSlide = index;
+            goodUpdateCarousel();
+            console.log('ACCESSIBILITY SUCCESS: Manual slide navigation');
+        }
+        
+        function goodPrevSlide() {
+            goodCurrentSlide = (goodCurrentSlide - 1 + 5) % 5;
+            goodUpdateCarousel();
+        }
+        
+        function goodNextSlide() {
+            goodCurrentSlide = (goodCurrentSlide + 1) % 5;
+            goodUpdateCarousel();
+        }
+        
+        function goodUpdateCarousel() {
+            const track = document.getElementById('goodCarouselTrack');
+            const indicators = document.querySelectorAll('.slide-indicator');
+            
+            track.style.transform = `translateX(-${goodCurrentSlide * 20}%)`;
+            
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === goodCurrentSlide);
+            });
+            
+            // Update navigation buttons
+            document.getElementById('prevButton').disabled = goodCurrentSlide === 0;
+            document.getElementById('nextButton').disabled = goodCurrentSlide === 4;
+        }
+        
+        function goodToggleAutoSlide() {
+            const button = document.getElementById('autoSlideButton');
+            
+            if (goodAutoSlideInterval) {
+                clearInterval(goodAutoSlideInterval);
+                goodAutoSlideInterval = null;
+                button.textContent = '▶️ Auto-Modus';
+                alert('⏸️ Automatische Wiedergabe gestoppt');
+            } else {
+                if (confirm('▶️ Automatische Wiedergabe starten?\n\nDas Karussell wird alle 3 Sekunden weiterschalten. Sie können es jederzeit stoppen.')) {
+                    goodAutoSlideInterval = setInterval(() => {
+                        goodNextSlide();
+                        if (goodCurrentSlide === 4) {
+                            clearInterval(goodAutoSlideInterval);
+                            goodAutoSlideInterval = null;
+                            button.textContent = '▶️ Auto-Modus';
+                            alert('🔚 Ende der automatischen Wiedergabe erreicht');
+                        }
+                    }, 3000);
+                    button.textContent = '⏸️ Stoppen';
+                }
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User controls auto-slide');
+        }
+        
+        // GOOD 5: Optional scroll animations
+        function goodTriggerScrollAnimation() {
+            const element = document.getElementById('goodScrollElement');
+            const button = document.getElementById('scrollAnimButton');
+            
+            if (goodReducedMotionEnabled) {
+                alert('⚠️ Bewegungen sind reduziert!\n\nDie Animation wird übersprungen, da Sie reduzierte Bewegungen aktiviert haben.');
+                return;
+            }
+            
+            element.classList.add('animated');
+            button.disabled = true;
+            button.textContent = '🚀 Animation läuft...';
+            
+            setTimeout(() => {
+                element.classList.remove('animated');
+                button.disabled = false;
+                button.textContent = '🚀 Animation starten';
+            }, 3000);
+            
+            console.log('ACCESSIBILITY SUCCESS: User-triggered scroll animation');
+        }
+        
+        function goodResetScrollAnimation() {
+            const element = document.getElementById('goodScrollElement');
+            const button = document.getElementById('scrollAnimButton');
+            
+            element.classList.remove('animated');
+            button.disabled = false;
+            button.textContent = '🚀 Animation starten';
+            
+            console.log('ACCESSIBILITY SUCCESS: Animation reset');
+        }
+        
+        // GOOD 6: Background animation control
+        function goodToggleBackground() {
+            const background = document.getElementById('goodBackground');
+            const button = document.getElementById('backgroundToggle');
+            
+            if (goodReducedMotionEnabled) {
+                alert('⚠️ Bewegungen sind reduziert!\n\nHintergrund-Animation wird übersprungen.');
+                return;
+            }
+            
+            if (background.classList.contains('animated')) {
+                background.classList.remove('animated');
+                button.textContent = '🌈 Animation aktivieren';
+            } else {
+                background.classList.add('animated');
+                button.textContent = '⏸️ Animation pausieren';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User controls background animation');
+        }
+        
+        function goodResetBackground() {
+            const background = document.getElementById('goodBackground');
+            const button = document.getElementById('backgroundToggle');
+            
+            background.classList.remove('animated');
+            button.textContent = '🌈 Animation aktivieren';
+            
+            console.log('ACCESSIBILITY SUCCESS: Background reset to static');
+        }
+        
+        // GOOD 7: Button-based zoom alternative
+        function goodZoomIn() {
+            goodZoomLevel = Math.min(2, goodZoomLevel + 0.2);
+            goodUpdateZoom();
+        }
+        
+        function goodZoomOut() {
+            goodZoomLevel = Math.max(0.5, goodZoomLevel - 0.2);
+            goodUpdateZoom();
+        }
+        
+        function goodZoomReset() {
+            goodZoomLevel = 1;
+            goodUpdateZoom();
+        }
+        
+        function goodUpdateZoom() {
+            const content = document.getElementById('goodZoomContent');
+            content.style.transform = `translate(-50%, -50%) scale(${goodZoomLevel})`;
+            
+            console.log('ACCESSIBILITY SUCCESS: Button-based zoom control');
+        }
+        
+        // GOOD 8: Motion with consent
+        function goodRequestMotionPermission() {
+            if (confirm('📱 Bewegungssensor aktivieren?\n\nDiese Demo möchte auf Ihre Gerätebewegung zugreifen um die Position des gelben Balls zu steuern.\n\n✅ Sie können es jederzeit deaktivieren\n✅ Keine Daten werden gespeichert\n✅ Nur für diese Demo')) {
+                goodMotionPermissionGranted = true;
+                
+                document.getElementById('motionPermissionButton').disabled = true;
+                document.getElementById('motionDisableButton').disabled = false;
+                document.getElementById('motionStatus').textContent = 'Bewegungssensor aktiv - neigen Sie Ihr Gerät';
+                
+                // Request actual device motion permission (modern browsers)
+                if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                    DeviceMotionEvent.requestPermission()
+                        .then(response => {
+                            if (response === 'granted') {
+                                goodStartMotionTracking();
+                            } else {
+                                alert('❌ Berechtigung verweigert\n\nBewegungssensor kann nicht aktiviert werden.');
+                                goodDisableMotion();
+                            }
+                        })
+                        .catch(error => {
+                            console.log('Motion permission error:', error);
+                            goodSimulateMotion(); // Fallback to simulation
+                        });
+                } else {
+                    goodSimulateMotion(); // Fallback for older browsers
+                }
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Motion permission requested with user consent');
+        }
+        
+        function goodStartMotionTracking() {
+            if (goodMotionPermissionGranted) {
+                window.addEventListener('devicemotion', goodHandleMotion);
+                console.log('ACCESSIBILITY SUCCESS: Motion tracking started with permission');
+            }
+        }
+        
+        function goodHandleMotion(event) {
+            if (!goodMotionPermissionGranted) return;
+            
+            const ball = document.getElementById('goodMotionBall');
+            const x = event.accelerationIncludingGravity.x;
+            const y = event.accelerationIncludingGravity.y;
+            
+            // Convert acceleration to position (simplified)
+            const newX = Math.max(15, Math.min(85, 50 + x * 5));
+            const newY = Math.max(15, Math.min(85, 50 + y * 5));
+            
+            ball.style.left = newX + '%';
+            ball.style.top = newY + '%';
+        }
+        
+        function goodDisableMotion() {
+            goodMotionPermissionGranted = false;
+            window.removeEventListener('devicemotion', goodHandleMotion);
+            
+            document.getElementById('motionPermissionButton').disabled = false;
+            document.getElementById('motionDisableButton').disabled = true;
+            document.getElementById('motionStatus').textContent = 'Bewegungssensor deaktiviert';
+            
+            // Reset ball position
+            const ball = document.getElementById('goodMotionBall');
+            ball.style.left = '50%';
+            ball.style.top = '50%';
+            
+            alert('✅ Bewegungssensor deaktiviert\n\nIhre Gerätebewegung wird nicht mehr verfolgt.');
+            console.log('ACCESSIBILITY SUCCESS: Motion tracking disabled by user');
+        }
+        
+        function goodSimulateMotion() {
+            if (!goodMotionPermissionGranted) return;
+            
+            alert('🎮 Bewegung simuliert\n\nFür Demonstrationszwecke wird eine sanfte Bewegung simuliert.');
+            
+            const ball = document.getElementById('goodMotionBall');
+            let angle = 0;
+            
+            const simulationInterval = setInterval(() => {
+                if (!goodMotionPermissionGranted) {
+                    clearInterval(simulationInterval);
+                    return;
+                }
+                
+                angle += 0.1;
+                const x = 50 + Math.sin(angle) * 20;
+                const y = 50 + Math.cos(angle) * 10;
+                
+                ball.style.left = x + '%';
+                ball.style.top = y + '%';
+            }, 100);
+            
+            setTimeout(() => {
+                clearInterval(simulationInterval);
+                ball.style.left = '50%';
+                ball.style.top = '50%';
+            }, 5000);
+            
+            console.log('ACCESSIBILITY SUCCESS: Motion simulation with user control');
+        }
+        
+        // Global motion controls
+        function goodToggleGlobalMotion() {
+            goodGlobalMotionEnabled = document.getElementById('globalMotionEnabled').checked;
+            
+            if (goodGlobalMotionEnabled && prefersReducedMotion.matches) {
+                if (!confirm('⚠️ System-Einstellung überschreiben?\n\nIhr System ist auf "Bewegungen reduzieren" eingestellt. Möchten Sie trotzdem Animationen aktivieren?')) {
+                    document.getElementById('globalMotionEnabled').checked = false;
+                    goodGlobalMotionEnabled = false;
+                    return;
+                }
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Global motion settings respected');
+        }
+        
+        function goodToggleReducedMotion() {
+            goodReducedMotionEnabled = document.getElementById('reduceMotionEnabled').checked;
+            
+            if (goodReducedMotionEnabled) {
+                // Disable all active animations
+                document.querySelectorAll('.animated').forEach(element => {
+                    element.classList.remove('animated');
+                });
+                
+                // Reset all controls
+                goodResetParallax();
+                goodResetBackground();
+                goodResetScrollAnimation();
+                goodStopVideo();
+                
+                alert('🐌 Bewegungen reduziert!\n\nAlle Animationen wurden gestoppt und können einzeln reaktiviert werden.');
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Reduced motion preference updated');
+        }
+        
+        function goodToggleAutoplay() {
+            goodAutoplayEnabled = document.getElementById('allowAutoplay').checked;
+            
+            if (!goodAutoplayEnabled) {
+                goodStopVideo();
+                if (goodAutoSlideInterval) {
+                    goodToggleAutoSlide();
+                }
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Autoplay preference updated');
+        }
+        
+        function goodRequestMotionForNav() {
+            // Simplified motion for navigation - with explicit consent
+            alert('📱 Bewegungssteuerung für Navigation aktiviert!\n\nNeigen Sie Ihr Gerät um den roten Ball zu steuern.\nJederzeit über das Kontrollfeld deaktivierbar.');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== MOTION & VESTIBULAR GOOD EXAMPLES LOADED ===');
+            
+            goodInitializeMotionSettings();
+            goodUpdateCarousel();
+            
+            // Set up keyboard navigation
+            goodToggleKeyboardNav();
+            
+            console.log('✅ All motion features initialized with user control:');
+            console.log('- Respects prefers-reduced-motion system setting');
+            console.log('- All animations require user activation');
+            console.log('- Multiple input methods for all interactions');
+            console.log('- Motion sensors require explicit permission');
+            console.log('- Static alternatives always available');
+            console.log('- User can pause/disable any motion');
+            
+            // Listen for system preference changes
+            prefersReducedMotion.addListener(function(e) {
+                if (e.matches) {
+                    goodReducedMotionEnabled = true;
+                    document.getElementById('reduceMotionEnabled').checked = true;
+                    goodToggleReducedMotion();
+                    console.log('ACCESSIBILITY SUCCESS: Automatically adapted to system reduced motion preference change');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

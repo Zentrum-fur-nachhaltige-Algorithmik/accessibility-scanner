@@ -163,6 +163,28 @@ class ResilientAccessibilityScanner {
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
       
+      // ENHANCED TIMING: Wait for dynamic Vue.js/Nuxt.js content
+      console.log('   ⏱️  Waiting for dynamic content to fully load...');
+      
+      // Wait for specific elements that we know should be there
+      try {
+        await page.waitForSelector('img', { timeout: 10000 });
+        console.log('   ✅ Images detected');
+      } catch {
+        console.log('   ⚠️  No images found within 10s');
+      }
+      
+      try {
+        await page.waitForSelector('input[type=\"email\"], input[placeholder*=\"mail\"]', { timeout: 10000 });
+        console.log('   ✅ Email inputs detected');
+      } catch {
+        console.log('   ⚠️  No email inputs found within 10s');
+      }
+      
+      // Additional wait for Vue.js hydration
+      await new Promise(resolve => setTimeout(resolve, 8000));
+      console.log('   ✅ Extended wait completed');
+      
       // Take screenshot before axe injection
       await page.screenshot({ 
         path: path.join(scanDir, 'before-axe-injection.png'),
@@ -181,7 +203,35 @@ class ResilientAccessibilityScanner {
             return;
           }
           
-          axe.run((err, results) => {
+          // COMPREHENSIVE SCAN with ALL available rules + role="none" override
+          const axeConfig = {
+            // Include ALL WCAG levels and best practices
+            tags: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa', 'best-practice'],
+            // Explicitly enable critical rules and override role-based exclusions
+            rules: {
+              'image-alt': { 
+                enabled: true,
+                // Override role="none" exclusion for functional images
+                selector: 'img, [role="img"], svg[role="img"]'
+              },
+              'label': { enabled: true },               // Form labels
+              'input-image-alt': { enabled: true },     // Input image alt
+              'aria-hidden-focus': { enabled: true },   // Hidden focus
+              'color-contrast': { enabled: true },      // Color contrast
+              'heading-order': { enabled: true },       // Heading hierarchy
+              'landmark-one-main': { enabled: true },   // Main landmark
+              'region': { enabled: true },              // Page regions
+              'form-field-multiple-labels': { enabled: true }
+            },
+            // Override default exclusions
+            exclude: [],
+            // Force checking of elements that might be ignored
+            allowedOrigins: ['<same>'],
+            // Check elements regardless of presentation role
+            elementRef: true
+          };
+          
+          axe.run(axeConfig, (err, results) => {
             if (err) {
               resolve({ error: err.message });
             } else {

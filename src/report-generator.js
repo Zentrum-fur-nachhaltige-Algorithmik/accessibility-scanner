@@ -68,12 +68,6 @@ class ReportGenerator {
 
   async generatePDFReport(reportData, htmlContent) {
     try {
-      // For now, skip PDF generation to avoid template issues
-      // We'll focus on HTML reports which work perfectly
-      console.log('PDF generation temporarily disabled for debugging');
-      return null;
-      
-      /* 
       const options = {
         format: 'A4',
         printBackground: true,
@@ -91,8 +85,8 @@ class ReportGenerator {
       const pdfPath = path.join(this.reportsDir, `${reportData.id}.pdf`);
       await fs.writeFile(pdfPath, pdfBuffer);
       
+      console.log(`✅ PDF report generated: ${pdfPath}`);
       return pdfPath;
-      */
     } catch (error) {
       console.error('PDF generation error:', error);
       throw new Error(`PDF generation failed: ${error.message}`);

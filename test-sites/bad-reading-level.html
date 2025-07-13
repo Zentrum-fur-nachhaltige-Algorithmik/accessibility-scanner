@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Reading Level Violations (BAD)</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.3;
+            font-size: 14px;
+            /* SCHLECHT: Kleine Schrift und schwer lesbare Serifen-Schrift */
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Overly complex academic language */
+        .bad-complex-text {
+            font-size: 13px;
+            line-height: 1.2;
+            text-align: justify;
+            color: #333333;
+            /* SCHLECHT: Zu kleine Schrift, geringer Zeilenabstand */
+        }
+        
+        /* VIOLATION 2: Technical jargon without explanations */
+        .bad-jargon-text {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            background-color: #f8f8f8;
+            padding: 15px;
+            border: 1px solid #ddd;
+            /* SCHLECHT: Technischer Jargon ohne Erklärungen */
+        }
+        
+        /* VIOLATION 3: Dense legal text */
+        .bad-legal-text {
+            font-size: 11px;
+            line-height: 1.1;
+            color: #444444;
+            text-align: justify;
+            margin: 0;
+            /* SCHLECHT: Extrem kleine Schrift, dichter Text */
+        }
+        
+        /* VIOLATION 4: Medical terminology without context */
+        .bad-medical-text {
+            font-family: serif;
+            font-size: 12px;
+            line-height: 1.2;
+            background-color: #fafafa;
+            padding: 10px;
+            /* SCHLECHT: Medizinische Fachbegriffe ohne Erklärung */
+        }
+        
+        /* VIOLATION 5: Complex financial information */
+        .bad-financial-text {
+            font-size: 11px;
+            line-height: 1.15;
+            color: #555555;
+            background-color: #f5f5f5;
+            padding: 8px;
+            border-left: 2px solid #ccc;
+            /* SCHLECHT: Komplexe Finanzsprache ohne Vereinfachung */
+        }
+        
+        /* VIOLATION 6: Academic abstracts without summaries */
+        .bad-academic-text {
+            font-family: 'Times New Roman', serif;
+            font-size: 12px;
+            line-height: 1.25;
+            text-align: justify;
+            color: #222222;
+            /* SCHLECHT: Akademische Abstracts ohne Vereinfachung */
+        }
+        
+        /* VIOLATION 7: Government bureaucratic language */
+        .bad-bureaucratic-text {
+            font-size: 11px;
+            line-height: 1.1;
+            color: #404040;
+            background-color: #fcfcfc;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            /* SCHLECHT: Bürokratische Sprache ohne Übersetzung */
+        }
+        
+        /* VIOLATION 8: Technical documentation without glossary */
+        .bad-technical-docs {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.3;
+            background-color: #f7f7f7;
+            padding: 10px;
+            color: #333333;
+            /* SCHLECHT: Technische Dokumentation ohne Glossar */
+        }
+        
+        /* VIOLATION 9: Long sentences without breaks */
+        .bad-long-sentences {
+            font-size: 13px;
+            line-height: 1.2;
+            text-align: justify;
+            color: #444444;
+            /* SCHLECHT: Sehr lange, verschachtelte Sätze */
+        }
+        
+        /* VIOLATION 10: Foreign phrases without translation */
+        .bad-foreign-phrases {
+            font-style: italic;
+            font-size: 13px;
+            color: #555555;
+            /* SCHLECHT: Fremdsprachige Begriffe ohne Übersetzung */
+        }
+        
+        .complexity-indicator {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        
+        .readability-warning {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-text {
+            color: #e65100;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        button {
+            background-color: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+        }
+        
+        button:hover {
+            background-color: #005a87;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Reading Level Violations (BAD)</h1>
+    <p><strong>WCAG 3.1.5 Verletzungen:</strong> Texte überschreiten das empfohlene Bildungsniveau (Sekundarstufe II) ohne vereinfachte Alternativen</p>
+    
+    <!-- VIOLATION 1: Overly complex academic language -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Übermäßig komplexe akademische Sprache</div>
+        <p><strong>Problem:</strong> Hochakademische Sprache ohne vereinfachte Alternative</p>
+        <div class="interactive-area">
+            <div class="bad-complex-text">
+                <!-- SCHLECHT: Extrem komplexe akademische Sprache -->
+                Die epistemologischen Implikationen der postmodernen Dekonstruktion traditioneller hermeneutischer Paradigmen manifestieren sich in der Dialektik zwischen strukturalistischen und poststrukturalistischen Methodologien, welche eine fundamentale Rekonzeptualisierung der ontologischen Grundlagen zeitgenössischer geisteswissenschaftlicher Diskurse erfordern. Die phänomenologische Reduktion, als heuristisches Instrument zur Erschließung der intentionalen Strukturen des Bewusstseins, konfrontiert uns mit der Aporie einer transzendentalen Subjektivität, die sich ihrer eigenen Konstitutionsbedingungen nicht vollständig bewusst werden kann. Dies führt unweigerlich zu einer Infragestellung der cartesianischen Dichotomie zwischen res extensa und res cogitans, welche die neuzeitliche Philosophie seit Jahrhunderten dominiert hat.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Lesegrad-Analyse:</strong> Universitätsniveau (Graduate+) - Weit über WCAG-Empfehlung
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Technical jargon without explanations -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Technischer Jargon ohne Erklärungen</div>
+        <p><strong>Problem:</strong> Fachbegriffe ohne Definitionen oder Glossar</p>
+        <div class="interactive-area">
+            <div class="bad-jargon-text">
+                <!-- SCHLECHT: Technische Fachbegriffe ohne Erklärung -->
+                Das OAuth 2.0-Framework implementiert eine rollenbasierte Autorisierungsarchitektur mit JWT-Tokens zur Authentifizierung von RESTful API-Endpunkten. Die asymmetrische Kryptographie mittels RSA-256-Verschlüsselung gewährleistet die Integrität der HMAC-signierten Payloads. Das CORS-Policy-Setup erfordert Whitelisting spezifischer Origins für Cross-Domain-AJAX-Requests. Die Implementierung von WebSockets ermöglicht bidirektionale Real-Time-Kommunikation über TCP-Verbindungen. Der Einsatz von CDNs optimiert die Latenz durch geografisch verteilte Edge-Server mit Caching-Strategien. Microservices-Architekturen nutzen Container-Orchestrierung via Kubernetes für horizontale Skalierung der Workloads.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Technische Komplexität:</strong> Experten-Level ohne Begriffserklärungen
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Dense legal text -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Dichter Rechtstext</div>
+        <p><strong>Problem:</strong> Juristische Sprache ohne Vereinfachung</p>
+        <div class="interactive-area">
+            <div class="bad-legal-text">
+                <!-- SCHLECHT: Komplexe juristische Sprache -->
+                Der Vertragspartner verpflichtet sich unwiderruflich zur Einhaltung sämtlicher in diesem Vertragsverhältnis stipulierten Konditionen sowie zur termingerechten Erfüllung der sich aus den Nebenbestimmungen ergebenden Obliegenheiten, wobei eine etwaige Zuwiderhandlung automatisch die Geltendmachung von Schadenersatzansprüchen in Höhe des entgangenen Gewinns sowie sämtlicher mittelbaren und unmittelbaren Folgeschäden zur Folge hat, sofern nicht force majeure-Umstände oder andere unabwendbare Ereignisse höherer Gewalt eine ordnungsgemäße Vertragserfüllung objektiv unmöglich machen, was jedoch durch entsprechende Nachweise binnen angemessener Frist zu belegen ist. Die Verjährungsfristen richten sich nach den einschlägigen Bestimmungen des Bürgerlichen Gesetzbuchs, wobei eine Verlängerung der Gewährleistungsansprüche durch entsprechende vertragliche Vereinbarungen möglich ist, sofern diese den gesetzlichen Mindeststandards entsprechen und nicht gegen die guten Sitten verstoßen.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Juristische Komplexität:</strong> Anwaltsniveau - Für Laien unverständlich
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Medical terminology without context -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Medizinische Fachsprache ohne Kontext</div>
+        <p><strong>Problem:</strong> Medizinische Terminologie ohne Laienverständliche Erklärung</p>
+        <div class="interactive-area">
+            <div class="bad-medical-text">
+                <!-- SCHLECHT: Medizinische Fachbegriffe ohne Erklärung -->
+                Bei der Diagnose einer chronischen Nephropathie mit progredientem Kreatininanstieg und Proteinurie ist eine differentialdiagnostische Abklärung bezüglich einer diabetischen versus hypertensiven Genese indiziert. Die glomeruläre Filtrationsrate zeigt eine kontinuierliche Verschlechterung mit konsekutiver Akkumulation harnpflichtiger Substanzen. Eine antihypertensive Therapie mit ACE-Hemmern oder Angiotensin-Rezeptor-Antagonisten ist zur Nephroprogression-Prophylaxe essentiell. Bei terminaler Niereninsuffizienz wird eine Nierenersatztherapie mittels Hämodialyse, Peritonealdialyse oder Nierentransplantation notwendig. Die Immunsuppression post-transplantationem erfordert eine sorgfältige Überwachung bezüglich opportunistischer Infektionen und maligner Entartungen.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Medizinische Komplexität:</strong> Facharztniveau - Ohne Patientenverständliche Übersetzung
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Complex financial information -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Komplexe Finanzinformationen</div>
+        <p><strong>Problem:</strong> Finanzfachsprache ohne verständliche Aufbereitung</p>
+        <div class="interactive-area">
+            <div class="bad-financial-text">
+                <!-- SCHLECHT: Komplexe Finanzterminologie -->
+                Die Portfoliooptimierung erfolgt durch Diversifikation über verschiedene Anlageklassen unter Berücksichtigung der Korrelationskoeffizienten zwischen den einzelnen Assets. Das Risikomanagement basiert auf Value-at-Risk-Berechnungen mit Monte-Carlo-Simulationen zur Bestimmung der maximalen Verlustwahrscheinlichkeit bei gegebenem Konfidenzniveau. Derivate wie Optionen und Futures ermöglichen komplexe Hedging-Strategien zur Absicherung gegen Marktvolatilität. Die Sharpe-Ratio dient als Kennzahl für die risikoadjustierte Rendite unter Einbeziehung der risikolosen Verzinsung. Strukturierte Finanzprodukte mit eingebetteten Derivaten weisen komplexe Auszahlungsprofile auf, die einer eingehenden Analyse der Underlying-Performance bedürfen.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Finanzielle Komplexität:</strong> Experten-Level ohne Vereinfachung für Privatkunden
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Academic abstracts without summaries -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Wissenschaftliche Abstracts ohne Zusammenfassung</div>
+        <p><strong>Problem:</strong> Forschungssprache ohne allgemeinverständliche Aufbereitung</p>
+        <div class="interactive-area">
+            <div class="bad-academic-text">
+                <!-- SCHLECHT: Wissenschaftlicher Abstract ohne Vereinfachung -->
+                Diese Studie untersucht die neuroplastischen Adaptationen in präfrontalen Kortexarealen bei Patienten mit chronischen affektiven Störungen mittels funktioneller Magnetresonanztomographie (fMRI) und Diffusions-Tensor-Bildgebung (DTI). Die Ergebnisse zeigen signifikante Alterationen in der weißen Substanz-Integrität, insbesondere im Fasciculus longitudinalis superior und im Cingulum, welche mit der Schwere der depressiven Symptomatik korrelieren. Die quantitative Analyse der fraktionalen Anisotropie ergab eine inverse Korrelation zur Hamilton-Depression-Rating-Skala. Neurochemische Spektroskopie mittels ¹H-MRS demonstrierte reduzierte N-Acetyl-Aspartat-Konzentrationen im anterioren cingulären Kortex, was auf neuronale Dysfunktion hindeutet. Diese Befunde unterstützen die Hypothese struktureller Konnektivitätsalterationen als pathophysiologisches Substrat affektiver Erkrankungen.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Wissenschaftliche Komplexität:</strong> Forschungsniveau ohne Übersetzung für die Öffentlichkeit
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Government bureaucratic language -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Behördensprache ohne Bürgernähe</div>
+        <p><strong>Problem:</strong> Amtsdeutsch ohne verständliche Übersetzung</p>
+        <div class="interactive-area">
+            <div class="bad-bureaucratic-text">
+                <!-- SCHLECHT: Komplexe Behördensprache -->
+                Gemäß § 23 Abs. 2 Satz 3 der Verordnung über die Durchführung von Genehmigungsverfahren nach dem Bundesimmissionsschutzgesetz in Verbindung mit den Bestimmungen der TA Luft sind bei Anlagen zur Behandlung und Verwertung von Abfällen mit einer Durchsatzkapazität von mehr als 10 Tonnen pro Tag umfangreiche Emissionsmessungen durchzuführen, wobei die Überschreitung der in Anhang III festgelegten Grenzwerte für Stickstoffdioxid, Schwefeldioxid und Partikel PM2.5 unverzüglich der zuständigen Überwachungsbehörde zu melden ist, es sei denn, es liegen außergewöhnliche Betriebszustände vor, die eine temporäre Abweichung von den Normalparametern rechtfertigen, was jedoch dokumentationspflichtig ist und innerhalb von 48 Stunden nach Auftreten des Ereignisses schriftlich zu begründen ist.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Bürokratische Komplexität:</strong> Verwaltungssprache ohne Bürgererklärung
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Technical documentation without glossary -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Technische Dokumentation ohne Glossar</div>
+        <p><strong>Problem:</strong> Komplexe Anweisungen ohne Begriffserklärungen</p>
+        <div class="interactive-area">
+            <div class="bad-technical-docs">
+                <!-- SCHLECHT: Technische Dokumentation ohne Erklärungen -->
+                Zur Konfiguration des Load Balancers implementieren Sie zunächst den Sticky Session-Mechanismus über Cookie-basiertes Session Affinity. Die Upstream-Server müssen in einem Round-Robin-Pattern mit Health Checks konfiguriert werden. Aktivieren Sie SSL Termination am Load Balancer mit Perfect Forward Secrecy über ECDHE-Schlüsselaustausch. Die Bandbreitenbegrenzung erfolgt über Token Bucket-Algorithmen mit konfigurierbaren Burst-Limits. Implementieren Sie Circuit Breaker-Pattern für Failover-Szenarien mit exponentieller Backoff-Strategie. Die Monitoring-Integration erfordert StatsD-Metriken mit Grafana-Dashboards für Real-Time-Visualisierung. Konfigurieren Sie Connection Pooling mit Keep-Alive-Timeouts zur Optimierung der TCP-Verbindungswiederverwendung.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Technische Dokumentation:</strong> Experten-Level ohne Glossar oder Erklärungen
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 9: Long sentences without breaks -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Sehr lange Sätze ohne Pausen</div>
+        <p><strong>Problem:</strong> Übermäßig verschachtelte Satzstrukturen</p>
+        <div class="interactive-area">
+            <div class="bad-long-sentences">
+                <!-- SCHLECHT: Extrem lange, verschachtelte Sätze -->
+                Die Implementation einer benutzerfreundlichen Website erfordert nicht nur die Berücksichtigung ästhetischer Gesichtspunkte, die sich in einer harmonischen Farbgebung, einer ausgewogenen Typographie und einer intuitiven Navigationsstruktur manifestieren, sondern auch die umfassende Analyse der Benutzerbedürfnisse, die durch extensive Usability-Tests, Fokusgruppen-Diskussionen und quantitative Datenanalysen ermittelt werden müssen, wobei gleichzeitig technische Aspekte wie Ladegeschwindigkeit, Cross-Browser-Kompatibilität, responsive Design für verschiedene Bildschirmgrößen, Suchmaschinenoptimierung durch semantisch korrektes HTML-Markup und strukturierte Daten, Barrierefreiheit gemäß WCAG-Richtlinien für Benutzer mit Behinderungen, Datenschutz und -sicherheit durch sichere Übertragungsprotokolle und Verschlüsselungsverfahren, sowie die Integration von Analytics-Tools zur kontinuierlichen Überwachung der Benutzerinteraktionen berücksichtigt werden müssen, um eine ganzheitliche digitale Erfahrung zu schaffen, die sowohl funktional als auch emotional ansprechend ist.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Satzlänge:</strong> 189 Wörter in einem Satz - Erschwert Verständnis erheblich
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 10: Foreign phrases without translation -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 10: Fremdsprachige Begriffe ohne Übersetzung</div>
+        <p><strong>Problem:</strong> Lateinische und andere Fremdsprachen ohne deutsche Entsprechung</p>
+        <div class="interactive-area">
+            <div class="bad-foreign-phrases">
+                <!-- SCHLECHT: Viele fremdsprachige Begriffe ohne Übersetzung -->
+                Das Unternehmen agiert als <em>primus inter pares</em> in der Branche und verfolgt eine Strategie des <em>status quo ante</em>. Die <em>sine qua non</em> Bedingungen für den Erfolg basieren auf dem Prinzip <em>pacta sunt servanda</em>. Das Management folgt dem Motto <em>per aspera ad astra</em> und vermeidet <em>ad hoc</em> Entscheidungen. Die <em>modus operandi</em> des Teams orientiert sich an Best Practices, wobei <em>de facto</em> Standards implementiert werden. Ein <em>sui generis</em> Ansatz gewährleistet <em>ex ante</em> Planungssicherheit. Die Qualitätskontrolle erfolgt <em>post hoc</em> durch unabhängige Auditoren. <em>Vis-à-vis</em> der Konkurrenz positioniert sich das Unternehmen als <em>avant-garde</em> Innovator. Das <em>raison d'être</em> der Organisation liegt in der Schaffung von <em>synergies par excellence</em>.
+            </div>
+            <div class="complexity-indicator">
+                <strong>⚠️ Fremdsprachliche Komplexität:</strong> Übermäßige Verwendung unübersetzter Fachbegriffe
+            </div>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 3.1.5 Verletzungen:</strong></p>
+        <ul>
+            <li>❌ Texte erfordern Hochschulbildung zum Verständnis</li>
+            <li>❌ Keine vereinfachten Alternativen oder Zusammenfassungen</li>
+            <li>❌ Fachbegriffe ohne Definitionen oder Glossar</li>
+            <li>❌ Übermäßig lange und verschachtelte Satzstrukturen</li>
+            <li>❌ Fremdsprachige Begriffe ohne Übersetzung</li>
+            <li>❌ Sehr kleine Schriftgrößen erschweren das Lesen zusätzlich</li>
+        </ul>
+        
+        <p><strong>Betroffene Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Niedrigere Bildungsgrade: Verstehen komplexe Texte nicht</li>
+            <li>👥 Nicht-Muttersprachler: Haben Schwierigkeiten mit Fachsprache</li>
+            <li>👥 Ältere Menschen: Mögen einfachere Sprache bevorzugen</li>
+            <li>👥 Legasthenie: Brauchen klarere, einfachere Texte</li>
+            <li>👥 Konzentrationsstörungen: Können langen Texten nicht folgen</li>
+            <li>👥 Stress-Situationen: Verstehen komplexe Infos schlechter</li>
+        </ul>
+    </div>
+
+    <div class="readability-warning">
+        <div class="warning-text">⚠️ LESEGRADE-WARNUNG</div>
+        <p>Diese Seite enthält Texte mit extremer Komplexität (Universitätsniveau und höher). Normale Website-Besucher können diese Inhalte nicht verstehen. WCAG 3.1.5 empfiehlt Texte auf Sekundarstufe II-Niveau oder niedriger, mit vereinfachten Alternativen für komplexere Inhalte.</p>
+    </div>
+
+    <script>
+        // Analyze reading level violations
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== READING LEVEL VIOLATIONS ANALYSIS ===');
+            
+            // Count complex text elements
+            const complexElements = document.querySelectorAll('[class*="bad-"]');
+            console.log(`Found ${complexElements.length} elements with reading level violations`);
+            
+            // Simulate reading level analysis
+            const textElements = [
+                { selector: '.bad-complex-text', level: 'Graduate+', wcagViolation: true },
+                { selector: '.bad-jargon-text', level: 'Expert Technical', wcagViolation: true },
+                { selector: '.bad-legal-text', level: 'Professional Legal', wcagViolation: true },
+                { selector: '.bad-medical-text', level: 'Medical Professional', wcagViolation: true },
+                { selector: '.bad-financial-text', level: 'Financial Expert', wcagViolation: true },
+                { selector: '.bad-academic-text', level: 'Research/PhD', wcagViolation: true },
+                { selector: '.bad-bureaucratic-text', level: 'Administrative Expert', wcagViolation: true },
+                { selector: '.bad-technical-docs', level: 'Technical Expert', wcagViolation: true },
+                { selector: '.bad-long-sentences', level: 'Complex Academic', wcagViolation: true },
+                { selector: '.bad-foreign-phrases', level: 'Multilingual Expert', wcagViolation: true }
+            ];
+            
+            textElements.forEach(element => {
+                const el = document.querySelector(element.selector);
+                if (el) {
+                    const wordCount = el.textContent.split(' ').length;
+                    const avgWordsPerSentence = wordCount / (el.textContent.split('.').length - 1);
+                    
+                    console.log(`ACCESSIBILITY VIOLATION: ${element.selector}`);
+                    console.log(`- Reading Level: ${element.level}`);
+                    console.log(`- Word Count: ${wordCount}`);
+                    console.log(`- Avg Words/Sentence: ${Math.round(avgWordsPerSentence)}`);
+                    console.log(`- WCAG 3.1.5 Violation: ${element.wcagViolation}`);
+                }
+            });
+            
+            // Check for missing simplification features
+            console.log('⚠️ MISSING ACCESSIBILITY FEATURES:');
+            console.log('- No plain language alternatives provided');
+            console.log('- No glossary for technical terms');
+            console.log('- No text-to-speech integration');
+            console.log('- No reading level indicators');
+            console.log('- No summary versions available');
+            console.log('- No translation of foreign phrases');
+            console.log('- Font sizes below recommended minimums');
+            console.log('- Dense text without visual breaks');
+            
+            // Simulate readability scores
+            setTimeout(() => {
+                console.log('=== READABILITY ANALYSIS ===');
+                console.log('Flesch Reading Ease: 15 (Very Difficult - Graduate Level)');
+                console.log('Flesch-Kincaid Grade: 18+ (Graduate Level)');
+                console.log('SMOG Index: 16+ (College Graduate)');
+                console.log('Gunning Fog Index: 20+ (Graduate Level)');
+                console.log('Coleman-Liau Index: 16+ (College Level)');
+                console.log('⚠️ ALL SCORES EXCEED WCAG 3.1.5 RECOMMENDATIONS');
+                console.log('RECOMMENDED: Middle/High School Level (Grades 8-12)');
+            }, 2000);
+            
+            // Track font size violations
+            setTimeout(() => {
+                const smallFonts = [];
+                complexElements.forEach(el => {
+                    const fontSize = window.getComputedStyle(el).fontSize;
+                    const fontSizeNum = parseInt(fontSize);
+                    if (fontSizeNum < 16) {
+                        smallFonts.push({
+                            element: el.className,
+                            fontSize: fontSize
+                        });
+                    }
+                });
+                
+                console.log(`⚠️ SMALL FONT VIOLATIONS: ${smallFonts.length} elements with fonts < 16px`);
+                smallFonts.forEach(font => {
+                    console.log(`- ${font.element}: ${font.fontSize}`);
+                });
+            }, 3000);
+        });
+        
+        // Function to demonstrate complexity impact
+        function demonstrateComplexity() {
+            const startTime = Date.now();
+            
+            // Simulate time to read complex text
+            const complexTexts = document.querySelectorAll('[class*="bad-"]');
+            let totalWords = 0;
+            
+            complexTexts.forEach(el => {
+                totalWords += el.textContent.split(' ').length;
+            });
+            
+            // Average reading speed: 200-300 words per minute for complex text
+            const readingTimeMinutes = Math.ceil(totalWords / 200);
+            
+            console.log(`COMPLEXITY IMPACT ANALYSIS:`);
+            console.log(`- Total words: ${totalWords}`);
+            console.log(`- Estimated reading time: ${readingTimeMinutes} minutes`);
+            console.log(`- Comprehension level required: Graduate+`);
+            console.log(`- Percentage of population who can understand: <20%`);
+            console.log(`- WCAG Violation: Text exceeds Secondary Education level`);
+        }
+        
+        // Auto-analyze on load
+        setTimeout(demonstrateComplexity, 4000);
+    </script>
+</body>
+</html>

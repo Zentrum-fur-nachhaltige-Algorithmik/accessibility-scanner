@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Form Labels - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-title {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .form-example {
+            background-color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        .form-row {
+            margin: 15px 0;
+        }
+        input, select, textarea {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .required {
+            color: red;
+        }
+        .instructions {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .side-by-side {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bad Form Labels - Multiple WCAG 3.3.2 & 1.3.1 Violations</h1>
+    <p>This page demonstrates common form labeling failures that prevent screen reader users from understanding form controls.</p>
+
+    <!-- VIOLATION 1: Unlinked labels -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Labels not programmatically linked to inputs</div>
+        <div class="form-example">
+            <h3>Contact Form with Unlinked Labels</h3>
+            <form>
+                <div class="form-row">
+                    <label>Full Name</label>
+                    <input type="text" name="name">
+                </div>
+                <div class="form-row">
+                    <label>Email Address</label>
+                    <input type="email" name="email">
+                </div>
+                <div class="form-row">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone">
+                </div>
+                <div class="form-row">
+                    <label>Message</label>
+                    <textarea name="message" rows="4" cols="50"></textarea>
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+            <p><strong>Problem:</strong> Labels lack 'for' attributes and inputs lack 'id' attributes!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 2: Placeholder-only labels -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Placeholder text as only label</div>
+        <div class="form-example">
+            <h3>Login Form - Placeholder Only</h3>
+            <form>
+                <div class="form-row">
+                    <input type="email" placeholder="Your Email Address" name="username">
+                </div>
+                <div class="form-row">
+                    <input type="password" placeholder="Your Password" name="password">
+                </div>
+                <div class="form-row">
+                    <input type="text" placeholder="Company Name (Optional)" name="company">
+                </div>
+                <button type="submit">Log In</button>
+            </form>
+            <p><strong>Problem:</strong> Placeholders disappear when typing and aren't labels!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 3: Visual labels without programmatic association -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Visual labels using wrong elements</div>
+        <div class="form-example">
+            <h3>Registration Form - Wrong Elements</h3>
+            <form>
+                <div class="form-row">
+                    <p>First Name:</p>
+                    <input type="text" name="firstName">
+                </div>
+                <div class="form-row">
+                    <div>Last Name:</div>
+                    <input type="text" name="lastName">
+                </div>
+                <div class="form-row">
+                    <span>Date of Birth:</span>
+                    <input type="date" name="dob">
+                </div>
+                <div class="form-row">
+                    <strong>Choose Your Country:</strong>
+                    <select name="country">
+                        <option value="">Select...</option>
+                        <option value="us">United States</option>
+                        <option value="ca">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                    </select>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <p><strong>Problem:</strong> Using p, div, span instead of label elements!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 4: Missing required field indicators -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Required fields not programmatically indicated</div>
+        <div class="form-example">
+            <h3>Order Form - Visual Only Required Indicators</h3>
+            <form>
+                <div class="form-row">
+                    <label for="product-name">Product Name <span class="required">*</span></label>
+                    <input type="text" id="product-name" name="productName">
+                </div>
+                <div class="form-row">
+                    <label for="quantity">Quantity <span class="required">*</span></label>
+                    <input type="number" id="quantity" name="quantity">
+                </div>
+                <div class="form-row">
+                    <label for="delivery-address">Delivery Address <span class="required">*</span></label>
+                    <textarea id="delivery-address" name="address" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <label for="special-instructions">Special Instructions</label>
+                    <textarea id="special-instructions" name="instructions" rows="2"></textarea>
+                </div>
+                <button type="submit">Place Order</button>
+            </form>
+            <p><strong>Problem:</strong> Missing 'required' attributes or aria-required="true"!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 5: Instructions not programmatically associated -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Instructions not linked to form controls</div>
+        <div class="form-example">
+            <h3>Account Setup - Unlinked Instructions</h3>
+            <form>
+                <div class="form-row">
+                    <label for="username-input">Username</label>
+                    <input type="text" id="username-input" name="username">
+                    <div class="instructions">Must be 3-20 characters, letters and numbers only</div>
+                </div>
+                <div class="form-row">
+                    <label for="password-input">Password</label>
+                    <input type="password" id="password-input" name="password">
+                    <div class="instructions">Minimum 8 characters with at least one number and special character</div>
+                </div>
+                <div class="form-row">
+                    <label for="date-input">Start Date</label>
+                    <input type="text" id="date-input" name="startDate">
+                    <div class="instructions">Format: YYYY-MM-DD (e.g., 2024-03-15)</div>
+                </div>
+                <button type="submit">Create Account</button>
+            </form>
+            <p><strong>Problem:</strong> Instructions lack aria-describedby associations!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 6: Conflicting aria-label and visible labels -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Conflicting ARIA labels</div>
+        <div class="form-example">
+            <h3>Survey Form - ARIA Label Conflicts</h3>
+            <form>
+                <div class="form-row">
+                    <label for="satisfaction">Overall Satisfaction</label>
+                    <select id="satisfaction" name="satisfaction" aria-label="Rate your experience">
+                        <option value="">Choose rating...</option>
+                        <option value="1">Very Unsatisfied</option>
+                        <option value="2">Unsatisfied</option>
+                        <option value="3">Neutral</option>
+                        <option value="4">Satisfied</option>
+                        <option value="5">Very Satisfied</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="feedback">Additional Comments</label>
+                    <textarea id="feedback" name="feedback" aria-label="Tell us more about your experience" rows="4"></textarea>
+                </div>
+                <div class="form-row side-by-side">
+                    <label for="newsletter">Subscribe to Newsletter</label>
+                    <input type="checkbox" id="newsletter" name="newsletter" aria-label="Get our weekly updates">
+                </div>
+                <button type="submit">Submit Survey</button>
+            </form>
+            <p><strong>Problem:</strong> aria-label overrides visible label text!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 7: Multiple inputs with same label -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Ambiguous labels for similar inputs</div>
+        <div class="form-example">
+            <h3>Address Form - Ambiguous Labels</h3>
+            <form>
+                <fieldset>
+                    <legend>Billing Address</legend>
+                    <div class="form-row">
+                        <label for="address1">Address</label>
+                        <input type="text" id="address1" name="billingAddress">
+                    </div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>Shipping Address</legend>
+                    <div class="form-row">
+                        <label for="address2">Address</label>
+                        <input type="text" id="address2" name="shippingAddress">
+                    </div>
+                </fieldset>
+                
+                <div class="form-row">
+                    <label for="phone1">Phone</label>
+                    <input type="tel" id="phone1" name="homePhone">
+                </div>
+                <div class="form-row">
+                    <label for="phone2">Phone</label>
+                    <input type="tel" id="phone2" name="workPhone">
+                </div>
+                <button type="submit">Save Addresses</button>
+            </form>
+            <p><strong>Problem:</strong> Multiple "Address" and "Phone" labels are confusing!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 8: Form controls without any labels -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Form controls with no labels at all</div>
+        <div class="form-example">
+            <h3>Search and Filter - Unlabeled Controls</h3>
+            <form>
+                <div class="form-row side-by-side">
+                    <input type="search" placeholder="Search products...">
+                    <button type="submit">🔍</button>
+                </div>
+                <div class="form-row side-by-side">
+                    <select>
+                        <option value="">All Categories</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="books">Books</option>
+                    </select>
+                    <select>
+                        <option value="">Sort by</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Customer Rating</option>
+                    </select>
+                </div>
+                <div class="form-row side-by-side">
+                    <input type="checkbox"> In Stock Only
+                    <input type="checkbox"> Free Shipping
+                    <input type="checkbox"> On Sale
+                </div>
+            </form>
+            <p><strong>Problem:</strong> Multiple form controls lack any accessible names!</p>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div style="background-color: #fff3e0; border: 2px solid #ff9800; padding: 20px; margin-top: 30px;">
+        <h2>Expected Scanner Results</h2>
+        <p><strong>WCAG 3.3.2 & 1.3.1 Violations Found:</strong></p>
+        <ul>
+            <li>8 unlinked labels (missing for/id associations)</li>
+            <li>6 placeholder-only form controls</li>
+            <li>8 visual labels using wrong elements (p, div, span)</li>
+            <li>6 required fields without programmatic indicators</li>
+            <li>6 instructions not linked via aria-describedby</li>
+            <li>4 conflicting aria-label and visible labels</li>
+            <li>8 ambiguous labels for similar controls</li>
+            <li>10 form controls with no labels at all</li>
+        </ul>
+        <p><strong>Total Expected Violations:</strong> 56+ form labeling failures</p>
+        <p><strong>Confidence Level:</strong> High (programmatically detectable)</p>
+    </div>
+
+</body>
+</html>

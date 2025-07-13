@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: ARIA Role Override Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Buttons with native semantics */
+        .good-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .good-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 2: Custom button with proper ARIA */
+        .good-custom-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .good-custom-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-custom-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 3: Proper input styling */
+        .good-input {
+            padding: 8px;
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        
+        .good-input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 4: Links with proper semantics */
+        .good-link {
+            color: #1976d2;
+            text-decoration: underline;
+            padding: 5px;
+            margin: 5px;
+            display: inline-block;
+        }
+        
+        .good-link:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .good-link:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 5: Proper heading hierarchy */
+        .good-heading {
+            margin: 15px 0;
+        }
+        
+        /* GOOD 6: Proper tab implementation */
+        .good-tablist {
+            list-style: none;
+            padding: 0;
+            border-bottom: 2px solid #4caf50;
+            display: flex;
+            margin: 0;
+        }
+        
+        .good-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 2px solid #4caf50;
+            border-bottom: none;
+            background-color: #f8f9fa;
+            margin-right: 2px;
+        }
+        
+        .good-tab:hover {
+            background-color: #e8f5e8;
+        }
+        
+        .good-tab:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-tab[aria-selected="true"] {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .good-tabpanel {
+            border: 2px solid #4caf50;
+            border-top: none;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        /* GOOD 7: Proper grid implementation */
+        .good-grid {
+            border: 2px solid #4caf50;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .good-grid th,
+        .good-grid td {
+            border: 1px solid #4caf50;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .good-grid th {
+            background-color: #e8f5e8;
+            font-weight: bold;
+        }
+        
+        .good-grid tr:focus-within {
+            background-color: #f1f8e9;
+        }
+        
+        .good-grid td:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: -2px;
+        }
+        
+        /* GOOD 8: Proper form styling */
+        .good-form {
+            border: 2px solid #4caf50;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        /* GOOD 9: Proper navigation */
+        .good-nav {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+        }
+        
+        .good-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .good-nav li {
+            margin: 5px 0;
+        }
+        
+        /* GOOD 10: Decorative elements */
+        .good-decorative {
+            padding: 15px;
+            border: 1px solid #4caf50;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Screen reader only content */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        button {
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: ARIA Role Override Accessible (GOOD)</h1>
+    <p><strong>WCAG 4.1.2 konforme Implementierung:</strong> Native HTML-Semantik wird beibehalten oder korrekt durch ARIA erweitert</p>
+    
+    <!-- GOOD 1: Buttons with native semantics -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Buttons behalten ihre native Semantik</div>
+        <p><strong>Lösung:</strong> Native HTML-Elemente ohne überflüssige oder widersprüchliche ARIA-Rollen</p>
+        <div class="interactive-area">
+            <!-- GUT: Native Buttons ohne role-Override -->
+            <button class="good-button" onclick="goodAlert('Button 1')">
+                Native Button (kein role-Attribut nötig)
+            </button>
+            <button class="good-button" onclick="goodAlert('Button 2')">
+                Zweiter Button (behält Semantik)
+            </button>
+            <button class="good-button" onclick="goodAlert('Button 3')">
+                Dritter Button (Space und Enter funktionieren)
+            </button>
+            <p>✅ Screen Reader erkennen diese korrekt als Buttons mit Space/Enter-Aktivierung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Custom elements with proper ARIA -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Custom Elements mit korrekten ARIA-Rollen</div>
+        <p><strong>Lösung:</strong> Wenn custom Elements nötig sind, dann mit passenden ARIA-Rollen</p>
+        <div class="interactive-area">
+            <!-- GUT: div als Button mit korrekter ARIA-Rolle -->
+            <div class="good-custom-button" 
+                 role="button" 
+                 tabindex="0" 
+                 onclick="goodAlert('Custom Button')"
+                 onkeydown="goodHandleKeydown(event, 'Custom Button')"
+                 aria-label="Custom Button mit korrekter Implementierung">
+                Custom Button (mit role="button")
+            </div>
+            
+            <!-- GUT: span als Link mit korrekter ARIA-Rolle -->
+            <span class="good-link" 
+                  role="link" 
+                  tabindex="0" 
+                  onclick="goodNavigate('custom-link')"
+                  onkeydown="goodHandleLinkKeydown(event, 'custom-link')"
+                  aria-label="Custom Link zur Demonstrationsseite">
+                Custom Link (mit role="link")
+            </span>
+            
+            <p>✅ Custom Elements haben korrekte Rollen UND entsprechende Funktionalität</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Input fields with proper semantics -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Eingabefelder behalten ihre Input-Semantik</div>
+        <p><strong>Lösung:</strong> Inputs bleiben Inputs und werden nicht als andere Elemente deklariert</p>
+        <div class="interactive-area">
+            <div style="margin: 10px 0;">
+                <label for="goodInput1">Textfeld (bleibt Textfeld):</label>
+                <!-- GUT: Input ohne falsche role -->
+                <input type="text" id="goodInput1" class="good-input" 
+                       placeholder="Native Input-Semantik">
+            </div>
+            
+            <div style="margin: 10px 0;">
+                <label for="goodInput2">E-Mail-Feld:</label>
+                <input type="email" id="goodInput2" class="good-input" 
+                       placeholder="email@example.com">
+            </div>
+            
+            <div style="margin: 10px 0;">
+                <label>
+                    <input type="checkbox" id="goodCheckbox"> 
+                    Checkbox (behält Checkbox-Semantik)
+                </label>
+            </div>
+            
+            <div style="margin: 10px 0;">
+                <label>
+                    <input type="radio" name="goodRadio" id="goodRadio1"> 
+                    Radio Button (native Semantik)
+                </label>
+            </div>
+            
+            <p>✅ Alle Eingabefelder behalten ihre erwartete Funktionalität</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Links with proper navigation semantics -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Links behalten ihre Navigation-Semantik</div>
+        <p><strong>Lösung:</strong> Links bleiben Links und führen zu Navigation</p>
+        <div class="interactive-area">
+            <!-- GUT: Links ohne role-Override -->
+            <a href="#home" class="good-link" onclick="goodNavigate('home', event)">
+                Home (native Link-Semantik)
+            </a>
+            <a href="#about" class="good-link" onclick="goodNavigate('about', event)">
+                Über uns (Enter aktiviert)
+            </a>
+            <a href="#contact" class="good-link" onclick="goodNavigate('contact', event)">
+                Kontakt (behält href-Attribut)
+            </a>
+            <p>✅ Links sind als Navigation erkennbar und funktionieren mit Enter</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Headings with proper structural semantics -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Überschriften behalten ihre strukturelle Bedeutung</div>
+        <p><strong>Lösung:</strong> Überschriften ohne role="presentation" für korrekte Dokumentstruktur</p>
+        <div class="interactive-area">
+            <!-- GUT: Headings ohne role-Override -->
+            <h2 class="good-heading">
+                Hauptüberschrift (H2 - korrekte Struktur)
+            </h2>
+            <h3 class="good-heading">
+                Unterüberschrift (H3 - hierarchisch korrekt)
+            </h3>
+            <h4 class="good-heading">
+                Weitere Unterteilung (H4 - Struktur bleibt erhalten)
+            </h4>
+            <p>✅ Dokumentstruktur ist für Screen Reader klar erkennbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Proper tab implementation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Korrekte Tab-Implementierung mit vollständiger Funktionalität</div>
+        <p><strong>Lösung:</strong> Tab-Interface mit korrekten ARIA-Rollen UND entsprechender Funktionalität</p>
+        <div class="interactive-area">
+            <!-- GUT: Vollständige Tab-Implementierung -->
+            <ul class="good-tablist" role="tablist" aria-label="Informationsreiter">
+                <li class="good-tab" 
+                    role="tab" 
+                    tabindex="0" 
+                    aria-selected="true" 
+                    aria-controls="goodTabpanel1"
+                    id="goodTab1"
+                    onclick="goodSelectTab(1)"
+                    onkeydown="goodTabKeydown(event, 1)">
+                    Tab 1
+                </li>
+                <li class="good-tab" 
+                    role="tab" 
+                    tabindex="-1" 
+                    aria-selected="false" 
+                    aria-controls="goodTabpanel2"
+                    id="goodTab2"
+                    onclick="goodSelectTab(2)"
+                    onkeydown="goodTabKeydown(event, 2)">
+                    Tab 2
+                </li>
+                <li class="good-tab" 
+                    role="tab" 
+                    tabindex="-1" 
+                    aria-selected="false" 
+                    aria-controls="goodTabpanel3"
+                    id="goodTab3"
+                    onclick="goodSelectTab(3)"
+                    onkeydown="goodTabKeydown(event, 3)">
+                    Tab 3
+                </li>
+            </ul>
+            
+            <div class="good-tabpanel" role="tabpanel" aria-labelledby="goodTab1" id="goodTabpanel1">
+                <h4>Inhalt von Tab 1</h4>
+                <p>Dies ist der Inhalt des ersten Tabs mit korrekter Tab-Funktionalität.</p>
+            </div>
+            
+            <div class="good-tabpanel" role="tabpanel" aria-labelledby="goodTab2" id="goodTabpanel2" style="display: none;">
+                <h4>Inhalt von Tab 2</h4>
+                <p>Zweiter Tab-Inhalt mit Pfeiltasten-Navigation zwischen Tabs.</p>
+            </div>
+            
+            <div class="good-tabpanel" role="tabpanel" aria-labelledby="goodTab3" id="goodTabpanel3" style="display: none;">
+                <h4>Inhalt von Tab 3</h4>
+                <p>Dritter Tab mit vollständiger ARIA-Implementierung.</p>
+            </div>
+            
+            <p>✅ Tab-Interface mit korrekter Tastaturnavigation (Pfeiltasten zwischen Tabs)</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Table vs Grid - proper usage -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Tabelle als Tabelle, Grid nur bei interaktiver Funktionalität</div>
+        <p><strong>Lösung:</strong> Statische Daten als table, interaktive Daten als grid</p>
+        <div class="interactive-area">
+            <h4>Statische Datentabelle (table):</h4>
+            <!-- GUT: Normale Tabelle ohne role="grid" -->
+            <table class="good-grid">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>E-Mail</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Max Mustermann</td>
+                        <td>max@example.com</td>
+                        <td>Aktiv</td>
+                    </tr>
+                    <tr>
+                        <td>Anna Schmidt</td>
+                        <td>anna@example.com</td>
+                        <td>Inaktiv</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h4 style="margin-top: 20px;">Interaktives Grid (falls nötig):</h4>
+            <!-- GUT: Nur bei echter Grid-Funktionalität -->
+            <div role="grid" aria-label="Interaktive Datentabelle" class="good-grid" style="border: 2px solid #4caf50;">
+                <div role="row" style="display: table-row; background-color: #e8f5e8;">
+                    <div role="columnheader" style="display: table-cell; padding: 8px; font-weight: bold;">Editierbare Spalte</div>
+                    <div role="columnheader" style="display: table-cell; padding: 8px; font-weight: bold;">Aktionen</div>
+                </div>
+                <div role="row" style="display: table-row;">
+                    <div role="gridcell" tabindex="0" style="display: table-cell; padding: 8px;" 
+                         contenteditable="true" aria-label="Editierbarer Wert">
+                        Editierbarer Wert
+                    </div>
+                    <div role="gridcell" style="display: table-cell; padding: 8px;">
+                        <button onclick="goodAlert('Grid-Aktion')">Bearbeiten</button>
+                    </div>
+                </div>
+            </div>
+            
+            <p>✅ Statische Daten als Tabelle, interaktive Daten als Grid mit echter Funktionalität</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Form with proper semantics -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Formular behält Form-Semantik</div>
+        <p><strong>Lösung:</strong> Normale Formulare ohne role="application"</p>
+        <div class="interactive-area">
+            <!-- GUT: form ohne role="application" -->
+            <form class="good-form">
+                <h4>Normales Formular (keine Rolle nötig)</h4>
+                <div style="margin: 10px 0;">
+                    <label for="goodFormName">Name:</label>
+                    <input type="text" id="goodFormName" class="good-input" style="width: 200px;">
+                </div>
+                <div style="margin: 10px 0;">
+                    <label for="goodFormEmail">E-Mail:</label>
+                    <input type="email" id="goodFormEmail" class="good-input" style="width: 200px;">
+                </div>
+                <button type="submit" onclick="goodSubmitForm(event)">Absenden</button>
+            </form>
+            <p>✅ Screen Reader-Navigation funktioniert normal, alle Formularfelder zugänglich</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Navigation with proper semantics -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Navigation behält Navigation-Semantik</div>
+        <p><strong>Lösung:</strong> Navigation-Bereiche korrekt als nav deklariert</p>
+        <div class="interactive-area">
+            <!-- GUT: nav ohne falsche role -->
+            <nav class="good-nav" aria-label="Hauptnavigation">
+                <h4>Seitennavigation</h4>
+                <ul>
+                    <li><a href="#home" onclick="goodNavigate('home', event)">Startseite</a></li>
+                    <li><a href="#products" onclick="goodNavigate('products', event)">Produkte</a></li>
+                    <li><a href="#contact" onclick="goodNavigate('contact', event)">Kontakt</a></li>
+                </ul>
+            </nav>
+            <p>✅ Navigation ist korrekt als solche erkennbar und vom Hauptinhalt unterscheidbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Proper use of presentation role -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Korrekte Verwendung von role="presentation"</div>
+        <p><strong>Lösung:</strong> role="presentation" nur für rein dekorative, nicht-interaktive Elemente</p>
+        <div class="interactive-area">
+            <!-- GUT: role="presentation" nur für dekorative Elemente -->
+            <div class="good-decorative" role="presentation">
+                Rein dekoratives Trennelement ohne Interaktion
+            </div>
+            
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23e8f5e8'/%3E%3Ctext x='50' y='30' text-anchor='middle' fill='%234caf50'%3EDekorativ%3C/text%3E%3C/svg%3E" 
+                 alt="" 
+                 role="presentation" 
+                 style="margin: 10px;">
+            
+            <!-- GUT: Interaktive Elemente OHNE role="presentation" -->
+            <button class="good-button" onclick="goodAlert('Wichtiger Button')">
+                Wichtiger interaktiver Button (KEINE presentation-Rolle)
+            </button>
+            
+            <input type="text" class="good-input" placeholder="Wichtiges Eingabefeld (KEINE presentation-Rolle)">
+            
+            <a href="#important" class="good-link" onclick="goodNavigate('important', event)">
+                Wichtiger Link (KEINE presentation-Rolle)
+            </a>
+            
+            <p>✅ Nur dekorative Elemente haben role="presentation", interaktive bleiben zugänglich</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 4.1.2 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Native HTML-Semantik wird beibehalten und respektiert</li>
+            <li>✅ ARIA-Rollen werden nur verwendet um Semantik zu ERWEITERN, nicht zu überschreiben</li>
+            <li>✅ Screen Reader erhalten konsistente und erwartbare Informationen</li>
+            <li>✅ Tastaturnavigation funktioniert wie von nativen Elementen erwartet</li>
+            <li>✅ Assistive Technology kann alle Elemente korrekt interpretieren</li>
+            <li>✅ Dokumentstruktur bleibt für Screen Reader verständlich</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Screen Reader-Nutzer: Erhalten korrekte und konsistente Informationen</li>
+            <li>👥 Tastatur-Nutzer: Erwartete Interaktionsmuster funktionieren zuverlässig</li>
+            <li>👥 Voice Control-Nutzer: Können Elemente korrekt identifizieren und steuern</li>
+            <li>👥 Switch Control-Nutzer: Navigation durch konsistente Semantik unterstützt</li>
+            <li>👥 Alle AT-Nutzer: Haben vollständigen Zugang zu allen Funktionen</li>
+        </ul>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        let goodCurrentTab = 1;
+        
+        // Helper function for announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // GOOD 1 & 2: Button functions
+        function goodAlert(buttonName) {
+            console.log(`✅ GOOD: ${buttonName} clicked with proper button semantics`);
+            announceToScreenReader(`${buttonName} aktiviert`);
+            alert(`${buttonName} wurde korrekt aktiviert!\n\n✅ Native Button-Semantik funktioniert perfekt`);
+        }
+        
+        function goodHandleKeydown(event, buttonName) {
+            if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                goodAlert(buttonName);
+                console.log('✅ GOOD: Custom button activated with Space/Enter as expected');
+            }
+        }
+        
+        // GOOD 2 & 4: Link functions
+        function goodNavigate(target, event) {
+            if (event) event.preventDefault();
+            console.log(`✅ GOOD: Navigation to ${target} with proper link semantics`);
+            announceToScreenReader(`Navigation zu ${target}`);
+            alert(`Navigation zu: ${target}\n\n✅ Link-Semantik funktioniert korrekt`);
+        }
+        
+        function goodHandleLinkKeydown(event, target) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                goodNavigate(target);
+                console.log('✅ GOOD: Custom link activated with Enter as expected');
+            }
+        }
+        
+        // GOOD 6: Tab functions
+        function goodSelectTab(tabNumber) {
+            // Update tab states
+            for (let i = 1; i <= 3; i++) {
+                const tab = document.getElementById(`goodTab${i}`);
+                const panel = document.getElementById(`goodTabpanel${i}`);
+                
+                if (i === tabNumber) {
+                    tab.setAttribute('aria-selected', 'true');
+                    tab.tabIndex = 0;
+                    panel.style.display = 'block';
+                } else {
+                    tab.setAttribute('aria-selected', 'false');
+                    tab.tabIndex = -1;
+                    panel.style.display = 'none';
+                }
+            }
+            
+            goodCurrentTab = tabNumber;
+            announceToScreenReader(`Tab ${tabNumber} ausgewählt`);
+            console.log(`✅ GOOD: Tab ${tabNumber} selected with proper ARIA state management`);
+        }
+        
+        function goodTabKeydown(event, tabNumber) {
+            let targetTab = tabNumber;
+            
+            if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                targetTab = tabNumber < 3 ? tabNumber + 1 : 1;
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                targetTab = tabNumber > 1 ? tabNumber - 1 : 3;
+            } else if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                goodSelectTab(tabNumber);
+                return;
+            }
+            
+            if (targetTab !== tabNumber) {
+                goodSelectTab(targetTab);
+                document.getElementById(`goodTab${targetTab}`).focus();
+                console.log('✅ GOOD: Tab navigation with arrow keys works correctly');
+            }
+        }
+        
+        // GOOD 8: Form function
+        function goodSubmitForm(event) {
+            event.preventDefault();
+            console.log('✅ GOOD: Form submitted with native form semantics');
+            announceToScreenReader('Formular abgesendet');
+            alert('Formular abgesendet!\n\n✅ Native Form-Semantik funktioniert korrekt');
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD ARIA ROLE OVERRIDE IMPLEMENTATION ===');
+            console.log('✅ Native HTML semantics preserved');
+            console.log('✅ ARIA roles only used to EXTEND, not override native semantics');
+            console.log('✅ Custom elements have proper ARIA roles AND functionality');
+            console.log('✅ Interactive elements maintain expected behavior');
+            console.log('✅ Structural elements preserve document hierarchy');
+            console.log('✅ Navigation semantics remain clear');
+            console.log('✅ Form semantics work as expected');
+            console.log('✅ Tab interface has complete functionality');
+            console.log('✅ Presentation role only used for decorative elements');
+            console.log('✅ Screen readers receive consistent, accurate information');
+        });
+    </script>
+</body>
+</html>

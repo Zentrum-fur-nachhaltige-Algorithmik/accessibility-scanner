@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Keyboard Native Override Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Accessible native buttons */
+        .good-button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-native-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            /* GUT: Native Button ohne tabindex="-1" */
+        }
+        
+        .good-native-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-native-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 2: Accessible links with proper keyboard support */
+        .good-link-container {
+            margin: 15px 0;
+        }
+        
+        .good-accessible-link {
+            color: #1976d2;
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+            margin: 5px 10px;
+            /* GUT: Links behalten natürliche Tastaturunterstützung */
+        }
+        
+        .good-accessible-link:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .good-accessible-link:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 3: Accessible form inputs */
+        .good-form-container {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .good-accessible-input {
+            padding: 8px;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            /* GUT: Inputs behalten natürliche Tastaturfokussierung */
+        }
+        
+        .good-accessible-input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+            border-color: #2e7d32;
+        }
+        
+        /* GOOD 4: Accessible custom dropdown with proper keyboard support */
+        .good-custom-dropdown {
+            position: relative;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        
+        .good-dropdown-trigger {
+            background-color: #f8f9fa;
+            border: 2px solid #4caf50;
+            padding: 10px 30px 10px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            min-width: 200px;
+            position: relative;
+            /* GUT: Dropdown mit vollständiger Tastaturunterstützung */
+        }
+        
+        .good-dropdown-trigger:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-dropdown-trigger::after {
+            content: "▼";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .good-dropdown-trigger[aria-expanded="true"]::after {
+            content: "▲";
+        }
+        
+        .good-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 2px solid #4caf50;
+            border-top: none;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .good-dropdown-item {
+            padding: 10px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            /* GUT: Dropdown-Items sind echte focusable Elemente */
+        }
+        
+        .good-dropdown-item:hover,
+        .good-dropdown-item:focus {
+            background-color: #e8f5e8;
+            outline: none;
+        }
+        
+        /* GOOD 5: Accessible custom checkboxes */
+        .good-checkbox-container {
+            margin: 15px 0;
+        }
+        
+        .good-custom-checkbox {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .good-checkbox-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            /* GUT: Native Checkbox versteckt aber funktional */
+        }
+        
+        .good-checkbox-visual {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #4caf50;
+            border-radius: 3px;
+            margin-right: 8px;
+            background-color: white;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .good-checkbox-input:checked + .good-checkbox-visual::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        
+        .good-checkbox-input:focus + .good-checkbox-visual {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-checkbox-label {
+            cursor: pointer;
+        }
+        
+        /* GOOD 6: Accessible custom radio buttons */
+        .good-radio-group {
+            margin: 15px 0;
+        }
+        
+        .good-custom-radio {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .good-radio-input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            /* GUT: Native Radio Button versteckt aber funktional */
+        }
+        
+        .good-radio-visual {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #4caf50;
+            border-radius: 50%;
+            margin-right: 8px;
+            background-color: white;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .good-radio-input:checked + .good-radio-visual::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #2e7d32;
+        }
+        
+        .good-radio-input:focus + .good-radio-visual {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-radio-label {
+            cursor: pointer;
+        }
+        
+        /* GOOD 7: Accessible search input */
+        .good-search-container {
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .good-search-input {
+            width: 250px;
+            padding: 10px 40px 10px 10px;
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+            font-size: 14px;
+            /* GUT: Suchfeld behält native Tastaturfunktionalität */
+        }
+        
+        .good-search-input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 8: Accessible native details/summary */
+        .good-accordion-section {
+            margin: 15px 0;
+        }
+        
+        .good-details {
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+            margin: 5px 0;
+            /* GUT: Native details/summary Element */
+        }
+        
+        .good-summary {
+            background-color: #f1f8e9;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            /* GUT: Native summary mit Tastaturunterstützung */
+        }
+        
+        .good-summary:hover {
+            background-color: #e8f5e8;
+        }
+        
+        .good-summary:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-details-content {
+            padding: 10px;
+            border-top: 1px solid #4caf50;
+        }
+        
+        /* GOOD 9: Accessible textarea */
+        .good-textarea-container {
+            margin: 15px 0;
+        }
+        
+        .good-textarea {
+            width: 100%;
+            max-width: 400px;
+            height: 100px;
+            padding: 10px;
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            /* GUT: Textarea behält native Tastaturfunktionalität */
+        }
+        
+        .good-textarea:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 10: Accessible file input */
+        .good-file-container {
+            margin: 15px 0;
+        }
+        
+        .good-file-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            /* GUT: Native File Input sichtbar und zugänglich */
+        }
+        
+        .good-file-input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* Enhanced accessibility indicators */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Keyboard Native Override Accessible (GOOD)</h1>
+    <p><strong>WCAG 2.1.1 konforme Implementierung:</strong> Native Elemente behalten ihre Tastaturfunktionalität, Custom Controls unterstützen vollständige Tastaturnavigation</p>
+    
+    <!-- GOOD 1: Accessible native buttons -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Native Buttons mit vollständiger Tastaturunterstützung</div>
+        <p><strong>Lösung:</strong> Buttons behalten ihre natürliche Tastaturfunktionalität ohne tabindex="-1"</p>
+        <div class="interactive-area">
+            <div class="good-button-group">
+                <button onclick="goodAlert('Button 1')" class="good-native-button">
+                    Wichtiger Button 1
+                </button>
+                <button onclick="goodSubmitForm()" class="good-native-button">
+                    Formular absenden
+                </button>
+                <button onclick="goodOpenDialog()" class="good-native-button">
+                    Dialog öffnen
+                </button>
+            </div>
+            <p>✅ Alle Buttons per Tab erreichbar, Enter/Space aktiviert sie</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Accessible links with proper keyboard support -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Links mit natürlicher Tastaturunterstützung</div>
+        <p><strong>Lösung:</strong> Links behalten href-Attribute und native Enter-Funktionalität</p>
+        <div class="interactive-area">
+            <div class="good-link-container">
+                <a href="#home" onclick="goodNavigate('home', event)" class="good-accessible-link">
+                    Zur Startseite
+                </a>
+                <a href="#products" onclick="goodNavigate('products', event)" class="good-accessible-link">
+                    Produktübersicht
+                </a>
+                <a href="#contact" onclick="goodNavigate('contact', event)" class="good-accessible-link">
+                    Kontakt
+                </a>
+            </div>
+            <p>✅ Links per Tab erreichbar, Enter funktioniert, href als Fallback</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Accessible form inputs -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Formular-Inputs mit natürlicher Tastaturfunktionalität</div>
+        <p><strong>Lösung:</strong> Alle Eingabefelder sind per Tab erreichbar und vollständig funktional</p>
+        <div class="interactive-area">
+            <div class="good-form-container">
+                <label for="goodName">Name:</label>
+                <input type="text" id="goodName" class="good-accessible-input" value="Dieses Feld ist erreichbar">
+                
+                <label for="goodEmail">E-Mail:</label>
+                <input type="email" id="goodEmail" class="good-accessible-input" placeholder="email@example.com">
+                
+                <label for="goodPassword">Passwort:</label>
+                <input type="password" id="goodPassword" class="good-accessible-input">
+            </div>
+            <p>✅ Alle Felder per Tab erreichbar, Eingabe und Bearbeitung möglich</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Accessible custom dropdown with keyboard support -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Custom Dropdown mit vollständiger Tastatursteuerung</div>
+        <p><strong>Lösung:</strong> Dropdown unterstützt Tab, Enter, Space, Pfeiltasten und Escape</p>
+        <div class="interactive-area">
+            <label for="goodCountry">Land auswählen:</label>
+            <div class="good-custom-dropdown">
+                <button 
+                    class="good-dropdown-trigger" 
+                    id="goodCountryTrigger"
+                    aria-haspopup="listbox" 
+                    aria-expanded="false"
+                    onclick="goodToggleDropdown()"
+                    onkeydown="goodHandleDropdownKey(event)"
+                >
+                    Deutschland
+                </button>
+                <div class="good-dropdown-menu" id="goodDropdownMenu" role="listbox">
+                    <button class="good-dropdown-item" role="option" onclick="goodSelectCountry('Deutschland')" onkeydown="goodHandleItemKey(event)">Deutschland</button>
+                    <button class="good-dropdown-item" role="option" onclick="goodSelectCountry('Österreich')" onkeydown="goodHandleItemKey(event)">Österreich</button>
+                    <button class="good-dropdown-item" role="option" onclick="goodSelectCountry('Schweiz')" onkeydown="goodHandleItemKey(event)">Schweiz</button>
+                    <button class="good-dropdown-item" role="option" onclick="goodSelectCountry('Frankreich')" onkeydown="goodHandleItemKey(event)">Frankreich</button>
+                </div>
+            </div>
+            <p>✅ Tab zum Trigger, Enter/Space öffnet, Pfeiltasten navigieren, Escape schließt</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Accessible custom checkboxes -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Custom Checkboxes mit nativer Tastaturunterstützung</div>
+        <p><strong>Lösung:</strong> Native Checkboxes versteckt aber funktional, Space togglet</p>
+        <div class="interactive-area">
+            <div class="good-checkbox-container">
+                <label class="good-custom-checkbox">
+                    <input type="checkbox" class="good-checkbox-input" onchange="goodCheckboxChange(this)">
+                    <div class="good-checkbox-visual"></div>
+                    <span class="good-checkbox-label">Newsletter abonnieren</span>
+                </label>
+                <label class="good-custom-checkbox">
+                    <input type="checkbox" class="good-checkbox-input" required onchange="goodCheckboxChange(this)">
+                    <div class="good-checkbox-visual"></div>
+                    <span class="good-checkbox-label">Datenschutzerklärung akzeptieren *</span>
+                </label>
+                <label class="good-custom-checkbox">
+                    <input type="checkbox" class="good-checkbox-input" onchange="goodCheckboxChange(this)">
+                    <div class="good-checkbox-visual"></div>
+                    <span class="good-checkbox-label">Marketing-E-Mails erhalten</span>
+                </label>
+            </div>
+            <p>✅ Tab zu Checkboxes, Space togglet Zustand, Label klickbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Accessible radio buttons -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Radio Buttons mit nativer Pfeiltasten-Navigation</div>
+        <p><strong>Lösung:</strong> Native Radio Button Navigation mit Pfeiltasten zwischen Optionen</p>
+        <div class="interactive-area">
+            <fieldset class="good-radio-group">
+                <legend><strong>Zahlungsart wählen:</strong></legend>
+                <label class="good-custom-radio">
+                    <input type="radio" name="payment" value="credit" class="good-radio-input" onchange="goodRadioChange(this)">
+                    <div class="good-radio-visual"></div>
+                    <span class="good-radio-label">Kreditkarte</span>
+                </label>
+                <label class="good-custom-radio">
+                    <input type="radio" name="payment" value="paypal" class="good-radio-input" onchange="goodRadioChange(this)">
+                    <div class="good-radio-visual"></div>
+                    <span class="good-radio-label">PayPal</span>
+                </label>
+                <label class="good-custom-radio">
+                    <input type="radio" name="payment" value="bank" class="good-radio-input" onchange="goodRadioChange(this)">
+                    <div class="good-radio-visual"></div>
+                    <span class="good-radio-label">Banküberweisung</span>
+                </label>
+            </fieldset>
+            <p>✅ Tab zur Gruppe, Pfeiltasten zwischen Optionen, Space wählt aus</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Accessible search input -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Suchfeld mit vollständiger Tastaturfunktionalität</div>
+        <p><strong>Lösung:</strong> Native Input mit Enter-Unterstützung für Suche</p>
+        <div class="interactive-area">
+            <div class="good-search-container">
+                <label for="goodSearch">Produktsuche:</label>
+                <input 
+                    type="search" 
+                    id="goodSearch" 
+                    class="good-search-input" 
+                    placeholder="Nach Produkten suchen..." 
+                    onkeydown="goodSearchKeydown(event)"
+                >
+                <button onclick="goodPerformSearch()">Suchen</button>
+            </div>
+            <p>✅ Tab zum Suchfeld, Eingabe möglich, Enter startet Suche</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Native accessible details/summary -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Native Details/Summary mit Tastaturunterstützung</div>
+        <p><strong>Lösung:</strong> Native HTML5 details/summary Element mit Enter/Space Unterstützung</p>
+        <div class="interactive-area">
+            <div class="good-accordion-section">
+                <details class="good-details">
+                    <summary class="good-summary">Allgemeine Geschäftsbedingungen</summary>
+                    <div class="good-details-content">
+                        <p>Hier stehen die wichtigen AGB-Inhalte, die für alle Nutzer zugänglich sind. Das native details/summary Element unterstützt automatisch Tastaturnavigation.</p>
+                        <p>Enter oder Space auf summary öffnet/schließt den Inhalt.</p>
+                    </div>
+                </details>
+                <details class="good-details">
+                    <summary class="good-summary">Datenschutzrichtlinie</summary>
+                    <div class="good-details-content">
+                        <p>Wichtige Datenschutzinformationen, die über alle Eingabemethoden erreichbar sind. Native semantische Bedeutung bleibt erhalten.</p>
+                        <p>Screen Reader erkennen den expandable content automatisch.</p>
+                    </div>
+                </details>
+            </div>
+            <p>✅ Tab zu summary, Enter/Space togglet, native Semantik erhalten</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Accessible textarea -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Textarea mit natürlicher Tastaturfunktionalität</div>
+        <p><strong>Lösung:</strong> Native Textarea behält alle Tastaturfeatures für Texteingabe</p>
+        <div class="interactive-area">
+            <div class="good-textarea-container">
+                <label for="goodComments">Ihre Nachricht:</label>
+                <textarea 
+                    id="goodComments" 
+                    class="good-textarea" 
+                    placeholder="Schreiben Sie hier Ihre Nachricht..."
+                    onkeydown="goodTextareaKeydown(event)"
+                ></textarea>
+                <button onclick="goodSubmitComment()">Nachricht senden</button>
+            </div>
+            <p>✅ Tab zu Textarea, vollständige Texteingabe und -bearbeitung möglich</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Accessible file input -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Datei-Upload mit nativer Tastaturunterstützung</div>
+        <p><strong>Lösung:</strong> Native File Input sichtbar und mit Enter/Space bedienbar</p>
+        <div class="interactive-area">
+            <div class="good-file-container">
+                <label for="goodFileInput">Dokument hochladen:</label>
+                <input 
+                    type="file" 
+                    id="goodFileInput" 
+                    class="good-file-input" 
+                    accept=".pdf,.doc,.docx,.txt"
+                    onchange="goodFileChange(this)"
+                    onkeydown="goodFileKeydown(event)"
+                >
+                <div id="goodFileStatus" aria-live="polite"></div>
+            </div>
+            <p>✅ Tab zu File Input, Enter/Space öffnet Dialog, native Funktionalität</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 2.1.1 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Native Elemente behalten ihre Tastaturfunktionalität</li>
+            <li>✅ Kein tabindex="-1" für funktionierende Elemente</li>
+            <li>✅ Custom Controls unterstützen alle relevanten Tasten</li>
+            <li>✅ ARIA-Attribute für Custom Elements korrekt implementiert</li>
+            <li>✅ Fokus-Indikatoren für alle interaktiven Elemente</li>
+            <li>✅ Native Semantik wird beibehalten oder korrekt nachgebildet</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Tastatur-only Nutzer: Können alle Elemente erreichen und bedienen</li>
+            <li>👥 Screen Reader-Nutzer: Behalten Zugang zu nativen Kontrollen</li>
+            <li>👥 Motorische Einschränkungen: Können konstante Eingabemethode verwenden</li>
+            <li>👥 Kognitive Beeinträchtigungen: Gewohnte Interaktionsmuster bleiben erhalten</li>
+            <li>👥 Power-User: Können effizient nur mit Tastatur arbeiten</li>
+        </ul>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        // GOOD 1: Functions for accessible buttons
+        function goodAlert(message) {
+            console.log('✅ GOOD: Button accessible via keyboard');
+            announceToScreenReader('Button aktiviert: ' + message);
+            alert(message + ' - Erreichbar per Tab und Enter/Space');
+        }
+        
+        function goodSubmitForm() {
+            console.log('✅ GOOD: Form submission accessible');
+            announceToScreenReader('Formular wird abgesendet');
+            alert('Formular würde abgesendet - vollständig tastaturzugänglich');
+        }
+        
+        function goodOpenDialog() {
+            console.log('✅ GOOD: Dialog button fully accessible');
+            announceToScreenReader('Dialog wird geöffnet');
+            alert('Dialog würde öffnen - native Tastaturunterstützung');
+        }
+        
+        // GOOD 2: Accessible navigation functions
+        function goodNavigate(section, event) {
+            console.log('✅ GOOD: Navigation accessible via keyboard');
+            announceToScreenReader('Navigation zu ' + section);
+            alert('Navigation zu: ' + section + ' - Enter und Mausklick funktionieren');
+            event.preventDefault(); // Prevent actual navigation for demo
+        }
+        
+        // GOOD 4: Accessible dropdown functions
+        let goodDropdownOpen = false;
+        let goodFocusedIndex = -1;
+        
+        function goodToggleDropdown() {
+            const trigger = document.getElementById('goodCountryTrigger');
+            const menu = document.getElementById('goodDropdownMenu');
+            
+            goodDropdownOpen = !goodDropdownOpen;
+            trigger.setAttribute('aria-expanded', goodDropdownOpen.toString());
+            menu.style.display = goodDropdownOpen ? 'block' : 'none';
+            
+            if (goodDropdownOpen) {
+                goodFocusedIndex = -1;
+                announceToScreenReader('Dropdown geöffnet. Verwenden Sie Pfeiltasten zum Navigieren.');
+            } else {
+                announceToScreenReader('Dropdown geschlossen.');
+            }
+            
+            console.log('✅ GOOD: Dropdown accessible via keyboard');
+        }
+        
+        function goodHandleDropdownKey(event) {
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (!goodDropdownOpen) {
+                    goodToggleDropdown();
+                } else {
+                    goodFocusNextItem();
+                }
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                goodFocusPrevItem();
+            } else if (event.key === 'Escape') {
+                if (goodDropdownOpen) {
+                    goodToggleDropdown();
+                    document.getElementById('goodCountryTrigger').focus();
+                }
+            }
+        }
+        
+        function goodHandleItemKey(event) {
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                goodFocusNextItem();
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                goodFocusPrevItem();
+            } else if (event.key === 'Escape') {
+                goodToggleDropdown();
+                document.getElementById('goodCountryTrigger').focus();
+            } else if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                event.target.click();
+            }
+        }
+        
+        function goodFocusNextItem() {
+            const items = document.querySelectorAll('.good-dropdown-item');
+            goodFocusedIndex = Math.min(goodFocusedIndex + 1, items.length - 1);
+            items[goodFocusedIndex].focus();
+        }
+        
+        function goodFocusPrevItem() {
+            const items = document.querySelectorAll('.good-dropdown-item');
+            goodFocusedIndex = Math.max(goodFocusedIndex - 1, 0);
+            items[goodFocusedIndex].focus();
+        }
+        
+        function goodSelectCountry(country) {
+            const trigger = document.getElementById('goodCountryTrigger');
+            trigger.textContent = country;
+            goodToggleDropdown();
+            trigger.focus();
+            announceToScreenReader('Land ausgewählt: ' + country);
+            console.log('✅ GOOD: Country selected with full keyboard support');
+        }
+        
+        // GOOD 5: Accessible checkbox functions
+        function goodCheckboxChange(checkbox) {
+            const state = checkbox.checked ? 'aktiviert' : 'deaktiviert';
+            announceToScreenReader('Checkbox ' + state);
+            console.log('✅ GOOD: Checkbox toggled with Space key support');
+        }
+        
+        // GOOD 6: Accessible radio functions
+        function goodRadioChange(radio) {
+            announceToScreenReader('Zahlungsart gewählt: ' + radio.value);
+            console.log('✅ GOOD: Radio button selected with arrow key navigation');
+        }
+        
+        // GOOD 7: Accessible search functions
+        function goodSearchKeydown(event) {
+            if (event.key === 'Enter') {
+                goodPerformSearch();
+            }
+        }
+        
+        function goodPerformSearch() {
+            const searchInput = document.getElementById('goodSearch');
+            const query = searchInput.value;
+            announceToScreenReader('Suche gestartet nach: ' + query);
+            console.log('✅ GOOD: Search initiated with Enter key support');
+            alert('Suche nach: "' + query + '" - Enter und Button funktionieren');
+        }
+        
+        // GOOD 9: Accessible textarea functions
+        function goodTextareaKeydown(event) {
+            // Allow normal textarea keyboard behavior
+            console.log('✅ GOOD: Textarea supports all keyboard input');
+        }
+        
+        function goodSubmitComment() {
+            const textarea = document.getElementById('goodComments');
+            const comment = textarea.value;
+            announceToScreenReader('Kommentar gesendet');
+            console.log('✅ GOOD: Comment submitted with full keyboard access');
+            alert('Kommentar gesendet: "' + comment + '" - Textarea war vollständig zugänglich');
+        }
+        
+        // GOOD 10: Accessible file input functions
+        function goodFileKeydown(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                // Native file input handles this automatically
+                console.log('✅ GOOD: File input accessible via Enter/Space');
+            }
+        }
+        
+        function goodFileChange(input) {
+            const status = document.getElementById('goodFileStatus');
+            if (input.files.length > 0) {
+                const fileName = input.files[0].name;
+                status.textContent = 'Datei ausgewählt: ' + fileName;
+                announceToScreenReader('Datei ausgewählt: ' + fileName);
+                console.log('✅ GOOD: File selected with native keyboard support');
+            } else {
+                status.textContent = 'Keine Datei ausgewählt';
+                announceToScreenReader('Dateiauswahl aufgehoben');
+            }
+        }
+        
+        // Helper function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.good-custom-dropdown') && goodDropdownOpen) {
+                goodToggleDropdown();
+            }
+        });
+        
+        // Initialize accessible keyboard navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD KEYBOARD NATIVE OVERRIDE IMPLEMENTATION ===');
+            console.log('✅ All native elements retain keyboard functionality');
+            console.log('✅ Custom controls support full keyboard interaction');
+            console.log('✅ No tabindex="-1" on functional elements');
+            console.log('✅ ARIA attributes properly implemented');
+            console.log('✅ Focus indicators for all interactive elements');
+            console.log('✅ Native semantics preserved or correctly replicated');
+        });
+    </script>
+</body>
+</html>

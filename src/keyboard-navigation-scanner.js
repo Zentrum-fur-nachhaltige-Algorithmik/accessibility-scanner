@@ -1817,12 +1817,30 @@ class KeyboardNavigationScanner {
         if (isHidden) return; // Skip hidden elements
         
         // Check for missing accessible names
-        const hasAccessibleName = element.hasAttribute('aria-label') ||
-                                 element.hasAttribute('aria-labelledby') ||
-                                 element.hasAttribute('title') ||
-                                 element.textContent.trim() ||
-                                 (tagName === 'input' && element.hasAttribute('alt')) ||
-                                 (tagName === 'input' && element.value);
+        // Check for accessible name including proper <label> association
+        const hasAriaLabel = element.hasAttribute('aria-label') || element.hasAttribute('aria-labelledby');
+        const hasTitle = element.hasAttribute('title');
+        const hasTextContent = element.textContent.trim();
+        const hasInputAlt = tagName === 'input' && element.hasAttribute('alt');
+        const hasInputValue = tagName === 'input' && element.value;
+        
+        // Check for associated label element (most important for form inputs)
+        let hasAssociatedLabel = false;
+        if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+          const id = element.id;
+          if (id) {
+            const associatedLabel = document.querySelector(`label[for="${id}"]`);
+            hasAssociatedLabel = associatedLabel && associatedLabel.textContent.trim();
+          }
+          // Also check if input is inside a label
+          if (!hasAssociatedLabel) {
+            const parentLabel = element.closest('label');
+            hasAssociatedLabel = parentLabel && parentLabel.textContent.trim();
+          }
+        }
+        
+        const hasAccessibleName = hasAriaLabel || hasTitle || hasTextContent || 
+                                 hasInputAlt || hasInputValue || hasAssociatedLabel;
         
         if (!hasAccessibleName) {
           issues.push({
@@ -1839,9 +1857,12 @@ class KeyboardNavigationScanner {
           const href = element.getAttribute('href');
           const text = element.textContent.trim().toLowerCase();
           
-          // Links that act like buttons
-          if (href === '#' || href === 'javascript:void(0)' || 
-              text.match(/^(click|submit|send|save|delete|edit)$/)) {
+          // Links that act like buttons - be more specific to avoid navigation false positives
+          const actionWords = /^(click|submit|send|save|delete|edit|post|update|create|remove)$/i;
+          const isJavascriptVoid = href === 'javascript:void(0)';
+          const isActionLink = href === '#' && text.match(actionWords);
+          
+          if (isJavascriptVoid || isActionLink) {
             issues.push({
               type: 'interactive-element',
               element: selector,

@@ -425,7 +425,7 @@
                 <div style="margin-top: 15px;">
                     <label for="email" class="required">E-Mail Adresse</label>
                     <input type="email" id="email" name="email" required aria-describedby="email-error">
-                    <div id="email-error" class="error-message">
+                    <div id="email-error" class="error-message" role="alert" aria-live="assertive">
                         Bitte geben Sie eine gültige E-Mail Adresse ein.
                     </div>
                 </div>
@@ -444,13 +444,13 @@
         
         <section>
             <h2>GOOD PRACTICE 4: Status-Nachrichten mit Icon und Text</h2>
-            <div class="status-message status-success">
+            <div class="status-message status-success" role="status" aria-live="polite">
                 Ihre Daten wurden erfolgreich gespeichert.
             </div>
-            <div class="status-message status-warning">
+            <div class="status-message status-warning" role="status" aria-live="polite">
                 Bitte überprüfen Sie Ihre E-Mail Adresse.
             </div>
-            <div class="status-message status-error">
+            <div class="status-message status-error" role="alert" aria-live="assertive">
                 Es ist ein Fehler beim Speichern aufgetreten.
             </div>
         </section>

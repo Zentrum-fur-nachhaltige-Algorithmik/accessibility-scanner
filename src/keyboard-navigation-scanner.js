@@ -1665,16 +1665,24 @@ class KeyboardNavigationScanner {
       return issues;
     });
 
-    // Create violations for keyboard event handling issues
+    // Create violations for keyboard event handling issues, avoiding duplicates
     keyboardIssues.forEach(issue => {
-      violations.push({
-        criterion: "9.2.1.1",
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: issue.suggestion
-      });
+      // Check if this violation already exists (avoid duplicates with other validation functions)
+      const alreadyReported = violations.some(v => 
+        v.element === issue.element && 
+        (v.issue === "not-keyboard-accessible" || v.issue === issue.type)
+      );
+      
+      if (!alreadyReported) {
+        violations.push({
+          criterion: "9.2.1.1",
+          element: issue.element,
+          issue: issue.type,
+          description: issue.description,
+          severity: issue.severity,
+          suggestion: issue.suggestion
+        });
+      }
     });
   }
 

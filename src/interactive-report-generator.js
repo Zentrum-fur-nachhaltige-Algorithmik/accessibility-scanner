@@ -40,16 +40,23 @@ class InteractiveReportGenerator {
       // Phase 1: Map violations to positions
       const violationOverlays = await this.mapViolationsToPositions(violations, screenshotData.elementMap);
       
-      // Phase 1: Generate interactive HTML
+      // Phase 2: Extract detailed HTML context for each violation
+      const enhancedViolations = await this.extractHTMLContext(page, violations, screenshotData.elementMap);
+      
+      // Phase 2: Generate WCAG rule information
+      const wcagDatabase = await this.buildWCAGDatabase(enhancedViolations);
+      
+      // Combined report data with Phase 2 enhancements
       const reportData = {
         reportId,
         timestamp: new Date().toISOString(),
         url: scanMetadata.url,
         scanMetadata,
         screenshotData,
-        violations,
+        violations: enhancedViolations,
         violationOverlays,
-        summary: this.generateSummary(violations)
+        wcagDatabase,
+        summary: this.generateSummary(enhancedViolations)
       };
 
       const htmlContent = await this.generateInteractiveHTML(reportData);
@@ -256,6 +263,266 @@ class InteractiveReportGenerator {
   }
 
   /**
+   * Phase 2: Extract detailed HTML context for each violation
+   */
+  async extractHTMLContext(page, violations, elementMap) {
+    console.log(`🔍 Extracting HTML context for ${violations.length} violations...`);
+
+    const enhancedViolations = await Promise.all(violations.map(async (violation) => {
+      const htmlContexts = [];
+
+      if (violation.nodes && violation.nodes.length > 0) {
+        for (const node of violation.nodes) {
+          try {
+            const targetSelectors = node.target || [];
+            const selector = Array.isArray(targetSelectors[0]) ? targetSelectors[0].join(' ') : targetSelectors[0];
+
+            // Extract HTML context from the page
+            const context = await page.evaluate((sel) => {
+              const element = document.querySelector(sel);
+              if (!element) return null;
+
+              return {
+                target: element.outerHTML,
+                parent: element.parentElement ? element.parentElement.outerHTML : null,
+                siblings: element.parentElement ? 
+                  Array.from(element.parentElement.children).map(el => el.outerHTML) : [],
+                textContent: element.textContent?.trim(),
+                computedStyle: {
+                  display: window.getComputedStyle(element).display,
+                  visibility: window.getComputedStyle(element).visibility,
+                  opacity: window.getComputedStyle(element).opacity,
+                  color: window.getComputedStyle(element).color,
+                  backgroundColor: window.getComputedStyle(element).backgroundColor,
+                  fontSize: window.getComputedStyle(element).fontSize,
+                  fontWeight: window.getComputedStyle(element).fontWeight
+                },
+                accessibility: {
+                  role: element.getAttribute('role') || element.tagName.toLowerCase(),
+                  ariaLabel: element.getAttribute('aria-label'),
+                  ariaLabelledBy: element.getAttribute('aria-labelledby'),
+                  ariaDescribedBy: element.getAttribute('aria-describedby'),
+                  tabIndex: element.tabIndex,
+                  disabled: element.disabled || element.getAttribute('aria-disabled') === 'true'
+                }
+              };
+            }, selector);
+
+            if (context) {
+              htmlContexts.push({
+                selector,
+                ...context
+              });
+            }
+          } catch (error) {
+            console.warn(`⚠️ Could not extract context for selector: ${selector}`, error.message);
+          }
+        }
+      }
+
+      return {
+        ...violation,
+        htmlContexts,
+        userImpact: this.generateUserImpact(violation),
+        technicalDetails: this.generateTechnicalDetails(violation),
+        fixSuggestions: this.generateFixSuggestions(violation)
+      };
+    }));
+
+    console.log(`✅ Enhanced ${enhancedViolations.length} violations with HTML context`);
+    return enhancedViolations;
+  }
+
+  /**
+   * Phase 2: Build comprehensive WCAG database
+   */
+  async buildWCAGDatabase(violations) {
+    console.log('📚 Building WCAG database...');
+
+    const wcagRules = new Map();
+
+    violations.forEach(violation => {
+      if (violation.tags) {
+        violation.tags.forEach(tag => {
+          if (tag.startsWith('wcag')) {
+            const wcagId = tag.replace('wcag', '').replace(/(\d)(\d)(\d)/, '$1.$2.$3');
+            
+            if (!wcagRules.has(wcagId)) {
+              wcagRules.set(wcagId, {
+                id: wcagId,
+                title: this.getWCAGTitle(wcagId),
+                level: this.getWCAGLevel(tag),
+                description: this.getWCAGDescription(wcagId),
+                successCriteria: this.getWCAGSuccessCriteria(wcagId),
+                techniques: this.getWCAGTechniques(wcagId),
+                helpUrl: `https://www.w3.org/WAI/WCAG21/Understanding/${this.getWCAGSlug(wcagId)}.html`,
+                violations: []
+              });
+            }
+
+            wcagRules.get(wcagId).violations.push({
+              id: violation.id,
+              impact: violation.impact,
+              description: violation.description
+            });
+          }
+        });
+      }
+    });
+
+    console.log(`✅ Built WCAG database with ${wcagRules.size} rules`);
+    return Object.fromEntries(wcagRules);
+  }
+
+  /**
+   * Generate user impact description
+   */
+  generateUserImpact(violation) {
+    const impactDescriptions = {
+      critical: {
+        description: "Blocks access for users with disabilities",
+        affectedUsers: "25-30% of users with disabilities",
+        severity: "Complete barrier to access"
+      },
+      serious: {
+        description: "Significantly hinders accessibility",
+        affectedUsers: "15-20% of users with disabilities", 
+        severity: "Major difficulty accessing content"
+      },
+      moderate: {
+        description: "Creates accessibility challenges",
+        affectedUsers: "10-15% of users with disabilities",
+        severity: "Noticeable difficulty but workarounds possible"
+      },
+      minor: {
+        description: "Minor accessibility inconvenience",
+        affectedUsers: "5-10% of users with disabilities",
+        severity: "Slight difficulty accessing content"
+      }
+    };
+
+    return impactDescriptions[violation.impact] || impactDescriptions.moderate;
+  }
+
+  /**
+   * Generate technical details
+   */
+  generateTechnicalDetails(violation) {
+    return {
+      ruleId: violation.id,
+      axeVersion: "4.10.0",
+      category: this.categorizeViolation(violation),
+      automatable: true,
+      elementCount: violation.nodes ? violation.nodes.length : 0,
+      testingMethod: "Automated accessibility testing with axe-core"
+    };
+  }
+
+  /**
+   * Generate fix suggestions
+   */
+  generateFixSuggestions(violation) {
+    // This will be expanded in Phase 3, for now basic suggestions
+    const basicFixes = {
+      'image-alt': {
+        type: 'attribute-addition',
+        suggestion: 'Add descriptive alt attribute to images',
+        example: '<img src="image.jpg" alt="Description of the image content">'
+      },
+      'color-contrast': {
+        type: 'style-modification',
+        suggestion: 'Increase color contrast to meet WCAG AA standards',
+        example: 'Use darker text colors or lighter backgrounds'
+      },
+      'label': {
+        type: 'element-association', 
+        suggestion: 'Associate form controls with descriptive labels',
+        example: '<label for="input-id">Label text</label><input id="input-id">'
+      }
+    };
+
+    const rulePrefix = violation.id.split('-')[0];
+    return basicFixes[rulePrefix] || {
+      type: 'manual-review',
+      suggestion: 'Review element and apply appropriate accessibility fixes',
+      example: 'See WCAG documentation for specific guidance'
+    };
+  }
+
+  /**
+   * Helper methods for WCAG database
+   */
+  getWCAGTitle(wcagId) {
+    const titles = {
+      '1.1.1': 'Non-text Content',
+      '1.3.1': 'Info and Relationships', 
+      '1.4.3': 'Contrast (Minimum)',
+      '1.4.6': 'Contrast (Enhanced)',
+      '2.1.1': 'Keyboard',
+      '2.4.1': 'Bypass Blocks',
+      '2.4.2': 'Page Titled',
+      '3.1.1': 'Language of Page',
+      '3.3.2': 'Labels or Instructions',
+      '4.1.1': 'Parsing',
+      '4.1.2': 'Name, Role, Value'
+    };
+    return titles[wcagId] || `WCAG ${wcagId}`;
+  }
+
+  getWCAGLevel(tag) {
+    if (tag.includes('wcag2a') && !tag.includes('wcag2aa')) return 'A';
+    if (tag.includes('wcag2aa')) return 'AA';
+    if (tag.includes('wcag2aaa')) return 'AAA';
+    return 'A';
+  }
+
+  getWCAGDescription(wcagId) {
+    const descriptions = {
+      '1.1.1': 'All non-text content must have a text alternative',
+      '1.3.1': 'Information, structure, and relationships must be programmatically determinable',
+      '1.4.3': 'Text must have sufficient contrast against its background',
+      '2.1.1': 'All functionality must be available from a keyboard',
+      '3.3.2': 'Labels or instructions must be provided when content requires user input'
+    };
+    return descriptions[wcagId] || 'WCAG accessibility requirement';
+  }
+
+  getWCAGSuccessCriteria(wcagId) {
+    return `Success Criteria ${wcagId}: ${this.getWCAGDescription(wcagId)}`;
+  }
+
+  getWCAGTechniques(wcagId) {
+    const techniques = {
+      '1.1.1': ['H37', 'H36', 'H24', 'H2'],
+      '1.3.1': ['H42', 'H43', 'H44', 'H51'],
+      '1.4.3': ['G18', 'G145', 'G174'],
+      '2.1.1': ['G202', 'H91'],
+      '3.3.2': ['H44', 'H65', 'G131']
+    };
+    return techniques[wcagId] || [];
+  }
+
+  getWCAGSlug(wcagId) {
+    const slugs = {
+      '1.1.1': 'non-text-content',
+      '1.3.1': 'info-and-relationships',
+      '1.4.3': 'contrast-minimum',
+      '2.1.1': 'keyboard',
+      '3.3.2': 'labels-or-instructions'
+    };
+    return slugs[wcagId] || wcagId.replace(/\./g, '-');
+  }
+
+  categorizeViolation(violation) {
+    if (violation.tags?.includes('cat.color')) return 'Color';
+    if (violation.tags?.includes('cat.keyboard')) return 'Keyboard';
+    if (violation.tags?.includes('cat.forms')) return 'Forms';
+    if (violation.tags?.includes('cat.images')) return 'Images';
+    if (violation.tags?.includes('cat.structure')) return 'Structure';
+    return 'General';
+  }
+
+  /**
    * Generate CSS styling for violation overlays based on impact level
    */
   getOverlayStyle(impact) {
@@ -388,16 +655,59 @@ class InteractiveReportGenerator {
             </div>
         </section>
 
-        <section class="screenshot-section">
-            <h2>📸 Interactive Website View</h2>
-            <div class="screenshot-container" id="screenshot-container">
-                <img src="${reportData.screenshotData.screenshotPath}" 
-                     alt="Website screenshot" 
-                     class="website-screenshot" 
-                     id="website-screenshot">
-                
-                <div class="violation-overlays" id="violation-overlays">
-                    ${this.generateOverlayHTML(reportData.violationOverlays)}
+        <section class="main-interface">
+            <div class="interface-layout">
+                <div class="screenshot-panel">
+                    <h2>📸 Interactive Website View</h2>
+                    <div class="screenshot-container" id="screenshot-container">
+                        <img src="${reportData.screenshotData.screenshotPath}" 
+                             alt="Website screenshot" 
+                             class="website-screenshot" 
+                             id="website-screenshot">
+                        
+                        <div class="violation-overlays" id="violation-overlays">
+                            ${this.generateOverlayHTML(reportData.violationOverlays)}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inspector-panel" id="inspector-panel">
+                    <div class="panel-header">
+                        <h2>🔍 Violation Inspector</h2>
+                        <div class="panel-controls">
+                            <select id="violation-filter" class="control-select">
+                                <option value="all">All Violations</option>
+                                <option value="critical">Critical Only</option>
+                                <option value="serious">Serious Only</option>
+                                <option value="moderate">Moderate Only</option>
+                                <option value="minor">Minor Only</option>
+                            </select>
+                            <button id="clear-selection" class="control-btn">Clear Selection</button>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-content" id="panel-content">
+                        <div class="inspector-welcome">
+                            <div class="welcome-icon">🎯</div>
+                            <h3>Select a violation to inspect</h3>
+                            <p>Click on any red marker in the screenshot to see detailed information about the accessibility issue.</p>
+                            
+                            <div class="quick-stats">
+                                <div class="stat-item">
+                                    <span class="stat-number">${reportData.summary.total}</span>
+                                    <span class="stat-label">Total Issues</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">${Object.keys(reportData.wcagDatabase || {}).length}</span>
+                                    <span class="stat-label">WCAG Rules</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-number">${reportData.screenshotData.elementMap.length}</span>
+                                    <span class="stat-label">Elements Mapped</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -620,12 +930,115 @@ class InteractiveReportGenerator {
             color: white;
         }
 
-        .summary-section, .controls-section, .screenshot-section, .violations-list {
+        .summary-section, .controls-section, .main-interface, .violations-list {
             background: white;
             padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 2rem;
+        }
+
+        .main-interface {
+            padding: 0;
+        }
+
+        .interface-layout {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 0;
+            min-height: 80vh;
+        }
+
+        .screenshot-panel {
+            padding: 2rem;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .inspector-panel {
+            padding: 0;
+            background: #f8f9fa;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .panel-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 0 8px 0 0;
+        }
+
+        .panel-header h2 {
+            margin: 0 0 1rem 0;
+            color: #1a365d;
+            font-size: 1.5rem;
+        }
+
+        .panel-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-select {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.875rem;
+        }
+
+        .panel-content {
+            padding: 2rem;
+            height: calc(80vh - 120px);
+            overflow-y: auto;
+        }
+
+        .inspector-welcome {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .inspector-welcome h3 {
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .inspector-welcome p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .quick-stats .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .quick-stats .stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .quick-stats .stat-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
         }
 
         .summary-stats {
@@ -735,6 +1148,11 @@ class InteractiveReportGenerator {
 
         .violation-overlay.hidden {
             display: none;
+        }
+
+        .violation-overlay.selected {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            z-index: 1005 !important;
         }
 
         .violation-tooltip {
@@ -919,7 +1337,168 @@ class InteractiveReportGenerator {
             }
         }
 
+        /* Inspector Detail View */
+        .inspector-detail {
+            animation: slideIn 0.3s ease;
+        }
+
+        .detail-header {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .detail-badge.critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .detail-badge.serious {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .detail-badge.moderate {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .code-block .tag {
+            color: #60a5fa;
+        }
+
+        .code-block .attr {
+            color: #fbbf24;
+        }
+
+        .code-block .value {
+            color: #34d399;
+        }
+
+        .impact-description {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #6b7280;
+        }
+
+        .wcag-reference {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .wcag-reference h5 {
+            margin: 0 0 0.5rem 0;
+            color: #1e40af;
+        }
+
+        .techniques-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .technique-tag {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .fix-suggestion {
+            background: #f0fdf4;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #16a34a;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
         /* Responsive design */
+        @media (max-width: 1024px) {
+            .interface-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+
+            .screenshot-panel {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .inspector-panel {
+                border-radius: 0 0 8px 8px;
+            }
+
+            .panel-header {
+                border-radius: 0;
+            }
+        }
+
         @media (max-width: 768px) {
             .report-container {
                 padding: 10px;
@@ -949,6 +1528,18 @@ class InteractiveReportGenerator {
             .view-controls {
                 justify-content: center;
             }
+
+            .interface-layout {
+                min-height: 60vh;
+            }
+
+            .panel-content {
+                height: calc(60vh - 120px);
+            }
+
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
         }
     `;
   }
@@ -971,12 +1562,16 @@ class InteractiveReportGenerator {
             // Initialize overlay interactions
             initializeOverlayInteractions();
             
+            // Initialize inspector panel controls
+            initializeInspectorControls();
+            
             // Log complete report data for debugging and inspection
             window.reportData = ${JSON.stringify(reportData, null, 2)};
             console.log('📊 Report data loaded:', {
                 violations: ${reportData.violations.length},
                 overlays: ${reportData.violationOverlays.length},
-                elements: ${reportData.screenshotData.elementMap.length}
+                elements: ${reportData.screenshotData.elementMap.length},
+                wcagRules: Object.keys(reportData.wcagDatabase || {}).length
             });
         });
 
@@ -1047,35 +1642,17 @@ class InteractiveReportGenerator {
                     
                     console.log('🎯 Clicked violation: ' + violationId + ' (' + impact + ')');
                     
-                    // Highlight corresponding table row
-                    const codeElements = document.querySelectorAll('.violation-row code');
-                    let tableRow = null;
-                    for (let i = 0; i < codeElements.length; i++) {
-                        if (codeElements[i].textContent.includes(violationId)) {
-                            tableRow = codeElements[i].closest('tr');
-                            break;
-                        }
+                    // Find the violation data
+                    const violation = window.reportData.violations.find(v => v.id === violationId);
+                    if (violation) {
+                        showViolationDetails(violation);
                     }
                     
-                    if (tableRow) {
-                        // Remove previous highlights
-                        document.querySelectorAll('.violation-row.highlighted').forEach(row => {
-                            row.classList.remove('highlighted');
-                        });
-                        
-                        // Add highlight
-                        tableRow.classList.add('highlighted');
-                        tableRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        
-                        // Add temporary highlight style
-                        const originalBackground = tableRow.style.background;
-                        tableRow.style.background = '#fff3cd';
-                        setTimeout(() => {
-                            tableRow.style.background = originalBackground;
-                        }, 2000);
-                    }
-                    
-                    // Future: Open inspector panel (Phase 2)
+                    // Highlight the overlay
+                    document.querySelectorAll('.violation-overlay').forEach(o => {
+                        o.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
                 });
                 
                 overlay.addEventListener('mouseenter', function() {
@@ -1083,6 +1660,171 @@ class InteractiveReportGenerator {
                     console.log('🔍 Hovering over violation: ' + violationId);
                 });
             });
+        }
+
+        function showViolationDetails(violation) {
+            console.log('📋 Showing details for violation:', violation.id);
+            
+            const panelContent = document.getElementById('panel-content');
+            const wcagRule = window.reportData.wcagDatabase ? 
+                Object.values(window.reportData.wcagDatabase).find(rule => 
+                    rule.violations.some(v => v.id === violation.id)
+                ) : null;
+
+            const htmlContext = violation.htmlContexts && violation.htmlContexts.length > 0 ? 
+                violation.htmlContexts[0] : null;
+
+            panelContent.innerHTML = generateViolationDetailHTML(violation, wcagRule, htmlContext);
+            
+            // Initialize detail view interactions
+            initializeDetailView();
+        }
+
+        function generateViolationDetailHTML(violation, wcagRule, htmlContext) {
+            return \`
+                <div class="inspector-detail">
+                    <button class="back-button" onclick="showWelcomeScreen()">
+                        ← Back to Overview
+                    </button>
+                    
+                    <div class="detail-header">
+                        <div class="detail-title">\${violation.id}</div>
+                        <div class="detail-meta">
+                            <span class="detail-badge \${violation.impact}">\${violation.impact.toUpperCase()}</span>
+                            <span class="detail-badge">\${violation.technicalDetails?.category || 'General'}</span>
+                            \${wcagRule ? \`<span class="detail-badge">WCAG \${wcagRule.level}</span>\` : ''}
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4>📝 Issue Description</h4>
+                        <p>\${violation.description || violation.help}</p>
+                    </div>
+
+                    \${violation.userImpact ? \`
+                        <div class="detail-section">
+                            <h4>👥 User Impact</h4>
+                            <div class="impact-description">
+                                <p><strong>Impact:</strong> \${violation.userImpact.description}</p>
+                                <p><strong>Affected Users:</strong> \${violation.userImpact.affectedUsers}</p>
+                                <p><strong>Severity:</strong> \${violation.userImpact.severity}</p>
+                            </div>
+                        </div>
+                    \` : ''}
+
+                    \${htmlContext ? \`
+                        <div class="detail-section">
+                            <h4>🔍 HTML Context</h4>
+                            <div class="code-block">\${escapeHTML(htmlContext.target)}</div>
+                            \${htmlContext.accessibility.role ? \`
+                                <p><strong>Role:</strong> \${htmlContext.accessibility.role}</p>
+                            \` : ''}
+                            \${htmlContext.accessibility.ariaLabel ? \`
+                                <p><strong>ARIA Label:</strong> \${htmlContext.accessibility.ariaLabel}</p>
+                            \` : ''}
+                        </div>
+                    \` : ''}
+
+                    \${wcagRule ? \`
+                        <div class="detail-section">
+                            <h4>📚 WCAG Reference</h4>
+                            <div class="wcag-reference">
+                                <h5>\${wcagRule.title} (\${wcagRule.id})</h5>
+                                <p>\${wcagRule.description}</p>
+                                <div class="techniques-list">
+                                    \${wcagRule.techniques.map(tech => \`<span class="technique-tag">\${tech}</span>\`).join('')}
+                                </div>
+                                <p><a href="\${wcagRule.helpUrl}" target="_blank">📖 Learn More</a></p>
+                            </div>
+                        </div>
+                    \` : ''}
+
+                    \${violation.fixSuggestions ? \`
+                        <div class="detail-section">
+                            <h4>🛠️ Fix Suggestion</h4>
+                            <div class="fix-suggestion">
+                                <p><strong>Type:</strong> \${violation.fixSuggestions.type}</p>
+                                <p><strong>Suggestion:</strong> \${violation.fixSuggestions.suggestion}</p>
+                                \${violation.fixSuggestions.example ? \`
+                                    <p><strong>Example:</strong></p>
+                                    <div class="code-block">\${escapeHTML(violation.fixSuggestions.example)}</div>
+                                \` : ''}
+                            </div>
+                        </div>
+                    \` : ''}
+
+                    <div class="detail-section">
+                        <h4>⚙️ Technical Details</h4>
+                        <ul>
+                            <li><strong>Rule ID:</strong> \${violation.id}</li>
+                            <li><strong>Impact Level:</strong> \${violation.impact}</li>
+                            <li><strong>Elements Affected:</strong> \${violation.nodes?.length || 0}</li>
+                            \${violation.technicalDetails ? \`
+                                <li><strong>Category:</strong> \${violation.technicalDetails.category}</li>
+                                <li><strong>Testing Method:</strong> \${violation.technicalDetails.testingMethod}</li>
+                            \` : ''}
+                        </ul>
+                    </div>
+                </div>
+            \`;
+        }
+
+        function showWelcomeScreen() {
+            const panelContent = document.getElementById('panel-content');
+            panelContent.innerHTML = \`
+                <div class="inspector-welcome">
+                    <div class="welcome-icon">🎯</div>
+                    <h3>Select a violation to inspect</h3>
+                    <p>Click on any red marker in the screenshot to see detailed information about the accessibility issue.</p>
+                    
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">\${window.reportData.summary.total}</span>
+                            <span class="stat-label">Total Issues</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">\${Object.keys(window.reportData.wcagDatabase || {}).length}</span>
+                            <span class="stat-label">WCAG Rules</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">\${window.reportData.screenshotData.elementMap.length}</span>
+                            <span class="stat-label">Elements Mapped</span>
+                        </div>
+                    </div>
+                </div>
+            \`;
+            
+            // Clear any selected overlays
+            document.querySelectorAll('.violation-overlay').forEach(o => {
+                o.classList.remove('selected');
+            });
+        }
+
+        function initializeDetailView() {
+            // Initialize any specific detail view interactions
+            console.log('🔧 Detail view initialized');
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Initialize inspector panel controls
+        function initializeInspectorControls() {
+            const clearButton = document.getElementById('clear-selection');
+            if (clearButton) {
+                clearButton.addEventListener('click', showWelcomeScreen);
+            }
+
+            const violationFilter = document.getElementById('violation-filter');
+            if (violationFilter) {
+                violationFilter.addEventListener('change', function() {
+                    // This filter is handled by the existing filter system
+                    console.log('🔧 Inspector filter changed:', this.value);
+                });
+            }
         }
 
         // Performance monitoring

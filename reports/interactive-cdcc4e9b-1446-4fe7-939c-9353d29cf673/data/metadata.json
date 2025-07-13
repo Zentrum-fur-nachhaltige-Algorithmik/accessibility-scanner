@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-cdcc4e9b-1446-4fe7-939c-9353d29cf673",
+  "timestamp": "2025-07-13T13:37:11.157Z",
+  "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-form-labels.html",
+  "summary": {
+    "total": 6,
+    "critical": 2,
+    "serious": 1,
+    "moderate": 3,
+    "minor": 0,
+    "accessibilityScore": 5
+  },
+  "scanMetadata": {
+    "url": "file:///mnt/c/Users/T14/Desktop/accessability/test-sites/bad-form-labels.html",
+    "testFile": "test-sites/bad-form-labels.html",
+    "scanDate": "2025-07-13T13:37:10.760Z",
+    "totalViolations": 6
+  }
+}

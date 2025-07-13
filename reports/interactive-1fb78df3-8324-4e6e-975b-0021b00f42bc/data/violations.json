@@ -1,0 +1,2156 @@
+[
+  {
+    "id": "color-contrast",
+    "impact": "serious",
+    "tags": [
+      "cat.color",
+      "wcag2aa",
+      "wcag143",
+      "TTv5",
+      "TT13.c",
+      "EN-301-549",
+      "EN-9.1.4.3",
+      "ACT"
+    ],
+    "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#cccccc",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.6,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-1"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Extrem schlechter Kontrast</h2>",
+        "target": [
+          ".poor-contrast-1 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#cccccc",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.6,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-1"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>",
+        "target": [
+          ".poor-contrast-1 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.6 (foreground color: #cccccc, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffff00",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.07,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-2"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Gelber Text Problem</h2>",
+        "target": [
+          ".poor-contrast-2 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ffff00",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.07,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-2"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>",
+        "target": [
+          ".poor-contrast-2 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.07 (foreground color: #ffff00, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#87ceeb",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.74,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-3"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Hellblauer Text</h2>",
+        "target": [
+          ".poor-contrast-3 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#87ceeb",
+              "bgColor": "#ffffff",
+              "contrastRatio": 1.74,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-3"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>",
+        "target": [
+          ".poor-contrast-3 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.74 (foreground color: #87ceeb, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#333333",
+              "bgColor": "#000000",
+              "contrastRatio": 1.66,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-4"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.66 (foreground color: #333333, background color: #000000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Links sind kaum sichtbar</a>",
+        "target": [
+          "p > a"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.66 (foreground color: #333333, background color: #000000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ff8c00",
+              "bgColor": "#ff0000",
+              "contrastRatio": 1.71,
+              "fontSize": "18.0pt (24px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-5"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h2>Orange auf Rot</h2>",
+        "target": [
+          ".poor-contrast-5 > h2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#ff8c00",
+              "bgColor": "#ff0000",
+              "contrastRatio": 1.71,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+                "target": [
+                  ".poor-contrast-5"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>",
+        "target": [
+          ".poor-contrast-5 > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.71 (foreground color: #ff8c00, background color: #ff0000, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#f0f0f0",
+              "bgColor": "#e0e0e0",
+              "contrastRatio": 1.15,
+              "fontSize": "10.0pt (13.3333px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<button class=\"poor-button\">Unsichtbarer Button</button>",
+                "target": [
+                  "button"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.15 (foreground color: #f0f0f0, background color: #e0e0e0, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<button class=\"poor-button\">Unsichtbarer Button</button>",
+        "target": [
+          "button"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.15 (foreground color: #f0f0f0, background color: #e0e0e0, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#cccccc",
+              "bgColor": "#f8f8f8",
+              "contrastRatio": 1.51,
+              "fontSize": "14.0pt (18.72px)",
+              "fontWeight": "bold",
+              "messageKey": null,
+              "expectedContrastRatio": "3:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<form class=\"poor-form\">",
+                "target": [
+                  "form"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.51 (foreground color: #cccccc, background color: #f8f8f8, font size: 14.0pt (18.72px), font weight: bold). Expected contrast ratio of 3:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+        "target": [
+          "form > h3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.51 (foreground color: #cccccc, background color: #f8f8f8, font size: 14.0pt (18.72px), font weight: bold). Expected contrast ratio of 3:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d0d0d0",
+              "bgColor": "#f8f8f8",
+              "contrastRatio": 1.45,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<form class=\"poor-form\">",
+                "target": [
+                  "form"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<label for=\"name\">Name (kaum sichtbar):</label>",
+        "target": [
+          "label[for=\"name\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#e8e8e8",
+              "bgColor": "#fafafa",
+              "contrastRatio": 1.17,
+              "fontSize": "10.0pt (13.3333px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+                "target": [
+                  "#name"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+        "target": [
+          "#name"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#d0d0d0",
+              "bgColor": "#f8f8f8",
+              "contrastRatio": 1.45,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<form class=\"poor-form\">",
+                "target": [
+                  "form"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<label for=\"email\">E-Mail:</label>",
+        "target": [
+          "label[for=\"email\"]"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.45 (foreground color: #d0d0d0, background color: #f8f8f8, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#e8e8e8",
+              "bgColor": "#fafafa",
+              "contrastRatio": 1.17,
+              "fontSize": "10.0pt (13.3333px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<input type=\"email\" id=\"email\" name=\"email\">",
+                "target": [
+                  "#email"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<input type=\"email\" id=\"email\" name=\"email\">",
+        "target": [
+          "#email"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.17 (foreground color: #e8e8e8, background color: #fafafa, font size: 10.0pt (13.3333px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Home</a>",
+        "target": [
+          "nav > a:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Über uns</a>",
+        "target": [
+          "a:nth-child(2)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Kontakt</a>",
+        "target": [
+          "a:nth-child(3)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#404040",
+              "bgColor": "#2c2c2c",
+              "contrastRatio": 1.34,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+                "target": [
+                  "nav"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<a href=\"#\">Service</a>",
+        "target": [
+          "a:nth-child(4)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.34 (foreground color: #404040, background color: #2c2c2c, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#999999",
+              "bgColor": "#bbbbbb",
+              "contrastRatio": 1.48,
+              "fontSize": "9.0pt (12px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+                "target": [
+                  ".poor-small-text"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.48 (foreground color: #999999, background color: #bbbbbb, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+        "target": [
+          ".poor-small-text"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.48 (foreground color: #999999, background color: #bbbbbb, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#f2f2f2",
+              "bgColor": "#f9f9f9",
+              "contrastRatio": 1.06,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">",
+                "target": [
+                  "footer"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>",
+        "target": [
+          "p:nth-child(1)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "any": [
+          {
+            "id": "color-contrast",
+            "data": {
+              "fgColor": "#f2f2f2",
+              "bgColor": "#f9f9f9",
+              "contrastRatio": 1.06,
+              "fontSize": "12.0pt (16px)",
+              "fontWeight": "normal",
+              "messageKey": null,
+              "expectedContrastRatio": "4.5:1"
+            },
+            "relatedNodes": [
+              {
+                "html": "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">",
+                "target": [
+                  "footer"
+                ]
+              }
+            ],
+            "impact": "serious",
+            "message": "Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "serious",
+        "html": "<p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>",
+        "target": [
+          "footer > p:nth-child(2)"
+        ],
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.06 (foreground color: #f2f2f2, background color: #f9f9f9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ],
+    "htmlContexts": [
+      {
+        "selector": ".poor-contrast-1 > h2",
+        "target": "<h2>Extrem schlechter Kontrast</h2>",
+        "parent": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+        "siblings": [
+          "<h2>Extrem schlechter Kontrast</h2>",
+          "<p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>"
+        ],
+        "textContent": "Extrem schlechter Kontrast",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(204, 204, 204)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "24px",
+          "fontWeight": "700"
+        },
+        "accessibility": {
+          "role": "h2",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-1 > p",
+        "target": "<p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>",
+        "parent": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+        "siblings": [
+          "<h2>Extrem schlechter Kontrast</h2>",
+          "<p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>"
+        ],
+        "textContent": "Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(204, 204, 204)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-2 > h2",
+        "target": "<h2>Gelber Text Problem</h2>",
+        "parent": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+        "siblings": [
+          "<h2>Gelber Text Problem</h2>",
+          "<p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>"
+        ],
+        "textContent": "Gelber Text Problem",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 255, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "24px",
+          "fontWeight": "700"
+        },
+        "accessibility": {
+          "role": "h2",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-2 > p",
+        "target": "<p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>",
+        "parent": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+        "siblings": [
+          "<h2>Gelber Text Problem</h2>",
+          "<p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>"
+        ],
+        "textContent": "Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 255, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-3 > h2",
+        "target": "<h2>Hellblauer Text</h2>",
+        "parent": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+        "siblings": [
+          "<h2>Hellblauer Text</h2>",
+          "<p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>"
+        ],
+        "textContent": "Hellblauer Text",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(135, 206, 235)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "24px",
+          "fontWeight": "700"
+        },
+        "accessibility": {
+          "role": "h2",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-3 > p",
+        "target": "<p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>",
+        "parent": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+        "siblings": [
+          "<h2>Hellblauer Text</h2>",
+          "<p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>"
+        ],
+        "textContent": "Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(135, 206, 235)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "p > a",
+        "target": "<a href=\"#\">Links sind kaum sichtbar</a>",
+        "parent": "<p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>",
+        "siblings": [
+          "<a href=\"#\">Links sind kaum sichtbar</a>"
+        ],
+        "textContent": "Links sind kaum sichtbar",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(51, 51, 51)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "a",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-5 > h2",
+        "target": "<h2>Orange auf Rot</h2>",
+        "parent": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+        "siblings": [
+          "<h2>Orange auf Rot</h2>",
+          "<p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>"
+        ],
+        "textContent": "Orange auf Rot",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 140, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "24px",
+          "fontWeight": "700"
+        },
+        "accessibility": {
+          "role": "h2",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-5 > p",
+        "target": "<p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>",
+        "parent": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+        "siblings": [
+          "<h2>Orange auf Rot</h2>",
+          "<p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>"
+        ],
+        "textContent": "Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 140, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "button",
+        "target": "<button class=\"poor-button\">Unsichtbarer Button</button>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Unsichtbarer Button",
+        "computedStyle": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(240, 240, 240)",
+          "backgroundColor": "rgb(224, 224, 224)",
+          "fontSize": "13.3333px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "button",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "form > h3",
+        "target": "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+        "parent": "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+        "siblings": [
+          "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+          "<label for=\"name\">Name (kaum sichtbar):</label>",
+          "<br>",
+          "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+          "<br>",
+          "<br>",
+          "<label for=\"email\">E-Mail:</label>",
+          "<br>",
+          "<input type=\"email\" id=\"email\" name=\"email\">",
+          "<br>",
+          "<br>"
+        ],
+        "textContent": "Formular mit schlechten Kontrasten",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(204, 204, 204)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "18.72px",
+          "fontWeight": "700"
+        },
+        "accessibility": {
+          "role": "h3",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "label[for=\"name\"]",
+        "target": "<label for=\"name\">Name (kaum sichtbar):</label>",
+        "parent": "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+        "siblings": [
+          "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+          "<label for=\"name\">Name (kaum sichtbar):</label>",
+          "<br>",
+          "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+          "<br>",
+          "<br>",
+          "<label for=\"email\">E-Mail:</label>",
+          "<br>",
+          "<input type=\"email\" id=\"email\" name=\"email\">",
+          "<br>",
+          "<br>"
+        ],
+        "textContent": "Name (kaum sichtbar):",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(208, 208, 208)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "label",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "#name",
+        "target": "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+        "parent": "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+        "siblings": [
+          "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+          "<label for=\"name\">Name (kaum sichtbar):</label>",
+          "<br>",
+          "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+          "<br>",
+          "<br>",
+          "<label for=\"email\">E-Mail:</label>",
+          "<br>",
+          "<input type=\"email\" id=\"email\" name=\"email\">",
+          "<br>",
+          "<br>"
+        ],
+        "textContent": "",
+        "computedStyle": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(232, 232, 232)",
+          "backgroundColor": "rgb(250, 250, 250)",
+          "fontSize": "13.3333px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "input",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "label[for=\"email\"]",
+        "target": "<label for=\"email\">E-Mail:</label>",
+        "parent": "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+        "siblings": [
+          "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+          "<label for=\"name\">Name (kaum sichtbar):</label>",
+          "<br>",
+          "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+          "<br>",
+          "<br>",
+          "<label for=\"email\">E-Mail:</label>",
+          "<br>",
+          "<input type=\"email\" id=\"email\" name=\"email\">",
+          "<br>",
+          "<br>"
+        ],
+        "textContent": "E-Mail:",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(208, 208, 208)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "label",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "#email",
+        "target": "<input type=\"email\" id=\"email\" name=\"email\">",
+        "parent": "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+        "siblings": [
+          "<h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>",
+          "<label for=\"name\">Name (kaum sichtbar):</label>",
+          "<br>",
+          "<input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\">",
+          "<br>",
+          "<br>",
+          "<label for=\"email\">E-Mail:</label>",
+          "<br>",
+          "<input type=\"email\" id=\"email\" name=\"email\">",
+          "<br>",
+          "<br>"
+        ],
+        "textContent": "",
+        "computedStyle": {
+          "display": "inline-block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(232, 232, 232)",
+          "backgroundColor": "rgb(250, 250, 250)",
+          "fontSize": "13.3333px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "input",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "nav > a:nth-child(1)",
+        "target": "<a href=\"#\">Home</a>",
+        "parent": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+        "siblings": [
+          "<a href=\"#\">Home</a>",
+          "<a href=\"#\">Über uns</a>",
+          "<a href=\"#\">Kontakt</a>",
+          "<a href=\"#\">Service</a>"
+        ],
+        "textContent": "Home",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(64, 64, 64)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "a",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "a:nth-child(2)",
+        "target": "<a href=\"#\">Über uns</a>",
+        "parent": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+        "siblings": [
+          "<a href=\"#\">Home</a>",
+          "<a href=\"#\">Über uns</a>",
+          "<a href=\"#\">Kontakt</a>",
+          "<a href=\"#\">Service</a>"
+        ],
+        "textContent": "Über uns",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(64, 64, 64)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "a",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "a:nth-child(3)",
+        "target": "<a href=\"#\">Kontakt</a>",
+        "parent": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+        "siblings": [
+          "<a href=\"#\">Home</a>",
+          "<a href=\"#\">Über uns</a>",
+          "<a href=\"#\">Kontakt</a>",
+          "<a href=\"#\">Service</a>"
+        ],
+        "textContent": "Kontakt",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(64, 64, 64)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "a",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "a:nth-child(4)",
+        "target": "<a href=\"#\">Service</a>",
+        "parent": "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+        "siblings": [
+          "<a href=\"#\">Home</a>",
+          "<a href=\"#\">Über uns</a>",
+          "<a href=\"#\">Kontakt</a>",
+          "<a href=\"#\">Service</a>"
+        ],
+        "textContent": "Service",
+        "computedStyle": {
+          "display": "inline",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(64, 64, 64)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "a",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": 0,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-small-text",
+        "target": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(153, 153, 153)",
+          "backgroundColor": "rgb(187, 187, 187)",
+          "fontSize": "12px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "p:nth-child(1)",
+        "target": "<p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>",
+        "parent": "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>",
+        "siblings": [
+          "<p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>",
+          "<p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>"
+        ],
+        "textContent": "Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(242, 242, 242)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "footer > p:nth-child(2)",
+        "target": "<p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>",
+        "parent": "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>",
+        "siblings": [
+          "<p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>",
+          "<p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>"
+        ],
+        "textContent": "Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(242, 242, 242)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      }
+    ],
+    "userImpact": {
+      "description": "Significantly hinders accessibility",
+      "affectedUsers": "15-20% of users with disabilities",
+      "severity": "Major difficulty accessing content"
+    },
+    "technicalDetails": {
+      "ruleId": "color-contrast",
+      "axeVersion": "4.10.0",
+      "category": "Color",
+      "automatable": true,
+      "elementCount": 22,
+      "testingMethod": "Automated accessibility testing with axe-core"
+    },
+    "fixSuggestions": {
+      "type": "manual-review",
+      "suggestion": "Review element and apply appropriate accessibility fixes",
+      "example": "See WCAG documentation for specific guidance"
+    }
+  },
+  {
+    "id": "landmark-one-main",
+    "impact": "moderate",
+    "tags": [
+      "cat.semantics",
+      "best-practice"
+    ],
+    "description": "Ensure the document has a main landmark",
+    "help": "Document should have one main landmark",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=axeAPI",
+    "nodes": [
+      {
+        "any": [],
+        "all": [
+          {
+            "id": "page-has-main",
+            "data": null,
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Document does not have a main landmark"
+          }
+        ],
+        "none": [],
+        "impact": "moderate",
+        "html": "<html lang=\"de\">",
+        "target": [
+          "html"
+        ],
+        "failureSummary": "Fix all of the following:\n  Document does not have a main landmark"
+      }
+    ],
+    "htmlContexts": [
+      {
+        "selector": "html",
+        "target": "<html lang=\"de\"><head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Test: Schlechte Farbkontraste (BAD)</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            margin: 20px;\n            background-color: #f5f5f5;\n        }\n        \n        /* VIOLATION 1: Sehr schlechter Kontrast - Hellgrauer Text auf weißem Hintergrund */\n        .poor-contrast-1 {\n            color: #cccccc;\n            background-color: #ffffff;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 2: Gelber Text auf weißem Hintergrund */\n        .poor-contrast-2 {\n            color: #ffff00;\n            background-color: #ffffff;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 3: Hellblauer Text auf weißem Hintergrund */\n        .poor-contrast-3 {\n            color: #87ceeb;\n            background-color: #ffffff;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 4: Dunkelgraue Links auf schwarzem Hintergrund */\n        .poor-contrast-4 {\n            background-color: #000000;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        .poor-contrast-4 a {\n            color: #333333;\n            text-decoration: underline;\n        }\n        \n        /* VIOLATION 5: Orange Text auf rotem Hintergrund */\n        .poor-contrast-5 {\n            color: #ff8c00;\n            background-color: #ff0000;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 6: Button mit schlechtem Kontrast */\n        .poor-button {\n            background-color: #e0e0e0;\n            color: #f0f0f0;\n            border: none;\n            padding: 10px 20px;\n            margin: 10px 0;\n            cursor: pointer;\n        }\n        \n        /* VIOLATION 7: Formular mit schlechtem Kontrast */\n        .poor-form {\n            background-color: #f8f8f8;\n        }\n        .poor-form input {\n            background-color: #fafafa;\n            color: #e8e8e8;\n            border: 1px solid #f0f0f0;\n            padding: 5px;\n        }\n        .poor-form label {\n            color: #d0d0d0;\n        }\n        \n        /* VIOLATION 8: Navigation mit extrem schlechtem Kontrast */\n        .poor-nav {\n            background-color: #2c2c2c;\n            padding: 10px;\n        }\n        .poor-nav a {\n            color: #404040;\n            text-decoration: none;\n            margin-right: 20px;\n        }\n        \n        /* VIOLATION 9: Sehr kleiner Text mit schlechtem Kontrast */\n        .poor-small-text {\n            font-size: 12px;\n            color: #999999;\n            background-color: #bbbbbb;\n            padding: 5px;\n        }\n        \n        /* VIOLATION 10: Gradient Hintergrund mit schlechtem Text */\n        .poor-gradient {\n            background: linear-gradient(to right, #ffffff, #f0f0f0);\n            color: #e8e8e8;\n            padding: 15px;\n            margin: 10px 0;\n        }\n    </style>\n<script type=\"text/javascript\" src=\"https://unpkg.com/axe-core@4.10.0/axe.min.js\"></script></head>\n<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body></html>",
+        "parent": null,
+        "siblings": [],
+        "textContent": "Test: Schlechte Farbkontraste (BAD)\n    \n        body {\n            font-family: Arial, sans-serif;\n            margin: 20px;\n            background-color: #f5f5f5;\n        }\n        \n        /* VIOLATION 1: Sehr schlechter Kontrast - Hellgrauer Text auf weißem Hintergrund */\n        .poor-contrast-1 {\n            color: #cccccc;\n            background-color: #ffffff;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 2: Gelber Text auf weißem Hintergrund */\n        .poor-contrast-2 {\n            color: #ffff00;\n            background-color: #ffffff;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 3: Hellblauer Text auf weißem Hintergrund */\n        .poor-contrast-3 {\n            color: #87ceeb;\n            background-color: #ffffff;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 4: Dunkelgraue Links auf schwarzem Hintergrund */\n        .poor-contrast-4 {\n            background-color: #000000;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        .poor-contrast-4 a {\n            color: #333333;\n            text-decoration: underline;\n        }\n        \n        /* VIOLATION 5: Orange Text auf rotem Hintergrund */\n        .poor-contrast-5 {\n            color: #ff8c00;\n            background-color: #ff0000;\n            padding: 10px;\n            margin: 10px 0;\n        }\n        \n        /* VIOLATION 6: Button mit schlechtem Kontrast */\n        .poor-button {\n            background-color: #e0e0e0;\n            color: #f0f0f0;\n            border: none;\n            padding: 10px 20px;\n            margin: 10px 0;\n            cursor: pointer;\n        }\n        \n        /* VIOLATION 7: Formular mit schlechtem Kontrast */\n        .poor-form {\n            background-color: #f8f8f8;\n        }\n        .poor-form input {\n            background-color: #fafafa;\n            color: #e8e8e8;\n            border: 1px solid #f0f0f0;\n            padding: 5px;\n        }\n        .poor-form label {\n            color: #d0d0d0;\n        }\n        \n        /* VIOLATION 8: Navigation mit extrem schlechtem Kontrast */\n        .poor-nav {\n            background-color: #2c2c2c;\n            padding: 10px;\n        }\n        .poor-nav a {\n            color: #404040;\n            text-decoration: none;\n            margin-right: 20px;\n        }\n        \n        /* VIOLATION 9: Sehr kleiner Text mit schlechtem Kontrast */\n        .poor-small-text {\n            font-size: 12px;\n            color: #999999;\n            background-color: #bbbbbb;\n            padding: 5px;\n        }\n        \n        /* VIOLATION 10: Gradient Hintergrund mit schlechtem Text */\n        .poor-gradient {\n            background: linear-gradient(to right, #ffffff, #f0f0f0);\n            color: #e8e8e8;\n            padding: 15px;\n            margin: 10px 0;\n        }\n    \n\n\n    Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)\n    \n    Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.\n    \n    \n        Extrem schlechter Kontrast\n        Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)\n    \n    \n    \n        Gelber Text Problem\n        Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1\n    \n    \n    \n        Hellblauer Text\n        Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1\n    \n    \n    \n        Dunkle Links auf schwarzem Hintergrund\n        Diese Links sind kaum sichtbar auf schwarzem Hintergrund.\n    \n    \n    \n        Orange auf Rot\n        Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!\n    \n    \n    Unsichtbarer Button\n    \n    \n        Formular mit schlechten Kontrasten\n        Name (kaum sichtbar):\n        \n        \n        E-Mail:\n        \n    \n    \n    \n        Home\n        Über uns\n        Kontakt\n        Service\n    \n    \n    \n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    \n    \n    \n        Text auf Gradient Hintergrund\n        Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.\n    \n    \n    \n        Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.\n        Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "html",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      }
+    ],
+    "userImpact": {
+      "description": "Creates accessibility challenges",
+      "affectedUsers": "10-15% of users with disabilities",
+      "severity": "Noticeable difficulty but workarounds possible"
+    },
+    "technicalDetails": {
+      "ruleId": "landmark-one-main",
+      "axeVersion": "4.10.0",
+      "category": "General",
+      "automatable": true,
+      "elementCount": 1,
+      "testingMethod": "Automated accessibility testing with axe-core"
+    },
+    "fixSuggestions": {
+      "type": "manual-review",
+      "suggestion": "Review element and apply appropriate accessibility fixes",
+      "example": "See WCAG documentation for specific guidance"
+    }
+  },
+  {
+    "id": "region",
+    "impact": "moderate",
+    "tags": [
+      "cat.keyboard",
+      "best-practice"
+    ],
+    "description": "Ensure all page content is contained by landmarks",
+    "help": "All page content should be contained by landmarks",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+        "target": [
+          "h1"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+        "target": [
+          "body > p"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+        "target": [
+          ".poor-contrast-1"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+        "target": [
+          ".poor-contrast-2"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+        "target": [
+          ".poor-contrast-3"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+        "target": [
+          ".poor-contrast-4"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+        "target": [
+          ".poor-contrast-5"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<form class=\"poor-form\">",
+        "target": [
+          "form"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+        "target": [
+          ".poor-small-text"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+        "target": [
+          ".poor-gradient"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      }
+    ],
+    "htmlContexts": [
+      {
+        "selector": "h1",
+        "target": "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "32px",
+          "fontWeight": "700"
+        },
+        "accessibility": {
+          "role": "h1",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "body > p",
+        "target": "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-1",
+        "target": "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Extrem schlechter Kontrast\n        Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(204, 204, 204)",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-2",
+        "target": "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Gelber Text Problem\n        Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 255, 0)",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-3",
+        "target": "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Hellblauer Text\n        Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(135, 206, 235)",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-4",
+        "target": "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Dunkle Links auf schwarzem Hintergrund\n        Diese Links sind kaum sichtbar auf schwarzem Hintergrund.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgb(0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-contrast-5",
+        "target": "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Orange auf Rot\n        Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(255, 140, 0)",
+          "backgroundColor": "rgb(255, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": "form",
+        "target": "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Formular mit schlechten Kontrasten\n        Name (kaum sichtbar):\n        \n        \n        E-Mail:",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(0, 0, 0)",
+          "backgroundColor": "rgb(248, 248, 248)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "form",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-small-text",
+        "target": "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(153, 153, 153)",
+          "backgroundColor": "rgb(187, 187, 187)",
+          "fontSize": "12px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".poor-gradient",
+        "target": "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+        "parent": "<body>\n    <h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>\n    \n    <p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>\n    \n    <div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>\n    \n    <div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>\n    \n    <div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>\n    \n    <div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>\n    \n    <button class=\"poor-button\">Unsichtbarer Button</button>\n    \n    <form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>\n    \n    <nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>\n    \n    <div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>\n    \n    <div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>\n    \n    <footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>\n\n</body>",
+        "siblings": [
+          "<h1>Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>",
+          "<p>Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten.</p>",
+          "<div class=\"poor-contrast-1\">\n        <h2>Extrem schlechter Kontrast</h2>\n        <p>Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontrastverhältnis: ca. 1.6:1 (WCAG AA benötigt 4.5:1)</p>\n    </div>",
+          "<div class=\"poor-contrast-2\">\n        <h2>Gelber Text Problem</h2>\n        <p>Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1</p>\n    </div>",
+          "<div class=\"poor-contrast-3\">\n        <h2>Hellblauer Text</h2>\n        <p>Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältnis: ca. 2.4:1</p>\n    </div>",
+          "<div class=\"poor-contrast-4\">\n        <h2 style=\"color: #666666;\">Dunkle Links auf schwarzem Hintergrund</h2>\n        <p style=\"color: #888888;\">Diese <a href=\"#\">Links sind kaum sichtbar</a> auf schwarzem Hintergrund.</p>\n    </div>",
+          "<div class=\"poor-contrast-5\">\n        <h2>Orange auf Rot</h2>\n        <p>Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!</p>\n    </div>",
+          "<button class=\"poor-button\">Unsichtbarer Button</button>",
+          "<form class=\"poor-form\">\n        <h3 style=\"color: #cccccc;\">Formular mit schlechten Kontrasten</h3>\n        <label for=\"name\">Name (kaum sichtbar):</label><br>\n        <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"Eingabe kaum sichtbar\"><br><br>\n        \n        <label for=\"email\">E-Mail:</label><br>\n        <input type=\"email\" id=\"email\" name=\"email\"><br><br>\n    </form>",
+          "<nav class=\"poor-nav\">\n        <a href=\"#\">Home</a>\n        <a href=\"#\">Über uns</a>\n        <a href=\"#\">Kontakt</a>\n        <a href=\"#\">Service</a>\n    </nav>",
+          "<div class=\"poor-small-text\">\n        Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.\n    </div>",
+          "<div class=\"poor-gradient\">\n        <h3>Text auf Gradient Hintergrund</h3>\n        <p>Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.</p>\n    </div>",
+          "<footer style=\"background-color: #f9f9f9; color: #f2f2f2; padding: 20px; margin-top: 30px;\">\n        <p>Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.</p>\n        <p>Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzungen.</p>\n    </footer>"
+        ],
+        "textContent": "Text auf Gradient Hintergrund\n        Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(232, 232, 232)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      }
+    ],
+    "userImpact": {
+      "description": "Creates accessibility challenges",
+      "affectedUsers": "10-15% of users with disabilities",
+      "severity": "Noticeable difficulty but workarounds possible"
+    },
+    "technicalDetails": {
+      "ruleId": "region",
+      "axeVersion": "4.10.0",
+      "category": "Keyboard",
+      "automatable": true,
+      "elementCount": 10,
+      "testingMethod": "Automated accessibility testing with axe-core"
+    },
+    "fixSuggestions": {
+      "type": "manual-review",
+      "suggestion": "Review element and apply appropriate accessibility fixes",
+      "example": "See WCAG documentation for specific guidance"
+    }
+  }
+]

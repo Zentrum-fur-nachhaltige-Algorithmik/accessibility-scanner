@@ -1,0 +1,1055 @@
+[
+  {
+    "id": "element-0",
+    "selector": "html",
+    "tagName": "html",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 1473.8125,
+      "left": 0,
+      "top": 0,
+      "right": 800,
+      "bottom": 1473.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Test: Schlechte Farbkontraste (BAD)\n    \n        body {\n            font-family: Arial, sans-serif;\n",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-7",
+    "selector": "body",
+    "tagName": "body",
+    "bounds": {
+      "x": 20,
+      "y": 21.4375,
+      "width": 760,
+      "height": 1432.375,
+      "left": 20,
+      "top": 21.4375,
+      "right": 780,
+      "bottom": 1453.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)\n    \n    Diese Website enth",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-8",
+    "selector": "h1",
+    "tagName": "h1",
+    "bounds": {
+      "x": 20,
+      "y": 21.4375,
+      "width": 760,
+      "height": 74,
+      "left": 20,
+      "top": 21.4375,
+      "right": 780,
+      "bottom": 95.4375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Test Website: Schlechte Farbkontraste (SOLL ALS SCHLECHT ERKANNT WERDEN)",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-9",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 20,
+      "y": 116.875,
+      "width": 760,
+      "height": 18,
+      "left": 20,
+      "top": 116.875,
+      "right": 780,
+      "bottom": 134.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Diese Website enthält verschiedene Farbkontrast-Verletzungen, die von Phase6a erkannt werden sollten",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-10",
+    "selector": "div.poor-contrast-1:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 150.875,
+      "width": 760,
+      "height": 139.8125,
+      "left": 20,
+      "top": 150.875,
+      "right": 780,
+      "bottom": 290.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-contrast-1",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Extrem schlechter Kontrast\n        Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf w",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-11",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 30,
+      "y": 180.78125,
+      "width": 740,
+      "height": 28,
+      "left": 30,
+      "top": 180.78125,
+      "right": 770,
+      "bottom": 208.78125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Extrem schlechter Kontrast",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-12",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 30,
+      "y": 228.6875,
+      "width": 740,
+      "height": 36,
+      "left": 30,
+      "top": 228.6875,
+      "right": 770,
+      "bottom": 264.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Dieser Text ist fast unsichtbar - hellgrauer Text (#cccccc) auf weißem Hintergrund (#ffffff). Kontra",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-13",
+    "selector": "div.poor-contrast-2:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 300.6875,
+      "width": 760,
+      "height": 121.8125,
+      "left": 20,
+      "top": 300.6875,
+      "right": 780,
+      "bottom": 422.5
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-contrast-2",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Gelber Text Problem\n        Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhä",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-14",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 30,
+      "y": 330.59375,
+      "width": 740,
+      "height": 28,
+      "left": 30,
+      "top": 330.59375,
+      "right": 770,
+      "bottom": 358.59375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Gelber Text Problem",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-15",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 30,
+      "y": 378.5,
+      "width": 740,
+      "height": 18,
+      "left": 30,
+      "top": 378.5,
+      "right": 770,
+      "bottom": 396.5
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Gelber Text auf weißem Hintergrund ist sehr schwer lesbar. Kontrastverhältnis: ca. 1.1:1",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-16",
+    "selector": "div.poor-contrast-3:nth-child(3)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 432.5,
+      "width": 760,
+      "height": 139.8125,
+      "left": 20,
+      "top": 432.5,
+      "right": 780,
+      "bottom": 572.3125
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-contrast-3",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Hellblauer Text\n        Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Ko",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-17",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 30,
+      "y": 462.40625,
+      "width": 740,
+      "height": 28,
+      "left": 30,
+      "top": 462.40625,
+      "right": 770,
+      "bottom": 490.40625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Hellblauer Text",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-18",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 30,
+      "y": 510.3125,
+      "width": 740,
+      "height": 36,
+      "left": 30,
+      "top": 510.3125,
+      "right": 770,
+      "bottom": 546.3125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Dieser hellblaue Text (#87ceeb) auf weißem Hintergrund hat unzureichenden Kontrast. Kontrastverhältn",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-19",
+    "selector": "div.poor-contrast-4:nth-child(4)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 582.3125,
+      "width": 760,
+      "height": 121.8125,
+      "left": 20,
+      "top": 582.3125,
+      "right": 780,
+      "bottom": 704.125
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-contrast-4",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Dunkle Links auf schwarzem Hintergrund\n        Diese Links sind kaum sichtbar auf schwarzem Hintergr",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-20",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 30,
+      "y": 612.21875,
+      "width": 740,
+      "height": 28,
+      "left": 30,
+      "top": 612.21875,
+      "right": 770,
+      "bottom": 640.21875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Dunkle Links auf schwarzem Hintergrund",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-21",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 30,
+      "y": 660.125,
+      "width": 740,
+      "height": 18,
+      "left": 30,
+      "top": 660.125,
+      "right": 770,
+      "bottom": 678.125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Diese Links sind kaum sichtbar auf schwarzem Hintergrund.",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-22",
+    "selector": "a",
+    "tagName": "a",
+    "bounds": {
+      "x": 75.359375,
+      "y": 660.125,
+      "width": 175.1875,
+      "height": 17,
+      "left": 75.359375,
+      "top": 660.125,
+      "right": 250.546875,
+      "bottom": 677.125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Links sind kaum sichtbar",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-23",
+    "selector": "div.poor-contrast-5:nth-child(5)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 714.125,
+      "width": 760,
+      "height": 121.8125,
+      "left": 20,
+      "top": 714.125,
+      "right": 780,
+      "bottom": 835.9375
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-contrast-5",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Orange auf Rot\n        Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-24",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 30,
+      "y": 744.03125,
+      "width": 740,
+      "height": 28,
+      "left": 30,
+      "top": 744.03125,
+      "right": 770,
+      "bottom": 772.03125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Orange auf Rot",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-25",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 30,
+      "y": 791.9375,
+      "width": 740,
+      "height": 18,
+      "left": 30,
+      "top": 791.9375,
+      "right": 770,
+      "bottom": 809.9375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Orange Text auf rotem Hintergrund - sehr schlechte Lesbarkeit!",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-26",
+    "selector": "button.poor-button",
+    "tagName": "button",
+    "bounds": {
+      "x": 20,
+      "y": 855.9375,
+      "width": 157.796875,
+      "height": 35,
+      "left": 20,
+      "top": 855.9375,
+      "right": 177.796875,
+      "bottom": 890.9375
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-button",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Unsichtbarer Button",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-27",
+    "selector": "form.poor-form",
+    "tagName": "form",
+    "bounds": {
+      "x": 20,
+      "y": 919.65625,
+      "width": 760,
+      "height": 166.71875,
+      "left": 20,
+      "top": 919.65625,
+      "right": 780,
+      "bottom": 1086.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-form",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Formular mit schlechten Kontrasten\n        Name (kaum sichtbar):\n        \n        \n        E-Mail:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-28",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 20,
+      "y": 919.65625,
+      "width": 760,
+      "height": 22,
+      "left": 20,
+      "top": 919.65625,
+      "right": 780,
+      "bottom": 941.65625
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Formular mit schlechten Kontrasten",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-29",
+    "selector": "label:nth-child(1)",
+    "tagName": "label",
+    "bounds": {
+      "x": 20,
+      "y": 960.375,
+      "width": 161.828125,
+      "height": 17,
+      "left": 20,
+      "top": 960.375,
+      "right": 181.828125,
+      "bottom": 977.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Name (kaum sichtbar):",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-31",
+    "selector": "#name",
+    "tagName": "input",
+    "bounds": {
+      "x": 20,
+      "y": 978.375,
+      "width": 181,
+      "height": 27,
+      "left": 20,
+      "top": 978.375,
+      "right": 201,
+      "bottom": 1005.375
+    },
+    "attributes": {
+      "id": "name",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-34",
+    "selector": "label:nth-child(2)",
+    "tagName": "label",
+    "bounds": {
+      "x": 20,
+      "y": 1023.375,
+      "width": 49.78125,
+      "height": 17,
+      "left": 20,
+      "top": 1023.375,
+      "right": 69.78125,
+      "bottom": 1040.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "E-Mail:",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-36",
+    "selector": "#email",
+    "tagName": "input",
+    "bounds": {
+      "x": 20,
+      "y": 1041.375,
+      "width": 181,
+      "height": 27,
+      "left": 20,
+      "top": 1041.375,
+      "right": 201,
+      "bottom": 1068.375
+    },
+    "attributes": {
+      "id": "email",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-39",
+    "selector": "nav.poor-nav",
+    "tagName": "nav",
+    "bounds": {
+      "x": 20,
+      "y": 1086.375,
+      "width": 760,
+      "height": 38,
+      "left": 20,
+      "top": 1086.375,
+      "right": 780,
+      "bottom": 1124.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-nav",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Home\n        Über uns\n        Kontakt\n        Service",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-40",
+    "selector": "a:nth-child(1)",
+    "tagName": "a",
+    "bounds": {
+      "x": 30,
+      "y": 1096.375,
+      "width": 42.6875,
+      "height": 17,
+      "left": 30,
+      "top": 1096.375,
+      "right": 72.6875,
+      "bottom": 1113.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Home",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-41",
+    "selector": "a:nth-child(2)",
+    "tagName": "a",
+    "bounds": {
+      "x": 97.140625,
+      "y": 1096.375,
+      "width": 64.921875,
+      "height": 17,
+      "left": 97.140625,
+      "top": 1096.375,
+      "right": 162.0625,
+      "bottom": 1113.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Über uns",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-42",
+    "selector": "a:nth-child(3)",
+    "tagName": "a",
+    "bounds": {
+      "x": 186.515625,
+      "y": 1096.375,
+      "width": 54.265625,
+      "height": 17,
+      "left": 186.515625,
+      "top": 1096.375,
+      "right": 240.78125,
+      "bottom": 1113.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Kontakt",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-43",
+    "selector": "a:nth-child(4)",
+    "tagName": "a",
+    "bounds": {
+      "x": 265.234375,
+      "y": 1096.375,
+      "width": 53.359375,
+      "height": 17,
+      "left": 265.234375,
+      "top": 1096.375,
+      "right": 318.59375,
+      "bottom": 1113.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Service",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-44",
+    "selector": "div.poor-small-text:nth-child(6)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 1124.375,
+      "width": 760,
+      "height": 24,
+      "left": 20,
+      "top": 1124.375,
+      "right": 780,
+      "bottom": 1148.375
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-small-text",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Sehr kleiner Text mit schlechtem Kontrast - besonders problematisch bei kleinen Schriftgrößen.",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-45",
+    "selector": "div.poor-gradient:nth-child(7)",
+    "tagName": "div",
+    "bounds": {
+      "x": 20,
+      "y": 1158.375,
+      "width": 760,
+      "height": 123.4375,
+      "left": 20,
+      "top": 1158.375,
+      "right": 780,
+      "bottom": 1281.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "poor-gradient",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Text auf Gradient Hintergrund\n        Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontras",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-46",
+    "selector": "h3",
+    "tagName": "h3",
+    "bounds": {
+      "x": 35,
+      "y": 1192.09375,
+      "width": 730,
+      "height": 22,
+      "left": 35,
+      "top": 1192.09375,
+      "right": 765,
+      "bottom": 1214.09375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Text auf Gradient Hintergrund",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-47",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 35,
+      "y": 1232.8125,
+      "width": 730,
+      "height": 18,
+      "left": 35,
+      "top": 1232.8125,
+      "right": 765,
+      "bottom": 1250.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Dieser Text auf Gradient-Hintergrund hat inkonsistente Kontrastverhältnisse und ist schwer lesbar.",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-48",
+    "selector": "footer",
+    "tagName": "footer",
+    "bounds": {
+      "x": 20,
+      "y": 1311.8125,
+      "width": 760,
+      "height": 142,
+      "left": 20,
+      "top": 1311.8125,
+      "right": 780,
+      "bottom": 1453.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.\n        Diese ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-49",
+    "selector": "p:nth-child(1)",
+    "tagName": "p",
+    "bounds": {
+      "x": 40,
+      "y": 1347.8125,
+      "width": 720,
+      "height": 18,
+      "left": 40,
+      "top": 1347.8125,
+      "right": 760,
+      "bottom": 1365.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Footer mit extrem schlechtem Kontrast - fast weißer Text auf fast weißem Hintergrund.",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-50",
+    "selector": "p:nth-child(2)",
+    "tagName": "p",
+    "bounds": {
+      "x": 40,
+      "y": 1381.8125,
+      "width": 720,
+      "height": 36,
+      "left": 40,
+      "top": 1381.8125,
+      "right": 760,
+      "bottom": 1417.8125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Diese Website sollte von Phase6a als SCHLECHT erkannt werden aufgrund multipler Kontrast-Verletzunge",
+    "isVisible": true,
+    "zIndex": "auto"
+  }
+]

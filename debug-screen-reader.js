@@ -39,25 +39,48 @@ async function debugScreenReader() {
       if (result.headingStructure) {
         console.log(`\nHeading Structure:`);
         console.log(`  Total headings: ${result.headingStructure.totalHeadings}`);
-        console.log(`  Logical order: ${result.headingStructure.logicalOrder ? 'YES' : 'NO'}`);
-        if (result.headingStructure.violations?.length > 0) {
-          console.log(`  Heading violations: ${result.headingStructure.violations.length}`);
+        console.log(`  Structure valid: ${result.headingStructure.valid ? 'YES' : 'NO'}`);
+        console.log(`  H1 count: ${result.headingStructure.h1Count}`);
+        if (result.headingStructure.issues?.length > 0) {
+          console.log(`  Heading issues: ${result.headingStructure.issues.length}`);
+          result.headingStructure.issues.slice(0, 3).forEach((issue, i) => {
+            console.log(`    ${i + 1}. ${issue}`);
+          });
         }
       }
       
       // Analyze images
       if (result.images) {
         console.log(`\nImage Analysis:`);
-        console.log(`  Total images: ${result.images.totalImages}`);
-        console.log(`  Missing alt text: ${result.images.missingAlt?.length || 0}`);
-        console.log(`  Empty alt text: ${result.images.emptyAlt?.length || 0}`);
+        console.log(`  Total images: ${result.images.total}`);
+        console.log(`  With alt text: ${result.images.withAlt}`);
+        console.log(`  Decorative: ${result.images.decorative}`);
+        console.log(`  Problematic: ${result.images.problematic?.length || 0}`);
+        if (result.images.problematic?.length > 0) {
+          console.log(`  Image issues:`);
+          result.images.problematic.slice(0, 3).forEach((issue, i) => {
+            console.log(`    ${i + 1}. ${issue.issue} (${issue.severity})`);
+          });
+        }
       }
       
       // Analyze forms
       if (result.forms) {
         console.log(`\nForm Analysis:`);
         console.log(`  Total forms: ${result.forms.totalForms}`);
-        console.log(`  Unlabeled inputs: ${result.forms.unlabeledInputs?.length || 0}`);
+        console.log(`  Total inputs: ${result.forms.totalInputs}`);
+        console.log(`  Labels correct: ${result.forms.labelsCorrect ? 'YES' : 'NO'}`);
+        console.log(`  Error handling: ${result.forms.errorHandling ? 'YES' : 'NO'}`);
+        console.log(`  Required fields: ${result.forms.requiredFields?.length || 0}`);
+        if (result.forms.requiredFields?.length > 0) {
+          const unlabeled = result.forms.requiredFields.filter(f => f.issue === 'No associated label found');
+          if (unlabeled.length > 0) {
+            console.log(`  Unlabeled inputs: ${unlabeled.length}`);
+            unlabeled.slice(0, 2).forEach((field, i) => {
+              console.log(`    ${i + 1}. ${field.type} (${field.id || 'no ID'})`);
+            });
+          }
+        }
       }
       
       // Analyze landmarks
@@ -68,9 +91,11 @@ async function debugScreenReader() {
       }
       
       // Estimate pass/fail based on violations
-      const hasViolations = (result.headingStructure?.violations?.length > 0) ||
-                           (result.images?.missingAlt?.length > 0) ||
-                           (result.forms?.unlabeledInputs?.length > 0);
+      const hasImageViolations = result.images?.problematic?.length > 0;
+      const hasFormViolations = !result.forms?.labelsCorrect;
+      const hasHeadingViolations = !result.headingStructure?.valid;
+      
+      const hasViolations = hasImageViolations || hasFormViolations || hasHeadingViolations;
       
       const actualResult = hasViolations ? 'FAIL' : 'PASS';
       console.log(`\nEstimated Result: ${actualResult} (based on violations)`);

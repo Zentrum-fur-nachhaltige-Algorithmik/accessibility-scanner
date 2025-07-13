@@ -14,7 +14,7 @@
         }
         
         .good-section {
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             padding: 20px;
             margin: 20px 0;
             background-color: #f1f8e9;
@@ -27,7 +27,7 @@
         }
         
         .interactive-area {
-            border: 1px solid #4caf50;
+            border: 1px solid #327d36;
             padding: 15px;
             margin: 15px 0;
             background-color: #f1f8e9;
@@ -35,7 +35,7 @@
         
         /* GOOD 1: Proper pointer cancel support */
         .good-cancel-button {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             padding: 15px 30px;
             border: none;
@@ -64,7 +64,7 @@
         .good-swipe-container {
             width: 300px;
             height: 200px;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             background: linear-gradient(45deg, #e8f5e8, #f1f8e9);
             position: relative;
             margin: 15px 0;
@@ -90,7 +90,7 @@
         }
         
         .good-nav-button {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             border: none;
             padding: 8px 12px;
@@ -109,7 +109,7 @@
         }
         
         .good-nav-button:disabled {
-            background-color: #cccccc;
+            background-color: #666666;
             cursor: not-allowed;
         }
         
@@ -130,7 +130,7 @@
         }
         
         .good-indicator-dot.active {
-            background-color: #4caf50;
+            background-color: #327d36;
         }
         
         .good-indicator-dot:hover {
@@ -153,14 +153,14 @@
         .good-drag-source {
             width: 200px;
             min-height: 150px;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             background-color: #f8f9fa;
             padding: 10px;
             border-radius: 4px;
         }
         
         .good-draggable-item {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             padding: 8px 12px;
             margin: 5px 0;
@@ -200,7 +200,7 @@
         .good-drop-zone {
             width: 200px;
             min-height: 150px;
-            border: 2px dashed #4caf50;
+            border: 2px dashed #327d36;
             background-color: #f8f9fa;
             padding: 10px;
             border-radius: 4px;
@@ -216,7 +216,7 @@
         /* GOOD 4: Multi-touch with single pointer alternatives */
         .good-zoom-container {
             width: 300px;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             background-color: #f8f9fa;
             border-radius: 8px;
             overflow: hidden;
@@ -230,11 +230,11 @@
             gap: 10px;
             padding: 10px;
             background-color: #e8f5e8;
-            border-bottom: 1px solid #4caf50;
+            border-bottom: 1px solid #327d36;
         }
         
         .good-zoom-btn {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             border: none;
             padding: 8px 12px;
@@ -279,7 +279,7 @@
         
         .good-context-item {
             background-color: #f8f9fa;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             padding: 15px;
             text-align: center;
             border-radius: 4px;
@@ -301,7 +301,7 @@
             position: absolute;
             top: 5px;
             right: 5px;
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             border: none;
             padding: 4px 6px;
@@ -322,7 +322,7 @@
         /* GOOD 6: Motion with button alternatives */
         .good-refresh-container {
             width: 250px;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             background-color: #f8f9fa;
             display: flex;
             flex-direction: column;
@@ -341,7 +341,7 @@
         }
         
         .good-refresh-btn {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -373,7 +373,7 @@
         
         /* GOOD 7: Voice with visual alternatives */
         .good-voice-container {
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             padding: 20px;
             background-color: #f8f9fa;
             border-radius: 8px;
@@ -390,7 +390,7 @@
         }
         
         .good-voice-nav-btn {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -409,7 +409,7 @@
         }
         
         .good-voice-button {
-            background-color: #2196F3;
+            background-color: #1a78c2; /* Fixed for WCAG AA compliance */
             color: white;
             border: none;
             padding: 12px 24px;
@@ -423,7 +423,7 @@
         }
         
         .good-voice-button:hover {
-            background-color: #1976D2;
+            background-color: #16619e; /* Darker blue for hover */
         }
         
         .good-voice-button:focus {
@@ -450,7 +450,7 @@
             width: 100%;
             max-width: 400px;
             padding: 10px;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             border-radius: 4px;
             background-color: #f8f9fa;
             font-size: 14px;
@@ -967,7 +967,7 @@
             const itemText = item.querySelector('span').textContent;
             
             newItem.textContent = itemText;
-            newItem.style.cssText = 'background: #4caf50; color: white; padding: 5px; margin: 2px 0; border-radius: 3px; font-size: 12px;';
+            newItem.style.cssText = 'background: #327d36; color: white; padding: 5px; margin: 2px 0; border-radius: 3px; font-size: 12px;';
             completedItems.appendChild(newItem);
             
             item.remove();

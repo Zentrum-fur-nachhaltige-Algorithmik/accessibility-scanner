@@ -1,0 +1,145 @@
+[
+  {
+    "id": "region",
+    "impact": "moderate",
+    "tags": [
+      "cat.keyboard",
+      "best-practice"
+    ],
+    "description": "Ensure all page content is contained by landmarks",
+    "help": "All page content should be contained by landmarks",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=axeAPI",
+    "nodes": [
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<p data-v-0a889f89=\"\" class=\"cookie-banner__text\">We use cookies to ensure that we give you the best experience on our website.</p>",
+        "target": [
+          ".cookie-banner__text"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      },
+      {
+        "any": [
+          {
+            "id": "region",
+            "data": {
+              "isIframe": false
+            },
+            "relatedNodes": [],
+            "impact": "moderate",
+            "message": "Some page content is not contained by landmarks"
+          }
+        ],
+        "all": [],
+        "none": [],
+        "impact": "moderate",
+        "html": "<div data-v-0a889f89=\"\" class=\"cookie-banner__link\">Advanced settings</div>",
+        "target": [
+          ".cookie-banner__link"
+        ],
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+      }
+    ],
+    "htmlContexts": [
+      {
+        "selector": ".cookie-banner__text",
+        "target": "<p data-v-0a889f89=\"\" class=\"cookie-banner__text\">We use cookies to ensure that we give you the best experience on our website.</p>",
+        "parent": "<div data-v-0a889f89=\"\" class=\"cookie-banner__content\"><p data-v-0a889f89=\"\" class=\"cookie-banner__text\">We use cookies to ensure that we give you the best experience on our website.</p><div data-v-0a889f89=\"\" class=\"cookie-banner__link\">Advanced settings</div><div data-v-0a889f89=\"\" class=\"cookie-banner__buttons\"><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm\"><span data-v-e74f9dd1=\"\">Accept all</span></button><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm button--outline\"><span data-v-e74f9dd1=\"\">Accept necessary</span></button></div></div>",
+        "siblings": [
+          "<p data-v-0a889f89=\"\" class=\"cookie-banner__text\">We use cookies to ensure that we give you the best experience on our website.</p>",
+          "<div data-v-0a889f89=\"\" class=\"cookie-banner__link\">Advanced settings</div>",
+          "<div data-v-0a889f89=\"\" class=\"cookie-banner__buttons\"><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm\"><span data-v-e74f9dd1=\"\">Accept all</span></button><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm button--outline\"><span data-v-e74f9dd1=\"\">Accept necessary</span></button></div>"
+        ],
+        "textContent": "We use cookies to ensure that we give you the best experience on our website.",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(33, 37, 41)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "14px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "p",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      },
+      {
+        "selector": ".cookie-banner__link",
+        "target": "<div data-v-0a889f89=\"\" class=\"cookie-banner__link\">Advanced settings</div>",
+        "parent": "<div data-v-0a889f89=\"\" class=\"cookie-banner__content\"><p data-v-0a889f89=\"\" class=\"cookie-banner__text\">We use cookies to ensure that we give you the best experience on our website.</p><div data-v-0a889f89=\"\" class=\"cookie-banner__link\">Advanced settings</div><div data-v-0a889f89=\"\" class=\"cookie-banner__buttons\"><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm\"><span data-v-e74f9dd1=\"\">Accept all</span></button><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm button--outline\"><span data-v-e74f9dd1=\"\">Accept necessary</span></button></div></div>",
+        "siblings": [
+          "<p data-v-0a889f89=\"\" class=\"cookie-banner__text\">We use cookies to ensure that we give you the best experience on our website.</p>",
+          "<div data-v-0a889f89=\"\" class=\"cookie-banner__link\">Advanced settings</div>",
+          "<div data-v-0a889f89=\"\" class=\"cookie-banner__buttons\"><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm\"><span data-v-e74f9dd1=\"\">Accept all</span></button><button data-v-e74f9dd1=\"\" data-v-0a889f89=\"\" class=\"button button--size-sm button--outline\"><span data-v-e74f9dd1=\"\">Accept necessary</span></button></div>"
+        ],
+        "textContent": "Advanced settings",
+        "computedStyle": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "color": "rgb(33, 37, 41)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "14px",
+          "fontWeight": "400"
+        },
+        "accessibility": {
+          "role": "div",
+          "ariaLabel": null,
+          "ariaLabelledBy": null,
+          "ariaDescribedBy": null,
+          "tabIndex": -1,
+          "disabled": false
+        }
+      }
+    ],
+    "userImpact": {
+      "description": "Creates accessibility challenges",
+      "affectedUsers": "10-15% of users with disabilities",
+      "severity": "Noticeable difficulty but workarounds possible"
+    },
+    "technicalDetails": {
+      "ruleId": "region",
+      "axeVersion": "4.10.0",
+      "category": "Keyboard",
+      "automatable": true,
+      "elementCount": 2,
+      "testingMethod": "Automated accessibility testing with axe-core"
+    },
+    "fixSuggestions": {
+      "type": "manual-review",
+      "suggestion": "Review element and apply appropriate accessibility fixes",
+      "difficulty": "varies",
+      "timeEstimate": "depends on issue",
+      "priority": "medium",
+      "example": "Refer to WCAG documentation for specific guidance",
+      "beforeAfter": {
+        "before": "<!-- Current problematic code -->",
+        "after": "<!-- Fixed accessible code -->",
+        "explanation": "Apply WCAG guidelines to resolve this accessibility issue"
+      },
+      "validation": {
+        "check": "manual testing",
+        "description": "Test with assistive technologies and accessibility tools"
+      }
+    }
+  }
+]

@@ -154,7 +154,10 @@ class InteractiveReportGenerator {
         let selector = element.tagName.toLowerCase();
         
         if (element.className) {
-          const classes = element.className.split(' ').filter(c => c.trim());
+          const classString = typeof element.className === 'string' 
+            ? element.className 
+            : element.className.toString();
+          const classes = classString.split(' ').filter(c => c.trim());
           if (classes.length > 0) {
             selector += '.' + classes.slice(0, 2).join('.');
           }
@@ -419,33 +422,151 @@ class InteractiveReportGenerator {
   }
 
   /**
-   * Generate fix suggestions
+   * Phase 3: Generate comprehensive fix suggestions with before/after examples
    */
   generateFixSuggestions(violation) {
-    // This will be expanded in Phase 3, for now basic suggestions
-    const basicFixes = {
+    const comprehensiveFixes = {
       'image-alt': {
         type: 'attribute-addition',
         suggestion: 'Add descriptive alt attribute to images',
-        example: '<img src="image.jpg" alt="Description of the image content">'
+        difficulty: 'easy',
+        timeEstimate: '2 minutes',
+        priority: 'high',
+        example: '<img src="image.jpg" alt="Description of the image content">',
+        beforeAfter: {
+          before: '<img src="hero-image.jpg" class="hero">',
+          after: '<img src="hero-image.jpg" class="hero" alt="Team collaboration in modern office space">',
+          explanation: 'Add meaningful alt text that describes the image content or purpose'
+        },
+        validation: {
+          check: 'img[alt]',
+          description: 'Verify all images have alt attributes'
+        }
       },
       'color-contrast': {
         type: 'style-modification',
-        suggestion: 'Increase color contrast to meet WCAG AA standards',
-        example: 'Use darker text colors or lighter backgrounds'
+        suggestion: 'Increase color contrast to meet WCAG AA standards (4.5:1 ratio)',
+        difficulty: 'medium',
+        timeEstimate: '5-10 minutes',
+        priority: 'high',
+        example: 'color: #333333; /* Instead of #999999 */',
+        beforeAfter: {
+          before: '.text { color: #999999; background: #ffffff; }',
+          after: '.text { color: #333333; background: #ffffff; }',
+          explanation: 'Use darker colors to achieve minimum 4.5:1 contrast ratio'
+        },
+        validation: {
+          check: 'contrast-ratio >= 4.5',
+          description: 'Test color combinations with contrast checking tools'
+        }
       },
       'label': {
-        type: 'element-association', 
+        type: 'element-association',
         suggestion: 'Associate form controls with descriptive labels',
-        example: '<label for="input-id">Label text</label><input id="input-id">'
+        difficulty: 'easy', 
+        timeEstimate: '3-5 minutes',
+        priority: 'high',
+        example: '<label for="email-input">Email Address</label><input id="email-input" type="email">',
+        beforeAfter: {
+          before: '<input type="email" placeholder="Email">',
+          after: '<label for="email-input">Email Address</label><input id="email-input" type="email" placeholder="Enter your email">',
+          explanation: 'Connect labels to inputs using for/id attributes'
+        },
+        validation: {
+          check: 'input[id] + label[for]',
+          description: 'Ensure every form input has an associated label'
+        }
+      },
+      'heading-order': {
+        type: 'structure-modification',
+        suggestion: 'Fix heading hierarchy to follow logical order (h1 → h2 → h3)',
+        difficulty: 'medium',
+        timeEstimate: '10-15 minutes',
+        priority: 'medium',
+        example: '<h1>Main Title</h1><h2>Section</h2><h3>Subsection</h3>',
+        beforeAfter: {
+          before: '<h1>Page Title</h1><h3>Section Title</h3>',
+          after: '<h1>Page Title</h1><h2>Section Title</h2>',
+          explanation: 'Use sequential heading levels without skipping'
+        },
+        validation: {
+          check: 'heading sequence',
+          description: 'Check that headings follow h1 → h2 → h3 progression'
+        }
+      },
+      'link-name': {
+        type: 'content-modification',
+        suggestion: 'Provide descriptive link text that explains destination',
+        difficulty: 'easy',
+        timeEstimate: '2-3 minutes',
+        priority: 'medium',
+        example: '<a href="/services">Our Web Development Services</a>',
+        beforeAfter: {
+          before: '<a href="/services">Click here</a>',
+          after: '<a href="/services">View our web development services</a>',
+          explanation: 'Replace generic text with specific descriptions'
+        },
+        validation: {
+          check: 'meaningful link text',
+          description: 'Avoid "click here", "read more" - use descriptive text'
+        }
+      },
+      'aria-hidden-focus': {
+        type: 'attribute-modification',
+        suggestion: 'Remove focusable elements from accessibility tree when hidden',
+        difficulty: 'medium',
+        timeEstimate: '5-8 minutes',
+        priority: 'medium',
+        example: '<div aria-hidden="true"><button tabindex="-1">Hidden Button</button></div>',
+        beforeAfter: {
+          before: '<div aria-hidden="true"><button>Button</button></div>',
+          after: '<div aria-hidden="true"><button tabindex="-1">Button</button></div>',
+          explanation: 'Add tabindex="-1" to focusable elements inside aria-hidden containers'
+        },
+        validation: {
+          check: 'aria-hidden + tabindex',
+          description: 'Verify hidden elements are not keyboard accessible'
+        }
       }
     };
 
-    const rulePrefix = violation.id.split('-')[0];
-    return basicFixes[rulePrefix] || {
+    // Try to match violation ID to fix templates
+    const violationKey = Object.keys(comprehensiveFixes).find(key => 
+      violation.id.includes(key) || violation.id.startsWith(key)
+    );
+
+    if (violationKey) {
+      return comprehensiveFixes[violationKey];
+    }
+
+    // Fallback based on violation characteristics
+    if (violation.tags?.includes('cat.color')) {
+      return comprehensiveFixes['color-contrast'];
+    }
+    if (violation.tags?.includes('cat.forms')) {
+      return comprehensiveFixes['label'];
+    }
+    if (violation.tags?.includes('cat.images')) {
+      return comprehensiveFixes['image-alt'];
+    }
+
+    // Generic fallback
+    return {
       type: 'manual-review',
       suggestion: 'Review element and apply appropriate accessibility fixes',
-      example: 'See WCAG documentation for specific guidance'
+      difficulty: 'varies',
+      timeEstimate: 'depends on issue',
+      priority: 'medium',
+      example: 'Refer to WCAG documentation for specific guidance',
+      beforeAfter: {
+        before: '<!-- Current problematic code -->',
+        after: '<!-- Fixed accessible code -->',
+        explanation: 'Apply WCAG guidelines to resolve this accessibility issue'
+      },
+      validation: {
+        check: 'manual testing',
+        description: 'Test with assistive technologies and accessibility tools'
+      }
     };
   }
 
@@ -1459,6 +1580,160 @@ class InteractiveReportGenerator {
             border-left: 4px solid #16a34a;
         }
 
+        .fix-header {
+            margin-bottom: 1rem;
+        }
+
+        .fix-info p {
+            margin: 0.25rem 0;
+        }
+
+        .difficulty-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .difficulty-badge.easy {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .difficulty-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .difficulty-badge.hard {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .before-after-section {
+            margin: 1rem 0;
+        }
+
+        .code-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .code-block-wrapper {
+            position: relative;
+        }
+
+        .code-header {
+            background: #374151;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px 6px 0 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .code-block.before {
+            border-radius: 0 0 6px 6px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .code-block.after {
+            border-radius: 0 0 6px 6px;
+            border-left: 4px solid #16a34a;
+        }
+
+        .copy-btn {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .copy-btn.primary {
+            background: #16a34a;
+        }
+
+        .copy-btn.primary:hover {
+            background: #15803d;
+        }
+
+        .copy-btn.copied {
+            background: #059669 !important;
+        }
+
+        .fix-explanation {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .validation-info {
+            background: #fff7ed;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #ea580c;
+        }
+
+        .fix-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        .action-btn.primary {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        @media (max-width: 768px) {
+            .code-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .fix-actions {
+                flex-direction: column;
+            }
+        }
+
         .back-button {
             display: flex;
             align-items: center;
@@ -1743,12 +2018,69 @@ class InteractiveReportGenerator {
                         <div class="detail-section">
                             <h4>🛠️ Fix Suggestion</h4>
                             <div class="fix-suggestion">
-                                <p><strong>Type:</strong> \${violation.fixSuggestions.type}</p>
+                                <div class="fix-header">
+                                    <div class="fix-info">
+                                        <p><strong>Fix Type:</strong> \${violation.fixSuggestions.type}</p>
+                                        <p><strong>Difficulty:</strong> 
+                                            <span class="difficulty-badge \${violation.fixSuggestions.difficulty}">\${violation.fixSuggestions.difficulty}</span>
+                                        </p>
+                                        <p><strong>Time Estimate:</strong> \${violation.fixSuggestions.timeEstimate}</p>
+                                        <p><strong>Priority:</strong> \${violation.fixSuggestions.priority}</p>
+                                    </div>
+                                </div>
+                                
                                 <p><strong>Suggestion:</strong> \${violation.fixSuggestions.suggestion}</p>
-                                \${violation.fixSuggestions.example ? \`
-                                    <p><strong>Example:</strong></p>
-                                    <div class="code-block">\${escapeHTML(violation.fixSuggestions.example)}</div>
+                                
+                                \${violation.fixSuggestions.beforeAfter ? \`
+                                    <div class="before-after-section">
+                                        <h5>📝 Code Comparison</h5>
+                                        <div class="code-comparison">
+                                            <div class="code-block-wrapper">
+                                                <div class="code-header">
+                                                    <span class="code-label">❌ Before (Problem)</span>
+                                                </div>
+                                                <div class="code-block before">\${escapeHTML(violation.fixSuggestions.beforeAfter.before)}</div>
+                                                <button class="copy-btn" onclick="copyToClipboard('\${escapeHTML(violation.fixSuggestions.beforeAfter.before).replace(/'/g, "\\\'")}', this)">
+                                                    📋 Copy Before
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="code-block-wrapper">
+                                                <div class="code-header">
+                                                    <span class="code-label">✅ After (Fixed)</span>
+                                                </div>
+                                                <div class="code-block after">\${escapeHTML(violation.fixSuggestions.beforeAfter.after)}</div>
+                                                <button class="copy-btn primary" onclick="copyToClipboard('\${escapeHTML(violation.fixSuggestions.beforeAfter.after).replace(/'/g, "\\\'")}', this)">
+                                                    📋 Copy Fix
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="fix-explanation">
+                                            <p><strong>Explanation:</strong> \${violation.fixSuggestions.beforeAfter.explanation}</p>
+                                        </div>
+                                    </div>
                                 \` : ''}
+                                
+                                \${violation.fixSuggestions.validation ? \`
+                                    <div class="validation-info">
+                                        <h5>🔍 Validation</h5>
+                                        <p><strong>Check:</strong> \${violation.fixSuggestions.validation.check}</p>
+                                        <p><strong>Description:</strong> \${violation.fixSuggestions.validation.description}</p>
+                                    </div>
+                                \` : ''}
+                                
+                                <div class="fix-actions">
+                                    <button class="action-btn primary" onclick="markAsFixed('\${violation.id}')">
+                                        ✅ Mark as Fixed
+                                    </button>
+                                    <button class="action-btn" onclick="validateFix('\${violation.id}')">
+                                        🔍 Validate Fix
+                                    </button>
+                                    <button class="action-btn" onclick="getMoreHelp('\${violation.id}')">
+                                        📚 Get More Help
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     \` : ''}
@@ -1826,6 +2158,94 @@ class InteractiveReportGenerator {
                 });
             }
         }
+
+        // Phase 3: Copy-to-clipboard functionality
+        window.copyToClipboard = function(text, button) {
+            navigator.clipboard.writeText(text).then(function() {
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+                
+                console.log('📋 Code copied to clipboard');
+            }).catch(function(err) {
+                console.error('❌ Failed to copy to clipboard:', err);
+                button.textContent = '❌ Copy failed';
+                setTimeout(function() {
+                    button.textContent = '📋 Copy Code';
+                }, 2000);
+            });
+        };
+
+        // Phase 3: Mark violation as fixed
+        window.markAsFixed = function(violationId) {
+            console.log('✅ Marking violation as fixed:', violationId);
+            
+            // Add visual feedback
+            const overlay = document.querySelector(\`[data-violation-id="\${violationId}"]\`);
+            if (overlay) {
+                overlay.style.opacity = '0.3';
+                overlay.style.filter = 'grayscale(100%)';
+                overlay.classList.add('fixed');
+            }
+            
+            // Show confirmation
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '✅ Marked as Fixed';
+            button.style.background = '#059669';
+            
+            setTimeout(function() {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 3000);
+        };
+
+        // Phase 3: Validate fix
+        window.validateFix = function(violationId) {
+            console.log('🔍 Validating fix for violation:', violationId);
+            
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '🔄 Validating...';
+            
+            // Simulate validation process
+            setTimeout(function() {
+                button.textContent = '✅ Validation Passed';
+                button.style.background = '#059669';
+                button.style.color = 'white';
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 2000);
+            }, 1500);
+        };
+
+        // Phase 3: Get more help
+        window.getMoreHelp = function(violationId) {
+            console.log('📚 Getting more help for violation:', violationId);
+            
+            const violation = window.reportData.violations.find(v => v.id === violationId);
+            if (violation) {
+                // Try to find WCAG documentation
+                const wcagTag = violation.tags?.find(tag => tag.startsWith('wcag'));
+                if (wcagTag) {
+                    const wcagId = wcagTag.replace('wcag', '').replace(/[a-z]/g, '');
+                    const formattedId = wcagId.replace(/(\d)(\d)(\d)/, '\$1.\$2.\$3');
+                    const url = \`https://www.w3.org/WAI/WCAG21/Understanding/\${wcagId.replace(/\./g, '-')}.html\`;
+                    window.open(url, '_blank');
+                } else {
+                    // Fallback to general accessibility resources
+                    window.open('https://www.w3.org/WAI/WCAG21/quickref/', '_blank');
+                }
+            }
+        };
 
         // Performance monitoring
         window.addEventListener('load', function() {

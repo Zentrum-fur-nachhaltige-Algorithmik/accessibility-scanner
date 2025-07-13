@@ -1,0 +1,96 @@
+{
+  "id": "514ebec8-06a1-4ed9-97f7-65f3924a199a",
+  "timestamp": "2025-07-13T12:09:47.799Z",
+  "url": "https://beeproduced.com",
+  "accessibilityScore": 97,
+  "violations": [
+    {
+      "id": "region",
+      "impact": "moderate",
+      "description": "Ensure all page content is contained by landmarks",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=axeAPI",
+      "nodes": [
+        ".cookie-banner__text",
+        ".cookie-banner__link"
+      ],
+      "wcagCriteria": []
+    }
+  ],
+  "passes": 35,
+  "pageTitle": "bee produced | The B2B marketplace for electronics manufacturing in Europe | bee produced",
+  "wcagCompliance": {
+    "level": "AA",
+    "criteria": []
+  },
+  "categories": {
+    "perceivable": {
+      "score": 100,
+      "violations": 0,
+      "passes": 0
+    },
+    "operable": {
+      "score": 100,
+      "violations": 0,
+      "passes": 0
+    },
+    "understandable": {
+      "score": 100,
+      "violations": 0,
+      "passes": 0
+    },
+    "robust": {
+      "score": 0,
+      "violations": 1,
+      "passes": 0
+    }
+  },
+  "pa11yIssues": [
+    {
+      "code": "WCAG2AA.Principle1.Guideline1_1.1_1_1.H30.2",
+      "type": "error",
+      "typeCode": 1,
+      "message": "Img element is the only content of the link, but is missing alt text. The alt text should describe the purpose of the link.",
+      "context": "<a aria-current=\"page\" href=\"/\" class=\"router-link-active router-link-exact-active\" aria-label=\"Home\"><img onerror=\"this.setAttribute...</a>",
+      "selector": "#appHeader > div > div:nth-child(1) > a",
+      "runner": "htmlcs",
+      "runnerExtras": {}
+    },
+    {
+      "code": "WCAG2AA.Principle4.Guideline4_1.4_1_2.H91.InputEmail.Name",
+      "type": "error",
+      "typeCode": 1,
+      "message": "This emailinput element does not have a name available to an accessibility API. Valid names are: label element, title undefined, aria-label undefined, aria-labelledby undefined.",
+      "context": "<input value=\"\" type=\"email\" placeholder=\"E-mail\" required=\"\" data-v-9ac491c1=\"\">",
+      "selector": "#__nuxt > div > div:nth-child(1) > footer > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > form > input",
+      "runner": "htmlcs",
+      "runnerExtras": {}
+    },
+    {
+      "code": "WCAG2AA.Principle2.Guideline2_4.2_4_1.H64.1",
+      "type": "error",
+      "typeCode": 1,
+      "message": "Iframe element requires a non-empty title attribute that identifies the frame.",
+      "context": "<iframe height=\"0\" width=\"0\" style=\"display: none; visibility: hidden;\"></iframe>",
+      "selector": "html > body > iframe",
+      "runner": "htmlcs",
+      "runnerExtras": {}
+    }
+  ],
+  "scanOptions": {
+    "wcagLevel": "AA",
+    "includeWarnings": true,
+    "testKeyboardNav": false,
+    "includePhase6A": false,
+    "includePhase6B": false,
+    "includePhase6D": false,
+    "includePhase6E": false,
+    "includePhase6F": false,
+    "timeout": 30000,
+    "includePDF": true
+  },
+  "metadata": {
+    "generatedBy": "Web Accessibility Checker v3.0",
+    "format": "both",
+    "includePDF": true
+  }
+}

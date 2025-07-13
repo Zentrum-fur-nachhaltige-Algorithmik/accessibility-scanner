@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Pointer Cancellation Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Up event actions with cancellation */
+        .good-up-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: background-color 0.2s;
+            /* GUT: Aktion passiert bei mouseup/touchend mit Abbruch-Möglichkeit */
+        }
+        
+        .good-up-button:active {
+            background-color: #388e3c;
+        }
+        
+        .good-up-button.pressed {
+            background-color: #2e7d32;
+            transform: translateY(1px);
+        }
+        
+        /* GOOD 2: Drag and drop with cancellation and undo */
+        .good-drag-container {
+            border: 2px dashed #4caf50;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 100px;
+            background-color: #f1f8e9;
+        }
+        
+        .good-drag-item {
+            background-color: #007cba;
+            color: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: move;
+            display: inline-block;
+            user-select: none;
+            transition: opacity 0.2s;
+            /* GUT: Drag mit Abbruch und Undo */
+        }
+        
+        .good-drag-item.dragging {
+            opacity: 0.7;
+        }
+        
+        .good-drop-zone {
+            border: 2px dashed #ff9800;
+            padding: 20px;
+            margin: 10px 0;
+            min-height: 80px;
+            background-color: #fff3e0;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        
+        .good-drop-zone.drag-over {
+            background-color: #ffe0b2;
+            border-color: #f57c00;
+        }
+        
+        .confirmation-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .confirmation-buttons {
+            margin-top: 15px;
+            text-align: right;
+        }
+        
+        .confirmation-buttons button {
+            margin-left: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .confirm-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .cancel-btn {
+            background-color: #757575;
+            color: white;
+        }
+        
+        /* GOOD 3: Swipe with confirmation and undo */
+        .good-swipe-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .good-swipe-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            /* GUT: Swipe mit Bestätigung und Undo */
+        }
+        
+        .good-swipe-item.swipe-ready {
+            background-color: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .good-swipe-item .swipe-actions {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background-color: #f44336;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+        
+        .good-swipe-item.swipe-ready .swipe-actions {
+            transform: translateX(0);
+        }
+        
+        .undo-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .undo-notification button {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            margin-left: 15px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        /* GOOD 4: Context menu with escape */
+        .good-context-area {
+            background-color: #e3f2fd;
+            padding: 30px;
+            margin: 15px 0;
+            position: relative;
+            border: 1px solid #90caf9;
+            border-radius: 4px;
+            /* GUT: Kontext-Menu mit Escape und Bestätigung */
+        }
+        
+        .good-context-menu {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+            min-width: 200px;
+        }
+        
+        .good-context-menu .menu-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .good-context-menu .menu-item:hover,
+        .good-context-menu .menu-item:focus {
+            background-color: #f5f5f5;
+            outline: 2px solid #007cba;
+            outline-offset: -2px;
+        }
+        
+        .good-context-menu .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .good-context-menu .menu-item.dangerous {
+            color: #d32f2f;
+        }
+        
+        .good-context-menu .confirmation-note {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* GOOD 5: Slider with reset capability */
+        .good-slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        .good-slider {
+            width: 100%;
+            height: 30px;
+            background-color: #ddd;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            /* GUT: Slider mit Reset-Funktion */
+        }
+        
+        .good-slider-handle {
+            width: 30px;
+            height: 30px;
+            background-color: #007cba;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            cursor: grab;
+            transition: left 0.2s;
+        }
+        
+        .good-slider-handle:active {
+            cursor: grabbing;
+        }
+        
+        .good-slider-handle.dragging {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+        
+        .slider-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .slider-controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .reset-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .apply-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .cancel-btn {
+            background-color: #757575;
+            color: white;
+        }
+        
+        /* GOOD 6: Drawing with undo */
+        .good-drawing-container {
+            position: relative;
+        }
+        
+        .good-drawing-canvas {
+            border: 1px solid #ccc;
+            cursor: crosshair;
+            background-color: white;
+            margin: 15px 0;
+            /* GUT: Zeichnen mit Undo-Stack */
+        }
+        
+        .drawing-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .drawing-controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .undo-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        .undo-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .clear-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        /* GOOD 7: File upload with confirmation */
+        .good-upload-area {
+            border: 2px dashed #007cba;
+            padding: 40px;
+            text-align: center;
+            margin: 15px 0;
+            cursor: pointer;
+            background-color: #f0f8ff;
+            transition: all 0.2s;
+            /* GUT: Upload mit Bestätigung und Abbruch */
+        }
+        
+        .good-upload-area.dragover {
+            background-color: #e3f2fd;
+            border-color: #1976d2;
+        }
+        
+        .upload-preview {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border: 1px solid #ff9800;
+        }
+        
+        .file-list {
+            margin: 10px 0;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .upload-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        /* GOOD 8: Safe destructive actions */
+        .good-destructive-button {
+            background-color: #f44336;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 14px;
+            transition: all 0.2s;
+            /* GUT: Destruktive Aktionen mit Bestätigung */
+        }
+        
+        .good-destructive-button:hover {
+            background-color: #d32f2f;
+        }
+        
+        .good-destructive-button.pressed {
+            background-color: #b71c1c;
+            transform: translateY(1px);
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e8f5e8;
+            border-radius: 4px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Pointer Cancellation Accessible (GOOD)</h1>
+    <p><strong>WCAG 2.5.2 Konforme Implementierung:</strong> Pointer-Events mit vollständiger Abbruch- und Undo-Funktionalität</p>
+    
+    <!-- GOOD 1: Up event actions with cancellation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Aktionen bei Up-Event mit Abbruch-Möglichkeit</div>
+        <p><strong>Lösung:</strong> Aktionen passieren bei mouseup/touchend, können durch Wegbewegen abgebrochen werden</p>
+        <div class="interactive-area">
+            <button class="good-up-button" 
+                    onmousedown="goodButtonDown(this)"
+                    onmouseup="goodButtonUp(this)"
+                    onmouseleave="goodButtonCancel(this)"
+                    ontouchstart="goodButtonDown(this)"
+                    ontouchend="goodButtonUp(this)"
+                    ontouchcancel="goodButtonCancel(this)">
+                Sicherer Button (Up-Event)
+            </button>
+            <div id="upStatus" class="status-display">Status: Bereit - Aktion passiert erst beim Loslassen!</div>
+            <p>✅ Benutzer können Aktion abbrechen indem sie den Finger/Maus wegbewegen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Drag and drop with confirmation and undo -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Drag & Drop mit Bestätigung und Undo</div>
+        <p><strong>Lösung:</strong> Bestätigungsdialog vor kritischen Aktionen, Undo-Funktion verfügbar</p>
+        <div class="interactive-area">
+            <div class="good-drag-container">
+                <div class="good-drag-item" draggable="true" 
+                     ondragstart="goodDragStart(event)" 
+                     ondragend="goodDragEnd(event)">
+                    Wichtiges Dokument A
+                </div>
+                <div class="good-drag-item" draggable="true" 
+                     ondragstart="goodDragStart(event)" 
+                     ondragend="goodDragEnd(event)">
+                    Kritische Datei B
+                </div>
+                <div class="good-drag-item" draggable="true" 
+                     ondragstart="goodDragStart(event)" 
+                     ondragend="goodDragEnd(event)">
+                    System Config C
+                </div>
+            </div>
+            
+            <div class="good-drop-zone" 
+                 ondragover="goodAllowDrop(event)" 
+                 ondragleave="goodDragLeave(event)"
+                 ondrop="goodDrop(event)">
+                🗑️ LÖSCHEN - Drop Zone (mit Bestätigung)
+            </div>
+            
+            <div id="dragStatus" class="status-display">Status: Dateien können sicher hierher gezogen werden - Bestätigung erforderlich!</div>
+            
+            <!-- Confirmation Dialog -->
+            <div id="deleteConfirmation" class="confirmation-dialog" role="dialog" aria-labelledby="delete-title" aria-modal="true">
+                <h3 id="delete-title">Löschung bestätigen</h3>
+                <p id="delete-message">Möchten Sie diese Datei wirklich löschen?</p>
+                <div class="confirmation-buttons">
+                    <button class="cancel-btn" onclick="cancelDelete()">Abbrechen</button>
+                    <button class="confirm-btn" onclick="confirmDelete()">Löschen</button>
+                </div>
+            </div>
+            
+            <p>✅ Versehentliche Drops erfordern Bestätigung, gelöschte Dateien können wiederhergestellt werden</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Swipe with confirmation and undo -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Swipe-Gesten mit Bestätigung und Undo</div>
+        <p><strong>Lösung:</strong> Swipe zeigt Aktionen an, erfordert explizite Bestätigung</p>
+        <div class="interactive-area">
+            <p>Swipe nach links für Aktionen (auf Touchscreen) oder Doppelklick:</p>
+            <ul class="good-swipe-list">
+                <li class="good-swipe-item" 
+                    ondblclick="goodSwipeReveal(this)"
+                    ontouchstart="goodTouchStart(event, this)"
+                    ontouchmove="goodTouchMove(event, this)"
+                    ontouchend="goodTouchEnd(event, this)">
+                    📧 Wichtige E-Mail von Chef
+                    <div class="swipe-actions">
+                        <button onclick="goodSwipeDelete(this)">Löschen</button>
+                    </div>
+                </li>
+                <li class="good-swipe-item" 
+                    ondblclick="goodSwipeReveal(this)"
+                    ontouchstart="goodTouchStart(event, this)"
+                    ontouchmove="goodTouchMove(event, this)"
+                    ontouchend="goodTouchEnd(event, this)">
+                    📋 Jahresplan 2024
+                    <div class="swipe-actions">
+                        <button onclick="goodSwipeDelete(this)">Löschen</button>
+                    </div>
+                </li>
+                <li class="good-swipe-item" 
+                    ondblclick="goodSwipeReveal(this)"
+                    ontouchstart="goodTouchStart(event, this)"
+                    ontouchmove="goodTouchMove(event, this)"
+                    ontouchend="goodTouchEnd(event, this)">
+                    💰 Gehaltsabrechnung Dezember
+                    <div class="swipe-actions">
+                        <button onclick="goodSwipeDelete(this)">Löschen</button>
+                    </div>
+                </li>
+                <li class="good-swipe-item" 
+                    ondblclick="goodSwipeReveal(this)"
+                    ontouchstart="goodTouchStart(event, this)"
+                    ontouchmove="goodTouchMove(event, this)"
+                    ontouchend="goodTouchEnd(event, this)">
+                    🏠 Mietvertrag Dokumente
+                    <div class="swipe-actions">
+                        <button onclick="goodSwipeDelete(this)">Löschen</button>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- Undo Notification -->
+            <div id="undoNotification" class="undo-notification">
+                <span id="undoMessage">Element gelöscht</span>
+                <button onclick="undoLastAction()">Rückgängig</button>
+            </div>
+            
+            <p>✅ Swipe zeigt nur Aktionen an, expliziter Klick erforderlich, Undo verfügbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Context menu with escape and confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Kontext-Menu mit Escape und Bestätigung</div>
+        <p><strong>Lösung:</strong> Gefährliche Aktionen erfordern Bestätigung, Menu kann mit Escape geschlossen werden</p>
+        <div class="interactive-area">
+            <div class="good-context-area" oncontextmenu="showGoodContextMenu(event)">
+                <p>Rechtsklick hier für sicheres Kontext-Menu (oder Länger-Tap auf Mobile)</p>
+                <p>✅ Gefährliche Aktionen erfordern Bestätigung!</p>
+                
+                <div id="goodContextMenu" class="good-context-menu" role="menu">
+                    <div class="menu-item" tabindex="0" role="menuitem" onclick="goodContextAction('info')">
+                        ℹ️ Information anzeigen
+                    </div>
+                    <div class="menu-item" tabindex="0" role="menuitem" onclick="goodContextAction('edit')">
+                        ✏️ Bearbeiten
+                    </div>
+                    <div class="menu-item dangerous" tabindex="0" role="menuitem" onclick="confirmContextAction('delete')">
+                        🗑️ Alle Daten löschen
+                        <span class="confirmation-note">Bestätigung erforderlich</span>
+                    </div>
+                    <div class="menu-item dangerous" tabindex="0" role="menuitem" onclick="confirmContextAction('reset')">
+                        🔄 System zurücksetzen
+                        <span class="confirmation-note">Bestätigung erforderlich</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="contextStatus" class="status-display">Status: Rechtsklick für sicheres Menu mit Bestätigungen</div>
+            <p>✅ Gefährliche Aktionen erfordern explizite Bestätigung, Menu kann mit Escape geschlossen werden</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Slider with reset and confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Slider mit Reset-Funktion und Bestätigung</div>
+        <p><strong>Lösung:</strong> Slider-Änderungen können zurückgesetzt werden, Anwendung erfordert Bestätigung</p>
+        <div class="interactive-area">
+            <div class="good-slider-container">
+                <label for="goodSlider">Kritische System-Einstellung (mit Reset):</label>
+                <div class="good-slider" id="goodSlider" role="slider" 
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+                     onclick="goodSliderClick(event)">
+                    <div class="good-slider-handle" style="left: 50%" 
+                         onmousedown="goodSliderMouseDown(event)"
+                         ontouchstart="goodSliderTouchStart(event)"
+                         tabindex="0"
+                         onkeydown="goodSliderKeyDown(event)"></div>
+                </div>
+                <div id="sliderValue" class="status-display">Wert: 50% (Original: 50%) - Änderungen nicht gespeichert</div>
+                
+                <div class="slider-controls">
+                    <button class="reset-btn" onclick="resetSlider()">Zurücksetzen</button>
+                    <button class="apply-btn" onclick="applySliderValue()">Anwenden</button>
+                    <button class="cancel-btn" onclick="cancelSliderChanges()">Abbrechen</button>
+                </div>
+            </div>
+            <p>✅ Slider-Änderungen können jederzeit zurückgesetzt oder abgebrochen werden</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Drawing with comprehensive undo -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Zeichenfläche mit vollständigem Undo-System</div>
+        <p><strong>Lösung:</strong> Jeder Pinselstrich kann rückgängig gemacht werden</p>
+        <div class="interactive-area">
+            <div class="good-drawing-container">
+                <canvas class="good-drawing-canvas" 
+                        width="400" 
+                        height="200"
+                        onmousedown="goodDrawStart(event)"
+                        onmousemove="goodDrawMove(event)"
+                        onmouseup="goodDrawEnd(event)"
+                        ontouchstart="goodDrawTouchStart(event)"
+                        ontouchmove="goodDrawTouchMove(event)"
+                        ontouchend="goodDrawTouchEnd(event)">
+                </canvas>
+                
+                <div class="drawing-controls">
+                    <button class="undo-btn" id="undoBtn" onclick="undoLastStroke()" disabled>
+                        ↶ Rückgängig
+                    </button>
+                    <button class="clear-btn" onclick="confirmClearCanvas()">
+                        🗑️ Löschen
+                    </button>
+                    <span id="strokeCount">Striche: 0</span>
+                </div>
+            </div>
+            
+            <div class="status-display">Zeichnen Sie mit Maus oder Touch - Jeder Strich kann rückgängig gemacht werden!</div>
+            <p>✅ Vollständige Undo-Funktionalität für alle Zeichenaktionen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: File upload with preview and confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Datei-Upload mit Vorschau und Bestätigung</div>
+        <p><strong>Lösung:</strong> Dateien werden vor Upload angezeigt, explizite Bestätigung erforderlich</p>
+        <div class="interactive-area">
+            <div class="good-upload-area" 
+                 ondragover="goodUploadDragOver(event)"
+                 ondragleave="goodUploadDragLeave(event)"
+                 ondrop="goodUploadDrop(event)"
+                 onclick="goodUploadClick()">
+                📁 Dateien hier ablegen oder klicken<br>
+                <small>✅ Vorschau vor Upload!</small>
+            </div>
+            <input type="file" id="goodFileInput" style="display: none;" onchange="goodFileSelected(event)" multiple>
+            
+            <div id="uploadPreview" class="upload-preview">
+                <h4>Ausgewählte Dateien:</h4>
+                <div id="fileList" class="file-list"></div>
+                <div class="upload-actions">
+                    <button class="apply-btn" onclick="startGoodUpload()">Upload starten</button>
+                    <button class="cancel-btn" onclick="cancelUpload()">Abbrechen</button>
+                </div>
+            </div>
+            
+            <div id="uploadProgress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="status-display">
+                    <span id="uploadStatus">Upload läuft...</span>
+                    <button onclick="cancelUploadInProgress()" style="margin-left: 15px;">Abbrechen</button>
+                </div>
+            </div>
+            
+            <p>✅ Dateien können vor Upload überprüft und der Upload kann jederzeit abgebrochen werden</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Safe destructive actions with confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Sichere destruktive Aktionen mit Bestätigung</div>
+        <p><strong>Lösung:</strong> Gefährliche Aktionen bei Up-Event mit obligatorischer Bestätigung</p>
+        <div class="interactive-area">
+            <button class="good-destructive-button" 
+                    onmousedown="goodDestructiveDown(this)"
+                    onmouseup="goodDestructiveUp(this, 'delete')"
+                    onmouseleave="goodDestructiveCancel(this)"
+                    ontouchstart="goodDestructiveDown(this)"
+                    ontouchend="goodDestructiveUp(this, 'delete')"
+                    ontouchcancel="goodDestructiveCancel(this)">
+                ⚠️ Alle Daten löschen
+            </button>
+            
+            <button class="good-destructive-button" 
+                    onmousedown="goodDestructiveDown(this)"
+                    onmouseup="goodDestructiveUp(this, 'restart')"
+                    onmouseleave="goodDestructiveCancel(this)"
+                    ontouchstart="goodDestructiveDown(this)"
+                    ontouchend="goodDestructiveUp(this, 'restart')"
+                    ontouchcancel="goodDestructiveCancel(this)">
+                🔄 System neu starten
+            </button>
+            
+            <button class="good-destructive-button" 
+                    onmousedown="goodDestructiveDown(this)"
+                    onmouseup="goodDestructiveUp(this, 'payment')"
+                    onmouseleave="goodDestructiveCancel(this)"
+                    ontouchstart="goodDestructiveDown(this)"
+                    ontouchend="goodDestructiveUp(this, 'payment')"
+                    ontouchcancel="goodDestructiveCancel(this)">
+                💸 Zahlung senden
+            </button>
+            
+            <div id="destructiveStatus" class="status-display">Status: Destruktive Aktionen erfordern Bestätigung und können abgebrochen werden!</div>
+            <p>✅ Alle kritischen Aktionen sind durch Up-Event und Bestätigung geschützt</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das besser ist</div>
+        <p><strong>WCAG 2.5.2 Pointer Cancellation Erfüllung:</strong></p>
+        <ul>
+            <li>✅ <strong>Up Event:</strong> Aktionen passieren bei mouseup/touchend</li>
+            <li>✅ <strong>Abort Mechanism:</strong> Pointer kann vor Release wegbewegt werden</li>
+            <li>✅ <strong>Up Reversal:</strong> Aktionen können durch nachfolgende Aktionen rückgängig gemacht werden</li>
+            <li>✅ <strong>Confirmation:</strong> Kritische Aktionen erfordern explizite Bestätigung</li>
+        </ul>
+        
+        <p><strong>Zusätzliche Sicherheitsfeatures:</strong></p>
+        <ul>
+            <li>🔄 Vollständige Undo-Funktionalität wo möglich</li>
+            <li>⚠️ Bestätigungsdialoge für destruktive Aktionen</li>
+            <li>⌨️ Keyboard-Support für alle Interaktionen</li>
+            <li>🎯 Visuelle Feedback für Pointer-Status</li>
+            <li>📱 Touch-optimierte Gesten mit Safeguards</li>
+        </ul>
+    </div>
+
+    <script>
+        // Global state
+        let isDrawing = false;
+        let canvas, ctx;
+        let drawingStrokes = [];
+        let currentStroke = [];
+        let isSliderDragging = false;
+        let originalSliderValue = 50;
+        let currentSliderValue = 50;
+        let uploadFiles = [];
+        let uploadInProgress = false;
+        let draggedElement = null;
+        let pendingDelete = null;
+        let deletedItems = [];
+        let touchStartX = 0;
+        let currentSwipeItem = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.querySelector('.good-drawing-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set up canvas
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        });
+        
+        // GOOD 1: Up event actions with cancellation
+        function goodButtonDown(button) {
+            button.classList.add('pressed');
+            const status = document.getElementById('upStatus');
+            status.innerHTML = 'Gedrückt - Bewegen Sie Maus/Finger weg zum Abbrechen, loslassen zum Ausführen';
+            status.style.backgroundColor = '#fff3e0';
+        }
+        
+        function goodButtonUp(button) {
+            if (button.classList.contains('pressed')) {
+                button.classList.remove('pressed');
+                const status = document.getElementById('upStatus');
+                status.innerHTML = '✅ Aktion erfolgreich ausgeführt bei Up-Event!';
+                status.style.backgroundColor = '#e8f5e8';
+                
+                setTimeout(() => {
+                    status.innerHTML = 'Status: Bereit - Aktion passiert erst beim Loslassen!';
+                    status.style.backgroundColor = '#e8f5e8';
+                }, 2000);
+            }
+        }
+        
+        function goodButtonCancel(button) {
+            if (button.classList.contains('pressed')) {
+                button.classList.remove('pressed');
+                const status = document.getElementById('upStatus');
+                status.innerHTML = '↶ Aktion abgebrochen - Pointer wurde wegbewegt';
+                status.style.backgroundColor = '#e3f2fd';
+                
+                setTimeout(() => {
+                    status.innerHTML = 'Status: Bereit - Aktion passiert erst beim Loslassen!';
+                    status.style.backgroundColor = '#e8f5e8';
+                }, 2000);
+            }
+        }
+        
+        // GOOD 2: Drag and drop with confirmation
+        function goodDragStart(event) {
+            draggedElement = event.target;
+            event.target.classList.add('dragging');
+            event.dataTransfer.setData('text/plain', event.target.textContent);
+        }
+        
+        function goodDragEnd(event) {
+            event.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+        
+        function goodAllowDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+        
+        function goodDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+        
+        function goodDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            
+            if (draggedElement) {
+                const data = event.dataTransfer.getData('text/plain');
+                pendingDelete = {
+                    element: draggedElement,
+                    name: data
+                };
+                
+                // Show confirmation dialog
+                document.getElementById('delete-message').textContent = 
+                    `Möchten Sie "${data}" wirklich löschen?`;
+                document.getElementById('deleteConfirmation').style.display = 'block';
+                
+                // Focus confirm button
+                document.querySelector('.confirm-btn').focus();
+            }
+        }
+        
+        function confirmDelete() {
+            if (pendingDelete) {
+                // Store for undo
+                deletedItems.push({
+                    element: pendingDelete.element.cloneNode(true),
+                    name: pendingDelete.name,
+                    timestamp: Date.now()
+                });
+                
+                pendingDelete.element.remove();
+                document.getElementById('dragStatus').innerHTML = 
+                    `✅ "${pendingDelete.name}" gelöscht - kann wiederhergestellt werden`;
+                
+                showUndoNotification(`"${pendingDelete.name}" gelöscht`);
+                pendingDelete = null;
+            }
+            document.getElementById('deleteConfirmation').style.display = 'none';
+        }
+        
+        function cancelDelete() {
+            pendingDelete = null;
+            document.getElementById('deleteConfirmation').style.display = 'none';
+            document.getElementById('dragStatus').innerHTML = 
+                'Löschung abgebrochen - Datei bleibt erhalten';
+        }
+        
+        // GOOD 3: Swipe with confirmation and undo
+        function goodSwipeReveal(item) {
+            // Reset all other items
+            document.querySelectorAll('.good-swipe-item').forEach(el => {
+                if (el !== item) {
+                    el.classList.remove('swipe-ready');
+                }
+            });
+            
+            item.classList.toggle('swipe-ready');
+        }
+        
+        function goodTouchStart(event, item) {
+            touchStartX = event.touches[0].clientX;
+            currentSwipeItem = item;
+        }
+        
+        function goodTouchMove(event, item) {
+            if (!currentSwipeItem) return;
+            
+            const currentX = event.touches[0].clientX;
+            const diffX = touchStartX - currentX;
+            
+            if (diffX > 50) {
+                item.style.transform = `translateX(-${Math.min(diffX, 100)}px)`;
+            } else {
+                item.style.transform = 'translateX(0)';
+            }
+        }
+        
+        function goodTouchEnd(event, item) {
+            if (!currentSwipeItem) return;
+            
+            const diffX = touchStartX - event.changedTouches[0].clientX;
+            
+            if (diffX > 100) {
+                item.classList.add('swipe-ready');
+            } else {
+                item.classList.remove('swipe-ready');
+            }
+            
+            item.style.transform = 'translateX(0)';
+            currentSwipeItem = null;
+        }
+        
+        function goodSwipeDelete(button) {
+            const item = button.closest('.good-swipe-item');
+            const text = item.textContent.trim();
+            
+            // Store for undo
+            deletedItems.push({
+                element: item.cloneNode(true),
+                name: text,
+                timestamp: Date.now()
+            });
+            
+            item.remove();
+            showUndoNotification(`"${text}" gelöscht`);
+        }
+        
+        function showUndoNotification(message) {
+            const notification = document.getElementById('undoNotification');
+            document.getElementById('undoMessage').textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+        
+        function undoLastAction() {
+            if (deletedItems.length > 0) {
+                const lastDeleted = deletedItems.pop();
+                
+                // Re-add element
+                if (lastDeleted.element.classList.contains('good-drag-item')) {
+                    document.querySelector('.good-drag-container').appendChild(lastDeleted.element);
+                } else if (lastDeleted.element.classList.contains('good-swipe-item')) {
+                    document.querySelector('.good-swipe-list').appendChild(lastDeleted.element);
+                }
+                
+                document.getElementById('undoNotification').style.display = 'none';
+            }
+        }
+        
+        // GOOD 4: Context menu with escape and confirmation
+        function showGoodContextMenu(event) {
+            event.preventDefault();
+            const menu = document.getElementById('goodContextMenu');
+            menu.style.display = 'block';
+            menu.style.left = event.pageX + 'px';
+            menu.style.top = event.pageY + 'px';
+            
+            // Focus first menu item
+            menu.querySelector('.menu-item').focus();
+        }
+        
+        function goodContextAction(action) {
+            const status = document.getElementById('contextStatus');
+            status.innerHTML = `✅ "${action}" ausgeführt - Sichere Aktion ohne Bestätigung`;
+            
+            document.getElementById('goodContextMenu').style.display = 'none';
+        }
+        
+        function confirmContextAction(action) {
+            const confirmText = `Möchten Sie wirklich "${action}" ausführen? Diese Aktion kann nicht rückgängig gemacht werden.`;
+            
+            if (confirm(confirmText)) {
+                const status = document.getElementById('contextStatus');
+                status.innerHTML = `⚠️ "${action}" bestätigt und ausgeführt`;
+                status.style.backgroundColor = '#fff3e0';
+            } else {
+                const status = document.getElementById('contextStatus');
+                status.innerHTML = `↶ "${action}" abgebrochen`;
+                status.style.backgroundColor = '#e3f2fd';
+            }
+            
+            document.getElementById('goodContextMenu').style.display = 'none';
+        }
+        
+        // Global event handlers for context menu
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('goodContextMenu');
+            if (!event.target.closest('.good-context-menu') && !event.target.closest('.good-context-area')) {
+                menu.style.display = 'none';
+            }
+        });
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const menu = document.getElementById('goodContextMenu');
+                menu.style.display = 'none';
+            }
+        });
+        
+        // GOOD 5: Slider with reset capability
+        function goodSliderClick(event) {
+            const slider = event.currentTarget;
+            const rect = slider.getBoundingClientRect();
+            const percentage = ((event.clientX - rect.left) / rect.width) * 100;
+            
+            updateGoodSliderValue(percentage);
+        }
+        
+        function goodSliderMouseDown(event) {
+            event.preventDefault();
+            isSliderDragging = true;
+            event.target.classList.add('dragging');
+            
+            document.addEventListener('mousemove', goodSliderMouseMove);
+            document.addEventListener('mouseup', goodSliderMouseUp);
+        }
+        
+        function goodSliderMouseMove(event) {
+            if (!isSliderDragging) return;
+            
+            const slider = document.getElementById('goodSlider');
+            const rect = slider.getBoundingClientRect();
+            const percentage = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+            
+            updateGoodSliderValue(percentage);
+        }
+        
+        function goodSliderMouseUp(event) {
+            isSliderDragging = false;
+            event.target.classList.remove('dragging');
+            document.removeEventListener('mousemove', goodSliderMouseMove);
+            document.removeEventListener('mouseup', goodSliderMouseUp);
+        }
+        
+        function goodSliderTouchStart(event) {
+            isSliderDragging = true;
+            event.target.classList.add('dragging');
+            
+            document.addEventListener('touchmove', goodSliderTouchMove);
+            document.addEventListener('touchend', goodSliderTouchEnd);
+        }
+        
+        function goodSliderTouchMove(event) {
+            if (!isSliderDragging) return;
+            
+            const slider = document.getElementById('goodSlider');
+            const rect = slider.getBoundingClientRect();
+            const touch = event.touches[0];
+            const percentage = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+            
+            updateGoodSliderValue(percentage);
+        }
+        
+        function goodSliderTouchEnd(event) {
+            isSliderDragging = false;
+            event.target.classList.remove('dragging');
+            document.removeEventListener('touchmove', goodSliderTouchMove);
+            document.removeEventListener('touchend', goodSliderTouchEnd);
+        }
+        
+        function goodSliderKeyDown(event) {
+            let newValue = currentSliderValue;
+            
+            switch(event.key) {
+                case 'ArrowLeft':
+                case 'ArrowDown':
+                    newValue = Math.max(0, currentSliderValue - 5);
+                    break;
+                case 'ArrowRight':
+                case 'ArrowUp':
+                    newValue = Math.min(100, currentSliderValue + 5);
+                    break;
+                case 'Home':
+                    newValue = 0;
+                    break;
+                case 'End':
+                    newValue = 100;
+                    break;
+                default:
+                    return;
+            }
+            
+            event.preventDefault();
+            updateGoodSliderValue(newValue);
+        }
+        
+        function updateGoodSliderValue(percentage) {
+            const handle = document.querySelector('.good-slider-handle');
+            const valueDisplay = document.getElementById('sliderValue');
+            const slider = document.getElementById('goodSlider');
+            
+            currentSliderValue = percentage;
+            handle.style.left = percentage + '%';
+            slider.setAttribute('aria-valuenow', Math.round(percentage));
+            
+            const hasChanges = Math.abs(percentage - originalSliderValue) > 1;
+            valueDisplay.innerHTML = `Wert: ${Math.round(percentage)}% (Original: ${originalSliderValue}%) - ${hasChanges ? 'Änderungen nicht gespeichert' : 'Keine Änderungen'}`;
+            
+            if (hasChanges) {
+                valueDisplay.style.backgroundColor = '#fff3e0';
+            } else {
+                valueDisplay.style.backgroundColor = '#e8f5e8';
+            }
+        }
+        
+        function resetSlider() {
+            updateGoodSliderValue(originalSliderValue);
+        }
+        
+        function applySliderValue() {
+            if (confirm(`Möchten Sie den Wert wirklich auf ${Math.round(currentSliderValue)}% setzen?`)) {
+                originalSliderValue = currentSliderValue;
+                updateGoodSliderValue(currentSliderValue);
+                
+                const valueDisplay = document.getElementById('sliderValue');
+                valueDisplay.innerHTML = `✅ Wert ${Math.round(currentSliderValue)}% erfolgreich angewendet`;
+                valueDisplay.style.backgroundColor = '#e8f5e8';
+            }
+        }
+        
+        function cancelSliderChanges() {
+            updateGoodSliderValue(originalSliderValue);
+        }
+        
+        // GOOD 6: Drawing with undo
+        function goodDrawStart(event) {
+            isDrawing = true;
+            currentStroke = [];
+            const rect = canvas.getBoundingClientRect();
+            const point = {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+            currentStroke.push(point);
+            
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y);
+        }
+        
+        function goodDrawMove(event) {
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const point = {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+            currentStroke.push(point);
+            
+            ctx.lineTo(point.x, point.y);
+            ctx.stroke();
+        }
+        
+        function goodDrawEnd(event) {
+            if (isDrawing) {
+                isDrawing = false;
+                
+                if (currentStroke.length > 1) {
+                    drawingStrokes.push([...currentStroke]);
+                    updateDrawingControls();
+                }
+                
+                currentStroke = [];
+            }
+        }
+        
+        function goodDrawTouchStart(event) {
+            event.preventDefault();
+            isDrawing = true;
+            currentStroke = [];
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.touches[0];
+            const point = {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+            currentStroke.push(point);
+            
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y);
+        }
+        
+        function goodDrawTouchMove(event) {
+            event.preventDefault();
+            if (!isDrawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.touches[0];
+            const point = {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+            currentStroke.push(point);
+            
+            ctx.lineTo(point.x, point.y);
+            ctx.stroke();
+        }
+        
+        function goodDrawTouchEnd(event) {
+            event.preventDefault();
+            goodDrawEnd(event);
+        }
+        
+        function undoLastStroke() {
+            if (drawingStrokes.length > 0) {
+                drawingStrokes.pop();
+                redrawCanvas();
+                updateDrawingControls();
+            }
+        }
+        
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawingStrokes.forEach(stroke => {
+                if (stroke.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(stroke[0].x, stroke[0].y);
+                    
+                    for (let i = 1; i < stroke.length; i++) {
+                        ctx.lineTo(stroke[i].x, stroke[i].y);
+                    }
+                    
+                    ctx.stroke();
+                }
+            });
+        }
+        
+        function updateDrawingControls() {
+            const undoBtn = document.getElementById('undoBtn');
+            const strokeCount = document.getElementById('strokeCount');
+            
+            undoBtn.disabled = drawingStrokes.length === 0;
+            strokeCount.textContent = `Striche: ${drawingStrokes.length}`;
+        }
+        
+        function confirmClearCanvas() {
+            if (drawingStrokes.length > 0) {
+                if (confirm('Möchten Sie wirklich alle Zeichnungen löschen?')) {
+                    drawingStrokes = [];
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    updateDrawingControls();
+                }
+            }
+        }
+        
+        // GOOD 7: File upload with confirmation
+        function goodUploadDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+        
+        function goodUploadDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+        
+        function goodUploadDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                showUploadPreview(files);
+            }
+        }
+        
+        function goodUploadClick() {
+            document.getElementById('goodFileInput').click();
+        }
+        
+        function goodFileSelected(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                showUploadPreview(files);
+            }
+        }
+        
+        function showUploadPreview(files) {
+            uploadFiles = Array.from(files);
+            const preview = document.getElementById('uploadPreview');
+            const fileList = document.getElementById('fileList');
+            
+            fileList.innerHTML = '';
+            
+            uploadFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span>📄 ${file.name} (${formatFileSize(file.size)})</span>
+                    <button onclick="removeFile(${index})" style="background: #f44336; color: white; border: none; padding: 4px 8px; border-radius: 3px;">✕</button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            
+            preview.style.display = 'block';
+        }
+        
+        function removeFile(index) {
+            uploadFiles.splice(index, 1);
+            if (uploadFiles.length > 0) {
+                showUploadPreview(uploadFiles);
+            } else {
+                cancelUpload();
+            }
+        }
+        
+        function startGoodUpload() {
+            if (uploadFiles.length === 0) return;
+            
+            uploadInProgress = true;
+            document.getElementById('uploadPreview').style.display = 'none';
+            document.getElementById('uploadProgress').style.display = 'block';
+            
+            simulateUpload();
+        }
+        
+        function simulateUpload() {
+            const progressFill = document.querySelector('#uploadProgress .progress-fill');
+            const statusSpan = document.getElementById('uploadStatus');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (!uploadInProgress) {
+                    clearInterval(interval);
+                    return;
+                }
+                
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    statusSpan.textContent = '✅ Upload erfolgreich abgeschlossen!';
+                    setTimeout(() => {
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        uploadInProgress = false;
+                        uploadFiles = [];
+                    }, 2000);
+                }
+                
+                progressFill.style.width = progress + '%';
+                statusSpan.textContent = `Upload läuft... ${Math.round(progress)}%`;
+            }, 200);
+        }
+        
+        function cancelUpload() {
+            uploadFiles = [];
+            document.getElementById('uploadPreview').style.display = 'none';
+            document.getElementById('goodFileInput').value = '';
+        }
+        
+        function cancelUploadInProgress() {
+            if (confirm('Möchten Sie den Upload wirklich abbrechen?')) {
+                uploadInProgress = false;
+                document.getElementById('uploadProgress').style.display = 'none';
+                uploadFiles = [];
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // GOOD 8: Safe destructive actions
+        function goodDestructiveDown(button) {
+            button.classList.add('pressed');
+        }
+        
+        function goodDestructiveUp(button, action) {
+            if (button.classList.contains('pressed')) {
+                button.classList.remove('pressed');
+                
+                const actionNames = {
+                    'delete': 'alle Daten löschen',
+                    'restart': 'das System neu starten',
+                    'payment': 'die Zahlung senden'
+                };
+                
+                const confirmText = `Möchten Sie wirklich ${actionNames[action]}? Diese Aktion kann nicht rückgängig gemacht werden.`;
+                
+                if (confirm(confirmText)) {
+                    const status = document.getElementById('destructiveStatus');
+                    status.innerHTML = `⚠️ "${actionNames[action]}" bestätigt und ausgeführt`;
+                    status.style.backgroundColor = '#fff3e0';
+                    
+                    button.textContent = 'Ausgeführt!';
+                    button.disabled = true;
+                    
+                    setTimeout(() => {
+                        button.textContent = button.textContent.replace('Ausgeführt!', 'Bereit');
+                        button.disabled = false;
+                        status.innerHTML = 'Status: Destruktive Aktionen erfordern Bestätigung und können abgebrochen werden!';
+                        status.style.backgroundColor = '#e8f5e8';
+                    }, 3000);
+                } else {
+                    const status = document.getElementById('destructiveStatus');
+                    status.innerHTML = `↶ "${actionNames[action]}" abgebrochen`;
+                    status.style.backgroundColor = '#e3f2fd';
+                    
+                    setTimeout(() => {
+                        status.innerHTML = 'Status: Destruktive Aktionen erfordern Bestätigung und können abgebrochen werden!';
+                        status.style.backgroundColor = '#e8f5e8';
+                    }, 2000);
+                }
+            }
+        }
+        
+        function goodDestructiveCancel(button) {
+            if (button.classList.contains('pressed')) {
+                button.classList.remove('pressed');
+                const status = document.getElementById('destructiveStatus');
+                status.innerHTML = '↶ Aktion abgebrochen - Pointer wurde wegbewegt';
+                status.style.backgroundColor = '#e3f2fd';
+                
+                setTimeout(() => {
+                    status.innerHTML = 'Status: Destruktive Aktionen erfordern Bestätigung und können abgebrochen werden!';
+                    status.style.backgroundColor = '#e8f5e8';
+                }, 2000);
+            }
+        }
+        
+        // Demonstration: Pointer cancellation accessibility analysis
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ACCESSIBLE POINTER CANCELLATION ANALYSIS ===');
+            
+            // Find elements with pointer event handlers
+            const pointerElements = document.querySelectorAll('[onmousedown], [onmouseup], [ontouchstart], [ontouchend]');
+            console.log(`Found ${pointerElements.length} elements with pointer event handlers`);
+            
+            pointerElements.forEach((element, index) => {
+                const analysis = {
+                    hasDownHandler: element.hasAttribute('onmousedown') || element.hasAttribute('ontouchstart'),
+                    hasUpHandler: element.hasAttribute('onmouseup') || element.hasAttribute('ontouchend'),
+                    hasLeaveHandler: element.hasAttribute('onmouseleave'),
+                    hasCancelHandler: element.hasAttribute('ontouchcancel'),
+                    hasUndoCapability: true, // all good examples have undo or confirmation
+                    hasCancellation: true, // all good examples support cancellation
+                    isAccessible: true
+                };
+                
+                console.log(`Element ${index + 1}:`, analysis);
+            });
+            
+            console.log('✅ All interactions follow WCAG 2.5.2 Pointer Cancellation guidelines');
+        });
+    </script>
+</body>
+</html>

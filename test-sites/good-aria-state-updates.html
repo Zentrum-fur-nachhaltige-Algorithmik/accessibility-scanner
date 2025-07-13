@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: ARIA State Updates Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Tabs with proper ARIA */
+        .good-tab-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .good-tab-list {
+            display: flex;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .good-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+            /* GUT: Mit vollständigen ARIA-Attributen */
+        }
+        
+        .good-tab:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        .good-tab[aria-selected="true"] {
+            background-color: white;
+            border-bottom-color: #007cba;
+            font-weight: bold;
+        }
+        
+        .good-tab-panel {
+            padding: 20px;
+            /* GUT: Mit aria-hidden Management */
+        }
+        
+        .good-tab-panel[aria-hidden="true"] {
+            display: none;
+        }
+        
+        /* GOOD 2: Accordion with proper ARIA */
+        .good-accordion {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .good-accordion-item {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .good-accordion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .good-accordion-header {
+            padding: 15px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: none;
+            width: 100%;
+            text-align: left;
+            /* GUT: Mit aria-expanded Management */
+        }
+        
+        .good-accordion-header:hover {
+            background-color: #e9ecef;
+        }
+        
+        .good-accordion-header:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        .good-accordion-content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .good-accordion-content[aria-hidden="false"] {
+            max-height: 200px;
+            padding: 15px;
+        }
+        
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .good-accordion-header[aria-expanded="true"] .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* GOOD 3: Toggle buttons with aria-pressed */
+        .good-toggle-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .good-toggle-button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            /* GUT: Mit aria-pressed Support */
+        }
+        
+        .good-toggle-button:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        .good-toggle-button[aria-pressed="true"] {
+            background-color: #007cba;
+            color: white;
+            border-color: #007cba;
+        }
+        
+        /* GOOD 4: Live regions for dynamic content */
+        .good-live-content {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            min-height: 60px;
+            background-color: #f9f9f9;
+        }
+        
+        .good-status-display {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .good-update-buttons {
+            margin-top: 10px;
+        }
+        
+        .good-update-buttons button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .good-update-buttons button:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 5: Modal with aria-modal */
+        .good-modal-trigger {
+            background-color: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .good-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .good-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+        
+        .good-modal-close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .good-modal-close:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 6: Form with aria-invalid */
+        .good-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-form-group {
+            margin-bottom: 15px;
+        }
+        
+        .good-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .good-form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .good-form-group input:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        .good-form-group input[aria-invalid="true"] {
+            border-color: #f44336;
+            background-color: #ffebee;
+        }
+        
+        .good-error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .good-error-message.show {
+            display: block;
+        }
+        
+        /* GOOD 7: Loading with aria-busy */
+        .good-loading-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            min-height: 100px;
+            position: relative;
+        }
+        
+        .good-loading-content {
+            transition: opacity 0.3s;
+        }
+        
+        .good-loading-container[aria-busy="true"] .good-loading-content {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .good-loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007cba;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        .good-loading-container[aria-busy="true"] .good-loading-spinner {
+            display: block;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* GOOD 8: Dropdown with aria-expanded */
+        .good-dropdown {
+            position: relative;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        
+        .good-dropdown-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .good-dropdown-button:focus {
+            outline: 2px solid #2e7d32;
+            outline-offset: 2px;
+        }
+        
+        .good-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .good-dropdown-button[aria-expanded="true"] + .good-dropdown-content {
+            display: block;
+        }
+        
+        .good-dropdown-content div {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+        
+        .good-dropdown-content div:hover,
+        .good-dropdown-content div:focus {
+            background-color: #f1f1f1;
+            outline: 2px solid #4caf50;
+            outline-offset: -2px;
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e8f5e8;
+            border-radius: 4px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: ARIA State Updates Accessible (GOOD)</h1>
+    <p><strong>WCAG 4.1.2 & 4.1.3 Konforme Implementierung:</strong> Dynamische UI-Komponenten mit vollständigen ARIA-Zustandsupdates</p>
+    
+    <!-- GOOD 1: Tabs with proper ARIA -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Tabs mit korrekten ARIA-Updates</div>
+        <p><strong>Lösung:</strong> Tab-Interface mit role, aria-selected und aria-hidden Management</p>
+        <div class="interactive-area">
+            <div class="good-tab-container">
+                <!-- GUT: Vollständige ARIA-Struktur -->
+                <ul class="good-tab-list" role="tablist" aria-label="Produktinformationen">
+                    <li role="presentation">
+                        <button class="good-tab" 
+                                role="tab" 
+                                aria-selected="true" 
+                                aria-controls="panel1"
+                                id="tab1"
+                                tabindex="0"
+                                onclick="goodSwitchTab(0, this)"
+                                onkeydown="goodTabKeyDown(event)">
+                            Übersicht
+                        </button>
+                    </li>
+                    <li role="presentation">
+                        <button class="good-tab" 
+                                role="tab" 
+                                aria-selected="false" 
+                                aria-controls="panel2"
+                                id="tab2"
+                                tabindex="-1"
+                                onclick="goodSwitchTab(1, this)"
+                                onkeydown="goodTabKeyDown(event)">
+                            Details
+                        </button>
+                    </li>
+                    <li role="presentation">
+                        <button class="good-tab" 
+                                role="tab" 
+                                aria-selected="false" 
+                                aria-controls="panel3"
+                                id="tab3"
+                                tabindex="-1"
+                                onclick="goodSwitchTab(2, this)"
+                                onkeydown="goodTabKeyDown(event)">
+                            Bewertungen
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- GUT: Korrekte tabpanel-Struktur mit aria-hidden -->
+                <div class="good-tab-panel" 
+                     role="tabpanel" 
+                     id="panel1" 
+                     aria-labelledby="tab1"
+                     aria-hidden="false"
+                     tabindex="0">
+                    <h3>Produktübersicht</h3>
+                    <p>Hier finden Sie eine allgemeine Übersicht über das Produkt mit den wichtigsten Features und Spezifikationen.</p>
+                </div>
+                <div class="good-tab-panel" 
+                     role="tabpanel" 
+                     id="panel2" 
+                     aria-labelledby="tab2"
+                     aria-hidden="true"
+                     tabindex="0">
+                    <h3>Detaillierte Informationen</h3>
+                    <p>Ausführliche technische Details, Abmessungen, Kompatibilität und weitere Spezifikationen des Produkts.</p>
+                </div>
+                <div class="good-tab-panel" 
+                     role="tabpanel" 
+                     id="panel3" 
+                     aria-labelledby="tab3"
+                     aria-hidden="true"
+                     tabindex="0">
+                    <h3>Kundenbewertungen</h3>
+                    <p>Bewertungen und Erfahrungen anderer Kunden mit diesem Produkt. Durchschnittsbewertung: 4.2/5 Sterne.</p>
+                </div>
+            </div>
+            <p>✅ Screen Reader erhalten vollständige Information über aktive Tabs und Zustandsänderungen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Accordion with aria-expanded -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Accordion mit aria-expanded Management</div>
+        <p><strong>Lösung:</strong> Accordion mit korrekten ARIA-Zuständen und Keyboard-Navigation</p>
+        <div class="interactive-area">
+            <div class="good-accordion" role="region" aria-label="Häufig gestellte Fragen">
+                <!-- GUT: aria-expanded und role-Attribute -->
+                <div class="good-accordion-item">
+                    <button class="good-accordion-header" 
+                            aria-expanded="false" 
+                            aria-controls="content1"
+                            id="header1"
+                            onclick="goodToggleAccordion(this)">
+                        Wie funktioniert die Installation?
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </button>
+                    <div class="good-accordion-content" 
+                         id="content1" 
+                         aria-labelledby="header1"
+                         aria-hidden="true"
+                         role="region">
+                        Die Installation ist sehr einfach und dauert nur wenige Minuten. Folgen Sie einfach der beigelegten Anleitung oder schauen Sie sich unser Video-Tutorial an.
+                    </div>
+                </div>
+                
+                <div class="good-accordion-item">
+                    <button class="good-accordion-header" 
+                            aria-expanded="false" 
+                            aria-controls="content2"
+                            id="header2"
+                            onclick="goodToggleAccordion(this)">
+                        Welche Garantie gibt es?
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </button>
+                    <div class="good-accordion-content" 
+                         id="content2" 
+                         aria-labelledby="header2"
+                         aria-hidden="true"
+                         role="region">
+                        Wir bieten eine 2-Jahres-Garantie auf alle Produkte. Bei Defekten tauschen wir das Produkt kostenlos aus oder erstatten den Kaufpreis.
+                    </div>
+                </div>
+                
+                <div class="good-accordion-item">
+                    <button class="good-accordion-header" 
+                            aria-expanded="false" 
+                            aria-controls="content3"
+                            id="header3"
+                            onclick="goodToggleAccordion(this)">
+                        Ist das Produkt wasserdicht?
+                        <span class="accordion-icon" aria-hidden="true">▼</span>
+                    </button>
+                    <div class="good-accordion-content" 
+                         id="content3" 
+                         aria-labelledby="header3"
+                         aria-hidden="true"
+                         role="region">
+                        Ja, das Produkt ist nach IP67 Standard wasserdicht und kann problemlos im Freien verwendet werden.
+                    </div>
+                </div>
+            </div>
+            <p>✅ Screen Reader können genau verfolgen welche Accordion-Sections geöffnet oder geschlossen sind</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Toggle buttons with aria-pressed -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Toggle-Buttons mit aria-pressed</div>
+        <p><strong>Lösung:</strong> Toggle-Zustände programmatisch verfügbar mit aria-pressed</p>
+        <div class="interactive-area">
+            <fieldset class="good-toggle-group">
+                <legend>Benachrichtigungseinstellungen</legend>
+                <!-- GUT: aria-pressed Attribute für Toggle-Zustände -->
+                <button class="good-toggle-button" 
+                        aria-pressed="false"
+                        onclick="goodToggleButton(this)"
+                        onkeydown="goodToggleKeyDown(event, this)">
+                    📧 E-Mail
+                </button>
+                <button class="good-toggle-button" 
+                        aria-pressed="false"
+                        onclick="goodToggleButton(this)"
+                        onkeydown="goodToggleKeyDown(event, this)">
+                    📱 SMS
+                </button>
+                <button class="good-toggle-button" 
+                        aria-pressed="true"
+                        onclick="goodToggleButton(this)"
+                        onkeydown="goodToggleKeyDown(event, this)">
+                    🔔 Push
+                </button>
+                <button class="good-toggle-button" 
+                        aria-pressed="false"
+                        onclick="goodToggleButton(this)"
+                        onkeydown="goodToggleKeyDown(event, this)">
+                    📞 Anruf
+                </button>
+            </fieldset>
+            
+            <div class="status-display" aria-live="polite" id="toggleStatus">
+                Aktuelle Einstellungen: Push-Benachrichtigungen aktiviert
+            </div>
+            <p>✅ Screen Reader können exakt feststellen welche Optionen aktiviert oder deaktiviert sind</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Dynamic content with live regions -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Dynamischer Inhalt mit Live Regions</div>
+        <p><strong>Lösung:</strong> aria-live Regionen für automatische Screen Reader Ankündigungen</p>
+        <div class="interactive-area">
+            <!-- GUT: aria-live Region für Status-Updates -->
+            <div class="good-live-content" aria-live="polite" aria-atomic="true">
+                <div class="good-status-display" id="goodStatusDisplay">
+                    Status: Bereit für Updates
+                </div>
+                <div>Letzte Aktualisierung: Noch nie</div>
+            </div>
+            
+            <!-- Separate aggressive live region for urgent updates -->
+            <div aria-live="assertive" aria-atomic="false" class="sr-only" id="urgentUpdates"></div>
+            
+            <div class="good-update-buttons">
+                <button onclick="goodUpdateStatus('success')">✅ Erfolg simulieren</button>
+                <button onclick="goodUpdateStatus('warning')">⚠️ Warnung simulieren</button>
+                <button onclick="goodUpdateStatus('error')">❌ Fehler simulieren</button>
+                <button onclick="goodUpdateStatus('info')">ℹ️ Info simulieren</button>
+            </div>
+            <p>✅ Alle Status-Änderungen werden automatisch an Screen Reader kommuniziert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Modal with aria-modal -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Modal mit vollständiger ARIA-Unterstützung</div>
+        <p><strong>Lösung:</strong> Modal-Dialog mit aria-modal, focus management und aria-hidden</p>
+        <div class="interactive-area">
+            <button class="good-modal-trigger" onclick="goodShowModal()">Modal öffnen</button>
+            
+            <!-- GUT: aria-modal und aria-labelledby -->
+            <div id="goodModal" 
+                 class="good-modal" 
+                 role="dialog" 
+                 aria-modal="true"
+                 aria-labelledby="modalTitle"
+                 aria-describedby="modalDesc">
+                <div class="good-modal-content">
+                    <button class="good-modal-close" 
+                            onclick="goodCloseModal()" 
+                            aria-label="Modal schließen">×</button>
+                    <h3 id="modalTitle">Zugänglicher Modal Dialog</h3>
+                    <div id="modalDesc">
+                        <p>Dies ist ein Modal-Dialog mit korrekten ARIA-Zuständen.</p>
+                        <p>Screen Reader können erkennen dass der Rest der Seite inaktiv ist und Focus ist korrekt verwaltet.</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button onclick="goodCloseModal()" style="background: #4caf50; color: white; border: none; padding: 8px 16px; border-radius: 4px;">OK</button>
+                        <button onclick="goodCloseModal()" style="background: #757575; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-left: 10px;">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+            <p>✅ Screen Reader können Modal-Zustand vollständig verstehen und navigieren</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Form validation with aria-invalid -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Formular-Validation mit aria-invalid</div>
+        <p><strong>Lösung:</strong> Validierungs-Zustände programmatisch verfügbar</p>
+        <div class="interactive-area">
+            <form class="good-form" onsubmit="return goodValidateForm(event)">
+                <!-- GUT: aria-invalid und aria-describedby -->
+                <div class="good-form-group">
+                    <label for="goodEmail">E-Mail Adresse:</label>
+                    <input type="email" 
+                           id="goodEmail" 
+                           name="email" 
+                           placeholder="ihre.email@beispiel.de"
+                           aria-invalid="false"
+                           aria-describedby="emailError">
+                    <div id="emailError" class="good-error-message" role="alert">
+                        Bitte geben Sie eine gültige E-Mail Adresse ein
+                    </div>
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodPhone">Telefonnummer:</label>
+                    <input type="tel" 
+                           id="goodPhone" 
+                           name="phone" 
+                           placeholder="+49 123 456789"
+                           aria-invalid="false"
+                           aria-describedby="phoneError">
+                    <div id="phoneError" class="good-error-message" role="alert">
+                        Telefonnummer muss mit +49 beginnen
+                    </div>
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodAge">Alter:</label>
+                    <input type="number" 
+                           id="goodAge" 
+                           name="age" 
+                           min="18" 
+                           max="120" 
+                           placeholder="25"
+                           aria-invalid="false"
+                           aria-describedby="ageError">
+                    <div id="ageError" class="good-error-message" role="alert">
+                        Alter muss zwischen 18 und 120 Jahren liegen
+                    </div>
+                </div>
+                
+                <button type="submit" style="background: #007cba; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    Absenden
+                </button>
+            </form>
+            
+            <!-- Live region for form submission feedback -->
+            <div aria-live="polite" class="sr-only" id="formFeedback"></div>
+            
+            <p>✅ Screen Reader können alle Validierungs-Fehler programmatisch erkennen und ankündigen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Loading states with aria-busy -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Loading-Zustände mit aria-busy</div>
+        <p><strong>Lösung:</strong> Lade-Zustände werden mit aria-busy und Live Regions kommuniziert</p>
+        <div class="interactive-area">
+            <!-- GUT: aria-busy für Loading-Zustände -->
+            <div class="good-loading-container" 
+                 aria-busy="false"
+                 aria-live="polite"
+                 aria-label="Daten Dashboard">
+                <div class="good-loading-content">
+                    <h4>Daten Dashboard</h4>
+                    <p>Hier werden wichtige Daten und Statistiken angezeigt.</p>
+                    <div style="display: flex; gap: 20px; margin: 15px 0;">
+                        <div style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1;">
+                            <strong>Verkäufe:</strong> <span id="salesData">1.234</span>
+                        </div>
+                        <div style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1;">
+                            <strong>Kunden:</strong> <span id="customersData">567</span>
+                        </div>
+                        <div style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1;">
+                            <strong>Umsatz:</strong> <span id="revenueData">€89.012</span>
+                        </div>
+                    </div>
+                    <button onclick="goodStartLoading()" 
+                            style="background: #ff9800; color: white; border: none; padding: 8px 16px; border-radius: 4px;">
+                        Daten aktualisieren
+                    </button>
+                </div>
+                <div class="good-loading-spinner" aria-hidden="true"></div>
+            </div>
+            
+            <!-- Separate live region for loading announcements -->
+            <div aria-live="assertive" class="sr-only" id="loadingAnnouncements"></div>
+            
+            <p>✅ Screen Reader werden über alle Lade-Zustände und Daten-Updates informiert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Dropdown with aria-expanded -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Dropdown mit aria-expanded Management</div>
+        <p><strong>Lösung:</strong> Dropdown-Menu mit vollständiger ARIA-Unterstützung</p>
+        <div class="interactive-area">
+            <div class="good-dropdown">
+                <!-- GUT: aria-expanded und aria-haspopup -->
+                <button class="good-dropdown-button" 
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-controls="dropdownMenu"
+                        id="dropdownTrigger"
+                        onclick="goodToggleDropdown()"
+                        onkeydown="goodDropdownKeyDown(event)">
+                    Aktionen wählen ▼
+                </button>
+                <div class="good-dropdown-content" 
+                     id="dropdownMenu"
+                     role="menu"
+                     aria-labelledby="dropdownTrigger">
+                    <div role="menuitem" 
+                         tabindex="0"
+                         onclick="goodDropdownAction('edit')"
+                         onkeydown="goodMenuItemKeyDown(event, 'edit')">
+                        📝 Bearbeiten
+                    </div>
+                    <div role="menuitem" 
+                         tabindex="0"
+                         onclick="goodDropdownAction('copy')"
+                         onkeydown="goodMenuItemKeyDown(event, 'copy')">
+                        📋 Kopieren
+                    </div>
+                    <div role="menuitem" 
+                         tabindex="0"
+                         onclick="goodDropdownAction('share')"
+                         onkeydown="goodMenuItemKeyDown(event, 'share')">
+                        📤 Teilen
+                    </div>
+                    <div role="menuitem" 
+                         tabindex="0"
+                         onclick="goodDropdownAction('delete')"
+                         onkeydown="goodMenuItemKeyDown(event, 'delete')">
+                        🗑️ Löschen
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-display" aria-live="polite" id="dropdownStatus">
+                Dropdown-Status: Geschlossen
+            </div>
+            <p>✅ Screen Reader können Dropdown-Zustand vollständig verfolgen und navigieren</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das besser ist</div>
+        <p><strong>WCAG 4.1.2 & 4.1.3 Vollständige Erfüllung:</strong></p>
+        <ul>
+            <li>✅ Alle dynamischen Zustandsänderungen programmatisch verfügbar</li>
+            <li>✅ Screen Reader erhalten vollständige UI-Zustandsinformation</li>
+            <li>✅ Live Regions für automatische Ankündigungen wichtiger Änderungen</li>
+            <li>✅ Formular-Validation vollständig zugänglich</li>
+            <li>✅ Modal-Zustände korrekt kommuniziert</li>
+        </ul>
+        
+        <p><strong>Zusätzliche Vorteile:</strong></p>
+        <ul>
+            <li>⌨️ Vollständige Keyboard-Navigation</li>
+            <li>🎯 Focus-Management für komplexe Komponenten</li>
+            <li>🔊 Intelligente Live Region Prioritäten (polite vs assertive)</li>
+            <li>🎨 Konsistente ARIA-Patterns nach WAI-ARIA Authoring Practices</li>
+            <li>🌐 Kompatibilität mit allen Screen Reader-Technologien</li>
+        </ul>
+    </div>
+
+    <script>
+        let currentTab = 0;
+        let loadingTimeout;
+        let focusedBeforeModal = null;
+        
+        // GOOD 1: Proper tab switching with ARIA updates
+        function goodSwitchTab(index, clickedTab) {
+            // GUT: Vollständige aria-selected Updates
+            document.querySelectorAll('.good-tab').forEach((tab, i) => {
+                tab.setAttribute('aria-selected', i === index ? 'true' : 'false');
+                tab.setAttribute('tabindex', i === index ? '0' : '-1');
+            });
+            
+            // GUT: aria-hidden Updates für Panels
+            document.querySelectorAll('.good-tab-panel').forEach((panel, i) => {
+                panel.setAttribute('aria-hidden', i !== index ? 'true' : 'false');
+            });
+            
+            currentTab = index;
+            clickedTab.focus();
+            
+            console.log(`✅ ACCESSIBILITY: Tab ${index} activated with full ARIA updates`);
+        }
+        
+        function goodTabKeyDown(event) {
+            const tabs = Array.from(document.querySelectorAll('.good-tab'));
+            const currentIndex = tabs.indexOf(event.target);
+            let newIndex = currentIndex;
+            
+            switch(event.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                    newIndex = (currentIndex + 1) % tabs.length;
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    newIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                    break;
+                case 'Home':
+                    newIndex = 0;
+                    break;
+                case 'End':
+                    newIndex = tabs.length - 1;
+                    break;
+                default:
+                    return;
+            }
+            
+            event.preventDefault();
+            goodSwitchTab(newIndex, tabs[newIndex]);
+        }
+        
+        // GOOD 2: Proper accordion with aria-expanded
+        function goodToggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const isExpanded = header.getAttribute('aria-expanded') === 'true';
+            
+            // GUT: aria-expanded und aria-hidden Updates
+            header.setAttribute('aria-expanded', !isExpanded);
+            content.setAttribute('aria-hidden', isExpanded);
+            
+            console.log(`✅ ACCESSIBILITY: Accordion ${isExpanded ? 'collapsed' : 'expanded'} with ARIA updates`);
+        }
+        
+        // GOOD 3: Toggle buttons with aria-pressed
+        function goodToggleButton(button) {
+            const isPressed = button.getAttribute('aria-pressed') === 'true';
+            
+            // GUT: aria-pressed Updates
+            button.setAttribute('aria-pressed', !isPressed);
+            
+            // Update live status
+            updateToggleStatus();
+            
+            console.log(`✅ ACCESSIBILITY: Toggle button ${!isPressed ? 'activated' : 'deactivated'} with aria-pressed`);
+        }
+        
+        function goodToggleKeyDown(event, button) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                goodToggleButton(button);
+            }
+        }
+        
+        function updateToggleStatus() {
+            const activeToggles = Array.from(document.querySelectorAll('.good-toggle-button[aria-pressed="true"]'))
+                .map(btn => btn.textContent.trim())
+                .join(', ');
+            
+            const statusEl = document.getElementById('toggleStatus');
+            statusEl.textContent = activeToggles 
+                ? `Aktuelle Einstellungen: ${activeToggles} aktiviert`
+                : 'Alle Benachrichtigungen deaktiviert';
+        }
+        
+        // GOOD 4: Live regions for status updates
+        function goodUpdateStatus(type) {
+            const statusDisplay = document.getElementById('goodStatusDisplay');
+            const urgentUpdates = document.getElementById('urgentUpdates');
+            const now = new Date().toLocaleTimeString();
+            
+            const messages = {
+                'success': '✅ Erfolgreich aktualisiert',
+                'warning': '⚠️ Warnung: Verbindung instabil', 
+                'error': '❌ Fehler beim Laden der Daten',
+                'info': 'ℹ️ Neue Daten verfügbar'
+            };
+            
+            // GUT: Live region Updates
+            statusDisplay.innerHTML = `Status: ${messages[type]}`;
+            statusDisplay.parentElement.querySelector('div:last-child').textContent = `Letzte Aktualisierung: ${now}`;
+            
+            // Use assertive live region for errors
+            if (type === 'error') {
+                urgentUpdates.textContent = 'Fehler aufgetreten: Daten konnten nicht geladen werden';
+                setTimeout(() => urgentUpdates.textContent = '', 3000);
+            }
+            
+            console.log(`✅ ACCESSIBILITY: Status updated with live region announcement: ${type}`);
+        }
+        
+        // GOOD 5: Modal with aria-modal and focus management
+        function goodShowModal() {
+            const modal = document.getElementById('goodModal');
+            const mainContent = document.querySelector('body');
+            
+            // Store current focus
+            focusedBeforeModal = document.activeElement;
+            
+            // GUT: aria-modal und aria-hidden Updates
+            modal.style.display = 'block';
+            modal.setAttribute('aria-hidden', 'false');
+            mainContent.setAttribute('aria-hidden', 'true');
+            
+            // Focus first focusable element in modal
+            const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) {
+                firstFocusable.focus();
+            }
+            
+            // Trap focus in modal
+            setupFocusTrap(modal);
+            
+            console.log('✅ ACCESSIBILITY: Modal opened with aria-modal and focus management');
+        }
+        
+        function goodCloseModal() {
+            const modal = document.getElementById('goodModal');
+            const mainContent = document.querySelector('body');
+            
+            // GUT: ARIA state restoration
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+            mainContent.removeAttribute('aria-hidden');
+            
+            // Restore focus
+            if (focusedBeforeModal) {
+                focusedBeforeModal.focus();
+                focusedBeforeModal = null;
+            }
+            
+            console.log('✅ ACCESSIBILITY: Modal closed with focus restoration');
+        }
+        
+        function setupFocusTrap(modal) {
+            const focusableElements = modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            
+            modal.addEventListener('keydown', function trapHandler(event) {
+                if (event.key === 'Tab') {
+                    if (event.shiftKey) {
+                        if (document.activeElement === firstElement) {
+                            event.preventDefault();
+                            lastElement.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastElement) {
+                            event.preventDefault();
+                            firstElement.focus();
+                        }
+                    }
+                }
+                
+                if (event.key === 'Escape') {
+                    goodCloseModal();
+                }
+            });
+        }
+        
+        // GOOD 6: Form validation with aria-invalid
+        function goodValidateForm(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('goodEmail');
+            const phone = document.getElementById('goodPhone');
+            const age = document.getElementById('goodAge');
+            const feedback = document.getElementById('formFeedback');
+            
+            let hasErrors = false;
+            
+            // E-Mail validation
+            if (!email.value.includes('@')) {
+                // GUT: aria-invalid Updates
+                email.setAttribute('aria-invalid', 'true');
+                email.nextElementSibling.classList.add('show');
+                hasErrors = true;
+            } else {
+                email.setAttribute('aria-invalid', 'false');
+                email.nextElementSibling.classList.remove('show');
+            }
+            
+            // Phone validation
+            if (!phone.value.startsWith('+49')) {
+                // GUT: aria-invalid Updates
+                phone.setAttribute('aria-invalid', 'true');
+                phone.nextElementSibling.classList.add('show');
+                hasErrors = true;
+            } else {
+                phone.setAttribute('aria-invalid', 'false');
+                phone.nextElementSibling.classList.remove('show');
+            }
+            
+            // Age validation
+            const ageValue = parseInt(age.value);
+            if (ageValue < 18 || ageValue > 120) {
+                // GUT: aria-invalid Updates
+                age.setAttribute('aria-invalid', 'true');
+                age.nextElementSibling.classList.add('show');
+                hasErrors = true;
+            } else {
+                age.setAttribute('aria-invalid', 'false');
+                age.nextElementSibling.classList.remove('show');
+            }
+            
+            // Live region feedback
+            if (hasErrors) {
+                feedback.textContent = 'Formular enthält Fehler. Bitte korrigieren Sie die markierten Felder.';
+                console.log('✅ ACCESSIBILITY: Form validation errors announced with aria-invalid');
+            } else {
+                feedback.textContent = 'Formular erfolgreich validiert und gesendet!';
+                console.log('✅ ACCESSIBILITY: Form submission announced');
+                
+                setTimeout(() => {
+                    // Reset form
+                    email.value = '';
+                    phone.value = '';
+                    age.value = '';
+                    feedback.textContent = '';
+                }, 2000);
+            }
+            
+            return false;
+        }
+        
+        // GOOD 7: Loading with aria-busy
+        function goodStartLoading() {
+            const container = document.querySelector('.good-loading-container');
+            const announcements = document.getElementById('loadingAnnouncements');
+            
+            // GUT: aria-busy Updates
+            container.setAttribute('aria-busy', 'true');
+            announcements.textContent = 'Daten werden geladen...';
+            
+            loadingTimeout = setTimeout(() => {
+                container.setAttribute('aria-busy', 'false');
+                
+                // Update data with random values
+                document.getElementById('salesData').textContent = Math.floor(Math.random() * 2000 + 1000).toLocaleString();
+                document.getElementById('customersData').textContent = Math.floor(Math.random() * 800 + 400).toLocaleString();
+                document.getElementById('revenueData').textContent = '€' + Math.floor(Math.random() * 50000 + 50000).toLocaleString();
+                
+                announcements.textContent = 'Daten erfolgreich aktualisiert!';
+                
+                console.log('✅ ACCESSIBILITY: Loading completed with aria-busy updates');
+            }, 3000);
+            
+            console.log('✅ ACCESSIBILITY: Loading started with aria-busy');
+        }
+        
+        // GOOD 8: Dropdown with aria-expanded
+        function goodToggleDropdown() {
+            const button = document.getElementById('dropdownTrigger');
+            const menu = document.getElementById('dropdownMenu');
+            const statusEl = document.getElementById('dropdownStatus');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+            
+            // GUT: aria-expanded Updates
+            button.setAttribute('aria-expanded', !isExpanded);
+            
+            if (!isExpanded) {
+                // Focus first menu item when opening
+                const firstItem = menu.querySelector('[role="menuitem"]');
+                if (firstItem) {
+                    setTimeout(() => firstItem.focus(), 0);
+                }
+                statusEl.textContent = 'Dropdown-Status: Geöffnet';
+            } else {
+                button.focus();
+                statusEl.textContent = 'Dropdown-Status: Geschlossen';
+            }
+            
+            console.log(`✅ ACCESSIBILITY: Dropdown ${!isExpanded ? 'opened' : 'closed'} with aria-expanded`);
+        }
+        
+        function goodDropdownKeyDown(event) {
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                const button = event.target;
+                if (button.getAttribute('aria-expanded') === 'false') {
+                    goodToggleDropdown();
+                }
+            } else if (event.key === 'Escape') {
+                const button = document.getElementById('dropdownTrigger');
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            }
+        }
+        
+        function goodMenuItemKeyDown(event, action) {
+            const menuItems = Array.from(document.querySelectorAll('[role="menuitem"]'));
+            const currentIndex = menuItems.indexOf(event.target);
+            
+            switch(event.key) {
+                case 'ArrowDown':
+                    event.preventDefault();
+                    const nextIndex = (currentIndex + 1) % menuItems.length;
+                    menuItems[nextIndex].focus();
+                    break;
+                case 'ArrowUp':
+                    event.preventDefault();
+                    const prevIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+                    menuItems[prevIndex].focus();
+                    break;
+                case 'Enter':
+                case ' ':
+                    event.preventDefault();
+                    goodDropdownAction(action);
+                    break;
+                case 'Escape':
+                    event.preventDefault();
+                    const button = document.getElementById('dropdownTrigger');
+                    button.setAttribute('aria-expanded', 'false');
+                    button.focus();
+                    break;
+            }
+        }
+        
+        function goodDropdownAction(action) {
+            const button = document.getElementById('dropdownTrigger');
+            const statusEl = document.getElementById('dropdownStatus');
+            
+            button.setAttribute('aria-expanded', 'false');
+            statusEl.textContent = `Aktion "${action}" ausgeführt - Dropdown geschlossen`;
+            
+            // Return focus to trigger
+            button.focus();
+            
+            console.log(`✅ ACCESSIBILITY: Dropdown action ${action} with proper focus management`);
+        }
+        
+        // Global click handler for dropdown
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.good-dropdown');
+            const button = document.getElementById('dropdownTrigger');
+            
+            if (!dropdown.contains(event.target)) {
+                button.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // Global escape handler
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                // Close dropdown
+                const dropdownBtn = document.getElementById('dropdownTrigger');
+                if (dropdownBtn.getAttribute('aria-expanded') === 'true') {
+                    dropdownBtn.setAttribute('aria-expanded', 'false');
+                    dropdownBtn.focus();
+                }
+                
+                // Close modal
+                const modal = document.getElementById('goodModal');
+                if (modal.style.display === 'block') {
+                    goodCloseModal();
+                }
+            }
+        });
+        
+        // Initialize toggle status on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateToggleStatus();
+            
+            console.log('=== ACCESSIBLE ARIA STATE MANAGEMENT ANALYSIS ===');
+            
+            // Check for proper ARIA implementation
+            const ariaElements = document.querySelectorAll('[aria-expanded], [aria-selected], [aria-pressed], [aria-invalid], [aria-live], [aria-busy]');
+            console.log(`Found ${ariaElements.length} elements with ARIA state attributes`);
+            
+            ariaElements.forEach((element, index) => {
+                const analysis = {
+                    tagName: element.tagName,
+                    ariaAttributes: Array.from(element.attributes).filter(attr => attr.name.startsWith('aria-')).map(attr => attr.name),
+                    role: element.getAttribute('role'),
+                    hasProperStateManagement: true // all good examples have proper state management
+                };
+                
+                console.log(`Element ${index + 1}:`, analysis);
+            });
+            
+            console.log('✅ All dynamic interactions have proper ARIA state management');
+        });
+    </script>
+</body>
+</html>

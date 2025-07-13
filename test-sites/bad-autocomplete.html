@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Autocomplete Attributes - WCAG 1.3.5 Violations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #666;
+            margin-top: 0;
+        }
+        
+        .violation {
+            background: #fee;
+            border-left: 4px solid #c00;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .field-group {
+            margin-bottom: 20px;
+        }
+        
+        .inline-fields {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .inline-fields > div {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bad Autocomplete Attributes - WCAG 1.3.5 Violations</h1>
+    
+    <div class="violation">
+        <strong>WCAG 1.3.5 Violation:</strong> This page demonstrates improper use of autocomplete attributes,
+        preventing password managers and assistive technologies from correctly identifying form fields.
+    </div>
+
+    <!-- Violation 1: Login form with wrong autocomplete values -->
+    <div class="form-section">
+        <h2>1. Login Form - Incorrect Autocomplete Values</h2>
+        <form>
+            <div class="field-group">
+                <label for="login-email">Email Address</label>
+                <!-- VIOLATION: Using 'username' for email field instead of 'email' -->
+                <input type="email" id="login-email" name="email" autocomplete="username" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="login-password">Password</label>
+                <!-- VIOLATION: Disabling autocomplete on password field -->
+                <input type="password" id="login-password" name="password" autocomplete="off" required>
+            </div>
+            
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <!-- Violation 2: Registration form with missing autocomplete attributes -->
+    <div class="form-section">
+        <h2>2. Registration Form - Missing Autocomplete Attributes</h2>
+        <form>
+            <div class="field-group">
+                <label for="reg-fname">First Name</label>
+                <!-- VIOLATION: Missing autocomplete="given-name" -->
+                <input type="text" id="reg-fname" name="firstname" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-lname">Last Name</label>
+                <!-- VIOLATION: Missing autocomplete="family-name" -->
+                <input type="text" id="reg-lname" name="lastname" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-email">Email</label>
+                <!-- VIOLATION: Missing autocomplete="email" -->
+                <input type="email" id="reg-email" name="email" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-phone">Phone Number</label>
+                <!-- VIOLATION: Missing autocomplete="tel" -->
+                <input type="tel" id="reg-phone" name="phone">
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-password">Create Password</label>
+                <!-- VIOLATION: Missing autocomplete="new-password" -->
+                <input type="password" id="reg-password" name="password" required>
+            </div>
+            
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+
+    <!-- Violation 3: Shipping address form without autocomplete -->
+    <div class="form-section">
+        <h2>3. Shipping Address - No Autocomplete Attributes</h2>
+        <form>
+            <div class="field-group">
+                <label for="ship-name">Full Name</label>
+                <!-- VIOLATION: Missing autocomplete="name" -->
+                <input type="text" id="ship-name" name="fullname" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="ship-address1">Address Line 1</label>
+                <!-- VIOLATION: Missing autocomplete="address-line1" -->
+                <input type="text" id="ship-address1" name="address1" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="ship-address2">Address Line 2</label>
+                <!-- VIOLATION: Missing autocomplete="address-line2" -->
+                <input type="text" id="ship-address2" name="address2">
+            </div>
+            
+            <div class="inline-fields">
+                <div>
+                    <label for="ship-city">City</label>
+                    <!-- VIOLATION: Missing autocomplete="address-level2" -->
+                    <input type="text" id="ship-city" name="city" required>
+                </div>
+                
+                <div>
+                    <label for="ship-state">State</label>
+                    <!-- VIOLATION: Missing autocomplete="address-level1" -->
+                    <select id="ship-state" name="state" required>
+                        <option value="">Select State</option>
+                        <option value="CA">California</option>
+                        <option value="NY">New York</option>
+                        <option value="TX">Texas</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="ship-zip">ZIP Code</label>
+                    <!-- VIOLATION: Missing autocomplete="postal-code" -->
+                    <input type="text" id="ship-zip" name="zipcode" pattern="[0-9]{5}" required>
+                </div>
+            </div>
+            
+            <div class="field-group">
+                <label for="ship-country">Country</label>
+                <!-- VIOLATION: Missing autocomplete="country" -->
+                <select id="ship-country" name="country" required>
+                    <option value="">Select Country</option>
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="MX">Mexico</option>
+                </select>
+            </div>
+            
+            <button type="submit">Save Address</button>
+        </form>
+    </div>
+
+    <!-- Violation 4: Credit card form without proper autocomplete -->
+    <div class="form-section">
+        <h2>4. Payment Information - Missing Credit Card Autocomplete</h2>
+        <form>
+            <div class="field-group">
+                <label for="cc-name">Cardholder Name</label>
+                <!-- VIOLATION: Missing autocomplete="cc-name" -->
+                <input type="text" id="cc-name" name="cardname" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="cc-number">Card Number</label>
+                <!-- VIOLATION: Missing autocomplete="cc-number" -->
+                <input type="text" id="cc-number" name="cardnumber" pattern="[0-9]{16}" required>
+            </div>
+            
+            <div class="inline-fields">
+                <div>
+                    <label for="cc-exp">Expiration Date</label>
+                    <!-- VIOLATION: Missing autocomplete="cc-exp" -->
+                    <input type="text" id="cc-exp" name="expiry" placeholder="MM/YY" pattern="[0-9]{2}/[0-9]{2}" required>
+                </div>
+                
+                <div>
+                    <label for="cc-csc">Security Code</label>
+                    <!-- VIOLATION: Missing autocomplete="cc-csc" -->
+                    <input type="text" id="cc-csc" name="cvv" pattern="[0-9]{3,4}" required>
+                </div>
+            </div>
+            
+            <button type="submit">Process Payment</button>
+        </form>
+    </div>
+
+    <!-- Violation 5: Profile form with wrong autocomplete values -->
+    <div class="form-section">
+        <h2>5. User Profile - Incorrect Autocomplete Usage</h2>
+        <form>
+            <div class="field-group">
+                <label for="profile-username">Username</label>
+                <!-- VIOLATION: Using 'name' instead of 'username' -->
+                <input type="text" id="profile-username" name="username" autocomplete="name">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-birthday">Date of Birth</label>
+                <!-- VIOLATION: Missing autocomplete="bday" -->
+                <input type="date" id="profile-birthday" name="birthday">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-website">Personal Website</label>
+                <!-- VIOLATION: Missing autocomplete="url" -->
+                <input type="url" id="profile-website" name="website">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-photo">Photo URL</label>
+                <!-- VIOLATION: Missing autocomplete="photo" -->
+                <input type="url" id="profile-photo" name="photo">
+            </div>
+            
+            <button type="submit">Update Profile</button>
+        </form>
+    </div>
+
+    <!-- Violation 6: One-time code with improper autocomplete -->
+    <div class="form-section">
+        <h2>6. Two-Factor Authentication - Wrong Autocomplete</h2>
+        <form>
+            <div class="field-group">
+                <label for="otp-code">Enter 6-digit code</label>
+                <!-- VIOLATION: Missing autocomplete="one-time-code" -->
+                <input type="text" id="otp-code" name="code" pattern="[0-9]{6}" autocomplete="off" required>
+            </div>
+            
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+
+    <div class="violation">
+        <p><strong>Total violations: ~25+</strong></p>
+        <p>Each missing or incorrect autocomplete attribute prevents password managers and assistive 
+        technologies from properly identifying and auto-filling form fields, creating barriers for users 
+        with disabilities who rely on these tools.</p>
+    </div>
+</body>
+</html>

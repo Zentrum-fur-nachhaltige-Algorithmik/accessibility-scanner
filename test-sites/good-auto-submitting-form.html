@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Auto-Submitting Form Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-form {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #4caf50;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .good-form-group {
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .good-form-input {
+            padding: 8px;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+        }
+        
+        .good-form-input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-form-select {
+            padding: 8px;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        .good-form-select:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .good-status-info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        
+        .good-status-success {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .good-submit-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px 5px 0;
+            font-size: 16px;
+        }
+        
+        .good-submit-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-submit-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-submit-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Auto-Submitting Form Accessible (GOOD)</h1>
+    <p><strong>WCAG 3.2.2 konforme Implementierung:</strong> Formulare werden nur nach expliziter Benutzeraktion abgesendet</p>
+    
+    <!-- GOOD 1: Form with explicit submit button -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Formular mit explizitem Submit-Button statt Auto-Submit</div>
+        <p><strong>Lösung:</strong> Nutzer müssen explizit den Submit-Button klicken</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodNewsletterForm">
+                <h4>Newsletter-Anmeldung (Explizite Übermittlung):</h4>
+                <div class="good-form-group">
+                    <label for="goodEmailExplicit">E-Mail-Adresse:</label>
+                    <input type="email" id="goodEmailExplicit" class="good-form-input" 
+                           placeholder="ihre@email.de" 
+                           required
+                           aria-describedby="email-help">
+                    <small id="email-help">Ihre E-Mail wird nur für Newsletter-Updates verwendet</small>
+                </div>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitNewsletter(event)">
+                    Newsletter abonnieren
+                </button>
+                <div id="goodNewsletterStatus"></div>
+            </form>
+            <p>✅ Formular wird nur bei explizitem Button-Klick abgesendet</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Dropdown with apply button -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Dropdown mit Bestätigungs-Button statt Auto-Submit</div>
+        <p><strong>Lösung:</strong> Änderungen werden erst nach Bestätigung übernommen</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodLanguageForm">
+                <h4>Sprachauswahl (Mit Bestätigung):</h4>
+                <div class="good-form-group">
+                    <label for="goodLanguageSelect">Sprache wählen:</label>
+                    <select id="goodLanguageSelect" class="good-form-select" 
+                            aria-describedby="language-help">
+                        <option value="de">Deutsch</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                    <small id="language-help">Wählen Sie Ihre bevorzugte Sprache und bestätigen Sie</small>
+                </div>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitLanguage(event)">
+                    Sprache ändern
+                </button>
+                <div id="goodLanguageStatus"></div>
+            </form>
+            <p>✅ Sprachänderung erst nach expliziter Bestätigung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Form with save draft option instead of timeout -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Formular mit manueller Speicheroption statt Timeout</div>
+        <p><strong>Lösung:</strong> Nutzer können selbst entscheiden wann gespeichert wird</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodSurveyForm">
+                <h4>Umfrage (Manuelle Speicherung):</h4>
+                <div class="good-form-group">
+                    <label for="goodSurveyInput">Ihre Meinung:</label>
+                    <textarea id="goodSurveyInput" class="good-form-input" rows="3" 
+                              placeholder="Schreiben Sie Ihre Meinung hier..."
+                              aria-describedby="survey-help"></textarea>
+                    <small id="survey-help">Nehmen Sie sich die Zeit, die Sie brauchen</small>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="good-submit-button" onclick="goodSaveDraft()" 
+                            style="background-color: #2196F3;">
+                        Entwurf speichern
+                    </button>
+                    <button type="submit" class="good-submit-button" onclick="goodSubmitSurvey(event)">
+                        Umfrage abschicken
+                    </button>
+                </div>
+                <div id="goodSurveyStatus"></div>
+            </form>
+            <p>✅ Nutzer kontrolliert vollständig wann und wie gespeichert wird</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Radio buttons with submit confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Radio Buttons mit Bestätigungs-Button</div>
+        <p><strong>Lösung:</strong> Auswahl wird erst nach Bestätigung übermittelt</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodRatingForm">
+                <fieldset>
+                    <legend>Wie bewerten Sie unseren Service?</legend>
+                    <div class="good-form-group">
+                        <label>
+                            <input type="radio" name="rating" value="1">
+                            ⭐ Sehr schlecht
+                        </label>
+                        <label>
+                            <input type="radio" name="rating" value="2">
+                            ⭐⭐ Schlecht
+                        </label>
+                        <label>
+                            <input type="radio" name="rating" value="3">
+                            ⭐⭐⭐ Okay
+                        </label>
+                        <label>
+                            <input type="radio" name="rating" value="4">
+                            ⭐⭐⭐⭐ Gut
+                        </label>
+                        <label>
+                            <input type="radio" name="rating" value="5">
+                            ⭐⭐⭐⭐⭐ Sehr gut
+                        </label>
+                    </div>
+                </fieldset>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitRating(event)">
+                    Bewertung abgeben
+                </button>
+                <div id="goodRatingStatus"></div>
+            </form>
+            <p>✅ Bewertung wird erst nach expliziter Bestätigung übermittelt</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Checkboxes with apply settings button -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Checkboxes mit "Einstellungen übernehmen"-Button</div>
+        <p><strong>Lösung:</strong> Änderungen werden gesammelt und auf einmal übernommen</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodSettingsForm">
+                <fieldset>
+                    <legend>Benachrichtigungseinstellungen:</legend>
+                    <div class="good-form-group">
+                        <label>
+                            <input type="checkbox" name="notifications" value="email">
+                            E-Mail-Benachrichtigungen
+                        </label>
+                        <label>
+                            <input type="checkbox" name="notifications" value="sms">
+                            SMS-Benachrichtigungen
+                        </label>
+                        <label>
+                            <input type="checkbox" name="notifications" value="push">
+                            Push-Benachrichtigungen
+                        </label>
+                        <label>
+                            <input type="checkbox" name="privacy" value="analytics">
+                            Analytics erlauben
+                        </label>
+                    </div>
+                </fieldset>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitSettings(event)">
+                    Einstellungen übernehmen
+                </button>
+                <div id="goodSettingsStatus"></div>
+            </form>
+            <p>✅ Alle Einstellungen werden zusammen nach Bestätigung gespeichert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Form with validation before submit -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Formular mit Validierung vor Übermittlung</div>
+        <p><strong>Lösung:</strong> Vollständigkeitsprüfung mit expliziter Submit-Aktion</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodAddressForm">
+                <h4>Adressformular (Mit Validierung):</h4>
+                <div class="good-form-group">
+                    <label for="goodName">Name: *</label>
+                    <input type="text" id="goodName" class="good-form-input" 
+                           required aria-describedby="name-error">
+                    <div id="name-error" class="error-message" style="color: #d32f2f; font-size: 14px;"></div>
+                </div>
+                <div class="good-form-group">
+                    <label for="goodStreet">Straße: *</label>
+                    <input type="text" id="goodStreet" class="good-form-input" 
+                           required aria-describedby="street-error">
+                    <div id="street-error" class="error-message" style="color: #d32f2f; font-size: 14px;"></div>
+                </div>
+                <div class="good-form-group">
+                    <label for="goodCity">Stadt: *</label>
+                    <input type="text" id="goodCity" class="good-form-input" 
+                           required aria-describedby="city-error">
+                    <div id="city-error" class="error-message" style="color: #d32f2f; font-size: 14px;"></div>
+                </div>
+                <div class="good-form-group">
+                    <label for="goodZip">PLZ: *</label>
+                    <input type="text" id="goodZip" class="good-form-input" 
+                           required aria-describedby="zip-error">
+                    <div id="zip-error" class="error-message" style="color: #d32f2f; font-size: 14px;"></div>
+                </div>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitAddress(event)">
+                    Adresse speichern
+                </button>
+                <div id="goodAddressStatus"></div>
+            </form>
+            <p>✅ Vollständigkeitsprüfung erfolgt erst bei expliziter Submit-Aktion</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: File upload with explicit upload button -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Datei-Upload mit explizitem Upload-Button</div>
+        <p><strong>Lösung:</strong> Dateiauswahl und Upload sind getrennte Aktionen</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodFileForm">
+                <h4>Datei-Upload (Explizite Aktion):</h4>
+                <div class="good-form-group">
+                    <label for="goodFileInput">Dokument auswählen:</label>
+                    <input type="file" id="goodFileInput" class="good-form-input" 
+                           accept=".pdf,.doc,.docx" 
+                           onchange="goodFileSelected()"
+                           aria-describedby="file-help">
+                    <small id="file-help">Wählen Sie eine Datei aus und klicken Sie dann auf "Hochladen"</small>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" onclick="goodClearFile()" 
+                            style="background-color: #757575; color: white; padding: 8px 16px; border: none; border-radius: 4px;">
+                        Auswahl löschen
+                    </button>
+                    <button type="submit" class="good-submit-button" onclick="goodSubmitFile(event)" disabled>
+                        Datei hochladen
+                    </button>
+                </div>
+                <div id="goodFileStatus">Keine Datei ausgewählt</div>
+            </form>
+            <p>✅ Upload startet erst nach expliziter Bestätigung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Slider with apply button -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Slider mit "Übernehmen"-Button</div>
+        <p><strong>Lösung:</strong> Slider-Änderungen werden erst nach Bestätigung gespeichert</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodSliderForm">
+                <h4>Lautstärke-Einstellung (Mit Bestätigung):</h4>
+                <div class="good-form-group">
+                    <label for="goodVolumeSlider">
+                        Lautstärke: <span id="goodVolumeValue">50</span>%
+                    </label>
+                    <input type="range" id="goodVolumeSlider" class="good-form-input" 
+                           min="0" max="100" value="50" 
+                           oninput="goodUpdateSliderValue(this)" 
+                           aria-describedby="volume-help">
+                    <small id="volume-help">Stellen Sie die gewünschte Lautstärke ein und bestätigen Sie</small>
+                </div>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitVolume(event)">
+                    Lautstärke übernehmen
+                </button>
+                <div id="goodSliderStatus">Aktuelle Einstellung: 50%</div>
+            </form>
+            <p>✅ Lautstärke wird erst nach expliziter Bestätigung gespeichert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Date picker with booking confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Datumswahl mit Buchungsbestätigung</div>
+        <p><strong>Lösung:</strong> Datumswahl und Buchung sind getrennte Schritte</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodDateForm">
+                <h4>Terminbuchung (Mit Bestätigung):</h4>
+                <div class="good-form-group">
+                    <label for="goodDateInput">Gewünschter Termin:</label>
+                    <input type="date" id="goodDateInput" class="good-form-input" 
+                           onchange="goodDateSelected()"
+                           aria-describedby="date-help">
+                    <small id="date-help">Wählen Sie ein Datum und bestätigen Sie die Buchung</small>
+                </div>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitDate(event)" disabled>
+                    Termin buchen
+                </button>
+                <div id="goodDateStatus">Kein Datum ausgewählt</div>
+            </form>
+            <p>✅ Buchung erfolgt erst nach expliziter Bestätigung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Search with explicit search button -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Suchformular mit explizitem Such-Button</div>
+        <p><strong>Lösung:</strong> Suche wird nur auf Enter oder Button-Klick ausgeführt</p>
+        <div class="interactive-area">
+            <form class="good-form" id="goodSearchForm">
+                <h4>Suchformular (Explizite Suche):</h4>
+                <div class="good-form-group">
+                    <label for="goodSearchInput">Suchbegriff:</label>
+                    <input type="search" id="goodSearchInput" class="good-form-input" 
+                           placeholder="Geben Sie Suchbegriff ein..." 
+                           onkeydown="goodSearchKeydown(event)"
+                           aria-describedby="search-help">
+                    <small id="search-help">Drücken Sie Enter oder klicken Sie auf "Suchen"</small>
+                </div>
+                <button type="submit" class="good-submit-button" onclick="goodSubmitSearch(event)">
+                    🔍 Suchen
+                </button>
+                <div id="goodSearchStatus">Bereit für Ihre Suchanfrage</div>
+            </form>
+            <p>✅ Suche wird nur bei Enter oder explizitem Button-Klick ausgeführt</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 3.2.2 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Formulare werden nur nach expliziter Benutzeraktion abgesendet</li>
+            <li>✅ Nutzer haben vollständige Kontrolle über Formularübermittlung</li>
+            <li>✅ Möglichkeit zur Korrektur und Überprüfung vor Submit</li>
+            <li>✅ Keine unerwarteten Kontextwechsel oder Seitenänderungen</li>
+            <li>✅ Klare Trennung zwischen Eingabe und Übermittlung</li>
+            <li>✅ Vorhersagbares Verhalten für alle Benutzer</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Tastatur-Nutzer: Behalten vollständige Kontrolle über Formularaktionen</li>
+            <li>👥 Screen Reader-Nutzer: Erleben vorhersagbare Navigation ohne unerwartete Änderungen</li>
+            <li>👥 Motorische Einschränkungen: Können Eingaben in eigenem Tempo vervollständigen</li>
+            <li>👥 Kognitive Beeinträchtigungen: Verstehen klare Aktionsschritte ohne Verwirrung</li>
+            <li>👥 Alle Nutzer: Erhalten vertrauensvolle, kontrollierbare Benutzererfahrung</li>
+        </ul>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        // Helper function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // GOOD 1: Explicit newsletter submit
+        function goodSubmitNewsletter(event) {
+            event.preventDefault();
+            const email = document.getElementById('goodEmailExplicit').value;
+            const status = document.getElementById('goodNewsletterStatus');
+            
+            if (email) {
+                status.innerHTML = '<div class="good-status-success">✅ Newsletter-Anmeldung erfolgreich!</div>';
+                announceToScreenReader('Newsletter-Anmeldung erfolgreich');
+                console.log('✅ GOOD: Form submitted only after explicit user action');
+            }
+        }
+        
+        // GOOD 2: Explicit language submit
+        function goodSubmitLanguage(event) {
+            event.preventDefault();
+            const language = document.getElementById('goodLanguageSelect').value;
+            const status = document.getElementById('goodLanguageStatus');
+            
+            status.innerHTML = '<div class="good-status-success">✅ Sprache erfolgreich geändert!</div>';
+            announceToScreenReader(`Sprache geändert zu ${language}`);
+            console.log('✅ GOOD: Language change only after explicit confirmation');
+        }
+        
+        // GOOD 3: Manual save options
+        function goodSaveDraft() {
+            const content = document.getElementById('goodSurveyInput').value;
+            const status = document.getElementById('goodSurveyStatus');
+            
+            if (content.trim()) {
+                status.innerHTML = '<div class="good-status-info">💾 Entwurf gespeichert</div>';
+                announceToScreenReader('Entwurf gespeichert');
+                console.log('✅ GOOD: Draft saved on explicit user action');
+            }
+        }
+        
+        function goodSubmitSurvey(event) {
+            event.preventDefault();
+            const content = document.getElementById('goodSurveyInput').value;
+            const status = document.getElementById('goodSurveyStatus');
+            
+            if (content.trim()) {
+                status.innerHTML = '<div class="good-status-success">✅ Umfrage erfolgreich abgesendet!</div>';
+                announceToScreenReader('Umfrage abgesendet');
+                console.log('✅ GOOD: Survey submitted only after explicit action');
+            }
+        }
+        
+        // GOOD 4: Explicit rating submit
+        function goodSubmitRating(event) {
+            event.preventDefault();
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const status = document.getElementById('goodRatingStatus');
+            
+            if (rating) {
+                status.innerHTML = '<div class="good-status-success">✅ Bewertung erfolgreich abgegeben!</div>';
+                announceToScreenReader(`Bewertung ${rating.value} Sterne abgegeben`);
+                console.log('✅ GOOD: Rating submitted only after explicit confirmation');
+            } else {
+                status.innerHTML = '<div style="color: #d32f2f;">Bitte wählen Sie eine Bewertung aus</div>';
+            }
+        }
+        
+        // GOOD 5: Explicit settings submit
+        function goodSubmitSettings(event) {
+            event.preventDefault();
+            const status = document.getElementById('goodSettingsStatus');
+            
+            status.innerHTML = '<div class="good-status-success">✅ Einstellungen erfolgreich gespeichert!</div>';
+            announceToScreenReader('Einstellungen gespeichert');
+            console.log('✅ GOOD: Settings saved only after explicit confirmation');
+        }
+        
+        // GOOD 6: Form validation before submit
+        function goodSubmitAddress(event) {
+            event.preventDefault();
+            const form = event.target.form;
+            const inputs = form.querySelectorAll('input[required]');
+            const status = document.getElementById('goodAddressStatus');
+            let isValid = true;
+            
+            // Clear previous errors
+            form.querySelectorAll('.error-message').forEach(error => error.textContent = '');
+            
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    const errorElement = document.getElementById(input.id.replace('good', '').toLowerCase() + '-error');
+                    if (errorElement) {
+                        errorElement.textContent = 'Dieses Feld ist erforderlich';
+                    }
+                    isValid = false;
+                }
+            });
+            
+            if (isValid) {
+                status.innerHTML = '<div class="good-status-success">✅ Adresse erfolgreich gespeichert!</div>';
+                announceToScreenReader('Adresse gespeichert');
+                console.log('✅ GOOD: Address submitted only after validation and explicit action');
+            } else {
+                announceToScreenReader('Bitte füllen Sie alle erforderlichen Felder aus');
+            }
+        }
+        
+        // GOOD 7: Explicit file upload
+        function goodFileSelected() {
+            const fileInput = document.getElementById('goodFileInput');
+            const status = document.getElementById('goodFileStatus');
+            const submitButton = document.querySelector('#goodFileForm button[type="submit"]');
+            
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                status.textContent = `Datei ausgewählt: ${fileName}`;
+                submitButton.disabled = false;
+                announceToScreenReader(`Datei ${fileName} ausgewählt`);
+                console.log('✅ GOOD: File selected, upload requires explicit action');
+            }
+        }
+        
+        function goodClearFile() {
+            const fileInput = document.getElementById('goodFileInput');
+            const status = document.getElementById('goodFileStatus');
+            const submitButton = document.querySelector('#goodFileForm button[type="submit"]');
+            
+            fileInput.value = '';
+            status.textContent = 'Keine Datei ausgewählt';
+            submitButton.disabled = true;
+            announceToScreenReader('Dateiauswahl gelöscht');
+        }
+        
+        function goodSubmitFile(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('goodFileInput');
+            const status = document.getElementById('goodFileStatus');
+            
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                status.innerHTML = '<div class="good-status-success">✅ Datei erfolgreich hochgeladen!</div>';
+                announceToScreenReader('Datei hochgeladen');
+                console.log('✅ GOOD: File uploaded only after explicit confirmation');
+            }
+        }
+        
+        // GOOD 8: Slider with confirmation
+        function goodUpdateSliderValue(slider) {
+            document.getElementById('goodVolumeValue').textContent = slider.value;
+        }
+        
+        function goodSubmitVolume(event) {
+            event.preventDefault();
+            const volume = document.getElementById('goodVolumeSlider').value;
+            const status = document.getElementById('goodSliderStatus');
+            
+            status.innerHTML = '<div class="good-status-success">✅ Lautstärke gespeichert!</div>';
+            announceToScreenReader(`Lautstärke auf ${volume}% eingestellt`);
+            console.log('✅ GOOD: Volume setting saved only after explicit confirmation');
+        }
+        
+        // GOOD 9: Date selection with confirmation
+        function goodDateSelected() {
+            const dateInput = document.getElementById('goodDateInput');
+            const status = document.getElementById('goodDateStatus');
+            const submitButton = document.querySelector('#goodDateForm button[type="submit"]');
+            
+            if (dateInput.value) {
+                status.textContent = `Datum ausgewählt: ${dateInput.value}`;
+                submitButton.disabled = false;
+                announceToScreenReader(`Datum ${dateInput.value} ausgewählt`);
+                console.log('✅ GOOD: Date selected, booking requires explicit action');
+            }
+        }
+        
+        function goodSubmitDate(event) {
+            event.preventDefault();
+            const date = document.getElementById('goodDateInput').value;
+            const status = document.getElementById('goodDateStatus');
+            
+            if (date) {
+                status.innerHTML = '<div class="good-status-success">✅ Termin erfolgreich gebucht!</div>';
+                announceToScreenReader('Termin gebucht');
+                console.log('✅ GOOD: Appointment booked only after explicit confirmation');
+            }
+        }
+        
+        // GOOD 10: Explicit search
+        function goodSearchKeydown(event) {
+            if (event.key === 'Enter') {
+                goodPerformSearch();
+            }
+        }
+        
+        function goodSubmitSearch(event) {
+            event.preventDefault();
+            goodPerformSearch();
+        }
+        
+        function goodPerformSearch() {
+            const searchTerm = document.getElementById('goodSearchInput').value;
+            const status = document.getElementById('goodSearchStatus');
+            
+            if (searchTerm.trim()) {
+                status.innerHTML = '<div class="good-status-success">✅ Suche ausgeführt!</div>';
+                announceToScreenReader(`Suche nach ${searchTerm} gestartet`);
+                console.log('✅ GOOD: Search executed only on Enter or explicit button click');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD AUTO-SUBMITTING FORM IMPLEMENTATION ===');
+            console.log('✅ All forms require explicit user action to submit');
+            console.log('✅ No automatic submission on focus loss');
+            console.log('✅ No automatic submission on input change');
+            console.log('✅ No automatic submission on timeout');
+            console.log('✅ Clear separation between input and submission');
+            console.log('✅ Users maintain full control over form actions');
+            console.log('✅ Predictable behavior for all users');
+            console.log('✅ Opportunity for review and correction before submit');
+        });
+    </script>
+</body>
+</html>

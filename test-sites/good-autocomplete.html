@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Autocomplete Attributes - WCAG 1.3.5 Compliant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #666;
+            margin-top: 0;
+        }
+        
+        .success {
+            background: #efe;
+            border-left: 4px solid #0c0;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .field-group {
+            margin-bottom: 20px;
+        }
+        
+        .inline-fields {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .inline-fields > div {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Good Autocomplete Attributes - WCAG 1.3.5 Compliant</h1>
+    
+    <div class="success">
+        <strong>WCAG 1.3.5 Compliant:</strong> This page demonstrates proper use of autocomplete attributes,
+        enabling password managers and assistive technologies to correctly identify and auto-fill form fields.
+    </div>
+
+    <!-- Good Example 1: Login form with correct autocomplete values -->
+    <div class="form-section">
+        <h2>1. Login Form - Correct Autocomplete Values</h2>
+        <form>
+            <div class="field-group">
+                <label for="login-email">Email Address</label>
+                <!-- CORRECT: Using 'email' autocomplete for email field -->
+                <input type="email" id="login-email" name="email" autocomplete="email" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="login-password">Password</label>
+                <!-- CORRECT: Using 'current-password' for login password -->
+                <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+            </div>
+            
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <!-- Good Example 2: Registration form with proper autocomplete attributes -->
+    <div class="form-section">
+        <h2>2. Registration Form - Complete Autocomplete Attributes</h2>
+        <form>
+            <div class="field-group">
+                <label for="reg-fname">First Name</label>
+                <!-- CORRECT: Using autocomplete="given-name" -->
+                <input type="text" id="reg-fname" name="firstname" autocomplete="given-name" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-lname">Last Name</label>
+                <!-- CORRECT: Using autocomplete="family-name" -->
+                <input type="text" id="reg-lname" name="lastname" autocomplete="family-name" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-email">Email</label>
+                <!-- CORRECT: Using autocomplete="email" -->
+                <input type="email" id="reg-email" name="email" autocomplete="email" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-phone">Phone Number</label>
+                <!-- CORRECT: Using autocomplete="tel" -->
+                <input type="tel" id="reg-phone" name="phone" autocomplete="tel">
+            </div>
+            
+            <div class="field-group">
+                <label for="reg-password">Create Password</label>
+                <!-- CORRECT: Using autocomplete="new-password" for registration -->
+                <input type="password" id="reg-password" name="password" autocomplete="new-password" required>
+            </div>
+            
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+
+    <!-- Good Example 3: Shipping address form with autocomplete -->
+    <div class="form-section">
+        <h2>3. Shipping Address - Proper Autocomplete Attributes</h2>
+        <form>
+            <div class="field-group">
+                <label for="ship-name">Full Name</label>
+                <!-- CORRECT: Using autocomplete="name" -->
+                <input type="text" id="ship-name" name="fullname" autocomplete="name" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="ship-address1">Address Line 1</label>
+                <!-- CORRECT: Using autocomplete="address-line1" -->
+                <input type="text" id="ship-address1" name="address1" autocomplete="address-line1" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="ship-address2">Address Line 2</label>
+                <!-- CORRECT: Using autocomplete="address-line2" -->
+                <input type="text" id="ship-address2" name="address2" autocomplete="address-line2">
+            </div>
+            
+            <div class="inline-fields">
+                <div>
+                    <label for="ship-city">City</label>
+                    <!-- CORRECT: Using autocomplete="address-level2" -->
+                    <input type="text" id="ship-city" name="city" autocomplete="address-level2" required>
+                </div>
+                
+                <div>
+                    <label for="ship-state">State</label>
+                    <!-- CORRECT: Using autocomplete="address-level1" -->
+                    <select id="ship-state" name="state" autocomplete="address-level1" required>
+                        <option value="">Select State</option>
+                        <option value="CA">California</option>
+                        <option value="NY">New York</option>
+                        <option value="TX">Texas</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="ship-zip">ZIP Code</label>
+                    <!-- CORRECT: Using autocomplete="postal-code" -->
+                    <input type="text" id="ship-zip" name="zipcode" autocomplete="postal-code" pattern="[0-9]{5}" required>
+                </div>
+            </div>
+            
+            <div class="field-group">
+                <label for="ship-country">Country</label>
+                <!-- CORRECT: Using autocomplete="country" -->
+                <select id="ship-country" name="country" autocomplete="country" required>
+                    <option value="">Select Country</option>
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="MX">Mexico</option>
+                </select>
+            </div>
+            
+            <button type="submit">Save Address</button>
+        </form>
+    </div>
+
+    <!-- Good Example 4: Credit card form with proper autocomplete -->
+    <div class="form-section">
+        <h2>4. Payment Information - Correct Credit Card Autocomplete</h2>
+        <form>
+            <div class="field-group">
+                <label for="cc-name">Cardholder Name</label>
+                <!-- CORRECT: Using autocomplete="cc-name" -->
+                <input type="text" id="cc-name" name="cardname" autocomplete="cc-name" required>
+            </div>
+            
+            <div class="field-group">
+                <label for="cc-number">Card Number</label>
+                <!-- CORRECT: Using autocomplete="cc-number" -->
+                <input type="text" id="cc-number" name="cardnumber" autocomplete="cc-number" pattern="[0-9]{16}" required>
+            </div>
+            
+            <div class="inline-fields">
+                <div>
+                    <label for="cc-exp">Expiration Date</label>
+                    <!-- CORRECT: Using autocomplete="cc-exp" -->
+                    <input type="text" id="cc-exp" name="expiry" autocomplete="cc-exp" placeholder="MM/YY" pattern="[0-9]{2}/[0-9]{2}" required>
+                </div>
+                
+                <div>
+                    <label for="cc-csc">Security Code</label>
+                    <!-- CORRECT: Using autocomplete="cc-csc" -->
+                    <input type="text" id="cc-csc" name="cvv" autocomplete="cc-csc" pattern="[0-9]{3,4}" required>
+                </div>
+            </div>
+            
+            <button type="submit">Process Payment</button>
+        </form>
+    </div>
+
+    <!-- Good Example 5: Profile form with correct autocomplete values -->
+    <div class="form-section">
+        <h2>5. User Profile - Correct Autocomplete Usage</h2>
+        <form>
+            <div class="field-group">
+                <label for="profile-username">Username</label>
+                <!-- CORRECT: Using 'username' for username field -->
+                <input type="text" id="profile-username" name="username" autocomplete="username">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-birthday">Date of Birth</label>
+                <!-- CORRECT: Using autocomplete="bday" -->
+                <input type="date" id="profile-birthday" name="birthday" autocomplete="bday">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-website">Personal Website</label>
+                <!-- CORRECT: Using autocomplete="url" -->
+                <input type="url" id="profile-website" name="website" autocomplete="url">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-photo">Photo URL</label>
+                <!-- CORRECT: Using autocomplete="photo" -->
+                <input type="url" id="profile-photo" name="photo" autocomplete="photo">
+            </div>
+            
+            <button type="submit">Update Profile</button>
+        </form>
+    </div>
+
+    <!-- Good Example 6: One-time code with proper autocomplete -->
+    <div class="form-section">
+        <h2>6. Two-Factor Authentication - Correct Autocomplete</h2>
+        <form>
+            <div class="field-group">
+                <label for="otp-code">Enter 6-digit code</label>
+                <!-- CORRECT: Using autocomplete="one-time-code" -->
+                <input type="text" id="otp-code" name="code" pattern="[0-9]{6}" autocomplete="one-time-code" required>
+            </div>
+            
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+
+    <!-- Good Example 7: Additional common fields -->
+    <div class="form-section">
+        <h2>7. Additional Profile Fields - Comprehensive Autocomplete</h2>
+        <form>
+            <div class="field-group">
+                <label for="profile-org">Organization</label>
+                <!-- CORRECT: Using autocomplete="organization" -->
+                <input type="text" id="profile-org" name="organization" autocomplete="organization">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-title">Job Title</label>
+                <!-- CORRECT: Using autocomplete="organization-title" -->
+                <input type="text" id="profile-title" name="jobtitle" autocomplete="organization-title">
+            </div>
+            
+            <div class="field-group">
+                <label for="profile-gender">Gender</label>
+                <!-- CORRECT: Using autocomplete="sex" -->
+                <select id="profile-gender" name="gender" autocomplete="sex">
+                    <option value="">Prefer not to say</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <button type="submit">Save Additional Info</button>
+        </form>
+    </div>
+
+    <div class="success">
+        <p><strong>All form fields properly configured</strong></p>
+        <p>Every input field has the appropriate autocomplete attribute, enabling password managers and
+        assistive technologies to correctly identify fields and help users complete forms efficiently.</p>
+    </div>
+</body>
+</html>

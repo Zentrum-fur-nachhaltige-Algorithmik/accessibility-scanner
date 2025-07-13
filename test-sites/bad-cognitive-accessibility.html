@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Cognitive Accessibility Violations (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Complex instructions without clear structure */
+        .bad-complex-instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            text-align: justify;
+            /* SCHLECHT: Keine klare Struktur oder Aufzählungen */
+        }
+        
+        .bad-password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin: 10px 0;
+            /* SCHLECHT: Versteckte, komplexe Anforderungen */
+        }
+        
+        /* VIOLATION 2: Memory-dependent tasks without help */
+        .bad-multi-step-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-step-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #999;
+            /* SCHLECHT: Keine Navigationshilfe zwischen Schritten */
+        }
+        
+        .bad-form-group {
+            margin-bottom: 15px;
+        }
+        
+        .bad-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .bad-form-group input, .bad-form-group select, .bad-form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* VIOLATION 3: Timeouts without extension options */
+        .bad-timeout-form {
+            border: 2px solid #ff9800;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #fff3e0;
+            position: relative;
+        }
+        
+        .bad-timeout-warning {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            /* SCHLECHT: Timeout ohne Verlängerungsoptionen */
+        }
+        
+        /* VIOLATION 4: Auto-refresh without controls */
+        .bad-auto-refresh {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #f0f8ff;
+            /* SCHLECHT: Automatische Aktualisierung alle 30 Sekunden */
+        }
+        
+        .bad-refresh-status {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        /* VIOLATION 5: Inconsistent navigation without landmarks */
+        .bad-navigation {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            /* SCHLECHT: Keine semantischen Landmark-Rollen */
+        }
+        
+        .bad-nav-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .bad-nav-links a {
+            color: #007cba;
+            text-decoration: none;
+            /* SCHLECHT: Inkonsistente Navigation ohne klare Struktur */
+        }
+        
+        /* VIOLATION 6: Error messages without clear guidance */
+        .bad-error-display {
+            background-color: #ffebee;
+            border: 1px solid #f44336;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #f44336;
+            display: none;
+            /* SCHLECHT: Vage Fehlermeldungen ohne Lösungsvorschläge */
+        }
+        
+        .bad-error-display.show {
+            display: block;
+        }
+        
+        /* VIOLATION 7: Context changes without warning */
+        .bad-context-changes {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-dropdown-context {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            /* SCHLECHT: Dropdown löst Kontextwechsel ohne Warnung aus */
+        }
+        
+        /* VIOLATION 8: Content disappears without user control */
+        .bad-disappearing-content {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .bad-notification {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: opacity 0.3s;
+            /* SCHLECHT: Verschwindet automatisch nach 3 Sekunden */
+        }
+        
+        .bad-notification.fade-out {
+            opacity: 0;
+        }
+        
+        /* VIOLATION 9: Overwhelming amount of information */
+        .bad-information-overload {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            /* SCHLECHT: Zu viele Informationen ohne Priorisierung */
+        }
+        
+        .bad-dense-content {
+            font-size: 12px;
+            line-height: 1.2;
+            columns: 3;
+            column-gap: 20px;
+            text-align: justify;
+        }
+        
+        /* VIOLATION 10: No progress indicators for complex tasks */
+        .bad-complex-task {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-task-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .bad-task-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            /* SCHLECHT: Keine Fortschrittsanzeige oder Orientierungshilfe */
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        button {
+            background-color: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #005a87;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Cognitive Accessibility Violations (BAD)</h1>
+    <p><strong>WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 & 3.3.2 Verletzungen:</strong> Kognitive Barrieren durch komplexe Interaktionen und fehlende Orientierungshilfen</p>
+    
+    <!-- VIOLATION 1: Complex instructions without clear structure -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Komplexe Anweisungen ohne klare Struktur</div>
+        <p><strong>Problem:</strong> Wichtige Informationen in langen Textblöcken versteckt</p>
+        <div class="interactive-area">
+            <div class="bad-complex-instructions">
+                <!-- SCHLECHT: Ein langer, unstrukturierter Textblock -->
+                Bitte beachten Sie bei der Erstellung Ihres Passworts folgende Kriterien: Das Passwort muss mindestens 12 Zeichen lang sein und sowohl Groß- als auch Kleinbuchstaben enthalten, zusätzlich mindestens zwei Zahlen und ein Sonderzeichen aus der Liste !@#$%^&*(), aber nicht (){}[]<> verwenden, außerdem darf es nicht Ihren Benutzernamen, Geburtsdatum oder häufige Wörter wie "password", "123456" oder "qwerty" enthalten, und es sollte sich von Ihren letzten 5 Passwörtern unterscheiden, wobei Sie auch bedenken sollten, dass das Passwort alle 90 Tage geändert werden muss und bei 3 falschen Eingaben Ihr Konto für 30 Minuten gesperrt wird.
+            </div>
+            
+            <form>
+                <div class="bad-form-group">
+                    <label for="badPassword">Neues Passwort:</label>
+                    <input type="password" id="badPassword" name="password">
+                    <div class="bad-password-requirements">
+                        Mindestens 12 Zeichen, Groß-/Kleinbuchstaben, 2 Zahlen, 1 Sonderzeichen (!@#$%^&*()), nicht: Benutzername, Geburtsdatum, häufige Wörter, letzte 5 Passwörter
+                    </div>
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badPasswordConfirm">Passwort bestätigen:</label>
+                    <input type="password" id="badPasswordConfirm" name="passwordConfirm">
+                </div>
+                
+                <button type="submit">Passwort erstellen</button>
+            </form>
+            <p>☝️ Kognitive Überlastung durch unstrukturierte, komplexe Anweisungen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Memory-dependent multi-step process -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Gedächtnisabhängiger mehrstufiger Prozess</div>
+        <p><strong>Problem:</strong> Benutzer müssen sich Informationen aus vorherigen Schritten merken</p>
+        <div class="interactive-area">
+            <div class="bad-multi-step-form">
+                <!-- SCHLECHT: Keine Navigation zwischen Schritten -->
+                <div class="bad-step-indicator">
+                    Schritt 2 von 5 - Persönliche Daten
+                </div>
+                
+                <form id="badStepForm">
+                    <div class="bad-form-group">
+                        <label for="badAddress">Adresse:</label>
+                        <input type="text" id="badAddress" name="address" placeholder="Wie in Schritt 1 angegeben">
+                    </div>
+                    
+                    <div class="bad-form-group">
+                        <label for="badPhone">Telefonnummer:</label>
+                        <input type="tel" id="badPhone" name="phone" placeholder="Dieselbe wie beim Konto in Schritt 1">
+                    </div>
+                    
+                    <div class="bad-form-group">
+                        <label for="badReference">Referenznummer:</label>
+                        <input type="text" id="badReference" name="reference" placeholder="Aus Schritt 1">
+                    </div>
+                    
+                    <div class="bad-form-group">
+                        <label for="badIncome">Monatliches Einkommen:</label>
+                        <input type="number" id="badIncome" name="income" placeholder="Bestätigung des Betrags aus Schritt 1">
+                    </div>
+                    
+                    <!-- SCHLECHT: Keine Übersicht der bisherigen Eingaben -->
+                    <button type="button" onclick="badNextStep()">Weiter zu Schritt 3</button>
+                </form>
+            </div>
+            <p>☝️ Benutzer müssen sich Details aus vorherigen Schritten merken</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Timeout without extension options -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Timeout ohne Verlängerungsmöglichkeiten</div>
+        <p><strong>Problem:</strong> Sitzung läuft ab ohne Benutzer-Kontrolle</p>
+        <div class="interactive-area">
+            <div class="bad-timeout-form">
+                <!-- SCHLECHT: Timeout ohne Optionen -->
+                <div class="bad-timeout-warning" id="badTimeoutWarning">
+                    Session läuft ab: 02:45
+                </div>
+                
+                <h4>Krankenversicherungsantrag</h4>
+                <form>
+                    <div class="bad-form-group">
+                        <label for="badMedicalHistory">Krankengeschichte (detailliert):</label>
+                        <textarea id="badMedicalHistory" name="medicalHistory" rows="6" placeholder="Bitte alle relevanten medizinischen Informationen detailliert beschreiben..."></textarea>
+                    </div>
+                    
+                    <div class="bad-form-group">
+                        <label for="badMedications">Aktuelle Medikamente:</label>
+                        <textarea id="badMedications" name="medications" rows="4" placeholder="Medikamentenname, Dosierung, Häufigkeit..."></textarea>
+                    </div>
+                    
+                    <div class="bad-form-group">
+                        <label for="badFamilyHistory">Familienanamnese:</label>
+                        <textarea id="badFamilyHistory" name="familyHistory" rows="4" placeholder="Erbkrankheiten, familiäre Vorbelastungen..."></textarea>
+                    </div>
+                    
+                    <button type="submit">Antrag absenden</button>
+                </form>
+            </div>
+            <p>☝️ Komplexe Formulare mit Zeitdruck ohne Kontrolle</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Auto-refresh without user control -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Auto-Aktualisierung ohne Benutzer-Kontrolle</div>
+        <p><strong>Problem:</strong> Inhalte ändern sich automatisch und stören die Konzentration</p>
+        <div class="interactive-area">
+            <div class="bad-auto-refresh">
+                <!-- SCHLECHT: Automatische Aktualisierung alle 30 Sekunden -->
+                <div class="bad-refresh-status">
+                    Automatische Aktualisierung: alle 30 Sekunden | Letzte Aktualisierung: vor <span id="badLastRefresh">5</span> Sekunden
+                </div>
+                
+                <h4>Live Börsenkurse</h4>
+                <div id="badStockData">
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <span>AAPL</span>
+                        <span id="aaplPrice">$178.45</span>
+                        <span style="color: green;">+2.34%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <span>MSFT</span>
+                        <span id="msftPrice">$412.67</span>
+                        <span style="color: red;">-1.23%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <span>GOOGL</span>
+                        <span id="googlPrice">$142.89</span>
+                        <span style="color: green;">+0.87%</span>
+                    </div>
+                </div>
+                
+                <p>Wichtige Investitionsentscheidungen erfordern sorgfältige Analyse der sich ständig ändernden Kursdaten...</p>
+            </div>
+            <p>☝️ Automatische Änderungen unterbrechen das Lesen und die Konzentration</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Inconsistent navigation without landmarks -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Inkonsistente Navigation ohne Orientierungshilfen</div>
+        <p><strong>Problem:</strong> Navigation ändert sich je nach Seite ohne semantische Struktur</p>
+        <div class="interactive-area">
+            <div class="bad-navigation">
+                <!-- SCHLECHT: Keine role="navigation" oder andere Landmark-Rollen -->
+                <div class="bad-nav-links">
+                    <a href="#" onclick="badChangeNavigation('home')">Startseite</a>
+                    <a href="#" onclick="badChangeNavigation('products')">Produkte</a>
+                    <a href="#" onclick="badChangeNavigation('services')">Dienstleistungen</a>
+                    <a href="#" onclick="badChangeNavigation('about')">Über uns</a>
+                    <a href="#" onclick="badChangeNavigation('contact')">Kontakt</a>
+                    <a href="#" onclick="badChangeNavigation('help')">Hilfe</a>
+                    <a href="#" onclick="badChangeNavigation('account')">Mein Konto</a>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0; padding: 15px; background: #f0f0f0; border-radius: 4px;">
+                <h4>Aktueller Bereich: <span id="badCurrentSection">Startseite</span></h4>
+                <p id="badSectionContent">Willkommen auf unserer Homepage...</p>
+            </div>
+            
+            <p>☝️ Navigation ändert sich ohne Vorhersagbarkeit oder klare Struktur</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Vague error messages without guidance -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Vage Fehlermeldungen ohne Anleitung</div>
+        <p><strong>Problem:</strong> Fehler werden nicht klar erklärt oder gelöst</p>
+        <div class="interactive-area">
+            <form onsubmit="return badValidateComplexForm(event)">
+                <div class="bad-form-group">
+                    <label for="badBankAccount">Bankverbindung:</label>
+                    <input type="text" id="badBankAccount" name="bankAccount" placeholder="IBAN oder Kontonummer">
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badTaxId">Steuer-ID:</label>
+                    <input type="text" id="badTaxId" name="taxId" placeholder="Steuernummer oder USt-IdNr">
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badBusinessType">Unternehmensform:</label>
+                    <select id="badBusinessType" name="businessType">
+                        <option value="">Bitte wählen</option>
+                        <option value="gmbh">GmbH</option>
+                        <option value="ag">AG</option>
+                        <option value="einzelunternehmen">Einzelunternehmen</option>
+                        <option value="partnership">Personengesellschaft</option>
+                    </select>
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badRevenue">Jahresumsatz (EUR):</label>
+                    <input type="number" id="badRevenue" name="revenue" placeholder="Umsatz der letzten 12 Monate">
+                </div>
+                
+                <!-- SCHLECHT: Vage, unhilfreiche Fehlermeldungen -->
+                <div id="badFormError" class="bad-error-display">
+                    <strong>Fehler:</strong> Eingaben sind ungültig. Bitte korrigieren Sie Ihre Angaben.
+                </div>
+                
+                <button type="submit">Geschäftskonto eröffnen</button>
+            </form>
+            <p>☝️ Fehlermeldungen bieten keine spezifische Hilfe zur Problemlösung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Context changes without warning -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Kontextwechsel ohne Warnung</div>
+        <p><strong>Problem:</strong> Interface ändert sich unerwartet bei Benutzeraktionen</p>
+        <div class="interactive-area">
+            <div class="bad-context-changes">
+                <h4>Spracheinstellungen</h4>
+                
+                <!-- SCHLECHT: Dropdown löst sofortigen Kontextwechsel aus -->
+                <label for="badLanguageSelect">Sprache wählen:</label>
+                <select id="badLanguageSelect" class="bad-dropdown-context" onchange="badChangeLanguageContext(this.value)">
+                    <option value="de">Deutsch</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                    <option value="it">Italiano</option>
+                </select>
+                
+                <div style="margin: 20px 0;">
+                    <h5 id="badContentTitle">Produktinformationen</h5>
+                    <p id="badContentText">Dies ist ein wichtiger Text über unser Produkt. Die Informationen hier sind sehr detailliert und erfordern Konzentration beim Lesen...</p>
+                </div>
+                
+                <h4>Währung auswählen</h4>
+                <!-- SCHLECHT: Weitere unerwartete Kontextwechsel -->
+                <select onchange="badChangeCurrency(this.value)">
+                    <option value="eur">EUR (€)</option>
+                    <option value="usd">USD ($)</option>
+                    <option value="gbp">GBP (£)</option>
+                    <option value="jpy">JPY (¥)</option>
+                </select>
+                
+                <div style="margin: 20px 0;">
+                    <h5>Preisliste</h5>
+                    <div id="badPriceDisplay">
+                        <div>Basis-Paket: €49.99</div>
+                        <div>Premium-Paket: €99.99</div>
+                        <div>Enterprise-Paket: €199.99</div>
+                    </div>
+                </div>
+            </div>
+            <p>☝️ Unerwartete Änderungen stören die Benutzerführung und Konzentration</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Content disappears without user control -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Inhalte verschwinden ohne Benutzer-Kontrolle</div>
+        <p><strong>Problem:</strong> Wichtige Informationen werden automatisch ausgeblendet</p>
+        <div class="interactive-area">
+            <div class="bad-disappearing-content">
+                <h4>Statusmeldungen</h4>
+                <p>Klicken Sie auf eine Aktion, um eine Statusmeldung zu sehen:</p>
+                
+                <button onclick="badShowNotification('success', 'Datei wurde erfolgreich hochgeladen!')">Datei hochladen</button>
+                <button onclick="badShowNotification('warning', 'Achtung: Speicherplatz wird knapp!')">Speicher prüfen</button>
+                <button onclick="badShowNotification('error', 'Fehler: Verbindung zur Datenbank verloren!')">Verbindung testen</button>
+                
+                <!-- SCHLECHT: Benachrichtigungen verschwinden automatisch -->
+                <div id="badNotification" class="bad-notification hidden">
+                    Statusmeldung
+                </div>
+                
+                <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>Wichtige Dokumentation</h5>
+                    <p>Lesen Sie aufmerksam die folgenden wichtigen Sicherheitshinweise für den Umgang mit den Systemfunktionen. Diese Informationen sind entscheidend für die korrekte Nutzung...</p>
+                </div>
+            </div>
+            <p>☝️ Wichtige Meldungen verschwinden bevor sie vollständig gelesen werden können</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 9: Information overload without prioritization -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Informationsüberflutung ohne Priorisierung</div>
+        <p><strong>Problem:</strong> Zu viele gleichzeitige Informationen ohne Strukturierung</p>
+        <div class="interactive-area">
+            <div class="bad-information-overload">
+                <!-- SCHLECHT: Massive Informationsmenge ohne Priorisierung -->
+                <div class="bad-dense-content">
+                    Das Europäische Parlament und der Rat der Europäischen Union haben die neue Datenschutz-Grundverordnung (DSGVO) verabschiedet, die am 25. Mai 2018 in Kraft getreten ist und weitreichende Auswirkungen auf alle Unternehmen hat, die personenbezogene Daten von EU-Bürgern verarbeiten. Diese Verordnung ersetzt die Datenschutzrichtlinie von 1995 und harmonisiert die Datenschutzgesetze in der gesamten EU. Gleichzeitig müssen Unternehmen die neuen Bestimmungen der ePrivacy-Verordnung beachten, die Cookie-Verwendung und elektronische Kommunikation regelt. Zusätzlich sind branchenspezifische Regelungen wie die PCI-DSS für Kreditkartendaten, HIPAA für Gesundheitsdaten in den USA, SOX für börsennotierte Unternehmen, und ISO 27001 für Informationssicherheit relevant. Die technische Umsetzung erfordert die Implementierung von Privacy by Design, Datenschutz-Folgenabschätzungen, Verzeichnisse von Verarbeitungstätigkeiten, Meldeverfahren für Datenschutzverletzungen, und die Benennung von Datenschutzbeauftragten. Dabei sind verschiedene Rechtsgrundlagen zu berücksichtigen: Einwilligung, berechtigte Interessen, Vertragserfüllung, rechtliche Verpflichtung, Schutz lebenswichtiger Interessen, und öffentliche Aufgaben. Die Betroffenenrechte umfassen Auskunftsrecht, Berichtigungsrecht, Löschungsrecht, Einschränkung der Verarbeitung, Datenübertragbarkeit, Widerspruchsrecht, und Rechte in Bezug auf automatisierte Entscheidungsfindung. Bei Verstößen drohen Bußgelder von bis zu 20 Millionen Euro oder 4% des weltweiten Jahresumsatzes. Die Aufsichtsbehörden haben weitreichende Befugnisse einschließlich Untersuchungen, Anordnungen, und Sanktionen. Unternehmen müssen auch internationale Datenübertragungen durch Angemessenheitsbeschlüsse, Standardvertragsklauseln, oder andere Garantien absichern. Die Cloud-Nutzung erfordert besondere Aufmerksamkeit bei der Auftragsverarbeitung und der Standortwahl der Rechenzentren.
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
+                    <button>DSGVO Compliance</button>
+                    <button>Privacy Impact</button>
+                    <button>Data Mapping</button>
+                    <button>Consent Management</button>
+                    <button>Breach Notification</button>
+                    <button>DPO Appointment</button>
+                    <button>Rights Management</button>
+                    <button>Transfer Mechanisms</button>
+                    <button>Cloud Assessment</button>
+                    <button>Vendor Management</button>
+                    <button>Risk Assessment</button>
+                    <button>Policy Development</button>
+                </div>
+            </div>
+            <p>☝️ Kognitive Überlastung durch ungefilterte Informationsmenge</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 10: Complex tasks without progress indicators -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 10: Komplexe Aufgaben ohne Fortschrittsanzeige</div>
+        <p><strong>Problem:</strong> Benutzer verlieren Überblick bei mehrstufigen Prozessen</p>
+        <div class="interactive-area">
+            <div class="bad-complex-task">
+                <h4>Systemkonfiguration</h4>
+                
+                <!-- SCHLECHT: Keine Fortschrittsanzeige oder Orientierung -->
+                <ul class="bad-task-list">
+                    <li onclick="badToggleTask(this)">
+                        Datenbank-Verbindung konfigurieren
+                        <div class="hidden">Server: db.example.com, Port: 5432, SSL: aktiviert</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        E-Mail-Server einrichten
+                        <div class="hidden">SMTP: mail.example.com, IMAP: imap.example.com</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        Benutzerrechte definieren
+                        <div class="hidden">Admin, Editor, Viewer Rollen mit spezifischen Berechtigungen</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        Backup-Strategien festlegen
+                        <div class="hidden">Tägliche inkrementelle, wöchentliche vollständige Backups</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        Sicherheitsrichtlinien implementieren
+                        <div class="hidden">Firewall, Intrusion Detection, Log-Monitoring</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        Performance-Überwachung aktivieren
+                        <div class="hidden">CPU, Memory, Disk I/O, Network-Monitoring</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        Compliance-Einstellungen überprüfen
+                        <div class="hidden">DSGVO, SOX, HIPAA Anforderungen validieren</div>
+                    </li>
+                    <li onclick="badToggleTask(this)">
+                        Integration-Tests durchführen
+                        <div class="hidden">API-Tests, Datenbank-Tests, E-Mail-Tests</div>
+                    </li>
+                </ul>
+                
+                <button onclick="badCompleteConfiguration()">Konfiguration abschließen</button>
+            </div>
+            <p>☝️ Komplexe mehrstufige Aufgaben ohne Orientierungshilfen oder Fortschritt</p>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 & 3.3.2 Verletzungen:</strong></p>
+        <ul>
+            <li>❌ Kognitive Überlastung durch unstrukturierte Informationen</li>
+            <li>❌ Gedächtnisabhängige Aufgaben ohne Hilfestellung</li>
+            <li>❌ Unvorhergesagbare Kontextwechsel</li>
+            <li>❌ Zeitdruck ohne Benutzer-Kontrolle</li>
+            <li>❌ Vage Fehlermeldungen ohne Lösungshilfe</li>
+        </ul>
+        
+        <p><strong>Betroffene Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Kognitive Beeinträchtigungen: Überfordert durch Komplexität</li>
+            <li>👥 Aufmerksamkeitsdefizite: Abgelenkt durch automatische Änderungen</li>
+            <li>👥 Gedächtnisprobleme: Vergessen Informationen zwischen Schritten</li>
+            <li>👥 Leseschwäche: Verstehen komplexe Anweisungen nicht</li>
+            <li>👥 Ältere Benutzer: Benötigen mehr Zeit und klarere Struktur</li>
+        </ul>
+    </div>
+
+    <script>
+        let badTimeoutCounter = 165; // 2:45 minutes
+        let badRefreshCounter = 5;
+        let badCurrentStep = 2;
+        
+        // VIOLATION 3: Countdown without extension
+        function badStartTimeout() {
+            const timeoutInterval = setInterval(() => {
+                badTimeoutCounter--;
+                const minutes = Math.floor(badTimeoutCounter / 60);
+                const seconds = badTimeoutCounter % 60;
+                
+                document.getElementById('badTimeoutWarning').textContent = 
+                    `Session läuft ab: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (badTimeoutCounter <= 0) {
+                    clearInterval(timeoutInterval);
+                    alert('Session abgelaufen! Alle Eingaben gehen verloren.');
+                    document.querySelector('.bad-timeout-form').innerHTML = 
+                        '<h3 style="color: #f44336; text-align: center;">Session abgelaufen</h3><p>Bitte starten Sie von vorne.</p>';
+                    console.log('ACCESSIBILITY VIOLATION: Session timeout without extension options');
+                }
+            }, 1000);
+        }
+        
+        // VIOLATION 4: Auto-refresh without controls
+        function badStartAutoRefresh() {
+            setInterval(() => {
+                badRefreshCounter++;
+                document.getElementById('badLastRefresh').textContent = '0';
+                
+                // Update prices randomly
+                const aaplPrice = (Math.random() * 20 + 170).toFixed(2);
+                const msftPrice = (Math.random() * 30 + 400).toFixed(2);
+                const googlPrice = (Math.random() * 15 + 135).toFixed(2);
+                
+                document.getElementById('aaplPrice').textContent = `$${aaplPrice}`;
+                document.getElementById('msftPrice').textContent = `$${msftPrice}`;
+                document.getElementById('googlPrice').textContent = `$${googlPrice}`;
+                
+                console.log('ACCESSIBILITY VIOLATION: Auto-refresh disrupts user focus');
+            }, 30000);
+            
+            // Update "seconds since refresh" counter
+            setInterval(() => {
+                const current = parseInt(document.getElementById('badLastRefresh').textContent);
+                document.getElementById('badLastRefresh').textContent = (current + 1).toString();
+            }, 1000);
+        }
+        
+        // VIOLATION 2: Memory-dependent steps
+        function badNextStep() {
+            if (!document.getElementById('badAddress').value || 
+                !document.getElementById('badPhone').value ||
+                !document.getElementById('badReference').value ||
+                !document.getElementById('badIncome').value) {
+                alert('Bitte füllen Sie alle Felder mit den Daten aus Schritt 1 aus.');
+                return;
+            }
+            
+            badCurrentStep++;
+            document.querySelector('.bad-step-indicator').textContent = `Schritt ${badCurrentStep} von 5 - Finanzielle Angaben`;
+            
+            // Clear form and show new fields that also reference previous steps
+            document.getElementById('badStepForm').innerHTML = `
+                <div class="bad-form-group">
+                    <label for="badEmployer">Arbeitgeber:</label>
+                    <input type="text" name="employer" placeholder="Bestätigung aus Schritt 1">
+                </div>
+                <div class="bad-form-group">
+                    <label for="badSalary">Gehalt:</label>
+                    <input type="number" name="salary" placeholder="Wie in Schritt 2 angegeben">
+                </div>
+                <div class="bad-form-group">
+                    <label for="badBankDetails">Bankverbindung:</label>
+                    <input type="text" name="bankDetails" placeholder="Dieselbe Bank wie Referenzkonto aus Schritt 1">
+                </div>
+                <button type="button" onclick="badNextStep()">Weiter zu Schritt 4</button>
+            `;
+            
+            console.log('ACCESSIBILITY VIOLATION: User must remember information from previous steps');
+        }
+        
+        // VIOLATION 5: Inconsistent navigation
+        function badChangeNavigation(section) {
+            const sections = {
+                'home': {
+                    title: 'Startseite',
+                    content: 'Willkommen auf unserer Homepage...',
+                    nav: ['Startseite', 'Produkte', 'Dienstleistungen', 'Über uns', 'Kontakt', 'Hilfe', 'Mein Konto']
+                },
+                'products': {
+                    title: 'Produkte',
+                    content: 'Unsere Produktpalette umfasst...',
+                    nav: ['Zurück', 'Kategorien', 'Bestseller', 'Neu', 'Angebote', 'Vergleichen', 'Warenkorb', 'Wunschliste']
+                },
+                'services': {
+                    title: 'Dienstleistungen',
+                    content: 'Wir bieten folgende Services...',
+                    nav: ['Services', 'Beratung', 'Support', 'Training', 'Wartung', 'Kontakt', 'Termine']
+                },
+                'about': {
+                    title: 'Über uns',
+                    content: 'Unser Unternehmen wurde gegründet...',
+                    nav: ['Über uns', 'Team', 'Geschichte', 'Mission', 'Karriere', 'Presse', 'Standorte']
+                }
+            };
+            
+            const current = sections[section] || sections['home'];
+            document.getElementById('badCurrentSection').textContent = current.title;
+            document.getElementById('badSectionContent').textContent = current.content;
+            
+            // SCHLECHT: Navigation ändert sich je nach Bereich
+            const navContainer = document.querySelector('.bad-nav-links');
+            navContainer.innerHTML = current.nav.map(item => 
+                `<a href="#" onclick="badChangeNavigation('${section}')">${item}</a>`
+            ).join('');
+            
+            console.log('ACCESSIBILITY VIOLATION: Navigation changes unpredictably between sections');
+        }
+        
+        // VIOLATION 6: Vague error messages
+        function badValidateComplexForm(event) {
+            event.preventDefault();
+            
+            const bankAccount = document.getElementById('badBankAccount').value;
+            const taxId = document.getElementById('badTaxId').value;
+            const businessType = document.getElementById('badBusinessType').value;
+            const revenue = document.getElementById('badRevenue').value;
+            
+            let hasError = false;
+            
+            // SCHLECHT: Vage, unhilfreiche Validierung
+            if (!bankAccount || bankAccount.length < 10) hasError = true;
+            if (!taxId || taxId.length < 5) hasError = true;
+            if (!businessType) hasError = true;
+            if (!revenue || isNaN(revenue) || revenue < 0) hasError = true;
+            
+            if (hasError) {
+                document.getElementById('badFormError').classList.add('show');
+                console.log('ACCESSIBILITY VIOLATION: Vague error message without specific guidance');
+                return false;
+            }
+            
+            alert('Antrag eingereicht - Bearbeitung dauert 2-3 Wochen');
+            return false;
+        }
+        
+        // VIOLATION 7: Context changes without warning
+        function badChangeLanguageContext(language) {
+            const content = {
+                'de': { title: 'Produktinformationen', text: 'Dies ist ein wichtiger Text über unser Produkt...' },
+                'en': { title: 'Product Information', text: 'This is important text about our product...' },
+                'fr': { title: 'Informations sur le produit', text: 'Ceci est un texte important sur notre produit...' },
+                'es': { title: 'Información del producto', text: 'Este es un texto importante sobre nuestro producto...' },
+                'it': { title: 'Informazioni sul prodotto', text: 'Questo è un testo importante sul nostro prodotto...' }
+            };
+            
+            // SCHLECHT: Sofortiger Kontextwechsel ohne Warnung
+            const current = content[language];
+            document.getElementById('badContentTitle').textContent = current.title;
+            document.getElementById('badContentText').textContent = current.text;
+            
+            console.log('ACCESSIBILITY VIOLATION: Immediate context change disrupts user focus');
+        }
+        
+        function badChangeCurrency(currency) {
+            const rates = {
+                'eur': ['€49.99', '€99.99', '€199.99'],
+                'usd': ['$54.99', '$109.99', '$219.99'],
+                'gbp': ['£44.99', '£89.99', '£179.99'],
+                'jpy': ['¥7,499', '¥14,999', '¥29,999']
+            };
+            
+            // SCHLECHT: Weitere unerwartete Änderung
+            const prices = rates[currency];
+            const priceElements = document.querySelectorAll('#badPriceDisplay div');
+            priceElements[0].textContent = `Basis-Paket: ${prices[0]}`;
+            priceElements[1].textContent = `Premium-Paket: ${prices[1]}`;
+            priceElements[2].textContent = `Enterprise-Paket: ${prices[2]}`;
+            
+            console.log('ACCESSIBILITY VIOLATION: Currency change without user confirmation');
+        }
+        
+        // VIOLATION 8: Content disappears automatically
+        function badShowNotification(type, message) {
+            const notification = document.getElementById('badNotification');
+            notification.textContent = message;
+            notification.className = `bad-notification ${type}`;
+            notification.classList.remove('hidden');
+            
+            // SCHLECHT: Verschwindet automatisch nach 3 Sekunden
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                    notification.classList.remove('fade-out');
+                }, 300);
+            }, 3000);
+            
+            console.log('ACCESSIBILITY VIOLATION: Important notification disappears automatically');
+        }
+        
+        // VIOLATION 10: Complex tasks without progress
+        function badToggleTask(element) {
+            const details = element.querySelector('div');
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                element.style.background = '#e8f5e8';
+            } else {
+                details.classList.add('hidden');
+                element.style.background = '#f8f9fa';
+            }
+            
+            console.log('ACCESSIBILITY VIOLATION: Task interaction without progress tracking');
+        }
+        
+        function badCompleteConfiguration() {
+            alert('Konfiguration abgeschlossen!\n\nAber warten Sie... haben Sie wirklich alle Schritte korrekt durchgeführt?\nEs gab keine Übersicht oder Bestätigung der einzelnen Schritte.');
+            console.log('ACCESSIBILITY VIOLATION: Complex task completed without progress validation');
+        }
+        
+        // Initialize violations
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== COGNITIVE ACCESSIBILITY VIOLATIONS ANALYSIS ===');
+            
+            // Start timeout and auto-refresh
+            badStartTimeout();
+            badStartAutoRefresh();
+            
+            console.log('⚠️ Multiple cognitive barriers active:');
+            console.log('- Complex instructions without structure');
+            console.log('- Memory-dependent multi-step processes');  
+            console.log('- Timeouts without extension options');
+            console.log('- Auto-refresh without user control');
+            console.log('- Inconsistent navigation without landmarks');
+            console.log('- Vague error messages without guidance');
+            console.log('- Context changes without warning');
+            console.log('- Content disappears without user control');
+            console.log('- Information overload without prioritization');
+            console.log('- Complex tasks without progress indicators');
+        });
+    </script>
+</body>
+</html>

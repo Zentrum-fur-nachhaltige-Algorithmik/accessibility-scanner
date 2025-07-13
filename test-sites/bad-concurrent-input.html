@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Concurrent Input Mechanisms Violations (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.4;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Pointer cancel blocked */
+        .bad-no-cancel {
+            background-color: #ff4444;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            /* SCHLECHT: Pointer-Cancel wird verhindert */
+        }
+        
+        /* VIOLATION 2: Touch gestures without keyboard alternatives */
+        .bad-swipe-container {
+            width: 300px;
+            height: 200px;
+            border: 2px solid #ddd;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            position: relative;
+            margin: 15px 0;
+            border-radius: 8px;
+            /* SCHLECHT: Nur Touch-Gesten, keine Tastaturalternativen */
+        }
+        
+        .bad-swipe-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .bad-swipe-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .bad-indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        
+        .bad-indicator-dot.active {
+            background-color: #666;
+        }
+        
+        /* VIOLATION 3: Drag and drop without keyboard alternative */
+        .bad-drag-container {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .bad-drag-source {
+            width: 150px;
+            min-height: 120px;
+            border: 2px solid #ddd;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .bad-draggable-item {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: move;
+            /* SCHLECHT: Nur Drag&Drop, keine Tastatursteuerung */
+        }
+        
+        .bad-drop-zone {
+            width: 150px;
+            min-height: 120px;
+            border: 2px dashed #ddd;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .bad-drop-zone.drag-over {
+            border-color: #007bff;
+            background-color: #e3f2fd;
+        }
+        
+        /* VIOLATION 4: Multi-touch without single pointer alternative */
+        .bad-pinch-container {
+            width: 250px;
+            height: 200px;
+            border: 2px solid #ddd;
+            background-color: #f0f0f0;
+            position: relative;
+            margin: 15px 0;
+            overflow: hidden;
+            border-radius: 8px;
+            /* SCHLECHT: Nur Pinch-to-Zoom, keine Alternativen */
+        }
+        
+        .bad-zoomable-content {
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e0e0e0"/><circle cx="50" cy="50" r="20" fill="%23666"/><text x="50" y="55" text-anchor="middle" font-size="8" fill="white">ZOOM</text></svg>') center/cover;
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+        
+        /* VIOLATION 5: Long press without alternative */
+        .bad-longpress-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .bad-longpress-item {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            /* SCHLECHT: Context Menu nur über Long Press */
+        }
+        
+        .bad-longpress-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* VIOLATION 6: Motion-based input without alternatives */
+        .bad-shake-container {
+            width: 200px;
+            height: 150px;
+            border: 2px solid #ddd;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            border-radius: 8px;
+            /* SCHLECHT: Nur Gerätebewegung für Interaktion */
+        }
+        
+        .bad-shake-content {
+            text-align: center;
+            color: #666;
+        }
+        
+        /* VIOLATION 7: Voice input without visual alternative */
+        .bad-voice-container {
+            border: 2px solid #ddd;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            /* SCHLECHT: Nur Sprachsteuerung, keine visuellen Alternativen */
+        }
+        
+        .bad-voice-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            position: relative;
+        }
+        
+        .bad-voice-button.listening {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* VIOLATION 8: Force touch without pressure alternatives */
+        .bad-force-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .bad-force-item {
+            background-color: #f8f9fa;
+            border: 2px solid #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /* SCHLECHT: Nur Force Touch für erweiterte Funktionen */
+        }
+        
+        .bad-force-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        /* VIOLATION 9: Eye tracking without alternatives */
+        .bad-eyetrack-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            border: 2px solid #ddd;
+            background-color: #f8f9fa;
+            margin: 15px 0;
+            border-radius: 8px;
+            /* SCHLECHT: Nur Eye-Tracking für Navigation */
+        }
+        
+        .bad-eyetrack-zones {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            height: 100%;
+            gap: 2px;
+        }
+        
+        .bad-eyetrack-zone {
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            transition: background-color 0.3s ease;
+        }
+        
+        .bad-eyetrack-zone.gazed {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        /* VIOLATION 10: Brain-computer interface without manual fallback */
+        .bad-bci-container {
+            border: 2px solid #ddd;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            /* SCHLECHT: Nur Gedankensteuerung, keine manuellen Alternativen */
+        }
+        
+        .bad-bci-indicator {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #ddd;
+            border-radius: 50%;
+            margin: 10px auto;
+            position: relative;
+            background-color: #f0f0f0;
+        }
+        
+        .bad-bci-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 2px;
+            background-color: #28a745;
+            animation: brainwave 2s infinite;
+        }
+        
+        @keyframes brainwave {
+            0%, 100% { width: 20px; opacity: 0.3; }
+            50% { width: 60px; opacity: 1; }
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Concurrent Input Mechanisms Violations (BAD)</h1>
+    <p><strong>WCAG 2.5.6 Verletzungen:</strong> Multimodale Eingabemethoden ohne Alternativen für einzelne Eingabemodalitäten</p>
+    
+    <!-- VIOLATION 1: Pointer cancel blocked -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Pointer Cancel Prevention</div>
+        <p><strong>Problem:</strong> mouseup/touchend Events werden blockiert, Nutzer können Aktionen nicht abbrechen</p>
+        <div class="interactive-area">
+            <button class="bad-no-cancel" onmousedown="badStartAction()" onmouseup="badBlockCancel(event)">
+                Kritische Aktion (nicht abbrechbar)
+            </button>
+            <button class="bad-no-cancel" ontouchstart="badStartTouch()" ontouchend="badBlockTouchCancel(event)">
+                Löschvorgang (kein Abbruch möglich)
+            </button>
+            <p>❌ Actions können nicht durch Wegziehen des Pointers abgebrochen werden</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Touch gestures without keyboard alternatives -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Touch Gestures ohne Tastaturalternativen</div>
+        <p><strong>Problem:</strong> Swipe-Navigation nur über Touch verfügbar, keine Tastatur- oder Button-Alternativen</p>
+        <div class="interactive-area">
+            <div class="bad-swipe-container" 
+                 ontouchstart="badSwipeStart(event)" 
+                 ontouchmove="badSwipeMove(event)" 
+                 ontouchend="badSwipeEnd(event)">
+                <div class="bad-swipe-content">
+                    <h4>Bildergalerie</h4>
+                    <p>Bild <span id="badCurrentImage">1</span> von 5</p>
+                    <p>Wischen zum Navigieren</p>
+                </div>
+                <div class="bad-swipe-indicator">
+                    <div class="bad-indicator-dot active"></div>
+                    <div class="bad-indicator-dot"></div>
+                    <div class="bad-indicator-dot"></div>
+                    <div class="bad-indicator-dot"></div>
+                    <div class="bad-indicator-dot"></div>
+                </div>
+            </div>
+            <p>❌ Navigation nur über Swipe-Gesten, keine Buttons oder Tastatursteuerung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Drag and drop without keyboard alternative -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Drag & Drop ohne Tastaturalternative</div>
+        <p><strong>Problem:</strong> Wichtige Funktionalität nur über Drag & Drop, keine Buttons oder Tastatursteuerung</p>
+        <div class="interactive-area">
+            <div class="bad-drag-container">
+                <div class="bad-drag-source">
+                    <h5>Verfügbare Items:</h5>
+                    <div class="bad-draggable-item" draggable="true" ondragstart="badDragStart(event)">
+                        Task 1
+                    </div>
+                    <div class="bad-draggable-item" draggable="true" ondragstart="badDragStart(event)">
+                        Task 2
+                    </div>
+                    <div class="bad-draggable-item" draggable="true" ondragstart="badDragStart(event)">
+                        Task 3
+                    </div>
+                </div>
+                <div class="bad-drop-zone" 
+                     ondragover="badDragOver(event)" 
+                     ondrop="badDrop(event)"
+                     ondragenter="badDragEnter(event)"
+                     ondragleave="badDragLeave(event)">
+                    <p>Hier ablegen</p>
+                    <div id="badDroppedItems"></div>
+                </div>
+            </div>
+            <p>❌ Task-Management nur über Drag & Drop, keine Tastatur- oder Button-Alternativen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Multi-touch without single pointer alternative -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Pinch-to-Zoom ohne Single-Pointer Alternative</div>
+        <p><strong>Problem:</strong> Zoom nur über Zwei-Finger-Pinch, keine Buttons oder Mausrad-Unterstützung</p>
+        <div class="interactive-area">
+            <div class="bad-pinch-container" 
+                 ontouchstart="badPinchStart(event)" 
+                 ontouchmove="badPinchMove(event)" 
+                 ontouchend="badPinchEnd(event)">
+                <div class="bad-zoomable-content" id="badZoomContent"></div>
+            </div>
+            <p>❌ Zoom nur über Pinch-Geste, keine +/- Buttons oder Mausrad-Unterstützung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Long press without alternative -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Long Press ohne Rechtsklick-Alternative</div>
+        <p><strong>Problem:</strong> Context Menu nur über Long Press, nicht über Rechtsklick oder Tastatur</p>
+        <div class="interactive-area">
+            <div class="bad-longpress-items">
+                <div class="bad-longpress-item" 
+                     ontouchstart="badLongPressStart(event, this)" 
+                     ontouchend="badLongPressEnd(this)">
+                    <p>Datei 1.pdf</p>
+                    <small>Long Press für Optionen</small>
+                </div>
+                <div class="bad-longpress-item" 
+                     ontouchstart="badLongPressStart(event, this)" 
+                     ontouchend="badLongPressEnd(this)">
+                    <p>Bild.jpg</p>
+                    <small>Long Press für Optionen</small>
+                </div>
+                <div class="bad-longpress-item" 
+                     ontouchstart="badLongPressStart(event, this)" 
+                     ontouchend="badLongPressEnd(this)">
+                    <p>Video.mp4</p>
+                    <small>Long Press für Optionen</small>
+                </div>
+            </div>
+            <p>❌ Context Menu nur über Long Press, kein Rechtsklick oder Menü-Taste</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Motion-based input without alternatives -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Shake-to-Refresh ohne Button-Alternative</div>
+        <p><strong>Problem:</strong> Aktualisierung nur über Gerätebewegung, keine Button- oder Tastaturalternative</p>
+        <div class="interactive-area">
+            <div class="bad-shake-container" id="badShakeContainer">
+                <div class="bad-shake-content">
+                    <h5>Nachrichten</h5>
+                    <p>Gerät schütteln zum Aktualisieren</p>
+                    <small>Letzte Aktualisierung: Nie</small>
+                </div>
+            </div>
+            <p>❌ Refresh nur über Shake-Geste, kein Refresh-Button oder F5-Unterstützung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Voice input without visual alternative -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Voice Commands ohne visuelle Alternative</div>
+        <p><strong>Problem:</strong> Navigation nur über Sprachbefehle, keine Buttons oder Tastatursteuerung</p>
+        <div class="interactive-area">
+            <div class="bad-voice-container">
+                <h5>Sprachgesteuerte Navigation</h5>
+                <button class="bad-voice-button" onclick="badStartVoice()" id="badVoiceBtn">
+                    🎤 Sprechen Sie jetzt
+                </button>
+                <p>Sagen Sie: "Nächste Seite", "Zurück", "Suchen"</p>
+                <div id="badVoiceStatus">Bereit zum Zuhören</div>
+            </div>
+            <p>❌ Navigation nur über Voice Commands, keine visuellen Buttons oder Tastaturkürzel</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Force touch without pressure alternatives -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Force Touch ohne Druckalternativen</div>
+        <p><strong>Problem:</strong> Erweiterte Funktionen nur über Druckempfindlichkeit, keine Modifier-Keys</p>
+        <div class="interactive-area">
+            <div class="bad-force-container">
+                <div class="bad-force-item" onmousedown="badForceTouch(event, this, 'preview')">
+                    <h6>E-Mail 1</h6>
+                    <p>Fest drücken für Vorschau</p>
+                </div>
+                <div class="bad-force-item" onmousedown="badForceTouch(event, this, 'quickactions')">
+                    <h6>App Icon</h6>
+                    <p>Force Touch für Quick Actions</p>
+                </div>
+                <div class="bad-force-item" onmousedown="badForceTouch(event, this, 'details')">
+                    <h6>Link</h6>
+                    <p>Stark drücken für Details</p>
+                </div>
+            </div>
+            <p>❌ Erweiterte Funktionen nur über Druckstärke, keine Ctrl+Click oder Hover-Alternativen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 9: Eye tracking without alternatives -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Eye Tracking ohne manuelle Alternative</div>
+        <p><strong>Problem:</strong> Interface-Steuerung nur über Blickerfassung, keine Maus- oder Tastatursteuerung</p>
+        <div class="interactive-area">
+            <div class="bad-eyetrack-container">
+                <div class="bad-eyetrack-zones">
+                    <div class="bad-eyetrack-zone">Menu</div>
+                    <div class="bad-eyetrack-zone">Home</div>
+                    <div class="bad-eyetrack-zone">Search</div>
+                    <div class="bad-eyetrack-zone">Profile</div>
+                    <div class="bad-eyetrack-zone">Settings</div>
+                    <div class="bad-eyetrack-zone">Help</div>
+                </div>
+            </div>
+            <p>❌ Navigation nur über Eye-Tracking, keine Maus- oder Tastatursteuerung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 10: Brain-computer interface without manual fallback -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 10: Brain-Computer Interface ohne manuelle Alternative</div>
+        <p><strong>Problem:</strong> Steuerung nur über Gehirnwellen, keine konventionellen Eingabemethoden</p>
+        <div class="interactive-area">
+            <div class="bad-bci-container">
+                <h5>Gedankengesteuerte Benutzeroberfläche</h5>
+                <div class="bad-bci-indicator">
+                    <div class="bad-bci-wave"></div>
+                </div>
+                <p>Denken Sie an "ÖFFNEN" zum Aktivieren</p>
+                <div id="badBciStatus">Gehirnwellen werden erfasst...</div>
+            </div>
+            <p>❌ Steuerung nur über BCI, keine Tastatur-, Maus- oder Touch-Alternativen</p>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 2.5.6 Verstöße - Concurrent Input Mechanisms:</strong></p>
+        <ul>
+            <li>❌ Pointer Cancel wird verhindert - Nutzer können Aktionen nicht abbrechen</li>
+            <li>❌ Touch-only Gesten ohne Tastatur- oder Button-Alternativen</li>
+            <li>❌ Drag & Drop ohne zugängliche Alternativen</li>
+            <li>❌ Multi-Touch ohne Single-Pointer Optionen</li>
+            <li>❌ Spezielle Eingabemethoden ohne Fallback-Optionen</li>
+            <li>❌ Motion-based Input ohne statische Alternativen</li>
+        </ul>
+        
+        <p><strong>Betroffene Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Motorische Einschränkungen: Können nicht alle Eingabemethoden verwenden</li>
+            <li>👥 Assistive Technology: Funktioniert nur mit bestimmten Eingabemodalitäten</li>
+            <li>👥 Tremor/Parkinson: Haben Schwierigkeiten mit präzisen Gesten</li>
+            <li>👥 Amputierte: Können Multi-Touch oder bestimmte Gesten nicht ausführen</li>
+            <li>👥 Temporäre Beeinträchtigungen: Verletzte Hand, getragenes Baby, etc.</li>
+        </ul>
+    </div>
+
+    <script>
+        let badCurrentImageIndex = 0;
+        let badSwipeStartX = 0;
+        let badDraggedElement = null;
+        let badZoomLevel = 1;
+        let badPinchStartDistance = 0;
+        let badLongPressTimer = null;
+        let badVoiceListening = false;
+        
+        // VIOLATION 1: Pointer cancel prevention
+        function badStartAction() {
+            console.log('❌ VIOLATION: Action started without cancel option');
+        }
+        
+        function badBlockCancel(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log('❌ VIOLATION: Pointer cancel blocked');
+            alert('Aktion ausgeführt - Abbruch wurde verhindert!');
+        }
+        
+        function badStartTouch() {
+            console.log('❌ VIOLATION: Touch action without cancel');
+        }
+        
+        function badBlockTouchCancel(event) {
+            event.preventDefault();
+            console.log('❌ VIOLATION: Touch cancel blocked');
+            alert('Löschvorgang durchgeführt - konnte nicht abgebrochen werden!');
+        }
+        
+        // VIOLATION 2: Touch gestures without alternatives
+        function badSwipeStart(event) {
+            badSwipeStartX = event.touches[0].clientX;
+            console.log('❌ VIOLATION: Swipe-only navigation');
+        }
+        
+        function badSwipeMove(event) {
+            event.preventDefault();
+        }
+        
+        function badSwipeEnd(event) {
+            const swipeEndX = event.changedTouches[0].clientX;
+            const swipeDistance = swipeEndX - badSwipeStartX;
+            
+            if (Math.abs(swipeDistance) > 50) {
+                if (swipeDistance > 0 && badCurrentImageIndex > 0) {
+                    badCurrentImageIndex--;
+                } else if (swipeDistance < 0 && badCurrentImageIndex < 4) {
+                    badCurrentImageIndex++;
+                }
+                
+                document.getElementById('badCurrentImage').textContent = badCurrentImageIndex + 1;
+                badUpdateImageIndicators();
+                console.log('❌ VIOLATION: Image navigation only via swipe');
+            }
+        }
+        
+        function badUpdateImageIndicators() {
+            const dots = document.querySelectorAll('.bad-indicator-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === badCurrentImageIndex);
+            });
+        }
+        
+        // VIOLATION 3: Drag and drop without alternatives
+        function badDragStart(event) {
+            badDraggedElement = event.target;
+            console.log('❌ VIOLATION: Drag&Drop-only functionality');
+        }
+        
+        function badDragOver(event) {
+            event.preventDefault();
+        }
+        
+        function badDragEnter(event) {
+            event.target.classList.add('drag-over');
+        }
+        
+        function badDragLeave(event) {
+            event.target.classList.remove('drag-over');
+        }
+        
+        function badDrop(event) {
+            event.preventDefault();
+            event.target.classList.remove('drag-over');
+            
+            if (badDraggedElement) {
+                const droppedItems = document.getElementById('badDroppedItems');
+                const newItem = document.createElement('div');
+                newItem.textContent = badDraggedElement.textContent;
+                newItem.style.cssText = 'background: #28a745; color: white; padding: 5px; margin: 2px 0; border-radius: 3px; font-size: 12px;';
+                droppedItems.appendChild(newItem);
+                
+                badDraggedElement.remove();
+                badDraggedElement = null;
+                
+                console.log('❌ VIOLATION: Task moved only via drag&drop');
+            }
+        }
+        
+        // VIOLATION 4: Pinch-to-zoom without alternatives
+        function badPinchStart(event) {
+            if (event.touches.length === 2) {
+                const distance = Math.hypot(
+                    event.touches[0].pageX - event.touches[1].pageX,
+                    event.touches[0].pageY - event.touches[1].pageY
+                );
+                badPinchStartDistance = distance;
+                console.log('❌ VIOLATION: Pinch-only zoom started');
+            }
+        }
+        
+        function badPinchMove(event) {
+            if (event.touches.length === 2) {
+                event.preventDefault();
+                const distance = Math.hypot(
+                    event.touches[0].pageX - event.touches[1].pageX,
+                    event.touches[0].pageY - event.touches[1].pageY
+                );
+                const scale = distance / badPinchStartDistance;
+                badZoomLevel = Math.max(0.5, Math.min(3, badZoomLevel * scale));
+                
+                const content = document.getElementById('badZoomContent');
+                content.style.transform = `scale(${badZoomLevel})`;
+                
+                badPinchStartDistance = distance;
+                console.log('❌ VIOLATION: Zoom only via pinch gesture');
+            }
+        }
+        
+        function badPinchEnd(event) {
+            console.log('❌ VIOLATION: Pinch zoom ended, no button alternatives');
+        }
+        
+        // VIOLATION 5: Long press without alternatives
+        function badLongPressStart(event, element) {
+            badLongPressTimer = setTimeout(() => {
+                console.log('❌ VIOLATION: Context menu only via long press');
+                alert('Context Menu für ' + element.querySelector('p').textContent + '\n(Nur über Long Press erreichbar)');
+            }, 800);
+        }
+        
+        function badLongPressEnd(element) {
+            if (badLongPressTimer) {
+                clearTimeout(badLongPressTimer);
+                badLongPressTimer = null;
+            }
+        }
+        
+        // VIOLATION 6: Motion-based input without alternatives
+        function badSimulateShake() {
+            const container = document.getElementById('badShakeContainer');
+            container.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                container.style.animation = '';
+                console.log('❌ VIOLATION: Refresh only via shake gesture');
+                alert('Seite aktualisiert durch Schüttel-Geste\n(Keine Button-Alternative verfügbar)');
+            }, 500);
+        }
+        
+        // Add shake simulation for demo
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Insert') { // Simulate shake for demo
+                badSimulateShake();
+            }
+        });
+        
+        // VIOLATION 7: Voice input without alternatives
+        function badStartVoice() {
+            const button = document.getElementById('badVoiceBtn');
+            const status = document.getElementById('badVoiceStatus');
+            
+            if (!badVoiceListening) {
+                badVoiceListening = true;
+                button.classList.add('listening');
+                status.textContent = 'Hört zu... (Nur Sprachsteuerung verfügbar)';
+                
+                setTimeout(() => {
+                    badVoiceListening = false;
+                    button.classList.remove('listening');
+                    status.textContent = 'Sprachbefehl erkannt: "Nächste Seite"\n(Keine Button-Alternative)';
+                    console.log('❌ VIOLATION: Navigation only via voice commands');
+                }, 3000);
+            }
+        }
+        
+        // VIOLATION 8: Force touch without alternatives
+        function badForceTouch(event, element, action) {
+            console.log('❌ VIOLATION: Force touch required for', action);
+            setTimeout(() => {
+                alert(action + ' Aktion\n(Nur über Force Touch verfügbar, keine Ctrl+Click Alternative)');
+            }, 100);
+        }
+        
+        // VIOLATION 9: Eye tracking simulation
+        let badGazeTimer = null;
+        
+        document.querySelectorAll('.bad-eyetrack-zone').forEach(zone => {
+            zone.addEventListener('mouseenter', function() {
+                badGazeTimer = setTimeout(() => {
+                    this.classList.add('gazed');
+                    console.log('❌ VIOLATION: Navigation only via eye tracking');
+                    alert('Navigation zu: ' + this.textContent + '\n(Nur über Eye-Tracking verfügbar)');
+                    setTimeout(() => this.classList.remove('gazed'), 1000);
+                }, 1000);
+            });
+            
+            zone.addEventListener('mouseleave', function() {
+                if (badGazeTimer) {
+                    clearTimeout(badGazeTimer);
+                    badGazeTimer = null;
+                }
+            });
+        });
+        
+        // VIOLATION 10: Brain-computer interface simulation
+        function badSimulateBCI() {
+            const status = document.getElementById('badBciStatus');
+            status.textContent = 'Gedanke "ÖFFNEN" erkannt\n(Nur über BCI verfügbar)';
+            console.log('❌ VIOLATION: Control only via brain-computer interface');
+            setTimeout(() => {
+                alert('Anwendung geöffnet durch Gedankensteuerung\n(Keine konventionellen Eingabemethoden verfügbar)');
+            }, 2000);
+        }
+        
+        // Simulate BCI activation
+        setTimeout(badSimulateBCI, 5000);
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize violations logging
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== CONCURRENT INPUT MECHANISMS VIOLATIONS DETECTED ===');
+            console.log('❌ Pointer cancel prevention');
+            console.log('❌ Touch-only gestures without keyboard alternatives');
+            console.log('❌ Drag&Drop without accessible alternatives');
+            console.log('❌ Multi-touch without single-pointer options');
+            console.log('❌ Long press without right-click alternatives');
+            console.log('❌ Motion-based input without static alternatives');
+            console.log('❌ Voice-only commands without visual alternatives');
+            console.log('❌ Force touch without pressure alternatives');
+            console.log('❌ Eye tracking without manual alternatives');
+            console.log('❌ BCI without conventional input methods');
+        });
+    </script>
+</body>
+</html>

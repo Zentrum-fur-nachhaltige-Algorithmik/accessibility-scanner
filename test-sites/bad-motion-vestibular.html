@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Motion and Vestibular Violations (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            /* SCHLECHT: Körper kann sich ohne Benutzer-Kontrolle bewegen */
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Parallax scrolling without controls */
+        .bad-parallax-container {
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            /* SCHLECHT: Parallax-Effekt ohne Abschaltmöglichkeit */
+        }
+        
+        .bad-parallax-layer {
+            position: absolute;
+            width: 100%;
+            height: 120%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(33, 150, 243, 0.3) 20%, transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.3) 15%, transparent 15%),
+                radial-gradient(circle at 40% 80%, rgba(255, 152, 0, 0.3) 25%, transparent 25%);
+            animation: badParallaxMove 8s infinite linear;
+            /* SCHLECHT: Kontinuierliche Bewegung ohne Stopp-Option */
+        }
+        
+        @keyframes badParallaxMove {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-50px) rotate(2deg); }
+            50% { transform: translateY(-100px) rotate(0deg); }
+            75% { transform: translateY(-50px) rotate(-2deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .bad-parallax-content {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            margin: 50px 20px;
+            border-radius: 8px;
+            animation: badFloatingText 6s infinite ease-in-out;
+        }
+        
+        @keyframes badFloatingText {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* VIOLATION 2: Auto-playing video with camera movement */
+        .bad-autoplay-video {
+            width: 100%;
+            height: 300px;
+            background-color: #000;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            /* SCHLECHT: Auto-Play ohne Kontrollen */
+        }
+        
+        .bad-video-simulator {
+            width: 120%;
+            height: 120%;
+            background: linear-gradient(45deg, #ff5722, #ff9800, #ffc107, #8bc34a, #4caf50, #009688, #00bcd4, #2196f3, #3f51b5, #9c27b0);
+            background-size: 400% 400%;
+            animation: badCameraShake 3s infinite, badColorShift 8s infinite;
+            position: relative;
+        }
+        
+        @keyframes badCameraShake {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            10% { transform: translate(-5px, -5px) scale(1.02); }
+            20% { transform: translate(5px, -5px) scale(0.98); }
+            30% { transform: translate(-5px, 5px) scale(1.01); }
+            40% { transform: translate(5px, 5px) scale(0.99); }
+            50% { transform: translate(-3px, -3px) scale(1.02); }
+            60% { transform: translate(3px, -3px) scale(0.98); }
+            70% { transform: translate(-3px, 3px) scale(1.01); }
+            80% { transform: translate(3px, 3px) scale(0.99); }
+            90% { transform: translate(-1px, -1px) scale(1.01); }
+        }
+        
+        @keyframes badColorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .bad-video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            animation: badTextBounce 2s infinite;
+        }
+        
+        @keyframes badTextBounce {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        /* VIOLATION 3: Tilt-based navigation without alternatives */
+        .bad-tilt-interface {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            cursor: move;
+            /* SCHLECHT: Nur Tilt/Gyroscope Navigation */
+        }
+        
+        .bad-tilt-content {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #ff4444;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+            animation: badTiltSimulation 10s infinite linear;
+        }
+        
+        @keyframes badTiltSimulation {
+            0% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-150px, -100px); }
+            50% { transform: translate(50px, -150px); }
+            75% { transform: translate(100px, 50px); }
+            100% { transform: translate(-50%, -50%); }
+        }
+        
+        .bad-tilt-instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        /* VIOLATION 4: Carousel with automatic rotation and zoom */
+        .bad-carousel {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            /* SCHLECHT: Automatische Rotation ohne Pause */
+        }
+        
+        .bad-carousel-track {
+            display: flex;
+            width: 500%;
+            height: 100%;
+            animation: badCarouselRotate 12s infinite linear;
+        }
+        
+        .bad-carousel-slide {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            animation: badSlideZoom 3s infinite ease-in-out;
+        }
+        
+        .bad-carousel-slide:nth-child(1) { background: #e91e63; animation-delay: 0s; }
+        .bad-carousel-slide:nth-child(2) { background: #9c27b0; animation-delay: 0.6s; }
+        .bad-carousel-slide:nth-child(3) { background: #673ab7; animation-delay: 1.2s; }
+        .bad-carousel-slide:nth-child(4) { background: #3f51b5; animation-delay: 1.8s; }
+        .bad-carousel-slide:nth-child(5) { background: #2196f3; animation-delay: 2.4s; }
+        
+        @keyframes badCarouselRotate {
+            0% { transform: translateX(0%); }
+            20% { transform: translateX(-20%); }
+            40% { transform: translateX(-40%); }
+            60% { transform: translateX(-60%); }
+            80% { transform: translateX(-80%); }
+            100% { transform: translateX(0%); }
+        }
+        
+        @keyframes badSlideZoom {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.05) rotate(1deg); }
+        }
+        
+        /* VIOLATION 5: Scroll-triggered animations without controls */
+        .bad-scroll-trigger {
+            height: 200px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            margin: 20px 0;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bad-scroll-element {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #ff4444;
+            border-radius: 50%;
+            top: 50%;
+            left: -100px;
+            animation: badScrollMove 5s infinite ease-in-out;
+            /* SCHLECHT: Animation beim Scrollen ohne Kontrolle */
+        }
+        
+        @keyframes badScrollMove {
+            0% { 
+                left: -100px; 
+                transform: translateY(-50%) rotate(0deg) scale(1); 
+            }
+            50% { 
+                left: calc(100% + 100px); 
+                transform: translateY(-50%) rotate(180deg) scale(1.2); 
+            }
+            100% { 
+                left: -100px; 
+                transform: translateY(-50%) rotate(360deg) scale(1); 
+            }
+        }
+        
+        /* VIOLATION 6: Background animation without pause option */
+        .bad-background-animation {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: badBackgroundMove 8s ease infinite;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: white;
+            /* SCHLECHT: Hintergrund bewegt sich ohne Kontrolle */
+        }
+        
+        @keyframes badBackgroundMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .bad-floating-elements {
+            position: relative;
+        }
+        
+        .bad-floating-elements::before,
+        .bad-floating-elements::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: badFloat 6s infinite ease-in-out;
+        }
+        
+        .bad-floating-elements::before {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .bad-floating-elements::after {
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+        
+        @keyframes badFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+        }
+        
+        /* VIOLATION 7: Zoom-based interactions without alternatives */
+        .bad-zoom-interface {
+            width: 100%;
+            height: 250px;
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            /* SCHLECHT: Nur Zoom-Gesten zur Interaktion */
+        }
+        
+        .bad-zoom-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            animation: badAutoZoom 8s infinite ease-in-out;
+        }
+        
+        @keyframes badAutoZoom {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.5) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) scale(1.2) rotate(90deg); }
+            50% { transform: translate(-50%, -50%) scale(0.8) rotate(180deg); }
+            75% { transform: translate(-50%, -50%) scale(1.5) rotate(270deg); }
+        }
+        
+        /* VIOLATION 8: Device motion without user consent */
+        .bad-motion-sensor {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            /* SCHLECHT: Gerätebewegung ohne Erlaubnis */
+        }
+        
+        .bad-motion-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .bad-motion-ball {
+            width: 30px;
+            height: 30px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: badMotionSimulate 4s infinite ease-in-out;
+        }
+        
+        @keyframes badMotionSimulate {
+            0% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-80px, -30px); }
+            50% { transform: translate(60px, -40px); }
+            75% { transform: translate(40px, 30px); }
+            100% { transform: translate(-50%, -50%); }
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        button {
+            background-color: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #005a87;
+        }
+        
+        /* Warning animations */
+        .warning-flash {
+            animation: badWarningFlash 2s infinite;
+        }
+        
+        @keyframes badWarningFlash {
+            0%, 100% { background-color: #fff5f5; }
+            50% { background-color: #ffcdd2; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Motion and Vestibular Violations (BAD)</h1>
+    <p><strong>WCAG 2.3.3 & 2.5.4 Verletzungen:</strong> Bewegungsbasierte Interaktionen ohne alternative Steuerung und unkontrollierte Animationen</p>
+    
+    <!-- VIOLATION 1: Parallax scrolling without controls -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Parallax-Scrolling ohne Kontrollen</div>
+        <p><strong>Problem:</strong> Kontinuierliche Parallax-Effekte ohne Abschaltmöglichkeit</p>
+        <div class="interactive-area">
+            <div class="bad-parallax-container">
+                <!-- SCHLECHT: Parallax-Effekt läuft kontinuierlich -->
+                <div class="bad-parallax-layer"></div>
+                <div class="bad-parallax-content">
+                    <h4>🌊 Parallax-Demo</h4>
+                    <p>Diese Animation läuft kontinuierlich und kann nicht gestoppt werden. Der Hintergrund bewegt sich in Ebenen mit unterschiedlicher Geschwindigkeit, was bei empfindlichen Personen Übelkeit oder Schwindel auslösen kann.</p>
+                    <p>Besonders problematisch: Keine Pause-Taste oder Einstellungen verfügbar.</p>
+                </div>
+            </div>
+            <p>☝️ Kontinuierliche Bewegung kann vestibulare Störungen auslösen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Auto-playing video with camera movement -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Auto-Play Video mit Kamerabewegung</div>
+        <p><strong>Problem:</strong> Automatisch abspielende Inhalte mit schnellen Bewegungen</p>
+        <div class="interactive-area">
+            <div class="bad-autoplay-video">
+                <!-- SCHLECHT: Auto-Play mit schnellen Kamerabewegungen -->
+                <div class="bad-video-simulator">
+                    <div class="bad-video-overlay">
+                        🎬 AUTO-PLAY VIDEO
+                    </div>
+                </div>
+            </div>
+            <div style="margin: 15px 0; padding: 10px; background: #ffcdd2; border-radius: 4px;">
+                <strong>⚠️ Simuliert:</strong> Schnelle Kameraschwenks, Zooms und Farbwechsel wie in Action-Videos oder Präsentationen. 
+                Keine Pause-Taste oder Bewegungsreduktion verfügbar.
+            </div>
+            <p>☝️ Auto-Play mit schnellen Bewegungen ohne Benutzer-Kontrolle</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Tilt-based navigation without alternatives -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Neige-Navigation ohne Alternativen</div>
+        <p><strong>Problem:</strong> Interface erfordert Geräteneigung zur Steuerung</p>
+        <div class="interactive-area">
+            <div class="bad-tilt-interface">
+                <!-- SCHLECHT: Nur Tilt-Steuerung verfügbar -->
+                <div class="bad-tilt-content"></div>
+                <div class="bad-tilt-instructions">
+                    📱 Neigen Sie Ihr Gerät um den roten Ball zu steuern<br>
+                    (Keine Tastatur- oder Maus-Alternative verfügbar)
+                </div>
+            </div>
+            <button onclick="badSimulateTilt()">Tilt-Steuerung simulieren</button>
+            <p>☝️ Bewegungsbasierte Steuerung ohne alternative Eingabemethoden</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Carousel with automatic rotation and zoom -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Karussell mit automatischer Rotation</div>
+        <p><strong>Problem:</strong> Automatisch rotierende Inhalte ohne Pause-Option</p>
+        <div class="interactive-area">
+            <div class="bad-carousel">
+                <!-- SCHLECHT: Automatische Rotation ohne Kontrolle -->
+                <div class="bad-carousel-track">
+                    <div class="bad-carousel-slide">Slide 1</div>
+                    <div class="bad-carousel-slide">Slide 2</div>
+                    <div class="bad-carousel-slide">Slide 3</div>
+                    <div class="bad-carousel-slide">Slide 4</div>
+                    <div class="bad-carousel-slide">Slide 5</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin: 15px 0;">
+                <span style="color: #666;">Karussell rotiert automatisch - keine Pause-Option</span>
+            </div>
+            <p>☝️ Kontinuierliche Rotation mit Zoom-Effekten ohne Stopp-Möglichkeit</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Scroll-triggered animations without controls -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Scroll-ausgelöste Animationen ohne Kontrolle</div>
+        <p><strong>Problem:</strong> Animationen werden beim Scrollen automatisch gestartet</p>
+        <div class="interactive-area">
+            <div class="bad-scroll-trigger">
+                <!-- SCHLECHT: Animation startet beim Scrollen -->
+                <div class="bad-scroll-element"></div>
+            </div>
+            <p>Scrollen Sie auf dieser Seite - verschiedene Animationen starten automatisch ohne Möglichkeit sie zu deaktivieren.</p>
+            <p>☝️ Scroll-basierte Animationen ohne Abschaltmöglichkeit</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Background animation without pause option -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Hintergrund-Animation ohne Pause</div>
+        <p><strong>Problem:</strong> Bewegte Hintergründe ohne Kontrollmöglichkeiten</p>
+        <div class="interactive-area">
+            <div class="bad-background-animation">
+                <!-- SCHLECHT: Bewegter Hintergrund ohne Kontrolle -->
+                <div class="bad-floating-elements">
+                    <h4>🌈 Animierter Hintergrund</h4>
+                    <p>Dieser Bereich hat einen kontinuierlich bewegten Gradient-Hintergrund mit schwebenden Elementen. Die Animation läuft dauerhaft und kann nicht gestoppt werden.</p>
+                    <p>Problematisch für Benutzer mit vestibulären Störungen oder Aufmerksamkeitsdefiziten.</p>
+                </div>
+            </div>
+            <p>☝️ Permanent animierte Hintergründe ohne Deaktivierungsoption</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Zoom-based interactions without alternatives -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Zoom-basierte Interaktionen ohne Alternativen</div>
+        <p><strong>Problem:</strong> Interface erfordert Pinch-Zoom Gesten</p>
+        <div class="interactive-area">
+            <div class="bad-zoom-interface">
+                <!-- SCHLECHT: Nur Zoom-Gesten zur Steuerung -->
+                <div class="bad-zoom-content">
+                    Zoom zum Steuern
+                </div>
+            </div>
+            <div style="margin: 15px 0; padding: 10px; background: #fff3e0; border-radius: 4px;">
+                <strong>📱 Anweisungen:</strong> Verwenden Sie Pinch-Zoom Gesten um zu interagieren. 
+                Keine Tastatur-, Maus- oder Touch-Alternativen verfügbar.
+            </div>
+            <button onclick="badSimulateZoom()">Zoom-Interaktion simulieren</button>
+            <p>☝️ Gestik-abhängige Steuerung ohne alternative Eingabemethoden</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Device motion without user consent -->
+    <div class="violation-section warning-flash">
+        <div class="violation-title">VIOLATION 8: Gerätebewegung ohne Benutzer-Zustimmung</div>
+        <p><strong>Problem:</strong> Automatischer Zugriff auf Bewegungssensoren</p>
+        <div class="interactive-area">
+            <div class="bad-motion-sensor">
+                <!-- SCHLECHT: Bewegungssensoren ohne Erlaubnis -->
+                <h4>📱 Bewegungssensor-Demo</h4>
+                <div class="bad-motion-display">
+                    <div class="bad-motion-ball"></div>
+                    <p style="margin-top: 50px;">Gerätebewegung wird automatisch verfolgt</p>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.2); padding: 10px; border-radius: 4px; margin: 15px 0;">
+                    <strong>⚠️ Problematisch:</strong><br>
+                    • Automatischer Zugriff auf Accelerometer<br>
+                    • Keine Zustimmungsabfrage<br>
+                    • Kann nicht deaktiviert werden<br>
+                    • Kontinuierliche Bewegungsauswertung
+                </div>
+            </div>
+            <button onclick="badRequestMotion()">Bewegungssensor aktivieren (automatisch)</button>
+            <p>☝️ Unbefragter Zugriff auf Gerätebewegung kann vestibulare Reaktionen auslösen</p>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 2.3.3 & 2.5.4 Verletzungen:</strong></p>
+        <ul>
+            <li>❌ Bewegungsbasierte Interaktionen ohne alternative Steuerung</li>
+            <li>❌ Auto-Play Animationen ohne Pause-Kontrolle</li>
+            <li>❌ Parallax und kontinuierliche Bewegungen</li>
+            <li>❌ Gerätebewegung ohne Benutzer-Zustimmung</li>
+            <li>❌ Zoom-/Gestik-abhängige Navigation ohne Alternativen</li>
+        </ul>
+        
+        <p><strong>Betroffene Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Vestibulare Störungen: Schwindel und Übelkeit durch Bewegungen</li>
+            <li>👥 Epilepsie/Anfälle: Ausgelöst durch schnelle Bewegungen</li>
+            <li>👥 Motion Sickness: Übelkeit bei bewegten Inhalten</li>
+            <li>👥 Motor-Beeinträchtigungen: Können Gerät nicht neigen/bewegen</li>
+            <li>👥 ADHS/Konzentrationsstörungen: Abgelenkt durch Animationen</li>
+            <li>👥 Ältere Benutzer: Schwierigkeiten mit Gestik-Navigation</li>
+        </ul>
+    </div>
+
+    <script>
+        let badMotionActive = false;
+        let badTiltActive = false;
+        let badAnimationCount = 0;
+        
+        // VIOLATION 3: Tilt-based navigation simulation
+        function badSimulateTilt() {
+            badTiltActive = !badTiltActive;
+            
+            if (badTiltActive) {
+                alert('🔄 Tilt-Steuerung aktiviert!\n\nSimuliert kontinuierliche Geräteneigung zur Navigation.\nProblem: Keine Tastatur/Maus-Alternative verfügbar.');
+                
+                // Simulate aggressive tilt movements
+                const tiltContent = document.querySelector('.bad-tilt-content');
+                let tiltAngle = 0;
+                
+                const tiltInterval = setInterval(() => {
+                    if (!badTiltActive) {
+                        clearInterval(tiltInterval);
+                        return;
+                    }
+                    
+                    tiltAngle += 10;
+                    const x = Math.sin(tiltAngle * Math.PI / 180) * 100;
+                    const y = Math.cos(tiltAngle * Math.PI / 180) * 50;
+                    
+                    tiltContent.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${tiltAngle}deg)`;
+                }, 50);
+                
+                console.log('ACCESSIBILITY VIOLATION: Tilt navigation without keyboard/mouse alternative');
+            } else {
+                alert('⏸️ Tilt-Steuerung pausiert');
+            }
+        }
+        
+        // VIOLATION 7: Zoom-based interaction simulation
+        function badSimulateZoom() {
+            const zoomContent = document.querySelector('.bad-zoom-content');
+            
+            alert('🔍 Zoom-Interaktion simuliert!\n\nBenutzer müsste Pinch-Zoom verwenden um zu navigieren.\nProblem: Keine Button/Link-Alternativen verfügbar.');
+            
+            // Simulate disorienting zoom behavior
+            let zoomLevel = 1;
+            let zoomDirection = 1;
+            
+            const zoomInterval = setInterval(() => {
+                zoomLevel += 0.1 * zoomDirection;
+                
+                if (zoomLevel > 2) zoomDirection = -1;
+                if (zoomLevel < 0.5) zoomDirection = 1;
+                
+                zoomContent.style.transform = `translate(-50%, -50%) scale(${zoomLevel}) rotate(${zoomLevel * 45}deg)`;
+                
+                if (zoomLevel < 0.6) {
+                    clearInterval(zoomInterval);
+                    zoomContent.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+                }
+            }, 100);
+            
+            console.log('ACCESSIBILITY VIOLATION: Zoom-dependent navigation without alternatives');
+        }
+        
+        // VIOLATION 8: Device motion without consent
+        function badRequestMotion() {
+            badMotionActive = !badMotionActive;
+            
+            if (badMotionActive) {
+                alert('📱 Bewegungssensor automatisch aktiviert!\n\nProblem: Keine Zustimmungsabfrage\nKeine Deaktivierungsoption\nKann vestibulare Reaktionen auslösen');
+                
+                // Simulate motion tracking without permission
+                if (typeof DeviceMotionEvent !== 'undefined') {
+                    // In a real violation, this would access sensors without asking
+                    console.log('ACCESSIBILITY VIOLATION: Device motion accessed without user consent');
+                }
+                
+                // Simulate aggressive motion feedback
+                const motionBall = document.querySelector('.bad-motion-ball');
+                let motionIntensity = 1;
+                
+                const motionInterval = setInterval(() => {
+                    if (!badMotionActive) {
+                        clearInterval(motionInterval);
+                        return;
+                    }
+                    
+                    motionIntensity += 0.1;
+                    const randomX = (Math.random() - 0.5) * motionIntensity * 100;
+                    const randomY = (Math.random() - 0.5) * motionIntensity * 50;
+                    
+                    motionBall.style.transform = `translate(calc(-50% + ${randomX}px), calc(-50% + ${randomY}px)) scale(${1 + motionIntensity * 0.1})`;
+                    
+                    if (motionIntensity > 3) {
+                        motionIntensity = 1; // Reset but continue
+                    }
+                }, 200);
+                
+            } else {
+                alert('⏹️ Bewegungssensor deaktiviert (falls möglich)');
+            }
+        }
+        
+        // Simulate scroll-triggered animations
+        function badTriggerScrollAnimations() {
+            const scrollElements = document.querySelectorAll('.bad-scroll-element');
+            
+            scrollElements.forEach((element, index) => {
+                // Add more aggressive animation on scroll
+                element.style.animationDuration = '2s';
+                element.style.animationIterationCount = '3';
+                
+                setTimeout(() => {
+                    element.style.animationDuration = '5s';
+                    element.style.animationIterationCount = 'infinite';
+                }, 6000);
+            });
+            
+            console.log('ACCESSIBILITY VIOLATION: Scroll-triggered animations without user control');
+        }
+        
+        // Auto-trigger problematic behaviors
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== MOTION & VESTIBULAR VIOLATIONS ANALYSIS ===');
+            
+            // Count ongoing animations
+            const animatedElements = document.querySelectorAll('[class*="bad-"]:not(script)');
+            console.log(`Found ${animatedElements.length} elements with potentially problematic animations`);
+            
+            // Simulate scroll triggers
+            window.addEventListener('scroll', badTriggerScrollAnimations);
+            
+            // Auto-start motion tracking (violation)
+            setTimeout(() => {
+                console.log('⚠️ Attempting automatic motion sensor access (would be blocked by browser security)');
+                // In a real violation, this would try to access motion sensors immediately
+                if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                    // Modern browsers require user gesture for motion access
+                    console.log('Motion sensors require permission (good browser behavior)');
+                } else {
+                    console.log('VIOLATION: Would access motion sensors without permission on older browsers');
+                }
+            }, 2000);
+            
+            // Track animation overload
+            setTimeout(() => {
+                badAnimationCount = document.querySelectorAll('[style*="animation"], [class*="animation"]').length;
+                console.log(`⚠️ ${badAnimationCount} simultaneous animations running without user control`);
+                console.log('ACCESSIBILITY VIOLATIONS ACTIVE:');
+                console.log('- Parallax scrolling without disable option');
+                console.log('- Auto-play video with camera shake');
+                console.log('- Tilt-based navigation without alternatives');
+                console.log('- Auto-rotating carousel without pause');
+                console.log('- Scroll-triggered animations without control');
+                console.log('- Background animations without pause');
+                console.log('- Zoom-dependent interactions without alternatives');
+                console.log('- Motion sensor access without consent');
+            }, 3000);
+            
+            // Warn about vestibular impact
+            setTimeout(() => {
+                const warningSection = document.querySelector('.warning-flash');
+                if (warningSection) {
+                    console.log('⚠️ VESTIBULAR WARNING: Multiple motion triggers active simultaneously');
+                }
+            }, 5000);
+        });
+        
+        // Additional problematic behavior: Prevent pausing
+        document.addEventListener('keydown', function(e) {
+            // SCHLECHT: Verhindert Space/Escape zum Pausieren
+            if (e.key === ' ' || e.key === 'Escape') {
+                e.preventDefault();
+                console.log('ACCESSIBILITY VIOLATION: Prevented user attempt to pause animations');
+                return false;
+            }
+        });
+        
+        // SCHLECHT: Überschreibt prefers-reduced-motion
+        function badIgnoreReducedMotion() {
+            // In einer echten Verletzung würde das System die Benutzer-Präferenz ignorieren
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            
+            if (prefersReducedMotion.matches) {
+                console.log('ACCESSIBILITY VIOLATION: User prefers reduced motion but animations continue anyway');
+                
+                // Force animations despite user preference
+                document.body.style.animation = 'none';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                }, 100);
+            }
+        }
+        
+        // Check and violate reduced motion preference
+        badIgnoreReducedMotion();
+    </script>
+</body>
+</html>

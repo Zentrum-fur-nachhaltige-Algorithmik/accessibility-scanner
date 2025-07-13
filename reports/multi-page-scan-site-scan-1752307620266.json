@@ -1,0 +1,143 @@
+{
+  "reportId": "site-scan-1752307620266",
+  "baseUrl": "https://beeproduced.com",
+  "scanDate": "2025-07-12T08:07:00.266Z",
+  "overview": {
+    "totalPages": 4,
+    "scannedPages": 4,
+    "skippedPages": 0,
+    "successRate": 100,
+    "totalScanTime": -1752307564816,
+    "averagePageScanTime": 12789
+  },
+  "cspAnalysis": {
+    "mostEffectiveStrategy": "standard",
+    "strategyPerformance": {
+      "standard": {
+        "successRate": 100,
+        "averageTime": 12789,
+        "usageCount": 4
+      }
+    },
+    "totalStrategiesUsed": 1
+  },
+  "pageResults": [
+    {
+      "url": "https://beeproduced.com/",
+      "pageType": "homepage",
+      "priority": 68,
+      "accessibilityScore": 100,
+      "violations": [],
+      "cspStrategy": "standard",
+      "scanDuration": 11209,
+      "timestamp": "2025-07-12T08:06:20.318Z"
+    },
+    {
+      "url": "https://beeproduced.com/contact",
+      "pageType": "contact",
+      "priority": 42,
+      "accessibilityScore": 100,
+      "violations": [],
+      "cspStrategy": "standard",
+      "scanDuration": 20300,
+      "timestamp": "2025-07-12T08:06:40.618Z"
+    },
+    {
+      "url": "https://beeproduced.com/about",
+      "pageType": "about",
+      "priority": 37,
+      "accessibilityScore": 100,
+      "violations": [],
+      "cspStrategy": "standard",
+      "scanDuration": 9205,
+      "timestamp": "2025-07-12T08:06:49.823Z"
+    },
+    {
+      "url": "https://beeproduced.com/blog",
+      "pageType": "content",
+      "priority": 32,
+      "accessibilityScore": 100,
+      "violations": [],
+      "cspStrategy": "standard",
+      "scanDuration": 10442,
+      "timestamp": "2025-07-12T08:07:00.265Z"
+    }
+  ],
+  "siteWideTrends": {
+    "commonViolations": [],
+    "accessibilityByPageType": {
+      "homepage": {
+        "avgScore": 100,
+        "count": 1
+      },
+      "contact": {
+        "avgScore": 100,
+        "count": 1
+      },
+      "about": {
+        "avgScore": 100,
+        "count": 1
+      },
+      "content": {
+        "avgScore": 100,
+        "count": 1
+      }
+    },
+    "averageAccessibilityScore": 100
+  },
+  "optimization": {
+    "reductionPercentage": 0,
+    "originalCount": 4,
+    "optimizedCount": 4,
+    "removedCount": 0,
+    "priorityDistribution": {
+      "high": 0,
+      "medium": 0.5,
+      "low": 0.5,
+      "average": 44.75
+    },
+    "containerDistribution": {
+      "semantic-nav": 4
+    },
+    "patternStats": {
+      "originalPages": 4,
+      "optimizedPages": 4,
+      "reductionPercentage": 0,
+      "pagesSaved": 0,
+      "patterns": 4,
+      "largestPattern": 1
+    },
+    "efficiency": {
+      "avgPriorityScore": 44.75,
+      "criticalPagesIncluded": 1,
+      "accessibilityBalance": {
+        "good": 0,
+        "poor": 0,
+        "unknown": 1,
+        "balanceScore": 0
+      }
+    },
+    "recommendations": []
+  },
+  "patterns": {
+    "/": [
+      "https://beeproduced.com/"
+    ],
+    "/contact": [
+      "https://beeproduced.com/contact"
+    ],
+    "/about": [
+      "https://beeproduced.com/about"
+    ],
+    "/blog": [
+      "https://beeproduced.com/blog"
+    ]
+  },
+  "recommendations": [],
+  "metadata": {
+    "scannerVersion": "1.0.0",
+    "pagesDiscovered": 4,
+    "cspStrategiesUsed": {},
+    "errors": []
+  }
+}

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Error Prevention Violations (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Financial transactions without confirmation */
+        .bad-payment-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        .bad-form-group {
+            margin-bottom: 15px;
+        }
+        
+        .bad-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .bad-form-group input, .bad-form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .bad-amount-display {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .bad-submit-button {
+            background-color: #f44336;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            /* SCHLECHT: Direkter Submit ohne Bestätigung */
+        }
+        
+        /* VIOLATION 2: Legal commitments without review */
+        .bad-legal-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-contract-summary {
+            background-color: #f0f0f0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .bad-checkbox-group {
+            margin: 15px 0;
+        }
+        
+        .bad-checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .bad-checkbox-group label {
+            cursor: pointer;
+        }
+        
+        .bad-legal-submit {
+            background-color: #2196f3;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            /* SCHLECHT: Bindende Verträge ohne Prüfungsschritt */
+        }
+        
+        /* VIOLATION 3: Data deletion without safeguards */
+        .bad-data-management {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-data-list {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: white;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        .bad-delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            /* SCHLECHT: Sofortige Löschung ohne Bestätigung */
+        }
+        
+        .bad-bulk-actions {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+        }
+        
+        .bad-bulk-delete {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            /* SCHLECHT: Bulk-Löschung ohne Schutz */
+        }
+        
+        /* VIOLATION 4: Account changes without verification */
+        .bad-account-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-critical-section {
+            background-color: #ffebee;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #f44336;
+        }
+        
+        .bad-danger-button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            /* SCHLECHT: Kritische Account-Änderungen ohne Verifikation */
+        }
+        
+        /* VIOLATION 5: Test data in production */
+        .bad-test-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #fff9c4;
+        }
+        
+        .bad-test-warning {
+            background-color: #ffecb3;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #f57f17;
+        }
+        
+        .bad-test-submit {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            /* SCHLECHT: Test-Daten ohne Warnung in Produktion */
+        }
+        
+        /* VIOLATION 6: Auto-save without user control */
+        .bad-document-editor {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-editor-content {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            /* SCHLECHT: Auto-save ohne Kontrolle */
+        }
+        
+        .bad-auto-save-status {
+            background-color: #e3f2fd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* VIOLATION 7: Time-sensitive actions without warning */
+        .bad-timer-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .bad-timer-display {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .bad-quiz-question {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .bad-quiz-options {
+            margin: 10px 0;
+        }
+        
+        .bad-quiz-options label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        
+        .bad-quiz-submit {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            /* SCHLECHT: Auto-Submit bei Zeitablauf ohne Warnung */
+        }
+        
+        /* VIOLATION 8: Irreversible actions without confirmation */
+        .bad-system-admin {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #ffebee;
+        }
+        
+        .bad-admin-warning {
+            background-color: #f44336;
+            color: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .bad-admin-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .bad-admin-button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            /* SCHLECHT: Systembefehle ohne Bestätigung */
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .success-message {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+            color: #2e7d32;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Error Prevention Violations (BAD)</h1>
+    <p><strong>WCAG 3.3.4 Verletzungen:</strong> Kritische Aktionen ohne angemessene Fehlerprävention</p>
+    
+    <!-- VIOLATION 1: Financial transactions without confirmation -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Finanzielle Transaktionen ohne Bestätigung</div>
+        <p><strong>Problem:</strong> Geldtransfer ohne Prüfungs- oder Bestätigungsschritt</p>
+        <div class="interactive-area">
+            <form class="bad-payment-form" onsubmit="return badProcessPayment(event)">
+                <h3>🏦 Geld überweisen</h3>
+                
+                <!-- SCHLECHT: Keine Bestätigung vor kritischer Transaktion -->
+                <div class="bad-form-group">
+                    <label for="badRecipient">Empfänger:</label>
+                    <input type="text" id="badRecipient" value="Max Mustermann" required>
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badIban">IBAN:</label>
+                    <input type="text" id="badIban" value="DE89 3704 0044 0532 0130 00" required>
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badAmount">Betrag (€):</label>
+                    <input type="number" id="badAmount" value="1500" min="0.01" step="0.01" required onchange="updateBadAmount()">
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badPurpose">Verwendungszweck:</label>
+                    <input type="text" id="badPurpose" value="Darlehensrückzahlung" required>
+                </div>
+                
+                <div class="bad-amount-display">
+                    💰 Überweisungsbetrag: <span id="badAmountDisplay">€1.500,00</span>
+                </div>
+                
+                <button type="submit" class="bad-submit-button">
+                    💸 SOFORT ÜBERWEISEN
+                </button>
+            </form>
+            <div id="paymentStatus" class="status-display">Transaktion bereit - Keine Bestätigung erforderlich!</div>
+            <p>☝️ Kritische Geldtransfers ohne jede Bestätigung oder Prüfungsschritt</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Legal commitments without review -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Rechtliche Verpflichtungen ohne Prüfung</div>
+        <p><strong>Problem:</strong> Bindende Verträge ohne Überprüfungsmöglichkeit</p>
+        <div class="interactive-area">
+            <form class="bad-legal-form" onsubmit="return badSignContract(event)">
+                <h3>📋 Kreditvertrag abschließen</h3>
+                
+                <div class="bad-contract-summary">
+                    <strong>Vertragsbedingungen:</strong><br>
+                    • Kreditsumme: €50.000<br>
+                    • Laufzeit: 7 Jahre<br>
+                    • Zinssatz: 8,9% p.a.<br>
+                    • Monatliche Rate: €789,32<br>
+                    • Gesamtkosten: €66.300<br>
+                    • Bearbeitungsgebühr: €500 (einmalig)<br>
+                    • Rücktrittsrecht: Keines nach Unterzeichnung
+                </div>
+                
+                <!-- SCHLECHT: Bindende Verträge ohne Review-Schritt -->
+                <div class="bad-checkbox-group">
+                    <input type="checkbox" id="badTerms" required>
+                    <label for="badTerms">Ich akzeptiere alle Vertragsbedingungen (48 Seiten AGB)</label>
+                </div>
+                
+                <div class="bad-checkbox-group">
+                    <input type="checkbox" id="badWaiver" required>
+                    <label for="badWaiver">Ich verzichte auf das Widerrufsrecht bei Fernabsatzverträgen</label>
+                </div>
+                
+                <div class="bad-checkbox-group">
+                    <input type="checkbox" id="badLiability" required>
+                    <label for="badLiability">Ich übernehme persönliche Haftung für die Gesamtsumme</label>
+                </div>
+                
+                <button type="submit" class="bad-legal-submit">
+                    ✍️ VERTRAG SOFORT UNTERZEICHNEN
+                </button>
+            </form>
+            <div id="legalStatus" class="status-display">Vertrag bereit zur sofortigen Unterzeichnung</div>
+            <p>☝️ Langfristige finanzielle Verpflichtungen ohne Bedenkzeit oder Prüfung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Data deletion without safeguards -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Datenlöschung ohne Sicherheitsvorkehrungen</div>
+        <p><strong>Problem:</strong> Irreversible Datenlöschung ohne Bestätigung oder Backup</p>
+        <div class="interactive-area">
+            <div class="bad-data-management">
+                <h3>🗂️ Dokumentenverwaltung</h3>
+                
+                <div class="bad-data-list">
+                    <!-- SCHLECHT: Sofortige Löschung ohne Bestätigung -->
+                    <div class="bad-data-item">
+                        <span>📄 Jahresabschluss_2023_FINAL.pdf (2,4 MB)</span>
+                        <button class="bad-delete-button" onclick="badDeleteFile('Jahresabschluss_2023_FINAL.pdf')">🗑️ Löschen</button>
+                    </div>
+                    
+                    <div class="bad-data-item">
+                        <span>📊 Kundendatenbank_Backup.sql (847 MB)</span>
+                        <button class="bad-delete-button" onclick="badDeleteFile('Kundendatenbank_Backup.sql')">🗑️ Löschen</button>
+                    </div>
+                    
+                    <div class="bad-data-item">
+                        <span>🎥 Schulungsvideo_Notfallplan.mp4 (1,2 GB)</span>
+                        <button class="bad-delete-button" onclick="badDeleteFile('Schulungsvideo_Notfallplan.mp4')">🗑️ Löschen</button>
+                    </div>
+                    
+                    <div class="bad-data-item">
+                        <span>📋 Mitarbeiterliste_Gehälter.xlsx (156 KB)</span>
+                        <button class="bad-delete-button" onclick="badDeleteFile('Mitarbeiterliste_Gehälter.xlsx')">🗑️ Löschen</button>
+                    </div>
+                    
+                    <div class="bad-data-item">
+                        <span>🔐 SSL_Zertifikate_Produktiv/ (Ordner)</span>
+                        <button class="bad-delete-button" onclick="badDeleteFile('SSL_Zertifikate_Produktiv/')">🗑️ Löschen</button>
+                    </div>
+                </div>
+                
+                <div class="bad-bulk-actions">
+                    <strong>Bulk-Aktionen:</strong><br>
+                    <!-- SCHLECHT: Bulk-Löschung ohne Schutz -->
+                    <button class="bad-bulk-delete" onclick="badBulkDelete('all')">🗑️ ALLES LÖSCHEN</button>
+                    <button class="bad-bulk-delete" onclick="badBulkDelete('old')">🗑️ Alte Dateien löschen (>30 Tage)</button>
+                    <button class="bad-bulk-delete" onclick="badBulkDelete('large')">🗑️ Große Dateien löschen (>1GB)</button>
+                </div>
+            </div>
+            <div id="dataStatus" class="status-display">Datenlöschung ohne Bestätigung oder Backup verfügbar</div>
+            <p>☝️ Kritische Unternehmensdaten können unwiderruflich gelöscht werden</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Account changes without verification -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Account-Änderungen ohne Verifikation</div>
+        <p><strong>Problem:</strong> Kritische Account-Funktionen ohne Identitätsbestätigung</p>
+        <div class="interactive-area">
+            <div class="bad-account-form">
+                <h3>⚙️ Account-Einstellungen</h3>
+                
+                <div class="bad-critical-section">
+                    <h4>🚨 Kritische Account-Funktionen</h4>
+                    <p>Diese Aktionen können nicht rückgängig gemacht werden!</p>
+                    
+                    <!-- SCHLECHT: Kritische Änderungen ohne Verifikation -->
+                    <button class="bad-danger-button" onclick="badAccountAction('changeEmail')">
+                        📧 E-Mail Adresse ändern
+                    </button>
+                    
+                    <button class="bad-danger-button" onclick="badAccountAction('changePassword')">
+                        🔑 Passwort zurücksetzen
+                    </button>
+                    
+                    <button class="bad-danger-button" onclick="badAccountAction('disable2FA')">
+                        🔓 2FA deaktivieren
+                    </button>
+                    
+                    <button class="bad-danger-button" onclick="badAccountAction('deleteAccount')">
+                        💀 Account löschen
+                    </button>
+                    
+                    <button class="bad-danger-button" onclick="badAccountAction('revokeTokens')">
+                        🔄 Alle Sessions beenden
+                    </button>
+                    
+                    <button class="bad-danger-button" onclick="badAccountAction('transferOwnership')">
+                        👑 Eigentümerschaft übertragen
+                    </button>
+                </div>
+            </div>
+            <div id="accountStatus" class="status-display">Account-Änderungen ohne Identitätsprüfung möglich</div>
+            <p>☝️ Sicherheitskritische Account-Funktionen ohne jede Verifikation</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Test data in production -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Test-Daten in Produktionsumgebung</div>
+        <p><strong>Problem:</strong> Test-Transaktionen ohne klare Kennzeichnung oder Warnung</p>
+        <div class="interactive-area">
+            <form class="bad-test-form" onsubmit="return badSubmitTestData(event)">
+                <h3>🧪 Kreditkarten-Test (PRODUKTIV)</h3>
+                
+                <div class="bad-test-warning">
+                    ⚠️ Test-Modus aktiv - Verwenden Sie nur Test-Kreditkarten
+                </div>
+                
+                <!-- SCHLECHT: Test-Interface in Produktion ohne deutliche Warnung -->
+                <div class="bad-form-group">
+                    <label for="badTestCard">Kreditkartennummer:</label>
+                    <input type="text" id="badTestCard" value="4111111111111111" placeholder="Test: 4111111111111111">
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badTestExp">Ablaufdatum:</label>
+                    <input type="text" id="badTestExp" value="12/25" placeholder="MM/YY">
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badTestCvv">CVV:</label>
+                    <input type="text" id="badTestCvv" value="123" placeholder="123">
+                </div>
+                
+                <div class="bad-form-group">
+                    <label for="badTestAmount">Test-Betrag:</label>
+                    <input type="number" id="badTestAmount" value="99.99" step="0.01">
+                </div>
+                
+                <button type="submit" class="bad-test-submit">
+                    💳 TEST-ZAHLUNG VERARBEITEN
+                </button>
+            </form>
+            <div id="testStatus" class="status-display">Test-Umgebung in Produktion ohne deutliche Abgrenzung</div>
+            <p>☝️ Benutzer könnten versehentlich echte Kreditkarten-Daten eingeben</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Auto-save without user control -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Auto-Save ohne Benutzerkontrolle</div>
+        <p><strong>Problem:</strong> Automatisches Speichern ohne Opt-out oder manuelle Kontrolle</p>
+        <div class="interactive-area">
+            <div class="bad-document-editor">
+                <h3>📝 Dokument-Editor</h3>
+                
+                <!-- SCHLECHT: Auto-save ohne Kontrolle -->
+                <textarea class="bad-editor-content" 
+                          placeholder="Beginnen Sie mit der Eingabe... (Auto-Save alle 10 Sekunden)"
+                          oninput="badAutoSave()">Vertrauliche Notizen über die geplante Fusion mit Competitor Inc. 
+
+STRENG VERTRAULICH - NICHT VERBREITEN
+
+Verhandlungsposition:
+- Maximales Angebot: €2.5M
+- Fallback-Position: €2.0M
+- Deal-Breaker: Personalabbau in Q1
+
+Interne Schwächen die nicht preisgegeben werden dürfen:
+- Cashflow-Probleme nächste 6 Monate
+- Rechtstreit mit Patent-Verletzer läuft
+- Key Account Manager will kündigen
+
+Nächste Schritte:
+- Meeting am Freitag 14:00
+- Finale Vertragsverhandlung
+- Board-Approval erforderlich</textarea>
+                
+                <div class="bad-auto-save-status" id="autoSaveStatus">
+                    💾 Auto-Save: Aktiviert - Letzter Save: Noch nie
+                </div>
+                
+                <p><small>💡 Das Dokument wird automatisch alle 10 Sekunden gespeichert und kann von anderen Benutzern eingesehen werden.</small></p>
+            </div>
+            <div id="editorStatus" class="status-display">Sensible Daten werden automatisch ohne Nutzerkontrolle gespeichert</div>
+            <p>☝️ Vertrauliche Informationen werden automatisch gespeichert ohne Opt-out</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Time-sensitive actions without warning -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Zeitkritische Aktionen ohne Warnung</div>
+        <p><strong>Problem:</strong> Auto-Submit bei Zeitablauf ohne angemessene Warnung</p>
+        <div class="interactive-area">
+            <form class="bad-timer-form" onsubmit="return badSubmitQuiz(event)">
+                <div class="bad-timer-display" id="timerDisplay">⏰ 00:30</div>
+                
+                <h3>🎯 Prüfung: Compliance Schulung</h3>
+                <p><strong>Achtung:</strong> Diese Prüfung ist zeitkritisch und bestimmt Ihre Berechtigung zum Umgang mit Kundendaten.</p>
+                
+                <div class="bad-quiz-question">
+                    <p><strong>Frage 1 von 10:</strong> Wie lange dürfen personenbezogene Daten ohne Einwilligung gespeichert werden?</p>
+                    <div class="bad-quiz-options">
+                        <label><input type="radio" name="q1" value="a"> a) Unbegrenzt</label>
+                        <label><input type="radio" name="q1" value="b"> b) 2 Jahre maximum</label>
+                        <label><input type="radio" name="q1" value="c"> c) Nur so lange wie erforderlich</label>
+                        <label><input type="radio" name="q1" value="d"> d) 6 Monate standard</label>
+                    </div>
+                </div>
+                
+                <div class="bad-quiz-question">
+                    <p><strong>Frage 2 von 10:</strong> Was ist bei einem Datenleck zu tun?</p>
+                    <div class="bad-quiz-options">
+                        <label><input type="radio" name="q2" value="a"> a) Nichts unternehmen</label>
+                        <label><input type="radio" name="q2" value="b"> b) Datenschutzbehörde informieren</label>
+                        <label><input type="radio" name="q2" value="c"> c) Nur interne Meldung</label>
+                        <label><input type="radio" name="q2" value="d"> d) Warten und beobachten</label>
+                    </div>
+                </div>
+                
+                <!-- SCHLECHT: Auto-Submit ohne angemessene Warnung -->
+                <button type="submit" class="bad-quiz-submit">
+                    📋 Prüfung abgeben
+                </button>
+                
+                <p><small>⚠️ Die Prüfung wird automatisch abgegeben wenn die Zeit abläuft!</small></p>
+            </form>
+            <div id="quizStatus" class="status-display">Zeitkritische Prüfung läuft - Auto-Submit bei Zeitablauf</div>
+            <p>☝️ Wichtige Prüfung wird automatisch abgegeben ohne ausreichende Warnung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Irreversible system actions -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Irreversible Systemaktionen ohne Bestätigung</div>
+        <p><strong>Problem:</strong> Kritische Systembefehle ohne Mehrfach-Bestätigung</p>
+        <div class="interactive-area">
+            <div class="bad-system-admin">
+                <h3>⚡ System-Administration</h3>
+                
+                <div class="bad-admin-warning">
+                    🚨 PRODUKTIONS-SYSTEM - ALLE AKTIONEN SIND IRREVERSIBEL
+                </div>
+                
+                <div class="bad-admin-actions">
+                    <!-- SCHLECHT: Kritische Systembefehle ohne Bestätigung -->
+                    <button class="bad-admin-button" onclick="badSystemAction('dropDatabase')">
+                        🗄️ Produktions-DB löschen
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('resetUsers')">
+                        👥 Alle Benutzer zurücksetzen
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('flushCache')">
+                        💾 Cache komplett leeren
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('rebootCluster')">
+                        🔄 Server-Cluster neustarten
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('revokeSSL')">
+                        🔐 SSL-Zertifikate widerrufen
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('deleteBackups')">
+                        📦 Alle Backups löschen
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('formatStorage')">
+                        💽 Storage formatieren
+                    </button>
+                    
+                    <button class="bad-admin-button" onclick="badSystemAction('killProcesses')">
+                        ⚡ Alle Prozesse beenden
+                    </button>
+                </div>
+            </div>
+            <div id="systemStatus" class="status-display">Kritische Systembefehle ohne Mehrfach-Bestätigung verfügbar</div>
+            <p>☝️ Systemzerstörende Aktionen können mit einem Klick ausgelöst werden</p>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 3.3.4 Error Prevention Anforderungen:</strong></p>
+        <ul>
+            <li>❌ <strong>Reversible:</strong> Aktionen können nicht rückgängig gemacht werden</li>
+            <li>❌ <strong>Checked:</strong> Eingaben werden nicht auf Fehler geprüft</li>
+            <li>❌ <strong>Confirmed:</strong> Kritische Aktionen ohne Bestätigung</li>
+        </ul>
+        
+        <p><strong>Besonders kritisch für:</strong></p>
+        <ul>
+            <li>👥 <strong>Alle Benutzer:</strong> Versehentliche irreversible Aktionen</li>
+            <li>👥 <strong>Unternehmen:</strong> Datenverlust und finanzielle Schäden</li>
+            <li>👥 <strong>Kognitive Beeinträchtigungen:</strong> Schwierigkeiten bei Folgenabschätzung</li>
+            <li>👥 <strong>Unerfahrene Benutzer:</strong> Unbeabsichtigte kritische Aktionen</li>
+            <li>👥 <strong>Stress-Situationen:</strong> Fehlerhafte Entscheidungen unter Zeitdruck</li>
+        </ul>
+    </div>
+
+    <script>
+        let autoSaveTimer;
+        let quizTimer;
+        let timeRemaining = 30; // seconds
+        
+        // VIOLATION 1: Financial transactions without confirmation
+        function updateBadAmount() {
+            const amount = document.getElementById('badAmount').value;
+            const display = document.getElementById('badAmountDisplay');
+            display.textContent = `€${parseFloat(amount).toLocaleString('de-DE', {minimumFractionDigits: 2})}`;
+        }
+        
+        function badProcessPayment(event) {
+            event.preventDefault();
+            
+            const amount = document.getElementById('badAmount').value;
+            const recipient = document.getElementById('badRecipient').value;
+            
+            // SCHLECHT: Sofortige Verarbeitung ohne Bestätigung
+            const status = document.getElementById('paymentStatus');
+            status.innerHTML = `💸 ZAHLUNG VERARBEITET! €${amount} an ${recipient} überwiesen - IRREVERSIBEL!`;
+            status.className = 'status-display success-message';
+            
+            console.log('ACCESSIBILITY VIOLATION: Financial transaction processed without confirmation');
+            return false;
+        }
+        
+        // VIOLATION 2: Legal commitments without review
+        function badSignContract(event) {
+            event.preventDefault();
+            
+            // SCHLECHT: Bindender Vertrag ohne Review-Periode
+            const status = document.getElementById('legalStatus');
+            status.innerHTML = `✍️ VERTRAG UNTERZEICHNET! Sie sind nun rechtlich an einen 7-Jahres-Kredit gebunden. Keine Widerrufsmöglichkeit.`;
+            status.className = 'status-display error-message';
+            
+            console.log('ACCESSIBILITY VIOLATION: Legal contract signed without review period');
+            return false;
+        }
+        
+        // VIOLATION 3: Data deletion without safeguards  
+        function badDeleteFile(filename) {
+            // SCHLECHT: Sofortige Löschung ohne Bestätigung
+            const status = document.getElementById('dataStatus');
+            status.innerHTML = `🗑️ DATEI GELÖSCHT! "${filename}" wurde unwiderruflich gelöscht. Kein Backup verfügbar.`;
+            status.className = 'status-display error-message';
+            
+            // Remove the item from UI
+            const items = document.querySelectorAll('.bad-data-item');
+            items.forEach(item => {
+                if (item.textContent.includes(filename)) {
+                    item.style.opacity = '0.3';
+                    item.style.textDecoration = 'line-through';
+                }
+            });
+            
+            console.log(`ACCESSIBILITY VIOLATION: File "${filename}" deleted without confirmation`);
+        }
+        
+        function badBulkDelete(type) {
+            // SCHLECHT: Bulk-Löschung ohne Schutz
+            const messages = {
+                'all': 'ALLE DATEIEN GELÖSCHT! Kompletter Datenverlust.',
+                'old': 'ALTE DATEIEN GELÖSCHT! 847 Dateien unwiderruflich entfernt.',
+                'large': 'GROSSE DATEIEN GELÖSCHT! 23 Dateien über 1GB entfernt.'
+            };
+            
+            const status = document.getElementById('dataStatus');
+            status.innerHTML = `🗑️ ${messages[type]} Kein Backup verfügbar.`;
+            status.className = 'status-display error-message';
+            
+            console.log(`ACCESSIBILITY VIOLATION: Bulk deletion "${type}" without safeguards`);
+        }
+        
+        // VIOLATION 4: Account changes without verification
+        function badAccountAction(action) {
+            const actions = {
+                'changeEmail': 'E-Mail Adresse geändert',
+                'changePassword': 'Passwort zurückgesetzt',
+                'disable2FA': '2FA deaktiviert - Account unsicher',
+                'deleteAccount': 'Account gelöscht - alle Daten verloren',
+                'revokeTokens': 'Alle Sessions beendet',
+                'transferOwnership': 'Eigentümerschaft übertragen'
+            };
+            
+            // SCHLECHT: Kritische Account-Änderungen ohne Verifikation
+            const status = document.getElementById('accountStatus');
+            status.innerHTML = `⚠️ ${actions[action]}! Änderung sofort wirksam ohne Identitätsprüfung.`;
+            status.className = 'status-display error-message';
+            
+            console.log(`ACCESSIBILITY VIOLATION: Account action "${action}" without verification`);
+        }
+        
+        // VIOLATION 5: Test data in production
+        function badSubmitTestData(event) {
+            event.preventDefault();
+            
+            const cardNumber = document.getElementById('badTestCard').value;
+            
+            // SCHLECHT: Test-Interface ohne deutliche Abgrenzung
+            const status = document.getElementById('testStatus');
+            
+            if (cardNumber === '4111111111111111') {
+                status.innerHTML = `💳 Test-Zahlung verarbeitet mit Test-Karte. System konnte nicht unterscheiden ob Test oder echt.`;
+            } else {
+                status.innerHTML = `💳 ECHTE ZAHLUNG VERARBEITET! €${document.getElementById('badTestAmount').value} von echter Kreditkarte abgebucht!`;
+                status.className = 'status-display error-message';
+            }
+            
+            console.log('ACCESSIBILITY VIOLATION: Test payment processed without clear production warning');
+            return false;
+        }
+        
+        // VIOLATION 6: Auto-save without user control
+        function badAutoSave() {
+            // SCHLECHT: Auto-save ohne Opt-out
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                const content = document.querySelector('.bad-editor-content').value;
+                const now = new Date().toLocaleTimeString();
+                
+                document.getElementById('autoSaveStatus').innerHTML = 
+                    `💾 Auto-Save: Dokument automatisch gespeichert um ${now} - ${content.length} Zeichen`;
+                
+                console.log('ACCESSIBILITY VIOLATION: Sensitive content auto-saved without user control');
+            }, 10000); // 10 seconds
+        }
+        
+        // VIOLATION 7: Time-sensitive actions without warning
+        function startQuizTimer() {
+            quizTimer = setInterval(() => {
+                timeRemaining--;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                
+                document.getElementById('timerDisplay').textContent = 
+                    `⏰ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(quizTimer);
+                    // SCHLECHT: Auto-submit ohne angemessene Warnung
+                    badSubmitQuiz(null, true);
+                }
+            }, 1000);
+        }
+        
+        function badSubmitQuiz(event, autoSubmit = false) {
+            if (event) event.preventDefault();
+            
+            clearInterval(quizTimer);
+            
+            const status = document.getElementById('quizStatus');
+            
+            if (autoSubmit) {
+                // SCHLECHT: Auto-Submit ohne ausreichende Warnung
+                status.innerHTML = `⏰ PRÜFUNG AUTO-ABGEGEBEN! Zeit abgelaufen - möglicherweise unvollständig beantwortet.`;
+                status.className = 'status-display error-message';
+                console.log('ACCESSIBILITY VIOLATION: Quiz auto-submitted without adequate warning');
+            } else {
+                status.innerHTML = `📋 Prüfung manuell abgegeben mit ${timeRemaining} Sekunden verbleibend.`;
+                status.className = 'status-display success-message';
+            }
+            
+            return false;
+        }
+        
+        // VIOLATION 8: Irreversible system actions
+        function badSystemAction(action) {
+            const actions = {
+                'dropDatabase': 'PRODUKTIONS-DATENBANK GELÖSCHT',
+                'resetUsers': 'ALLE BENUTZERKONTEN ZURÜCKGESETZT',
+                'flushCache': 'KOMPLETTER CACHE GELEERT',
+                'rebootCluster': 'SERVER-CLUSTER NEUGESTARTET',
+                'revokeSSL': 'SSL-ZERTIFIKATE WIDERRUFEN',
+                'deleteBackups': 'ALLE BACKUPS GELÖSCHT',
+                'formatStorage': 'STORAGE FORMATIERT',
+                'killProcesses': 'ALLE PROZESSE BEENDET'
+            };
+            
+            // SCHLECHT: Kritische Systembefehle ohne Bestätigung
+            const status = document.getElementById('systemStatus');
+            status.innerHTML = `⚡ ${actions[action]}! System möglicherweise irreparabel beschädigt.`;
+            status.className = 'status-display error-message';
+            
+            console.log(`ACCESSIBILITY VIOLATION: Critical system action "${action}" without confirmation`);
+        }
+        
+        // Initialize timers and auto-save on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start quiz timer
+            startQuizTimer();
+            
+            // Initialize auto-save
+            badAutoSave();
+            
+            console.log('=== ERROR PREVENTION VIOLATIONS ANALYSIS ===');
+            
+            // Find critical action buttons
+            const criticalButtons = document.querySelectorAll('.bad-submit-button, .bad-legal-submit, .bad-delete-button, .bad-danger-button, .bad-admin-button');
+            console.log(`Found ${criticalButtons.length} critical action buttons`);
+            
+            criticalButtons.forEach((button, index) => {
+                console.log(`Critical Button ${index + 1}:`, {
+                    text: button.textContent.trim(),
+                    hasConfirmation: false, // all bad examples lack confirmation
+                    hasReversibility: false, // all bad examples are irreversible
+                    hasErrorChecking: false, // all bad examples lack error checking
+                    riskLevel: 'HIGH'
+                });
+            });
+            
+            console.warn('⚠️ All critical actions lack proper error prevention measures');
+        });
+    </script>
+</body>
+</html>

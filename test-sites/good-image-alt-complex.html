@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Complex Image Alt Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Link with image - consistent accessible names */
+        .good-link-image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .good-product-link {
+            display: block;
+            text-decoration: none;
+            color: #333333;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #ffffff;
+            /* GUT: Link beschreibt Ziel, Bild ist dekorativ */
+        }
+        
+        .good-product-link:hover {
+            background-color: #f0f0f0;
+            border-color: #45a049;
+        }
+        
+        .good-product-link:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-product-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        /* GOOD 2: SVG as img with proper alt */
+        .good-svg-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-svg-icon {
+            width: 48px;
+            height: 48px;
+            /* GUT: SVG mit beschreibendem alt-Text */
+        }
+        
+        /* GOOD 3: Complex diagrams with detailed descriptions */
+        .good-diagram-container {
+            margin: 20px 0;
+        }
+        
+        .good-complex-diagram {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #4caf50;
+            /* GUT: Komplexes Diagramm mit ausführlicher Beschreibung */
+        }
+        
+        .detailed-description {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .detailed-description h4 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        /* GOOD 4: Image links with clear context */
+        .good-image-only-links {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-image-link {
+            display: block;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            /* GUT: Klarer Link-Kontext im alt-Text */
+        }
+        
+        .good-image-link:hover {
+            transform: scale(1.05);
+            border-color: #45a049;
+        }
+        
+        .good-image-link:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-link-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        /* GOOD 5: Decorative images properly marked */
+        .good-decorative-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .good-decorative-image {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            opacity: 0.3;
+            /* GUT: Dekoratives Bild mit alt="" */
+        }
+        
+        /* GOOD 6: Image buttons with descriptive accessible names */
+        .good-image-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-image-button {
+            background: none;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            /* GUT: Klare aria-label für Button-Funktion */
+        }
+        
+        .good-image-button:hover {
+            background-color: #e8f5e8;
+        }
+        
+        .good-image-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-button-image {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+        
+        /* GOOD 7: Accessible captcha alternatives */
+        .good-captcha-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .captcha-options {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .captcha-option {
+            margin: 10px 0;
+        }
+        
+        /* GOOD 8: Chart with data table alternative */
+        .good-chart-container {
+            margin: 20px 0;
+        }
+        
+        .good-chart-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #4caf50;
+            margin-bottom: 15px;
+            /* GUT: Diagramm mit Datentabelle als Alternative */
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .data-table th,
+        .data-table td {
+            border: 1px solid #4caf50;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: #e8f5e8;
+            font-weight: bold;
+        }
+        
+        .data-table caption {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2e7d32;
+        }
+        
+        /* GOOD 9: Avatar images with specific alt text */
+        .good-profile-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #4caf50;
+        }
+        
+        .good-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            /* GUT: Avatar mit spezifischem Namen */
+        }
+        
+        /* GOOD 10: Image maps with descriptive area labels */
+        .good-image-map-container {
+            margin: 20px 0;
+        }
+        
+        .good-map-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #4caf50;
+            /* GUT: Image Map mit aussagekräftigen Area-Beschreibungen */
+        }
+        
+        .map-legend {
+            background-color: #e8f5e8;
+            border: 1px solid #4caf50;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .map-legend h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        
+        .feature-highlight {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .feature-highlight h4 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        input[type="text"], input[type="checkbox"] {
+            padding: 8px;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        
+        input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* Create simple inline images for demonstration */
+        .placeholder-image {
+            background: linear-gradient(45deg, #e8f5e8 25%, transparent 25%, transparent 75%, #e8f5e8 75%, #e8f5e8),
+                        linear-gradient(45deg, #e8f5e8 25%, transparent 25%, transparent 75%, #e8f5e8 75%, #e8f5e8);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border: 1px solid #4caf50;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Complex Image Alt Accessible (GOOD)</h1>
+    <p><strong>WCAG 1.1.1 konforme Implementierung:</strong> Korrekte Behandlung aller komplexen Alt-Text Szenarien für optimale Screen Reader Erfahrung</p>
+    
+    <!-- GOOD 1: Link with image - consistent accessible names -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Link mit Bild - konsistente zugängliche Namen</div>
+        <p><strong>Lösung:</strong> Link beschreibt das Ziel, Bild ist dekorativ (alt="") oder ergänzt den Kontext</p>
+        <div class="interactive-area">
+            <div class="good-link-image-container">
+                <!-- GUT: Link-Ziel klar beschrieben, Bild dekorativ -->
+                <a href="#product1" class="good-product-link" aria-label="Laptop Pro Produktdetails anzeigen">
+                    <div class="placeholder-image good-product-image" 
+                         style="background-color: #ffeb3b; width: 120px; height: 120px;"
+                         alt=""></div>
+                    <p>Laptop Pro</p>
+                </a>
+                
+                <a href="#product2" class="good-product-link" aria-label="Tablet Plus Produktdetails anzeigen">
+                    <div class="placeholder-image good-product-image" 
+                         style="background-color: #4caf50; width: 120px; height: 120px;"
+                         alt=""></div>
+                    <p>Tablet Plus</p>
+                </a>
+                
+                <a href="#product3" class="good-product-link" aria-label="Smartphone X Produktdetails anzeigen">
+                    <div class="placeholder-image good-product-image" 
+                         style="background-color: #2196f3; width: 120px; height: 120px;"
+                         alt=""></div>
+                    <p>Smartphone X</p>
+                </a>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Konsistente Beschreibung:</h4>
+                <p>• Link aria-label beschreibt Ziel und Aktion<br>
+                • Produktbilder sind dekorativ (alt="")<br>
+                • Produktname bereits im sichtbaren Text<br>
+                • Keine widersprüchlichen Informationen</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: SVG as img with proper alt -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: SVG als &lt;img&gt; mit ordentlichem alt-Text</div>
+        <p><strong>Lösung:</strong> SVG-Icons haben beschreibende alt-Texte die ihre Funktion oder Bedeutung erklären</p>
+        <div class="interactive-area">
+            <div class="good-svg-container">
+                <!-- GUT: SVG mit beschreibendem alt-Text -->
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%23f44336'/%3E%3Ctext x='24' y='28' text-anchor='middle' fill='white' font-size='14'%3E!%3C/text%3E%3C/svg%3E" 
+                     class="good-svg-icon"
+                     alt="Warnung: Fehler beim Speichern">
+                <span>Fehler beim Speichern der Datei</span>
+                
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%234caf50'/%3E%3Ctext x='24' y='28' text-anchor='middle' fill='white' font-size='18'%3E✓%3C/text%3E%3C/svg%3E" 
+                     class="good-svg-icon"
+                     alt="Erfolgreich: Daten wurden gespeichert">
+                <span>Daten erfolgreich gespeichert</span>
+                
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%23ff9800'/%3E%3Ctext x='24' y='28' text-anchor='middle' fill='white' font-size='14'%3E?%3C/text%3E%3C/svg%3E" 
+                     class="good-svg-icon"
+                     alt="Hilfe: Support kontaktieren">
+                <span>Support kontaktieren</span>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ SVG Barrierefreiheit:</h4>
+                <p>• Alt-Text beschreibt Status und Aktion<br>
+                • Kontext wird klar übermittelt<br>
+                • Icons ergänzen den sichtbaren Text<br>
+                • Screen Reader versteht die Bedeutung</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Complex diagrams with detailed descriptions -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Komplexe Diagramme mit detaillierten Beschreibungen</div>
+        <p><strong>Lösung:</strong> Kurzer Alt-Text + ausführliche Beschreibung via aria-describedby</p>
+        <div class="interactive-area">
+            <div class="good-diagram-container">
+                <!-- GUT: Komplexes Diagramm mit aria-describedby -->
+                <div class="placeholder-image good-complex-diagram" 
+                     style="width: 400px; height: 300px; background: linear-gradient(to bottom, #e3f2fd 0%, #bbdefb 100%); position: relative;"
+                     alt="Unternehmensorganisation mit 3 Führungsebenen und 6 Abteilungen"
+                     aria-describedby="org-chart-description">
+                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: #2196f3; color: white; padding: 10px; border-radius: 4px; font-size: 12px;">CEO</div>
+                    <div style="position: absolute; top: 80px; left: 25%; background: #4caf50; color: white; padding: 8px; border-radius: 4px; font-size: 10px;">CTO</div>
+                    <div style="position: absolute; top: 80px; right: 25%; background: #ff9800; color: white; padding: 8px; border-radius: 4px; font-size: 10px;">CFO</div>
+                    <div style="position: absolute; top: 140px; left: 10%; background: #9c27b0; color: white; padding: 6px; border-radius: 4px; font-size: 9px;">Dev Team</div>
+                    <div style="position: absolute; top: 140px; left: 35%; background: #f44336; color: white; padding: 6px; border-radius: 4px; font-size: 9px;">QA Team</div>
+                    <div style="position: absolute; top: 140px; right: 10%; background: #607d8b; color: white; padding: 6px; border-radius: 4px; font-size: 9px;">Accounting</div>
+                    <div style="position: absolute; top: 200px; left: 5%; background: #795548; color: white; padding: 4px; border-radius: 4px; font-size: 8px;">5 Entwickler</div>
+                    <div style="position: absolute; top: 200px; left: 30%; background: #e91e63; color: white; padding: 4px; border-radius: 4px; font-size: 8px;">3 Tester</div>
+                    <div style="position: absolute; top: 200px; right: 5%; background: #009688; color: white; padding: 4px; border-radius: 4px; font-size: 8px;">2 Buchhalter</div>
+                </div>
+                
+                <div class="detailed-description" id="org-chart-description">
+                    <h4>Detaillierte Organisationsstruktur:</h4>
+                    <p><strong>Führungsebene:</strong> Der CEO steht an der Spitze des Unternehmens.</p>
+                    <p><strong>Zweite Ebene:</strong> Unter dem CEO berichten der CTO (Chief Technology Officer) für technische Bereiche und der CFO (Chief Financial Officer) für Finanzen.</p>
+                    <p><strong>Abteilungsebene:</strong></p>
+                    <ul>
+                        <li><strong>Unter dem CTO:</strong> Development Team (5 Entwickler) und QA Team (3 Tester)</li>
+                        <li><strong>Unter dem CFO:</strong> Accounting Abteilung (2 Buchhalter)</li>
+                    </ul>
+                    <p><strong>Gesamtpersonal:</strong> 15 Mitarbeiter in 6 verschiedenen Rollen verteilt auf 3 Hierarchie-Ebenen.</p>
+                </div>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Komplexe Diagramme:</h4>
+                <p>• Kurzer Alt-Text für schnelle Orientierung<br>
+                • aria-describedby verweist auf ausführliche Beschreibung<br>
+                • Strukturierte Beschreibung mit Hierarchie-Ebenen<br>
+                • Alle relevanten Daten verfügbar</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Image links with clear context -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Bild-Links mit klarem Kontext</div>
+        <p><strong>Lösung:</strong> Alt-Text beschreibt das Link-Ziel, nicht nur das Bild</p>
+        <div class="interactive-area">
+            <div class="good-image-only-links">
+                <!-- GUT: Alt-Text beschreibt Link-Ziel -->
+                <a href="#facebook" class="good-image-link">
+                    <div class="placeholder-image good-link-image" 
+                         style="background-color: #3b5998; width: 80px; height: 80px;"
+                         alt="Facebook Unternehmensseite besuchen"></div>
+                </a>
+                
+                <a href="#twitter" class="good-image-link">
+                    <div class="placeholder-image good-link-image" 
+                         style="background-color: #1da1f2; width: 80px; height: 80px;"
+                         alt="Twitter Profil folgen"></div>
+                </a>
+                
+                <a href="#download-app" class="good-image-link">
+                    <div class="placeholder-image good-link-image" 
+                         style="background-color: #4caf50; width: 80px; height: 80px;"
+                         alt="Mobile App herunterladen"></div>
+                </a>
+                
+                <a href="#contact-form" class="good-image-link">
+                    <div class="placeholder-image good-link-image" 
+                         style="background-color: #ff9800; width: 80px; height: 80px;"
+                         alt="Kontaktformular öffnen"></div>
+                </a>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Klare Link-Ziele:</h4>
+                <p>• Alt-Text beschreibt die Aktion und das Ziel<br>
+                • Benutzer wissen genau, was passiert<br>
+                • Keine generischen Phrasen<br>
+                • Kontext ist sofort verständlich</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Decorative images properly marked -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Dekorative Bilder korrekt markiert</div>
+        <p><strong>Lösung:</strong> Rein dekorative Bilder haben alt="" um Screen Reader nicht abzulenken</p>
+        <div class="interactive-area">
+            <div class="good-decorative-container">
+                <!-- GUT: Dekoratives Bild mit alt="" -->
+                <div class="placeholder-image good-decorative-image" 
+                     style="background-color: #e1bee7; width: 60px; height: 60px;"
+                     alt=""></div>
+                <h4>Willkommen auf unserer Website</h4>
+                <p>Dies ist der wichtige Hauptinhalt. Das dekorative Muster rechts oben wird von Screen Readern ignoriert, da es alt="" hat.</p>
+                <p>So können sich Benutzer auf die wesentlichen Informationen konzentrieren, ohne durch unwichtige Beschreibungen abgelenkt zu werden.</p>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Dekorative Bilder:</h4>
+                <p>• alt="" für rein dekorative Elemente<br>
+                • Screen Reader überspringt sie<br>
+                • Fokus bleibt auf wichtigem Inhalt<br>
+                • Schnellere Navigation für Nutzer assistiver Technologien</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Image buttons with descriptive accessible names -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Bild-Buttons mit beschreibenden zugänglichen Namen</div>
+        <p><strong>Lösung:</strong> aria-label beschreibt die Button-Funktion, Bild ist dekorativ</p>
+        <div class="interactive-area">
+            <div class="good-image-buttons">
+                <!-- GUT: aria-label beschreibt Button-Funktion -->
+                <button class="good-image-button" aria-label="Artikel bearbeiten" onclick="goodEditAction()">
+                    <div class="placeholder-image good-button-image" 
+                         style="background-color: #2196f3; width: 24px; height: 24px;"
+                         alt=""></div>
+                </button>
+                
+                <button class="good-image-button" aria-label="Artikel löschen" onclick="goodDeleteAction()">
+                    <div class="placeholder-image good-button-image" 
+                         style="background-color: #f44336; width: 24px; height: 24px;"
+                         alt=""></div>
+                </button>
+                
+                <button class="good-image-button" aria-label="Änderungen speichern" onclick="goodSaveAction()">
+                    <div class="placeholder-image good-button-image" 
+                         style="background-color: #4caf50; width: 24px; height: 24px;"
+                         alt=""></div>
+                </button>
+                
+                <button class="good-image-button" aria-label="Artikel teilen" onclick="goodShareAction()">
+                    <div class="placeholder-image good-button-image" 
+                         style="background-color: #ff9800; width: 24px; height: 24px;"
+                         alt=""></div>
+                </button>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Button Barrierefreiheit:</h4>
+                <p>• aria-label beschreibt genau die Funktion<br>
+                • Bild ist dekorativ (alt="")<br>
+                • Screen Reader versteht den Zweck<br>
+                • Keyboard-Navigation unterstützt</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Accessible captcha alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Barrierefreie Captcha-Alternativen</div>
+        <p><strong>Lösung:</strong> Multiple Zugänglichkeitsoptionen für verschiedene Benutzergruppen</p>
+        <div class="interactive-area">
+            <div class="good-captcha-container">
+                <h4>Sicherheitsverifikation</h4>
+                <p>Wählen Sie eine der folgenden Optionen zur Verifikation:</p>
+                
+                <div class="captcha-options">
+                    <div class="captcha-option">
+                        <input type="checkbox" id="accessibility-captcha" checked>
+                        <label for="accessibility-captcha">
+                            <strong>Barrierefreie Option:</strong> Ich bin ein Mensch (Honeypot + Zeitbasiert)
+                        </label>
+                        <p style="font-size: 0.9em; color: #666; margin: 5px 0 0 25px;">
+                            Diese Option verwendet unsichtbare Tests und ist für Screen Reader optimiert.
+                        </p>
+                    </div>
+                    
+                    <div class="captcha-option">
+                        <button type="button" onclick="playAudioCaptcha()">
+                            🔊 Audio-Captcha abspielen
+                        </button>
+                        <input type="text" placeholder="Gehörten Code eingeben" style="margin-left: 10px;">
+                    </div>
+                    
+                    <div class="captcha-option">
+                        <button type="button" onclick="requestHumanVerification()">
+                            👤 Menschliche Verifikation anfordern
+                        </button>
+                        <p style="font-size: 0.9em; color: #666; margin: 5px 0 0 0;">
+                            Kontakt mit Support für alternative Verifikation.
+                        </p>
+                    </div>
+                </div>
+                
+                <button type="submit">Verifikation abschließen</button>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Captcha Alternativen:</h4>
+                <p>• Barrierefreie Standardoption<br>
+                • Audio-Alternative für sehbehinderte Nutzer<br>
+                • Menschliche Verifikation als Fallback<br>
+                • Keine rein visuellen Anforderungen</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Chart with data table alternative -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Diagramm mit Datentabellen-Alternative</div>
+        <p><strong>Lösung:</strong> Visuelles Diagramm + vollständige Datentabelle für Screen Reader</p>
+        <div class="interactive-area">
+            <div class="good-chart-container">
+                <!-- GUT: Diagramm mit aria-describedby auf Datentabelle -->
+                <div class="placeholder-image good-chart-image" 
+                     style="width: 400px; height: 250px; background: linear-gradient(to top, #4caf50 0%, #4caf50 30%, #ff9800 30%, #ff9800 60%, #f44336 60%, #f44336 100%); position: relative;"
+                     alt="Quartalsumsätze 2024: Q1 bis Q4 mit steigender Tendenz"
+                     aria-describedby="sales-data-table">
+                    <div style="position: absolute; bottom: 10px; left: 20px; color: white; font-weight: bold; font-size: 12px;">Q1: 150k</div>
+                    <div style="position: absolute; bottom: 10px; left: 100px; color: white; font-weight: bold; font-size: 12px;">Q2: 200k</div>
+                    <div style="position: absolute; bottom: 10px; left: 180px; color: white; font-weight: bold; font-size: 12px;">Q3: 120k</div>
+                    <div style="position: absolute; bottom: 10px; left: 260px; color: white; font-weight: bold; font-size: 12px;">Q4: 300k</div>
+                    <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px; border-radius: 4px; font-size: 10px;">Jahresumsatz 2024</div>
+                </div>
+                
+                <table class="data-table" id="sales-data-table">
+                    <caption>Quartalsumsätze 2024 - Detaillierte Daten</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Quartal</th>
+                            <th scope="col">Umsatz (in €)</th>
+                            <th scope="col">Veränderung zum Vorquartal</th>
+                            <th scope="col">Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Q1 2024</th>
+                            <td>150.000</td>
+                            <td>Basis</td>
+                            <td>Starker Start</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Q2 2024</th>
+                            <td>200.000</td>
+                            <td>+33% (+50.000)</td>
+                            <td>Wachstum</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Q3 2024</th>
+                            <td>120.000</td>
+                            <td>-40% (-80.000)</td>
+                            <td>Sommerflaute</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Q4 2024</th>
+                            <td>300.000</td>
+                            <td>+150% (+180.000)</td>
+                            <td>Starkes Jahresende</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row">Gesamt 2024</th>
+                            <td><strong>770.000</strong></td>
+                            <td>Durchschnitt: 192.500/Quartal</td>
+                            <td>Positiver Jahrestrend</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Datenvisualisierung:</h4>
+                <p>• Visuelles Diagramm für sehende Nutzer<br>
+                • Vollständige Datentabelle für Screen Reader<br>
+                • aria-describedby verknüpft beide<br>
+                • Alle Daten in beiden Formaten verfügbar</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Avatar images with specific alt text -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Avatar-Bilder mit spezifischem alt-Text</div>
+        <p><strong>Lösung:</strong> Alt-Text nennt den Namen der Person, nicht nur "Avatar"</p>
+        <div class="interactive-area">
+            <div class="good-profile-container">
+                <!-- GUT: Avatar mit spezifischem Namen -->
+                <div class="placeholder-image good-avatar" 
+                     style="background-color: #3f51b5; width: 60px; height: 60px; border-radius: 50%;"
+                     alt="Dr. Maria Schmidt"></div>
+                <div>
+                    <h4>Dr. Maria Schmidt</h4>
+                    <p>Leitende Entwicklerin</p>
+                    <p>15 Jahre Erfahrung in der Softwareentwicklung</p>
+                </div>
+            </div>
+            
+            <div class="good-profile-container">
+                <div class="placeholder-image good-avatar" 
+                     style="background-color: #e91e63; width: 60px; height: 60px; border-radius: 50%;"
+                     alt="Thomas Müller"></div>
+                <div>
+                    <h4>Thomas Müller</h4>
+                    <p>UI/UX Designer</p>
+                    <p>Spezialist für barrierefreies Design</p>
+                </div>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Personen-Bilder:</h4>
+                <p>• Alt-Text enthält den spezifischen Namen<br>
+                • Screen Reader kann Personen unterscheiden<br>
+                • Kontext ist sofort klar<br>
+                • Professionelle Identifikation möglich</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Image maps with descriptive area labels -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Image Maps mit beschreibenden Area-Labels</div>
+        <p><strong>Lösung:</strong> Jeder klickbare Bereich hat aussagekräftige alt-Texte</p>
+        <div class="interactive-area">
+            <div class="good-image-map-container">
+                <!-- GUT: Image Map mit aussagekräftigen Area-Beschreibungen -->
+                <div style="position: relative; display: inline-block;">
+                    <div class="placeholder-image good-map-image" 
+                         style="width: 400px; height: 300px; background: linear-gradient(45deg, #81c784, #4fc3f7); position: relative;"
+                         alt="Interaktive Weltkarte mit klickbaren Regionen" usemap="#goodworldmap">
+                        <div style="position: absolute; top: 50px; left: 80px; width: 60px; height: 40px; background: rgba(255,0,0,0.3); border: 2px solid red;"></div>
+                        <div style="position: absolute; top: 80px; right: 100px; width: 80px; height: 50px; background: rgba(0,255,0,0.3); border: 2px solid green;"></div>
+                        <div style="position: absolute; bottom: 100px; left: 120px; width: 70px; height: 45px; background: rgba(0,0,255,0.3); border: 2px solid blue;"></div>
+                    </div>
+                    
+                    <!-- GUT: Areas mit aussagekräftigen alt-Texten -->
+                    <map name="goodworldmap">
+                        <area shape="rect" coords="80,50,140,90" href="#europe" 
+                              alt="Europa: Unsere Niederlassungen in Deutschland, Frankreich und Italien anzeigen">
+                        <area shape="rect" coords="320,80,400,130" href="#asia" 
+                              alt="Asien: Standorte in Japan, Südkorea und Singapur erkunden">
+                        <area shape="rect" coords="120,200,190,245" href="#africa" 
+                              alt="Afrika: Projekte in Südafrika und Nigeria ansehen">
+                    </map>
+                </div>
+                
+                <div class="map-legend">
+                    <h4>Klickbare Regionen:</h4>
+                    <ul>
+                        <li><strong style="color: red;">Europa (Rot):</strong> 15 Niederlassungen in 8 Ländern</li>
+                        <li><strong style="color: green;">Asien (Grün):</strong> 8 Büros in 5 Ländern</li>
+                        <li><strong style="color: blue;">Afrika (Blau):</strong> 4 Projekte in 2 Ländern</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="feature-highlight">
+                <h4>✅ Image Map Barrierefreiheit:</h4>
+                <p>• Jede Area hat beschreibenden alt-Text<br>
+                • Ziel und Kontext sind klar<br>
+                • Zusätzliche Legende für Orientierung<br>
+                • Tastatur-Navigation möglich</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 1.1.1 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Konsistente Beschreibungen zwischen Links und Bildern</li>
+            <li>✅ SVG-Grafiken haben aussagekräftige alt-Texte</li>
+            <li>✅ Komplexe Diagramme mit aria-describedby und ausführlichen Beschreibungen</li>
+            <li>✅ Link-Ziele sind durch alt-Text klar erkennbar</li>
+            <li>✅ Dekorative Bilder haben alt="" und lenken nicht ab</li>
+            <li>✅ Image-Buttons mit funktionsbeschreibenden aria-labels</li>
+            <li>✅ Captcha mit mehreren zugänglichen Alternativen</li>
+            <li>✅ Datenvisualisierungen mit vollständigen Tabellenalternativen</li>
+            <li>✅ Spezifische Namen statt generischer Avatar-Beschreibungen</li>
+            <li>✅ Image Maps mit beschreibenden Area-Labels</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Blinde Screen Reader-Nutzer: Erhalten vollständige, korrekte Informationen</li>
+            <li>👥 Sehbehinderte: Können durch Beschreibungen Kontext verstehen</li>
+            <li>👥 Kognitive Beeinträchtigungen: Profitieren von klaren, widerspruchsfreien Informationen</li>
+            <li>👥 Motorische Einschränkungen: Haben alternative Zugriffsmethoden auf Image Maps</li>
+            <li>👥 Langsame Verbindungen: Verstehen Inhalte auch ohne geladene Bilder</li>
+            <li>👥 Alle Benutzer: Profitieren von klarerem Kontext und besserer Struktur</li>
+        </ul>
+    </div>
+
+    <script>
+        // Demonstrate proper alt text behaviors
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== COMPLEX IMAGE ALT COMPLIANCE ANALYSIS ===');
+            
+            // Analyze different types of proper image alt implementations
+            const goodPatterns = [
+                { selector: '.good-product-link', type: 'Consistent link and image labels' },
+                { selector: '.good-svg-icon', type: 'SVG with descriptive alt text' },
+                { selector: '.good-complex-diagram', type: 'Complex diagrams with detailed descriptions' },
+                { selector: '.good-image-link', type: 'Image links with clear context' },
+                { selector: '.good-decorative-image', type: 'Properly marked decorative images' },
+                { selector: '.good-image-button', type: 'Image buttons with accessible names' },
+                { selector: '.good-chart-image', type: 'Charts with data table alternatives' },
+                { selector: '.good-avatar', type: 'Avatars with specific names' },
+                { selector: '.good-map-image', type: 'Image maps with descriptive areas' }
+            ];
+            
+            goodPatterns.forEach(pattern => {
+                const elements = document.querySelectorAll(pattern.selector);
+                console.log(`✅ Found ${elements.length} elements with ${pattern.type}`);
+                
+                elements.forEach((element, index) => {
+                    const altText = element.getAttribute('alt') || '';
+                    const ariaLabel = element.getAttribute('aria-label') || '';
+                    const ariaDescribedby = element.getAttribute('aria-describedby') || '';
+                    
+                    console.log(`  ${pattern.type} ${index + 1}:`);
+                    console.log(`    Alt text: "${altText}"`);
+                    if (ariaLabel) console.log(`    ARIA label: "${ariaLabel}"`);
+                    if (ariaDescribedby) console.log(`    ARIA describedby: "${ariaDescribedby}"`);
+                    
+                    // Check for specific good practices
+                    if (pattern.type.includes('Consistent')) {
+                        const parent = element.closest('a');
+                        if (parent && parent.getAttribute('aria-label')) {
+                            console.log(`    ✅ GOOD: Link describes destination, image is decorative`);
+                        }
+                    }
+                    
+                    if (pattern.type.includes('SVG') && altText && altText.length > 10) {
+                        console.log(`    ✅ GOOD: SVG has meaningful description`);
+                    }
+                    
+                    if (pattern.type.includes('Complex') && ariaDescribedby) {
+                        console.log(`    ✅ GOOD: Complex content linked to detailed description`);
+                    }
+                    
+                    if (pattern.type.includes('decorative') && altText === '') {
+                        console.log(`    ✅ GOOD: Decorative image correctly marked with alt=""`);
+                    }
+                    
+                    if (pattern.type.includes('specific') && altText && !['avatar', 'profilbild', 'user'].includes(altText.toLowerCase())) {
+                        console.log(`    ✅ GOOD: Specific person name instead of generic description`);
+                    }
+                });
+            });
+            
+            // Analyze aria-describedby connections
+            const elementsWithDescribedby = document.querySelectorAll('[aria-describedby]');
+            console.log(`✅ ARIA-DESCRIBEDBY ANALYSIS:`);
+            console.log(`Found ${elementsWithDescribedby.length} elements with aria-describedby`);
+            
+            elementsWithDescribedby.forEach((element, index) => {
+                const describedbyId = element.getAttribute('aria-describedby');
+                const descriptionElement = document.getElementById(describedbyId);
+                
+                console.log(`Element ${index + 1}:`);
+                console.log(`  Points to: #${describedbyId}`);
+                console.log(`  Description found: ${descriptionElement ? 'Yes' : 'No'}`);
+                
+                if (descriptionElement) {
+                    const descriptionLength = descriptionElement.textContent.length;
+                    console.log(`  Description length: ${descriptionLength} characters`);
+                    console.log(`  ✅ GOOD: Detailed description available for complex content`);
+                }
+            });
+            
+            // Check image button accessibility
+            setTimeout(() => {
+                const imageButtons = document.querySelectorAll('.good-image-button');
+                console.log(`🔘 IMAGE BUTTON ANALYSIS:`);
+                console.log(`Found ${imageButtons.length} image buttons`);
+                
+                imageButtons.forEach((button, index) => {
+                    const ariaLabel = button.getAttribute('aria-label');
+                    const img = button.querySelector('img, .placeholder-image');
+                    const imgAlt = img ? img.getAttribute('alt') : '';
+                    
+                    console.log(`Button ${index + 1}:`);
+                    console.log(`  ARIA label: "${ariaLabel}"`);
+                    console.log(`  Image alt: "${imgAlt}"`);
+                    
+                    if (ariaLabel && ariaLabel.length > 5 && imgAlt === '') {
+                        console.log(`  ✅ GOOD: Button function clearly described, image is decorative`);
+                    }
+                });
+            }, 2000);
+            
+            // Check data table connections
+            setTimeout(() => {
+                const charts = document.querySelectorAll('[aria-describedby*="table"]');
+                console.log(`📊 CHART DATA TABLE ANALYSIS:`);
+                console.log(`Found ${charts.length} charts with table descriptions`);
+                
+                charts.forEach((chart, index) => {
+                    const tableId = chart.getAttribute('aria-describedby');
+                    const dataTable = document.getElementById(tableId);
+                    
+                    if (dataTable && dataTable.tagName === 'TABLE') {
+                        const rows = dataTable.querySelectorAll('tbody tr');
+                        console.log(`Chart ${index + 1}:`);
+                        console.log(`  Connected to table with ${rows.length} data rows`);
+                        console.log(`  ✅ GOOD: Visual chart has complete data table alternative`);
+                    }
+                });
+            }, 3000);
+            
+            // Simulate screen reader navigation improvements
+            setTimeout(() => {
+                console.log('🔊 SCREEN READER EXPERIENCE SIMULATION:');
+                console.log('Navigating through links...');
+                
+                const linkTexts = [];
+                const links = document.querySelectorAll('a');
+                
+                links.forEach(link => {
+                    const ariaLabel = link.getAttribute('aria-label');
+                    const linkText = link.textContent.trim();
+                    const img = link.querySelector('img, .placeholder-image');
+                    const imgAlt = img ? img.getAttribute('alt') : '';
+                    
+                    // Simulate how screen reader would announce this
+                    let announcement = ariaLabel || linkText;
+                    if (imgAlt && imgAlt !== '') {
+                        announcement += `, ${imgAlt}`;
+                    }
+                    announcement += ', link';
+                    
+                    linkTexts.push(announcement);
+                });
+                
+                console.log('Screen Reader Link List:');
+                linkTexts.forEach((text, index) => {
+                    console.log(`${index + 1}. ${text}`);
+                });
+                
+                console.log('✅ IMPROVEMENTS: Clear destinations, no conflicts, meaningful context');
+            }, 4000);
+        });
+        
+        // Demonstrate accessible button actions
+        function goodEditAction() {
+            alert('✅ Bearbeiten-Aktion - Screen Reader hörte "Artikel bearbeiten Button"');
+            console.log('✅ Image button with clear aria-label - user knew exact function');
+        }
+        
+        function goodDeleteAction() {
+            if (confirm('Möchten Sie den Artikel wirklich löschen?')) {
+                alert('✅ Löschen-Aktion - Screen Reader hörte "Artikel löschen Button"');
+                console.log('✅ Dangerous action with clear description and confirmation');
+            }
+        }
+        
+        function goodSaveAction() {
+            alert('✅ Speichern-Aktion - Screen Reader hörte "Änderungen speichern Button"');
+            console.log('✅ Save action with descriptive aria-label');
+        }
+        
+        function goodShareAction() {
+            alert('✅ Teilen-Aktion - Screen Reader hörte "Artikel teilen Button"');
+            console.log('✅ Share action with clear function description');
+        }
+        
+        // Accessible captcha alternatives
+        function playAudioCaptcha() {
+            alert('🔊 Audio-Captcha würde abgespielt: "7-4-9-2" (Beispiel)');
+            console.log('✅ Audio alternative provided for visual captcha');
+        }
+        
+        function requestHumanVerification() {
+            alert('👤 Support kontaktiert - Alternative Verifikationsmethode wird eingerichtet');
+            console.log('✅ Human verification fallback available');
+        }
+        
+        // Monitor accessibility features
+        function validateAccessibilityFeatures() {
+            const results = {
+                consistentLabels: 0,
+                descriptiveAlts: 0,
+                decorativeImages: 0,
+                complexDescriptions: 0,
+                dataAlternatives: 0
+            };
+            
+            // Check for consistent labeling
+            const linksWithImages = document.querySelectorAll('a img, a .placeholder-image');
+            linksWithImages.forEach(img => {
+                const link = img.closest('a');
+                const linkLabel = link.getAttribute('aria-label');
+                const imgAlt = img.getAttribute('alt');
+                
+                if (linkLabel && (imgAlt === '' || !imgAlt)) {
+                    results.consistentLabels++;
+                }
+            });
+            
+            // Check for descriptive alt texts
+            const svgImages = document.querySelectorAll('img[src*="svg"], .good-svg-icon');
+            svgImages.forEach(img => {
+                const alt = img.getAttribute('alt');
+                if (alt && alt.length > 10) {
+                    results.descriptiveAlts++;
+                }
+            });
+            
+            // Check for properly marked decorative images
+            const decorativeImages = document.querySelectorAll('.good-decorative-image');
+            decorativeImages.forEach(img => {
+                if (img.getAttribute('alt') === '') {
+                    results.decorativeImages++;
+                }
+            });
+            
+            // Check for complex content descriptions
+            const complexElements = document.querySelectorAll('[aria-describedby]');
+            complexElements.forEach(element => {
+                const describedbyId = element.getAttribute('aria-describedby');
+                if (document.getElementById(describedbyId)) {
+                    results.complexDescriptions++;
+                }
+            });
+            
+            // Check for data alternatives
+            const dataVisualization = document.querySelectorAll('.good-chart-image');
+            dataVisualization.forEach(chart => {
+                const tableId = chart.getAttribute('aria-describedby');
+                if (tableId && document.getElementById(tableId)) {
+                    results.dataAlternatives++;
+                }
+            });
+            
+            console.log('📊 ACCESSIBILITY VALIDATION RESULTS:');
+            console.log(`✅ Consistent link/image labels: ${results.consistentLabels}`);
+            console.log(`✅ Descriptive SVG alt texts: ${results.descriptiveAlts}`);
+            console.log(`✅ Properly marked decorative images: ${results.decorativeImages}`);
+            console.log(`✅ Complex content with descriptions: ${results.complexDescriptions}`);
+            console.log(`✅ Data visualizations with table alternatives: ${results.dataAlternatives}`);
+            
+            return results;
+        }
+        
+        // Run validation
+        setTimeout(validateAccessibilityFeatures, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1735 @@
+{
+  "scanners": [
+    "color-contrast",
+    "use-of-color",
+    "images-of-text",
+    "keyboard-navigation",
+    "focus-management"
+  ],
+  "testFiles": [
+    "bad-color-contrast.html",
+    "bad-use-of-color.html",
+    "bad-images-of-text.html",
+    "bad-seizure-risk.html",
+    "bad-label-in-name.html",
+    "bad-status-messages.html",
+    "bad-nontext-contrast.html",
+    "bad-timing-controls.html",
+    "bad-form-errors.html",
+    "bad-complex-aria.html",
+    "bad-input-modalities.html",
+    "bad-html-validation.html",
+    "bad-keyboard-access.html",
+    "bad-keyboard-trap.html",
+    "bad-focus-order.html",
+    "bad-focus-visible.html",
+    "bad-link-purpose.html",
+    "bad-focus-management.html",
+    "good-accessibility.html",
+    "good-css-background-accessible.html",
+    "good-focus-management.html"
+  ],
+  "matrix": {
+    "color-contrast": {
+      "bad-color-contrast.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-color-contrast.html",
+        "scanTime": 2099,
+        "violations": 22,
+        "hasViolations": true,
+        "classification": "TRUE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "h2",
+            "currentRatio": 1.61,
+            "requiredRatio": 3,
+            "foregroundColor": "rgb(204, 204, 204)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": true,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "p",
+            "currentRatio": 1.61,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(204, 204, 204)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "h2",
+            "currentRatio": 1.07,
+            "requiredRatio": 3,
+            "foregroundColor": "rgb(255, 255, 0)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": true,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-use-of-color.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-use-of-color.html",
+        "scanTime": 2099,
+        "violations": 15,
+        "hasViolations": true,
+        "classification": "FALSE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "a",
+            "currentRatio": 4,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "a",
+            "currentRatio": 4,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "a",
+            "currentRatio": 4,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-images-of-text.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-images-of-text.html",
+        "scanTime": 2088,
+        "violations": 15,
+        "hasViolations": true,
+        "classification": "FALSE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.text-button-image.simulated-text-image",
+            "currentRatio": 1,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.text-button-image.simulated-text-image",
+            "currentRatio": 1,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.text-button-image.simulated-text-image",
+            "currentRatio": 1,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-seizure-risk.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-seizure-risk.html",
+        "scanTime": 660,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.seizure-warning",
+            "currentRatio": 4,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(255, 0, 0)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          }
+        ]
+      },
+      "bad-label-in-name.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-label-in-name.html",
+        "scanTime": 1082,
+        "violations": 12,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button.submit-btn",
+            "currentRatio": 3.13,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(40, 167, 69)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          },
+          {
+            "element": "button.submit-btn",
+            "currentRatio": 3.13,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(40, 167, 69)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          }
+        ]
+      },
+      "bad-status-messages.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-status-messages.html",
+        "scanTime": 2100,
+        "violations": 8,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-nontext-contrast.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-nontext-contrast.html",
+        "scanTime": 1090,
+        "violations": 26,
+        "hasViolations": true,
+        "classification": "TRUE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-timing-controls.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-timing-controls.html",
+        "scanTime": 1093,
+        "violations": 15,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-form-errors.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-form-errors.html",
+        "scanTime": 1095,
+        "violations": 7,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-complex-aria.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-complex-aria.html",
+        "scanTime": 2090,
+        "violations": 10,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-input-modalities.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-input-modalities.html",
+        "scanTime": 2082,
+        "violations": 14,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-html-validation.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-html-validation.html",
+        "scanTime": 1093,
+        "violations": 11,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-keyboard-access.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-keyboard-access.html",
+        "scanTime": 2089,
+        "violations": 38,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.fake-button",
+            "currentRatio": 3.12,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(33, 150, 243)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.fake-button",
+            "currentRatio": 3.12,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(33, 150, 243)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-keyboard-trap.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-keyboard-trap.html",
+        "scanTime": 1086,
+        "violations": 29,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button.btn",
+            "currentRatio": 3.12,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(33, 150, 243)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "span.close-modal",
+            "currentRatio": 2.32,
+            "requiredRatio": 3,
+            "foregroundColor": "rgb(170, 170, 170)",
+            "backgroundColor": "rgb(255, 255, 255)",
+            "isLargeText": true,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-focus-order.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-focus-order.html",
+        "scanTime": 1088,
+        "violations": 40,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button.btn",
+            "currentRatio": 3.12,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(33, 150, 243)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button.btn",
+            "currentRatio": 3.12,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(33, 150, 243)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-focus-visible.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-focus-visible.html",
+        "scanTime": 1077,
+        "violations": 23,
+        "hasViolations": true,
+        "classification": "TRUE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-link-purpose.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-link-purpose.html",
+        "scanTime": 2104,
+        "violations": 58,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 4.36,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(211, 47, 47)",
+            "backgroundColor": "rgb(255, 235, 238)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          }
+        ]
+      },
+      "bad-focus-management.html": {
+        "scanner": "color-contrast",
+        "testFile": "bad-focus-management.html",
+        "scanTime": 2092,
+        "violations": 23,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.violation-title",
+            "currentRatio": 3.74,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 0, 0)",
+            "backgroundColor": "rgb(255, 245, 245)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button.bad-delete-button",
+            "currentRatio": 3.68,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(244, 67, 54)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          }
+        ]
+      },
+      "good-accessibility.html": {
+        "scanner": "color-contrast",
+        "testFile": "good-accessibility.html",
+        "scanTime": 2129,
+        "violations": 8,
+        "hasViolations": true,
+        "classification": "FALSE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "a.active",
+            "currentRatio": 3.29,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(74, 144, 226)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div#name-help",
+            "currentRatio": 4.45,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(108, 117, 125)",
+            "backgroundColor": "rgb(248, 249, 250)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button.good-button",
+            "currentRatio": 3.13,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(40, 167, 69)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          }
+        ]
+      },
+      "good-css-background-accessible.html": {
+        "scanner": "color-contrast",
+        "testFile": "good-css-background-accessible.html",
+        "scanTime": 2087,
+        "violations": 6,
+        "hasViolations": true,
+        "classification": "FALSE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "a.phone-accessible",
+            "currentRatio": 4.26,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(0, 124, 186)",
+            "backgroundColor": "rgb(240, 248, 255)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "div.price-note",
+            "currentRatio": 3.37,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(136, 136, 136)",
+            "backgroundColor": "rgb(249, 249, 249)",
+            "isLargeText": false,
+            "suggestedForeground": "#000000"
+          },
+          {
+            "element": "button",
+            "currentRatio": 2.78,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(76, 175, 80)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          }
+        ]
+      },
+      "good-focus-management.html": {
+        "scanner": "color-contrast",
+        "testFile": "good-focus-management.html",
+        "scanTime": 2132,
+        "violations": 8,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "button#goodModalOpener",
+            "currentRatio": 2.78,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(76, 175, 80)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          },
+          {
+            "element": "button",
+            "currentRatio": 2.78,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(76, 175, 80)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          },
+          {
+            "element": "button",
+            "currentRatio": 2.78,
+            "requiredRatio": 4.5,
+            "foregroundColor": "rgb(255, 255, 255)",
+            "backgroundColor": "rgb(76, 175, 80)",
+            "isLargeText": false,
+            "suggestedForeground": "#ffffff"
+          }
+        ]
+      }
+    },
+    "use-of-color": {
+      "bad-color-contrast.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-color-contrast.html",
+        "scanTime": 2093,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-use-of-color.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-use-of-color.html",
+        "scanTime": 2103,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "FALSE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-images-of-text.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-images-of-text.html",
+        "scanTime": 2084,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-seizure-risk.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-seizure-risk.html",
+        "scanTime": 655,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "canvas#dangerousCanvas.dangerous-canvas",
+            "issue": "chart-color-only",
+            "description": "Chart or graph may rely only on color to distinguish data",
+            "suggestion": "Add patterns, textures, labels, or legend to differentiate data series"
+          }
+        ]
+      },
+      "bad-label-in-name.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-label-in-name.html",
+        "scanTime": 1075,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-status-messages.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-status-messages.html",
+        "scanTime": 2092,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-nontext-contrast.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-nontext-contrast.html",
+        "scanTime": 1080,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-timing-controls.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-timing-controls.html",
+        "scanTime": 1076,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-form-errors.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-form-errors.html",
+        "scanTime": 1100,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-complex-aria.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-complex-aria.html",
+        "scanTime": 2108,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-input-modalities.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-input-modalities.html",
+        "scanTime": 2084,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "element": "canvas#signature-canvas",
+            "issue": "chart-color-only",
+            "description": "Chart or graph may rely only on color to distinguish data",
+            "suggestion": "Add patterns, textures, labels, or legend to differentiate data series"
+          }
+        ]
+      },
+      "bad-html-validation.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-html-validation.html",
+        "scanTime": 1085,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-keyboard-access.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-keyboard-access.html",
+        "scanTime": 2082,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-keyboard-trap.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-keyboard-trap.html",
+        "scanTime": 1075,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-order.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-focus-order.html",
+        "scanTime": 1086,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-visible.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-focus-visible.html",
+        "scanTime": 1076,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-link-purpose.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-link-purpose.html",
+        "scanTime": 2106,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-management.html": {
+        "scanner": "use-of-color",
+        "testFile": "bad-focus-management.html",
+        "scanTime": 2139,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-accessibility.html": {
+        "scanner": "use-of-color",
+        "testFile": "good-accessibility.html",
+        "scanTime": 2118,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-css-background-accessible.html": {
+        "scanner": "use-of-color",
+        "testFile": "good-css-background-accessible.html",
+        "scanTime": 2146,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "good-focus-management.html": {
+        "scanner": "use-of-color",
+        "testFile": "good-focus-management.html",
+        "scanTime": 2077,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      }
+    },
+    "images-of-text": {
+      "bad-color-contrast.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-color-contrast.html",
+        "scanTime": 2086,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-use-of-color.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-use-of-color.html",
+        "scanTime": 2081,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-images-of-text.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-images-of-text.html",
+        "scanTime": 2078,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "FALSE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-seizure-risk.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-seizure-risk.html",
+        "scanTime": 671,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-label-in-name.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-label-in-name.html",
+        "scanTime": 1084,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-status-messages.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-status-messages.html",
+        "scanTime": 2099,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-nontext-contrast.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-nontext-contrast.html",
+        "scanTime": 1081,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-timing-controls.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-timing-controls.html",
+        "scanTime": 1079,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-form-errors.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-form-errors.html",
+        "scanTime": 1101,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-complex-aria.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-complex-aria.html",
+        "scanTime": 2123,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-input-modalities.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-input-modalities.html",
+        "scanTime": 2080,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-html-validation.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-html-validation.html",
+        "scanTime": 30043,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-keyboard-access.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-keyboard-access.html",
+        "scanTime": 2171,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-keyboard-trap.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-keyboard-trap.html",
+        "scanTime": 1105,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-order.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-focus-order.html",
+        "scanTime": 1105,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-visible.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-focus-visible.html",
+        "scanTime": 1101,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-link-purpose.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-link-purpose.html",
+        "scanTime": 2113,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-management.html": {
+        "scanner": "images-of-text",
+        "testFile": "bad-focus-management.html",
+        "scanTime": 2118,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-accessibility.html": {
+        "scanner": "images-of-text",
+        "testFile": "good-accessibility.html",
+        "scanTime": 2169,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-css-background-accessible.html": {
+        "scanner": "images-of-text",
+        "testFile": "good-css-background-accessible.html",
+        "scanTime": 2120,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-focus-management.html": {
+        "scanner": "images-of-text",
+        "testFile": "good-focus-management.html",
+        "scanTime": 2102,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      }
+    },
+    "keyboard-navigation": {
+      "bad-color-contrast.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-color-contrast.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-use-of-color.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-use-of-color.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-images-of-text.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-images-of-text.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-seizure-risk.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-seizure-risk.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-label-in-name.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-label-in-name.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-status-messages.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-status-messages.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-nontext-contrast.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-nontext-contrast.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-timing-controls.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-timing-controls.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-form-errors.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-form-errors.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-complex-aria.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-complex-aria.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-input-modalities.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-input-modalities.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-html-validation.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-html-validation.html",
+        "scanTime": 5,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-keyboard-access.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-keyboard-access.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-keyboard-trap.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-keyboard-trap.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-focus-order.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-focus-order.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-focus-visible.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-focus-visible.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-link-purpose.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-link-purpose.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-focus-management.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "bad-focus-management.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "good-accessibility.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "good-accessibility.html",
+        "scanTime": 4,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "good-css-background-accessible.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "good-css-background-accessible.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "good-focus-management.html": {
+        "scanner": "keyboard-navigation",
+        "testFile": "good-focus-management.html",
+        "scanTime": 3,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      }
+    },
+    "focus-management": {
+      "bad-color-contrast.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-color-contrast.html",
+        "scanTime": 5007,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-use-of-color.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-use-of-color.html",
+        "scanTime": 4016,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-images-of-text.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-images-of-text.html",
+        "scanTime": 4372,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-seizure-risk.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-seizure-risk.html",
+        "scanTime": 2044,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-label-in-name.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-label-in-name.html",
+        "scanTime": 5569,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-status-messages.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-status-messages.html",
+        "scanTime": 4027,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-nontext-contrast.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-nontext-contrast.html",
+        "scanTime": 12563,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "criterion": "9.2.4.3",
+            "element": "document",
+            "issue": "illogical-tab-order",
+            "description": "Tab order does not follow a logical sequence",
+            "suggestion": "Adjust tabindex values or DOM order to match visual layout"
+          }
+        ]
+      },
+      "bad-timing-controls.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-timing-controls.html",
+        "scanTime": 4897,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-form-errors.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-form-errors.html",
+        "scanTime": 8373,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-complex-aria.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-complex-aria.html",
+        "scanTime": 5094,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "criterion": "9.2.4.3",
+            "element": "document",
+            "issue": "illogical-tab-order",
+            "description": "Tab order does not follow a logical sequence",
+            "suggestion": "Adjust tabindex values or DOM order to match visual layout"
+          }
+        ]
+      },
+      "bad-input-modalities.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-input-modalities.html",
+        "scanTime": 4733,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-html-validation.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-html-validation.html",
+        "scanTime": 30063,
+        "error": "API returned status 500",
+        "success": false,
+        "classification": "ERROR"
+      },
+      "bad-keyboard-access.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-keyboard-access.html",
+        "scanTime": 4673,
+        "violations": 2,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "criterion": "9.2.4.3",
+            "element": "div.dropdown-trigger",
+            "issue": "focus-not-restored",
+            "description": "Focus is not restored to trigger element after dropdown closes",
+            "suggestion": "Return focus to the element that opened the dropdown when it closes"
+          },
+          {
+            "criterion": "9.2.4.3",
+            "element": "div.dropdown-trigger",
+            "issue": "focus-not-restored",
+            "description": "Focus is not restored to trigger element after dropdown closes",
+            "suggestion": "Return focus to the element that opened the dropdown when it closes"
+          }
+        ]
+      },
+      "bad-keyboard-trap.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-keyboard-trap.html",
+        "scanTime": 2368,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "FALSE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-order.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-focus-order.html",
+        "scanTime": 6621,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "TRUE_POSITIVE",
+        "success": true,
+        "violationDetails": [
+          {
+            "criterion": "9.2.4.3",
+            "element": "document",
+            "issue": "illogical-tab-order",
+            "description": "Tab order does not follow a logical sequence",
+            "suggestion": "Adjust tabindex values or DOM order to match visual layout"
+          }
+        ]
+      },
+      "bad-focus-visible.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-focus-visible.html",
+        "scanTime": 3459,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-link-purpose.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-link-purpose.html",
+        "scanTime": 3743,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": []
+      },
+      "bad-focus-management.html": {
+        "scanner": "focus-management",
+        "testFile": "bad-focus-management.html",
+        "scanTime": 4086,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "FALSE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-accessibility.html": {
+        "scanner": "focus-management",
+        "testFile": "good-accessibility.html",
+        "scanTime": 4270,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      },
+      "good-css-background-accessible.html": {
+        "scanner": "focus-management",
+        "testFile": "good-css-background-accessible.html",
+        "scanTime": 4259,
+        "violations": 1,
+        "hasViolations": true,
+        "classification": "UNKNOWN",
+        "success": true,
+        "violationDetails": [
+          {
+            "criterion": "9.2.4.3",
+            "element": "document",
+            "issue": "illogical-tab-order",
+            "description": "Tab order does not follow a logical sequence",
+            "suggestion": "Adjust tabindex values or DOM order to match visual layout"
+          }
+        ]
+      },
+      "good-focus-management.html": {
+        "scanner": "focus-management",
+        "testFile": "good-focus-management.html",
+        "scanTime": 3529,
+        "violations": 0,
+        "hasViolations": false,
+        "classification": "TRUE_NEGATIVE",
+        "success": true,
+        "violationDetails": []
+      }
+    }
+  },
+  "summary": {
+    "total": 105,
+    "successful": 81,
+    "errors": 24,
+    "truePositives": 4,
+    "trueNegatives": 9,
+    "falsePositives": 4,
+    "falseNegatives": 4,
+    "unknown": 60
+  },
+  "scannerSummary": {
+    "color-contrast": {
+      "total": 21,
+      "truePositives": 3,
+      "trueNegatives": 0,
+      "falsePositives": 4,
+      "falseNegatives": 0,
+      "errors": 0,
+      "avgScanTime": 1645
+    },
+    "use-of-color": {
+      "total": 21,
+      "truePositives": 0,
+      "trueNegatives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 1,
+      "errors": 1,
+      "avgScanTime": 1620
+    },
+    "images-of-text": {
+      "total": 21,
+      "truePositives": 0,
+      "trueNegatives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 1,
+      "errors": 1,
+      "avgScanTime": 1683
+    },
+    "keyboard-navigation": {
+      "total": 21,
+      "truePositives": 0,
+      "trueNegatives": 0,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "errors": 21,
+      "avgScanTime": 0
+    },
+    "focus-management": {
+      "total": 21,
+      "truePositives": 1,
+      "trueNegatives": 3,
+      "falsePositives": 0,
+      "falseNegatives": 2,
+      "errors": 1,
+      "avgScanTime": 4885
+    }
+  },
+  "fileSummary": {}
+}

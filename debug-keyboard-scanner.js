@@ -42,7 +42,7 @@ async function debugKeyboardScanner() {
       if (result.violations.length > 0) {
         console.log(`   🚨 First 3 violations:`);
         result.violations.slice(0, 3).forEach((violation, i) => {
-          console.log(`     ${i + 1}. ${violation.type}: ${violation.element || violation.description}`);
+          console.log(`     ${i + 1}. ${violation.issue}: ${violation.element || violation.description}`);
         });
       }
       console.log('');
@@ -73,7 +73,7 @@ async function debugKeyboardScanner() {
       if (result.violations.length > 0) {
         console.log(`   ⚠️ Unexpected violations:`);
         result.violations.slice(0, 3).forEach((violation, i) => {
-          console.log(`     ${i + 1}. ${violation.type}: ${violation.element || violation.description}`);
+          console.log(`     ${i + 1}. ${violation.issue}: ${violation.element || violation.description}`);
         });
       }
       console.log('');

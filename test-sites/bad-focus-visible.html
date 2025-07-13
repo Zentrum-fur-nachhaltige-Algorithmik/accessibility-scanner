@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Focus Visible - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-title {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .focus-example {
+            background-color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        
+        /* VIOLATION 1: Global outline removal */
+        *:focus {
+            outline: none !important;
+        }
+        
+        /* VIOLATION 2: Poor contrast focus indicators */
+        .poor-contrast-btn {
+            background-color: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #666;
+        }
+        .poor-contrast-btn:focus {
+            outline: 1px solid #f0f0f0 !important;
+            background-color: #fafafa;
+        }
+        
+        .light-gray-focus {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .light-gray-focus:focus {
+            outline: 2px solid #e0e0e0 !important;
+        }
+        
+        /* VIOLATION 3: Invisible focus on colored backgrounds */
+        .blue-bg {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .blue-bg:focus {
+            outline: 2px solid #1976d2 !important;
+        }
+        
+        .dark-bg {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .dark-bg:focus {
+            outline: 1px solid #555 !important;
+        }
+        
+        /* VIOLATION 4: Custom focus that disappears */
+        .disappearing-focus {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .disappearing-focus:focus {
+            outline: 2px solid transparent !important;
+            box-shadow: 0 0 0 1px #4caf50;
+            transform: scale(0.95);
+        }
+        
+        /* VIOLATION 5: Focus indicators only on hover */
+        .hover-only-focus {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .hover-only-focus:hover {
+            outline: 2px solid #f57c00;
+        }
+        /* No :focus styles defined */
+        
+        /* VIOLATION 6: Links without focus indicators */
+        .no-focus-link {
+            color: #2196f3;
+            text-decoration: none;
+        }
+        .no-focus-link:focus {
+            outline: none !important;
+            text-decoration: none;
+        }
+        
+        /* VIOLATION 7: Form inputs with poor focus */
+        .poor-input-focus {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            width: 200px;
+        }
+        .poor-input-focus:focus {
+            outline: none !important;
+            border-color: #e0e0e0;
+        }
+        
+        /* VIOLATION 8: Custom elements without focus */
+        .custom-button {
+            background-color: #e91e63;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 10px;
+            user-select: none;
+        }
+        /* No focus styles at all for custom clickable elements */
+        
+        /* Navigation styles */
+        .nav-container {
+            background-color: #333;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .nav-link:focus {
+            outline: none !important;
+            background-color: #333; /* Same as background - invisible */
+        }
+        
+        /* Card styles */
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #2196f3;
+        }
+        .card:focus {
+            outline: none !important;
+            /* Same styling as hover - confusing for keyboard users */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #2196f3;
+        }
+        
+        /* Table styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #f5f5f5;
+        }
+        .data-table tr:focus {
+            outline: none !important;
+            background-color: #f9f9f9; /* Very subtle change */
+        }
+        
+        /* Checkbox and radio styles */
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 3px;
+            margin-right: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .custom-checkbox:checked {
+            background-color: #2196f3;
+            border-color: #2196f3;
+        }
+        .custom-checkbox:focus {
+            outline: none !important;
+            /* No focus indicator */
+        }
+        
+        /* Dropdown styles */
+        .custom-select {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            width: 200px;
+        }
+        .custom-select:focus {
+            outline: none !important;
+            border-color: #ddd; /* Same as default */
+        }
+    </style>
+</head>
+<body>
+    <h1>Bad Focus Visible - Multiple WCAG 2.4.7 & 2.4.11 Violations</h1>
+    <p>This page demonstrates focus visibility failures where keyboard users cannot see which element currently has focus. Try tabbing through the page!</p>
+
+    <!-- VIOLATION 1: Global outline removal -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Global outline removal with *:focus { outline: none }</div>
+        <div class="focus-example">
+            <h3>Standard Buttons - No Focus Indicators</h3>
+            <p>These buttons have all focus outlines removed globally:</p>
+            <button>Save Document</button>
+            <button>Cancel</button>
+            <button>Delete</button>
+            <button>Export</button>
+            <button>Share</button>
+            
+            <h3>Standard Links - No Focus Indicators</h3>
+            <p>Try tabbing to these links:</p>
+            <a href="#">Home Page</a> |
+            <a href="#">About Us</a> |
+            <a href="#">Contact</a> |
+            <a href="#">Privacy Policy</a>
+            
+            <p><strong>Problem:</strong> Global CSS rule removes all focus indicators!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 2: Poor contrast focus indicators -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Focus indicators with insufficient contrast</div>
+        <div class="focus-example">
+            <h3>Light Gray Focus Outlines</h3>
+            <p>These buttons have focus indicators that are barely visible:</p>
+            <button class="poor-contrast-btn">Very Light Focus</button>
+            <button class="light-gray-focus">Gray on White Focus</button>
+            <button class="poor-contrast-btn">Barely Visible</button>
+            
+            <h3>Form Inputs with Poor Focus</h3>
+            <p>Try tabbing to these form fields:</p>
+            <input type="text" class="poor-input-focus" placeholder="First Name">
+            <input type="email" class="poor-input-focus" placeholder="Email Address">
+            <input type="tel" class="poor-input-focus" placeholder="Phone Number">
+            
+            <p><strong>Problem:</strong> Focus indicators don't meet contrast requirements!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 3: Focus invisible on colored backgrounds -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Focus indicators invisible on colored backgrounds</div>
+        <div class="focus-example">
+            <h3>Blue Buttons with Blue Focus</h3>
+            <p>Focus indicators blend into button backgrounds:</p>
+            <button class="blue-bg">Primary Action</button>
+            <button class="blue-bg">Secondary Action</button>
+            <button class="blue-bg">Submit Form</button>
+            
+            <h3>Dark Buttons with Dark Focus</h3>
+            <button class="dark-bg">Dark Button 1</button>
+            <button class="dark-bg">Dark Button 2</button>
+            <button class="dark-bg">Dark Button 3</button>
+            
+            <p><strong>Problem:</strong> Focus colors too similar to background colors!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 4: Focus indicators that disappear or transform -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Focus indicators that disappear or transform confusingly</div>
+        <div class="focus-example">
+            <h3>Buttons with Disappearing Focus</h3>
+            <p>These buttons have focus effects that make them hard to track:</p>
+            <button class="disappearing-focus">Shrinking Focus</button>
+            <button class="disappearing-focus">Transparent Focus</button>
+            <button class="disappearing-focus">Animated Focus</button>
+            
+            <p><strong>Problem:</strong> Focus indicators animate or disappear making tracking difficult!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 5: Hover-only focus styles -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Focus styles only defined for :hover, not :focus</div>
+        <div class="focus-example">
+            <h3>Hover-Only Styling</h3>
+            <p>These buttons only show indicators on mouse hover, not keyboard focus:</p>
+            <button class="hover-only-focus">Hover Only 1</button>
+            <button class="hover-only-focus">Hover Only 2</button>
+            <button class="hover-only-focus">Hover Only 3</button>
+            
+            <p><strong>Problem:</strong> Keyboard users get no visual feedback!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 6: Links without focus indicators -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Links with focus indicators removed</div>
+        <div class="focus-example">
+            <h3>Navigation Links - No Focus</h3>
+            <div class="nav-container">
+                <a href="#" class="nav-link">Dashboard</a>
+                <a href="#" class="nav-link">Projects</a>
+                <a href="#" class="nav-link">Team</a>
+                <a href="#" class="nav-link">Settings</a>
+                <a href="#" class="nav-link">Logout</a>
+            </div>
+            
+            <h3>In-Page Links</h3>
+            <p>Related articles:</p>
+            <a href="#" class="no-focus-link">How to improve accessibility</a><br>
+            <a href="#" class="no-focus-link">WCAG compliance checklist</a><br>
+            <a href="#" class="no-focus-link">Testing with screen readers</a><br>
+            
+            <p><strong>Problem:</strong> Navigation is impossible for keyboard users!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 7: Custom interactive elements without focus -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Custom interactive elements without focus styles</div>
+        <div class="focus-example">
+            <h3>Custom Clickable Cards</h3>
+            <p>These cards are clickable but have no keyboard focus indicators:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div class="card" tabindex="0" onclick="alert('Card 1 clicked')">
+                    <h4>📊 Analytics</h4>
+                    <p>View your dashboard analytics and reports.</p>
+                </div>
+                <div class="card" tabindex="0" onclick="alert('Card 2 clicked')">
+                    <h4>👥 Team</h4>
+                    <p>Manage your team members and permissions.</p>
+                </div>
+                <div class="card" tabindex="0" onclick="alert('Card 3 clicked')">
+                    <h4>⚙️ Settings</h4>
+                    <p>Configure your account preferences.</p>
+                </div>
+            </div>
+            
+            <h3>Custom Button Elements</h3>
+            <div class="custom-button" tabindex="0" onclick="alert('Custom button clicked')">
+                🎉 Custom Action Button
+            </div>
+            <div class="custom-button" tabindex="0" onclick="alert('Custom button clicked')">
+                📤 Share Content
+            </div>
+            
+            <p><strong>Problem:</strong> Custom interactive elements lack focus indicators!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 8: Form controls with missing focus -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Form controls with inadequate focus indicators</div>
+        <div class="focus-example">
+            <h3>Custom Form Controls</h3>
+            <form>
+                <p>
+                    <label>
+                        <input type="checkbox" class="custom-checkbox">
+                        Subscribe to newsletter
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        <input type="checkbox" class="custom-checkbox">
+                        Receive product updates
+                    </label>
+                </p>
+                <p>
+                    <label for="customSelect">Choose your country:</label><br>
+                    <select id="customSelect" class="custom-select">
+                        <option>United States</option>
+                        <option>Canada</option>
+                        <option>United Kingdom</option>
+                        <option>Australia</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="customTextarea">Additional comments:</label><br>
+                    <textarea id="customTextarea" class="poor-input-focus" rows="4" cols="50"></textarea>
+                </p>
+            </form>
+            
+            <p><strong>Problem:</strong> Custom form controls lack proper focus indication!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 9: Data table without focus indicators -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Interactive table rows without clear focus</div>
+        <div class="focus-example">
+            <h3>Clickable Data Table</h3>
+            <p>Table rows are clickable but focus is barely visible:</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tabindex="0" onclick="alert('Row clicked')">
+                        <td>Wireless Headphones</td>
+                        <td>$99.99</td>
+                        <td>25</td>
+                        <td>In Stock</td>
+                    </tr>
+                    <tr tabindex="0" onclick="alert('Row clicked')">
+                        <td>Bluetooth Speaker</td>
+                        <td>$79.99</td>
+                        <td>12</td>
+                        <td>Low Stock</td>
+                    </tr>
+                    <tr tabindex="0" onclick="alert('Row clicked')">
+                        <td>Smart Watch</td>
+                        <td>$199.99</td>
+                        <td>0</td>
+                        <td>Out of Stock</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p><strong>Problem:</strong> Table row focus is too subtle to notice!</p>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div style="background-color: #fff3e0; border: 2px solid #ff9800; padding: 20px; margin-top: 30px;">
+        <h2>Expected Scanner Results</h2>
+        <p><strong>WCAG 2.4.7 & 2.4.11 Violations Found:</strong></p>
+        <ul>
+            <li>Global *:focus { outline: none } removing all focus indicators</li>
+            <li>8 buttons with poor contrast focus indicators (&lt;3:1 ratio)</li>
+            <li>6 buttons with focus colors too similar to background</li>
+            <li>3 elements with disappearing/transforming focus effects</li>
+            <li>3 elements with hover-only styling (no :focus styles)</li>
+            <li>8 links with focus indicators completely removed</li>
+            <li>5 custom interactive elements without focus styles</li>
+            <li>6 form controls with inadequate focus indication</li>
+            <li>3 table rows with barely visible focus indication</li>
+        </ul>
+        <p><strong>Total Expected Violations:</strong> 42+ focus visibility failures</p>
+        <p><strong>Confidence Level:</strong> High (CSS analysis can detect outline:none and contrast issues)</p>
+        <p><strong>Testing Tip:</strong> Tab through this page to experience poor focus visibility!</p>
+    </div>
+
+</body>
+</html>

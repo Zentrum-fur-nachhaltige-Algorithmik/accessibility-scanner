@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Reflow Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #4caf50;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Flexible containers that adapt to content */
+        .good-flexible-container {
+            max-width: 100%;
+            min-height: 9.375rem; /* 150px in rem */
+            overflow: visible;
+            border: 1px solid #4caf50;
+            padding: 0.625rem; /* 10px */
+            font-size: 1rem;
+            /* GUT: min-height statt height, overflow visible, rem-Einheiten */
+        }
+        
+        /* GOOD 2: Responsive layouts that adapt to viewport */
+        .good-responsive-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+            gap: 1rem;
+            max-width: 100%;
+            /* GUT: Responsive Grid mit auto-fit und minmax */
+        }
+        
+        .good-responsive-layout .column {
+            min-width: 0; /* Wichtig für Text-Wrapping */
+            padding: 1rem;
+            border: 1px solid #4caf50;
+            background-color: #f8f9fa;
+        }
+        
+        /* GOOD 3: Responsive data tables */
+        .good-data-table-container {
+            width: 100%;
+            overflow-x: auto;
+            /* GUT: Container für horizontale Scroll-Unterstützung */
+        }
+        
+        .good-data-table {
+            width: 100%;
+            min-width: 37.5rem; /* 600px minimum */
+            border-collapse: collapse;
+            /* GUT: Responsive Breite mit Minimum */
+        }
+        
+        .good-data-table th,
+        .good-data-table td {
+            border: 1px solid #4caf50;
+            padding: 0.5rem;
+            text-align: left;
+            word-wrap: break-word;
+            /* GUT: Flexible Padding, Text kann umbrechen */
+        }
+        
+        .good-data-table th {
+            background-color: #e8f5e8;
+            font-weight: bold;
+        }
+        
+        /* GOOD 4: Expandable containers for content */
+        .good-expandable-container {
+            width: 100%;
+            max-width: 18.75rem; /* 300px */
+            min-height: 5rem; /* 80px */
+            overflow: visible;
+            border: 1px solid #4caf50;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            /* GUT: Container passt sich an Inhalt an */
+        }
+        
+        /* GOOD 5: Flexible grid layouts with breakpoints */
+        .good-grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+            gap: 1rem;
+            width: 100%;
+            /* GUT: Responsive Grid mit Breakpoints */
+        }
+        
+        .good-grid-item {
+            border: 1px solid #4caf50;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            min-width: 0;
+            /* GUT: Flexible Grid-Items */
+        }
+        
+        /* GOOD 6: Responsive form layouts */
+        .good-form-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            width: 100%;
+            max-width: 50rem; /* 800px */
+            /* GUT: Einspaltiges Layout standardmäßig */
+        }
+        
+        @media (min-width: 48rem) { /* 768px */
+            .good-form-layout {
+                grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+            }
+        }
+        
+        .good-form-layout label,
+        .good-form-layout input {
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .good-form-layout input {
+            border: 1px solid #4caf50;
+            border-radius: 0.25rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* GOOD 7: Responsive sticky elements */
+        .good-sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: #4caf50;
+            color: white;
+            padding: 1rem;
+            z-index: 1000;
+            /* GUT: Angemessene Höhe, responsive Padding */
+        }
+        
+        @media (max-width: 48rem) { /* Bei kleinen Bildschirmen */
+            .good-sticky-header {
+                position: relative; /* Nicht sticky auf Mobilgeräten */
+                padding: 0.75rem;
+            }
+        }
+        
+        .good-sidebar {
+            display: none; /* Standardmäßig versteckt */
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 18.75rem; /* 300px */
+            height: 100vh;
+            background-color: #2e7d32;
+            color: white;
+            padding: 1rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            /* GUT: Sidebar beginnt außerhalb des Viewports */
+        }
+        
+        .good-sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .good-main-content {
+            transition: margin-left 0.3s ease;
+            /* GUT: Smooth Transition */
+        }
+        
+        @media (min-width: 64rem) { /* 1024px */
+            .good-sidebar {
+                display: block;
+                position: static;
+                transform: none;
+                height: auto;
+                width: 15rem;
+                float: left;
+            }
+            
+            .good-main-content {
+                margin-left: 16rem; /* Platz für Sidebar */
+            }
+        }
+        
+        /* GOOD 8: Responsive modal dialogs */
+        .good-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            overflow-y: auto;
+            /* GUT: Overlay mit Scroll-Unterstützung */
+        }
+        
+        .good-modal-content {
+            position: relative;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 37.5rem; /* 600px */
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            /* GUT: Responsive Modal mit max-width */
+        }
+        
+        @media (max-width: 30rem) { /* 480px */
+            .good-modal-content {
+                width: 95%;
+                top: 1rem;
+                padding: 1rem;
+            }
+        }
+        
+        /* Helper styles */
+        .content-block {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border: 1px solid #4caf50;
+            border-radius: 0.25rem;
+        }
+        
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            margin: 0.25rem;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* Utilities */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Reflow Accessible (GOOD)</h1>
+    <p><strong>WCAG 1.4.10 & 1.4.4 konforme Implementierung:</strong> Content bleibt bei 400% Zoom und verschiedenen Viewport-Größen vollständig zugänglich</p>
+    
+    <!-- GOOD 1: Flexible containers that adapt to content -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Flexible Container die sich an Inhalt anpassen</div>
+        <p><strong>Lösung:</strong> min-height statt height, overflow:visible, relative Einheiten</p>
+        <div class="interactive-area">
+            <div class="good-flexible-container">
+                Diese Box verwendet min-height statt fester Höhe und overflow:visible. Bei Textvergrößerung oder 400% Zoom bleibt der gesamte Inhalt sichtbar und zugänglich. Die Container verwenden relative Einheiten (rem) für bessere Skalierbarkeit. Assistive Technology-Nutzer haben vollständigen Zugang zu allen Informationen.
+            </div>
+            <p>✅ Text bleibt bei allen Zoom-Stufen vollständig sichtbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Responsive layouts that adapt to viewport -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Responsive Layout ohne horizontales Scrollen</div>
+        <p><strong>Lösung:</strong> CSS Grid mit auto-fit und minmax für flexible Anpassung</p>
+        <div class="interactive-area">
+            <div class="good-responsive-layout">
+                <div class="column">
+                    <h4>Flexible Spalte 1</h4>
+                    <p>Diese Spalte passt sich automatisch an die verfügbare Breite an.</p>
+                </div>
+                <div class="column">
+                    <h4>Adaptive Spalte 2</h4>
+                    <p>Bei 400% Zoom ordnen sich die Spalten vertikal an.</p>
+                </div>
+                <div class="column">
+                    <h4>Responsive Spalte 3</h4>
+                    <p>Kein horizontales Scrollen erforderlich bei verschiedenen Bildschirmgrößen.</p>
+                </div>
+            </div>
+            <p>✅ Layout passt sich flexibel an Viewport-Größe an</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Responsive data tables -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Responsive Datentabelle mit intelligenter Behandlung</div>
+        <p><strong>Lösung:</strong> Tabellen-Container mit overflow-x, flexible Spaltenbreiten</p>
+        <div class="interactive-area">
+            <div class="good-data-table-container">
+                <table class="good-data-table">
+                    <thead>
+                        <tr>
+                            <th>Produktname</th>
+                            <th>Beschreibung</th>
+                            <th>Preis</th>
+                            <th>Verfügbarkeit</th>
+                            <th>Bewertung</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Laptop XYZ</td>
+                            <td>Professioneller Laptop für anspruchsvolle Aufgaben</td>
+                            <td>€1.299,00</td>
+                            <td>Auf Lager</td>
+                            <td>★★★★☆</td>
+                            <td><button>Kaufen</button></td>
+                        </tr>
+                        <tr>
+                            <td>Monitor ABC</td>
+                            <td>4K Display für professionelle Anwendungen</td>
+                            <td>€599,00</td>
+                            <td>Begrenzt verfügbar</td>
+                            <td>★★★★★</td>
+                            <td><button>Kaufen</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>✅ Tabelle bietet horizontalen Scroll nur wenn nötig, Text kann umbrechen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Expandable containers for content -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Sich ausdehnende Container für variablen Content</div>
+        <p><strong>Lösung:</strong> Container wachsen mit dem Inhalt, overflow:visible</p>
+        <div class="interactive-area">
+            <div class="good-expandable-container">
+                Wichtige Informationen in diesem Container bleiben bei größerer Schrift oder Zoom vollständig lesbar und zugänglich.
+            </div>
+            <div class="good-expandable-container">
+                Diese Nachricht mit kritischen Fehlermeldungen oder Warnungen bleibt immer vollständig sichtbar.
+            </div>
+            <p>✅ Wichtige Inhalte bleiben bei Textvergrößerung vollständig zugänglich</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Flexible grid layouts with breakpoints -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Flexibles Grid-Layout mit intelligenten Breakpoints</div>
+        <p><strong>Lösung:</strong> CSS Grid mit auto-fit für verschiedene Bildschirmgrößen</p>
+        <div class="interactive-area">
+            <div class="good-grid-layout">
+                <div class="good-grid-item">
+                    <h4>Adaptive Karte 1</h4>
+                    <p>Inhalt der ersten Karte passt sich an verfügbaren Platz an.</p>
+                </div>
+                <div class="good-grid-item">
+                    <h4>Flexible Karte 2</h4>
+                    <p>Zweite Karte reorganisiert sich bei kleineren Bildschirmen.</p>
+                </div>
+                <div class="good-grid-item">
+                    <h4>Responsive Karte 3</h4>
+                    <p>Dritte Karte bleibt lesbar bei allen Viewport-Größen.</p>
+                </div>
+                <div class="good-grid-item">
+                    <h4>Skalierbare Karte 4</h4>
+                    <p>Vierte Karte mit optimaler Darstellung bei Zoom.</p>
+                </div>
+            </div>
+            <p>✅ Grid-Layout passt sich intelligent an verschiedene Bildschirmgrößen an</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Responsive form layouts -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Responsive Formular-Layout</div>
+        <p><strong>Lösung:</strong> Adaptive Grid-Struktur mit Breakpoints</p>
+        <div class="interactive-area">
+            <form class="good-form-layout">
+                <label for="goodName">Name:</label>
+                <input type="text" id="goodName" placeholder="Ihr vollständiger Name">
+                <label for="goodEmail">E-Mail:</label>
+                <input type="email" id="goodEmail" placeholder="ihre@email.de">
+                <label for="goodPhone">Telefon:</label>
+                <input type="tel" id="goodPhone" placeholder="+49 xxx xxxx">
+                <label for="goodAddress">Adresse:</label>
+                <input type="text" id="goodAddress" placeholder="Straße und Hausnummer">
+            </form>
+            <p>✅ Formular-Layout reorganisiert sich bei verschiedenen Bildschirmgrößen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Responsive sticky elements -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Responsive Sticky/Fixed Elemente</div>
+        <p><strong>Lösung:</strong> Angemessene Größe, Mobile-first Ansatz</p>
+        <div class="interactive-area">
+            <div class="good-sticky-header">
+                <h3>Responsive Header</h3>
+                <p>Kompakter Header der sich an Bildschirmgröße anpasst. Bei mobilen Geräten nicht sticky.</p>
+                <button onclick="toggleGoodSidebar()">Sidebar öffnen</button>
+            </div>
+            <div class="content-block">
+                <h4>Hauptinhalt</h4>
+                <p>Dieser Inhalt bleibt vollständig zugänglich. Der Header nimmt angemessen Platz weg.</p>
+            </div>
+            <p>✅ Sticky Elemente sind proportional und responsive</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Responsive modal dialogs -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Responsive Modal-Dialoge</div>
+        <p><strong>Lösung:</strong> Flexible Dimensionen mit max-width und mobile Anpassung</p>
+        <div class="interactive-area">
+            <button onclick="showGoodModal()">Responsive Modal öffnen</button>
+            <div class="content-block">
+                <h4>Flexibler Content</h4>
+                <p>Dieser Bereich zeigt wie responsive Modals mit dem Hauptinhalt interagieren.</p>
+            </div>
+            <p>✅ Modal passt sich an verschiedene Bildschirmgrößen an</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 1.4.10 & 1.4.4 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Content bleibt bei 200%+ Textvergrößerung vollständig zugänglich</li>
+            <li>✅ Kein horizontales Scrollen bei 400% Zoom erforderlich</li>
+            <li>✅ Informationen bleiben bei verschiedenen Bildschirmgrößen zugänglich</li>
+            <li>✅ Layout funktioniert zuverlässig mit assistiven Technologien</li>
+            <li>✅ Mobile Nutzer haben vollständigen Zugang zu allen Inhalten</li>
+            <li>✅ Sehbeeinträchtigte behalten Zugang zu wichtigen Informationen</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Sehbeeinträchtigte: Behalten Content bei Textvergrößerung</li>
+            <li>👥 Mobile Nutzer: Layout funktioniert optimal auf kleinen Bildschirmen</li>
+            <li>👥 Zoom-Nutzer: Benötigen kein horizontales Scrollen</li>
+            <li>👥 Nutzer mit geringer Auflösung: Können alle Inhalte vollständig sehen</li>
+            <li>👥 Ältere Nutzer: Profitieren von flexiblen, anpassbaren Layouts</li>
+        </ul>
+    </div>
+
+    <!-- Responsive modal -->
+    <div class="good-modal-overlay" id="goodModal">
+        <div class="good-modal-content">
+            <h3>Responsive Modal Dialog</h3>
+            <p>Dieses Modal hat flexible Dimensionen (90% Breite, max-width 600px). Es passt sich an verschiedene Bildschirmgrößen an und bleibt bei Zoom vollständig zugänglich.</p>
+            <p>Bei kleinen Bildschirmen wird es schmaler und der Abstand wird reduziert. Das Overlay unterstützt vertikales Scrollen falls nötig.</p>
+            <div class="content-block">
+                <h4>Zusätzlicher Inhalt</h4>
+                <p>Auch bei viel Inhalt bleibt das Modal zugänglich und scrollbar.</p>
+            </div>
+            <button onclick="closeGoodModal()">Modal schließen</button>
+        </div>
+    </div>
+
+    <!-- Responsive sidebar -->
+    <div class="good-sidebar" id="goodSidebar">
+        <h3>Responsive Sidebar</h3>
+        <p>Diese Sidebar erscheint nur bei größeren Bildschirmen automatisch.</p>
+        <p>Bei kleineren Bildschirmen wird sie als Overlay gezeigt und blockiert keinen Content.</p>
+        <button onclick="toggleGoodSidebar()">Sidebar schließen</button>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        // Helper function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        function showGoodModal() {
+            document.getElementById('goodModal').style.display = 'block';
+            announceToScreenReader('Modal geöffnet');
+            console.log('✅ GOOD: Responsive modal opened');
+            
+            // Focus management
+            setTimeout(() => {
+                document.querySelector('#goodModal button').focus();
+            }, 100);
+        }
+        
+        function closeGoodModal() {
+            document.getElementById('goodModal').style.display = 'none';
+            announceToScreenReader('Modal geschlossen');
+        }
+        
+        function toggleGoodSidebar() {
+            const sidebar = document.getElementById('goodSidebar');
+            const isOpen = sidebar.classList.contains('open');
+            
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                sidebar.style.display = 'none';
+                announceToScreenReader('Sidebar geschlossen');
+            } else {
+                sidebar.style.display = 'block';
+                setTimeout(() => {
+                    sidebar.classList.add('open');
+                }, 10);
+                announceToScreenReader('Sidebar geöffnet');
+            }
+            
+            console.log('✅ GOOD: Responsive sidebar toggled');
+        }
+        
+        // Initialize responsive behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD REFLOW IMPLEMENTATION ===');
+            console.log('✅ Flexible containers adapt to content size');
+            console.log('✅ Responsive layouts prevent horizontal scrolling');
+            console.log('✅ Data tables use intelligent overflow handling');
+            console.log('✅ Containers expand with content rather than hiding it');
+            console.log('✅ Grid layouts use auto-fit for flexible adaptation');
+            console.log('✅ Forms reorganize for different screen sizes');
+            console.log('✅ Sticky elements are proportional and responsive');
+            console.log('✅ Modal dialogs adapt to viewport constraints');
+            
+            // Close modal on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('goodModal');
+                    if (modal.style.display === 'block') {
+                        closeGoodModal();
+                    }
+                    
+                    const sidebar = document.getElementById('goodSidebar');
+                    if (sidebar.classList.contains('open')) {
+                        toggleGoodSidebar();
+                    }
+                }
+            });
+            
+            // Handle window resize for responsive adjustments
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('goodSidebar');
+                if (window.innerWidth >= 1024) {
+                    // Large screen: show sidebar by default
+                    sidebar.style.display = 'block';
+                    sidebar.classList.remove('open');
+                } else {
+                    // Small screen: hide sidebar
+                    if (!sidebar.classList.contains('open')) {
+                        sidebar.style.display = 'none';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

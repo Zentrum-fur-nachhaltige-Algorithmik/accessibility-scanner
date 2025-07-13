@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Isolated Element Test - page-structure - undefined</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .test-info {
+      background: #f0f0f0;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    .test-info h2 {
+      margin-top: 0;
+    }
+    .isolated-element {
+      border: 2px dashed #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      background: #fafafa;
+    }
+    .element-info {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-info">
+    <h2>Isolated Element Test</h2>
+    <p><strong>Scanner:</strong> page-structure</p>
+    <p><strong>Issue Type:</strong> false-negative</p>
+    <p><strong>Original File:</strong> bad-form-labels.html</p>
+    <p><strong>Expected Result:</strong> Should detect violations</p>
+    <p><strong>Actual Result:</strong> Detected 18 violations</p>
+    <p><strong>Problem:</strong> Scanner missing expected violations</p>
+    <p><strong>Generated:</strong> 2025-07-12T17:10:19.521Z</p>
+  </div>
+
+  <h3>Isolated Elements:</h3>
+  
+
+  <!-- Additional context if needed -->
+  <script>
+    // Log test metadata for debugging
+    console.log('Isolated Element Test Metadata:', {
+  "scanner": "page-structure",
+  "originalFile": "bad-form-labels.html",
+  "issueType": "false-negative",
+  "expected": "Should detect violations",
+  "actual": "Detected 18 violations",
+  "problem": "Scanner missing expected violations",
+  "violationSummary": [
+    {
+      "description": "Only 1 way(s) to locate content found. WCAG requires at least 2 ways."
+    },
+    {
+      "description": "Form control (text) lacks a proper label"
+    },
+    {
+      "description": "Form control (email) lacks a proper label"
+    }
+  ]
+});
+  </script>
+</body>
+</html>

@@ -26,7 +26,7 @@
         }
         
         .good-section {
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             padding: 1.25rem;
             margin: 1.25rem 0;
             background-color: #f1f8e9;
@@ -41,7 +41,7 @@
         }
         
         .interactive-area {
-            border: 1px solid #4caf50;
+            border: 1px solid #327d36;
             padding: 1rem;
             margin: 1rem 0;
             background-color: #f1f8e9;
@@ -115,7 +115,7 @@
         .good-flexible-button {
             min-width: 7.5rem;
             min-height: 2.5rem;
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             border: none;
             border-radius: 0.25rem;
@@ -130,7 +130,7 @@
         }
         
         .good-flexible-button:focus {
-            outline: 3px solid #ff9800;
+            outline: 3px solid #a66300;
             outline-offset: 2px;
         }
         
@@ -158,7 +158,7 @@
         }
         
         .good-nav-item:focus {
-            outline: 3px solid #ff9800;
+            outline: 3px solid #a66300;
             outline-offset: -3px;
         }
         
@@ -204,7 +204,7 @@
         }
         
         .good-form-input:focus {
-            outline: 3px solid #007bff;
+            outline: 3px solid #0056b3;
             outline-offset: 2px;
         }
         
@@ -356,21 +356,21 @@
         
         .resize-test-controls {
             background-color: #e3f2fd;
-            border: 2px solid #2196f3;
+            border: 2px solid #1a78c2;
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 0.5rem;
         }
         
         .resize-test-controls h4 {
-            color: #1976d2;
+            color: #0d47a1;
             margin-top: 0;
             font-size: var(--heading-font-size);
         }
         
         .compliance-indicator {
             background-color: #e8f5e8;
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             padding: 0.75rem;
             margin: 0.75rem 0;
             border-radius: 0.25rem;
@@ -379,7 +379,7 @@
         
         .feature-highlight {
             background-color: #fff3e0;
-            border-left: 4px solid #ff9800;
+            border-left: 4px solid #a66300;
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 0 0.25rem 0.25rem 0;
@@ -391,7 +391,7 @@
         }
         
         button {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             padding: 0.75rem 1.5rem;
             border: none;
@@ -408,16 +408,16 @@
         }
         
         button:focus {
-            outline: 3px solid #ff9800;
+            outline: 3px solid #a66300;
             outline-offset: 2px;
         }
         
         button.secondary {
-            background-color: #2196f3;
+            background-color: #1a78c2;
         }
         
         button.secondary:hover {
-            background-color: #1976d2;
+            background-color: #0d47a1;
         }
         
         /* High contrast mode support */
@@ -797,7 +797,7 @@
             if (percentage >= 200) {
                 indicator.innerHTML = `✅ WCAG 1.4.4 ERFÜLLT bei ${percentage}% - Alle Inhalte bleiben vollständig zugänglich`;
                 indicator.style.backgroundColor = '#e8f5e8';
-                indicator.style.borderColor = '#4caf50';
+                indicator.style.borderColor = '#327d36';
                 indicator.style.color = '#2e7d32';
                 
                 console.log(`✅ WCAG 1.4.4 COMPLIANCE TEST PASSED AT ${percentage}%`);
@@ -809,8 +809,8 @@
             } else {
                 indicator.innerHTML = `🔍 Demo ${percentage}% Textvergrößerung - Alle Inhalte skalieren korrekt`;
                 indicator.style.backgroundColor = '#e3f2fd';
-                indicator.style.borderColor = '#2196f3';
-                indicator.style.color = '#1976d2';
+                indicator.style.borderColor = '#1a78c2';
+                indicator.style.color = '#0d47a1';
             }
             
             // Reset after demonstration
@@ -818,7 +818,7 @@
                 rootElement.style.fontSize = '';
                 indicator.innerHTML = '✅ WCAG 1.4.4 konform - Alle Inhalte skalieren korrekt mit Textvergrößerung';
                 indicator.style.backgroundColor = '#e8f5e8';
-                indicator.style.borderColor = '#4caf50';
+                indicator.style.borderColor = '#327d36';
                 indicator.style.color = '#2e7d32';
             }, 3000);
             

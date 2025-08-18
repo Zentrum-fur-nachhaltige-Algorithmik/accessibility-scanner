@@ -908,7 +908,8 @@ class InteractiveReportGenerator {
    * Generate violations table HTML
    */
   generateViolationsTableHTML(violations) {
-    return `
+    // Use string concatenation instead of nested template literals to avoid conflicts
+    let tableHTML = `
         <table class="violations-table">
             <thead>
                 <tr>
@@ -919,19 +920,43 @@ class InteractiveReportGenerator {
                     <th>Elements</th>
                 </tr>
             </thead>
-            <tbody>
-                ${violations.map(violation => `
-                    <tr class="violation-row ${violation.impact}">
-                        <td><code>${violation.id}</code></td>
-                        <td><span class="impact-badge ${violation.impact}">${violation.impact}</span></td>
-                        <td>${violation.description || violation.help}</td>
-                        <td>${(violation.tags?.filter(tag => tag.startsWith('wcag')) || []).join(', ')}</td>
-                        <td>${violation.nodes?.length || 0} elements</td>
-                    </tr>
-                `).join('')}
+            <tbody>`;
+
+    // Generate rows using string concatenation
+    violations.forEach(violation => {
+      const wcagTags = (violation.tags?.filter(tag => tag.startsWith('wcag')) || []).join(', ');
+      const description = this.escapeHTML(violation.description || violation.help || 'No description');
+      const elementCount = violation.nodes?.length || 0;
+      
+      tableHTML += `
+                <tr class="violation-row ` + violation.impact + `">
+                    <td><code>` + violation.id + `</code></td>
+                    <td><span class="impact-badge ` + violation.impact + `">` + violation.impact + `</span></td>
+                    <td>` + description + `</td>
+                    <td>` + wcagTags + `</td>
+                    <td>` + elementCount + ` elements</td>
+                </tr>`;
+    });
+
+    tableHTML += `
             </tbody>
-        </table>
-    `;
+        </table>`;
+
+    return tableHTML;
+  }
+
+  /**
+   * Escape HTML to prevent template literal conflicts
+   */
+  escapeHTML(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;')
+              .replace(/`/g, '&#96;')
+              .replace(/\$/g, '&#36;');
   }
 
   /**
@@ -1840,8 +1865,27 @@ class InteractiveReportGenerator {
             // Initialize inspector panel controls
             initializeInspectorControls();
             
-            // Log complete report data for debugging and inspection
-            window.reportData = ${JSON.stringify(reportData, null, 2)};
+            // Store lightweight report data for interactions (avoid massive JSON dump)
+            window.reportData = {
+                reportId: "${reportData.reportId}",
+                url: "${reportData.url}",
+                timestamp: "${reportData.timestamp}",
+                violations: ${JSON.stringify(reportData.violations.map(v => ({
+                    id: v.id,
+                    impact: v.impact,
+                    description: v.description || v.help,
+                    tags: v.tags,
+                    nodes: v.nodes ? v.nodes.length : 0,
+                    fixSuggestions: v.fixSuggestions
+                })), null, 2)},
+                violationOverlays: ${JSON.stringify(reportData.violationOverlays || [])},
+                summary: ${JSON.stringify(reportData.summary)},
+                wcagDatabase: ${JSON.stringify(reportData.wcagDatabase || {})},
+                screenshotData: {
+                    elementMap: { length: ${reportData.screenshotData.elementMap.length} },
+                    screenshotPath: "${reportData.screenshotData.screenshotPath}"
+                }
+            };
             console.log('📊 Report data loaded:', {
                 violations: ${reportData.violations.length},
                 overlays: ${reportData.violationOverlays.length},

@@ -14,7 +14,7 @@
         }
         
         .good-section {
-            border: 2px solid #4caf50;
+            border: 2px solid #327d36;
             padding: 20px;
             margin: 20px 0;
             background-color: #f1f8e9;
@@ -27,7 +27,7 @@
         }
         
         .interactive-area {
-            border: 1px solid #4caf50;
+            border: 1px solid #327d36;
             padding: 15px;
             margin: 15px 0;
             background-color: #f1f8e9;
@@ -35,7 +35,7 @@
         
         /* GOOD 1: Up event actions with cancellation */
         .good-up-button {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
             padding: 15px 25px;
             border: none;
@@ -58,7 +58,7 @@
         
         /* GOOD 2: Drag and drop with cancellation and undo */
         .good-drag-container {
-            border: 2px dashed #4caf50;
+            border: 2px dashed #327d36;
             padding: 20px;
             margin: 15px 0;
             min-height: 100px;
@@ -83,7 +83,7 @@
         }
         
         .good-drop-zone {
-            border: 2px dashed #ff9800;
+            border: 2px dashed #a66300;
             padding: 20px;
             margin: 10px 0;
             min-height: 80px;
@@ -94,7 +94,7 @@
         
         .good-drop-zone.drag-over {
             background-color: #ffe0b2;
-            border-color: #f57c00;
+            border-color: #bf360c;
         }
         
         .confirmation-dialog {
@@ -103,7 +103,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            border: 2px solid #ff9800;
+            border: 2px solid #a66300;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -125,7 +125,7 @@
         }
         
         .confirm-btn {
-            background-color: #f44336;
+            background-color: #d32f2f;
             color: white;
         }
         
@@ -154,7 +154,7 @@
         
         .good-swipe-item.swipe-ready {
             background-color: #ffebee;
-            border-color: #f44336;
+            border-color: #d32f2f;
         }
         
         .good-swipe-item .swipe-actions {
@@ -162,7 +162,7 @@
             right: 0;
             top: 0;
             height: 100%;
-            background-color: #f44336;
+            background-color: #d32f2f;
             color: white;
             display: flex;
             align-items: center;
@@ -301,12 +301,12 @@
         }
         
         .reset-btn {
-            background-color: #ff9800;
+            background-color: #a66300;
             color: white;
         }
         
         .apply-btn {
-            background-color: #4caf50;
+            background-color: #327d36;
             color: white;
         }
         
@@ -343,7 +343,7 @@
         }
         
         .undo-btn {
-            background-color: #2196f3;
+            background-color: #1a78c2;
             color: white;
         }
         
@@ -353,7 +353,7 @@
         }
         
         .clear-btn {
-            background-color: #f44336;
+            background-color: #d32f2f;
             color: white;
         }
         
@@ -371,7 +371,7 @@
         
         .good-upload-area.dragover {
             background-color: #e3f2fd;
-            border-color: #1976d2;
+            border-color: #0d47a1;
         }
         
         .upload-preview {
@@ -380,7 +380,7 @@
             padding: 15px;
             background-color: #fff3e0;
             border-radius: 4px;
-            border: 1px solid #ff9800;
+            border: 1px solid #a66300;
         }
         
         .file-list {
@@ -404,7 +404,7 @@
         
         /* GOOD 8: Safe destructive actions */
         .good-destructive-button {
-            background-color: #f44336;
+            background-color: #d32f2f;
             color: white;
             padding: 12px 20px;
             border: none;
@@ -430,7 +430,7 @@
             padding: 10px;
             background-color: #e8f5e8;
             border-radius: 4px;
-            border-left: 4px solid #4caf50;
+            border-left: 4px solid #327d36;
         }
         
         .progress-bar {
@@ -444,7 +444,7 @@
         
         .progress-fill {
             height: 100%;
-            background-color: #4caf50;
+            background-color: #327d36;
             width: 0%;
             transition: width 0.3s;
         }
@@ -1338,7 +1338,7 @@
                 fileItem.className = 'file-item';
                 fileItem.innerHTML = `
                     <span>📄 ${file.name} (${formatFileSize(file.size)})</span>
-                    <button onclick="removeFile(${index})" style="background: #f44336; color: white; border: none; padding: 4px 8px; border-radius: 3px;">✕</button>
+                    <button onclick="removeFile(${index})" style="background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 3px;">✕</button>
                 `;
                 fileList.appendChild(fileItem);
             });

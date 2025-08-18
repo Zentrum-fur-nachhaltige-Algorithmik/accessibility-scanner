@@ -1,0 +1,677 @@
+[
+  {
+    "id": "element-0",
+    "selector": "html",
+    "tagName": "html",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 342.6875,
+      "left": 0,
+      "top": 0,
+      "right": 800,
+      "bottom": 342.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Perfect Accessibility - Test Scenario\n/*! axe v4.10.3\n * Copyright (c) 2015 - 2025 Deque Systems, In",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-6",
+    "selector": "body",
+    "tagName": "body",
+    "bounds": {
+      "x": 8,
+      "y": 21.4375,
+      "width": 784,
+      "height": 313.25,
+      "left": 8,
+      "top": 21.4375,
+      "right": 792,
+      "bottom": 334.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Perfect Accessibility Example\n        \n            \n                Main Content\n                Abo",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-7",
+    "selector": "header",
+    "tagName": "header",
+    "bounds": {
+      "x": 8,
+      "y": 21.4375,
+      "width": 784,
+      "height": 112.4375,
+      "left": 8,
+      "top": 21.4375,
+      "right": 792,
+      "bottom": 133.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Perfect Accessibility Example\n        \n            \n                Main Content\n                Abo",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-8",
+    "selector": "h1",
+    "tagName": "h1",
+    "bounds": {
+      "x": 8,
+      "y": 21.4375,
+      "width": 784,
+      "height": 37,
+      "left": 8,
+      "top": 21.4375,
+      "right": 792,
+      "bottom": 58.4375
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Perfect Accessibility Example",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-9",
+    "selector": "nav",
+    "tagName": "nav",
+    "bounds": {
+      "x": 8,
+      "y": 79.875,
+      "width": 784,
+      "height": 54,
+      "left": 8,
+      "top": 79.875,
+      "right": 792,
+      "bottom": 133.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": "Main navigation",
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Main Content\n                About\n                Contact",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-10",
+    "selector": "ul",
+    "tagName": "ul",
+    "bounds": {
+      "x": 8,
+      "y": 79.875,
+      "width": 784,
+      "height": 54,
+      "left": 8,
+      "top": 79.875,
+      "right": 792,
+      "bottom": 133.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Main Content\n                About\n                Contact",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-11",
+    "selector": "li:nth-child(1)",
+    "tagName": "li",
+    "bounds": {
+      "x": 48,
+      "y": 79.875,
+      "width": 744,
+      "height": 18,
+      "left": 48,
+      "top": 79.875,
+      "right": 792,
+      "bottom": 97.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Main Content",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-12",
+    "selector": "a",
+    "tagName": "a",
+    "bounds": {
+      "x": 48,
+      "y": 79.875,
+      "width": 88.4375,
+      "height": 17,
+      "left": 48,
+      "top": 79.875,
+      "right": 136.4375,
+      "bottom": 96.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Main Content",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-13",
+    "selector": "li:nth-child(2)",
+    "tagName": "li",
+    "bounds": {
+      "x": 48,
+      "y": 97.875,
+      "width": 744,
+      "height": 18,
+      "left": 48,
+      "top": 97.875,
+      "right": 792,
+      "bottom": 115.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "About",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-14",
+    "selector": "a",
+    "tagName": "a",
+    "bounds": {
+      "x": 48,
+      "y": 97.875,
+      "width": 40,
+      "height": 17,
+      "left": 48,
+      "top": 97.875,
+      "right": 88,
+      "bottom": 114.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "About",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-15",
+    "selector": "li:nth-child(3)",
+    "tagName": "li",
+    "bounds": {
+      "x": 48,
+      "y": 115.875,
+      "width": 744,
+      "height": 18,
+      "left": 48,
+      "top": 115.875,
+      "right": 792,
+      "bottom": 133.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Contact",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-16",
+    "selector": "a",
+    "tagName": "a",
+    "bounds": {
+      "x": 48,
+      "y": 115.875,
+      "width": 49.765625,
+      "height": 17,
+      "left": 48,
+      "top": 115.875,
+      "right": 97.765625,
+      "bottom": 132.875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Contact",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-17",
+    "selector": "#main",
+    "tagName": "main",
+    "bounds": {
+      "x": 8,
+      "y": 153.78125,
+      "width": 784,
+      "height": 180.90625,
+      "left": 8,
+      "top": 153.78125,
+      "right": 792,
+      "bottom": 334.6875
+    },
+    "attributes": {
+      "id": "main",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Welcome Section\n            This page has perfect accessibility with no violations.\n            \n   ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-18",
+    "selector": "section",
+    "tagName": "section",
+    "bounds": {
+      "x": 8,
+      "y": 153.78125,
+      "width": 784,
+      "height": 180.90625,
+      "left": 8,
+      "top": 153.78125,
+      "right": 792,
+      "bottom": 334.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Welcome Section\n            This page has perfect accessibility with no violations.\n            \n   ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-19",
+    "selector": "h2",
+    "tagName": "h2",
+    "bounds": {
+      "x": 8,
+      "y": 153.78125,
+      "width": 784,
+      "height": 27,
+      "left": 8,
+      "top": 153.78125,
+      "right": 792,
+      "bottom": 180.78125
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Welcome Section",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-20",
+    "selector": "p",
+    "tagName": "p",
+    "bounds": {
+      "x": 8,
+      "y": 200.6875,
+      "width": 784,
+      "height": 18,
+      "left": 8,
+      "top": 200.6875,
+      "right": 792,
+      "bottom": 218.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "This page has perfect accessibility with no violations.",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-21",
+    "selector": "img",
+    "tagName": "img",
+    "bounds": {
+      "x": 8,
+      "y": 234.6875,
+      "width": 304.265625,
+      "height": 18,
+      "left": 8,
+      "top": 234.6875,
+      "right": 312.265625,
+      "bottom": 252.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": "Team working together in bright office space",
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-22",
+    "selector": "form",
+    "tagName": "form",
+    "bounds": {
+      "x": 8,
+      "y": 252.6875,
+      "width": 784,
+      "height": 82,
+      "left": 8,
+      "top": 252.6875,
+      "right": 792,
+      "bottom": 334.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Email Address\n                    \n                \n                \n                    Message\n   ",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-23",
+    "selector": "div:nth-child(1)",
+    "tagName": "div",
+    "bounds": {
+      "x": 8,
+      "y": 252.6875,
+      "width": 784,
+      "height": 21,
+      "left": 8,
+      "top": 252.6875,
+      "right": 792,
+      "bottom": 273.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Email Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-24",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 8,
+      "y": 253.6875,
+      "width": 93.765625,
+      "height": 17,
+      "left": 8,
+      "top": 253.6875,
+      "right": 101.765625,
+      "bottom": 270.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Email Address",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-25",
+    "selector": "#email",
+    "tagName": "input",
+    "bounds": {
+      "x": 105.765625,
+      "y": 252.6875,
+      "width": 177,
+      "height": 21,
+      "left": 105.765625,
+      "top": 252.6875,
+      "right": 282.765625,
+      "bottom": 273.6875
+    },
+    "attributes": {
+      "id": "email",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-26",
+    "selector": "div:nth-child(2)",
+    "tagName": "div",
+    "bounds": {
+      "x": 8,
+      "y": 273.6875,
+      "width": 784,
+      "height": 40,
+      "left": 8,
+      "top": 273.6875,
+      "right": 792,
+      "bottom": 313.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Message",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-27",
+    "selector": "label",
+    "tagName": "label",
+    "bounds": {
+      "x": 8,
+      "y": 295.6875,
+      "width": 55.984375,
+      "height": 17,
+      "left": 8,
+      "top": 295.6875,
+      "right": 63.984375,
+      "bottom": 312.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Message",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-28",
+    "selector": "#message",
+    "tagName": "textarea",
+    "bounds": {
+      "x": 67.984375,
+      "y": 273.6875,
+      "width": 182,
+      "height": 36,
+      "left": 67.984375,
+      "top": 273.6875,
+      "right": 249.984375,
+      "bottom": 309.6875
+    },
+    "attributes": {
+      "id": "message",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "",
+    "isVisible": true,
+    "zIndex": "auto"
+  },
+  {
+    "id": "element-29",
+    "selector": "button",
+    "tagName": "button",
+    "bounds": {
+      "x": 8,
+      "y": 313.6875,
+      "width": 104.921875,
+      "height": 21,
+      "left": 8,
+      "top": 313.6875,
+      "right": 112.921875,
+      "bottom": 334.6875
+    },
+    "attributes": {
+      "id": "",
+      "class": "",
+      "aria-label": null,
+      "aria-labelledby": null,
+      "role": null,
+      "alt": null,
+      "title": null
+    },
+    "text": "Send Message",
+    "isVisible": true,
+    "zIndex": "auto"
+  }
+]

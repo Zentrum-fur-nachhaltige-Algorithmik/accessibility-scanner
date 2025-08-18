@@ -1,0 +1,57 @@
+{
+  "generated": "2025-07-13T14:00:03.398Z",
+  "scenarios": [
+    {
+      "scenario": "empty-state",
+      "description": "No violations (perfect accessibility)",
+      "violations": 0,
+      "elementsAffected": 0,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-d3d33b33-2a08-4472-acad-5118eeea4cd5/index.html",
+      "reportId": "interactive-d3d33b33-2a08-4472-acad-5118eeea4cd5",
+      "accessibilityScore": 100
+    },
+    {
+      "scenario": "low-violations",
+      "description": "1-5 violations (minor issues)",
+      "violations": 4,
+      "elementsAffected": 8,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-590469e5-c6d5-438e-a57a-36e0f145c1f6/index.html",
+      "reportId": "interactive-590469e5-c6d5-438e-a57a-36e0f145c1f6",
+      "accessibilityScore": 40
+    },
+    {
+      "scenario": "medium-violations",
+      "description": "10-20 violations (typical website)",
+      "violations": 8,
+      "elementsAffected": 21,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-289e5a1d-961c-441e-985b-9b5b18e0a92c/index.html",
+      "reportId": "interactive-289e5a1d-961c-441e-985b-9b5b18e0a92c",
+      "accessibilityScore": 0
+    },
+    {
+      "scenario": "high-violations",
+      "description": "50+ violations (problematic website)",
+      "violations": 6,
+      "elementsAffected": 110,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-1ab7b6d7-cb95-433f-8aa8-21ffb78882c9/index.html",
+      "reportId": "interactive-1ab7b6d7-cb95-433f-8aa8-21ffb78882c9",
+      "accessibilityScore": 15
+    },
+    {
+      "scenario": "complex-violations",
+      "description": "All violation types (comprehensive test)",
+      "violations": 8,
+      "elementsAffected": 25,
+      "reportPath": "/mnt/c/Users/T14/Desktop/accessability/reports/interactive-d2a2a2d2-e7f7-4f64-ad48-df80d93f13b8/index.html",
+      "reportId": "interactive-d2a2a2d2-e7f7-4f64-ad48-df80d93f13b8",
+      "accessibilityScore": 0
+    }
+  ],
+  "summary": {
+    "totalReports": 5,
+    "violationRange": {
+      "min": 0,
+      "max": 8
+    }
+  }
+}

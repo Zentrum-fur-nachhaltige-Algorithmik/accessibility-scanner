@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-3e79b2bf-987c-4c4f-8b79-8532835defa5",
+  "timestamp": "2025-07-13T13:59:08.398Z",
+  "url": "test-scenario-medium-violations",
+  "summary": {
+    "total": 8,
+    "critical": 3,
+    "serious": 2,
+    "moderate": 3,
+    "minor": 0,
+    "accessibilityScore": 0
+  },
+  "scanMetadata": {
+    "url": "test-scenario-medium-violations",
+    "timestamp": "2025-07-13T13:59:08.212Z",
+    "scenario": "medium-violations",
+    "description": "10-20 violations (typical website)"
+  }
+}

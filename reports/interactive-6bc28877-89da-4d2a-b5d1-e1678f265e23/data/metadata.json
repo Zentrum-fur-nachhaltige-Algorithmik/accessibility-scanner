@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-6bc28877-89da-4d2a-b5d1-e1678f265e23",
+  "timestamp": "2025-07-13T13:59:10.042Z",
+  "url": "test-scenario-complex-violations",
+  "summary": {
+    "total": 8,
+    "critical": 2,
+    "serious": 3,
+    "moderate": 3,
+    "minor": 0,
+    "accessibilityScore": 0
+  },
+  "scanMetadata": {
+    "url": "test-scenario-complex-violations",
+    "timestamp": "2025-07-13T13:59:09.815Z",
+    "scenario": "complex-violations",
+    "description": "All violation types (comprehensive test)"
+  }
+}

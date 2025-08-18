@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-d3d33b33-2a08-4472-acad-5118eeea4cd5",
+  "timestamp": "2025-07-13T14:00:00.384Z",
+  "url": "test-scenario-empty-state",
+  "summary": {
+    "total": 0,
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "minor": 0,
+    "accessibilityScore": 100
+  },
+  "scanMetadata": {
+    "url": "test-scenario-empty-state",
+    "timestamp": "2025-07-13T14:00:00.307Z",
+    "scenario": "empty-state",
+    "description": "No violations (perfect accessibility)"
+  }
+}

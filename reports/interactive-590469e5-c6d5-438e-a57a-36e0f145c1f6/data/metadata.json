@@ -1,0 +1,19 @@
+{
+  "reportId": "interactive-590469e5-c6d5-438e-a57a-36e0f145c1f6",
+  "timestamp": "2025-07-13T14:00:00.856Z",
+  "url": "test-scenario-low-violations",
+  "summary": {
+    "total": 4,
+    "critical": 1,
+    "serious": 1,
+    "moderate": 2,
+    "minor": 0,
+    "accessibilityScore": 40
+  },
+  "scanMetadata": {
+    "url": "test-scenario-low-violations",
+    "timestamp": "2025-07-13T14:00:00.685Z",
+    "scenario": "low-violations",
+    "description": "1-5 violations (minor issues)"
+  }
+}

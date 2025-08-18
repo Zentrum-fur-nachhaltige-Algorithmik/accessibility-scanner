@@ -1,0 +1,17 @@
+{
+  "reportId": "interactive-697b2351-be94-4ea2-98b8-12781441e248",
+  "timestamp": "2025-07-13T14:14:59.833Z",
+  "url": "local-test",
+  "summary": {
+    "total": 5,
+    "critical": 2,
+    "serious": 1,
+    "moderate": 2,
+    "minor": 0,
+    "accessibilityScore": 15
+  },
+  "scanMetadata": {
+    "url": "local-test",
+    "timestamp": "2025-07-13T14:14:59.672Z"
+  }
+}

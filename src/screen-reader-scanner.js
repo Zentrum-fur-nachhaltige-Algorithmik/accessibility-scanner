@@ -1,7 +1,12 @@
 const puppeteer = require('puppeteer');
+const BaseScanner = require('./base-scanner');
 
-class ScreenReaderScanner {
+class ScreenReaderScanner extends BaseScanner {
   constructor() {
+    super('screen-reader', {
+      wcagCriteria: ['1.3.1', '4.1.2', '4.1.3'],
+      wcagPrinciple: 'perceivable'
+    });
     this.browser = null;
   }
 
@@ -14,55 +19,80 @@ class ScreenReaderScanner {
     }
   }
 
+  /**
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
+   */
+  async scan(page, options = {}) {
+    const [
+      headingStructure,
+      landmarks,
+      images,
+      forms,
+      ariaUsage
+    ] = await Promise.all([
+      this.analyzeHeadingStructure(page),
+      this.analyzeLandmarks(page),
+      this.analyzeImages(page),
+      this.analyzeForms(page),
+      this.analyzeAriaUsage(page)
+    ]);
+
+    const pageTitle = await page.title();
+
+    const euCompliance = this.calculateEUCompliance({
+      headingStructure,
+      landmarks,
+      images,
+      forms,
+      ariaUsage
+    });
+
+    return {
+      scannerId: this.id,
+      passed: euCompliance.en301549.compliant,
+      timestamp: new Date(),
+      pageTitle,
+      headingStructure,
+      landmarks,
+      images,
+      forms,
+      ariaUsage,
+      euCompliance,
+      violations: euCompliance.en301549.violations,
+      summary: {
+        score: euCompliance.en301549.score,
+        headingIssues: headingStructure.issues.length,
+        landmarkIssues: landmarks.issues.length,
+        imageIssues: images.problematic.length,
+        ariaIssues: ariaUsage.misusedAttributes.length
+      }
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
   async screenReaderAnalysis(url) {
     try {
       await this.init();
-      
+
       if (!this.isValidUrl(url)) {
         return this.createErrorReport(url, 'Invalid URL format');
       }
 
       const page = await this.browser.newPage();
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-
-      const [
-        headingStructure,
-        landmarks,
-        images,
-        forms,
-        ariaUsage
-      ] = await Promise.all([
-        this.analyzeHeadingStructure(page),
-        this.analyzeLandmarks(page),
-        this.analyzeImages(page),
-        this.analyzeForms(page),
-        this.analyzeAriaUsage(page)
-      ]);
-
-      const pageTitle = await page.title();
-      await page.close();
-
-      return {
-        url,
-        timestamp: new Date(),
-        pageTitle,
-        headingStructure,
-        landmarks,
-        images,
-        forms,
-        ariaUsage,
-        euCompliance: this.calculateEUCompliance({
-          headingStructure,
-          landmarks,
-          images,
-          forms,
-          ariaUsage
-        })
-      };
-
+      try {
+        const result = await this.scan(page);
+        result.url = url;
+        return result;
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       let errorMessage = 'Unknown error occurred';
-      
+
       if (error.name === 'TimeoutError') {
         errorMessage = 'Failed to load page: Timeout';
       } else if (error.message.includes('net::ERR_NAME_NOT_RESOLVED')) {
@@ -87,7 +117,7 @@ class ScreenReaderScanner {
         const line = heading.getBoundingClientRect().top + window.scrollY;
 
         if (level === 1) h1Count++;
-        
+
         hierarchy.push({
           level,
           text: text || '[Empty heading]',
@@ -138,7 +168,7 @@ class ScreenReaderScanner {
       const issues = [];
       const landmarkElements = document.querySelectorAll(`
         main, [role="main"],
-        nav, [role="navigation"], 
+        nav, [role="navigation"],
         header, [role="banner"],
         footer, [role="contentinfo"],
         aside, [role="complementary"],
@@ -160,7 +190,7 @@ class ScreenReaderScanner {
 
       const contentWithoutLandmarks = Array.from(document.querySelectorAll('body > *'))
         .filter(el => {
-          return el.offsetParent !== null && 
+          return el.offsetParent !== null &&
                  el.textContent.trim().length > 0 &&
                  !el.closest('main, nav, header, footer, aside, [role="main"], [role="navigation"], [role="banner"], [role="contentinfo"], [role="complementary"]');
         });
@@ -242,7 +272,7 @@ class ScreenReaderScanner {
         const label = document.querySelector(`label[for="${input.id}"]`) ||
                      input.closest('label') ||
                      document.querySelector(`[aria-labelledby="${input.id}"]`);
-        
+
         const ariaLabel = input.getAttribute('aria-label');
         const ariaLabelledby = input.getAttribute('aria-labelledby');
 
@@ -257,7 +287,7 @@ class ScreenReaderScanner {
         }
 
         if (input.hasAttribute('required') || input.hasAttribute('aria-required')) {
-          const hasRequiredIndicator = 
+          const hasRequiredIndicator =
             (label && label.textContent.includes('*')) ||
             input.getAttribute('aria-required') === 'true' ||
             input.hasAttribute('required');
@@ -293,15 +323,15 @@ class ScreenReaderScanner {
       let correctUsage = 0;
 
       const validRoles = [
-        'alert', 'alertdialog', 'application', 'article', 'banner', 'button', 'cell', 'checkbox', 
-        'columnheader', 'combobox', 'complementary', 'contentinfo', 'definition', 'dialog', 
-        'directory', 'document', 'feed', 'figure', 'form', 'grid', 'gridcell', 'group', 
-        'heading', 'img', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee', 
-        'math', 'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 
-        'navigation', 'none', 'note', 'option', 'presentation', 'progressbar', 'radio', 
-        'radiogroup', 'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search', 
-        'searchbox', 'separator', 'slider', 'spinbutton', 'status', 'switch', 'tab', 
-        'table', 'tablist', 'tabpanel', 'term', 'textbox', 'timer', 'toolbar', 'tooltip', 
+        'alert', 'alertdialog', 'application', 'article', 'banner', 'button', 'cell', 'checkbox',
+        'columnheader', 'combobox', 'complementary', 'contentinfo', 'definition', 'dialog',
+        'directory', 'document', 'feed', 'figure', 'form', 'grid', 'gridcell', 'group',
+        'heading', 'img', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee',
+        'math', 'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio',
+        'navigation', 'none', 'note', 'option', 'presentation', 'progressbar', 'radio',
+        'radiogroup', 'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search',
+        'searchbox', 'separator', 'slider', 'spinbutton', 'status', 'switch', 'tab',
+        'table', 'tablist', 'tabpanel', 'term', 'textbox', 'timer', 'toolbar', 'tooltip',
         'tree', 'treegrid', 'treeitem'
       ];
 

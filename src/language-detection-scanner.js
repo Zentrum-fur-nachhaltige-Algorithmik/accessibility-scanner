@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Language Detection Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.3.1.1, 9.3.1.2 (Language of Page, Language of Parts)
  * Detects page language declarations and multilingual content marking
  */
-class LanguageDetectionScanner {
+class LanguageDetectionScanner extends BaseScanner {
   constructor() {
+    super('language-detection', {
+      wcagCriteria: ['3.1.1', '3.1.2'],
+      wcagPrinciple: 'understandable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/language-screenshots');
   }
@@ -20,59 +25,64 @@ class LanguageDetectionScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan language compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated page
    * @param {Object} options - Scanning options
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} LanguageReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanLanguageCompliance(url, options = {}) {
-    const defaultOptions = {
-      timeout: 60000
+  async scan(page, options = {}) {
+    const scanOptions = {
+      timeout: options.timeout || 60000,
+      ...options
     };
 
-    const scanOptions = { ...defaultOptions, ...options };
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const languageResults = await this.performLanguageAnalysis(page, scanDir, scanOptions);
+
+    // Create report according to interface
+    return {
+      scannerId: this.id,
+      criteria: ["9.3.1.1", "9.3.1.2"],
+      passed: languageResults.violations.length === 0,
+      violations: languageResults.violations,
+      summary: {
+        pageLanguageSet: languageResults.pageLanguageSet,
+        pageLanguageValid: languageResults.pageLanguageValid,
+        multilingualContentMarked: languageResults.multilingualContentMarked,
+        languageChangesMarked: languageResults.languageChangesMarked
+      },
+      screenshotPath: scanDir,
+      visualEvidence: languageResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanLanguageCompliance(url, options = {}) {
+    const scanOptions = {
+      timeout: options.timeout || 60000,
+      ...options
+    };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const languageResults = await this.performLanguageAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.3.1.1", "9.3.1.2"],
-        passed: languageResults.violations.length === 0,
-        violations: languageResults.violations,
-        summary: {
-          pageLanguageSet: languageResults.pageLanguageSet,
-          pageLanguageValid: languageResults.pageLanguageValid,
-          multilingualContentMarked: languageResults.multilingualContentMarked,
-          languageChangesMarked: languageResults.languageChangesMarked
-        },
-        screenshotPath: scanDir,
-        visualEvidence: languageResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, options);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Language detection scan failed: ${error.message}`);
     }
@@ -102,7 +112,7 @@ class LanguageDetectionScanner {
 
     // 2. Detect text content and analyze language usage
     const contentAnalysis = await this.analyzeContentLanguages(page, violations);
-    
+
     // 3. Check for multilingual content marking (WCAG 3.1.2)
     const multilingualAnalysis = await this.analyzeMultilingualContent(page, violations, contentAnalysis);
     multilingualContentMarked = multilingualAnalysis.contentMarked;
@@ -138,7 +148,7 @@ class LanguageDetectionScanner {
     const pageLanguageInfo = await page.evaluate(() => {
       const htmlElement = document.documentElement;
       const declaredLanguage = htmlElement.getAttribute('lang') || htmlElement.getAttribute('xml:lang');
-      
+
       return {
         declaredLanguage: declaredLanguage,
         hasLang: !!declaredLanguage,
@@ -167,7 +177,7 @@ class LanguageDetectionScanner {
     } else {
       // Validate language code format
       languageValid = this.isValidLanguageCode(pageLanguageInfo.declaredLanguage);
-      
+
       if (!languageValid) {
         violations.push({
           criterion: "9.3.1.1",
@@ -206,7 +216,7 @@ class LanguageDetectionScanner {
             if (['script', 'style', 'noscript'].includes(parentTag)) {
               return NodeFilter.FILTER_REJECT;
             }
-            
+
             // Only include text nodes with meaningful content
             const text = node.textContent.trim();
             if (text.length > 10) { // Minimum text length for language detection
@@ -221,12 +231,12 @@ class LanguageDetectionScanner {
       while (node = walker.nextNode()) {
         const text = node.textContent.trim();
         const element = node.parentElement;
-        
+
         textElements.push({
           text: text,
           element: element,
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
+          selector: element.tagName.toLowerCase() +
+                   (element.id ? `#${element.id}` : '') +
                    (element.className ? `.${element.className.split(' ')[0]}` : ''),
           langAttribute: element.getAttribute('lang') || element.closest('[lang]')?.getAttribute('lang')
         });
@@ -250,7 +260,7 @@ class LanguageDetectionScanner {
 
     // Analyze all text content
     const allText = contentAnalysis.map(item => item.text).join(' ').toLowerCase();
-    
+
     for (const [lang, pattern] of Object.entries(languagePatterns)) {
       const matches = allText.match(pattern) || [];
       languageScores[lang] = matches.length;
@@ -284,14 +294,14 @@ class LanguageDetectionScanner {
     for (const textItem of contentAnalysis.textElements) {
       const text = textItem.text.toLowerCase();
       const declaredLang = textItem.langAttribute;
-      
+
       // Detect if text appears to be in a different language than the primary language
       const detectedLanguage = this.detectTextLanguage(text);
-      
-      if (detectedLanguage && 
-          detectedLanguage !== contentAnalysis.primaryLanguage && 
+
+      if (detectedLanguage &&
+          detectedLanguage !== contentAnalysis.primaryLanguage &&
           detectedLanguage !== 'unknown') {
-        
+
         // This text appears to be in a different language
         if (!declaredLang || declaredLang !== detectedLanguage) {
           // Language change not properly marked
@@ -306,7 +316,7 @@ class LanguageDetectionScanner {
             description: `Text appears to be in ${detectedLanguage} but is not marked with lang="${detectedLanguage}"`,
             suggestion: `Add lang="${detectedLanguage}" attribute to element containing foreign language text`
           });
-          
+
           contentMarked = false;
         } else {
           changesMarked++;
@@ -318,20 +328,20 @@ class LanguageDetectionScanner {
     const invalidLangElements = await page.evaluate(() => {
       const elementsWithLang = document.querySelectorAll('[lang]');
       const invalid = [];
-      
+
       elementsWithLang.forEach(element => {
         const langCode = element.getAttribute('lang');
-        const selector = element.tagName.toLowerCase() + 
-                        (element.id ? `#${element.id}` : '') + 
+        const selector = element.tagName.toLowerCase() +
+                        (element.id ? `#${element.id}` : '') +
                         (element.className ? `.${element.className.split(' ')[0]}` : '');
-        
+
         invalid.push({
           selector: selector,
           langCode: langCode,
           text: element.textContent.trim().substring(0, 100)
         });
       });
-      
+
       return invalid;
     });
 
@@ -385,9 +395,9 @@ class LanguageDetectionScanner {
    */
   getDetectionConfidence(text, language) {
     const words = text.split(/\s+/).length;
-    const languageWords = this.detectTextLanguage(text) === language ? 
+    const languageWords = this.detectTextLanguage(text) === language ?
                          (text.match(this.getLanguagePattern(language)) || []).length : 0;
-    
+
     return Math.min(95, Math.round((languageWords / words) * 100));
   }
 
@@ -401,7 +411,7 @@ class LanguageDetectionScanner {
       'de': /\b(diese|dieser|dieses|aber|weil|wenn|wo|wie|sehr|mehr|auch|nach|vor|während|der|die|das|und|oder|ist|sind)\b/gi,
       'it': /\b(questo|questa|questi|queste|ma|perché|quando|dove|come|molto|più|anche|dopo|prima|durante|il|la|i|le|e|o|è|sono)\b/gi
     };
-    
+
     return patterns[language] || /\w+/gi;
   }
 
@@ -410,17 +420,17 @@ class LanguageDetectionScanner {
    */
   isValidLanguageCode(code) {
     if (!code) return false;
-    
+
     // Basic validation for ISO 639-1 codes (2 letters) and some extended formats
     const validPattern = /^[a-z]{2}(-[A-Z]{2})?$/;
-    
+
     // Common valid language codes
     const validCodes = [
       'en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ko', 'ar', 'hi',
       'en-US', 'en-GB', 'es-ES', 'es-MX', 'fr-FR', 'fr-CA', 'de-DE', 'de-AT',
       'it-IT', 'pt-BR', 'pt-PT', 'zh-CN', 'zh-TW'
     ];
-    
+
     return validPattern.test(code) && (code.length === 2 || validCodes.includes(code));
   }
 

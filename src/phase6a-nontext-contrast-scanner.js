@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Non-text Contrast Scanner for WCAG 1.4.11 compliance testing
  * Tests UI components and graphical objects for 3:1 contrast ratio
  * Critical for UI usability and legal compliance
  */
-class NonTextContrastScanner {
+class NonTextContrastScanner extends BaseScanner {
     constructor() {
+        super('nontext-contrast', {
+            wcagCriteria: ['1.4.11'],
+            wcagPrinciple: 'perceivable'
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/nontext-contrast-screenshots');
     }
@@ -24,86 +29,98 @@ class NonTextContrastScanner {
     }
 
     /**
-     * Scan non-text contrast compliance (WCAG 1.4.11)
-     * @param {string} url - URL to scan
+     * Core scan method. Receives an already-navigated Puppeteer page.
+     * @param {import('puppeteer').Page} page - Already-navigated page
      * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} NonTextContrastReport
+     * @returns {Promise<Object>} ScanResult
      */
+    async scan(page, options = {}) {
+        const scanOptions = {
+            checkInteractiveElements: options.checkInteractiveElements !== false,
+            checkGraphicalObjects: options.checkGraphicalObjects !== false,
+            checkFocusIndicators: options.checkFocusIndicators !== false,
+            checkStateChanges: options.checkStateChanges !== false,
+            contrastThreshold: options.contrastThreshold || 3.0,
+            timeout: options.timeout || 60000
+        };
+
+        const timestamp = Date.now();
+        const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+        await fs.ensureDir(scanDir);
+
+        // Take screenshot for analysis
+        const screenshotPath = path.join(scanDir, 'nontext-contrast-analysis.png');
+        await page.screenshot({
+            path: screenshotPath,
+            fullPage: true
+        });
+
+        const violations = [];
+
+        // Analyze UI components
+        if (scanOptions.checkInteractiveElements) {
+            const uiViolations = await this.analyzeUIComponents(page, scanOptions);
+            violations.push(...uiViolations);
+        }
+
+        // Analyze graphical objects
+        if (scanOptions.checkGraphicalObjects) {
+            const graphicsViolations = await this.analyzeGraphicalObjects(page, scanOptions);
+            violations.push(...graphicsViolations);
+        }
+
+        // Analyze focus indicators
+        if (scanOptions.checkFocusIndicators) {
+            const focusViolations = await this.analyzeFocusIndicators(page, scanOptions);
+            violations.push(...focusViolations);
+        }
+
+        // Analyze interactive states
+        if (scanOptions.checkStateChanges) {
+            const stateViolations = await this.analyzeInteractiveStates(page, scanOptions);
+            violations.push(...stateViolations);
+        }
+
+        return {
+            scannerId: this.id,
+            criteria: ["1.4.11"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalElementsChecked: violations.length + this.getPassedElementsCount(violations),
+                uiComponentIssues: violations.filter(v => v.category === 'ui-component').length,
+                graphicalObjectIssues: violations.filter(v => v.category === 'graphical-object').length,
+                focusIndicatorIssues: violations.filter(v => v.category === 'focus-indicator').length,
+                stateChangeIssues: violations.filter(v => v.category === 'state-change').length,
+                averageContrastRatio: this.calculateAverageContrast(violations)
+            },
+            screenshotPath: screenshotPath,
+            recommendations: this.generateNonTextContrastRecommendations(violations)
+        };
+    }
+
+    /** @deprecated Use scan(page, options) via ScanPipeline instead */
     async scanNonTextContrast(url, options = {}) {
-        const defaultOptions = {
+        const scanOptions = {
             checkInteractiveElements: true,
             checkGraphicalObjects: true,
             checkFocusIndicators: true,
             checkStateChanges: true,
             contrastThreshold: 3.0,
-            timeout: 60000
+            timeout: 60000,
+            ...options
         };
-
-        const scanOptions = { ...defaultOptions, ...options };
 
         try {
             await this.init();
             const page = await this.browser.newPage();
-            const timestamp = Date.now();
-            const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-            await fs.ensureDir(scanDir);
-
             await page.setViewport({ width: 1280, height: 1024 });
             await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-            // Take screenshot for analysis
-            const screenshotPath = path.join(scanDir, 'nontext-contrast-analysis.png');
-            await page.screenshot({ 
-                path: screenshotPath, 
-                fullPage: true 
-            });
-
-            const violations = [];
-            
-            // Analyze UI components
-            if (scanOptions.checkInteractiveElements) {
-                const uiViolations = await this.analyzeUIComponents(page, scanOptions);
-                violations.push(...uiViolations);
+            try {
+                return await this.scan(page, options);
+            } finally {
+                await page.close();
             }
-
-            // Analyze graphical objects
-            if (scanOptions.checkGraphicalObjects) {
-                const graphicsViolations = await this.analyzeGraphicalObjects(page, scanOptions);
-                violations.push(...graphicsViolations);
-            }
-
-            // Analyze focus indicators
-            if (scanOptions.checkFocusIndicators) {
-                const focusViolations = await this.analyzeFocusIndicators(page, scanOptions);
-                violations.push(...focusViolations);
-            }
-
-            // Analyze interactive states
-            if (scanOptions.checkStateChanges) {
-                const stateViolations = await this.analyzeInteractiveStates(page, scanOptions);
-                violations.push(...stateViolations);
-            }
-
-            await page.close();
-
-            const report = {
-                criteria: ["1.4.11"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalElementsChecked: violations.length + this.getPassedElementsCount(violations),
-                    uiComponentIssues: violations.filter(v => v.category === 'ui-component').length,
-                    graphicalObjectIssues: violations.filter(v => v.category === 'graphical-object').length,
-                    focusIndicatorIssues: violations.filter(v => v.category === 'focus-indicator').length,
-                    stateChangeIssues: violations.filter(v => v.category === 'state-change').length,
-                    averageContrastRatio: this.calculateAverageContrast(violations)
-                },
-                screenshotPath: screenshotPath,
-                recommendations: this.generateNonTextContrastRecommendations(violations)
-            };
-
-            return report;
-
         } catch (error) {
             throw new Error(`Non-text contrast scan failed: ${error.message}`);
         }
@@ -124,7 +141,7 @@ class NonTextContrastScanner {
                     document.body.appendChild(div);
                     const rgb = window.getComputedStyle(div).color;
                     document.body.removeChild(div);
-                    
+
                     const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
                     if (match) {
                         return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
@@ -371,11 +388,11 @@ class NonTextContrastScanner {
             for (let i = 0; i < canvasElements.length; i++) {
                 const canvas = canvasElements[i];
                 const parentBg = window.getComputedStyle(canvas.parentElement).backgroundColor || 'rgb(255, 255, 255)';
-                
+
                 // Check canvas background
                 const canvasStyles = window.getComputedStyle(canvas);
                 const canvasBg = canvasStyles.backgroundColor;
-                
+
                 if (canvasBg && canvasBg !== 'rgba(0, 0, 0, 0)' && canvasBg !== 'transparent') {
                     try {
                         const contrast = this.getContrastRatio(canvasBg, parentBg);
@@ -449,7 +466,7 @@ class NonTextContrastScanner {
      */
     async analyzeFocusIndicators(page, options) {
         const violations = [];
-        
+
         // Get all focusable elements
         const focusableElements = await page.evaluate(() => {
             const elements = document.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -470,12 +487,12 @@ class NonTextContrastScanner {
                 const focusViolation = await page.evaluate((info, contrastThreshold) => {
                     const elements = document.querySelectorAll(`${info.tagName}:nth-of-type(${info.index + 1})`);
                     const element = elements[0];
-                    
+
                     if (!element) return null;
 
                     // Focus the element
                     element.focus();
-                    
+
                     // Get focus styles
                     const focusStyles = window.getComputedStyle(element, ':focus');
                     const normalStyles = window.getComputedStyle(element);
@@ -484,10 +501,10 @@ class NonTextContrastScanner {
                     // Check outline contrast
                     const outlineColor = focusStyles.outlineColor || normalStyles.outlineColor;
                     const outlineWidth = focusStyles.outlineWidth || normalStyles.outlineWidth;
-                    
+
                     if (outlineColor && outlineColor !== 'rgba(0, 0, 0, 0)' && outlineColor !== 'transparent' &&
                         outlineWidth && parseFloat(outlineWidth) > 0) {
-                        
+
                         function getContrastRatio(color1, color2) {
                             // Simplified contrast calculation
                             try {
@@ -497,17 +514,17 @@ class NonTextContrastScanner {
                                 div2.style.color = color2;
                                 document.body.appendChild(div1);
                                 document.body.appendChild(div2);
-                                
+
                                 const rgb1 = window.getComputedStyle(div1).color;
                                 const rgb2 = window.getComputedStyle(div2).color;
-                                
+
                                 document.body.removeChild(div1);
                                 document.body.removeChild(div2);
 
                                 // Simple contrast approximation
                                 const match1 = rgb1.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
                                 const match2 = rgb2.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-                                
+
                                 if (match1 && match2) {
                                     const lum1 = (parseInt(match1[1]) + parseInt(match1[2]) + parseInt(match1[3])) / 3;
                                     const lum2 = (parseInt(match2[1]) + parseInt(match2[2]) + parseInt(match2[3])) / 3;
@@ -521,7 +538,7 @@ class NonTextContrastScanner {
                         }
 
                         const contrast = getContrastRatio(outlineColor, parentBg);
-                        
+
                         if (contrast < contrastThreshold) {
                             return {
                                 type: 'insufficient-focus-indicator-contrast',
@@ -547,7 +564,7 @@ class NonTextContrastScanner {
                         // Check for other focus indicators (box-shadow, border changes)
                         const boxShadow = focusStyles.boxShadow;
                         const borderColor = focusStyles.borderColor || focusStyles.borderTopColor;
-                        
+
                         if (!boxShadow || boxShadow === 'none') {
                             if (!borderColor || borderColor === normalStyles.borderColor) {
                                 return {
@@ -594,21 +611,21 @@ class NonTextContrastScanner {
 
             // Check hover states
             const interactiveElements = document.querySelectorAll('a, button, input[type="button"], input[type="submit"]');
-            
+
             for (let i = 0; i < Math.min(interactiveElements.length, 15); i++) { // Limit for performance
                 const element = interactiveElements[i];
                 const normalStyles = window.getComputedStyle(element);
-                
+
                 // Simulate hover by checking CSS hover rules
                 try {
                     // Create temporary element to test hover styles
                     const testEl = element.cloneNode(true);
                     testEl.style.cssText = normalStyles.cssText;
-                    
+
                     // Check if element has hover styles defined
                     const sheets = Array.from(document.styleSheets);
                     let hasHoverStyles = false;
-                    
+
                     for (const sheet of sheets) {
                         try {
                             const rules = Array.from(sheet.cssRules || []);
@@ -628,7 +645,7 @@ class NonTextContrastScanner {
                         const backgroundColor = normalStyles.backgroundColor;
                         const borderColor = normalStyles.borderColor;
                         const parentBg = window.getComputedStyle(element.parentElement).backgroundColor || 'rgb(255, 255, 255)';
-                        
+
                         // Check if element has sufficient visual distinction
                         if (backgroundColor === 'rgba(0, 0, 0, 0)' || backgroundColor === 'transparent') {
                             if (!borderColor || borderColor === 'rgba(0, 0, 0, 0)' || borderColor === 'transparent') {
@@ -667,7 +684,7 @@ class NonTextContrastScanner {
     calculateAverageContrast(violations) {
         const contrastViolations = violations.filter(v => v.details && v.details.contrastRatio);
         if (contrastViolations.length === 0) return 'N/A';
-        
+
         const average = contrastViolations.reduce((sum, v) => sum + v.details.contrastRatio, 0) / contrastViolations.length;
         return Math.round(average * 100) / 100;
     }
@@ -687,7 +704,7 @@ class NonTextContrastScanner {
         const recommendations = [];
         const issueTypes = [...new Set(violations.map(v => v.type))];
 
-        if (issueTypes.includes('insufficient-border-contrast') || 
+        if (issueTypes.includes('insufficient-border-contrast') ||
             issueTypes.includes('insufficient-form-border-contrast')) {
             recommendations.push({
                 priority: 'high',

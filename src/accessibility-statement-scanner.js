@@ -1,12 +1,17 @@
 const puppeteer = require('puppeteer');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Accessibility Statement Scanner for EAA Procedural Requirements
  * Implements European Accessibility Act compliance checking
  * EN 301 549 criteria 12.1.1 (Accessibility and compatibility features)
  */
-class AccessibilityStatementScanner {
+class AccessibilityStatementScanner extends BaseScanner {
   constructor() {
+    super('accessibility-statement', {
+      wcagCriteria: ['EN 301 549 12.1'],
+      wcagPrinciple: 'robust'
+    });
     this.browser = null;
   }
 
@@ -20,6 +25,44 @@ class AccessibilityStatementScanner {
   }
 
   /**
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * This scanner needs to follow links to find the accessibility statement,
+   * so it will navigate from the provided starting page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
+   */
+  async scan(page, options = {}) {
+    const defaultOptions = {
+      searchDepth: 3,
+      timeout: 30000,
+      language: 'auto'
+    };
+
+    const scanOptions = { ...defaultOptions, ...options };
+
+    const statementResults = await this.analyzeAccessibilityStatement(page, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["EAA-Statement", "EN-301-549-12.1.1"],
+      passed: statementResults.violations.length === 0,
+      violations: statementResults.violations,
+      summary: {
+        statementExists: statementResults.statementExists,
+        statementAccessible: statementResults.statementAccessible,
+        statementComplete: statementResults.statementComplete,
+        contactMechanismProvided: statementResults.contactMechanismProvided,
+        lastUpdated: statementResults.lastUpdated,
+        complianceLevel: statementResults.complianceLevel,
+        knownIssuesListed: statementResults.knownIssuesListed,
+        feedbackMechanismAvailable: statementResults.feedbackMechanismAvailable
+      }
+    };
+  }
+
+  /**
+   * @deprecated Use scan(page, options) via ScanPipeline instead
    * Scan for accessibility statement compliance
    * @param {string} url - URL to scan
    * @param {Object} options - Scanning options
@@ -31,37 +74,20 @@ class AccessibilityStatementScanner {
       timeout: 30000,
       language: 'auto'
     };
-    
+
     const scanOptions = { ...defaultOptions, ...options };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
+
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      const statementResults = await this.analyzeAccessibilityStatement(page, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["EAA-Statement", "EN-301-549-12.1.1"],
-        passed: statementResults.violations.length === 0,
-        violations: statementResults.violations,
-        summary: {
-          statementExists: statementResults.statementExists,
-          statementAccessible: statementResults.statementAccessible,
-          statementComplete: statementResults.statementComplete,
-          contactMechanismProvided: statementResults.contactMechanismProvided,
-          lastUpdated: statementResults.lastUpdated,
-          complianceLevel: statementResults.complianceLevel,
-          knownIssuesListed: statementResults.knownIssuesListed,
-          feedbackMechanismAvailable: statementResults.feedbackMechanismAvailable
-        }
-      };
-
-      return report;
+      try {
+        return await this.scan(page, options);
+      } finally {
+        await page.close();
+      }
 
     } catch (error) {
       throw new Error(`Accessibility statement scan failed: ${error.message}`);
@@ -73,7 +99,7 @@ class AccessibilityStatementScanner {
    */
   async analyzeAccessibilityStatement(page, options) {
     console.log('Analyzing accessibility statement...');
-    
+
     const violations = [];
     let statementExists = false;
     let statementAccessible = false;
@@ -86,7 +112,7 @@ class AccessibilityStatementScanner {
 
     // 1. Look for accessibility statement link on main page
     const statementLinkResults = await this.findAccessibilityStatementLink(page);
-    
+
     if (!statementLinkResults.found) {
       violations.push({
         criterion: "EAA-Statement",
@@ -95,7 +121,7 @@ class AccessibilityStatementScanner {
         suggestion: "Create an accessibility statement page and link it from the main navigation or footer",
         severity: "critical"
       });
-      
+
       return {
         violations,
         statementExists: false,
@@ -110,7 +136,7 @@ class AccessibilityStatementScanner {
     }
 
     statementExists = true;
-    
+
     // 2. Navigate to accessibility statement page
     try {
       await page.goto(statementLinkResults.url, { waitUntil: 'networkidle0', timeout: options.timeout });
@@ -125,7 +151,7 @@ class AccessibilityStatementScanner {
         suggestion: "Ensure accessibility statement page loads correctly and is accessible",
         severity: "critical"
       });
-      
+
       return {
         violations,
         statementExists: true,
@@ -141,7 +167,7 @@ class AccessibilityStatementScanner {
 
     // 3. Analyze statement content
     const contentAnalysis = await this.analyzeStatementContent(page);
-    
+
     // Check last updated date
     lastUpdated = contentAnalysis.lastUpdated;
     if (!contentAnalysis.lastUpdated || this.isStatementOutdated(contentAnalysis.lastUpdated)) {
@@ -183,7 +209,7 @@ class AccessibilityStatementScanner {
 
     // Check known issues
     knownIssuesListed = contentAnalysis.knownIssues;
-    
+
     // Check feedback mechanism
     feedbackMechanismAvailable = contentAnalysis.feedbackMechanism;
 
@@ -208,7 +234,7 @@ class AccessibilityStatementScanner {
    */
   async findAccessibilityStatementLink(page) {
     console.log('  Looking for accessibility statement link...');
-    
+
     const linkResults = await page.evaluate(() => {
       // Common patterns for accessibility statement links
       const patterns = [
@@ -218,7 +244,7 @@ class AccessibilityStatementScanner {
         'barrierefreiheit',
         'zugänglichkeit',
         'erklärung zur barrierefreiheit',
-        
+
         // Partial matches
         'statement',
         'compliance',
@@ -226,19 +252,19 @@ class AccessibilityStatementScanner {
       ];
 
       const links = Array.from(document.querySelectorAll('a[href]'));
-      
+
       for (const link of links) {
         const text = link.textContent.toLowerCase().trim();
         const href = link.getAttribute('href').toLowerCase();
-        
+
         // Check if link text or href contains accessibility statement patterns
         for (const pattern of patterns) {
           if (text.includes(pattern) || href.includes(pattern)) {
             const fullUrl = link.href; // Gets absolute URL
-            const selector = link.id ? `a#${link.id}` : 
+            const selector = link.id ? `a#${link.id}` :
                            link.className ? `a.${link.className.split(' ').join('.')}` :
                            `a[href="${link.getAttribute('href')}"]`;
-            
+
             return {
               found: true,
               url: fullUrl,
@@ -260,10 +286,10 @@ class AccessibilityStatementScanner {
    */
   async analyzeStatementContent(page) {
     console.log('  Analyzing statement content...');
-    
+
     const contentAnalysis = await page.evaluate(() => {
       const pageText = document.body.textContent.toLowerCase();
-      
+
       // Look for last updated date
       let lastUpdated = null;
       const datePatterns = [
@@ -272,7 +298,7 @@ class AccessibilityStatementScanner {
         /([0-9]{4}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{1,2})/i,
         /([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i
       ];
-      
+
       // Check time elements first
       const timeElements = document.querySelectorAll('time[datetime]');
       if (timeElements.length > 0) {
@@ -306,7 +332,7 @@ class AccessibilityStatementScanner {
         /(partially\s+compliant)/i,
         /(non[‑\-\s]*compliant)/i
       ];
-      
+
       for (const pattern of compliancePatterns) {
         const match = pageText.match(pattern);
         if (match) {
@@ -329,7 +355,7 @@ class AccessibilityStatementScanner {
         /feedback/i,
         /report\s+issue/i
       ];
-      
+
       let contactMechanism = false;
       for (const pattern of contactPatterns) {
         if (pattern.test(pageText)) {
@@ -342,7 +368,7 @@ class AccessibilityStatementScanner {
       const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
       const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
       const forms = document.querySelectorAll('form');
-      
+
       if (emailLinks.length > 0 || phoneLinks.length > 0 || forms.length > 0) {
         contactMechanism = true;
       }
@@ -354,7 +380,7 @@ class AccessibilityStatementScanner {
         /exceptions/i,
         /accessibility\s+barriers/i
       ];
-      
+
       let knownIssues = false;
       for (const pattern of knownIssuesPatterns) {
         if (pattern.test(pageText)) {
@@ -370,7 +396,7 @@ class AccessibilityStatementScanner {
         /contact\s+us/i,
         /accessibility\s+support/i
       ];
-      
+
       let feedbackMechanism = false;
       for (const pattern of feedbackPatterns) {
         if (pattern.test(pageText)) {
@@ -401,11 +427,15 @@ class AccessibilityStatementScanner {
    */
   isStatementOutdated(lastUpdated) {
     if (!lastUpdated) return true;
-    
+
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
-    
+
     return lastUpdated < twelveMonthsAgo;
+  }
+
+  get needsExclusiveAccess() {
+    return true;
   }
 
   async close() {

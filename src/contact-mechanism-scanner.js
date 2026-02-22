@@ -1,12 +1,17 @@
 const puppeteer = require('puppeteer');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Contact Mechanism Scanner for EAA Procedural Requirements
  * Implements European Accessibility Act contact requirements
  * EN 301 549 criteria 12.1.2 (Accessible procurement)
  */
-class ContactMechanismScanner {
+class ContactMechanismScanner extends BaseScanner {
   constructor() {
+    super('contact-mechanism', {
+      wcagCriteria: ['EN 301 549 12.2'],
+      wcagPrinciple: 'robust'
+    });
     this.browser = null;
   }
 
@@ -20,6 +25,41 @@ class ContactMechanismScanner {
   }
 
   /**
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * This scanner may navigate to sub-pages to find contact information,
+   * so it uses the provided page as a starting point.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
+   */
+  async scan(page, options = {}) {
+    const defaultOptions = {
+      timeout: 30000,
+      searchDepth: 3
+    };
+
+    const scanOptions = { ...defaultOptions, ...options };
+
+    const contactResults = await this.analyzeContactMechanisms(page, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["EAA-Contact", "EN-301-549-12.1.2"],
+      passed: contactResults.violations.length === 0,
+      violations: contactResults.violations,
+      summary: {
+        emailContactAvailable: contactResults.emailContactAvailable,
+        phoneContactAvailable: contactResults.phoneContactAvailable,
+        onlineFormAvailable: contactResults.onlineFormAvailable,
+        contactAccessible: contactResults.contactAccessible,
+        responseTimeStated: contactResults.responseTimeStated,
+        multipleOptionsAvailable: contactResults.multipleOptionsAvailable
+      }
+    };
+  }
+
+  /**
+   * @deprecated Use scan(page, options) via ScanPipeline instead
    * Scan for contact mechanism compliance
    * @param {string} url - URL to scan
    * @param {Object} options - Scanning options
@@ -30,35 +70,20 @@ class ContactMechanismScanner {
       timeout: 30000,
       searchDepth: 3
     };
-    
+
     const scanOptions = { ...defaultOptions, ...options };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
+
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      const contactResults = await this.analyzeContactMechanisms(page, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["EAA-Contact", "EN-301-549-12.1.2"],
-        passed: contactResults.violations.length === 0,
-        violations: contactResults.violations,
-        summary: {
-          emailContactAvailable: contactResults.emailContactAvailable,
-          phoneContactAvailable: contactResults.phoneContactAvailable,
-          onlineFormAvailable: contactResults.onlineFormAvailable,
-          contactAccessible: contactResults.contactAccessible,
-          responseTimeStated: contactResults.responseTimeStated,
-          multipleOptionsAvailable: contactResults.multipleOptionsAvailable
-        }
-      };
-
-      return report;
+      try {
+        return await this.scan(page, options);
+      } finally {
+        await page.close();
+      }
 
     } catch (error) {
       throw new Error(`Contact mechanism scan failed: ${error.message}`);
@@ -70,7 +95,7 @@ class ContactMechanismScanner {
    */
   async analyzeContactMechanisms(page, options) {
     console.log('Analyzing contact mechanisms...');
-    
+
     const violations = [];
     let emailContactAvailable = false;
     let phoneContactAvailable = false;
@@ -81,7 +106,7 @@ class ContactMechanismScanner {
 
     // Analyze main page for contact mechanisms
     const mainPageAnalysis = await this.analyzePageContactMechanisms(page);
-    
+
     // Check if we found any contact mechanisms on main page
     if (mainPageAnalysis.hasContactMechanisms) {
       emailContactAvailable = mainPageAnalysis.emailContact;
@@ -92,7 +117,7 @@ class ContactMechanismScanner {
     } else {
       // Look for contact page
       const contactPageResult = await this.findAndAnalyzeContactPage(page, options);
-      
+
       if (contactPageResult.found) {
         emailContactAvailable = contactPageResult.emailContact;
         phoneContactAvailable = contactPageResult.phoneContact;
@@ -192,10 +217,10 @@ class ContactMechanismScanner {
    */
   async analyzePageContactMechanisms(page) {
     console.log('  Analyzing contact mechanisms on current page...');
-    
+
     const analysis = await page.evaluate(() => {
       const pageText = document.body.textContent.toLowerCase();
-      
+
       // Check for email contacts
       const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
       const emailMatches = pageText.match(emailPattern);
@@ -212,8 +237,8 @@ class ContactMechanismScanner {
       const forms = document.querySelectorAll('form');
       const contactForms = Array.from(forms).filter(form => {
         const formText = form.textContent.toLowerCase();
-        return formText.includes('contact') || 
-               formText.includes('feedback') || 
+        return formText.includes('contact') ||
+               formText.includes('feedback') ||
                formText.includes('accessibility') ||
                formText.includes('support');
       });
@@ -227,7 +252,7 @@ class ContactMechanismScanner {
         /\d+\s+(business\s+)?days?\s+to\s+respond/i,
         /reply\s+within/i
       ];
-      
+
       let responseTime = false;
       for (const pattern of responseTimePatterns) {
         if (pattern.test(pageText)) {
@@ -256,7 +281,7 @@ class ContactMechanismScanner {
    */
   async findAndAnalyzeContactPage(page, options) {
     console.log('  Looking for dedicated contact page...');
-    
+
     // Find contact page link
     const contactLinkResult = await page.evaluate(() => {
       const contactPatterns = [
@@ -270,11 +295,11 @@ class ContactMechanismScanner {
       ];
 
       const links = Array.from(document.querySelectorAll('a[href]'));
-      
+
       for (const link of links) {
         const text = link.textContent.toLowerCase().trim();
         const href = link.getAttribute('href').toLowerCase();
-        
+
         for (const pattern of contactPatterns) {
           if (text.includes(pattern) || href.includes(pattern)) {
             return {
@@ -304,10 +329,10 @@ class ContactMechanismScanner {
     try {
       await page.goto(contactLinkResult.url, { waitUntil: 'networkidle0', timeout: options.timeout });
       console.log(`  Found contact page at: ${contactLinkResult.url}`);
-      
+
       // Analyze contact page
       const contactPageAnalysis = await this.analyzePageContactMechanisms(page);
-      
+
       return {
         found: true,
         emailContact: contactPageAnalysis.emailContact,
@@ -361,9 +386,9 @@ class ContactMechanismScanner {
           const href = link.getAttribute('href');
           const email = href.replace('mailto:', '');
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          
+
           if (!emailRegex.test(email)) {
-            const selector = link.id ? `a#${link.id}` : 
+            const selector = link.id ? `a#${link.id}` :
                            link.className ? `a.${link.className.split(' ')[0]}` :
                            'a[href^="mailto:"]';
             return {
@@ -387,16 +412,16 @@ class ContactMechanismScanner {
   async validatePhoneContacts(page) {
     const validation = await page.evaluate(() => {
       const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
-      
+
       if (phoneLinks.length > 0) {
         for (const link of phoneLinks) {
           const href = link.getAttribute('href');
           const phone = href.replace('tel:', '');
-          
+
           // Basic phone validation - should contain only numbers, spaces, +, -, ()
           const phoneRegex = /^[\+]?[0-9\s\-()]+$/;
           if (!phoneRegex.test(phone) || phone.replace(/[^0-9]/g, '').length < 7) {
-            const selector = link.id ? `a#${link.id}` : 
+            const selector = link.id ? `a#${link.id}` :
                            link.className ? `a.${link.className.split(' ')[0]}` :
                            'a[href^="tel:"]';
             return {
@@ -412,6 +437,10 @@ class ContactMechanismScanner {
     });
 
     return validation;
+  }
+
+  get needsExclusiveAccess() {
+    return true;
   }
 
   async close() {

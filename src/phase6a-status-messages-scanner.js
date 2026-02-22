@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Status Messages Scanner for WCAG 4.1.3 compliance testing
  * Ensures status messages are programmatically determinable via ARIA live regions
  * Critical for screen reader users who need status change announcements
  */
-class StatusMessagesScanner {
+class StatusMessagesScanner extends BaseScanner {
     constructor() {
+        super('status-messages', {
+            wcagCriteria: ['4.1.3'],
+            wcagPrinciple: 'robust'
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/status-messages-screenshots');
     }
@@ -24,6 +29,71 @@ class StatusMessagesScanner {
     }
 
     /**
+     * Core scan method. Receives an already-navigated Puppeteer page.
+     * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+     * @param {Object} options - Scanning options
+     * @returns {Promise<Object>} ScanResult
+     */
+    async scan(page, options = {}) {
+        const defaultOptions = {
+            checkFormValidation: true,
+            checkLoadingStates: true,
+            checkDynamicContent: true,
+            checkErrorMessages: true,
+            checkSuccessMessages: true,
+            checkProgressIndicators: true,
+            simulateInteractions: true,
+            timeout: 60000
+        };
+
+        const scanOptions = { ...defaultOptions, ...options };
+
+        const violations = [];
+
+        // Static analysis of existing status message patterns
+        const staticViolations = await this.analyzeStaticStatusMessages(page, scanOptions);
+        violations.push(...staticViolations);
+
+        // Dynamic analysis - simulate interactions to detect missing status messages
+        if (scanOptions.simulateInteractions) {
+            const dynamicViolations = await this.analyzeDynamicStatusMessages(page, null, scanOptions);
+            violations.push(...dynamicViolations);
+        }
+
+        // Analyze form validation feedback
+        if (scanOptions.checkFormValidation) {
+            const formViolations = await this.analyzeFormValidationMessages(page, null, scanOptions);
+            violations.push(...formViolations);
+        }
+
+        // Analyze loading states and progress indicators
+        if (scanOptions.checkLoadingStates) {
+            const loadingViolations = await this.analyzeLoadingStateMessages(page, scanOptions);
+            violations.push(...loadingViolations);
+        }
+
+        return {
+            scannerId: this.id,
+            criteria: ["4.1.3"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalStatusElements: violations.length + this.getPassedElementsCount(violations),
+                formValidationIssues: violations.filter(v => v.category === 'form-validation').length,
+                loadingStateIssues: violations.filter(v => v.category === 'loading-state').length,
+                dynamicContentIssues: violations.filter(v => v.category === 'dynamic-content').length,
+                errorMessageIssues: violations.filter(v => v.category === 'error-message').length,
+                successMessageIssues: violations.filter(v => v.category === 'success-message').length,
+                progressIndicatorIssues: violations.filter(v => v.category === 'progress-indicator').length,
+                missingLiveRegions: violations.filter(v => v.type === 'missing-live-region').length
+            },
+            recommendations: this.generateStatusMessagesRecommendations(violations),
+            screenReaderTesting: this.generateScreenReaderTestCases(violations)
+        };
+    }
+
+    /**
+     * @deprecated Use scan(page, options) via ScanPipeline instead
      * Scan status messages compliance (WCAG 4.1.3)
      * @param {string} url - URL to scan
      * @param {Object} options - Scanning options
@@ -55,57 +125,18 @@ class StatusMessagesScanner {
 
             // Take screenshot for analysis
             const screenshotPath = path.join(scanDir, 'status-messages-analysis.png');
-            await page.screenshot({ 
-                path: screenshotPath, 
-                fullPage: true 
+            await page.screenshot({
+                path: screenshotPath,
+                fullPage: true
             });
 
-            const violations = [];
-            
-            // Static analysis of existing status message patterns
-            const staticViolations = await this.analyzeStaticStatusMessages(page, scanOptions);
-            violations.push(...staticViolations);
-
-            // Dynamic analysis - simulate interactions to detect missing status messages
-            if (scanOptions.simulateInteractions) {
-                const dynamicViolations = await this.analyzeDynamicStatusMessages(page, scanDir, scanOptions);
-                violations.push(...dynamicViolations);
+            try {
+                const result = await this.scan(page, options);
+                result.screenshotPath = screenshotPath;
+                return result;
+            } finally {
+                await page.close();
             }
-
-            // Analyze form validation feedback
-            if (scanOptions.checkFormValidation) {
-                const formViolations = await this.analyzeFormValidationMessages(page, scanDir, scanOptions);
-                violations.push(...formViolations);
-            }
-
-            // Analyze loading states and progress indicators
-            if (scanOptions.checkLoadingStates) {
-                const loadingViolations = await this.analyzeLoadingStateMessages(page, scanOptions);
-                violations.push(...loadingViolations);
-            }
-
-            await page.close();
-
-            const report = {
-                criteria: ["4.1.3"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalStatusElements: violations.length + this.getPassedElementsCount(violations),
-                    formValidationIssues: violations.filter(v => v.category === 'form-validation').length,
-                    loadingStateIssues: violations.filter(v => v.category === 'loading-state').length,
-                    dynamicContentIssues: violations.filter(v => v.category === 'dynamic-content').length,
-                    errorMessageIssues: violations.filter(v => v.category === 'error-message').length,
-                    successMessageIssues: violations.filter(v => v.category === 'success-message').length,
-                    progressIndicatorIssues: violations.filter(v => v.category === 'progress-indicator').length,
-                    missingLiveRegions: violations.filter(v => v.type === 'missing-live-region').length
-                },
-                screenshotPath: screenshotPath,
-                recommendations: this.generateStatusMessagesRecommendations(violations),
-                screenReaderTesting: this.generateScreenReaderTestCases(violations)
-            };
-
-            return report;
 
         } catch (error) {
             throw new Error(`Status messages scan failed: ${error.message}`);
@@ -123,8 +154,8 @@ class StatusMessagesScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
@@ -140,7 +171,7 @@ class StatusMessagesScanner {
             // Look for error message containers
             const errorContainers = document.querySelectorAll([
                 '.error', '.error-message', '.validation-error', '.field-error',
-                '.alert-danger', '.alert-error', '.message-error', 
+                '.alert-danger', '.alert-error', '.message-error',
                 '[class*="error"]', '[id*="error"]', '[class*="invalid"]'
             ].join(', '));
 
@@ -170,7 +201,7 @@ class StatusMessagesScanner {
             // Look for success message containers
             const successContainers = document.querySelectorAll([
                 '.success', '.success-message', '.alert-success', '.message-success',
-                '.confirmation', '.saved', '.submitted', '[class*="success"]', 
+                '.confirmation', '.saved', '.submitted', '[class*="success"]',
                 '[id*="success"]', '[class*="confirm"]'
             ].join(', '));
 
@@ -326,14 +357,16 @@ class StatusMessagesScanner {
         try {
             // Look for forms to test
             const forms = await page.$$('form');
-            
+
             for (let i = 0; i < Math.min(forms.length, 3); i++) { // Limit to 3 forms
                 const form = forms[i];
-                
-                // Take screenshot before interaction
-                await page.screenshot({
-                    path: path.join(scanDir, `form-${i}-before.png`)
-                });
+
+                // Take screenshot before interaction (only if scanDir provided)
+                if (scanDir) {
+                    await page.screenshot({
+                        path: path.join(scanDir, `form-${i}-before.png`)
+                    });
+                }
 
                 // Try to submit form to trigger validation
                 try {
@@ -342,10 +375,12 @@ class StatusMessagesScanner {
                         await submitButton.click();
                         await page.waitForTimeout(1000); // Wait for validation messages
 
-                        // Take screenshot after interaction
-                        await page.screenshot({
-                            path: path.join(scanDir, `form-${i}-after.png`)
-                        });
+                        // Take screenshot after interaction (only if scanDir provided)
+                        if (scanDir) {
+                            await page.screenshot({
+                                path: path.join(scanDir, `form-${i}-after.png`)
+                            });
+                        }
 
                         // Check if any new content appeared without live regions
                         const newErrors = await page.evaluate(() => {
@@ -382,10 +417,10 @@ class StatusMessagesScanner {
 
             // Test interactive buttons that might show status
             const interactiveButtons = await page.$$('button:not([type="submit"]), [role="button"], .btn:not([type="submit"])');
-            
+
             for (let i = 0; i < Math.min(interactiveButtons.length, 5); i++) { // Limit to 5 buttons
                 const button = interactiveButtons[i];
-                
+
                 try {
                     const beforeContent = await page.evaluate(() => document.body.innerHTML.length);
                     await button.click();
@@ -457,18 +492,18 @@ class StatusMessagesScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Check form fields with validation patterns
             const formFields = document.querySelectorAll('input, textarea, select');
-            
+
             for (const field of formFields) {
                 const fieldSelector = getElementSelector(field);
-                
+
                 // Check for associated error message containers
                 const errorContainer = field.parentElement.querySelector('.error, .invalid, .validation-error') ||
                                      document.querySelector(`[id="${field.id}-error"]`) ||
@@ -543,8 +578,8 @@ class StatusMessagesScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
@@ -582,16 +617,16 @@ class StatusMessagesScanner {
 
             // Check for buttons that might trigger loading states
             const asyncButtons = document.querySelectorAll('button[onclick*="ajax"], button[onclick*="fetch"], button[class*="async"], .submit-button, .save-button');
-            
+
             for (const button of asyncButtons) {
                 // Look for nearby status containers
                 const nearbyStatusContainer = button.parentElement.querySelector('.status, .message, .result') ||
                                             button.nextElementSibling;
 
-                if (nearbyStatusContainer && 
+                if (nearbyStatusContainer &&
                     !nearbyStatusContainer.hasAttribute('aria-live') &&
                     !nearbyStatusContainer.hasAttribute('role')) {
-                    
+
                     violations.push({
                         type: 'async-action-no-status-announcement',
                         category: 'loading-state',
@@ -685,7 +720,7 @@ class StatusMessagesScanner {
 
         violations.forEach((violation, index) => {
             const testId = `screen-reader-test-${index + 1}`;
-            
+
             switch (violation.category) {
                 case 'form-validation':
                     testCases.push({

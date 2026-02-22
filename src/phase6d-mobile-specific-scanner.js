@@ -60,7 +60,8 @@ class MobileSpecificScanner extends BaseScanner {
         const viewportResults = {};
 
         // Test on different mobile viewports
-        for (const [deviceName, viewport] of Object.entries(this.mobileViewports)) {
+        const viewports = scanOptions.mobileViewports || this.mobileViewports;
+        for (const [deviceName, viewport] of Object.entries(viewports)) {
             console.log(`Testing on ${deviceName}...`);
 
             await page.setViewport(viewport);

@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const ScanPipeline = require('./scan-pipeline');
-const { registerAllScanners } = require('./scanner-registry');
+const { registerAllScanners, getProfile } = require('./scanner-registry');
 const ReportGenerator = require('./report-generator');
 
 const app = express();
@@ -34,7 +34,7 @@ let scanQueue = null;
 async function getQueue() {
   if (!scanQueue) {
     const PQueue = (await import('p-queue')).default;
-    scanQueue = new PQueue({ concurrency: 2 });
+    scanQueue = new PQueue({ concurrency: parseInt(process.env.SCAN_CONCURRENCY) || 1 });
   }
   return scanQueue;
 }
@@ -47,16 +47,26 @@ async function getQueue() {
  * Body: { url: string, scannerIds?: string[], options?: object }
  */
 app.post('/api/scan', async (req, res) => {
-  const { url, scannerIds, options = {} } = req.body;
+  const { url, profile, scannerIds, options = {} } = req.body;
 
   if (!url) {
     return res.status(400).json({ error: 'url is required' });
   }
 
   try {
+    let resolvedScannerIds = scannerIds || null;
+    let mergedOptions = { ...options };
+
+    // Resolve profile if provided and no explicit scannerIds
+    if (profile && !scannerIds) {
+      const profileConfig = getProfile(profile);
+      resolvedScannerIds = profileConfig.scannerIds;
+      mergedOptions = { ...profileConfig.options, ...options };
+    }
+
     const queue = await getQueue();
     const result = await queue.add(() =>
-      pipeline.scan(url, { scannerIds, ...options })
+      pipeline.scan(url, { scannerIds: resolvedScannerIds, ...mergedOptions })
     );
     res.json(result);
   } catch (error) {

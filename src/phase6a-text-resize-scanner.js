@@ -59,7 +59,7 @@ class TextResizeScanner extends BaseScanner {
         const currentUrl = page.url();
 
         // Test each viewport for zoom compliance using the provided page
-        for (const viewport of this.testViewports) {
+        for (const viewport of (scanOptions.viewports || this.testViewports)) {
             await page.setViewport({
                 width: viewport.width,
                 height: viewport.height,

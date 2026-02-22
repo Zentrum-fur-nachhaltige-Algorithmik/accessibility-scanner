@@ -82,6 +82,58 @@ function createAllScanners() {
 }
 
 /**
+ * Scan profiles — subsets of scanners optimised for different speed/coverage trade-offs.
+ * `null` means "all scanners".
+ */
+const PROFILES = {
+  fast: [
+    // Concurrent (no seizure-prevention — its 10s observation dominates)
+    'color-contrast', 'use-of-color', 'images-of-text', 'advanced-contrast',
+    'nontext-contrast', 'screen-reader', 'media-accessibility',
+    'language-detection', 'predictable-navigation', 'error-handling',
+    'html-validation', 'page-structure', 'label-in-name',
+    'status-messages', 'advanced-aria', 'timing-controls',
+    // Fast exclusive (~6s each with navigation)
+    'keyboard-navigation', 'focus-management',
+  ],
+  standard: [
+    // Everything except responsive-design, text-resize, mobile-specific
+    'color-contrast', 'use-of-color', 'images-of-text', 'advanced-contrast',
+    'nontext-contrast', 'screen-reader', 'media-accessibility',
+    'language-detection', 'predictable-navigation', 'error-handling',
+    'html-validation', 'page-structure', 'label-in-name',
+    'status-messages', 'advanced-aria',
+    'seizure-prevention', 'timing-controls',
+    'keyboard-navigation', 'focus-management', 'input-modalities',
+    'dynamic-spa',
+    'accessibility-statement', 'contact-mechanism',
+    'compliance-monitoring', 'eaa-procedure',
+  ],
+  full: null, // all scanners
+};
+
+const PROFILE_OPTIONS = {
+  fast: { observationTime: 0 },
+  standard: { observationTime: 3000 },
+  full: {},
+};
+
+/**
+ * Resolve a profile name to scanner ids and merged options.
+ * @param {string} name — 'fast' | 'standard' | 'full'
+ * @returns {{ scannerIds: string[] | null, options: object }}
+ */
+function getProfile(name) {
+  if (!PROFILES.hasOwnProperty(name)) {
+    throw new Error(`Unknown scan profile: "${name}". Valid profiles: ${Object.keys(PROFILES).join(', ')}`);
+  }
+  return {
+    scannerIds: PROFILES[name],
+    options: PROFILE_OPTIONS[name] || {},
+  };
+}
+
+/**
  * Register all scanners with a pipeline.
  * @param {import('./scan-pipeline')} pipeline
  */
@@ -91,4 +143,4 @@ function registerAllScanners(pipeline) {
   return scanners;
 }
 
-module.exports = { createAllScanners, registerAllScanners };
+module.exports = { createAllScanners, registerAllScanners, getProfile, PROFILES, PROFILE_OPTIONS };

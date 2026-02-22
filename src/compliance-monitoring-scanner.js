@@ -1,12 +1,17 @@
 const puppeteer = require('puppeteer');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Compliance Monitoring Scanner for EAA Procedural Requirements
  * Implements European Accessibility Act monitoring requirements
  * EN 301 549 criteria 12.1.3 (Accessibility procedures)
  */
-class ComplianceMonitoringScanner {
+class ComplianceMonitoringScanner extends BaseScanner {
   constructor() {
+    super('compliance-monitoring', {
+      wcagCriteria: ['EN 301 549 12.4'],
+      wcagPrinciple: 'robust'
+    });
     this.browser = null;
   }
 
@@ -20,6 +25,40 @@ class ComplianceMonitoringScanner {
   }
 
   /**
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * This scanner may navigate to sub-pages to find monitoring information,
+   * so it uses the provided page as a starting point.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
+   */
+  async scan(page, options = {}) {
+    const defaultOptions = {
+      timeout: 30000,
+      searchDepth: 3
+    };
+
+    const scanOptions = { ...defaultOptions, ...options };
+
+    const monitoringResults = await this.analyzeComplianceMonitoring(page, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["EAA-Monitoring", "EN-301-549-12.1.3"],
+      passed: monitoringResults.violations.length === 0,
+      violations: monitoringResults.violations,
+      summary: {
+        monitoringProcedureDocumented: monitoringResults.monitoringProcedureDocumented,
+        regularAuditsScheduled: monitoringResults.regularAuditsScheduled,
+        issueTrackingSystem: monitoringResults.issueTrackingSystem,
+        userFeedbackIntegrated: monitoringResults.userFeedbackIntegrated,
+        continuousImprovementEvidence: monitoringResults.continuousImprovementEvidence
+      }
+    };
+  }
+
+  /**
+   * @deprecated Use scan(page, options) via ScanPipeline instead
    * Scan for compliance monitoring procedures
    * @param {string} url - URL to scan
    * @param {Object} options - Scanning options
@@ -30,34 +69,20 @@ class ComplianceMonitoringScanner {
       timeout: 30000,
       searchDepth: 3
     };
-    
+
     const scanOptions = { ...defaultOptions, ...options };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
+
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      const monitoringResults = await this.analyzeComplianceMonitoring(page, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["EAA-Monitoring", "EN-301-549-12.1.3"],
-        passed: monitoringResults.violations.length === 0,
-        violations: monitoringResults.violations,
-        summary: {
-          monitoringProcedureDocumented: monitoringResults.monitoringProcedureDocumented,
-          regularAuditsScheduled: monitoringResults.regularAuditsScheduled,
-          issueTrackingSystem: monitoringResults.issueTrackingSystem,
-          userFeedbackIntegrated: monitoringResults.userFeedbackIntegrated,
-          continuousImprovementEvidence: monitoringResults.continuousImprovementEvidence
-        }
-      };
-
-      return report;
+      try {
+        return await this.scan(page, options);
+      } finally {
+        await page.close();
+      }
 
     } catch (error) {
       throw new Error(`Compliance monitoring scan failed: ${error.message}`);
@@ -69,7 +94,7 @@ class ComplianceMonitoringScanner {
    */
   async analyzeComplianceMonitoring(page, options) {
     console.log('Analyzing compliance monitoring procedures...');
-    
+
     const violations = [];
     let monitoringProcedureDocumented = false;
     let regularAuditsScheduled = false;
@@ -79,7 +104,7 @@ class ComplianceMonitoringScanner {
 
     // 1. Check main page for monitoring information
     const mainPageAnalysis = await this.analyzePageForMonitoring(page);
-    
+
     // 2. Look for dedicated monitoring/compliance pages
     const monitoringPageAnalysis = await this.findAndAnalyzeMonitoringPages(page, options);
 
@@ -165,10 +190,10 @@ class ComplianceMonitoringScanner {
    */
   async analyzePageForMonitoring(page) {
     console.log('  Analyzing current page for monitoring procedures...');
-    
+
     const analysis = await page.evaluate(() => {
       const pageText = document.body.textContent.toLowerCase();
-      
+
       // Check for monitoring procedures
       const monitoringPatterns = [
         /accessibility\s+monitoring/i,
@@ -177,7 +202,7 @@ class ComplianceMonitoringScanner {
         /compliance\s+monitoring/i,
         /accessibility\s+oversight/i
       ];
-      
+
       let monitoringProcedure = false;
       for (const pattern of monitoringPatterns) {
         if (pattern.test(pageText)) {
@@ -197,7 +222,7 @@ class ComplianceMonitoringScanner {
         /monthly\s+review/i,
         /we\s+conduct.*audit/i
       ];
-      
+
       let regularAudits = false;
       for (const pattern of auditPatterns) {
         if (pattern.test(pageText)) {
@@ -218,7 +243,7 @@ class ComplianceMonitoringScanner {
         /jira/i,
         /trello/i
       ];
-      
+
       let issueTracking = false;
       for (const pattern of trackingPatterns) {
         if (pattern.test(pageText)) {
@@ -232,9 +257,9 @@ class ComplianceMonitoringScanner {
       for (const link of links) {
         const href = link.getAttribute('href').toLowerCase();
         const text = link.textContent.toLowerCase();
-        
+
         if (href.includes('github.com') && (href.includes('issues') || text.includes('issues')) ||
-            href.includes('jira') || href.includes('trello') || 
+            href.includes('jira') || href.includes('trello') ||
             text.includes('issue tracker') || text.includes('bug tracker')) {
           issueTracking = true;
           break;
@@ -251,7 +276,7 @@ class ComplianceMonitoringScanner {
         /accessibility\s+feedback/i,
         /user\s+suggestions?/i
       ];
-      
+
       let userFeedback = false;
       for (const pattern of feedbackPatterns) {
         if (pattern.test(pageText)) {
@@ -273,7 +298,7 @@ class ComplianceMonitoringScanner {
         /recent.*update/i,
         /improvement.*log/i
       ];
-      
+
       let continuousImprovement = false;
       for (const pattern of improvementPatterns) {
         if (pattern.test(pageText)) {
@@ -299,10 +324,10 @@ class ComplianceMonitoringScanner {
    */
   async findAndAnalyzeMonitoringPages(page, options) {
     console.log('  Looking for dedicated monitoring/compliance pages...');
-    
+
     // Find potential monitoring pages
     const monitoringPages = await this.findMonitoringPages(page);
-    
+
     let combinedAnalysis = {
       monitoringProcedure: false,
       regularAudits: false,
@@ -316,16 +341,16 @@ class ComplianceMonitoringScanner {
       try {
         console.log(`  Analyzing monitoring page: ${pageInfo.url}`);
         await page.goto(pageInfo.url, { waitUntil: 'networkidle0', timeout: options.timeout });
-        
+
         const pageAnalysis = await this.analyzePageForMonitoring(page);
-        
+
         // Combine results (OR operation - if any page has evidence, mark as true)
         combinedAnalysis.monitoringProcedure = combinedAnalysis.monitoringProcedure || pageAnalysis.monitoringProcedure;
         combinedAnalysis.regularAudits = combinedAnalysis.regularAudits || pageAnalysis.regularAudits;
         combinedAnalysis.issueTracking = combinedAnalysis.issueTracking || pageAnalysis.issueTracking;
         combinedAnalysis.userFeedback = combinedAnalysis.userFeedback || pageAnalysis.userFeedback;
         combinedAnalysis.continuousImprovement = combinedAnalysis.continuousImprovement || pageAnalysis.continuousImprovement;
-        
+
       } catch (error) {
         console.log(`  Could not analyze ${pageInfo.url}: ${error.message}`);
       }
@@ -356,21 +381,21 @@ class ComplianceMonitoringScanner {
 
       const links = Array.from(document.querySelectorAll('a[href]'));
       const foundPages = [];
-      
+
       for (const link of links) {
         const text = link.textContent.toLowerCase().trim();
         const href = link.getAttribute('href').toLowerCase();
-        
+
         for (const pattern of monitoringPatterns) {
           if (text.includes(pattern) || href.includes(pattern)) {
             // Avoid duplicate pages and external links
-            if (!foundPages.some(p => p.url === link.href) && 
-                !link.href.startsWith('mailto:') && 
+            if (!foundPages.some(p => p.url === link.href) &&
+                !link.href.startsWith('mailto:') &&
                 !link.href.startsWith('tel:') &&
                 !link.href.includes('twitter.com') &&
                 !link.href.includes('facebook.com') &&
                 !link.href.includes('linkedin.com')) {
-              
+
               foundPages.push({
                 url: link.href,
                 text: link.textContent.trim(),
@@ -387,6 +412,10 @@ class ComplianceMonitoringScanner {
     });
 
     return potentialPages;
+  }
+
+  get needsExclusiveAccess() {
+    return true;
   }
 
   async close() {

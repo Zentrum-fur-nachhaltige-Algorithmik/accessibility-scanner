@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Label in Name Scanner for WCAG 2.5.3 compliance testing
  * Ensures visible text is contained in accessible name for voice control compatibility
  * Critical for Dragon NaturallySpeaking, Voice Control, and other speech recognition software
  */
-class LabelInNameScanner {
+class LabelInNameScanner extends BaseScanner {
     constructor() {
+        super('label-in-name', {
+            wcagCriteria: ['2.5.3'],
+            wcagPrinciple: 'operable'
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/label-in-name-screenshots');
     }
@@ -24,12 +29,12 @@ class LabelInNameScanner {
     }
 
     /**
-     * Scan label in name compliance (WCAG 2.5.3)
-     * @param {string} url - URL to scan
+     * Core scan method. Receives an already-navigated Puppeteer page.
+     * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
      * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} LabelInNameReport
+     * @returns {Promise<Object>} ScanResult
      */
-    async scanLabelInName(url, options = {}) {
+    async scan(page, options = {}) {
         const defaultOptions = {
             checkButtons: true,
             checkFormControls: true,
@@ -43,6 +48,61 @@ class LabelInNameScanner {
 
         const scanOptions = { ...defaultOptions, ...options };
 
+        const violations = [];
+
+        // Analyze different types of elements
+        if (scanOptions.checkButtons) {
+            const buttonViolations = await this.analyzeButtons(page, scanOptions);
+            violations.push(...buttonViolations);
+        }
+
+        if (scanOptions.checkFormControls) {
+            const formViolations = await this.analyzeFormControls(page, scanOptions);
+            violations.push(...formViolations);
+        }
+
+        if (scanOptions.checkLinks) {
+            const linkViolations = await this.analyzeLinks(page, scanOptions);
+            violations.push(...linkViolations);
+        }
+
+        if (scanOptions.checkImageButtons) {
+            const imageViolations = await this.analyzeImageButtons(page, scanOptions);
+            violations.push(...imageViolations);
+        }
+
+        if (scanOptions.checkCustomControls) {
+            const customViolations = await this.analyzeCustomControls(page, scanOptions);
+            violations.push(...customViolations);
+        }
+
+        return {
+            scannerId: this.id,
+            criteria: ["2.5.3"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalElementsChecked: violations.length + this.getPassedElementsCount(violations),
+                buttonIssues: violations.filter(v => v.category === 'button').length,
+                formControlIssues: violations.filter(v => v.category === 'form-control').length,
+                linkIssues: violations.filter(v => v.category === 'link').length,
+                imageButtonIssues: violations.filter(v => v.category === 'image-button').length,
+                customControlIssues: violations.filter(v => v.category === 'custom-control').length,
+                voiceControlFailures: violations.length
+            },
+            recommendations: this.generateLabelInNameRecommendations(violations),
+            voiceControlTesting: this.generateVoiceControlTestCases(violations)
+        };
+    }
+
+    /**
+     * @deprecated Use scan(page, options) via ScanPipeline instead
+     * Scan label in name compliance (WCAG 2.5.3)
+     * @param {string} url - URL to scan
+     * @param {Object} options - Scanning options
+     * @returns {Promise<Object>} LabelInNameReport
+     */
+    async scanLabelInName(url, options = {}) {
         try {
             await this.init();
             const page = await this.browser.newPage();
@@ -51,64 +111,22 @@ class LabelInNameScanner {
             await fs.ensureDir(scanDir);
 
             await page.setViewport({ width: 1280, height: 1024 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
+            await page.goto(url, { waitUntil: 'networkidle0', timeout: options.timeout || 60000 });
 
             // Take screenshot for analysis
             const screenshotPath = path.join(scanDir, 'label-in-name-analysis.png');
-            await page.screenshot({ 
-                path: screenshotPath, 
-                fullPage: true 
+            await page.screenshot({
+                path: screenshotPath,
+                fullPage: true
             });
 
-            const violations = [];
-            
-            // Analyze different types of elements
-            if (scanOptions.checkButtons) {
-                const buttonViolations = await this.analyzeButtons(page, scanOptions);
-                violations.push(...buttonViolations);
+            try {
+                const result = await this.scan(page, options);
+                result.screenshotPath = screenshotPath;
+                return result;
+            } finally {
+                await page.close();
             }
-
-            if (scanOptions.checkFormControls) {
-                const formViolations = await this.analyzeFormControls(page, scanOptions);
-                violations.push(...formViolations);
-            }
-
-            if (scanOptions.checkLinks) {
-                const linkViolations = await this.analyzeLinks(page, scanOptions);
-                violations.push(...linkViolations);
-            }
-
-            if (scanOptions.checkImageButtons) {
-                const imageViolations = await this.analyzeImageButtons(page, scanOptions);
-                violations.push(...imageViolations);
-            }
-
-            if (scanOptions.checkCustomControls) {
-                const customViolations = await this.analyzeCustomControls(page, scanOptions);
-                violations.push(...customViolations);
-            }
-
-            await page.close();
-
-            const report = {
-                criteria: ["2.5.3"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalElementsChecked: violations.length + this.getPassedElementsCount(violations),
-                    buttonIssues: violations.filter(v => v.category === 'button').length,
-                    formControlIssues: violations.filter(v => v.category === 'form-control').length,
-                    linkIssues: violations.filter(v => v.category === 'link').length,
-                    imageButtonIssues: violations.filter(v => v.category === 'image-button').length,
-                    customControlIssues: violations.filter(v => v.category === 'custom-control').length,
-                    voiceControlFailures: violations.length
-                },
-                screenshotPath: screenshotPath,
-                recommendations: this.generateLabelInNameRecommendations(violations),
-                voiceControlTesting: this.generateVoiceControlTestCases(violations)
-            };
-
-            return report;
 
         } catch (error) {
             throw new Error(`Label in name scan failed: ${error.message}`);
@@ -183,11 +201,11 @@ class LabelInNameScanner {
             function getVisibleText(element) {
                 // Clone element to manipulate
                 const clone = element.cloneNode(true);
-                
+
                 // Remove screen-reader only text
                 const srOnly = clone.querySelectorAll('.sr-only, .visually-hidden, [aria-hidden="true"]');
                 srOnly.forEach(el => el.remove());
-                
+
                 // Remove icon fonts and decorative elements
                 const icons = clone.querySelectorAll('[class*="icon"], [class*="fa-"], .material-icons');
                 icons.forEach(el => {
@@ -199,7 +217,7 @@ class LabelInNameScanner {
 
                 // Get the remaining text content
                 let text = clone.textContent || '';
-                
+
                 // For images within buttons, include alt text
                 const images = element.querySelectorAll('img');
                 images.forEach(img => {
@@ -431,11 +449,11 @@ class LabelInNameScanner {
 
             function getVisibleText(element) {
                 const clone = element.cloneNode(true);
-                
+
                 // Remove screen-reader only text
                 const srOnly = clone.querySelectorAll('.sr-only, .visually-hidden, [aria-hidden="true"]');
                 srOnly.forEach(el => el.remove());
-                
+
                 // Remove decorative icons but keep meaningful text
                 const icons = clone.querySelectorAll('[class*="icon"], [class*="fa-"], .material-icons');
                 icons.forEach(el => {
@@ -445,7 +463,7 @@ class LabelInNameScanner {
                 });
 
                 let text = clone.textContent || '';
-                
+
                 // Include alt text from images
                 const images = element.querySelectorAll('img');
                 images.forEach(img => {
@@ -469,7 +487,7 @@ class LabelInNameScanner {
                 if (visibleText.length === 0) continue;
 
                 // Skip links that are just URLs or very generic
-                if (visibleText === 'here' || visibleText === 'click here' || visibleText === 'more' || 
+                if (visibleText === 'here' || visibleText === 'click here' || visibleText === 'more' ||
                     visibleText === 'read more' || visibleText.startsWith('http')) {
                     continue;
                 }
@@ -532,9 +550,9 @@ class LabelInNameScanner {
                 const alt = input.getAttribute('alt') || '';
                 const ariaLabel = input.getAttribute('aria-label') || '';
                 const title = input.getAttribute('title') || '';
-                
+
                 const accessibleName = ariaLabel || alt || title;
-                
+
                 if (alt && accessibleName && !normalizeText(accessibleName).includes(normalizeText(alt))) {
                     violations.push({
                         type: 'image-button-alt-not-in-name',
@@ -568,9 +586,9 @@ class LabelInNameScanner {
                 const imgAlt = img.getAttribute('alt') || '';
                 const buttonText = button.textContent || '';
                 const buttonAriaLabel = button.getAttribute('aria-label') || '';
-                
+
                 const accessibleName = buttonAriaLabel || buttonText;
-                
+
                 if (imgAlt && accessibleName && !normalizeText(accessibleName).includes(normalizeText(imgAlt))) {
                     violations.push({
                         type: 'button-image-alt-not-in-name',

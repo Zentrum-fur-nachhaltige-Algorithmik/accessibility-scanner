@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * EAA Procedure Scanner for EU European Accessibility Act 2025 compliance
  * Tests procedural requirements beyond WCAG technical standards
  * Legal compliance for EU market accessibility obligations
  */
-class EAAProcedureScanner {
+class EAAProcedureScanner extends BaseScanner {
   constructor() {
+    super('eaa-procedure', {
+      wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+      wcagPrinciple: 'robust'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/eaa-procedure-screenshots');
   }
@@ -20,21 +25,53 @@ class EAAProcedureScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * This scanner navigates to sub-pages to find statements, contact info, etc.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
+   */
+  async scan(page, options = {}) {
+    const defaultOptions = {
+      testAccessibilityStatement: true,
+      testContactMechanism: true,
+      testFeedbackProcess: true,
+      testComplianceMonitoring: true,
+      searchDepth: 3,
+      timeout: 60000
+    };
+
+    const scanOptions = { ...defaultOptions, ...options };
+
+    const eaaResults = await this.performEAAProcedureAnalysis(page, null, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["EAA-Statement", "EAA-Contact", "EAA-Feedback", "EAA-Monitoring"],
+      passed: eaaResults.violations.length === 0,
+      violations: eaaResults.violations,
+      summary: {
+        accessibilityStatementPresent: eaaResults.accessibilityStatementPresent,
+        contactMechanismAvailable: eaaResults.contactMechanismAvailable,
+        feedbackProcessImplemented: eaaResults.feedbackProcessImplemented,
+        complianceMonitoringActive: eaaResults.complianceMonitoringActive,
+        euLegalCompliance: eaaResults.euLegalCompliance
+      },
+      visualEvidence: eaaResults.visualEvidence
+    };
+  }
+
+  /**
+   * @deprecated Use scan(page, options) via ScanPipeline instead
    * Scan EAA procedural compliance
    * @param {string} url - URL to scan
    * @param {Object} options - Scanning options
-   * @param {boolean} options.testAccessibilityStatement - Test accessibility statement presence
-   * @param {boolean} options.testContactMechanism - Test contact mechanism for accessibility
-   * @param {boolean} options.testFeedbackProcess - Test feedback process implementation
-   * @param {boolean} options.testComplianceMonitoring - Test compliance monitoring procedures
-   * @param {number} options.searchDepth - Depth of link following for statements
-   * @param {number} options.timeout - Test timeout in milliseconds
    * @returns {Promise<Object>} EAAProcedureReport
    */
   async scanEAAProcedure(url, options = {}) {
@@ -52,7 +89,7 @@ class EAAProcedureScanner {
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
+
       // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
@@ -63,11 +100,11 @@ class EAAProcedureScanner {
       await fs.ensureDir(scanDir);
 
       const eaaResults = await this.performEAAProcedureAnalysis(page, scanDir, scanOptions);
-      
+
       await page.close();
 
-      // Create report according to interface
-      const report = {
+      return {
+        scannerId: this.id,
         criteria: ["EAA-Statement", "EAA-Contact", "EAA-Feedback", "EAA-Monitoring"],
         passed: eaaResults.violations.length === 0,
         violations: eaaResults.violations,
@@ -81,8 +118,6 @@ class EAAProcedureScanner {
         screenshotPath: scanDir,
         visualEvidence: eaaResults.visualEvidence
       };
-
-      return report;
 
     } catch (error) {
       throw new Error(`EAA procedure scan failed: ${error.message}`);
@@ -102,9 +137,11 @@ class EAAProcedureScanner {
 
     console.log('Starting EAA procedural analysis...');
 
-    // Take initial screenshot
-    const initialScreenshot = path.join(scanDir, 'eaa-procedure-analysis.png');
-    await page.screenshot({ path: initialScreenshot, fullPage: true });
+    // Take initial screenshot (only if scanDir provided)
+    if (scanDir) {
+      const initialScreenshot = path.join(scanDir, 'eaa-procedure-analysis.png');
+      await page.screenshot({ path: initialScreenshot, fullPage: true });
+    }
 
     // 1. Test accessibility statement presence and compliance
     if (options.testAccessibilityStatement) {
@@ -131,14 +168,14 @@ class EAAProcedureScanner {
     }
 
     // Calculate overall EU legal compliance
-    const euLegalCompliance = accessibilityStatementPresent && 
-                             contactMechanismAvailable && 
+    const euLegalCompliance = accessibilityStatementPresent &&
+                             contactMechanismAvailable &&
                              feedbackProcessImplemented;
 
     // Generate visual evidence
     visualEvidence.push({
       type: 'eaa-procedure',
-      screenshot: path.basename(initialScreenshot),
+      screenshot: scanDir ? 'eaa-procedure-analysis.png' : null,
       accessibilityStatementPresent: accessibilityStatementPresent,
       contactMechanismAvailable: contactMechanismAvailable,
       feedbackProcessImplemented: feedbackProcessImplemented,
@@ -147,7 +184,7 @@ class EAAProcedureScanner {
     });
 
     console.log(`EAA procedural analysis complete: ${violations.length} violations found`);
-    console.log(`EU Legal Compliance Status: ${euLegalCompliance ? '✅ COMPLIANT' : '❌ NON-COMPLIANT'}`);
+    console.log(`EU Legal Compliance Status: ${euLegalCompliance ? 'COMPLIANT' : 'NON-COMPLIANT'}`);
 
     return {
       violations,
@@ -180,7 +217,7 @@ class EAAProcedureScanner {
       ];
 
       const pageText = document.body.textContent.toLowerCase();
-      const hasAccessibilityContent = accessibilityKeywords.some(keyword => 
+      const hasAccessibilityContent = accessibilityKeywords.some(keyword =>
         pageText.includes(keyword)
       );
 
@@ -188,7 +225,7 @@ class EAAProcedureScanner {
       const statementElements = document.querySelectorAll('section, div, article, main');
       statementElements.forEach(element => {
         const elementText = element.textContent.toLowerCase();
-        const hasStatementKeywords = accessibilityKeywords.some(keyword => 
+        const hasStatementKeywords = accessibilityKeywords.some(keyword =>
           elementText.includes(keyword) && elementText.length > 200
         );
 
@@ -212,8 +249,8 @@ class EAAProcedureScanner {
       links.forEach(link => {
         const linkText = link.textContent.toLowerCase();
         const href = link.getAttribute('href');
-        
-        const isAccessibilityLink = accessibilityKeywords.some(keyword => 
+
+        const isAccessibilityLink = accessibilityKeywords.some(keyword =>
           linkText.includes(keyword) || href.toLowerCase().includes('accessibility')
         );
 
@@ -244,7 +281,7 @@ class EAAProcedureScanner {
     if (!present && options.searchDepth > 0) {
       try {
         console.log('Searching linked pages for accessibility statement...');
-        
+
         const linkedPageResults = await page.evaluate(async () => {
           const links = document.querySelectorAll('a[href]');
           const accessibilityLinks = [];
@@ -252,11 +289,11 @@ class EAAProcedureScanner {
           for (const link of links) {
             const linkText = link.textContent.toLowerCase();
             const href = link.getAttribute('href');
-            
-            if ((linkText.includes('accessibility') || 
+
+            if ((linkText.includes('accessibility') ||
                  linkText.includes('statement') ||
                  href.toLowerCase().includes('accessibility')) &&
-                !href.startsWith('mailto:') && 
+                !href.startsWith('mailto:') &&
                 !href.startsWith('tel:')) {
               accessibilityLinks.push({
                 text: linkText.trim(),
@@ -273,18 +310,20 @@ class EAAProcedureScanner {
           try {
             if (statementLink.href.startsWith('/') || statementLink.href.startsWith(page.url())) {
               const newPage = await this.browser.newPage();
-              const fullUrl = statementLink.href.startsWith('/') ? 
+              const fullUrl = statementLink.href.startsWith('/') ?
                 new URL(statementLink.href, page.url()).href : statementLink.href;
-              
+
               await newPage.goto(fullUrl, { waitUntil: 'networkidle0', timeout: 10000 });
-              
-              // Take screenshot of accessibility statement
-              const statementScreenshot = path.join(scanDir, 'accessibility-statement.png');
-              await newPage.screenshot({ path: statementScreenshot, fullPage: true });
+
+              // Take screenshot of accessibility statement (only if scanDir provided)
+              if (scanDir) {
+                const statementScreenshot = path.join(scanDir, 'accessibility-statement.png');
+                await newPage.screenshot({ path: statementScreenshot, fullPage: true });
+              }
 
               const statementPageAnalysis = await newPage.evaluate(() => {
                 const pageText = document.body.textContent.toLowerCase();
-                
+
                 return {
                   hasWCAG: pageText.includes('wcag') || pageText.includes('web content accessibility'),
                   hasContactInfo: pageText.includes('contact') && pageText.includes('@'),
@@ -297,7 +336,7 @@ class EAAProcedureScanner {
 
               if (statementPageAnalysis.contentLength > 500) {
                 present = true;
-                
+
                 // Validate statement quality
                 if (!statementPageAnalysis.hasWCAG) {
                   violations.push({
@@ -395,7 +434,7 @@ class EAAProcedureScanner {
       const forms = document.querySelectorAll('form');
       forms.forEach(form => {
         const formText = form.textContent.toLowerCase();
-        if (formText.includes('contact') || formText.includes('feedback') || 
+        if (formText.includes('contact') || formText.includes('feedback') ||
             formText.includes('support') || formText.includes('help')) {
           contactMethods.form = true;
           available = true;
@@ -421,8 +460,8 @@ class EAAProcedureScanner {
 
       // Look for accessibility-specific contact information
       const pageText = document.body.textContent.toLowerCase();
-      const hasAccessibilityContact = pageText.includes('accessibility') && 
-                                     (pageText.includes('contact') || pageText.includes('email') || 
+      const hasAccessibilityContact = pageText.includes('accessibility') &&
+                                     (pageText.includes('contact') || pageText.includes('email') ||
                                       pageText.includes('feedback'));
 
       return { issues, available, contactMethods, hasAccessibilityContact };
@@ -489,7 +528,7 @@ class EAAProcedureScanner {
       const forms = document.querySelectorAll('form');
       forms.forEach(form => {
         const formText = form.textContent.toLowerCase();
-        if (formText.includes('feedback') || formText.includes('report') || 
+        if (formText.includes('feedback') || formText.includes('report') ||
             formText.includes('issue') || formText.includes('problem')) {
           feedbackFeatures.feedbackForm = true;
           implemented = true;
@@ -500,7 +539,7 @@ class EAAProcedureScanner {
       const reportElements = document.querySelectorAll('a, button');
       reportElements.forEach(element => {
         const text = element.textContent.toLowerCase();
-        if (text.includes('report') && (text.includes('issue') || text.includes('problem') || 
+        if (text.includes('report') && (text.includes('issue') || text.includes('problem') ||
             text.includes('bug') || text.includes('accessibility'))) {
           feedbackFeatures.reportIssue = true;
           implemented = true;
@@ -515,7 +554,7 @@ class EAAProcedureScanner {
       }
 
       // Look for response commitment
-      if (pageText.includes('respond') || pageText.includes('reply') || 
+      if (pageText.includes('respond') || pageText.includes('reply') ||
           pageText.includes('within') || pageText.includes('business days')) {
         feedbackFeatures.responseCommitment = true;
       }
@@ -588,33 +627,33 @@ class EAAProcedureScanner {
       const pageText = document.body.textContent.toLowerCase();
 
       // Look for compliance monitoring statements
-      if (pageText.includes('compliance') && (pageText.includes('monitor') || 
+      if (pageText.includes('compliance') && (pageText.includes('monitor') ||
           pageText.includes('review') || pageText.includes('audit'))) {
         monitoringFeatures.complianceStatement = true;
         active = true;
       }
 
       // Look for audit information
-      if (pageText.includes('audit') || pageText.includes('assessment') || 
+      if (pageText.includes('audit') || pageText.includes('assessment') ||
           pageText.includes('evaluation')) {
         monitoringFeatures.auditInformation = true;
         active = true;
       }
 
       // Look for update schedule
-      if (pageText.includes('schedule') || pageText.includes('regular') || 
+      if (pageText.includes('schedule') || pageText.includes('regular') ||
           pageText.includes('annually') || pageText.includes('quarterly')) {
         monitoringFeatures.updateSchedule = true;
       }
 
       // Look for improvement plan
-      if (pageText.includes('improvement') || pageText.includes('roadmap') || 
+      if (pageText.includes('improvement') || pageText.includes('roadmap') ||
           pageText.includes('plan') || pageText.includes('enhance')) {
         monitoringFeatures.improvementPlan = true;
       }
 
       // Look for public reporting
-      if (pageText.includes('public') && (pageText.includes('report') || 
+      if (pageText.includes('public') && (pageText.includes('report') ||
           pageText.includes('transparency') || pageText.includes('progress'))) {
         monitoringFeatures.publicReporting = true;
       }
@@ -659,6 +698,10 @@ class EAAProcedureScanner {
     }
 
     return { active: monitoringAnalysis.active };
+  }
+
+  get needsExclusiveAccess() {
+    return true;
   }
 
   async close() {

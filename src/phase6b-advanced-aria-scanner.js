@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Phase 6B: Advanced ARIA Complex Widgets Scanner
@@ -8,8 +9,12 @@ const path = require('path');
  * Focuses on advanced ARIA patterns: trees, grids, combo boxes, carousels, tabs
  * Essential for single-page applications and modern web components
  */
-class AdvancedAriaScanner {
+class AdvancedAriaScanner extends BaseScanner {
     constructor() {
+        super('advanced-aria', {
+            wcagCriteria: ['4.1.2', '1.3.1'],
+            wcagPrinciple: 'robust'
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/advanced-aria-screenshots');
     }
@@ -25,6 +30,103 @@ class AdvancedAriaScanner {
     }
 
     /**
+     * Core scan method. Receives an already-navigated Puppeteer page.
+     * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+     * @param {Object} options - Scanning options
+     * @returns {Promise<Object>} ScanResult
+     */
+    async scan(page, options = {}) {
+        const defaultOptions = {
+            checkTreeViews: true,
+            checkDataGrids: true,
+            checkComboboxes: true,
+            checkCarousels: true,
+            checkTabPanels: true,
+            checkAccordions: true,
+            checkMenubars: true,
+            checkDialogs: true,
+            checkLiveRegions: true,
+            validateKeyboardInteraction: true,
+            checkAriaStates: true,
+            timeout: 60000
+        };
+
+        const scanOptions = { ...defaultOptions, ...options };
+
+        const violations = [];
+
+        // Analyze different widget types
+        if (scanOptions.checkTreeViews) {
+            const treeViolations = await this.analyzeTreeViews(page, scanOptions);
+            violations.push(...treeViolations);
+        }
+
+        if (scanOptions.checkDataGrids) {
+            const gridViolations = await this.analyzeDataGrids(page, scanOptions);
+            violations.push(...gridViolations);
+        }
+
+        if (scanOptions.checkComboboxes) {
+            const comboViolations = await this.analyzeComboboxes(page, scanOptions);
+            violations.push(...comboViolations);
+        }
+
+        if (scanOptions.checkCarousels) {
+            const carouselViolations = await this.analyzeCarousels(page, scanOptions);
+            violations.push(...carouselViolations);
+        }
+
+        if (scanOptions.checkTabPanels) {
+            const tabViolations = await this.analyzeTabPanels(page, scanOptions);
+            violations.push(...tabViolations);
+        }
+
+        if (scanOptions.checkAccordions) {
+            const accordionViolations = await this.analyzeAccordions(page, scanOptions);
+            violations.push(...accordionViolations);
+        }
+
+        if (scanOptions.checkMenubars) {
+            const menuViolations = await this.analyzeMenubars(page, scanOptions);
+            violations.push(...menuViolations);
+        }
+
+        if (scanOptions.checkDialogs) {
+            const dialogViolations = await this.analyzeDialogs(page, scanOptions);
+            violations.push(...dialogViolations);
+        }
+
+        if (scanOptions.checkLiveRegions) {
+            const liveRegionViolations = await this.analyzeLiveRegions(page, scanOptions);
+            violations.push(...liveRegionViolations);
+        }
+
+        return {
+            scannerId: this.id,
+            criteria: ["4.1.2"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalWidgetsChecked: violations.length + this.getPassedWidgetsCount(violations),
+                treeViewIssues: violations.filter(v => v.category === 'tree-view').length,
+                dataGridIssues: violations.filter(v => v.category === 'data-grid').length,
+                comboboxIssues: violations.filter(v => v.category === 'combobox').length,
+                carouselIssues: violations.filter(v => v.category === 'carousel').length,
+                tabPanelIssues: violations.filter(v => v.category === 'tab-panel').length,
+                accordionIssues: violations.filter(v => v.category === 'accordion').length,
+                menubarIssues: violations.filter(v => v.category === 'menubar').length,
+                dialogIssues: violations.filter(v => v.category === 'dialog').length,
+                liveRegionIssues: violations.filter(v => v.category === 'live-region').length,
+                ariaStateErrors: violations.filter(v => v.type === 'aria-state-error').length,
+                keyboardAccessibilityIssues: violations.filter(v => v.type === 'keyboard-inaccessible').length
+            },
+            recommendations: this.generateAdvancedAriaRecommendations(violations),
+            widgetPatterns: this.generateWidgetPatternGuidance(violations)
+        };
+    }
+
+    /**
+     * @deprecated Use scan(page, options) via ScanPipeline instead
      * Scan advanced ARIA widget compliance (WCAG 4.1.2)
      * @param {string} url - URL to scan
      * @param {Object} options - Scanning options
@@ -60,85 +162,18 @@ class AdvancedAriaScanner {
 
             // Take screenshot for analysis
             const screenshotPath = path.join(scanDir, 'advanced-aria-analysis.png');
-            await page.screenshot({ 
-                path: screenshotPath, 
-                fullPage: true 
+            await page.screenshot({
+                path: screenshotPath,
+                fullPage: true
             });
 
-            const violations = [];
-            
-            // Analyze different widget types
-            if (scanOptions.checkTreeViews) {
-                const treeViolations = await this.analyzeTreeViews(page, scanOptions);
-                violations.push(...treeViolations);
+            try {
+                const result = await this.scan(page, options);
+                result.screenshotPath = screenshotPath;
+                return result;
+            } finally {
+                await page.close();
             }
-
-            if (scanOptions.checkDataGrids) {
-                const gridViolations = await this.analyzeDataGrids(page, scanOptions);
-                violations.push(...gridViolations);
-            }
-
-            if (scanOptions.checkComboboxes) {
-                const comboViolations = await this.analyzeComboboxes(page, scanOptions);
-                violations.push(...comboViolations);
-            }
-
-            if (scanOptions.checkCarousels) {
-                const carouselViolations = await this.analyzeCarousels(page, scanOptions);
-                violations.push(...carouselViolations);
-            }
-
-            if (scanOptions.checkTabPanels) {
-                const tabViolations = await this.analyzeTabPanels(page, scanOptions);
-                violations.push(...tabViolations);
-            }
-
-            if (scanOptions.checkAccordions) {
-                const accordionViolations = await this.analyzeAccordions(page, scanOptions);
-                violations.push(...accordionViolations);
-            }
-
-            if (scanOptions.checkMenubars) {
-                const menuViolations = await this.analyzeMenubars(page, scanOptions);
-                violations.push(...menuViolations);
-            }
-
-            if (scanOptions.checkDialogs) {
-                const dialogViolations = await this.analyzeDialogs(page, scanOptions);
-                violations.push(...dialogViolations);
-            }
-
-            if (scanOptions.checkLiveRegions) {
-                const liveRegionViolations = await this.analyzeLiveRegions(page, scanOptions);
-                violations.push(...liveRegionViolations);
-            }
-
-            await page.close();
-
-            const report = {
-                criteria: ["4.1.2"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalWidgetsChecked: violations.length + this.getPassedWidgetsCount(violations),
-                    treeViewIssues: violations.filter(v => v.category === 'tree-view').length,
-                    dataGridIssues: violations.filter(v => v.category === 'data-grid').length,
-                    comboboxIssues: violations.filter(v => v.category === 'combobox').length,
-                    carouselIssues: violations.filter(v => v.category === 'carousel').length,
-                    tabPanelIssues: violations.filter(v => v.category === 'tab-panel').length,
-                    accordionIssues: violations.filter(v => v.category === 'accordion').length,
-                    menubarIssues: violations.filter(v => v.category === 'menubar').length,
-                    dialogIssues: violations.filter(v => v.category === 'dialog').length,
-                    liveRegionIssues: violations.filter(v => v.category === 'live-region').length,
-                    ariaStateErrors: violations.filter(v => v.type === 'aria-state-error').length,
-                    keyboardAccessibilityIssues: violations.filter(v => v.type === 'keyboard-inaccessible').length
-                },
-                screenshotPath: screenshotPath,
-                recommendations: this.generateAdvancedAriaRecommendations(violations),
-                widgetPatterns: this.generateWidgetPatternGuidance(violations)
-            };
-
-            return report;
 
         } catch (error) {
             throw new Error(`Advanced ARIA scan failed: ${error.message}`);
@@ -155,15 +190,15 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find tree widgets
             const trees = document.querySelectorAll('[role="tree"]');
-            
+
             for (let i = 0; i < trees.length; i++) {
                 const tree = trees[i];
                 const treeSelector = getElementSelector(tree);
@@ -237,7 +272,7 @@ class AdvancedAriaScanner {
                     }
 
                     // Check selected state
-                    if (item.hasAttribute('aria-selected') && 
+                    if (item.hasAttribute('aria-selected') &&
                         !['true', 'false'].includes(item.getAttribute('aria-selected'))) {
                         violations.push({
                             type: 'invalid-aria-selected',
@@ -292,15 +327,15 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find grid widgets
             const grids = document.querySelectorAll('[role="grid"]');
-            
+
             for (let i = 0; i < grids.length; i++) {
                 const grid = grids[i];
                 const gridSelector = getElementSelector(grid);
@@ -329,7 +364,7 @@ class AdvancedAriaScanner {
                     const row = rows[j];
                     const rowHeaders = row.querySelectorAll('[role="rowheader"]');
                     const gridCells = row.querySelectorAll('[role="gridcell"]');
-                    
+
                     if (gridCells.length > 0 && rowHeaders.length === 0 && j > 0) { // Skip header row
                         violations.push({
                             type: 'missing-row-headers',
@@ -409,15 +444,15 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find combobox widgets
             const comboboxes = document.querySelectorAll('[role="combobox"]');
-            
+
             for (let i = 0; i < comboboxes.length; i++) {
                 const combobox = comboboxes[i];
                 const comboboxSelector = getElementSelector(combobox);
@@ -530,8 +565,8 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
@@ -541,7 +576,7 @@ class AdvancedAriaScanner {
                 '[role="region"][aria-label*="carousel"], [role="region"][aria-label*="slider"], ' +
                 '.carousel, .slider, .swiper, [class*="carousel"], [class*="slider"], [class*="swiper"]'
             );
-            
+
             for (let i = 0; i < carousels.length; i++) {
                 const carousel = carousels[i];
                 const carouselSelector = getElementSelector(carousel);
@@ -568,7 +603,7 @@ class AdvancedAriaScanner {
                 const hasAutoRotate = carousel.querySelector('[data-autoplay], [data-auto]') ||
                                     carousel.className.includes('auto') ||
                                     carousel.hasAttribute('data-interval');
-                
+
                 if (hasAutoRotate && !carousel.hasAttribute('aria-live')) {
                     violations.push({
                         type: 'missing-carousel-live-region',
@@ -589,7 +624,7 @@ class AdvancedAriaScanner {
                 // Check carousel controls
                 const prevButton = carousel.querySelector('[aria-label*="previous"], [aria-label*="prev"], .prev, .previous');
                 const nextButton = carousel.querySelector('[aria-label*="next"], .next');
-                
+
                 if (prevButton && !prevButton.hasAttribute('aria-label')) {
                     violations.push({
                         type: 'carousel-control-unlabeled',
@@ -627,7 +662,7 @@ class AdvancedAriaScanner {
                 // Check slide indicators
                 const indicators = carousel.querySelectorAll('.indicator, .dot, [role="button"][aria-label*="slide"]');
                 indicators.forEach((indicator, k) => {
-                    if (!indicator.hasAttribute('aria-label') && 
+                    if (!indicator.hasAttribute('aria-label') &&
                         (!indicator.textContent || indicator.textContent.trim().length === 0)) {
                         violations.push({
                             type: 'carousel-indicator-unlabeled',
@@ -662,22 +697,22 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find tab lists
             const tabLists = document.querySelectorAll('[role="tablist"]');
-            
+
             for (let i = 0; i < tabLists.length; i++) {
                 const tabList = tabLists[i];
                 const tabListSelector = getElementSelector(tabList);
 
                 // Check tabs within tablist
                 const tabs = tabList.querySelectorAll('[role="tab"]');
-                
+
                 if (tabs.length === 0) {
                     violations.push({
                         type: 'tablist-without-tabs',
@@ -822,8 +857,8 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
@@ -833,7 +868,7 @@ class AdvancedAriaScanner {
                 '[aria-expanded], .accordion-header button, .accordion-toggle, ' +
                 '[class*="accordion"] button, [role="button"][aria-controls]'
             );
-            
+
             accordionButtons.forEach((button, i) => {
                 const buttonSelector = getElementSelector(button);
 
@@ -930,15 +965,15 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find menubar widgets
             const menubars = document.querySelectorAll('[role="menubar"]');
-            
+
             menubars.forEach((menubar, i) => {
                 const menubarSelector = getElementSelector(menubar);
 
@@ -967,9 +1002,9 @@ class AdvancedAriaScanner {
                     const itemSelector = getElementSelector(item);
 
                     // Check if item has submenu
-                    const hasSubMenu = item.hasAttribute('aria-haspopup') || 
+                    const hasSubMenu = item.hasAttribute('aria-haspopup') ||
                                      item.getAttribute('aria-expanded') !== null;
-                    
+
                     if (hasSubMenu && !item.hasAttribute('aria-expanded')) {
                         violations.push({
                             type: 'submenu-missing-expanded',
@@ -1005,15 +1040,15 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find dialog widgets
             const dialogs = document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog');
-            
+
             dialogs.forEach((dialog, i) => {
                 const dialogSelector = getElementSelector(dialog);
 
@@ -1093,15 +1128,15 @@ class AdvancedAriaScanner {
             function getElementSelector(element) {
                 const tagName = element.tagName.toLowerCase();
                 const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
+                const className = element.className && typeof element.className === 'string'
+                    ? `.${element.className.split(' ')[0]}`
                     : '';
                 return `${tagName}${id}${className}`;
             }
 
             // Find live regions
             const liveRegions = document.querySelectorAll('[aria-live], [role="status"], [role="alert"], [role="log"]');
-            
+
             liveRegions.forEach((region, i) => {
                 const regionSelector = getElementSelector(region);
 
@@ -1222,7 +1257,7 @@ class AdvancedAriaScanner {
 
         categories.forEach(category => {
             const categoryViolations = violations.filter(v => v.category === category);
-            
+
             patterns[category] = {
                 issuesFound: categoryViolations.length,
                 commonProblems: [...new Set(categoryViolations.map(v => v.type))],

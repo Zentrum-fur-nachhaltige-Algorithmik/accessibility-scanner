@@ -144,9 +144,9 @@ class ReportGenerator {
             .violation-item.moderate { background: #fffaf0; border-left-color: #dd6b20; }
             .violation-item.minor { background: #f7fafc; border-left-color: #4299e1; }
             .impact-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-            .impact-critical { background: #fed7d7; color: #742a2a; }
-            .impact-serious { background: #fed7d7; color: #742a2a; }
-            .impact-moderate { background: #feebc8; color: #744210; }
+            .impact-critical, .impact-error { background: #fed7d7; color: #742a2a; }
+            .impact-serious, .impact-major { background: #fbd38d; color: #744210; }
+            .impact-moderate, .impact-warning { background: #feebc8; color: #744210; }
             .impact-minor { background: #bee3f8; color: #2a4365; }
             .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 2rem 0; }
             .stat-item { text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 6px; }
@@ -299,13 +299,19 @@ class ReportGenerator {
     `;
     
     data.violations.forEach(violation => {
+      const title = violation.type || violation.id || violation.description || 'Unknown violation';
+      const severity = violation.severity || violation.impact || 'moderate';
+      const severityClass = severity.replace(/\s+/g, '-').toLowerCase();
       violationsHtml += `
-      <div class="violation-item ${violation.impact}">
+      <div class="violation-item ${severityClass}">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <h4>${violation.id}</h4>
-              <span class="impact-badge impact-${violation.impact}">${violation.impact}</span>
+              <h4>${title}</h4>
+              <span class="impact-badge impact-${severityClass}">${severity}</span>
           </div>
-          <p>${violation.description}</p>
+          <p>${violation.description || ''}</p>
+          ${violation.element ? `<p><strong>Element:</strong> <code>${violation.element}</code></p>` : ''}
+          ${violation.wcagCriteria ? `<p><strong>WCAG:</strong> ${violation.wcagCriteria}</p>` : ''}
+          ${violation.recommendation ? `<p><strong>Fix:</strong> ${violation.recommendation}</p>` : ''}
           ${violation.nodes && violation.nodes.length ? `<p><strong>Affected elements:</strong> ${violation.nodes.join(', ')}</p>` : ''}
           ${violation.helpUrl ? `<p><a href="${violation.helpUrl}" target="_blank">Learn more about this issue</a></p>` : ''}
       </div>

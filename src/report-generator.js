@@ -5,28 +5,21 @@ const htmlPdf = require('html-pdf-node');
 
 const DEFAULT_ORG_NAME = 'Zentrum f\u00fcr nachhaltige Algorithmik und Intelligenzforschung e.V.';
 
-// Map WCAG criterion numbers to principles
 function classifyWcagPrinciple(violation) {
   const criterion = violation.criterion || violation.wcagCriteria || violation.clause || '';
   const str = String(criterion);
-
-  // EU/EAA-specific violations
   if (str.startsWith('EAA-')) return 'eaa';
-
-  // EN 301 549 mapping: 9.1.x = Perceivable, 9.2.x = Operable, 9.3.x = Understandable, 9.4.x = Robust
   const match = str.match(/^(?:9\.)?([1-4])\./);
   if (match) {
-    const principle = parseInt(match[1], 10);
-    if (principle === 1) return 'perceivable';
-    if (principle === 2) return 'operable';
-    if (principle === 3) return 'understandable';
-    if (principle === 4) return 'robust';
+    const p = parseInt(match[1], 10);
+    if (p === 1) return 'perceivable';
+    if (p === 2) return 'operable';
+    if (p === 3) return 'understandable';
+    if (p === 4) return 'robust';
   }
-
   return 'other';
 }
 
-// Normalize severity values to a consistent set
 function normalizeSeverity(violation) {
   const raw = (violation.severity || violation.impact || 'moderate').toLowerCase();
   if (raw === 'critical' || raw === 'error') return 'critical';
@@ -37,13 +30,13 @@ function normalizeSeverity(violation) {
 }
 
 const SEVERITY_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3 };
+const SEVERITY_LABELS = { critical: 'Critical', serious: 'Serious', moderate: 'Moderate', minor: 'Minor' };
 
-const SEVERITY_LABELS = {
-  critical: 'Critical',
-  serious: 'Serious',
-  moderate: 'Moderate',
-  minor: 'Minor',
-};
+function formatDocNumber(id) {
+  const short = id.split('-')[0].toUpperCase();
+  const now = new Date();
+  return `ACC-${now.getFullYear()}-${short}`;
+}
 
 class ReportGenerator {
   constructor() {
@@ -72,6 +65,7 @@ class ReportGenerator {
       orgName: options.orgName || DEFAULT_ORG_NAME,
       orgLogo: options.orgLogo || null,
       orgContact: options.orgContact || null,
+      docNumber: formatDocNumber(reportId),
       metadata: {
         generatedBy: 'Web Accessibility Checker v3.0',
         format: options.format || 'html',
@@ -92,14 +86,7 @@ class ReportGenerator {
       const metadataPath = path.join(this.reportsDir, `${reportId}.json`);
       await fs.writeFile(metadataPath, JSON.stringify(reportData, null, 2));
 
-      return {
-        reportId,
-        htmlPath,
-        pdfPath,
-        reportUrl: `/api/report/${reportId}`,
-        pdfUrl: pdfPath ? `/api/report/${reportId}/pdf` : null,
-        timestamp,
-      };
+      return { reportId, htmlPath, pdfPath, reportUrl: `/api/report/${reportId}`, pdfUrl: pdfPath ? `/api/report/${reportId}/pdf` : null, timestamp };
     } catch (error) {
       console.error('Error generating report:', error);
       throw new Error(`Failed to generate report: ${error.message}`);
@@ -113,15 +100,9 @@ class ReportGenerator {
 
   async generatePDFReport(reportData, htmlContent) {
     try {
-      const options = {
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '20mm', bottom: '20mm', left: '18mm', right: '18mm' },
-      };
-
+      const options = { format: 'A4', printBackground: true, margin: { top: '20mm', bottom: '25mm', left: '18mm', right: '18mm' } };
       const file = { content: htmlContent };
       const pdfBuffer = await htmlPdf.generatePdf(file, options);
-
       const pdfPath = path.join(this.reportsDir, `${reportData.id}.pdf`);
       await fs.writeFile(pdfPath, pdfBuffer);
       return pdfPath;
@@ -133,17 +114,14 @@ class ReportGenerator {
 
   async getHTMLTemplate(reportData) {
     let templateName = 'basic-report.html';
-    if (reportData.headingStructure && reportData.euCompliance) {
-      templateName = 'screen-reader-report.html';
-    } else if (reportData.categories && reportData.wcagCompliance) {
-      templateName = 'enhanced-report.html';
-    }
+    if (reportData.headingStructure && reportData.euCompliance) templateName = 'screen-reader-report.html';
+    else if (reportData.categories && reportData.wcagCompliance) templateName = 'enhanced-report.html';
 
     const templatePath = path.join(this.templatesDir, templateName);
     try {
       return await fs.readFile(templatePath, 'utf8');
     } catch (error) {
-      return this.createDefaultTemplate(reportData);
+      return this.createDefaultTemplate();
     }
   }
 
@@ -153,269 +131,283 @@ class ReportGenerator {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accessibility Audit Report - {{pageTitle}}</title>
+<title>{{docNumber}} — Accessibility Audit Report</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
-    font-size: 13.5px;
-    line-height: 1.7;
-    color: #1a1a1a;
+    font-family: 'Source Sans Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.55;
+    color: #2b2b2b;
     background: #fff;
-    max-width: 900px;
+    max-width: 210mm;
     margin: 0 auto;
-    padding: 40px 48px;
+    padding: 32px 40px 60px;
   }
 
+  /* --- Typography hierarchy through weight and size only --- */
   h1, h2, h3, h4 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-weight: normal;
-    color: #222;
+    font-family: 'Source Sans Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: #1b2a4a;
+    letter-spacing: -0.01em;
   }
+  h1 { font-size: 15pt; font-weight: 700; margin: 0 0 2px; }
+  h2 { font-size: 12pt; font-weight: 700; margin: 28px 0 10px; padding-bottom: 4px; border-bottom: 1.5px solid #1b2a4a; }
+  h3 { font-size: 10.5pt; font-weight: 600; margin: 20px 0 6px; }
+  h4 { font-size: 10pt; font-weight: 600; margin: 14px 0 4px; }
 
-  h1 { font-size: 1.6rem; margin-bottom: 0.25em; }
-  h2 { font-size: 1.25rem; margin: 2em 0 0.75em; padding-bottom: 0.3em; border-bottom: 2px solid #222; }
-  h3 { font-size: 1.05rem; margin: 1.5em 0 0.5em; }
-  h4 { font-size: 0.95rem; margin: 1em 0 0.4em; }
+  p { margin: 0 0 8px; }
+  a { color: #1b2a4a; }
 
-  p { margin-bottom: 0.6em; }
-  a { color: #2a5db0; }
-
-  /* Report header */
-  .report-header {
-    border-bottom: 3px solid #222;
-    padding-bottom: 20px;
-    margin-bottom: 24px;
+  /* --- Document header (letterhead) --- */
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #1b2a4a;
+    padding-bottom: 14px;
+    margin-bottom: 6px;
   }
-  .report-header .org-name {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 0.85rem;
+  .doc-header-left { flex: 1; padding-right: 24px; }
+  .doc-header-right {
+    text-align: left;
+    font-size: 8pt;
     color: #555;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 12px;
+    line-height: 1.6;
+    min-width: 170px;
+    padding-left: 16px;
+    border-left: 0.5px solid #ccc;
   }
-  .report-header .org-logo {
-    max-height: 48px;
+  .org-name {
+    font-size: 8.5pt;
+    font-weight: 600;
+    color: #1b2a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
     margin-bottom: 8px;
   }
-  .report-header h1 {
-    margin-bottom: 12px;
-  }
-  .report-meta {
-    font-size: 0.85rem;
-    color: #444;
-    line-height: 1.9;
-  }
-  .report-meta dt {
-    display: inline;
-    font-weight: 600;
-    color: #222;
-  }
-  .report-meta dt::after { content: ': '; }
-  .report-meta dd {
-    display: inline;
-    margin: 0;
-  }
-  .report-meta dd::after {
-    content: '';
+  .org-logo {
+    max-height: 32px;
+    margin-bottom: 6px;
     display: block;
   }
-
-  /* Table of contents */
-  .toc {
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    padding: 16px 24px;
-    margin: 24px 0 32px;
+  .doc-subtitle {
+    font-size: 9pt;
+    color: #555;
+    margin-top: 3px;
   }
-  .toc h2 {
-    font-size: 1rem;
-    margin: 0 0 8px;
-    padding: 0;
-    border: none;
+  .doc-meta-line {
+    margin: 0 0 1px;
+    font-size: 8pt;
+    color: #555;
+  }
+  .doc-meta-line.doc-id {
+    font-size: 8.5pt;
+    color: #1b2a4a;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  /* Classification strip */
+  .doc-classification {
+    text-align: center;
+    font-size: 7.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #888;
+    border-bottom: 0.5px solid #ccc;
+    padding: 4px 0;
+    margin-bottom: 20px;
+  }
+
+  /* --- Table of contents --- */
+  .toc {
+    border: 0.5px solid #999;
+    padding: 12px 18px;
+    margin: 16px 0 24px;
+    background: none;
+  }
+  .toc-title {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #1b2a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 6px;
   }
   .toc ol {
     margin: 0;
-    padding-left: 1.5em;
-    font-size: 0.9rem;
-    line-height: 2;
+    padding-left: 1.4em;
+    font-size: 9pt;
+    line-height: 1.9;
   }
-  .toc ol ol {
-    margin-top: 0;
-    line-height: 1.8;
-  }
-  .toc a {
-    text-decoration: none;
-    color: #1a1a1a;
-  }
+  .toc ol ol { margin-top: 0; line-height: 1.7; list-style: none; padding-left: 1.6em; }
+  .toc a { text-decoration: none; color: #2b2b2b; }
   .toc a:hover { text-decoration: underline; }
 
-  /* Score display */
-  .score-display {
-    display: inline-block;
-    font-size: 2.4rem;
-    font-weight: 700;
-    font-family: Georgia, 'Times New Roman', serif;
-    margin: 8px 0;
+  /* --- Score info box (not a hero) --- */
+  .score-box {
+    border: 0.5px solid #999;
+    padding: 10px 14px;
+    margin: 12px 0 16px;
+    display: table;
+    width: 100%;
   }
-  .score-label {
-    font-size: 0.85rem;
+  .score-box-row {
+    display: table-row;
+  }
+  .score-box-label {
+    display: table-cell;
+    font-size: 9pt;
     color: #555;
+    padding: 3px 12px 3px 0;
+    white-space: nowrap;
+    vertical-align: middle;
   }
-  .score-excellent { color: #1a7a2e; }
-  .score-good { color: #2a7a6e; }
-  .score-fair { color: #8a6d00; }
-  .score-poor { color: #b32d2d; }
+  .score-box-value {
+    display: table-cell;
+    font-size: 9pt;
+    font-weight: 700;
+    color: #1b2a4a;
+    padding: 3px 0;
+    vertical-align: middle;
+  }
 
-  /* Tables */
+  /* --- Tables --- */
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: 12px 0 20px;
-    font-size: 0.88rem;
+    margin: 8px 0 14px;
+    font-size: 9pt;
   }
-  th {
-    background: #f0f0f0;
+  th, td {
+    border: 0.5px solid #999;
+    padding: 5px 8px;
     text-align: left;
-    padding: 8px 10px;
-    border-bottom: 2px solid #333;
-    font-weight: 600;
-    font-size: 0.82rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: #333;
-  }
-  td {
-    padding: 7px 10px;
-    border-bottom: 1px solid #ddd;
     vertical-align: top;
   }
-  tr:nth-child(even) { background: #fafafa; }
-
-  /* Severity indicators */
-  .severity {
+  th {
+    background: #e8ecf2;
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: 8pt;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    color: #1b2a4a;
   }
-  .severity-critical { color: #b32d2d; }
-  .severity-serious { color: #c06a00; }
-  .severity-moderate { color: #7a6a00; }
-  .severity-minor { color: #2a6a9e; }
+  tr:nth-child(even) td { background: #f6f7f9; }
 
-  /* Summary severity distribution */
-  .severity-bar {
-    display: flex;
-    height: 8px;
-    border-radius: 2px;
-    overflow: hidden;
-    margin: 8px 0 16px;
-    background: #eee;
-  }
-  .severity-bar span {
-    display: block;
-    height: 100%;
-  }
-  .bar-critical { background: #b32d2d; }
-  .bar-serious { background: #d4840a; }
-  .bar-moderate { background: #c4a800; }
-  .bar-minor { background: #4a90c4; }
+  /* --- Severity: monochrome labels, row tint for emphasis --- */
+  .sev { font-weight: 600; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.03em; color: #2b2b2b; }
+  tr.row-critical td { border-left: 3px solid #7a2e2e; }
+  tr.row-serious td  { border-left: 3px solid #6b4a1a; }
+  tr.row-moderate td { border-left: 3px solid #8a8a5a; }
+  tr.row-minor td    { border-left: 3px solid #7a8a9a; }
+  tr.row-critical td:first-child, tr.row-serious td:first-child,
+  tr.row-moderate td:first-child, tr.row-minor td:first-child { border-left-width: 3px; }
+  tr.row-critical td:not(:first-child), tr.row-serious td:not(:first-child),
+  tr.row-moderate td:not(:first-child), tr.row-minor td:not(:first-child) { border-left: 0.5px solid #999; }
 
-  /* Element code */
+  /* --- Code elements --- */
   code {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 0.82rem;
-    background: #f3f3f3;
-    padding: 1px 5px;
-    border-radius: 2px;
-    color: #333;
-    word-break: break-all;
+    font-family: 'Consolas', 'SF Mono', 'Monaco', monospace;
+    font-size: 8pt;
+    background: #eef0f3;
+    padding: 1px 4px;
+    color: #2b2b2b;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
-  /* Section numbering */
-  .section-num {
-    font-family: Georgia, 'Times New Roman', serif;
-    color: #555;
-    margin-right: 0.4em;
+  /* --- Section numbering --- */
+  .sn {
+    color: #888;
+    margin-right: 0.3em;
+    font-weight: 400;
   }
 
-  /* Footer */
-  .report-footer {
-    margin-top: 48px;
-    padding-top: 16px;
-    border-top: 1px solid #ccc;
-    font-size: 0.8rem;
+  /* --- Table footnotes --- */
+  .table-note {
+    font-size: 7.5pt;
     color: #666;
-    line-height: 1.8;
+    margin: -8px 0 14px;
+    line-height: 1.5;
   }
 
-  /* Methodology scanner list */
-  .scanner-list {
-    column-count: 2;
-    column-gap: 2em;
-    font-size: 0.88rem;
-    margin: 8px 0 16px;
-    padding-left: 1.5em;
+  /* (reserved) */
+
+  /* --- Running footer --- */
+  .doc-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 40px;
+    font-size: 7pt;
+    color: #888;
+    border-top: 0.5px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    background: #fff;
   }
 
-  /* Print styles */
+  /* --- Print --- */
   @media print {
-    body {
-      padding: 0;
-      font-size: 11pt;
-      max-width: none;
-    }
+    body { padding: 0; max-width: none; font-size: 9pt; }
+    .doc-footer { position: fixed; }
     .toc { break-after: page; }
     h2 { break-before: page; break-after: avoid; }
     h3, h4 { break-after: avoid; }
     table { break-inside: auto; }
     tr { break-inside: avoid; }
-    .severity-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .severity-critical, .severity-serious, .severity-moderate, .severity-minor {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    a { color: #1a1a1a; text-decoration: none; }
-    .report-footer { break-before: page; }
+    th { background: #e8ecf2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tr:nth-child(even) td { background: #f6f7f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    tr.row-critical td, tr.row-serious td, tr.row-moderate td, tr.row-minor td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    a { color: #2b2b2b; text-decoration: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="report-header">
-  {{orgLogoHtml}}
-  <div class="org-name">{{orgName}}</div>
-  <h1>Web Accessibility Audit Report</h1>
-  <dl class="report-meta">
-    <dt>Target URL</dt><dd>{{url}}</dd>
-    <dt>Report Date</dt><dd>{{reportDate}}</dd>
-    <dt>Reference</dt><dd>{{id}}</dd>
-  </dl>
+<div class="doc-header">
+  <div class="doc-header-left">
+    {{orgLogoHtml}}
+    <div class="org-name">{{orgName}}</div>
+    <h1>Accessibility Audit Report</h1>
+    <div class="doc-subtitle">Automated WCAG 2.1 Level AA Conformance Assessment</div>
+  </div>
+  <div class="doc-header-right">
+    <p class="doc-meta-line doc-id">{{docNumber}}</p>
+    <p class="doc-meta-line">Date: {{reportDate}}</p>
+    <p class="doc-meta-line">Version 1.0</p>
+    <p class="doc-meta-line">Classification: Confidential</p>
+    {{orgContactHtml}}
+  </div>
 </div>
+
+<div class="doc-classification">Confidential — {{orgName}}</div>
 
 {{tocSection}}
 
-<h2 id="section-2"><span class="section-num">2</span>Executive Summary</h2>
+<h2 id="s-1"><span class="sn">1</span> Subject of Assessment</h2>
 
-<p>
-  Automated accessibility audit of <strong>{{url}}</strong>, conducted on {{reportDate}}.
-</p>
-
-<div>
-  <span class="score-label">Overall Accessibility Score</span><br>
-  <span class="score-display {{scoreClass}}">{{accessibilityScore}} / 100</span>
+<div class="score-box">
+  <div class="score-box-row"><span class="score-box-label">Target URL</span><span class="score-box-value">{{url}}</span></div>
+  <div class="score-box-row"><span class="score-box-label">Assessment Date</span><span class="score-box-value">{{reportDate}}</span></div>
+  <div class="score-box-row"><span class="score-box-label">Conformance Target</span><span class="score-box-value">WCAG 2.1 Level AA</span></div>
+  <div class="score-box-row"><span class="score-box-label">Overall Score</span><span class="score-box-value">{{accessibilityScore}} of 100</span></div>
+  <div class="score-box-row"><span class="score-box-label">Violations</span><span class="score-box-value">{{violationsCount}}</span></div>
+  {{passesRow}}
 </div>
 
-<p>Total violations identified: <strong>{{violationsCount}}</strong> across {{totalChecks}} checks ({{passes}} passed).</p>
+<h2 id="s-2"><span class="sn">2</span> Summary of Findings</h2>
 
 {{severityDistribution}}
 
 {{principleScoresTable}}
 
-<h2 id="section-3"><span class="section-num">3</span>Methodology</h2>
+<h2 id="s-3"><span class="sn">3</span> Methodology</h2>
 
 {{methodologySection}}
 
@@ -425,14 +417,13 @@ class ReportGenerator {
 
 {{recommendationsSection}}
 
-<h2 id="section-7"><span class="section-num">7</span>Appendix</h2>
+<h2 id="s-app"><span class="sn">A</span> Appendix: Technical Metadata</h2>
 
 {{appendixSection}}
 
-<div class="report-footer">
-  <p>Report generated by {{generatedBy}}</p>
-  <p>Reference: {{id}}</p>
-  <p>For information on web accessibility standards, see <a href="https://www.w3.org/WAI/">W3C Web Accessibility Initiative</a>.</p>
+<div class="doc-footer">
+  <span>{{orgName}} — {{docNumber}}</span>
+  <span>{{reportDate}}</span>
 </div>
 
 </body>
@@ -449,32 +440,32 @@ class ReportGenerator {
       return 'score-poor';
     };
 
-    const reportDate = new Date(data.timestamp).toLocaleDateString('en-GB', {
-      year: 'numeric', month: 'long', day: 'numeric',
-    });
-
+    const reportDate = new Date(data.timestamp).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
     const violationsCount = data.violations ? data.violations.length : 0;
     const passes = data.passes || 0;
-    const totalChecks = passes + violationsCount;
 
     html = html.replace(/{{pageTitle}}/g, data.pageTitle || data.url || 'Unknown Page');
-    html = html.replace(/{{url}}/g, this.escapeHtml(data.url || ''));
+    html = html.replace(/{{url}}/g, this.esc(data.url || ''));
     html = html.replace(/{{reportDate}}/g, reportDate);
-    html = html.replace(/{{timestamp}}/g, reportDate);
     html = html.replace(/{{accessibilityScore}}/g, data.accessibilityScore || 0);
-    html = html.replace(/{{scoreClass}}/g, getScoreClass(data.accessibilityScore || 0));
     html = html.replace(/{{passes}}/g, passes);
     html = html.replace(/{{id}}/g, data.id || 'unknown');
-    html = html.replace(/{{totalChecks}}/g, totalChecks);
+    html = html.replace(/{{docNumber}}/g, this.esc(data.docNumber || ''));
     html = html.replace(/{{violationsCount}}/g, violationsCount);
-    html = html.replace(/{{orgName}}/g, this.escapeHtml(data.orgName || DEFAULT_ORG_NAME));
-    html = html.replace(/{{generatedBy}}/g, this.escapeHtml(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0'));
+    html = html.replace(/{{orgName}}/g, this.esc(data.orgName || DEFAULT_ORG_NAME));
+    html = html.replace(/{{generatedBy}}/g, this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0'));
+
+    // Passes row (only if passes > 0)
+    const passesRow = passes > 0
+      ? `<div class="score-box-row"><span class="score-box-label">Checks Passed</span><span class="score-box-value">${passes}</span></div>`
+      : '';
+    html = html.replace(/{{passesRow}}/g, passesRow);
 
     // Org logo
-    const logoHtml = data.orgLogo
-      ? `<img class="org-logo" src="${this.escapeHtml(data.orgLogo)}" alt="">`
-      : '';
-    html = html.replace(/{{orgLogoHtml}}/g, logoHtml);
+    html = html.replace(/{{orgLogoHtml}}/g, data.orgLogo ? `<img class="org-logo" src="${this.esc(data.orgLogo)}" alt="">` : '');
+
+    // Org contact
+    html = html.replace(/{{orgContactHtml}}/g, data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : '');
 
     // Sections
     html = html.replace(/{{tocSection}}/g, this.generateTocSection(data));
@@ -489,43 +480,37 @@ class ReportGenerator {
     return html;
   }
 
-  escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+  esc(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   // --- Section generators ---
 
   generateTocSection(data) {
-    const hasEu = !!data.euCompliance;
     const groups = this.groupViolationsByPrinciple(data.violations || []);
+    const hasEu = (groups.eaa || []).length > 0 || !!data.euCompliance;
 
-    let subSections = '';
-    let subIdx = 1;
+    let sub = '';
+    let i = 1;
     for (const [key, label] of [['perceivable', 'Perceivable'], ['operable', 'Operable'], ['understandable', 'Understandable'], ['robust', 'Robust']]) {
-      const count = (groups[key] || []).length;
-      subSections += `<li><a href="#section-4-${subIdx}">4.${subIdx} ${label}</a> (${count})</li>\n`;
-      subIdx++;
+      sub += `<li><a href="#s-4-${i}">4.${i} ${label}</a></li>\n`;
+      i++;
     }
-    if ((groups.other || []).length > 0) {
-      subSections += `<li><a href="#section-4-5">4.5 Other Findings</a> (${groups.other.length})</li>\n`;
-    }
+    if ((groups.other || []).length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
 
     return `
 <nav class="toc">
-  <h2>Table of Contents</h2>
+  <div class="toc-title">Contents</div>
   <ol>
-    <li><a href="#section-2">Executive Summary</a></li>
-    <li><a href="#section-3">Methodology</a></li>
-    <li><a href="#section-4">Findings by WCAG Principle</a>
-      <ol>${subSections}</ol>
+    <li><a href="#s-1">Subject of Assessment</a></li>
+    <li><a href="#s-2">Summary of Findings</a></li>
+    <li><a href="#s-3">Methodology</a></li>
+    <li><a href="#s-4">Detailed Findings</a>
+      <ol>${sub}</ol>
     </li>
-    ${hasEu ? '<li><a href="#section-5">EU/EAA Compliance</a></li>' : ''}
-    <li><a href="#section-6">Recommendations</a></li>
-    <li><a href="#section-7">Appendix</a></li>
+    ${hasEu ? '<li><a href="#s-5">EU/EAA Compliance</a></li>' : ''}
+    <li><a href="#s-6">Recommended Actions</a></li>
+    <li><a href="#s-app">Appendix: Technical Metadata</a></li>
   </ol>
 </nav>`;
   }
@@ -537,86 +522,71 @@ class ReportGenerator {
     data.violations.forEach(v => { counts[normalizeSeverity(v)]++; });
     const total = data.violations.length;
 
-    let barHtml = '<div class="severity-bar">';
-    for (const sev of ['critical', 'serious', 'moderate', 'minor']) {
-      if (counts[sev] > 0) {
-        const pct = ((counts[sev] / total) * 100).toFixed(1);
-        barHtml += `<span class="bar-${sev}" style="width:${pct}%" title="${SEVERITY_LABELS[sev]}: ${counts[sev]}"></span>`;
-      }
-    }
-    barHtml += '</div>';
-
-    let tableHtml = `<table>
-<thead><tr><th>Severity</th><th>Count</th><th>Percentage</th></tr></thead>
+    let html = `<table>
+<thead><tr><th>Classification</th><th>Count</th><th>Share</th></tr></thead>
 <tbody>`;
     for (const sev of ['critical', 'serious', 'moderate', 'minor']) {
       if (counts[sev] > 0) {
         const pct = ((counts[sev] / total) * 100).toFixed(0);
-        tableHtml += `<tr><td><span class="severity severity-${sev}">${SEVERITY_LABELS[sev]}</span></td><td>${counts[sev]}</td><td>${pct}%</td></tr>`;
+        html += `<tr class="row-${sev}"><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${counts[sev]}</td><td>${pct}%</td></tr>`;
       }
     }
-    tableHtml += '</tbody></table>';
+    html += `<tr><td><strong>Total</strong></td><td><strong>${total}</strong></td><td></td></tr>`;
+    html += '</tbody></table>';
+    html += '<p class="table-note">Severity classification per WCAG 2.1 impact assessment. Critical: barriers preventing access. Serious: significant obstacles. Moderate: degraded experience. Minor: best-practice deviations.</p>';
 
-    return `<h3>Severity Distribution</h3>\n${barHtml}\n${tableHtml}`;
+    return html;
   }
 
   generatePrincipleScoresTable(data, getScoreClass) {
-    // Use actual violation grouping instead of potentially broken upstream categories
     const groups = this.groupViolationsByPrinciple(data.violations || []);
     const cats = data.categories || {};
+    const principles = [['Perceivable', 'perceivable'], ['Operable', 'operable'], ['Understandable', 'understandable'], ['Robust', 'robust']];
+    const hasScores = principles.some(([, key]) => cats[key]?.score != null);
 
-    const principles = [
-      ['Perceivable', 'perceivable'],
-      ['Operable', 'operable'],
-      ['Understandable', 'understandable'],
-      ['Robust', 'robust'],
-    ];
-
-    let html = `<h3>WCAG Principle Overview</h3>
-<table>
-<thead><tr><th>Principle</th><th>Score</th><th>Violations</th></tr></thead>
-<tbody>`;
+    let html = '<table>\n<thead><tr><th>WCAG Principle</th>';
+    if (hasScores) html += '<th>Score</th>';
+    html += '<th>Violations</th></tr></thead>\n<tbody>';
 
     for (const [name, key] of principles) {
       const cat = cats[key];
-      const score = cat?.score != null ? cat.score : '--';
       const violations = (groups[key] || []).length;
-      const cls = cat?.score != null ? getScoreClass(cat.score) : '';
-      html += `<tr><td>${name}</td><td class="${cls}">${score}${score !== '--' ? '%' : ''}</td><td>${violations}</td></tr>`;
+      html += `<tr><td>${name}</td>`;
+      if (hasScores) {
+        const score = cat?.score != null ? cat.score : '\u2014';
+        html += `<td>${score}${typeof score === 'number' ? '%' : ''}</td>`;
+      }
+      html += `<td>${violations}</td></tr>`;
     }
-
     html += '</tbody></table>';
     return html;
   }
 
   generateMethodologySection(data) {
-    let html = '<p>This report was generated through automated accessibility scanning targeting <strong>WCAG 2.1 Level AA</strong> conformance.</p>';
+    let html = '<p>Assessment conducted via automated scanning against WCAG 2.1 Level AA success criteria per EN 301 549. Results reflect machine-detectable violations only. Manual expert review is recommended for full conformance evaluation.</p>';
 
     if (data.scanners && Object.keys(data.scanners).length > 0) {
-      const scannerNames = Object.keys(data.scanners);
-      const passed = scannerNames.filter(s => data.scanners[s].passed).length;
-      const failed = scannerNames.length - passed;
+      const names = Object.keys(data.scanners);
+      const passed = names.filter(s => data.scanners[s].passed).length;
+      const failed = names.filter(s => !data.scanners[s].passed);
 
-      html += `<p>${scannerNames.length} scanners executed (${passed} passed, ${failed} with findings).</p>`;
-      html += '<h4>Scanners</h4><ul class="scanner-list">';
-      for (const name of scannerNames) {
-        const s = data.scanners[name];
-        const status = s.passed ? 'passed' : `${s.violationCount} violation${s.violationCount !== 1 ? 's' : ''}`;
-        html += `<li><strong>${this.escapeHtml(name)}</strong> &mdash; ${status}</li>`;
+      html += `<p>${names.length} scanner modules executed. ${passed} passed without findings.</p>`;
+
+      // Summarize where findings concentrated
+      if (failed.length > 0) {
+        const top = failed
+          .map(n => ({ name: n, count: data.scanners[n].violationCount || 0 }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+        html += `<p>Findings concentrated in: ${top.map(t => `${t.name} (${t.count})`).join(', ')}.</p>`;
       }
-      html += '</ul>';
     }
-
     return html;
   }
 
   groupViolationsByPrinciple(violations) {
     const groups = { perceivable: [], operable: [], understandable: [], robust: [], eaa: [], other: [] };
-    for (const v of violations) {
-      const principle = classifyWcagPrinciple(v);
-      groups[principle].push(v);
-    }
-    // Sort each group by severity
+    for (const v of violations) groups[classifyWcagPrinciple(v)].push(v);
     for (const key of Object.keys(groups)) {
       groups[key].sort((a, b) => (SEVERITY_ORDER[normalizeSeverity(a)] || 2) - (SEVERITY_ORDER[normalizeSeverity(b)] || 2));
     }
@@ -625,37 +595,33 @@ class ReportGenerator {
 
   generateFindingsSection(data) {
     if (!data.violations || data.violations.length === 0) {
-      return '<h2 id="section-4"><span class="section-num">4</span>Findings</h2>\n<p>No accessibility violations were identified.</p>';
+      return '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>';
     }
 
     const groups = this.groupViolationsByPrinciple(data.violations);
-
-    let html = `<h2 id="section-4"><span class="section-num">4</span>Findings by WCAG Principle</h2>
-<p>${data.violations.length} violations identified across ${Object.values(groups).filter(g => g.length > 0).length} categories.</p>`;
+    let html = '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>';
 
     const sections = [
-      ['perceivable', 'Perceivable', '4.1', 'Information and user interface components must be presentable in ways users can perceive.'],
-      ['operable', 'Operable', '4.2', 'User interface components and navigation must be operable.'],
-      ['understandable', 'Understandable', '4.3', 'Information and operation of the user interface must be understandable.'],
-      ['robust', 'Robust', '4.4', 'Content must be robust enough to be interpreted by a wide variety of user agents.'],
+      ['perceivable', 'Perceivable', '4.1'],
+      ['operable', 'Operable', '4.2'],
+      ['understandable', 'Understandable', '4.3'],
+      ['robust', 'Robust', '4.4'],
     ];
 
-    let subIdx = 1;
-    for (const [key, label, num, desc] of sections) {
-      const violations = groups[key] || [];
-      html += `<h3 id="section-4-${subIdx}"><span class="section-num">${num}</span>${label} (${violations.length} violation${violations.length !== 1 ? 's' : ''})</h3>`;
-      html += `<p>${desc}</p>`;
-      if (violations.length === 0) {
-        html += '<p>No violations identified in this category.</p>';
+    let i = 1;
+    for (const [key, label, num] of sections) {
+      const v = groups[key] || [];
+      html += `<h3 id="s-4-${i}"><span class="sn">${num}</span> ${label}</h3>`;
+      if (v.length === 0) {
+        html += '<p>No findings.</p>';
       } else {
-        html += this.renderViolationTable(violations);
+        html += this.renderViolationTable(v);
       }
-      subIdx++;
+      i++;
     }
 
-    // Other/unclassified findings
     if (groups.other.length > 0) {
-      html += `<h3 id="section-4-5"><span class="section-num">4.5</span>Other Findings (${groups.other.length})</h3>`;
+      html += `<h3 id="s-4-5"><span class="sn">4.5</span> Other Findings</h3>`;
       html += this.renderViolationTable(groups.other);
     }
 
@@ -664,24 +630,16 @@ class ReportGenerator {
 
   renderViolationTable(violations) {
     let html = `<table>
-<thead><tr><th>#</th><th>Severity</th><th>WCAG</th><th>Description</th><th>Element</th><th>Recommendation</th></tr></thead>
+<thead><tr><th style="width:28px">#</th><th style="width:62px">Severity</th><th style="width:60px">Criterion</th><th>Finding</th><th>Element</th><th>Remediation</th></tr></thead>
 <tbody>`;
 
     violations.forEach((v, i) => {
       const sev = normalizeSeverity(v);
       const criterion = v.criterion || v.wcagCriteria || v.clause || '';
-      const desc = this.escapeHtml(v.description || v.type || v.issue || 'Unknown violation');
-      const element = v.element ? `<code>${this.escapeHtml(v.element)}</code>` : '';
-      const rec = this.escapeHtml(v.recommendation || v.suggestion || '');
-
-      html += `<tr>
-<td>${i + 1}</td>
-<td><span class="severity severity-${sev}">${SEVERITY_LABELS[sev]}</span></td>
-<td>${this.escapeHtml(String(criterion))}</td>
-<td>${desc}</td>
-<td>${element}</td>
-<td>${rec}</td>
-</tr>`;
+      const desc = this.esc(v.description || v.type || v.issue || '');
+      const el = v.element ? `<code>${this.esc(v.element)}</code>` : '\u2014';
+      const rec = this.esc(v.recommendation || v.suggestion || '\u2014');
+      html += `<tr class="row-${sev}"><td>${i + 1}</td><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${desc}</td><td>${el}</td><td>${rec}</td></tr>`;
     });
 
     html += '</tbody></table>';
@@ -689,32 +647,25 @@ class ReportGenerator {
   }
 
   generateEuComplianceSection(data) {
-    // Collect EAA violations from grouped findings
     const groups = this.groupViolationsByPrinciple(data.violations || []);
     const eaaViolations = groups.eaa || [];
-
-    // Also check legacy euCompliance data
     const hasLegacyEu = data.euCompliance?.en301549;
     if (!hasLegacyEu && eaaViolations.length === 0) return '';
 
-    let html = '<h2 id="section-5"><span class="section-num">5</span>EU/EAA Compliance</h2>';
+    let html = '<h2 id="s-5"><span class="sn">5</span> EU/EAA Compliance</h2>';
 
     if (hasLegacyEu) {
-      const score = data.euCompliance.en301549.score || 0;
-      html += `<p>EN 301 549 Compliance Score: <strong>${score} / 100</strong></p>`;
+      html += `<p>EN 301 549 compliance score: ${data.euCompliance.en301549.score || 0} of 100.</p>`;
     }
 
     if (eaaViolations.length > 0) {
-      html += `<p>${eaaViolations.length} EU European Accessibility Act violation${eaaViolations.length !== 1 ? 's' : ''} identified.</p>`;
       html += this.renderViolationTable(eaaViolations);
     } else if (hasLegacyEu && data.euCompliance.en301549.violations?.length > 0) {
       const violations = data.euCompliance.en301549.violations;
-      html += `<table>
-<thead><tr><th>#</th><th>Severity</th><th>Clause</th><th>Description</th></tr></thead>
-<tbody>`;
+      html += '<table>\n<thead><tr><th>#</th><th>Severity</th><th>Clause</th><th>Finding</th></tr></thead>\n<tbody>';
       violations.forEach((v, i) => {
         const sev = normalizeSeverity(v);
-        html += `<tr><td>${i + 1}</td><td><span class="severity severity-${sev}">${SEVERITY_LABELS[sev]}</span></td><td>${this.escapeHtml(v.clause || '')}</td><td>${this.escapeHtml(v.description || '')}</td></tr>`;
+        html += `<tr class="row-${sev}"><td>${i + 1}</td><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(v.clause || '')}</td><td>${this.esc(v.description || '')}</td></tr>`;
       });
       html += '</tbody></table>';
     }
@@ -724,82 +675,44 @@ class ReportGenerator {
 
   generateRecommendationsSection(data) {
     if (!data.violations || data.violations.length === 0) {
-      return '<h2 id="section-6"><span class="section-num">6</span>Recommendations</h2>\n<p>No specific recommendations at this time.</p>';
+      return '<h2 id="s-6"><span class="sn">6</span> Recommended Actions</h2>\n<p>No actions required.</p>';
     }
 
-    // Derive recommendations from actual findings
     const groups = this.groupViolationsByPrinciple(data.violations);
-    const sevCounts = { critical: 0, serious: 0, moderate: 0, minor: 0 };
-    data.violations.forEach(v => sevCounts[normalizeSeverity(v)]++);
 
-    const recommendations = [];
+    const collectCriteria = (violations) => {
+      const c = new Set();
+      violations.forEach(v => { const k = v.criterion || v.wcagCriteria || v.clause || ''; if (k) c.add(String(k)); });
+      return [...c];
+    };
 
-    // Critical and serious issues first
-    if (sevCounts.critical > 0) {
-      recommendations.push({
-        priority: 'Critical',
-        text: `Address ${sevCounts.critical} critical violation${sevCounts.critical !== 1 ? 's' : ''} immediately. These represent significant barriers to accessibility.`,
-      });
-    }
-    if (sevCounts.serious > 0) {
-      recommendations.push({
-        priority: 'High',
-        text: `Resolve ${sevCounts.serious} serious violation${sevCounts.serious !== 1 ? 's' : ''} as a priority. These issues substantially affect user experience for people with disabilities.`,
-      });
-    }
+    const recs = [];
 
-    // Principle-specific recommendations
     if (groups.perceivable.length > 0) {
-      const issues = groups.perceivable.map(v => v.issue || v.type || '').filter(Boolean);
-      const hasImageIssues = issues.some(i => i.includes('image') || i.includes('alt'));
-      if (hasImageIssues) {
-        recommendations.push({ priority: 'High', text: 'Audit all images for proper alternative text. Ensure decorative images use empty alt attributes and informative images have descriptive alternatives.' });
-      }
+      const c = collectCriteria(groups.perceivable);
+      recs.push({ p: 'High', ref: c.join(', '), text: `${groups.perceivable.length} perceivable findings. Review non-text content alternatives and information structure.` });
     }
-
     if (groups.operable.length > 0) {
-      const issues = groups.operable.map(v => v.issue || v.type || '').filter(Boolean);
-      const hasFocusIssues = issues.some(i => i.includes('focus') || i.includes('keyboard'));
-      const hasNavIssues = issues.some(i => i.includes('navigation') || i.includes('link'));
-      if (hasFocusIssues) {
-        recommendations.push({ priority: 'High', text: 'Review keyboard navigation and focus management. Ensure all interactive elements have visible focus indicators and are keyboard accessible.' });
-      }
-      if (hasNavIssues) {
-        recommendations.push({ priority: 'Medium', text: 'Improve link text and navigation structure. Ensure links have descriptive text and multiple navigation pathways exist.' });
-      }
+      const c = collectCriteria(groups.operable);
+      recs.push({ p: 'High', ref: c.join(', '), text: `${groups.operable.length} operable findings. Verify keyboard access, focus indicators, link purpose.` });
     }
-
     if (groups.understandable.length > 0) {
-      const issues = groups.understandable.map(v => v.issue || v.type || v.description || '').filter(Boolean);
-      const hasLangIssues = issues.some(i => i.includes('lang') || i.includes('language'));
-      if (hasLangIssues) {
-        recommendations.push({ priority: 'Medium', text: 'Set the document language attribute and mark language changes within content.' });
-      }
+      const c = collectCriteria(groups.understandable);
+      recs.push({ p: 'Medium', ref: c.join(', '), text: `${groups.understandable.length} understandable findings. Set page language attribute, review navigation consistency.` });
     }
-
     if (groups.robust.length > 0) {
-      recommendations.push({ priority: 'Medium', text: `Address ${groups.robust.length} robustness violation${groups.robust.length !== 1 ? 's' : ''} to ensure compatibility with assistive technologies.` });
+      const c = collectCriteria(groups.robust);
+      recs.push({ p: 'Medium', ref: c.join(', '), text: `${groups.robust.length} robustness findings. Correct parsing errors and ARIA attribute usage.` });
     }
-
     if (groups.eaa.length > 0) {
-      recommendations.push({ priority: 'Critical', text: 'Address EU European Accessibility Act compliance gaps, including accessibility statement, contact mechanisms, and monitoring procedures.' });
+      const c = collectCriteria(groups.eaa);
+      recs.push({ p: 'Critical', ref: c.join(', '), text: `${groups.eaa.length} EU EAA compliance gaps. Publish accessibility statement, establish feedback mechanism and monitoring procedures.` });
     }
 
-    if (sevCounts.moderate > 0 || sevCounts.minor > 0) {
-      recommendations.push({
-        priority: 'Low',
-        text: `Review remaining ${sevCounts.moderate + sevCounts.minor} moderate and minor violations to improve overall accessibility posture.`,
-      });
-    }
-
-    let html = '<h2 id="section-6"><span class="section-num">6</span>Recommendations</h2>';
-    html += `<p>${recommendations.length} prioritized recommendations based on findings.</p>`;
-
-    html += `<table>
-<thead><tr><th>#</th><th>Priority</th><th>Recommendation</th></tr></thead>
-<tbody>`;
-    recommendations.forEach((r, i) => {
-      html += `<tr><td>${i + 1}</td><td><strong>${r.priority}</strong></td><td>${this.escapeHtml(r.text)}</td></tr>`;
+    let html = '<h2 id="s-6"><span class="sn">6</span> Recommended Actions</h2>';
+    html += '<table>\n<thead><tr><th>#</th><th>Priority</th><th>Criteria</th><th>Action</th></tr></thead>\n<tbody>';
+    recs.forEach((r, i) => {
+      html += `<tr><td>${i + 1}</td><td>${r.p}</td><td><span style="font-size:7.5pt">${this.esc(r.ref)}</span></td><td>${this.esc(r.text)}</td></tr>`;
     });
     html += '</tbody></table>';
 
@@ -807,56 +720,39 @@ class ReportGenerator {
   }
 
   generateAppendixSection(data) {
-    let html = '';
-
-    html += '<h3>Technical Details</h3>';
-    html += `<table>
-<thead><tr><th>Parameter</th><th>Value</th></tr></thead>
-<tbody>`;
-    html += `<tr><td>Report ID</td><td><code>${this.escapeHtml(data.id || '')}</code></td></tr>`;
+    let html = '<table>\n<thead><tr><th>Parameter</th><th>Value</th></tr></thead>\n<tbody>';
+    html += `<tr><td>Report ID</td><td><code>${this.esc(data.id || '')}</code></td></tr>`;
+    html += `<tr><td>Document Number</td><td>${this.esc(data.docNumber || '')}</td></tr>`;
     html += `<tr><td>Generated</td><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
-    html += `<tr><td>Generator</td><td>${this.escapeHtml(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
-    html += `<tr><td>Target URL</td><td>${this.escapeHtml(data.url || '')}</td></tr>`;
-    html += `<tr><td>Conformance Target</td><td>WCAG 2.1 Level AA</td></tr>`;
-
-    if (data.scanners) {
-      html += `<tr><td>Scanners Executed</td><td>${Object.keys(data.scanners).length}</td></tr>`;
-    }
-
+    html += `<tr><td>Generator</td><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
+    html += `<tr><td>Target</td><td>${this.esc(data.url || '')}</td></tr>`;
+    html += `<tr><td>Standard</td><td>WCAG 2.1 Level AA / EN 301 549</td></tr>`;
+    if (data.scanners) html += `<tr><td>Modules Executed</td><td>${Object.keys(data.scanners).length}</td></tr>`;
     html += '</tbody></table>';
 
     if (data.scanners) {
-      html += '<h3>Scanner Results</h3>';
-      html += `<table>
-<thead><tr><th>Scanner</th><th>Status</th><th>Violations</th></tr></thead>
-<tbody>`;
+      html += '<h3>Scanner Module Results</h3>';
+      html += '<table>\n<thead><tr><th>Module</th><th>Result</th><th>Findings</th></tr></thead>\n<tbody>';
       for (const [name, s] of Object.entries(data.scanners)) {
-        const status = s.passed ? 'Passed' : 'Failed';
-        html += `<tr><td>${this.escapeHtml(name)}</td><td>${status}</td><td>${s.violationCount || 0}</td></tr>`;
+        html += `<tr><td>${this.esc(name)}</td><td>${s.passed ? 'Pass' : 'Fail'}</td><td>${s.violationCount || 0}</td></tr>`;
       }
       html += '</tbody></table>';
     }
-
     return html;
   }
 
-  // --- Unchanged utility methods ---
+  // --- Utility methods ---
 
   async getReport(reportId) {
+    const metadataPath = path.join(this.reportsDir, `${reportId}.json`);
     try {
-      const metadataPath = path.join(this.reportsDir, `${reportId}.json`);
       const metadata = await fs.readJson(metadataPath);
-
       const htmlPath = path.join(this.reportsDir, `${reportId}.html`);
-      const htmlExists = await fs.pathExists(htmlPath);
-
       const pdfPath = path.join(this.reportsDir, `${reportId}.pdf`);
-      const pdfExists = await fs.pathExists(pdfPath);
-
       return {
         metadata,
-        htmlPath: htmlExists ? htmlPath : null,
-        pdfPath: pdfExists ? pdfPath : null,
+        htmlPath: (await fs.pathExists(htmlPath)) ? htmlPath : null,
+        pdfPath: (await fs.pathExists(pdfPath)) ? pdfPath : null,
       };
     } catch (error) {
       throw new Error(`Report not found: ${reportId}`);
@@ -865,12 +761,8 @@ class ReportGenerator {
 
   async deleteReport(reportId) {
     try {
-      const files = [
-        path.join(this.reportsDir, `${reportId}.json`),
-        path.join(this.reportsDir, `${reportId}.html`),
-        path.join(this.reportsDir, `${reportId}.pdf`),
-      ];
-      await Promise.all(files.map(file => fs.remove(file).catch(() => {})));
+      const files = [`${reportId}.json`, `${reportId}.html`, `${reportId}.pdf`].map(f => path.join(this.reportsDir, f));
+      await Promise.all(files.map(f => fs.remove(f).catch(() => {})));
       return true;
     } catch (error) {
       console.error('Error deleting report:', error);
@@ -881,27 +773,15 @@ class ReportGenerator {
   async listReports(limit = 50) {
     try {
       const files = await fs.readdir(this.reportsDir);
-      const jsonFiles = files.filter(file => file.endsWith('.json'));
-
       const reports = await Promise.all(
-        jsonFiles.slice(0, limit).map(async (file) => {
+        files.filter(f => f.endsWith('.json')).slice(0, limit).map(async (file) => {
           try {
-            const metadata = await fs.readJson(path.join(this.reportsDir, file));
-            return {
-              id: metadata.id,
-              timestamp: metadata.timestamp,
-              url: metadata.url,
-              score: metadata.accessibilityScore,
-              violationsCount: metadata.violations ? metadata.violations.length : 0,
-            };
-          } catch (error) {
-            return null;
-          }
+            const m = await fs.readJson(path.join(this.reportsDir, file));
+            return { id: m.id, timestamp: m.timestamp, url: m.url, score: m.accessibilityScore, violationsCount: m.violations ? m.violations.length : 0 };
+          } catch (e) { return null; }
         })
       );
-
-      return reports.filter(report => report !== null)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      return reports.filter(Boolean).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     } catch (error) {
       console.error('Error listing reports:', error);
       return [];

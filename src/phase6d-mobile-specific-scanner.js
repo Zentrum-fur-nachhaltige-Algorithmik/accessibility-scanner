@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Phase 6D: Mobile Specific Accessibility Scanner
@@ -8,8 +9,12 @@ const path = require('path');
  * Critical for mobile accessibility compliance and responsive design testing
  * CSP-independent implementation using Puppeteer viewport simulation
  */
-class MobileSpecificScanner {
+class MobileSpecificScanner extends BaseScanner {
     constructor() {
+        super('mobile-specific', {
+            wcagCriteria: ['1.4.10', '2.5.5'],
+            wcagPrinciple: 'operable',
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/mobile-screenshots');
         this.mobileViewports = {
@@ -20,6 +25,8 @@ class MobileSpecificScanner {
             'Tablet Landscape': { width: 1024, height: 768, deviceScaleFactor: 2, isMobile: true }
         };
     }
+
+    get needsExclusiveAccess() { return true; }
 
     async init() {
         if (!this.browser) {
@@ -32,13 +39,14 @@ class MobileSpecificScanner {
     }
 
     /**
-     * Scan mobile-specific accessibility compliance
-     * @param {string} url - URL to scan
+     * Core scan method — receives an already-navigated Puppeteer page.
+     * Note: This scanner re-navigates internally (per-device viewport testing) since it has exclusive access.
+     * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
      * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} MobileAccessibilityReport
+     * @returns {Promise<Object>} ScanResult
      */
-    async scanMobileAccessibility(url, options = {}) {
-        const defaultOptions = {
+    async scan(page, options = {}) {
+        const scanOptions = {
             test400PercentZoom: true,
             testOrientation: true,
             testTouchTargets: true,
@@ -46,105 +54,129 @@ class MobileSpecificScanner {
             testScrollHorizontal: true,
             testInteractionSize: true,
             testDeviceAdaptation: true,
-            timeout: 60000
+            timeout: 60000,
+            ...options,
         };
 
-        const scanOptions = { ...defaultOptions, ...options };
+        const screenshotDir = options.screenshotDir || this.screenshotDir;
+        await fs.ensureDir(screenshotDir);
+
+        const timestamp = Date.now();
+        const scanDir = path.join(screenshotDir, `scan-${timestamp}`);
+        await fs.ensureDir(scanDir);
+
+        // Get the current URL from the already-navigated page for internal re-navigation
+        const url = page.url();
+
+        const violations = [];
+        const viewportResults = {};
+
+        // Test on different mobile viewports
+        for (const [deviceName, viewport] of Object.entries(this.mobileViewports)) {
+            console.log(`Testing on ${deviceName}...`);
+
+            await page.setViewport(viewport);
+            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
+
+            // Take screenshot for each device
+            const screenshotPath = path.join(scanDir, `${deviceName.replace(/\s+/g, '-')}.png`);
+            await page.screenshot({
+                path: screenshotPath,
+                fullPage: true
+            });
+
+            const deviceViolations = [];
+
+            // Test 400% zoom compliance
+            if (scanOptions.test400PercentZoom) {
+                const zoomViolations = await this.test400PercentZoom(page, deviceName, viewport);
+                deviceViolations.push(...zoomViolations);
+            }
+
+            // Test touch target sizes
+            if (scanOptions.testTouchTargets) {
+                const touchViolations = await this.testTouchTargets(page, deviceName);
+                deviceViolations.push(...touchViolations);
+            }
+
+            // Test viewport meta tag
+            if (scanOptions.testViewportMeta) {
+                const viewportViolations = await this.testViewportMeta(page, deviceName);
+                deviceViolations.push(...viewportViolations);
+            }
+
+            // Test horizontal scrolling
+            if (scanOptions.testScrollHorizontal) {
+                const scrollViolations = await this.testHorizontalScrolling(page, deviceName, viewport);
+                deviceViolations.push(...scrollViolations);
+            }
+
+            // Test device adaptation
+            if (scanOptions.testDeviceAdaptation) {
+                const adaptationViolations = await this.testDeviceAdaptation(page, deviceName, viewport);
+                deviceViolations.push(...adaptationViolations);
+            }
+
+            viewportResults[deviceName] = {
+                viewport: viewport,
+                violations: deviceViolations,
+                screenshotPath: screenshotPath
+            };
+
+            violations.push(...deviceViolations);
+        }
+
+        // Test orientation changes
+        if (scanOptions.testOrientation) {
+            const orientationViolations = await this.testOrientationChanges(page, scanDir);
+            violations.push(...orientationViolations);
+        }
+
+        return {
+            scannerId: this.id,
+            criteria: ["1.4.4", "1.4.10", "2.5.5"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalDevicesTested: Object.keys(this.mobileViewports).length,
+                zoom400PercentIssues: violations.filter(v => v.category === '400-percent-zoom').length,
+                touchTargetIssues: violations.filter(v => v.category === 'touch-targets').length,
+                orientationIssues: violations.filter(v => v.category === 'orientation').length,
+                viewportIssues: violations.filter(v => v.category === 'viewport-meta').length,
+                horizontalScrollIssues: violations.filter(v => v.category === 'horizontal-scroll').length,
+                deviceAdaptationIssues: violations.filter(v => v.category === 'device-adaptation').length
+            },
+            viewportResults: viewportResults,
+            screenshotDir: scanDir,
+            recommendations: this.generateMobileRecommendations(violations),
+            mobileTestingGuidance: this.generateMobileTestingGuidance(violations)
+        };
+    }
+
+    /** @deprecated Use scan(page, options) via ScanPipeline instead */
+    async scanMobileAccessibility(url, options = {}) {
+        const scanOptions = {
+            test400PercentZoom: true,
+            testOrientation: true,
+            testTouchTargets: true,
+            testViewportMeta: true,
+            testScrollHorizontal: true,
+            testInteractionSize: true,
+            testDeviceAdaptation: true,
+            timeout: 60000,
+            ...options,
+        };
 
         try {
             await this.init();
             const page = await this.browser.newPage();
-            const timestamp = Date.now();
-            const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-            await fs.ensureDir(scanDir);
-
-            const violations = [];
-            const viewportResults = {};
-
-            // Test on different mobile viewports
-            for (const [deviceName, viewport] of Object.entries(this.mobileViewports)) {
-                console.log(`📱 Testing on ${deviceName}...`);
-                
-                await page.setViewport(viewport);
-                await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-                // Take screenshot for each device
-                const screenshotPath = path.join(scanDir, `${deviceName.replace(/\s+/g, '-')}.png`);
-                await page.screenshot({ 
-                    path: screenshotPath, 
-                    fullPage: true 
-                });
-
-                const deviceViolations = [];
-
-                // Test 400% zoom compliance
-                if (scanOptions.test400PercentZoom) {
-                    const zoomViolations = await this.test400PercentZoom(page, deviceName, viewport);
-                    deviceViolations.push(...zoomViolations);
-                }
-
-                // Test touch target sizes
-                if (scanOptions.testTouchTargets) {
-                    const touchViolations = await this.testTouchTargets(page, deviceName);
-                    deviceViolations.push(...touchViolations);
-                }
-
-                // Test viewport meta tag
-                if (scanOptions.testViewportMeta) {
-                    const viewportViolations = await this.testViewportMeta(page, deviceName);
-                    deviceViolations.push(...viewportViolations);
-                }
-
-                // Test horizontal scrolling
-                if (scanOptions.testScrollHorizontal) {
-                    const scrollViolations = await this.testHorizontalScrolling(page, deviceName, viewport);
-                    deviceViolations.push(...scrollViolations);
-                }
-
-                // Test device adaptation
-                if (scanOptions.testDeviceAdaptation) {
-                    const adaptationViolations = await this.testDeviceAdaptation(page, deviceName, viewport);
-                    deviceViolations.push(...adaptationViolations);
-                }
-
-                viewportResults[deviceName] = {
-                    viewport: viewport,
-                    violations: deviceViolations,
-                    screenshotPath: screenshotPath
-                };
-
-                violations.push(...deviceViolations);
+            await page.setViewport({ width: 1280, height: 1024 });
+            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
+            try {
+                return await this.scan(page, scanOptions);
+            } finally {
+                await page.close();
             }
-
-            // Test orientation changes
-            if (scanOptions.testOrientation) {
-                const orientationViolations = await this.testOrientationChanges(page, scanDir);
-                violations.push(...orientationViolations);
-            }
-
-            await page.close();
-
-            const report = {
-                criteria: ["1.4.4", "1.4.10", "2.5.5"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalDevicesTested: Object.keys(this.mobileViewports).length,
-                    zoom400PercentIssues: violations.filter(v => v.category === '400-percent-zoom').length,
-                    touchTargetIssues: violations.filter(v => v.category === 'touch-targets').length,
-                    orientationIssues: violations.filter(v => v.category === 'orientation').length,
-                    viewportIssues: violations.filter(v => v.category === 'viewport-meta').length,
-                    horizontalScrollIssues: violations.filter(v => v.category === 'horizontal-scroll').length,
-                    deviceAdaptationIssues: violations.filter(v => v.category === 'device-adaptation').length
-                },
-                viewportResults: viewportResults,
-                screenshotDir: scanDir,
-                recommendations: this.generateMobileRecommendations(violations),
-                mobileTestingGuidance: this.generateMobileTestingGuidance(violations)
-            };
-
-            return report;
-
         } catch (error) {
             throw new Error(`Mobile accessibility scan failed: ${error.message}`);
         }

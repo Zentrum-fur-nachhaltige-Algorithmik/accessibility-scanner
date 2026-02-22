@@ -1,17 +1,24 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Focus Management Scanner for WCAG compliance testing
  * Implements EN 301 549 criteria 9.2.4.3, 9.2.4.7 (Focus Order, Focus Visible)
  * Analyzes logical tab order and visual focus indicators with screenshot validation
  */
-class FocusManagementScanner {
+class FocusManagementScanner extends BaseScanner {
   constructor() {
+    super('focus-management', {
+      wcagCriteria: ['2.4.3', '2.4.7'],
+      wcagPrinciple: 'operable',
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/focus-screenshots');
   }
+
+  get needsExclusiveAccess() { return true; }
 
   async init() {
     if (!this.browser) {
@@ -26,45 +33,49 @@ class FocusManagementScanner {
   }
 
   /**
-   * Scan focus management compliance
-   * @param {string} url - URL to scan
-   * @returns {Promise<Object>} FocusReport
+   * Core scan method — receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
    */
+  async scan(page, options = {}) {
+    const screenshotDir = options.screenshotDir || this.screenshotDir;
+    await fs.ensureDir(screenshotDir);
+
+    const timestamp = Date.now();
+    const scanDir = path.join(screenshotDir, `focus-scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const focusResults = await this.performFocusAnalysis(page, scanDir);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.2.4.3", "9.2.4.7"],
+      passed: focusResults.violations.length === 0,
+      violations: focusResults.violations,
+      summary: {
+        logicalTabOrder: focusResults.logicalTabOrder,
+        allElementsHaveVisibleFocus: focusResults.allElementsHaveVisibleFocus,
+        focusTraps: focusResults.focusTraps
+      },
+      screenshotPath: scanDir,
+      focusSequence: focusResults.focusSequence,
+      visualAnalysis: focusResults.visualAnalysis
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
   async scanFocusManagement(url) {
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent screenshots
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-
-      // Create timestamp-based directory for this scan
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `focus-scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const focusResults = await this.performFocusAnalysis(page, scanDir);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.2.4.3", "9.2.4.7"],
-        passed: focusResults.violations.length === 0,
-        violations: focusResults.violations,
-        summary: {
-          logicalTabOrder: focusResults.logicalTabOrder,
-          allElementsHaveVisibleFocus: focusResults.allElementsHaveVisibleFocus,
-          focusTraps: focusResults.focusTraps
-        },
-        screenshotPath: scanDir,
-        focusSequence: focusResults.focusSequence,
-        visualAnalysis: focusResults.visualAnalysis
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Focus management scan failed: ${error.message}`);
     }

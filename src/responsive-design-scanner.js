@@ -1,17 +1,24 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Responsive Design Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.1.4.4, 9.1.4.10, 9.1.4.12 (Resize Text, Reflow, Text Spacing)
  * Uses visual screenshot analysis for thorough responsive design testing
  */
-class ResponsiveDesignScanner {
+class ResponsiveDesignScanner extends BaseScanner {
   constructor() {
+    super('responsive-design', {
+      wcagCriteria: ['1.4.4', '1.4.10'],
+      wcagPrinciple: 'perceivable',
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/responsive-screenshots');
   }
+
+  get needsExclusiveAccess() { return true; }
 
   async init() {
     if (!this.browser) {
@@ -26,17 +33,14 @@ class ResponsiveDesignScanner {
   }
 
   /**
-   * Scan responsive design compliance
-   * @param {string} url - URL to scan
+   * Core scan method — receives an already-navigated Puppeteer page.
+   * Note: This scanner re-navigates internally (viewport/zoom testing) since it has exclusive access.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {Array} options.viewports - Array of viewport configurations
-   * @param {Array} options.testZoomLevels - Zoom levels to test [100, 200, 320, 400]
-   * @param {boolean} options.testOrientation - Test orientation changes
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} ResponsiveReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanResponsiveCompliance(url, options = {}) {
-    const defaultOptions = {
+  async scan(page, options = {}) {
+    const scanOptions = {
       viewports: [
         { width: 320, height: 568, devicePixelRatio: 2, name: "iPhone SE" },
         { width: 375, height: 667, devicePixelRatio: 2, name: "iPhone 8" },
@@ -45,43 +49,63 @@ class ResponsiveDesignScanner {
       ],
       testZoomLevels: [100, 200, 320, 400],
       testOrientation: false,
-      timeout: 60000
+      timeout: 60000,
+      ...options,
     };
 
-    const scanOptions = { ...defaultOptions, ...options };
+    const screenshotDir = options.screenshotDir || this.screenshotDir;
+    await fs.ensureDir(screenshotDir);
+
+    const timestamp = Date.now();
+    const scanDir = path.join(screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    // Get the current URL from the already-navigated page for internal re-navigation
+    const url = page.url();
+    const responsiveResults = await this.performResponsiveAnalysis(page, url, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.1.4.4", "9.1.4.10", "9.1.4.12"],
+      passed: responsiveResults.violations.length === 0,
+      violations: responsiveResults.violations,
+      summary: {
+        reflowWorks: responsiveResults.reflowWorks,
+        textResizable: responsiveResults.textResizable,
+        textSpacingOk: responsiveResults.textSpacingOk,
+        contentLossAt320px: responsiveResults.contentLossAt320px,
+        viewportsTested: scanOptions.viewports.length,
+        zoomLevelsTested: scanOptions.testZoomLevels.length
+      },
+      screenshotPath: scanDir,
+      visualEvidence: responsiveResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanResponsiveCompliance(url, options = {}) {
+    const scanOptions = {
+      viewports: [
+        { width: 320, height: 568, devicePixelRatio: 2, name: "iPhone SE" },
+        { width: 375, height: 667, devicePixelRatio: 2, name: "iPhone 8" },
+        { width: 768, height: 1024, devicePixelRatio: 2, name: "iPad" },
+        { width: 1920, height: 1080, devicePixelRatio: 1, name: "Desktop" }
+      ],
+      testZoomLevels: [100, 200, 320, 400],
+      testOrientation: false,
+      timeout: 60000,
+      ...options,
+    };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const responsiveResults = await this.performResponsiveAnalysis(page, url, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.1.4.4", "9.1.4.10", "9.1.4.12"],
-        passed: responsiveResults.violations.length === 0,
-        violations: responsiveResults.violations,
-        summary: {
-          reflowWorks: responsiveResults.reflowWorks,
-          textResizable: responsiveResults.textResizable,
-          textSpacingOk: responsiveResults.textSpacingOk,
-          contentLossAt320px: responsiveResults.contentLossAt320px,
-          viewportsTested: scanOptions.viewports.length,
-          zoomLevelsTested: scanOptions.testZoomLevels.length
-        },
-        screenshotPath: scanDir,
-        visualEvidence: responsiveResults.visualEvidence
-      };
-
-      return report;
-
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Responsive design scan failed: ${error.message}`);
     }

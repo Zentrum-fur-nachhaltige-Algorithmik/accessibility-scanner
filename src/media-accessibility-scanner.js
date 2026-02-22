@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -19,20 +18,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       wcagCriteria: ['1.2.1', '1.2.2', '1.2.3', '1.2.5'],
       wcagPrinciple: 'perceivable'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/media-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -77,33 +63,6 @@ class MediaAccessibilityScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: mediaResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanMediaAccessibility(url, options = {}) {
-    const scanOptions = {
-      analyzeImages: true,
-      analyzeVideo: true,
-      analyzeAudio: true,
-      analyzeSVG: true,
-      timeout: 60000,
-      ...options
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, scanOptions);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Media accessibility scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -723,12 +682,6 @@ class MediaAccessibilityScanner extends BaseScanner {
   // This single DOM pass approach reduces execution time from ~10s to <2s.
   // ============================================================================
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = MediaAccessibilityScanner;

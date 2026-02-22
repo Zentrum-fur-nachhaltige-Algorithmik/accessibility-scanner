@@ -15,6 +15,10 @@ class ReportGenerator {
     await fs.ensureDir(this.templatesDir);
   }
 
+  async generate(scanData, options = {}) {
+    return this.generateReport(scanData, options);
+  }
+
   async generateReport(scanData, options = {}) {
     const reportId = uuidv4();
     const timestamp = new Date().toISOString();

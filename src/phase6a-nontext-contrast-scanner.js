@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,18 +13,7 @@ class NonTextContrastScanner extends BaseScanner {
             wcagCriteria: ['1.4.11'],
             wcagPrinciple: 'perceivable'
         });
-        this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/nontext-contrast-screenshots');
-    }
-
-    async init() {
-        if (!this.browser) {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-        }
-        await fs.ensureDir(this.screenshotDir);
     }
 
     /**
@@ -97,33 +85,6 @@ class NonTextContrastScanner extends BaseScanner {
             screenshotPath: screenshotPath,
             recommendations: this.generateNonTextContrastRecommendations(violations)
         };
-    }
-
-    /** @deprecated Use scan(page, options) via ScanPipeline instead */
-    async scanNonTextContrast(url, options = {}) {
-        const scanOptions = {
-            checkInteractiveElements: true,
-            checkGraphicalObjects: true,
-            checkFocusIndicators: true,
-            checkStateChanges: true,
-            contrastThreshold: 3.0,
-            timeout: 60000,
-            ...options
-        };
-
-        try {
-            await this.init();
-            const page = await this.browser.newPage();
-            await page.setViewport({ width: 1280, height: 1024 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-            try {
-                return await this.scan(page, options);
-            } finally {
-                await page.close();
-            }
-        } catch (error) {
-            throw new Error(`Non-text contrast scan failed: ${error.message}`);
-        }
     }
 
     /**
@@ -746,12 +707,6 @@ class NonTextContrastScanner extends BaseScanner {
         return recommendations;
     }
 
-    async close() {
-        if (this.browser) {
-            await this.browser.close();
-            this.browser = null;
-        }
-    }
 }
 
 module.exports = NonTextContrastScanner;

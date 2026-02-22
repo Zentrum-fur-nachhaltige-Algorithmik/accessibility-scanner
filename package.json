@@ -4,25 +4,12 @@
   "description": "Web accessibility checker with focus on screen reader support and EU compliance",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "test": "node src/test.js",
-    "test:phase2": "node src/phase2-test.js",
-    "test:phase3": "node src/phase3-test.js",
-    "test:phase4": "node src/phase4-test.js",
-    "test:phase6a": "node src/phase6a-test.js",
-    "api:start": "node src/api-server.js",
+    "start": "node src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "frontend:dev": "next dev frontend",
     "frontend:build": "next build frontend",
-    "frontend:start": "next start frontend",
-    "e2e": "node src/enhanced-e2e-cli.js",
-    "e2e:single": "node src/enhanced-e2e-cli.js single",
-    "e2e:batch": "node src/enhanced-e2e-cli.js batch",
-    "e2e:suite": "node src/enhanced-e2e-cli.js suite",
-    "e2e:config": "node src/enhanced-e2e-cli.js config",
-    "e2e:status": "node src/enhanced-e2e-cli.js status",
-    "e2e:example": "node examples/example-usage.js",
-    "e2e:demo": "node src/enhanced-e2e-cli.js suite --suite=config/example-test-suite.json"
+    "frontend:start": "next start frontend"
   },
   "keywords": [
     "accessibility",
@@ -44,13 +31,14 @@
     "helmet": "^8.1.0",
     "html-pdf-node": "^1.0.8",
     "next": "^15.3.5",
-    "pa11y": "^9.0.0",
+    "p-queue": "^9.1.0",
     "path": "^0.12.7",
-    "pg": "^8.16.3",
     "puppeteer": "^22.15.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "redis": "^5.6.0",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.18"
   }
 }

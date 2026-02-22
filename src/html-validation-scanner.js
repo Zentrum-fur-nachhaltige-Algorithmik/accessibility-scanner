@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -18,20 +17,7 @@ class HTMLValidationScanner extends BaseScanner {
       wcagCriteria: ['4.1.1', '4.1.2'],
       wcagPrinciple: 'robust'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/html-validation-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -71,32 +57,6 @@ class HTMLValidationScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: htmlResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanHTMLCompliance(url, options = {}) {
-    const scanOptions = {
-      strictValidation: true,
-      checkAccessibilityMarkup: true,
-      validateARIA: true,
-      timeout: 60000,
-      ...options
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, scanOptions);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`HTML validation scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -1709,12 +1669,6 @@ class HTMLValidationScanner extends BaseScanner {
     return `${tagName}${id}${className}`;
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = HTMLValidationScanner;

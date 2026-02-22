@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,20 +13,7 @@ class PredictableNavigationScanner extends BaseScanner {
       wcagCriteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
       wcagPrinciple: 'understandable'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/predictable-navigation-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -68,33 +54,6 @@ class PredictableNavigationScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: navigationResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanPredictableNavigation(url, options = {}) {
-    const scanOptions = {
-      testOnFocus: true,
-      testOnInput: true,
-      testConsistentNavigation: true,
-      testConsistentIdentification: true,
-      timeout: 60000,
-      ...options
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, scanOptions);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Predictable navigation scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -1008,12 +967,6 @@ class PredictableNavigationScanner extends BaseScanner {
     return suggestions[violationType] || 'Maintain consistent identification patterns for similar interface components';
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = PredictableNavigationScanner;

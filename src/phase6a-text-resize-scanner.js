@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,7 +13,6 @@ class TextResizeScanner extends BaseScanner {
             wcagCriteria: ['1.4.4'],
             wcagPrinciple: 'perceivable'
         });
-        this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/text-resize-screenshots');
         this.testViewports = [
             { width: 1280, height: 1024, name: 'desktop', scale: 1 },
@@ -31,16 +29,6 @@ class TextResizeScanner extends BaseScanner {
      */
     get needsExclusiveAccess() {
         return true;
-    }
-
-    async init() {
-        if (!this.browser) {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: ['--no-sandbox', '--disable-setuid-sandbox', '--force-device-scale-factor=1']
-            });
-        }
-        await fs.ensureDir(this.screenshotDir);
     }
 
     /**
@@ -185,34 +173,6 @@ class TextResizeScanner extends BaseScanner {
         }
 
         return violations;
-    }
-
-    /** @deprecated Use scan(page, options) via ScanPipeline instead */
-    async scanTextResize(url, options = {}) {
-        const defaultOptions = {
-            testZoomLevels: [200, 400],
-            checkMobile: true,
-            detectFixedElements: true,
-            analyzeTextFlow: true,
-            timeout: 60000
-        };
-
-        const scanOptions = { ...defaultOptions, ...options };
-
-        try {
-            await this.init();
-            const page = await this.browser.newPage();
-            await page.setViewport({ width: 1920, height: 1080 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-            try {
-                return await this.scan(page, scanOptions);
-            } finally {
-                await page.close();
-            }
-        } catch (error) {
-            throw new Error(`Text resize scan failed: ${error.message}`);
-        }
     }
 
     /**
@@ -645,12 +605,6 @@ class TextResizeScanner extends BaseScanner {
         return recommendations[type] || 'Use relative units and flexible layouts';
     }
 
-    async close() {
-        if (this.browser) {
-            await this.browser.close();
-            this.browser = null;
-        }
-    }
 }
 
 module.exports = TextResizeScanner;

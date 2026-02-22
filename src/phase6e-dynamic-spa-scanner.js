@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -15,21 +14,10 @@ class DynamicSpaScanner extends BaseScanner {
             wcagCriteria: ['4.1.2', '4.1.3'],
             wcagPrinciple: 'robust',
         });
-        this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/dynamic-spa-screenshots');
     }
 
     get needsExclusiveAccess() { return true; }
-
-    async init() {
-        if (!this.browser) {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-        }
-        await fs.ensureDir(this.screenshotDir);
-    }
 
     /**
      * Core scan method — receives an already-navigated Puppeteer page.
@@ -145,39 +133,6 @@ class DynamicSpaScanner extends BaseScanner {
             recommendations: this.generateDynamicSpaRecommendations(violations),
             spaTestingGuidance: this.generateSpaTestingGuidance(violations)
         };
-    }
-
-    /** @deprecated Use scan(page, options) via ScanPipeline instead */
-    async scanDynamicSpa(url, options = {}) {
-        const scanOptions = {
-            testRouteChanges: true,
-            testDynamicContent: true,
-            testLoadingStates: true,
-            testErrorStates: true,
-            testFormSubmissions: true,
-            testModalDialogs: true,
-            testInfiniteScroll: true,
-            testSearchFilters: true,
-            monitorFocusManagement: true,
-            checkLiveRegions: true,
-            interactionTimeout: 5000,
-            timeout: 60000,
-            ...options,
-        };
-
-        try {
-            await this.init();
-            const page = await this.browser.newPage();
-            await page.setViewport({ width: 1280, height: 1024 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-            try {
-                return await this.scan(page, scanOptions);
-            } finally {
-                await page.close();
-            }
-        } catch (error) {
-            throw new Error(`Dynamic SPA scan failed: ${error.message}`);
-        }
     }
 
     /**
@@ -1192,12 +1147,6 @@ class DynamicSpaScanner extends BaseScanner {
         };
     }
 
-    async close() {
-        if (this.browser) {
-            await this.browser.close();
-            this.browser = null;
-        }
-    }
 }
 
 module.exports = DynamicSpaScanner;

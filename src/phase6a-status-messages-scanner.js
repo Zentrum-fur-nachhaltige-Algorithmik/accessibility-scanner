@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,18 +13,7 @@ class StatusMessagesScanner extends BaseScanner {
             wcagCriteria: ['4.1.3'],
             wcagPrinciple: 'robust'
         });
-        this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/status-messages-screenshots');
-    }
-
-    async init() {
-        if (!this.browser) {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-        }
-        await fs.ensureDir(this.screenshotDir);
     }
 
     /**
@@ -800,12 +788,6 @@ class StatusMessagesScanner extends BaseScanner {
         return testCases;
     }
 
-    async close() {
-        if (this.browser) {
-            await this.browser.close();
-            this.browser = null;
-        }
-    }
 }
 
 module.exports = StatusMessagesScanner;

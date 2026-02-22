@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,20 +13,7 @@ class LanguageDetectionScanner extends BaseScanner {
       wcagCriteria: ['3.1.1', '3.1.2'],
       wcagPrinciple: 'understandable'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/language-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -64,28 +50,6 @@ class LanguageDetectionScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: languageResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanLanguageCompliance(url, options = {}) {
-    const scanOptions = {
-      timeout: options.timeout || 60000,
-      ...options
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-      try {
-        return await this.scan(page, options);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Language detection scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -434,12 +398,6 @@ class LanguageDetectionScanner extends BaseScanner {
     return validPattern.test(code) && (code.length === 2 || validCodes.includes(code));
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = LanguageDetectionScanner;

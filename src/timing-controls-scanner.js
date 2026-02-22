@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Timing Controls Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.2.2.1, 9.2.2.2, 9.2.2.6
  * Tests timing adjustability, auto-play controls, and timeout handling
  */
-class TimingControlsScanner {
+class TimingControlsScanner extends BaseScanner {
   constructor() {
+    super('timing-controls', {
+      wcagCriteria: ['2.2.1', '2.2.2'],
+      wcagPrinciple: 'operable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/timing-controls-screenshots');
   }
@@ -20,23 +25,18 @@ class TimingControlsScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan timing controls compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.testTimeouts - Test timeout adjustability
-   * @param {boolean} options.testAutoPlay - Test auto-playing content controls
-   * @param {boolean} options.testMovingContent - Test moving/updating content controls
-   * @param {number} options.observationTime - Time to observe for dynamic content (ms)
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} TimingControlsReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanTimingControls(url, options = {}) {
+  async scan(page, options = {}) {
     const defaultOptions = {
       testTimeouts: true,
       testAutoPlay: true,
@@ -47,40 +47,51 @@ class TimingControlsScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const timingResults = await this.performTimingControlsAnalysis(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.2.2.1", "9.2.2.2", "9.2.2.6"],
+      passed: timingResults.violations.length === 0,
+      violations: timingResults.violations,
+      summary: {
+        timeoutsAdjustable: timingResults.timeoutsAdjustable,
+        autoPlayControlled: timingResults.autoPlayControlled,
+        movingContentControllable: timingResults.movingContentControllable,
+        dataPreservedOnTimeout: timingResults.dataPreservedOnTimeout
+      },
+      screenshotPath: scanDir,
+      visualEvidence: timingResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanTimingControls(url, options = {}) {
+    const scanOptions = {
+      testTimeouts: true,
+      testAutoPlay: true,
+      testMovingContent: true,
+      observationTime: 5000,
+      timeout: 60000,
+      ...options
+    };
+
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const timingResults = await this.performTimingControlsAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.2.2.1", "9.2.2.2", "9.2.2.6"],
-        passed: timingResults.violations.length === 0,
-        violations: timingResults.violations,
-        summary: {
-          timeoutsAdjustable: timingResults.timeoutsAdjustable,
-          autoPlayControlled: timingResults.autoPlayControlled,
-          movingContentControllable: timingResults.movingContentControllable,
-          dataPreservedOnTimeout: timingResults.dataPreservedOnTimeout
-        },
-        screenshotPath: scanDir,
-        visualEvidence: timingResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Timing controls scan failed: ${error.message}`);
     }

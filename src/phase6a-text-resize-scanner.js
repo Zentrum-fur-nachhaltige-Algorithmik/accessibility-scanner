@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Text Resize Scanner for WCAG 1.4.4 compliance testing
  * Tests 200% zoom and 400% mobile zoom without horizontal scrolling
  * Critical for 25% of users who need text magnification
  */
-class TextResizeScanner {
+class TextResizeScanner extends BaseScanner {
     constructor() {
+        super('text-resize', {
+            wcagCriteria: ['1.4.4'],
+            wcagPrinciple: 'perceivable'
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/text-resize-screenshots');
         this.testViewports = [
@@ -19,6 +24,13 @@ class TextResizeScanner {
             { width: 188, height: 334, name: 'mobile-200%', scale: 2 }, // Mobile 200% zoom
             { width: 94, height: 167, name: 'mobile-400%', scale: 4 }   // Mobile 400% zoom
         ];
+    }
+
+    /**
+     * This scanner modifies viewport, so it needs exclusive access.
+     */
+    get needsExclusiveAccess() {
+        return true;
     }
 
     async init() {
@@ -32,11 +44,150 @@ class TextResizeScanner {
     }
 
     /**
-     * Scan text resize compliance (WCAG 1.4.4)
-     * @param {string} url - URL to scan
+     * Core scan method. Receives an already-navigated Puppeteer page.
+     * Loops through multiple viewports using the provided page.
+     * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
      * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} TextResizeReport
+     * @returns {Promise<Object>} ScanResult
      */
+    async scan(page, options = {}) {
+        const defaultOptions = {
+            testZoomLevels: [200, 400],
+            checkMobile: true,
+            detectFixedElements: true,
+            analyzeTextFlow: true,
+            timeout: 60000
+        };
+
+        const scanOptions = { ...defaultOptions, ...options };
+        const timestamp = Date.now();
+        const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+        await fs.ensureDir(scanDir);
+
+        const violations = [];
+        const viewportResults = {};
+
+        // Get the current URL from the page for reloads after viewport changes
+        const currentUrl = page.url();
+
+        // Test each viewport for zoom compliance using the provided page
+        for (const viewport of this.testViewports) {
+            await page.setViewport({
+                width: viewport.width,
+                height: viewport.height,
+                deviceScaleFactor: viewport.scale
+            });
+
+            // Reload so the page renders at the new viewport
+            await page.goto(currentUrl, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
+
+            const result = await this.analyzeTextResizeCompliance(page, viewport, scanDir);
+            viewportResults[viewport.name] = result;
+
+            if (result.violations.length > 0) {
+                violations.push(...result.violations.map(v => ({
+                    ...v,
+                    viewport: viewport.name,
+                    zoomLevel: viewport.scale === 1 ? '100%' : `${viewport.scale * 100}%`
+                })));
+            }
+        }
+
+        // Additional CSS analysis using the provided page (reset to desktop viewport)
+        await page.setViewport({ width: 1280, height: 1024, deviceScaleFactor: 1 });
+        await page.goto(currentUrl, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
+        const cssViolations = await this._analyzeCSSFromPage(page);
+        violations.push(...cssViolations);
+
+        return {
+            scannerId: this.id,
+            criteria: ["1.4.4"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalViewportsTested: this.testViewports.length,
+                zoomLevelsSupported: this.calculateZoomSupport(viewportResults),
+                horizontalScrollIssues: violations.filter(v => v.type === 'horizontal-scroll').length,
+                fixedElementIssues: violations.filter(v => v.type === 'fixed-size').length,
+                textFlowIssues: violations.filter(v => v.type === 'text-overflow').length
+            },
+            viewportResults: viewportResults,
+            screenshotPath: scanDir,
+            recommendations: this.generateTextResizeRecommendations(violations)
+        };
+    }
+
+    /**
+     * Analyze CSS for text resize issues using an already-loaded page.
+     * @private
+     */
+    async _analyzeCSSFromPage(page) {
+        const violations = [];
+
+        const cssAnalysis = await page.evaluate(() => {
+            const issues = [];
+            const sheets = Array.from(document.styleSheets);
+
+            for (const sheet of sheets) {
+                try {
+                    const rules = Array.from(sheet.cssRules || sheet.rules || []);
+
+                    for (const rule of rules) {
+                        if (rule.style) {
+                            const selector = rule.selectorText;
+                            const styles = rule.style;
+
+                            if (styles.fontSize && styles.fontSize.endsWith('px') && parseInt(styles.fontSize) < 12) {
+                                issues.push({ type: 'small-fixed-font', selector, property: 'font-size', value: styles.fontSize, severity: 'moderate' });
+                            }
+                            if (styles.width && styles.width.endsWith('px')) {
+                                const width = parseInt(styles.width);
+                                if (width > 800) {
+                                    issues.push({ type: 'fixed-width', selector, property: 'width', value: styles.width, severity: 'serious' });
+                                }
+                            }
+                            if (styles.minWidth && styles.minWidth.endsWith('px')) {
+                                const minWidth = parseInt(styles.minWidth);
+                                if (minWidth > 600) {
+                                    issues.push({ type: 'fixed-min-width', selector, property: 'min-width', value: styles.minWidth, severity: 'serious' });
+                                }
+                            }
+                            if (styles.maxWidth && styles.maxWidth.endsWith('px')) {
+                                const maxWidth = parseInt(styles.maxWidth);
+                                if (maxWidth < 320) {
+                                    issues.push({ type: 'restrictive-max-width', selector, property: 'max-width', value: styles.maxWidth, severity: 'moderate' });
+                                }
+                            }
+                            if (styles.overflow === 'hidden' && (styles.width?.endsWith('px') || styles.height?.endsWith('px'))) {
+                                issues.push({ type: 'overflow-hidden-fixed', selector, properties: { overflow: styles.overflow, width: styles.width, height: styles.height }, severity: 'serious' });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // Skip stylesheets that can't be accessed (CORS)
+                }
+            }
+
+            return issues;
+        });
+
+        for (const issue of cssAnalysis) {
+            violations.push({
+                type: issue.type,
+                severity: issue.severity,
+                description: this.getCSSIssueDescription(issue.type),
+                selector: issue.selector,
+                details: issue.properties || { [issue.property]: issue.value },
+                wcagCriteria: '1.4.4',
+                impact: this.getCSSIssueImpact(issue.type),
+                recommendation: this.getCSSRecommendation(issue.type)
+            });
+        }
+
+        return violations;
+    }
+
+    /** @deprecated Use scan(page, options) via ScanPipeline instead */
     async scanTextResize(url, options = {}) {
         const defaultOptions = {
             testZoomLevels: [200, 400],
@@ -50,64 +201,15 @@ class TextResizeScanner {
 
         try {
             await this.init();
-            const timestamp = Date.now();
-            const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-            await fs.ensureDir(scanDir);
+            const page = await this.browser.newPage();
+            await page.setViewport({ width: 1920, height: 1080 });
+            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-            const violations = [];
-            const viewportResults = {};
-            
-            // Test each viewport for zoom compliance
-            for (const viewport of this.testViewports) {
-                const page = await this.browser.newPage();
-                
-                try {
-                    await page.setViewport({
-                        width: viewport.width,
-                        height: viewport.height,
-                        deviceScaleFactor: viewport.scale
-                    });
-
-                    await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-                    
-                    const result = await this.analyzeTextResizeCompliance(page, viewport, scanDir);
-                    viewportResults[viewport.name] = result;
-                    
-                    if (result.violations.length > 0) {
-                        violations.push(...result.violations.map(v => ({
-                            ...v,
-                            viewport: viewport.name,
-                            zoomLevel: viewport.scale === 1 ? '100%' : `${viewport.scale * 100}%`
-                        })));
-                    }
-                    
-                } finally {
-                    await page.close();
-                }
+            try {
+                return await this.scan(page, scanOptions);
+            } finally {
+                await page.close();
             }
-
-            // Additional CSS analysis for text resize issues
-            const cssViolations = await this.analyzeCSSForTextResizeIssues(url, scanOptions);
-            violations.push(...cssViolations);
-
-            const report = {
-                criteria: ["1.4.4"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalViewportsTested: this.testViewports.length,
-                    zoomLevelsSupported: this.calculateZoomSupport(viewportResults),
-                    horizontalScrollIssues: violations.filter(v => v.type === 'horizontal-scroll').length,
-                    fixedElementIssues: violations.filter(v => v.type === 'fixed-size').length,
-                    textFlowIssues: violations.filter(v => v.type === 'text-overflow').length
-                },
-                viewportResults: viewportResults,
-                screenshotPath: scanDir,
-                recommendations: this.generateTextResizeRecommendations(violations)
-            };
-
-            return report;
-
         } catch (error) {
             throw new Error(`Text resize scan failed: ${error.message}`);
         }

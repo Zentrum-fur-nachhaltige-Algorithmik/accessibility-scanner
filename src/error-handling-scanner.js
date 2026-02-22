@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Error Handling Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.3.3.1, 9.3.3.2, 9.3.3.3, 9.3.3.4
  * Tests error identification, labels/instructions, suggestions, and error prevention
  */
-class ErrorHandlingScanner {
+class ErrorHandlingScanner extends BaseScanner {
   constructor() {
+    super('error-handling', {
+      wcagCriteria: ['3.3.1', '3.3.2', '3.3.3', '3.3.4'],
+      wcagPrinciple: 'understandable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/error-handling-screenshots');
   }
@@ -20,24 +25,18 @@ class ErrorHandlingScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan error handling compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.testErrorIdentification - Test error identification
-   * @param {boolean} options.testLabelsInstructions - Test labels and instructions
-   * @param {boolean} options.testErrorSuggestions - Test error suggestions
-   * @param {boolean} options.testErrorPrevention - Test error prevention
-   * @param {boolean} options.simulateErrors - Trigger form errors for testing
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} ErrorHandlingReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanErrorHandling(url, options = {}) {
+  async scan(page, options = {}) {
     const defaultOptions = {
       testErrorIdentification: true,
       testLabelsInstructions: true,
@@ -49,40 +48,52 @@ class ErrorHandlingScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const errorResults = await this.performErrorHandlingAnalysis(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.3.3.1", "9.3.3.2", "9.3.3.3", "9.3.3.4"],
+      passed: errorResults.violations.length === 0,
+      violations: errorResults.violations,
+      summary: {
+        errorsIdentified: errorResults.errorsIdentified,
+        labelsProvided: errorResults.labelsProvided,
+        suggestionsProvided: errorResults.suggestionsProvided,
+        preventionImplemented: errorResults.preventionImplemented
+      },
+      screenshotPath: scanDir,
+      visualEvidence: errorResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanErrorHandling(url, options = {}) {
+    const scanOptions = {
+      testErrorIdentification: true,
+      testLabelsInstructions: true,
+      testErrorSuggestions: true,
+      testErrorPrevention: true,
+      simulateErrors: true,
+      timeout: 60000,
+      ...options
+    };
+
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const errorResults = await this.performErrorHandlingAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.3.3.1", "9.3.3.2", "9.3.3.3", "9.3.3.4"],
-        passed: errorResults.violations.length === 0,
-        violations: errorResults.violations,
-        summary: {
-          errorsIdentified: errorResults.errorsIdentified,
-          labelsProvided: errorResults.labelsProvided,
-          suggestionsProvided: errorResults.suggestionsProvided,
-          preventionImplemented: errorResults.preventionImplemented
-        },
-        screenshotPath: scanDir,
-        visualEvidence: errorResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Error handling scan failed: ${error.message}`);
     }

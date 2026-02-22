@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Predictable Navigation Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.3.2.1, 9.3.2.2, 9.3.2.3, 9.3.2.4
  * Tests navigation consistency, predictable behavior, and user control
  */
-class PredictableNavigationScanner {
+class PredictableNavigationScanner extends BaseScanner {
   constructor() {
+    super('predictable-navigation', {
+      wcagCriteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
+      wcagPrinciple: 'understandable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/predictable-navigation-screenshots');
   }
@@ -20,23 +25,18 @@ class PredictableNavigationScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan predictable navigation compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.testOnFocus - Test on focus behavior
-   * @param {boolean} options.testOnInput - Test on input behavior
-   * @param {boolean} options.testConsistentNavigation - Test navigation consistency
-   * @param {boolean} options.testConsistentIdentification - Test component identification consistency
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} PredictableNavigationReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanPredictableNavigation(url, options = {}) {
+  async scan(page, options = {}) {
     const defaultOptions = {
       testOnFocus: true,
       testOnInput: true,
@@ -47,40 +47,51 @@ class PredictableNavigationScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const navigationResults = await this.performPredictableNavigationAnalysis(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.3.2.1", "9.3.2.2", "9.3.2.3", "9.3.2.4"],
+      passed: navigationResults.violations.length === 0,
+      violations: navigationResults.violations,
+      summary: {
+        onFocusPredictable: navigationResults.onFocusPredictable,
+        onInputPredictable: navigationResults.onInputPredictable,
+        navigationConsistent: navigationResults.navigationConsistent,
+        identificationConsistent: navigationResults.identificationConsistent
+      },
+      screenshotPath: scanDir,
+      visualEvidence: navigationResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanPredictableNavigation(url, options = {}) {
+    const scanOptions = {
+      testOnFocus: true,
+      testOnInput: true,
+      testConsistentNavigation: true,
+      testConsistentIdentification: true,
+      timeout: 60000,
+      ...options
+    };
+
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const navigationResults = await this.performPredictableNavigationAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.3.2.1", "9.3.2.2", "9.3.2.3", "9.3.2.4"],
-        passed: navigationResults.violations.length === 0,
-        violations: navigationResults.violations,
-        summary: {
-          onFocusPredictable: navigationResults.onFocusPredictable,
-          onInputPredictable: navigationResults.onInputPredictable,
-          navigationConsistent: navigationResults.navigationConsistent,
-          identificationConsistent: navigationResults.identificationConsistent
-        },
-        screenshotPath: scanDir,
-        visualEvidence: navigationResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Predictable navigation scan failed: ${error.message}`);
     }

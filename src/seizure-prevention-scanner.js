@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Seizure Prevention Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.2.3.1, 9.2.3.3 (Three Flashes, Animation from Interactions)
  * CRITICAL SAFETY REQUIREMENT - Tests for seizure-inducing content
  */
-class SeizurePreventionScanner {
+class SeizurePreventionScanner extends BaseScanner {
   constructor() {
+    super('seizure-prevention', {
+      wcagCriteria: ['2.3.1', '2.3.2'],
+      wcagPrinciple: 'operable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/seizure-prevention-screenshots');
   }
@@ -20,67 +25,73 @@ class SeizurePreventionScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan seizure prevention compliance - SAFETY CRITICAL
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.testFlashingContent - Test for dangerous flashing (CRITICAL)
-   * @param {boolean} options.testAnimationTriggers - Test animation from interactions
-   * @param {boolean} options.testMotionSensitivity - Test motion sensitivity controls
-   * @param {number} options.observationTime - Time to observe for flashing (ms)
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} SeizurePreventionReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanSeizurePrevention(url, options = {}) {
+  async scan(page, options = {}) {
     const defaultOptions = {
       testFlashingContent: true,
       testAnimationTriggers: true,
       testMotionSensitivity: true,
-      observationTime: 10000, // 10 seconds observation for safety
+      observationTime: 10000,
       timeout: 60000
     };
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const seizureResults = await this.performSeizurePreventionAnalysis(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.2.3.1", "9.2.3.3"],
+      passed: seizureResults.violations.length === 0,
+      violations: seizureResults.violations,
+      summary: {
+        noFlashingViolations: seizureResults.noFlashingViolations,
+        animationTriggersControlled: seizureResults.animationTriggersControlled,
+        motionSensitivitySupported: seizureResults.motionSensitivitySupported,
+        seizureRiskLevel: seizureResults.seizureRiskLevel
+      },
+      screenshotPath: scanDir,
+      visualEvidence: seizureResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanSeizurePrevention(url, options = {}) {
+    const scanOptions = {
+      testFlashingContent: true,
+      testAnimationTriggers: true,
+      testMotionSensitivity: true,
+      observationTime: 10000,
+      timeout: 60000,
+      ...options
+    };
+
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const seizureResults = await this.performSeizurePreventionAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.2.3.1", "9.2.3.3"],
-        passed: seizureResults.violations.length === 0,
-        violations: seizureResults.violations,
-        summary: {
-          noFlashingViolations: seizureResults.noFlashingViolations,
-          animationTriggersControlled: seizureResults.animationTriggersControlled,
-          motionSensitivitySupported: seizureResults.motionSensitivitySupported,
-          seizureRiskLevel: seizureResults.seizureRiskLevel
-        },
-        screenshotPath: scanDir,
-        visualEvidence: seizureResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Seizure prevention scan failed: ${error.message}`);
     }

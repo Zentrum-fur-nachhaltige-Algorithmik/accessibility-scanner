@@ -90,19 +90,34 @@ class ScanPipeline {
         }
       }
 
-      // Run exclusive scanners sequentially, re-navigating between each
-      for (const scanner of exclusive) {
-        try {
-          await page.goto(url, { waitUntil: 'networkidle0', timeout });
-          const result = await scanner.scan(page, passedOptions);
-          allResults.push(result);
-        } catch (err) {
-          allResults.push({
-            scannerId: scanner.id,
-            passed: false,
-            violations: [],
-            error: err.message,
-          });
+      // Run exclusive scanners in parallel batches, each in its own tab
+      const tabConcurrency = options.tabConcurrency || 2;
+
+      for (let i = 0; i < exclusive.length; i += tabConcurrency) {
+        const batch = exclusive.slice(i, i + tabConcurrency);
+        const batchResults = await Promise.allSettled(
+          batch.map(async (scanner) => {
+            const tab = await this.browser.newPage();
+            await tab.setViewport({ width: 1920, height: 1080 });
+            try {
+              await tab.goto(url, { waitUntil: 'networkidle0', timeout });
+              return await scanner.scan(tab, passedOptions);
+            } finally {
+              await tab.close().catch(() => {});
+            }
+          })
+        );
+        for (const result of batchResults) {
+          if (result.status === 'fulfilled') {
+            allResults.push(result.value);
+          } else {
+            allResults.push({
+              scannerId: 'unknown',
+              passed: false,
+              violations: [],
+              error: result.reason?.message || String(result.reason),
+            });
+          }
         }
       }
     } finally {

@@ -561,13 +561,15 @@ class ReportGenerator {
   }
 
   generatePrincipleScoresTable(data, getScoreClass) {
-    if (!data.categories) return '';
+    // Use actual violation grouping instead of potentially broken upstream categories
+    const groups = this.groupViolationsByPrinciple(data.violations || []);
+    const cats = data.categories || {};
 
     const principles = [
-      ['Perceivable', data.categories.perceivable],
-      ['Operable', data.categories.operable],
-      ['Understandable', data.categories.understandable],
-      ['Robust', data.categories.robust],
+      ['Perceivable', 'perceivable'],
+      ['Operable', 'operable'],
+      ['Understandable', 'understandable'],
+      ['Robust', 'robust'],
     ];
 
     let html = `<h3>WCAG Principle Overview</h3>
@@ -575,9 +577,10 @@ class ReportGenerator {
 <thead><tr><th>Principle</th><th>Score</th><th>Violations</th></tr></thead>
 <tbody>`;
 
-    for (const [name, cat] of principles) {
+    for (const [name, key] of principles) {
+      const cat = cats[key];
       const score = cat?.score != null ? cat.score : '--';
-      const violations = cat?.violations || 0;
+      const violations = (groups[key] || []).length;
       const cls = cat?.score != null ? getScoreClass(cat.score) : '';
       html += `<tr><td>${name}</td><td class="${cls}">${score}${score !== '--' ? '%' : ''}</td><td>${violations}</td></tr>`;
     }

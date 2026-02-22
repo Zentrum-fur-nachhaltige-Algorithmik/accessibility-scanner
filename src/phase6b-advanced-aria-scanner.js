@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -15,18 +14,7 @@ class AdvancedAriaScanner extends BaseScanner {
             wcagCriteria: ['4.1.2', '1.3.1'],
             wcagPrinciple: 'robust'
         });
-        this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/advanced-aria-screenshots');
-    }
-
-    async init() {
-        if (!this.browser) {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-        }
-        await fs.ensureDir(this.screenshotDir);
     }
 
     /**
@@ -1350,12 +1338,6 @@ class AdvancedAriaScanner extends BaseScanner {
         return references[category] || 'https://www.w3.org/WAI/ARIA/apg/patterns/';
     }
 
-    async close() {
-        if (this.browser) {
-            await this.browser.close();
-            this.browser = null;
-        }
-    }
 }
 
 module.exports = AdvancedAriaScanner;

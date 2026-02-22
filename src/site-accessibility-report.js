@@ -17,6 +17,10 @@ class SiteAccessibilityReport {
    * @param {Object} options - Report generation options
    * @returns {Object} Report generation results
    */
+  async generate(siteData, options = {}) {
+    return this.generateSiteReport(siteData, options);
+  }
+
   async generateSiteReport(siteData, options = {}) {
     const {
       format = 'html', // 'html', 'pdf', 'both'

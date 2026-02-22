@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,20 +13,7 @@ class AdvancedContrastScanner extends BaseScanner {
       wcagCriteria: ['1.4.3', '1.4.6', '1.4.11'],
       wcagPrinciple: 'perceivable'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/contrast-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -64,28 +50,6 @@ class AdvancedContrastScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: contrastResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanAdvancedContrast(url, options = {}) {
-    const scanOptions = {
-      timeout: options.timeout || 60000,
-      ...options
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-      try {
-        return await this.scan(page, options);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Advanced contrast scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -635,12 +599,6 @@ class AdvancedContrastScanner extends BaseScanner {
     return analysis;
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = AdvancedContrastScanner;

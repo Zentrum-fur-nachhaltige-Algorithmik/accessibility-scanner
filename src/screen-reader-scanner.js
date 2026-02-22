@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const BaseScanner = require('./base-scanner');
 
 class ScreenReaderScanner extends BaseScanner {
@@ -7,16 +6,6 @@ class ScreenReaderScanner extends BaseScanner {
       wcagCriteria: ['1.3.1', '4.1.2', '4.1.3'],
       wcagPrinciple: 'perceivable'
     });
-    this.browser = null;
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
   }
 
   /**
@@ -70,37 +59,6 @@ class ScreenReaderScanner extends BaseScanner {
         ariaIssues: ariaUsage.misusedAttributes.length
       }
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async screenReaderAnalysis(url) {
-    try {
-      await this.init();
-
-      if (!this.isValidUrl(url)) {
-        return this.createErrorReport(url, 'Invalid URL format');
-      }
-
-      const page = await this.browser.newPage();
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-      try {
-        const result = await this.scan(page);
-        result.url = url;
-        return result;
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      let errorMessage = 'Unknown error occurred';
-
-      if (error.name === 'TimeoutError') {
-        errorMessage = 'Failed to load page: Timeout';
-      } else if (error.message.includes('net::ERR_NAME_NOT_RESOLVED')) {
-        errorMessage = 'Failed to load page: DNS lookup failed';
-      }
-
-      return this.createErrorReport(url, errorMessage);
-    }
   }
 
   async analyzeHeadingStructure(page) {
@@ -494,12 +452,6 @@ class ScreenReaderScanner extends BaseScanner {
     };
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = ScreenReaderScanner;

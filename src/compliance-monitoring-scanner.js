@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const BaseScanner = require('./base-scanner');
 
 /**
@@ -12,16 +11,6 @@ class ComplianceMonitoringScanner extends BaseScanner {
       wcagCriteria: ['EN 301 549 12.4'],
       wcagPrinciple: 'robust'
     });
-    this.browser = null;
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
   }
 
   /**
@@ -418,12 +407,6 @@ class ComplianceMonitoringScanner extends BaseScanner {
     return true;
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = ComplianceMonitoringScanner;

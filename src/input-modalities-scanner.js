@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,23 +13,10 @@ class InputModalitiesScanner extends BaseScanner {
       wcagCriteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4'],
       wcagPrinciple: 'operable',
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/input-modalities-screenshots');
   }
 
   get needsExclusiveAccess() { return true; }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-    
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
-  }
 
   /**
    * Core scan method — receives an already-navigated Puppeteer page.
@@ -69,31 +55,6 @@ class InputModalitiesScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: inputResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanInputModalities(url, options = {}) {
-    const scanOptions = {
-      testPointerGestures: true,
-      testMotionActuation: true,
-      testLabelMatching: true,
-      timeout: 60000,
-      ...options,
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-      try {
-        return await this.scan(page, scanOptions);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Input modalities scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -702,12 +663,6 @@ class InputModalitiesScanner extends BaseScanner {
     return suggestions[violationType] || 'Ensure motion-based features can be disabled and have alternatives';
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = InputModalitiesScanner;

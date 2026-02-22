@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,20 +13,7 @@ class TimingControlsScanner extends BaseScanner {
       wcagCriteria: ['2.2.1', '2.2.2'],
       wcagPrinciple: 'operable'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/timing-controls-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -68,33 +54,6 @@ class TimingControlsScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: timingResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanTimingControls(url, options = {}) {
-    const scanOptions = {
-      testTimeouts: true,
-      testAutoPlay: true,
-      testMovingContent: true,
-      observationTime: 5000,
-      timeout: 60000,
-      ...options
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, scanOptions);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Timing controls scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -673,12 +632,6 @@ class TimingControlsScanner extends BaseScanner {
     return suggestions[violationType] || 'Make timeout warnings accessible with proper ARIA markup';
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = TimingControlsScanner;

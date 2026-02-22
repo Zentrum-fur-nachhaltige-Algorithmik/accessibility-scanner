@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const BaseScanner = require('./base-scanner');
 
 /**
@@ -12,16 +11,6 @@ class UseOfColorScanner extends BaseScanner {
       wcagCriteria: ['1.4.1'],
       wcagPrinciple: 'perceivable'
     });
-    this.browser = null;
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
   }
 
   /**
@@ -239,29 +228,6 @@ class UseOfColorScanner extends BaseScanner {
     };
   }
 
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanColorDependency(url) {
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-      try {
-        return await this.scan(page);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Use of color scan failed: ${error.message}`);
-    }
-  }
-
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = UseOfColorScanner;

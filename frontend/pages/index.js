@@ -14,22 +14,12 @@ export default function Home() {
     setReport(null);
 
     try {
-      const endpoint = options.scanType === 'screen-reader' 
-        ? '/api/screen-reader-scan'
-        : options.scanType === 'basic'
-        ? '/api/scan'
-        : '/api/enhanced-scan';
-
-      const body = options.scanType === 'screen-reader' 
-        ? { url }
-        : { url, options };
-
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ url, options }),
       });
 
       if (!response.ok) {

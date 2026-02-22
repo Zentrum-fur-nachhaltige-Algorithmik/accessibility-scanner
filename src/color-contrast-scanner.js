@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const BaseScanner = require('./base-scanner');
 
 /**
@@ -11,16 +10,6 @@ class ColorContrastScanner extends BaseScanner {
       wcagCriteria: ['1.4.3', '1.4.6'],
       wcagPrinciple: 'perceivable'
     });
-    this.browser = null;
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
   }
 
   /**
@@ -214,29 +203,6 @@ class ColorContrastScanner extends BaseScanner {
     };
   }
 
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanColorContrast(url, options = {}) {
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-      try {
-        return await this.scan(page, options);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Color contrast scan failed: ${error.message}`);
-    }
-  }
-
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = ColorContrastScanner;

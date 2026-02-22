@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,20 +13,7 @@ class EAAProcedureScanner extends BaseScanner {
       wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
       wcagPrinciple: 'robust'
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/eaa-procedure-screenshots');
-  }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
   }
 
   /**
@@ -704,12 +690,6 @@ class EAAProcedureScanner extends BaseScanner {
     return true;
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = EAAProcedureScanner;

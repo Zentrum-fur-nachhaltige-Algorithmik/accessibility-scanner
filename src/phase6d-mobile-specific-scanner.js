@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -15,7 +14,6 @@ class MobileSpecificScanner extends BaseScanner {
             wcagCriteria: ['1.4.10', '2.5.5'],
             wcagPrinciple: 'operable',
         });
-        this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/mobile-screenshots');
         this.mobileViewports = {
             'iPhone SE': { width: 375, height: 667, deviceScaleFactor: 2, isMobile: true },
@@ -27,16 +25,6 @@ class MobileSpecificScanner extends BaseScanner {
     }
 
     get needsExclusiveAccess() { return true; }
-
-    async init() {
-        if (!this.browser) {
-            this.browser = await puppeteer.launch({
-                headless: 'new',
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
-            });
-        }
-        await fs.ensureDir(this.screenshotDir);
-    }
 
     /**
      * Core scan method — receives an already-navigated Puppeteer page.
@@ -151,35 +139,6 @@ class MobileSpecificScanner extends BaseScanner {
             recommendations: this.generateMobileRecommendations(violations),
             mobileTestingGuidance: this.generateMobileTestingGuidance(violations)
         };
-    }
-
-    /** @deprecated Use scan(page, options) via ScanPipeline instead */
-    async scanMobileAccessibility(url, options = {}) {
-        const scanOptions = {
-            test400PercentZoom: true,
-            testOrientation: true,
-            testTouchTargets: true,
-            testViewportMeta: true,
-            testScrollHorizontal: true,
-            testInteractionSize: true,
-            testDeviceAdaptation: true,
-            timeout: 60000,
-            ...options,
-        };
-
-        try {
-            await this.init();
-            const page = await this.browser.newPage();
-            await page.setViewport({ width: 1280, height: 1024 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-            try {
-                return await this.scan(page, scanOptions);
-            } finally {
-                await page.close();
-            }
-        } catch (error) {
-            throw new Error(`Mobile accessibility scan failed: ${error.message}`);
-        }
     }
 
     /**
@@ -807,12 +766,6 @@ class MobileSpecificScanner extends BaseScanner {
         };
     }
 
-    async close() {
-        if (this.browser) {
-            await this.browser.close();
-            this.browser = null;
-        }
-    }
 }
 
 module.exports = MobileSpecificScanner;

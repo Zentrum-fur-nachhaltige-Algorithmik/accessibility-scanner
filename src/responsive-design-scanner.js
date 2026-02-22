@@ -1,4 +1,3 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
@@ -14,23 +13,10 @@ class ResponsiveDesignScanner extends BaseScanner {
       wcagCriteria: ['1.4.4', '1.4.10'],
       wcagPrinciple: 'perceivable',
     });
-    this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/responsive-screenshots');
   }
 
   get needsExclusiveAccess() { return true; }
-
-  async init() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    }
-    
-    // Ensure screenshot directory exists
-    await fs.ensureDir(this.screenshotDir);
-  }
 
   /**
    * Core scan method — receives an already-navigated Puppeteer page.
@@ -80,35 +66,6 @@ class ResponsiveDesignScanner extends BaseScanner {
       screenshotPath: scanDir,
       visualEvidence: responsiveResults.visualEvidence
     };
-  }
-
-  /** @deprecated Use scan(page, options) via ScanPipeline instead */
-  async scanResponsiveCompliance(url, options = {}) {
-    const scanOptions = {
-      viewports: [
-        { width: 320, height: 568, devicePixelRatio: 2, name: "iPhone SE" },
-        { width: 375, height: 667, devicePixelRatio: 2, name: "iPhone 8" },
-        { width: 768, height: 1024, devicePixelRatio: 2, name: "iPad" },
-        { width: 1920, height: 1080, devicePixelRatio: 1, name: "Desktop" }
-      ],
-      testZoomLevels: [100, 200, 320, 400],
-      testOrientation: false,
-      timeout: 60000,
-      ...options,
-    };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-      try {
-        return await this.scan(page, scanOptions);
-      } finally {
-        await page.close();
-      }
-    } catch (error) {
-      throw new Error(`Responsive design scan failed: ${error.message}`);
-    }
   }
 
   /**
@@ -514,12 +471,6 @@ class ResponsiveDesignScanner extends BaseScanner {
     });
   }
 
-  async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
-  }
 }
 
 module.exports = ResponsiveDesignScanner;

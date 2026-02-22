@@ -1,17 +1,24 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Keyboard Navigation Scanner for WCAG compliance testing
  * Implements EN 301 549 criteria 9.2.1.1, 9.2.1.2, 9.2.1.4 (Keyboard Accessible, No Keyboard Trap, Character Key Shortcuts)
  * Uses full visual screenshot analysis for thorough focus visibility testing
  */
-class KeyboardNavigationScanner {
+class KeyboardNavigationScanner extends BaseScanner {
   constructor() {
+    super('keyboard-navigation', {
+      wcagCriteria: ['2.1.1', '2.1.2', '2.1.4'],
+      wcagPrinciple: 'operable',
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/keyboard-screenshots');
   }
+
+  get needsExclusiveAccess() { return true; }
 
   async init() {
     if (!this.browser) {
@@ -26,60 +33,65 @@ class KeyboardNavigationScanner {
   }
 
   /**
-   * Scan keyboard accessibility compliance
-   * @param {string} url - URL to scan
+   * Core scan method — receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.testAllInteractives - Test all interactive elements
-   * @param {boolean} options.simulateTabbing - Simulate actual tab key presses
-   * @param {boolean} options.testCustomControls - Test custom control accessibility
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} KeyboardReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanKeyboardAccess(url, options = {}) {
-    const defaultOptions = {
+  async scan(page, options = {}) {
+    const scanOptions = {
       testAllInteractives: true,
       simulateTabbing: true,
       testCustomControls: true,
-      timeout: 60000
+      ...options,
     };
 
-    const scanOptions = { ...defaultOptions, ...options };
+    const screenshotDir = options.screenshotDir || this.screenshotDir;
+    await fs.ensureDir(screenshotDir);
+
+    const timestamp = Date.now();
+    const scanDir = path.join(screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const keyboardResults = await this.performKeyboardAnalysis(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.2.1.1", "9.2.1.2", "9.2.1.4"],
+      passed: keyboardResults.violations.length === 0,
+      violations: keyboardResults.violations,
+      summary: {
+        tabbableElements: keyboardResults.tabbableElements,
+        keyboardInaccessible: keyboardResults.keyboardInaccessible,
+        keyboardTraps: keyboardResults.keyboardTraps,
+        customShortcuts: keyboardResults.customShortcuts
+      },
+      tabOrder: keyboardResults.tabOrder,
+      screenshotPath: scanDir,
+      visualEvidence: keyboardResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanKeyboardAccess(url, options = {}) {
+    const scanOptions = {
+      testAllInteractives: true,
+      simulateTabbing: true,
+      testCustomControls: true,
+      timeout: 60000,
+      ...options,
+    };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent screenshots
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      // Clean up previous screenshots for this scan
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const keyboardResults = await this.performKeyboardAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.2.1.1", "9.2.1.2", "9.2.1.4"],
-        passed: keyboardResults.violations.length === 0,
-        violations: keyboardResults.violations,
-        summary: {
-          tabbableElements: keyboardResults.tabbableElements,
-          keyboardInaccessible: keyboardResults.keyboardInaccessible,
-          keyboardTraps: keyboardResults.keyboardTraps,
-          customShortcuts: keyboardResults.customShortcuts
-        },
-        tabOrder: keyboardResults.tabOrder,
-        screenshotPath: scanDir,
-        visualEvidence: keyboardResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Keyboard navigation scan failed: ${error.message}`);
     }

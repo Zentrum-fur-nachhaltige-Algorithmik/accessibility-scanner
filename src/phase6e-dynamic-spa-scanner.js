@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Phase 6E: Dynamic Content & Single Page Application (SPA) Scanner
@@ -8,11 +9,17 @@ const path = require('path');
  * Critical for modern web applications with dynamic content and client-side routing
  * CSP-independent implementation focusing on DOM observation and interaction testing
  */
-class DynamicSpaScanner {
+class DynamicSpaScanner extends BaseScanner {
     constructor() {
+        super('dynamic-spa', {
+            wcagCriteria: ['4.1.2', '4.1.3'],
+            wcagPrinciple: 'robust',
+        });
         this.browser = null;
         this.screenshotDir = path.join(__dirname, '../tmp/dynamic-spa-screenshots');
     }
+
+    get needsExclusiveAccess() { return true; }
 
     async init() {
         if (!this.browser) {
@@ -25,13 +32,14 @@ class DynamicSpaScanner {
     }
 
     /**
-     * Scan dynamic content and SPA accessibility
-     * @param {string} url - URL to scan
+     * Core scan method — receives an already-navigated Puppeteer page.
+     * Note: This scanner may re-navigate internally (route changes, DOM observation) since it has exclusive access.
+     * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
      * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} DynamicSpaReport
+     * @returns {Promise<Object>} ScanResult
      */
-    async scanDynamicSpa(url, options = {}) {
-        const defaultOptions = {
+    async scan(page, options = {}) {
+        const scanOptions = {
             testRouteChanges: true,
             testDynamicContent: true,
             testLoadingStates: true,
@@ -43,108 +51,130 @@ class DynamicSpaScanner {
             monitorFocusManagement: true,
             checkLiveRegions: true,
             interactionTimeout: 5000,
-            timeout: 60000
+            timeout: 60000,
+            ...options,
         };
 
-        const scanOptions = { ...defaultOptions, ...options };
+        const screenshotDir = options.screenshotDir || this.screenshotDir;
+        await fs.ensureDir(screenshotDir);
+
+        const timestamp = Date.now();
+        const scanDir = path.join(screenshotDir, `scan-${timestamp}`);
+        await fs.ensureDir(scanDir);
+
+        // Take initial screenshot
+        const initialScreenshot = path.join(scanDir, 'initial-state.png');
+        await page.screenshot({
+            path: initialScreenshot,
+            fullPage: true
+        });
+
+        const violations = [];
+        const interactionResults = [];
+
+        // Set up monitoring for dynamic changes
+        await this.setupDynamicMonitoring(page);
+
+        // Test route changes and navigation
+        if (scanOptions.testRouteChanges) {
+            const routeViolations = await this.testRouteChanges(page, scanDir, scanOptions);
+            violations.push(...routeViolations);
+        }
+
+        // Test dynamic content updates
+        if (scanOptions.testDynamicContent) {
+            const dynamicViolations = await this.testDynamicContentUpdates(page, scanDir, scanOptions);
+            violations.push(...dynamicViolations);
+        }
+
+        // Test loading states
+        if (scanOptions.testLoadingStates) {
+            const loadingViolations = await this.testLoadingStates(page, scanDir, scanOptions);
+            violations.push(...loadingViolations);
+        }
+
+        // Test form submissions and validation
+        if (scanOptions.testFormSubmissions) {
+            const formViolations = await this.testFormSubmissions(page, scanDir, scanOptions);
+            violations.push(...formViolations);
+        }
+
+        // Test modal dialogs and overlays
+        if (scanOptions.testModalDialogs) {
+            const modalViolations = await this.testModalDialogs(page, scanDir, scanOptions);
+            violations.push(...modalViolations);
+        }
+
+        // Test infinite scroll and pagination
+        if (scanOptions.testInfiniteScroll) {
+            const scrollViolations = await this.testInfiniteScroll(page, scanDir, scanOptions);
+            violations.push(...scrollViolations);
+        }
+
+        // Test search and filtering
+        if (scanOptions.testSearchFilters) {
+            const searchViolations = await this.testSearchFilters(page, scanDir, scanOptions);
+            violations.push(...searchViolations);
+        }
+
+        // Monitor focus management throughout interactions
+        if (scanOptions.monitorFocusManagement) {
+            const focusViolations = await this.monitorFocusManagement(page, scanOptions);
+            violations.push(...focusViolations);
+        }
+
+        return {
+            scannerId: this.id,
+            criteria: ["2.4.3", "3.2.1", "3.2.2", "4.1.3"],
+            passed: violations.length === 0,
+            violations: violations,
+            summary: {
+                totalInteractionsTested: interactionResults.length,
+                routeChangeIssues: violations.filter(v => v.category === 'route-change').length,
+                dynamicContentIssues: violations.filter(v => v.category === 'dynamic-content').length,
+                loadingStateIssues: violations.filter(v => v.category === 'loading-state').length,
+                formSubmissionIssues: violations.filter(v => v.category === 'form-submission').length,
+                modalDialogIssues: violations.filter(v => v.category === 'modal-dialog').length,
+                infiniteScrollIssues: violations.filter(v => v.category === 'infinite-scroll').length,
+                searchFilterIssues: violations.filter(v => v.category === 'search-filter').length,
+                focusManagementIssues: violations.filter(v => v.category === 'focus-management').length,
+                liveRegionIssues: violations.filter(v => v.category === 'live-region').length
+            },
+            interactionResults: interactionResults,
+            screenshotDir: scanDir,
+            recommendations: this.generateDynamicSpaRecommendations(violations),
+            spaTestingGuidance: this.generateSpaTestingGuidance(violations)
+        };
+    }
+
+    /** @deprecated Use scan(page, options) via ScanPipeline instead */
+    async scanDynamicSpa(url, options = {}) {
+        const scanOptions = {
+            testRouteChanges: true,
+            testDynamicContent: true,
+            testLoadingStates: true,
+            testErrorStates: true,
+            testFormSubmissions: true,
+            testModalDialogs: true,
+            testInfiniteScroll: true,
+            testSearchFilters: true,
+            monitorFocusManagement: true,
+            checkLiveRegions: true,
+            interactionTimeout: 5000,
+            timeout: 60000,
+            ...options,
+        };
 
         try {
             await this.init();
             const page = await this.browser.newPage();
-            const timestamp = Date.now();
-            const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-            await fs.ensureDir(scanDir);
-
             await page.setViewport({ width: 1280, height: 1024 });
             await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-            // Take initial screenshot
-            const initialScreenshot = path.join(scanDir, 'initial-state.png');
-            await page.screenshot({ 
-                path: initialScreenshot, 
-                fullPage: true 
-            });
-
-            const violations = [];
-            const interactionResults = [];
-
-            // Set up monitoring for dynamic changes
-            await this.setupDynamicMonitoring(page);
-
-            // Test route changes and navigation
-            if (scanOptions.testRouteChanges) {
-                const routeViolations = await this.testRouteChanges(page, scanDir, scanOptions);
-                violations.push(...routeViolations);
+            try {
+                return await this.scan(page, scanOptions);
+            } finally {
+                await page.close();
             }
-
-            // Test dynamic content updates
-            if (scanOptions.testDynamicContent) {
-                const dynamicViolations = await this.testDynamicContentUpdates(page, scanDir, scanOptions);
-                violations.push(...dynamicViolations);
-            }
-
-            // Test loading states
-            if (scanOptions.testLoadingStates) {
-                const loadingViolations = await this.testLoadingStates(page, scanDir, scanOptions);
-                violations.push(...loadingViolations);
-            }
-
-            // Test form submissions and validation
-            if (scanOptions.testFormSubmissions) {
-                const formViolations = await this.testFormSubmissions(page, scanDir, scanOptions);
-                violations.push(...formViolations);
-            }
-
-            // Test modal dialogs and overlays
-            if (scanOptions.testModalDialogs) {
-                const modalViolations = await this.testModalDialogs(page, scanDir, scanOptions);
-                violations.push(...modalViolations);
-            }
-
-            // Test infinite scroll and pagination
-            if (scanOptions.testInfiniteScroll) {
-                const scrollViolations = await this.testInfiniteScroll(page, scanDir, scanOptions);
-                violations.push(...scrollViolations);
-            }
-
-            // Test search and filtering
-            if (scanOptions.testSearchFilters) {
-                const searchViolations = await this.testSearchFilters(page, scanDir, scanOptions);
-                violations.push(...searchViolations);
-            }
-
-            // Monitor focus management throughout interactions
-            if (scanOptions.monitorFocusManagement) {
-                const focusViolations = await this.monitorFocusManagement(page, scanOptions);
-                violations.push(...focusViolations);
-            }
-
-            await page.close();
-
-            const report = {
-                criteria: ["2.4.3", "3.2.1", "3.2.2", "4.1.3"],
-                passed: violations.length === 0,
-                violations: violations,
-                summary: {
-                    totalInteractionsTested: interactionResults.length,
-                    routeChangeIssues: violations.filter(v => v.category === 'route-change').length,
-                    dynamicContentIssues: violations.filter(v => v.category === 'dynamic-content').length,
-                    loadingStateIssues: violations.filter(v => v.category === 'loading-state').length,
-                    formSubmissionIssues: violations.filter(v => v.category === 'form-submission').length,
-                    modalDialogIssues: violations.filter(v => v.category === 'modal-dialog').length,
-                    infiniteScrollIssues: violations.filter(v => v.category === 'infinite-scroll').length,
-                    searchFilterIssues: violations.filter(v => v.category === 'search-filter').length,
-                    focusManagementIssues: violations.filter(v => v.category === 'focus-management').length,
-                    liveRegionIssues: violations.filter(v => v.category === 'live-region').length
-                },
-                interactionResults: interactionResults,
-                screenshotDir: scanDir,
-                recommendations: this.generateDynamicSpaRecommendations(violations),
-                spaTestingGuidance: this.generateSpaTestingGuidance(violations)
-            };
-
-            return report;
-
         } catch (error) {
             throw new Error(`Dynamic SPA scan failed: ${error.message}`);
         }

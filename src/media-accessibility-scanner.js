@@ -1,19 +1,24 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Media Accessibility Scanner for WCAG compliance testing
  * PHASE 3: CSP-Independent Implementation
- * 
+ *
  * Implements EN 301 549 criteria for media accessibility without script injection
- * Coverage: image-alt, area-alt, object-alt, input-image-alt, svg-img-alt, 
+ * Coverage: image-alt, area-alt, object-alt, input-image-alt, svg-img-alt,
  * audio-caption, video-description + 4 more media rules
- * 
+ *
  * CSP-Immune: Uses pure DOM parsing and analysis (no script injection)
  */
-class MediaAccessibilityScanner {
+class MediaAccessibilityScanner extends BaseScanner {
   constructor() {
+    super('media-accessibility', {
+      wcagCriteria: ['1.2.1', '1.2.2', '1.2.3', '1.2.5'],
+      wcagPrinciple: 'perceivable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/media-screenshots');
   }
@@ -25,23 +30,18 @@ class MediaAccessibilityScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan media accessibility compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.analyzeImages - Analyze image accessibility
-   * @param {boolean} options.analyzeVideo - Analyze video accessibility
-   * @param {boolean} options.analyzeAudio - Analyze audio accessibility
-   * @param {boolean} options.analyzeSVG - Analyze SVG accessibility
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} MediaReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanMediaAccessibility(url, options = {}) {
+  async scan(page, options = {}) {
     const defaultOptions = {
       analyzeImages: true,
       analyzeVideo: true,
@@ -52,44 +52,55 @@ class MediaAccessibilityScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const mediaResults = await this.performMediaAnalysis(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.1.1.1", "9.1.3.1", "9.1.4.5"],
+      passed: mediaResults.violations.length === 0,
+      violations: mediaResults.violations,
+      summary: {
+        totalImages: mediaResults.totalImages,
+        imagesWithoutAlt: mediaResults.imagesWithoutAlt,
+        totalVideos: mediaResults.totalVideos,
+        videosWithoutCaptions: mediaResults.videosWithoutCaptions,
+        totalAudio: mediaResults.totalAudio,
+        audioWithoutTranscripts: mediaResults.audioWithoutTranscripts,
+        totalSVGs: mediaResults.totalSVGs,
+        svgsWithoutAlt: mediaResults.svgsWithoutAlt
+      },
+      screenshotPath: scanDir,
+      visualEvidence: mediaResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanMediaAccessibility(url, options = {}) {
+    const scanOptions = {
+      analyzeImages: true,
+      analyzeVideo: true,
+      analyzeAudio: true,
+      analyzeSVG: true,
+      timeout: 60000,
+      ...options
+    };
+
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const mediaResults = await this.performMediaAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.1.1.1", "9.1.3.1", "9.1.4.5"],
-        passed: mediaResults.violations.length === 0,
-        violations: mediaResults.violations,
-        summary: {
-          totalImages: mediaResults.totalImages,
-          imagesWithoutAlt: mediaResults.imagesWithoutAlt,
-          totalVideos: mediaResults.totalVideos,
-          videosWithoutCaptions: mediaResults.videosWithoutCaptions,
-          totalAudio: mediaResults.totalAudio,
-          audioWithoutTranscripts: mediaResults.audioWithoutTranscripts,
-          totalSVGs: mediaResults.totalSVGs,
-          svgsWithoutAlt: mediaResults.svgsWithoutAlt
-        },
-        screenshotPath: scanDir,
-        visualEvidence: mediaResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Media accessibility scan failed: ${error.message}`);
     }

@@ -1,12 +1,17 @@
 const puppeteer = require('puppeteer');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Page Structure Scanner for WCAG compliance testing
  * Implements EN 301 549 criteria 9.2.4.2, 9.2.4.4, 9.2.4.5, 9.2.4.6
  * (Page Titles, Link Purpose, Multiple Ways, Headings and Labels)
  */
-class PageStructureScanner {
+class PageStructureScanner extends BaseScanner {
   constructor() {
+    super('page-structure', {
+      wcagCriteria: ['1.3.1', '2.4.1', '2.4.2', '2.4.6'],
+      wcagPrinciple: 'robust'
+    });
     this.browser = null;
   }
 
@@ -20,37 +25,42 @@ class PageStructureScanner {
   }
 
   /**
-   * Scan page structure compliance
-   * @param {string} url - URL to scan
-   * @returns {Promise<Object>} PageStructureReport
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
+   * @param {Object} options - Scanning options
+   * @returns {Promise<Object>} ScanResult
    */
+  async scan(page, options = {}) {
+    const structureResults = await this.analyzePageStructure(page);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.2.4.2", "9.2.4.4", "9.2.4.5", "9.2.4.6"],
+      passed: structureResults.violations.length === 0,
+      violations: structureResults.violations,
+      summary: {
+        hasPageTitle: structureResults.hasPageTitle,
+        titleDescriptive: structureResults.titleDescriptive,
+        linksHavePurpose: structureResults.linksHavePurpose,
+        multipleWaysAvailable: structureResults.multipleWaysAvailable,
+        headingsDescriptive: structureResults.headingsDescriptive
+      }
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
   async scanPageStructure(url) {
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
+      await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
 
-      const structureResults = await this.analyzePageStructure(page);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.2.4.2", "9.2.4.4", "9.2.4.5", "9.2.4.6"],
-        passed: structureResults.violations.length === 0,
-        violations: structureResults.violations,
-        summary: {
-          hasPageTitle: structureResults.hasPageTitle,
-          titleDescriptive: structureResults.titleDescriptive,
-          linksHavePurpose: structureResults.linksHavePurpose,
-          multipleWaysAvailable: structureResults.multipleWaysAvailable,
-          headingsDescriptive: structureResults.headingsDescriptive
-        }
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Page structure scan failed: ${error.message}`);
     }

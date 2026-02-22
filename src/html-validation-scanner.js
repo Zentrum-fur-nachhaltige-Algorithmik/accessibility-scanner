@@ -1,18 +1,23 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Enhanced HTML Validation Scanner for WCAG 2.1 compliance testing
  * PHASE 1: CSP-Independent Implementation
- * 
+ *
  * Implements EN 301 549 criteria 9.4.1.1, 9.4.1.3 + 40+ additional axe rules
  * Coverage: button-name, link-name, frame-title, aria-*, meta-*, duplicate-id-*
- * 
+ *
  * CSP-Immune: Uses pure DOM parsing and analysis (no script injection)
  */
-class HTMLValidationScanner {
+class HTMLValidationScanner extends BaseScanner {
   constructor() {
+    super('html-validation', {
+      wcagCriteria: ['4.1.1', '4.1.2'],
+      wcagPrinciple: 'robust'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/html-validation-screenshots');
   }
@@ -24,22 +29,18 @@ class HTMLValidationScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan HTML compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
-   * @param {boolean} options.strictValidation - Enable strict HTML validation
-   * @param {boolean} options.checkAccessibilityMarkup - Check accessibility-specific markup
-   * @param {boolean} options.validateARIA - Enable ARIA validation
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} HTMLReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanHTMLCompliance(url, options = {}) {
+  async scan(page, options = {}) {
     const defaultOptions = {
       strictValidation: true,
       checkAccessibilityMarkup: true,
@@ -49,40 +50,50 @@ class HTMLValidationScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const htmlResults = await this.performHTMLValidation(page, scanDir, scanOptions);
+
+    return {
+      scannerId: this.id,
+      criteria: ["9.4.1.1", "9.4.1.3"],
+      passed: htmlResults.violations.length === 0,
+      violations: htmlResults.violations,
+      summary: {
+        syntaxErrors: htmlResults.syntaxErrors,
+        duplicateIds: htmlResults.duplicateIds,
+        invalidARIA: htmlResults.invalidARIA,
+        statusMessagesProper: htmlResults.statusMessagesProper
+      },
+      screenshotPath: scanDir,
+      visualEvidence: htmlResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanHTMLCompliance(url, options = {}) {
+    const scanOptions = {
+      strictValidation: true,
+      checkAccessibilityMarkup: true,
+      validateARIA: true,
+      timeout: 60000,
+      ...options
+    };
+
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
 
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const htmlResults = await this.performHTMLValidation(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.4.1.1", "9.4.1.3"],
-        passed: htmlResults.violations.length === 0,
-        violations: htmlResults.violations,
-        summary: {
-          syntaxErrors: htmlResults.syntaxErrors,
-          duplicateIds: htmlResults.duplicateIds,
-          invalidARIA: htmlResults.invalidARIA,
-          statusMessagesProper: htmlResults.statusMessagesProper
-        },
-        screenshotPath: scanDir,
-        visualEvidence: htmlResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, scanOptions);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`HTML validation scan failed: ${error.message}`);
     }

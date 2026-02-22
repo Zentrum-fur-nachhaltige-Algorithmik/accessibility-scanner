@@ -1,14 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs-extra');
 const path = require('path');
+const BaseScanner = require('./base-scanner');
 
 /**
  * Advanced Contrast Scanner for WCAG 2.1 compliance testing
  * Implements EN 301 549 criteria 9.1.4.11, 9.1.4.13 (Non-text Contrast, Content on Hover or Focus)
  * Tests UI components, graphical objects, and hover/focus content contrast
  */
-class AdvancedContrastScanner {
+class AdvancedContrastScanner extends BaseScanner {
   constructor() {
+    super('advanced-contrast', {
+      wcagCriteria: ['1.4.3', '1.4.6', '1.4.11'],
+      wcagPrinciple: 'perceivable'
+    });
     this.browser = null;
     this.screenshotDir = path.join(__dirname, '../tmp/contrast-screenshots');
   }
@@ -20,59 +25,64 @@ class AdvancedContrastScanner {
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       });
     }
-    
+
     // Ensure screenshot directory exists
     await fs.ensureDir(this.screenshotDir);
   }
 
   /**
-   * Scan advanced contrast compliance
-   * @param {string} url - URL to scan
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * @param {import('puppeteer').Page} page - Already-navigated page
    * @param {Object} options - Scanning options
-   * @param {number} options.timeout - Test timeout in milliseconds
-   * @returns {Promise<Object>} AdvancedContrastReport
+   * @returns {Promise<Object>} ScanResult
    */
-  async scanAdvancedContrast(url, options = {}) {
-    const defaultOptions = {
-      timeout: 60000
+  async scan(page, options = {}) {
+    const scanOptions = {
+      timeout: options.timeout || 60000,
+      ...options
     };
 
-    const scanOptions = { ...defaultOptions, ...options };
+    // Create timestamped scan directory
+    const timestamp = Date.now();
+    const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
+    await fs.ensureDir(scanDir);
+
+    const contrastResults = await this.performAdvancedContrastAnalysis(page, scanDir, scanOptions);
+
+    // Create report according to interface
+    return {
+      scannerId: this.id,
+      criteria: ["9.1.4.11", "9.1.4.13"],
+      passed: contrastResults.violations.length === 0,
+      violations: contrastResults.violations,
+      summary: {
+        nonTextElementsTested: contrastResults.nonTextElementsTested,
+        hoverContentTested: contrastResults.hoverContentTested,
+        graphicalObjectsCompliant: contrastResults.graphicalObjectsCompliant,
+        uiComponentsCompliant: contrastResults.uiComponentsCompliant
+      },
+      screenshotPath: scanDir,
+      visualEvidence: contrastResults.visualEvidence
+    };
+  }
+
+  /** @deprecated Use scan(page, options) via ScanPipeline instead */
+  async scanAdvancedContrast(url, options = {}) {
+    const scanOptions = {
+      timeout: options.timeout || 60000,
+      ...options
+    };
 
     try {
       await this.init();
       const page = await this.browser.newPage();
-      
-      // Set viewport for consistent testing
       await page.setViewport({ width: 1920, height: 1080 });
       await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const contrastResults = await this.performAdvancedContrastAnalysis(page, scanDir, scanOptions);
-      
-      await page.close();
-
-      // Create report according to interface
-      const report = {
-        criteria: ["9.1.4.11", "9.1.4.13"],
-        passed: contrastResults.violations.length === 0,
-        violations: contrastResults.violations,
-        summary: {
-          nonTextElementsTested: contrastResults.nonTextElementsTested,
-          hoverContentTested: contrastResults.hoverContentTested,
-          graphicalObjectsCompliant: contrastResults.graphicalObjectsCompliant,
-          uiComponentsCompliant: contrastResults.uiComponentsCompliant
-        },
-        screenshotPath: scanDir,
-        visualEvidence: contrastResults.visualEvidence
-      };
-
-      return report;
-
+      try {
+        return await this.scan(page, options);
+      } finally {
+        await page.close();
+      }
     } catch (error) {
       throw new Error(`Advanced contrast scan failed: ${error.message}`);
     }
@@ -97,7 +107,7 @@ class AdvancedContrastScanner {
       window.parseRgb = function(rgbString) {
         const match = rgbString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
         if (!match) return null;
-        
+
         return {
           r: parseInt(match[1]),
           g: parseInt(match[2]),
@@ -138,10 +148,10 @@ class AdvancedContrastScanner {
     // Calculate summary statistics
     nonTextElementsTested = visualEvidence.length;
     hoverContentTested = visualEvidence.filter(e => e.type === 'hover-content').length;
-    graphicalObjectsCompliant = visualEvidence.filter(e => 
+    graphicalObjectsCompliant = visualEvidence.filter(e =>
       e.type === 'graphical-object' && e.contrastRatio >= 3
     ).length;
-    uiComponentsCompliant = visualEvidence.filter(e => 
+    uiComponentsCompliant = visualEvidence.filter(e =>
       e.type === 'ui-component' && e.contrastRatio >= 3
     ).length;
 
@@ -165,7 +175,7 @@ class AdvancedContrastScanner {
 
     const uiComponents = await page.evaluate(() => {
       const components = [];
-      
+
       // Find UI components that need contrast testing
       const selectors = [
         'button',
@@ -188,7 +198,7 @@ class AdvancedContrastScanner {
           const rect = element.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
             const computed = window.getComputedStyle(element);
-            
+
             // Generate unique selector
             let elementSelector = element.tagName.toLowerCase();
             if (element.id) elementSelector += `#${element.id}`;
@@ -199,7 +209,7 @@ class AdvancedContrastScanner {
             const backgroundColor = computed.backgroundColor;
             const borderColor = computed.borderColor;
             const outlineColor = computed.outlineColor;
-            
+
             components.push({
               selector: elementSelector,
               type: element.tagName.toLowerCase(),
@@ -236,7 +246,7 @@ class AdvancedContrastScanner {
 
     const graphicalObjects = await page.evaluate(() => {
       const objects = [];
-      
+
       // Find graphical objects
       const selectors = [
         'svg',
@@ -255,7 +265,7 @@ class AdvancedContrastScanner {
           const rect = element.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
             const computed = window.getComputedStyle(element);
-            
+
             let elementSelector = element.tagName.toLowerCase();
             if (element.id) elementSelector += `#${element.id}`;
             if (element.className) elementSelector += `.${element.className.split(' ').join('.')}`;
@@ -299,7 +309,7 @@ class AdvancedContrastScanner {
       const elements = [];
       const selectors = [
         'a',
-        'button', 
+        'button',
         '[tabindex]',
         '.tooltip',
         '[title]',
@@ -322,16 +332,16 @@ class AdvancedContrastScanner {
                 elementSelector += `.${classes.join('.')}`;
               }
             }
-            
+
             // Only add nth-of-type if we don't have a more specific selector
             if (!element.id && !element.className) {
               // Use a more specific parent-based selector
               const parent = element.parentElement;
               if (parent) {
-                const parentSelector = parent.tagName.toLowerCase() + 
+                const parentSelector = parent.tagName.toLowerCase() +
                                     (parent.id ? `#${parent.id}` : '') +
                                     (parent.className ? `.${parent.className.split(' ')[0]}` : '');
-                const siblings = Array.from(parent.children).filter(child => 
+                const siblings = Array.from(parent.children).filter(child =>
                   child.tagName.toLowerCase() === element.tagName.toLowerCase()
                 );
                 const elementIndex = siblings.indexOf(element);
@@ -361,7 +371,7 @@ class AdvancedContrastScanner {
         const elementExists = await page.evaluate((selector) => {
           return !!document.querySelector(selector);
         }, element.selector);
-        
+
         if (!elementExists) {
           console.warn(`Skipping hover test for ${element.selector} - element not found`);
           continue;
@@ -394,7 +404,7 @@ class AdvancedContrastScanner {
           tooltips.forEach(tooltip => {
             const tooltipRect = tooltip.getBoundingClientRect();
             const tooltipStyle = window.getComputedStyle(tooltip);
-            
+
             if (tooltipStyle.visibility !== 'hidden' && tooltipStyle.display !== 'none' &&
                 tooltipRect.width > 0 && tooltipRect.height > 0) {
               tooltipContent = {
@@ -419,8 +429,8 @@ class AdvancedContrastScanner {
         if (hoverAnalysis && hoverAnalysis.tooltip) {
           // Test tooltip contrast
           const contrastResult = await this.analyzeTooltipContrast(
-            page, 
-            hoverAnalysis.tooltip, 
+            page,
+            hoverAnalysis.tooltip,
             element.selector
           );
 
@@ -461,7 +471,7 @@ class AdvancedContrastScanner {
       // Get parent background for comparison
       let parentBg = 'rgb(255, 255, 255)'; // Default white
       const element = document.querySelector(comp.selector);
-      
+
       if (element && element.parentElement) {
         const parentStyle = window.getComputedStyle(element.parentElement);
         const parentBgColor = parentStyle.backgroundColor;
@@ -477,15 +487,15 @@ class AdvancedContrastScanner {
       if (comp.backgroundColor && comp.backgroundColor !== 'rgba(0, 0, 0, 0)') {
         const bgRgb = window.parseRgb(comp.backgroundColor);
         const parentRgb = window.parseRgb(parentBg);
-        
+
         if (bgRgb && parentRgb) {
           const ratio = window.getContrastRatio(bgRgb, parentRgb);
-          
+
           // Skip if background is identical to parent (this is normal for input fields)
           const colorsDifferent = Math.abs(bgRgb.r - parentRgb.r) > 5 ||
                                  Math.abs(bgRgb.g - parentRgb.g) > 5 ||
                                  Math.abs(bgRgb.b - parentRgb.b) > 5;
-          
+
           if (colorsDifferent) {
             results.push({
               type: 'background',
@@ -508,15 +518,15 @@ class AdvancedContrastScanner {
       }
 
       // Test border contrast - only for visible borders
-      if (comp.borderColor && comp.borderColor !== 'rgba(0, 0, 0, 0)' && 
+      if (comp.borderColor && comp.borderColor !== 'rgba(0, 0, 0, 0)' &&
           comp.borderWidth && comp.borderWidth !== '0px') {
         const borderRgb = window.parseRgb(comp.borderColor);
         const parentRgb = window.parseRgb(parentBg);
-        
+
         if (borderRgb && parentRgb) {
           const ratio = window.getContrastRatio(borderRgb, parentRgb);
           const borderWidthPx = parseFloat(comp.borderWidth);
-          
+
           results.push({
             type: 'border',
             ratio: ratio,
@@ -537,17 +547,17 @@ class AdvancedContrastScanner {
       hasFocusIndicator = await page.evaluate((selector) => {
         const el = document.querySelector(selector);
         if (!el) return false;
-        
+
         // Get original border color
         const originalBorderColor = window.getComputedStyle(el).borderColor;
-        
+
         // Simulate focus to check focus styles
         el.focus();
         const focusStyle = window.getComputedStyle(el);
         const hasFocusOutline = focusStyle.outline && focusStyle.outline !== 'none';
         const hasFocusBoxShadow = focusStyle.boxShadow && focusStyle.boxShadow !== 'none';
         const hasFocusBorderChange = focusStyle.borderColor !== originalBorderColor;
-        
+
         el.blur(); // Remove focus
         return hasFocusOutline || hasFocusBoxShadow || hasFocusBorderChange;
       }, component.selector);
@@ -558,7 +568,7 @@ class AdvancedContrastScanner {
       // Different thresholds for different component types
       let requiredRatio = 3.0; // WCAG 1.4.11 requires 3:1 for UI components
       let tolerance = 0.05; // Allow small rounding differences
-      
+
       // For input fields, be more lenient with subtle borders if they have good focus indicators
       if (component.type === 'input' || component.type === 'textarea') {
         if (analysis.type === 'border') {
@@ -569,11 +579,11 @@ class AdvancedContrastScanner {
           }
         }
       }
-      
+
       // Only flag significant contrast issues
       const actualRatio = analysis.ratio + tolerance; // Account for rounding
       const isSignificantIssue = analysis.significant && (actualRatio < requiredRatio);
-      
+
       if (isSignificantIssue) {
         violations.push({
           criterion: "9.1.4.11",
@@ -610,7 +620,7 @@ class AdvancedContrastScanner {
     const analysis = await page.evaluate((tt) => {
       const bgRgb = window.parseRgb(tt.backgroundColor);
       const fgRgb = window.parseRgb(tt.color);
-      
+
       if (bgRgb && fgRgb) {
         return {
           contrastRatio: window.getContrastRatio(fgRgb, bgRgb),
@@ -618,7 +628,7 @@ class AdvancedContrastScanner {
           textColor: tt.color
         };
       }
-      
+
       return { contrastRatio: 21 }; // Perfect contrast if can't parse
     }, tooltip);
 

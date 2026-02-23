@@ -1,10 +1,57 @@
+import { useState, useRef } from 'react';
 import Head from 'next/head';
 
 export default function Accessibility() {
+  const [formErrors, setFormErrors] = useState({});
+  const emailRef = useRef(null);
+  const descRef = useRef(null);
+
+  const validateForm = () => {
+    const errors = {};
+    const email = emailRef.current?.value.trim();
+    const desc = descRef.current?.value.trim();
+
+    if (!email) {
+      errors.email = 'Please enter your email address.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = 'Please enter a valid email address.';
+    }
+
+    if (!desc) {
+      errors.description = 'Please describe the accessibility issue.';
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = (e) => {
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      e.preventDefault();
+      setFormErrors(errors);
+      // Focus the first field with an error
+      if (errors.email) {
+        emailRef.current?.focus();
+      } else if (errors.description) {
+        descRef.current?.focus();
+      }
+    }
+  };
+
+  const clearError = (field) => {
+    if (formErrors[field]) {
+      setFormErrors(prev => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
+  };
+
   return (
     <>
       <Head>
-        <title>Accessibility Statement — Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</title>
+        <title>Accessibility Statement — Abraham Nemeth Society for Accessible Algorithmics e.V.</title>
         <meta name="description" content="Accessibility statement, feedback process, and compliance monitoring" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -14,7 +61,7 @@ export default function Accessibility() {
 
         <header className="letterhead">
           <nav className="letterhead-inner" aria-label="Service">
-            <h1 className="org-name" lang="de">Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</h1>
+            <h1 className="org-name">Abraham Nemeth Society for Accessible Algorithmics e.V.</h1>
             <div className="service-title">Web Accessibility Audit Service</div>
           </nav>
         </header>
@@ -26,7 +73,7 @@ export default function Accessibility() {
             <section aria-labelledby="statement-heading">
               <h2 id="statement-heading">Commitment to Accessibility</h2>
               <p>
-                <span lang="de">Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</span> is
+                Abraham Nemeth Society for Accessible Algorithmics e.V. is
                 committed to ensuring digital accessibility for people with disabilities. This website strives
                 to be <strong>WCAG 2.1 AA</strong> compliant in accordance with the European Accessibility Act
                 (EAA) and EN 301 549.
@@ -81,9 +128,17 @@ export default function Accessibility() {
                 action="mailto:accessibility@placeholder.org"
                 method="POST"
                 encType="text/plain"
+                onSubmit={handleSubmit}
+                noValidate
               >
                 <fieldset>
                   <legend>Report an Accessibility Issue</legend>
+
+                  {Object.keys(formErrors).length > 0 && (
+                    <p className="error-text" role="alert">
+                      <strong>Error:</strong> Please correct the highlighted fields below.
+                    </p>
+                  )}
 
                   <div className="acc-field">
                     <label htmlFor="feedback-name">Your name</label>
@@ -95,7 +150,20 @@ export default function Accessibility() {
                       Your email <span className="required-indicator" aria-hidden="true">*</span>
                       <span className="sr-only">(required)</span>
                     </label>
-                    <input type="email" id="feedback-email" name="email" required aria-required="true" autoComplete="email" />
+                    <input
+                      ref={emailRef}
+                      type="email"
+                      id="feedback-email"
+                      name="email"
+                      aria-required="true"
+                      aria-invalid={formErrors.email ? 'true' : undefined}
+                      aria-describedby={formErrors.email ? 'feedback-email-error' : undefined}
+                      autoComplete="email"
+                      onChange={() => clearError('email')}
+                    />
+                    {formErrors.email && (
+                      <p className="error-text" id="feedback-email-error">{formErrors.email}</p>
+                    )}
                   </div>
 
                   <div className="acc-field">
@@ -109,13 +177,19 @@ export default function Accessibility() {
                       <span className="sr-only">(required)</span>
                     </label>
                     <textarea
+                      ref={descRef}
                       id="feedback-description"
                       name="description"
                       rows="5"
-                      required
                       aria-required="true"
+                      aria-invalid={formErrors.description ? 'true' : undefined}
+                      aria-describedby={formErrors.description ? 'feedback-desc-error' : undefined}
                       placeholder="Please describe the accessibility barrier you encountered"
+                      onChange={() => clearError('description')}
                     />
+                    {formErrors.description && (
+                      <p className="error-text" id="feedback-desc-error">{formErrors.description}</p>
+                    )}
                   </div>
 
                   <button type="submit" className="submit-btn">Submit Feedback</button>
@@ -158,7 +232,7 @@ export default function Accessibility() {
         </main>
 
         <footer className="footer">
-          <p><span lang="de">Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</span> — {new Date().getFullYear()}</p>
+          <p>Abraham Nemeth Society for Accessible Algorithmics e.V. — {new Date().getFullYear()}</p>
           <p><a href="/accessibility">Accessibility</a></p>
         </footer>
       </div>

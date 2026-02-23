@@ -429,6 +429,11 @@ h1.org-name {
   border-color: #1a1a1a;
 }
 
+.acc-field input[aria-invalid="true"],
+.acc-field textarea[aria-invalid="true"] {
+  border-color: #b00;
+}
+
 .acc-field textarea {
   resize: vertical;
 }

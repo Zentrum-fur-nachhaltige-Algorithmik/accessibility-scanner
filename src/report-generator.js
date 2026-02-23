@@ -3,7 +3,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const htmlPdf = require('html-pdf-node');
 
-const DEFAULT_ORG_NAME = 'Abraham-Nemeth-Gesellschaft f\u00fcr Barrierefreie Algorithmik e.V.';
+const DEFAULT_ORG_NAME = 'Abraham Nemeth Society for Accessible Algorithmics e.V.';
 
 function classifyWcagPrinciple(violation) {
   const criterion = violation.criterion || violation.wcagCriteria || violation.clause || '';
@@ -158,7 +158,8 @@ class ReportGenerator {
     text-decoration: none;
     z-index: 100;
   }
-  .skip-link:focus { top: 0; outline: 2px solid #fff; outline-offset: -2px; }
+  .skip-link:focus,
+  .skip-link:focus-visible { top: 0; outline: 2px solid #fff; outline-offset: -2px; }
 
   /* --- Typography hierarchy through weight and size only --- */
   h1, h2, h3, h4 {
@@ -373,7 +374,7 @@ class ReportGenerator {
 <div class="doc-header">
   <div class="doc-header-left">
     {{orgLogoHtml}}
-    <div class="org-name" lang="de">{{orgName}}</div>
+    <div class="org-name">{{orgName}}</div>
     <h1>Accessibility Audit Report</h1>
     <div class="doc-subtitle">Automated WCAG 2.1 Level AA Conformance Assessment</div>
   </div>
@@ -426,7 +427,7 @@ class ReportGenerator {
 
 </main>
 
-<footer class="doc-footer" lang="de">
+<footer class="doc-footer">
   <span>{{orgName}} — {{docNumber}}</span>
   <span>{{reportDate}}</span>
 </footer>

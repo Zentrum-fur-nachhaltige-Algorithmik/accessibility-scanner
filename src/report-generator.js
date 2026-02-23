@@ -3,7 +3,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const htmlPdf = require('html-pdf-node');
 
-const DEFAULT_ORG_NAME = 'Zentrum f\u00fcr nachhaltige Algorithmik und Intelligenzforschung e.V.';
+const DEFAULT_ORG_NAME = 'Abraham-Nemeth-Gesellschaft f\u00fcr Barrierefreie Algorithmik e.V.';
 
 function classifyWcagPrinciple(violation) {
   const criterion = violation.criterion || violation.wcagCriteria || violation.clause || '';

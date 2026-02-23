@@ -101,7 +101,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Web Accessibility Audit Service — Zentrum für Nachhaltige Algorithmik e.V.</title>
+        <title>Web Accessibility Audit Service — Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</title>
         <meta name="description" content="Automated WCAG 2.1 Level AA conformance assessment" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -111,7 +111,7 @@ export default function Home() {
 
         <header className="letterhead">
           <nav className="letterhead-inner" aria-label="Service">
-            <h1 className="org-name" lang="de">Zentrum für Nachhaltige Algorithmik e.V.</h1>
+            <h1 className="org-name" lang="de">Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</h1>
             <div className="service-title">Web Accessibility Audit Service</div>
           </nav>
         </header>
@@ -165,8 +165,9 @@ export default function Home() {
           </div>
         </main>
 
-        <footer className="footer" lang="de">
-          <p>Zentrum für Nachhaltige Algorithmik e.V. — {new Date().getFullYear()}</p>
+        <footer className="footer">
+          <p><span lang="de">Abraham-Nemeth-Gesellschaft für Barrierefreie Algorithmik e.V.</span> — {new Date().getFullYear()}</p>
+          <p><a href="/accessibility">Accessibility</a></p>
         </footer>
       </div>
     </>

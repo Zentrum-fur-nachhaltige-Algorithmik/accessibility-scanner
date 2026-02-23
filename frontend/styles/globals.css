@@ -268,6 +268,182 @@ h1.org-name {
   letter-spacing: 0.02em;
 }
 
+/* Footer link */
+.footer a {
+  color: #595959;
+  text-decoration: underline;
+  font-size: 0.6875rem;
+}
+
+.footer a:hover {
+  color: #1a1a1a;
+}
+
+.footer a:focus-visible {
+  outline: 3px solid #1a1a1a;
+  outline-offset: 2px;
+}
+
+/* Accessibility page */
+.acc-main {
+  flex: 1;
+  padding: 3rem 1.5rem;
+}
+
+.acc-content {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.acc-content > h1 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 0.75rem;
+}
+
+.acc-content section {
+  margin-bottom: 2.5rem;
+}
+
+.acc-content h2 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.acc-content h3 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.acc-content p {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+}
+
+.acc-content ul {
+  margin: 0.5rem 0 1rem 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #1a1a1a;
+}
+
+.acc-content ul li {
+  margin-bottom: 0.25rem;
+}
+
+.acc-content a {
+  color: #1a1a1a;
+  text-decoration: underline;
+}
+
+.acc-content a:focus-visible {
+  outline: 3px solid #1a1a1a;
+  outline-offset: 2px;
+}
+
+/* Contact list */
+.acc-contact-list {
+  margin: 1rem 0;
+}
+
+.acc-contact-list dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1a1a1a;
+  margin-top: 0.75rem;
+}
+
+.acc-contact-list dd {
+  margin-left: 0;
+  font-size: 0.9375rem;
+  margin-top: 0.125rem;
+}
+
+/* Feedback form */
+.acc-feedback-form {
+  margin-top: 1.5rem;
+}
+
+.acc-feedback-form fieldset {
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  margin: 0;
+}
+
+.acc-feedback-form legend {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  padding: 0 0.5rem;
+}
+
+.acc-field {
+  margin-bottom: 1.25rem;
+}
+
+.acc-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1a1a1a;
+  margin-bottom: 0.375rem;
+}
+
+.acc-field input,
+.acc-field textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  border: 2px solid #767676;
+  border-radius: 0;
+  background: #fff;
+  color: #1a1a1a;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.acc-field input:focus-visible,
+.acc-field textarea:focus-visible {
+  outline: 3px solid #1a1a1a;
+  outline-offset: 1px;
+  border-color: #1a1a1a;
+}
+
+.acc-field textarea {
+  resize: vertical;
+}
+
+.acc-feedback-form .submit-btn {
+  margin-top: 0.5rem;
+}
+
+/* Back link */
+.acc-back {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ddd;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .letterhead {

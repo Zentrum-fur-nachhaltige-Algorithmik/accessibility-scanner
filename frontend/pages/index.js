@@ -7,6 +7,7 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const timerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const startTimer = useCallback(() => {
     setElapsed(0);
@@ -32,10 +33,26 @@ export default function Home() {
     return m > 0 ? `${m}m ${s}s` : `${s}s`;
   };
 
+  const validateUrl = (value) => {
+    if (!value.trim()) return 'Please enter a URL.';
+    try {
+      const parsed = new URL(value.trim());
+      if (!['http:', 'https:'].includes(parsed.protocol)) return 'URL must start with http:// or https://';
+    } catch {
+      return 'Please enter a valid URL (e.g. https://example.com).';
+    }
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmed = url.trim();
-    if (!trimmed) return;
+    const validationError = validateUrl(url);
+    if (validationError) {
+      setError(validationError);
+      inputRef.current?.focus();
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -76,56 +93,71 @@ export default function Home() {
       setError(err.message);
       setLoading(false);
       stopTimer();
+      // Focus back to input so screen reader users land on the relevant field
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
 
   return (
     <>
       <Head>
-        <title>Barrierefreiheitsprüfung — Zentrum für Nachhaltige Algorithmik e.V.</title>
+        <title>Web Accessibility Audit Service — Zentrum für Nachhaltige Algorithmik e.V.</title>
         <meta name="description" content="Automated WCAG 2.1 Level AA conformance assessment" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <div className="page">
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+
         <header className="letterhead">
-          <div className="letterhead-inner">
-            <div className="org-name">Zentrum für Nachhaltige Algorithmik e.V.</div>
+          <nav className="letterhead-inner" aria-label="Service">
+            <h1 className="org-name" lang="de">Zentrum für Nachhaltige Algorithmik e.V.</h1>
             <div className="service-title">Web Accessibility Audit Service</div>
-          </div>
+          </nav>
         </header>
 
-        <main className="main">
+        <main className="main" id="main-content">
           <div className="content">
-            {!loading ? (
-              <form className="audit-form" onSubmit={handleSubmit}>
-                <h2>Request Accessibility Audit</h2>
-                <div className="field">
-                  <label htmlFor="url">Target URL</label>
-                  <input
-                    type="url"
-                    id="url"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    placeholder="https://example.com"
-                    required
-                    autoComplete="url"
-                    disabled={loading}
-                  />
-                </div>
-                <button type="submit" className="submit-btn" disabled={!url.trim()}>
-                  Start Audit
-                </button>
+            <form className="audit-form" onSubmit={handleSubmit} noValidate>
+              <h2>Request Accessibility Audit</h2>
+              <div className="field">
+                <label htmlFor="url">
+                  Target URL <span className="required-indicator" aria-hidden="true">*</span>
+                  <span className="sr-only">(required)</span>
+                </label>
+                <input
+                  ref={inputRef}
+                  type="url"
+                  id="url"
+                  value={url}
+                  onChange={(e) => { setUrl(e.target.value); if (error) setError(null); }}
+                  placeholder="https://example.com"
+                  aria-required="true"
+                  aria-invalid={error ? 'true' : undefined}
+                  aria-describedby={error ? 'url-error' : undefined}
+                  autoComplete="url"
+                  disabled={loading}
+                />
+              </div>
+              <button type="submit" className="submit-btn" disabled={loading || !url.trim()}>
+                Start Audit
+              </button>
 
-                {error && (
-                  <p className="error-text">
-                    <strong>Error:</strong> {error}
-                  </p>
-                )}
-              </form>
-            ) : (
-              <div className="loading-state">
-                <div className="spinner" role="status" aria-label="Scanning" />
+              {error && (
+                <p className="error-text" id="url-error" role="alert">
+                  <strong>Error:</strong> {error}
+                </p>
+              )}
+            </form>
+
+            {/* Persistent live region for status announcements */}
+            <div aria-live="polite" aria-atomic="true" className="sr-only">
+              {loading ? `Accessibility audit in progress. ${formatElapsed(elapsed)} elapsed.` : ''}
+            </div>
+
+            {loading && (
+              <div className="loading-state" aria-hidden="true">
+                <div className="spinner" />
                 <span className="loading-text">Accessibility audit in progress</span>
                 <span className="elapsed">{formatElapsed(elapsed)}</span>
               </div>
@@ -133,7 +165,7 @@ export default function Home() {
           </div>
         </main>
 
-        <footer className="footer">
+        <footer className="footer" lang="de">
           <p>Zentrum für Nachhaltige Algorithmik e.V. — {new Date().getFullYear()}</p>
         </footer>
       </div>

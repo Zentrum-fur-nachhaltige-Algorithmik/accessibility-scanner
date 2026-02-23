@@ -247,32 +247,15 @@ class ReportGenerator {
   .toc a { text-decoration: none; color: #2b2b2b; }
   .toc a:hover { text-decoration: underline; }
 
-  /* --- Score info box (not a hero) --- */
-  .score-box {
-    border: 0.5px solid #999;
-    padding: 10px 14px;
-    margin: 12px 0 16px;
-    display: table;
-    width: 100%;
-  }
-  .score-box-row {
-    display: table-row;
-  }
-  .score-box-label {
-    display: table-cell;
-    font-size: 9pt;
-    color: #555;
-    padding: 3px 12px 3px 0;
-    white-space: nowrap;
-    vertical-align: middle;
-  }
-  .score-box-value {
-    display: table-cell;
-    font-size: 9pt;
-    font-weight: 700;
+  /* --- Table captions --- */
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-size: 8.5pt;
+    font-weight: 600;
     color: #1b2a4a;
-    padding: 3px 0;
-    vertical-align: middle;
+    padding: 0 0 4px;
+    font-style: italic;
   }
 
   /* --- Tables --- */
@@ -335,7 +318,15 @@ class ReportGenerator {
     line-height: 1.5;
   }
 
-  /* (reserved) */
+  /* --- Scope disclaimer --- */
+  .scope-note {
+    font-size: 8pt;
+    color: #666;
+    border-left: 2px solid #ccc;
+    padding: 6px 0 6px 12px;
+    margin: 10px 0 14px;
+    line-height: 1.5;
+  }
 
   /* --- Running footer --- */
   .doc-footer {
@@ -353,6 +344,7 @@ class ReportGenerator {
   }
 
   /* --- Print --- */
+  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 7pt; color: #888; } }
   @media print {
     body { padding: 0; max-width: none; font-size: 9pt; }
     .doc-footer { position: fixed; }
@@ -392,14 +384,17 @@ class ReportGenerator {
 
 <h2 id="s-1"><span class="sn">1</span> Subject of Assessment</h2>
 
-<div class="score-box">
-  <div class="score-box-row"><span class="score-box-label">Target URL</span><span class="score-box-value">{{url}}</span></div>
-  <div class="score-box-row"><span class="score-box-label">Assessment Date</span><span class="score-box-value">{{reportDate}}</span></div>
-  <div class="score-box-row"><span class="score-box-label">Conformance Target</span><span class="score-box-value">WCAG 2.1 Level AA</span></div>
-  <div class="score-box-row"><span class="score-box-label">Overall Score</span><span class="score-box-value">{{accessibilityScore}} of 100</span></div>
-  <div class="score-box-row"><span class="score-box-label">Violations</span><span class="score-box-value">{{violationsCount}}</span></div>
-  {{passesRow}}
-</div>
+<table>
+<caption>Table 1: Assessment scope</caption>
+<tbody>
+<tr><th style="width:160px;text-align:left">Target URL</th><td>{{url}}</td></tr>
+<tr><th style="text-align:left">Assessment Date</th><td>{{reportDate}}</td></tr>
+<tr><th style="text-align:left">Conformance Target</th><td>WCAG 2.1 Level AA</td></tr>
+<tr><th style="text-align:left">Overall Score</th><td>{{accessibilityScore}} of 100</td></tr>
+<tr><th style="text-align:left">Violations Identified</th><td>{{violationsCount}}</td></tr>
+{{passesRow}}
+</tbody>
+</table>
 
 <h2 id="s-2"><span class="sn">2</span> Summary of Findings</h2>
 
@@ -457,7 +452,7 @@ class ReportGenerator {
 
     // Passes row (only if passes > 0)
     const passesRow = passes > 0
-      ? `<div class="score-box-row"><span class="score-box-label">Checks Passed</span><span class="score-box-value">${passes}</span></div>`
+      ? `<tr><th style="text-align:left">Checks Passed</th><td>${passes}</td></tr>`
       : '';
     html = html.replace(/{{passesRow}}/g, passesRow);
 
@@ -496,7 +491,8 @@ class ReportGenerator {
       sub += `<li><a href="#s-4-${i}">4.${i} ${label}</a></li>\n`;
       i++;
     }
-    if ((groups.other || []).length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
+    const meaningfulOther = (groups.other || []).filter(v => (v.description || v.type || v.issue || '').trim());
+    if (meaningfulOther.length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
 
     return `
 <nav class="toc">
@@ -523,6 +519,7 @@ class ReportGenerator {
     const total = data.violations.length;
 
     let html = `<table>
+<caption>Table 2: Severity distribution</caption>
 <thead><tr><th>Classification</th><th>Count</th><th>Share</th></tr></thead>
 <tbody>`;
     for (const sev of ['critical', 'serious', 'moderate', 'minor']) {
@@ -544,7 +541,7 @@ class ReportGenerator {
     const principles = [['Perceivable', 'perceivable'], ['Operable', 'operable'], ['Understandable', 'understandable'], ['Robust', 'robust']];
     const hasScores = principles.some(([, key]) => cats[key]?.score != null);
 
-    let html = '<table>\n<thead><tr><th>WCAG Principle</th>';
+    let html = '<table>\n<caption>Table 3: Findings by WCAG principle</caption>\n<thead><tr><th>WCAG Principle</th>';
     if (hasScores) html += '<th>Score</th>';
     html += '<th>Violations</th></tr></thead>\n<tbody>';
 
@@ -563,7 +560,8 @@ class ReportGenerator {
   }
 
   generateMethodologySection(data) {
-    let html = '<p>Assessment conducted via automated scanning against WCAG 2.1 Level AA success criteria per EN 301 549. Results reflect machine-detectable violations only. Manual expert review is recommended for full conformance evaluation.</p>';
+    let html = '<p>Assessment conducted via automated scanning against WCAG 2.1 Level AA success criteria per EN 301 549.</p>';
+    html += '<div class="scope-note">This report documents machine-detectable violations only. Automated testing covers approximately 30\u201340% of WCAG success criteria. A full conformance evaluation requires additional manual expert review, assistive technology testing, and user testing. Findings should be interpreted as a lower bound of existing barriers.</div>';
 
     if (data.scanners && Object.keys(data.scanners).length > 0) {
       const names = Object.keys(data.scanners);
@@ -599,7 +597,9 @@ class ReportGenerator {
     }
 
     const groups = this.groupViolationsByPrinciple(data.violations);
+    const totalViolations = data.violations.length;
     let html = '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>';
+    html += `<p>The following ${totalViolations} findings are grouped by WCAG 2.1 principle. Each sub-section lists violations ordered by severity.</p>`;
 
     const sections = [
       ['perceivable', 'Perceivable', '4.1'],
@@ -608,6 +608,7 @@ class ReportGenerator {
       ['robust', 'Robust', '4.4'],
     ];
 
+    let tableCounter = 4; // Tables 1-3 are in earlier sections
     let i = 1;
     for (const [key, label, num] of sections) {
       const v = groups[key] || [];
@@ -615,22 +616,28 @@ class ReportGenerator {
       if (v.length === 0) {
         html += '<p>No findings.</p>';
       } else {
-        html += this.renderViolationTable(v);
+        html += this.renderViolationTable(v, tableCounter, `${label} findings`);
+        tableCounter++;
       }
       i++;
     }
 
-    if (groups.other.length > 0) {
+    // Only show "Other" if there are violations with actual descriptions
+    const meaningfulOther = groups.other.filter(v => (v.description || v.type || v.issue || '').trim());
+    if (meaningfulOther.length > 0) {
       html += `<h3 id="s-4-5"><span class="sn">4.5</span> Other Findings</h3>`;
-      html += this.renderViolationTable(groups.other);
+      html += this.renderViolationTable(meaningfulOther, tableCounter, 'Other findings');
+      tableCounter++;
     }
 
+    this._tableCounter = tableCounter;
     return html;
   }
 
-  renderViolationTable(violations) {
-    let html = `<table>
-<thead><tr><th style="width:28px">#</th><th style="width:62px">Severity</th><th style="width:60px">Criterion</th><th>Finding</th><th>Element</th><th>Remediation</th></tr></thead>
+  renderViolationTable(violations, tableNum, captionText) {
+    let html = `<table>\n`;
+    if (tableNum && captionText) html += `<caption>Table ${tableNum}: ${captionText}</caption>\n`;
+    html += `<thead><tr><th style="width:28px">#</th><th style="width:62px">Severity</th><th style="width:60px">Criterion</th><th>Finding</th><th>Element</th><th>Remediation</th></tr></thead>
 <tbody>`;
 
     violations.forEach((v, i) => {
@@ -653,13 +660,16 @@ class ReportGenerator {
     if (!hasLegacyEu && eaaViolations.length === 0) return '';
 
     let html = '<h2 id="s-5"><span class="sn">5</span> EU/EAA Compliance</h2>';
+    html += '<p>Assessment of compliance with the European Accessibility Act (EAA) and EN 301 549 procedural requirements.</p>';
 
     if (hasLegacyEu) {
       html += `<p>EN 301 549 compliance score: ${data.euCompliance.en301549.score || 0} of 100.</p>`;
     }
 
     if (eaaViolations.length > 0) {
-      html += this.renderViolationTable(eaaViolations);
+      const tNum = this._tableCounter || 8;
+      this._tableCounter = tNum + 1;
+      html += this.renderViolationTable(eaaViolations, tNum, 'EU/EAA compliance findings');
     } else if (hasLegacyEu && data.euCompliance.en301549.violations?.length > 0) {
       const violations = data.euCompliance.en301549.violations;
       html += '<table>\n<thead><tr><th>#</th><th>Severity</th><th>Clause</th><th>Finding</th></tr></thead>\n<tbody>';
@@ -688,6 +698,11 @@ class ReportGenerator {
 
     const recs = [];
 
+    // Critical first (EAA gaps), then High (perceivable/operable), then Medium
+    if (groups.eaa.length > 0) {
+      const c = collectCriteria(groups.eaa);
+      recs.push({ p: 'Critical', ref: c.join(', '), text: `${groups.eaa.length} EU EAA compliance gaps. Publish accessibility statement, establish feedback mechanism and monitoring procedures.` });
+    }
     if (groups.perceivable.length > 0) {
       const c = collectCriteria(groups.perceivable);
       recs.push({ p: 'High', ref: c.join(', '), text: `${groups.perceivable.length} perceivable findings. Review non-text content alternatives and information structure.` });
@@ -704,13 +719,11 @@ class ReportGenerator {
       const c = collectCriteria(groups.robust);
       recs.push({ p: 'Medium', ref: c.join(', '), text: `${groups.robust.length} robustness findings. Correct parsing errors and ARIA attribute usage.` });
     }
-    if (groups.eaa.length > 0) {
-      const c = collectCriteria(groups.eaa);
-      recs.push({ p: 'Critical', ref: c.join(', '), text: `${groups.eaa.length} EU EAA compliance gaps. Publish accessibility statement, establish feedback mechanism and monitoring procedures.` });
-    }
 
+    const recTableNum = this._tableCounter || 9;
+    this._tableCounter = recTableNum + 1;
     let html = '<h2 id="s-6"><span class="sn">6</span> Recommended Actions</h2>';
-    html += '<table>\n<thead><tr><th>#</th><th>Priority</th><th>Criteria</th><th>Action</th></tr></thead>\n<tbody>';
+    html += `<table>\n<caption>Table ${recTableNum}: Prioritised remediation actions</caption>\n<thead><tr><th>#</th><th>Priority</th><th>Criteria</th><th>Action</th></tr></thead>\n<tbody>`;
     recs.forEach((r, i) => {
       html += `<tr><td>${i + 1}</td><td>${r.p}</td><td><span style="font-size:7.5pt">${this.esc(r.ref)}</span></td><td>${this.esc(r.text)}</td></tr>`;
     });
@@ -720,19 +733,24 @@ class ReportGenerator {
   }
 
   generateAppendixSection(data) {
-    let html = '<table>\n<thead><tr><th>Parameter</th><th>Value</th></tr></thead>\n<tbody>';
-    html += `<tr><td>Report ID</td><td><code>${this.esc(data.id || '')}</code></td></tr>`;
-    html += `<tr><td>Document Number</td><td>${this.esc(data.docNumber || '')}</td></tr>`;
-    html += `<tr><td>Generated</td><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
-    html += `<tr><td>Generator</td><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
-    html += `<tr><td>Target</td><td>${this.esc(data.url || '')}</td></tr>`;
-    html += `<tr><td>Standard</td><td>WCAG 2.1 Level AA / EN 301 549</td></tr>`;
-    if (data.scanners) html += `<tr><td>Modules Executed</td><td>${Object.keys(data.scanners).length}</td></tr>`;
+    const tBase = this._tableCounter || 10;
+    let tNum = tBase;
+
+    let html = `<h3><span class="sn">A.1</span> Report Parameters</h3>`;
+    html += `<table>\n<caption>Table ${tNum}: Technical parameters</caption>\n<tbody>`;
+    html += `<tr><th style="text-align:left;width:160px">Report ID</th><td><code>${this.esc(data.id || '')}</code></td></tr>`;
+    html += `<tr><th style="text-align:left">Document Number</th><td>${this.esc(data.docNumber || '')}</td></tr>`;
+    html += `<tr><th style="text-align:left">Generated</th><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
+    html += `<tr><th style="text-align:left">Generator</th><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
+    html += `<tr><th style="text-align:left">Target</th><td>${this.esc(data.url || '')}</td></tr>`;
+    html += `<tr><th style="text-align:left">Standard</th><td>WCAG 2.1 Level AA / EN 301 549</td></tr>`;
+    if (data.scanners) html += `<tr><th style="text-align:left">Modules Executed</th><td>${Object.keys(data.scanners).length}</td></tr>`;
     html += '</tbody></table>';
+    tNum++;
 
     if (data.scanners) {
-      html += '<h3>Scanner Module Results</h3>';
-      html += '<table>\n<thead><tr><th>Module</th><th>Result</th><th>Findings</th></tr></thead>\n<tbody>';
+      html += `<h3><span class="sn">A.2</span> Scanner Module Results</h3>`;
+      html += `<table>\n<caption>Table ${tNum}: Individual scanner outcomes</caption>\n<thead><tr><th>Module</th><th>Result</th><th>Findings</th></tr></thead>\n<tbody>`;
       for (const [name, s] of Object.entries(data.scanners)) {
         html += `<tr><td>${this.esc(name)}</td><td>${s.passed ? 'Pass' : 'Fail'}</td><td>${s.violationCount || 0}</td></tr>`;
       }

@@ -143,8 +143,22 @@ class ReportGenerator {
     background: #fff;
     max-width: 210mm;
     margin: 0 auto;
-    padding: 32px 40px 60px;
+    padding: 32px 40px 80px;
   }
+
+  /* --- Skip link --- */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    padding: 4px 12px;
+    background: #1b2a4a;
+    color: #fff;
+    font-size: 9pt;
+    text-decoration: none;
+    z-index: 100;
+  }
+  .skip-link:focus { top: 0; outline: 2px solid #fff; outline-offset: -2px; }
 
   /* --- Typography hierarchy through weight and size only --- */
   h1, h2, h3, h4 {
@@ -158,7 +172,8 @@ class ReportGenerator {
   h4 { font-size: 10pt; font-weight: 600; margin: 14px 0 4px; }
 
   p { margin: 0 0 8px; }
-  a { color: #1b2a4a; }
+  a { color: #1b2a4a; text-decoration: underline; }
+  a:focus-visible { outline: 2px solid #1b2a4a; outline-offset: 2px; }
 
   /* --- Document header (letterhead) --- */
   .doc-header {
@@ -209,7 +224,6 @@ class ReportGenerator {
     margin-bottom: 4px;
   }
 
-
   /* --- Table of contents --- */
   .toc {
     border: 0.5px solid #999;
@@ -253,6 +267,7 @@ class ReportGenerator {
     margin: 8px 0 14px;
     font-size: 9pt;
   }
+  thead { display: table-header-group; }
   th, td {
     border: 0.5px solid #999;
     padding: 5px 8px;
@@ -293,7 +308,7 @@ class ReportGenerator {
 
   /* --- Section numbering --- */
   .sn {
-    color: #888;
+    color: #595959;
     margin-right: 0.3em;
     font-weight: 400;
   }
@@ -301,7 +316,7 @@ class ReportGenerator {
   /* --- Table footnotes --- */
   .table-note {
     font-size: 7.5pt;
-    color: #666;
+    color: #555;
     margin: -8px 0 14px;
     line-height: 1.5;
   }
@@ -309,7 +324,7 @@ class ReportGenerator {
   /* --- Scope disclaimer --- */
   .scope-note {
     font-size: 8pt;
-    color: #666;
+    color: #555;
     border-left: 2px solid #ccc;
     padding: 6px 0 6px 12px;
     margin: 10px 0 14px;
@@ -324,7 +339,7 @@ class ReportGenerator {
     right: 0;
     padding: 8px 40px;
     font-size: 7pt;
-    color: #888;
+    color: #595959;
     border-top: 0.5px solid #ccc;
     display: flex;
     justify-content: space-between;
@@ -332,28 +347,33 @@ class ReportGenerator {
   }
 
   /* --- Print --- */
-  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 7pt; color: #888; } }
+  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 7pt; color: #595959; } }
   @media print {
     body { padding: 0; max-width: none; font-size: 9pt; }
+    .skip-link { display: none; }
     .doc-footer { position: fixed; }
     .toc { break-after: page; }
     h2 { break-before: page; break-after: avoid; }
     h3, h4 { break-after: avoid; }
     table { break-inside: auto; }
+    thead { display: table-header-group; }
     tr { break-inside: avoid; }
     th { background: #e8ecf2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     tr:nth-child(even) td { background: #f6f7f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     tr.row-critical td, tr.row-serious td, tr.row-moderate td, tr.row-minor td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    a { color: #2b2b2b; text-decoration: none; }
+    a { color: #2b2b2b; }
   }
 </style>
 </head>
 <body>
 
+<a href="#s-1" class="skip-link">Skip to content</a>
+
+<header>
 <div class="doc-header">
   <div class="doc-header-left">
     {{orgLogoHtml}}
-    <div class="org-name">{{orgName}}</div>
+    <div class="org-name" lang="de">{{orgName}}</div>
     <h1>Accessibility Audit Report</h1>
     <div class="doc-subtitle">Automated WCAG 2.1 Level AA Conformance Assessment</div>
   </div>
@@ -364,19 +384,22 @@ class ReportGenerator {
     {{orgContactHtml}}
   </div>
 </div>
+</header>
 
 {{tocSection}}
+
+<main>
 
 <h2 id="s-1"><span class="sn">1</span> Subject of Assessment</h2>
 
 <table>
 <caption>Table 1: Assessment scope</caption>
 <tbody>
-<tr><th style="width:160px;text-align:left">Target URL</th><td>{{url}}</td></tr>
-<tr><th style="text-align:left">Assessment Date</th><td>{{reportDate}}</td></tr>
-<tr><th style="text-align:left">Conformance Target</th><td>WCAG 2.1 Level AA</td></tr>
-<tr><th style="text-align:left">Overall Score</th><td>{{accessibilityScore}} of 100</td></tr>
-<tr><th style="text-align:left">Violations Identified</th><td>{{violationsCount}}</td></tr>
+<tr><th scope="row" style="width:160px;text-align:left">Target URL</th><td>{{url}}</td></tr>
+<tr><th scope="row" style="text-align:left">Assessment Date</th><td>{{reportDate}}</td></tr>
+<tr><th scope="row" style="text-align:left">Conformance Target</th><td>WCAG 2.1 Level AA</td></tr>
+<tr><th scope="row" style="text-align:left">Overall Score</th><td>{{accessibilityScore}} of 100</td></tr>
+<tr><th scope="row" style="text-align:left">Violations Identified</th><td>{{violationsCount}}</td></tr>
 {{passesRow}}
 </tbody>
 </table>
@@ -401,10 +424,12 @@ class ReportGenerator {
 
 {{appendixSection}}
 
-<div class="doc-footer">
+</main>
+
+<footer class="doc-footer" lang="de">
   <span>{{orgName}} — {{docNumber}}</span>
   <span>{{reportDate}}</span>
-</div>
+</footer>
 
 </body>
 </html>`;
@@ -437,12 +462,12 @@ class ReportGenerator {
 
     // Passes row (only if passes > 0)
     const passesRow = passes > 0
-      ? `<tr><th style="text-align:left">Checks Passed</th><td>${passes}</td></tr>`
+      ? `<tr><th scope="row" style="text-align:left">Checks Passed</th><td>${passes}</td></tr>`
       : '';
     html = html.replace(/{{passesRow}}/g, passesRow);
 
     // Org logo
-    html = html.replace(/{{orgLogoHtml}}/g, data.orgLogo ? `<img class="org-logo" src="${this.esc(data.orgLogo)}" alt="">` : '');
+    html = html.replace(/{{orgLogoHtml}}/g, data.orgLogo ? `<img class="org-logo" src="${this.esc(data.orgLogo)}" alt="${this.esc(data.orgName || 'Organization')} logo">` : '');
 
     // Org contact
     html = html.replace(/{{orgContactHtml}}/g, data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : '');
@@ -480,8 +505,8 @@ class ReportGenerator {
     if (meaningfulOther.length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
 
     return `
-<nav class="toc">
-  <div class="toc-title">Contents</div>
+<nav class="toc" aria-label="Table of contents">
+  <h2 class="toc-title" id="toc-heading">Contents</h2>
   <ol>
     <li><a href="#s-1">Subject of Assessment</a></li>
     <li><a href="#s-2">Summary of Findings</a></li>
@@ -505,7 +530,7 @@ class ReportGenerator {
 
     let html = `<table>
 <caption>Table 2: Severity distribution</caption>
-<thead><tr><th>Classification</th><th>Count</th><th>Share</th></tr></thead>
+<thead><tr><th scope="col">Classification</th><th scope="col">Count</th><th scope="col">Share</th></tr></thead>
 <tbody>`;
     for (const sev of ['critical', 'serious', 'moderate', 'minor']) {
       if (counts[sev] > 0) {
@@ -526,9 +551,9 @@ class ReportGenerator {
     const principles = [['Perceivable', 'perceivable'], ['Operable', 'operable'], ['Understandable', 'understandable'], ['Robust', 'robust']];
     const hasScores = principles.some(([, key]) => cats[key]?.score != null);
 
-    let html = '<table>\n<caption>Table 3: Findings by WCAG principle</caption>\n<thead><tr><th>WCAG Principle</th>';
-    if (hasScores) html += '<th>Score</th>';
-    html += '<th>Violations</th></tr></thead>\n<tbody>';
+    let html = '<table>\n<caption>Table 3: Findings by WCAG principle</caption>\n<thead><tr><th scope="col">WCAG Principle</th>';
+    if (hasScores) html += '<th scope="col">Score</th>';
+    html += '<th scope="col">Violations</th></tr></thead>\n<tbody>';
 
     for (const [name, key] of principles) {
       const cat = cats[key];
@@ -622,7 +647,7 @@ class ReportGenerator {
   renderViolationTable(violations, tableNum, captionText) {
     let html = `<table>\n`;
     if (tableNum && captionText) html += `<caption>Table ${tableNum}: ${captionText}</caption>\n`;
-    html += `<thead><tr><th style="width:28px">#</th><th style="width:62px">Severity</th><th style="width:60px">Criterion</th><th>Finding</th><th>Element</th><th>Remediation</th></tr></thead>
+    html += `<thead><tr><th scope="col" style="width:28px">#</th><th scope="col" style="width:62px">Severity</th><th scope="col" style="width:60px">Criterion</th><th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
 <tbody>`;
 
     violations.forEach((v, i) => {
@@ -657,7 +682,7 @@ class ReportGenerator {
       html += this.renderViolationTable(eaaViolations, tNum, 'EU/EAA compliance findings');
     } else if (hasLegacyEu && data.euCompliance.en301549.violations?.length > 0) {
       const violations = data.euCompliance.en301549.violations;
-      html += '<table>\n<thead><tr><th>#</th><th>Severity</th><th>Clause</th><th>Finding</th></tr></thead>\n<tbody>';
+      html += '<table>\n<caption>EU/EAA compliance findings</caption>\n<thead><tr><th scope="col">#</th><th scope="col">Severity</th><th scope="col">Clause</th><th scope="col">Finding</th></tr></thead>\n<tbody>';
       violations.forEach((v, i) => {
         const sev = normalizeSeverity(v);
         html += `<tr class="row-${sev}"><td>${i + 1}</td><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(v.clause || '')}</td><td>${this.esc(v.description || '')}</td></tr>`;
@@ -708,7 +733,7 @@ class ReportGenerator {
     const recTableNum = this._tableCounter || 9;
     this._tableCounter = recTableNum + 1;
     let html = '<h2 id="s-6"><span class="sn">6</span> Recommended Actions</h2>';
-    html += `<table>\n<caption>Table ${recTableNum}: Prioritised remediation actions</caption>\n<thead><tr><th>#</th><th>Priority</th><th>Criteria</th><th>Action</th></tr></thead>\n<tbody>`;
+    html += `<table>\n<caption>Table ${recTableNum}: Prioritised remediation actions</caption>\n<thead><tr><th scope="col">#</th><th scope="col">Priority</th><th scope="col">Criteria</th><th scope="col">Action</th></tr></thead>\n<tbody>`;
     recs.forEach((r, i) => {
       html += `<tr><td>${i + 1}</td><td>${r.p}</td><td><span style="font-size:7.5pt">${this.esc(r.ref)}</span></td><td>${this.esc(r.text)}</td></tr>`;
     });
@@ -721,21 +746,21 @@ class ReportGenerator {
     const tBase = this._tableCounter || 10;
     let tNum = tBase;
 
-    let html = `<h3><span class="sn">A.1</span> Report Parameters</h3>`;
+    let html = `<h3 id="s-app-1"><span class="sn">A.1</span> Report Parameters</h3>`;
     html += `<table>\n<caption>Table ${tNum}: Technical parameters</caption>\n<tbody>`;
-    html += `<tr><th style="text-align:left;width:160px">Report ID</th><td><code>${this.esc(data.id || '')}</code></td></tr>`;
-    html += `<tr><th style="text-align:left">Document Number</th><td>${this.esc(data.docNumber || '')}</td></tr>`;
-    html += `<tr><th style="text-align:left">Generated</th><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
-    html += `<tr><th style="text-align:left">Generator</th><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
-    html += `<tr><th style="text-align:left">Target</th><td>${this.esc(data.url || '')}</td></tr>`;
-    html += `<tr><th style="text-align:left">Standard</th><td>WCAG 2.1 Level AA / EN 301 549</td></tr>`;
-    if (data.scanners) html += `<tr><th style="text-align:left">Modules Executed</th><td>${Object.keys(data.scanners).length}</td></tr>`;
+    html += `<tr><th scope="row" style="text-align:left;width:160px">Report ID</th><td><code>${this.esc(data.id || '')}</code></td></tr>`;
+    html += `<tr><th scope="row" style="text-align:left">Document Number</th><td>${this.esc(data.docNumber || '')}</td></tr>`;
+    html += `<tr><th scope="row" style="text-align:left">Generated</th><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
+    html += `<tr><th scope="row" style="text-align:left">Generator</th><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
+    html += `<tr><th scope="row" style="text-align:left">Target</th><td>${this.esc(data.url || '')}</td></tr>`;
+    html += `<tr><th scope="row" style="text-align:left">Standard</th><td>WCAG 2.1 Level AA / EN 301 549</td></tr>`;
+    if (data.scanners) html += `<tr><th scope="row" style="text-align:left">Modules Executed</th><td>${Object.keys(data.scanners).length}</td></tr>`;
     html += '</tbody></table>';
     tNum++;
 
     if (data.scanners) {
-      html += `<h3><span class="sn">A.2</span> Scanner Module Results</h3>`;
-      html += `<table>\n<caption>Table ${tNum}: Individual scanner outcomes</caption>\n<thead><tr><th>Module</th><th>Result</th><th>Findings</th></tr></thead>\n<tbody>`;
+      html += `<h3 id="s-app-2"><span class="sn">A.2</span> Scanner Module Results</h3>`;
+      html += `<table>\n<caption>Table ${tNum}: Individual scanner outcomes</caption>\n<thead><tr><th scope="col">Module</th><th scope="col">Result</th><th scope="col">Findings</th></tr></thead>\n<tbody>`;
       for (const [name, s] of Object.entries(data.scanners)) {
         html += `<tr><td>${this.esc(name)}</td><td>${s.passed ? 'Pass' : 'Fail'}</td><td>${s.violationCount || 0}</td></tr>`;
       }

@@ -1,75 +1,142 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Head from 'next/head';
-import ScanForm from '../components/ScanForm';
-import ReportDisplay from '../components/ReportDisplay';
 
 export default function Home() {
-  const [report, setReport] = useState(null);
+  const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [elapsed, setElapsed] = useState(0);
+  const timerRef = useRef(null);
 
-  const handleScan = async (url, options) => {
+  const startTimer = useCallback(() => {
+    setElapsed(0);
+    timerRef.current = setInterval(() => {
+      setElapsed(prev => prev + 1);
+    }, 1000);
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => stopTimer();
+  }, [stopTimer]);
+
+  const formatElapsed = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const trimmed = url.trim();
+    if (!trimmed) return;
+
     setLoading(true);
     setError(null);
-    setReport(null);
+    startTimer();
 
     try {
-      const response = await fetch('/api/scan', {
+      const scanRes = await fetch('/api/scan', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url, options }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: trimmed, profile: 'standard' }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!scanRes.ok) {
+        const body = await scanRes.json().catch(() => null);
+        throw new Error(body?.error || `Scan failed (HTTP ${scanRes.status})`);
       }
 
-      const data = await response.json();
-      setReport(data);
+      const scanResult = await scanRes.json();
+
+      const reportRes = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scanResult }),
+      });
+
+      if (!reportRes.ok) {
+        const body = await reportRes.json().catch(() => null);
+        throw new Error(body?.error || `Report generation failed (HTTP ${reportRes.status})`);
+      }
+
+      const { reportUrl } = await reportRes.json();
+      if (!reportUrl) {
+        throw new Error('No report URL returned from server');
+      }
+
+      window.location.href = reportUrl;
     } catch (err) {
-      setError('Failed to scan the website. Please check the URL and try again.');
-      console.error('Scan error:', err);
-    } finally {
+      setError(err.message);
       setLoading(false);
+      stopTimer();
     }
   };
 
   return (
     <>
       <Head>
-        <title>Web Accessibility Checker</title>
-        <meta name="description" content="Professional web accessibility scanning tool with WCAG compliance checking" />
+        <title>Barrierefreiheitsprüfung — Zentrum für Nachhaltige Algorithmik e.V.</title>
+        <meta name="description" content="Automated WCAG 2.1 Level AA conformance assessment" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <header className="header">
-        <div className="container">
-          <h1>Web Accessibility Checker</h1>
-          <p>Professional accessibility scanning with WCAG compliance and screen reader support</p>
-        </div>
-      </header>
-
-      <main className="container">
-        <ScanForm onScan={handleScan} loading={loading} />
-        
-        {error && (
-          <div className="error-message">
-            {error}
+      <div className="page">
+        <header className="letterhead">
+          <div className="letterhead-inner">
+            <div className="org-name">Zentrum für Nachhaltige Algorithmik e.V.</div>
+            <div className="service-title">Web Accessibility Audit Service</div>
           </div>
-        )}
+        </header>
 
-        {loading && (
-          <div className="loading">
-            <div className="spinner"></div>
-            <span>Scanning website for accessibility issues...</span>
+        <main className="main">
+          <div className="content">
+            {!loading ? (
+              <form className="audit-form" onSubmit={handleSubmit}>
+                <h2>Request Accessibility Audit</h2>
+                <div className="field">
+                  <label htmlFor="url">Target URL</label>
+                  <input
+                    type="url"
+                    id="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    required
+                    autoComplete="url"
+                    disabled={loading}
+                  />
+                </div>
+                <button type="submit" className="submit-btn" disabled={!url.trim()}>
+                  Start Audit
+                </button>
+
+                {error && (
+                  <p className="error-text">
+                    <strong>Error:</strong> {error}
+                  </p>
+                )}
+              </form>
+            ) : (
+              <div className="loading-state">
+                <div className="spinner" role="status" aria-label="Scanning" />
+                <span className="loading-text">Accessibility audit in progress</span>
+                <span className="elapsed">{formatElapsed(elapsed)}</span>
+              </div>
+            )}
           </div>
-        )}
+        </main>
 
-        {report && <ReportDisplay report={report} />}
-      </main>
+        <footer className="footer">
+          <p>Zentrum für Nachhaltige Algorithmik e.V. — {new Date().getFullYear()}</p>
+        </footer>
+      </div>
     </>
   );
 }

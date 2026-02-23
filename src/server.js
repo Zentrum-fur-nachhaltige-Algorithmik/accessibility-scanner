@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs-extra');
 
@@ -39,6 +40,15 @@ async function getQueue() {
   return scanQueue;
 }
 
+// Rate limiter for scan endpoint (5 requests per hour per IP)
+const scanLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Rate limit exceeded. Maximum 5 scans per hour.' },
+});
+
 // ── Routes ──────────────────────────────────────────────────────
 
 /**
@@ -46,7 +56,7 @@ async function getQueue() {
  * Run accessibility scan against a URL.
  * Body: { url: string, scannerIds?: string[], options?: object }
  */
-app.post('/api/scan', async (req, res) => {
+app.post('/api/scan', scanLimiter, async (req, res) => {
   const { url, profile, scannerIds, options = {} } = req.body;
 
   if (!url) {

@@ -209,18 +209,6 @@ class ReportGenerator {
     margin-bottom: 4px;
   }
 
-  /* Classification strip */
-  .doc-classification {
-    text-align: center;
-    font-size: 7.5pt;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: #888;
-    border-bottom: 0.5px solid #ccc;
-    padding: 4px 0;
-    margin-bottom: 20px;
-  }
 
   /* --- Table of contents --- */
   .toc {
@@ -373,12 +361,9 @@ class ReportGenerator {
     <p class="doc-meta-line doc-id">{{docNumber}}</p>
     <p class="doc-meta-line">Date: {{reportDate}}</p>
     <p class="doc-meta-line">Version 1.0</p>
-    <p class="doc-meta-line">Classification: Confidential</p>
     {{orgContactHtml}}
   </div>
 </div>
-
-<div class="doc-classification">Confidential — {{orgName}}</div>
 
 {{tocSection}}
 

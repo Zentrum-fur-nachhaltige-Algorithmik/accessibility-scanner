@@ -1,0 +1,45 @@
+\begingroup
+\begin{table*}[!t]
+    \centering
+    \small
+    \scalebox{0.9}{
+    \begin{tabular}{p{\linewidth}}
+        \toprule
+        \underline{\textbf{\textsc{Exemplar for AQuA}}} \\
+        \vspace{-1mm}
+        \underline{Step 1: Answer Prediction}\\
+        \# Question: In a flight of 600 km, an aircraft was slowed down due to bad weather. Its average speed for the trip was reduced by 200 km/hr and the time of flight increased by 30 minutes. The duration of the flight is: \\
+        \vspace{-1mm}
+        \# Answer option: ['A)1 hour', 'B)2 hours', 'C)3 hours', 'D)4 hours', 'E)5 hours'] \\
+        \# Write Python code to solve the following questions. Store your result as a variable named 'answer'. \\
+        \# 1. What was the duration of the flight? (independent, support: ["The duration of the flight is"]) \\
+        duration = Symbol('duration', positive=True) \\
+        \# 2. What is the delay of the flight? (independent, support: ["the time of flight increased by 30 minutes"]) \\
+        delay = 30 / 60 \\
+        \# 3. What was the total flight distance? (independent, support: ["In a flight of 600 km"]) \\
+        total\_distance = 600 \\
+        \# 4. What was the original speed? (depends on 1 and 3, support: ["External knowledge: speed is distance over time"]) \\
+        original\_speed = total\_distance / duration \\
+        \# 5. What was the reduced speed? (depends on 1, 2, and 3, support: []) \\
+        reduced\_speed = total\_distance / (duration + delay) \\
+        \# 6. What was the duration of the flight if the original speed was 200 km/hr faster than the reduced speed? (depends on 4, 5, and 1, support: []) \\
+        solution = solve\_it(original\_speed - reduced\_speed - 200, duration) \\
+        answer = solution[duration] \\
+        
+        \vspace{2mm}
+
+        \underline{Step 2: Multiple Choice Conversion}\\
+        \# Question: In a flight of 600 km, an aircraft was slowed down due to bad weather. Its average speed for the trip was reduced by 200 km/hr and the time of flight increased by 30 minutes. The duration of the flight is: \\
+        \vspace{-1mm}
+        \# Answer option: ['A)1 hour', 'B)2 hours', 'C)3 hours', 'D)4 hours', 'E)5 hours'] \\
+        \# Prediction: 1.00000000000000 \\
+        \# Closest Option: A \\
+        \bottomrule
+    \end{tabular}
+    }
+        \caption{
+    An exemplar from our prompt for AQuA.
+    }
+    \label{tab:appendix-AQUA_prompt}
+\end{table*}
+\endgroup

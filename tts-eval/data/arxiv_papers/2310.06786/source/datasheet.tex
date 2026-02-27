@@ -1,0 +1,59 @@
+\clearpage
+\section{Datasheet}
+
+We provide a datasheet for OpenWebMath, following the framework in \citet{gebru2021datasheets}.
+\begin{longtable}{p{6cm}|p{6cm}}
+    \toprule
+    \multicolumn{2}{c}{\textsc{\textbf{Motivation}}} \\
+    \midrule
+    \textbf{For what purpose was the dataset created?} & The dataset was created to enable the training of large language models on mathematical texts, in order to improve their mathematical reasoning capabilities.\\ \midrule
+    \textbf{Who created the dataset and on behalf of which entity?} & The dataset was created by the authors of this work. \\ \midrule
+    \textbf{Who funded the creation of the dataset?} & Resources used in preparing this research were provided, in part, by the Province of Ontario, the Government of Canada through CIFAR, Fujitsu Limited, and companies sponsoring the Vector Institute for Artificial Intelligence (\url{www.vectorinstitute.ai/partners}). Computing resources for model training were provided by EleutherAI and Brigham Young University. \\ \midrule
+    \textbf{Any other comment?} &  None. \\ \midrule
+    \multicolumn{2}{c}{\textsc{\textbf{Composition}}} \\ \midrule
+    \textbf{What do the instances that comprise the dataset represent?} & The instances are text documents extracted from mathematics-related webpages from Common Crawl. \\ \midrule
+    \textbf{How many instances are there in total?} & In total, OpenWebMath contains 6.3 million documents. \\ \midrule
+    \textbf{Does the dataset contain all possible instances or is it a sample (not necessarily random) of instances from a larger set?} & OpenWebMath doesn't contain all instances of text extracted from mathematics-related webpages from Common Crawl, as our filters can miss a non-zero proportion of such webpages. However, we expect OpenWebMath to contain most of them. \\ \midrule
+    \textbf{What data does each instance consist of?} & Each instance consists of plain text and metadata including the source URL, the snapshot date, and other extraction parameters. \\ \midrule
+    \textbf{Is there a label or target associated with each instance?} & No. \\ \midrule
+    \textbf{Is any information missing from individual instances?} & No. \\ \midrule
+    \textbf{Are relationships between individual instances made explicit?} & No. \\ \midrule
+    \textbf{Are there recommended data splits?} & No. \\ \midrule
+    \textbf{Are there any errors, sources of noise, or redundancies in the dataset?} & Yes, a small portion of the documents from OpenWebMath are not related to mathematics, or contain bad quality content. \\ \midrule
+    \textbf{Is the dataset self-contained, or does it link to or otherwise rely on external resources?} & The dataset is entirely self-contained. \\ \midrule
+    \textbf{Does the dataset contain data that might be considered confidential?} & No. \\ \midrule
+    \textbf{Does the dataset contain data that, if viewed directly, might be offensive, insulting, threatening, or might otherwise cause anxiety?} & The data is filtered for quality and we do not expect that this content will be offensive, but since our filters may be imperfect we make no guarantees. \\ \midrule
+    \multicolumn{2}{c}{\textsc{\textbf{Collection}}} \\ \midrule
+    \textbf{How was the data associated with each instance acquired?} & The data was acquired by processing data from Common Crawl. \\ \midrule
+    \textbf{What mechanisms or procedures were used to collect the data?} & We refer to the CommonCrawl website (\href{https://commoncrawl.org/}{commoncrawl.org}) for details on how they collect data. \\ \midrule
+    \textbf{If the dataset is a sample from a larger set, what was the sampling strategy?} & We use all data from Common Crawl that was available before May 2023. \\ \midrule
+    \textbf{Who was involved in the data collection process and how were they compensated?} & Keiran Paster and Marco Dos Santos collected the data and were compensated by their respective graduate programs. \\ \midrule
+    \textbf{Over what timeframe was the data collected?} & OpenWebMath uses shards of CommonCrawl gathered between 2013 and 2023.   \\ \midrule
+    \textbf{Were any ethical review processes conducted?} & No. \\ \midrule
+    \multicolumn{2}{c}{\textsc{\textbf{Preprocessing}}} \\ \midrule
+    \textbf{Was any preprocessing/cleaning/labeling of the data done?} & Yes. See \autoref{sec:filtering} for details. \\ \midrule
+    \textbf{Was the “raw” data saved in addition to the preprocessed/cleaned/labeled data?} & Yes. \\ \midrule
+    \textbf{ Is the software that was used to preprocess/clean/label the data available?} & Yes. See supplementary materials. \\ \midrule
+    \multicolumn{2}{c}{\textsc{\textbf{Uses}}} \\ \midrule
+    \textbf{Has the dataset been used for any tasks already?} & Yes, the data was used to train 1.4B parameter language models in \autoref{sec:models} \\ \midrule
+    \textbf{Is there a repository that links to any or all papers or systems that use the dataset?} & No. \\ \midrule
+    \textbf{What (other) tasks could the dataset be used for?} & We primarily envision that OpenWebMath could be useful for language model pretraining, finetuning, and evaluation. \\ \midrule
+    \textbf{Is there anything about the composition of the dataset or the way it was collected and preprocessed/cleaned/labeled that might impact future uses?} & It is possible that the filtering stage of the project discarded valuable documents, such as those not written in English. This makes OpenWebMath suboptimal for creating mathematical models in other languages. \\ \midrule
+    \textbf{Are there tasks for which the dataset should not be used?} & Any tasks which may considered irresponsible or harmful. \\ \midrule
+    \multicolumn{2}{c}{\textsc{\textbf{Distribution}}} \\ \midrule
+    \textbf{Will the dataset be distributed to third parties outside of the entity on behalf of which the dataset was created?} & Yes, the dataset will be available on the Hugging Face Hub for NLP practitioners. \\ \midrule
+    \textbf{How will the dataset will be distributed?} & We will distribute the dataset on the Hugging Face Hub \\ \midrule
+    \textbf{When will the dataset be distributed?} & The dataset will be available when the paper is made public. \\ \midrule
+    \textbf{Will the dataset be distributed under a copyright or other intellectual property (IP) license, and/or under applicable terms of use (ToU)?} & The public extract is made available under an ODC-By 1.0 license; users should also abide to the CommonCrawl ToU: \href{https://commoncrawl.org/terms-of-use/}{https://commoncrawl.org/terms-of-use/}. \\ \midrule
+    \textbf{Have any third parties imposed IP-based or other restrictions on the data associated with the instances?} & Not to our knowledge. \\ \midrule
+    \textbf{Do any export controls or other regulatory restrictions apply to the dataset or to individual instances?} & Not to our knowledge. \\ \midrule
+    \multicolumn{2}{c}{\textsc{\textbf{Maintenance}}} \\ \midrule
+    \textbf{Who will be supporting/hosting/maintaining the dataset?} & The dataset will be hosted on the Hugging Face Hub. \\ \midrule
+    \textbf{How can the owner/curator/manager of the dataset be contacted?} & \texttt{keirp@cs.toronto.edu} \\ \midrule
+    \textbf{Is there an erratum?} & No. \\ \midrule
+    \textbf{Will the dataset be updated?} & No. \\ \midrule
+    \textbf{If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for them to do so?} & No. \\ \bottomrule
+    \caption{\textbf{Datasheet for OpenWebMath}, following the framework introduced by \citet{gebru2021datasheets}.}
+    \label{tab:datasheet}
+\end{longtable}
+\clearpage

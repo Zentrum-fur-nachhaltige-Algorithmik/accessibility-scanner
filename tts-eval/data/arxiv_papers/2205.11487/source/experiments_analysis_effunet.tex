@@ -1,0 +1,11 @@
+\subsubsection{Comparison of U-Net vs Efficient U-Net}
+\label{sec:unet_vs_efficientunet}
+We compare the performance of U-Net with our new Efficient U-Net on the task of $64\times64 \rightarrow 256\times256$ super-resolution task. Fig. \ref{fig:unet_vs_Efficient} compares the training convergence of the two architectures. We observe that Efficient U-Net converges significantly faster than U-Net, and obtains better performance overall. Our Efficient U-Net is also $\times2-3$ faster at sampling.
+
+\begin{figure}
+\centering
+\input{figures/pgfplots/unet_vs_efficient-unet}
+\caption{Comparison of convergence speed of U-Net vs Efficient U-Net on the $64\times64 \rightarrow 256\times256$ super-resolution task.}
+\label{fig:unet_vs_Efficient}
+\end{figure}
+

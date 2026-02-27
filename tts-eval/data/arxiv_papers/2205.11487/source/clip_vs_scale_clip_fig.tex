@@ -1,0 +1,59 @@
+\begin{figure}[tb]
+\centering
+\begin{subfigure}{.495\textwidth}
+\centering
+\setlength{\tabcolsep}{0.1pt}
+\begin{tabular}{cccc}
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/1.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/2.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/3.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/4.jpg} \\ [-3pt]
+
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/5.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/6.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/7.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/8.jpg} \\ [-3pt]
+
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/9.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/10.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/11.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/12.jpg} \\ [-3pt]
+
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/13.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/14.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/15.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/clip_samples/16.jpg} \\
+\end{tabular}
+\vspace*{-0.2cm}
+\caption{Samples using static thresholding.}
+\end{subfigure}%
+\begin{subfigure}{.495\textwidth}
+\centering
+\setlength{\tabcolsep}{0.1pt}
+\begin{tabular}{cccc}
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/1.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/2.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/3.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/4.jpg} \\[-3pt] 
+
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/5.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/6.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/7.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/8.jpg} \\[-3pt]
+
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/9.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/10.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/11.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/12.jpg} \\[-3pt]
+
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/13.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/14.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/15.jpg} &
+\includegraphics[width=0.24\textwidth]{figures/clip_vs_scaled_clip/scaled_clip_samples/16.jpg} \\
+\end{tabular}
+\vspace*{-0.2cm}
+\caption{Samples using dynamic thresholding ($p=99.5$)}
+\end{subfigure}
+\caption{Static vs.\ dynamic thresholding on non-cherry picked $256\times256$ samples using a guidance weight of 5 for both the base model and the super-resolution model, using the same random seed. The text prompt used for these samples is ``A photo of an astronaut riding a horse.'' When using high guidance weights, static thresholding often leads to oversaturated samples, while our dynamic thresholding yields more natural looking images.}
+\label{fig:clip_vs_scaled_clip_samples}
+\end{figure}

@@ -1,0 +1,50 @@
+\hypertarget{scoring}{\section{Scoring}}
+\label{sec:scoring}
+By selecting the indicators and companies, we abstractly specify the form of the index.
+By defining each indicator and designating the flagship foundation model to be assessed for each developer, we move to a more precise operationalization. 
+To make the index fully precise, we describe how we sourced the information that was used to assess each developer on each indicator, resulting in the final scores.
+
+\paragraph{Search protocol.}
+To source information that we use to score developers, we exclusively use publicly available information provided by developers themselves.
+We recognize that this information may be incomplete (\eg clients or governments may have greater access to information from the developer), but given that our focus includes public accountability, and we are academic researchers, we choose to consider only publicly available information.
+Given that public information may change, we use information available as of \informationfreezedate.
+
+For each developer, we initially compile a basic set of resources disclosed by the developer about their model development practices and their flagship foundation model.
+To gather information for a specific indicator, we perform a structured search to identify all relevant information that is public.
+The exact details of how we execute this search are provided in \refapp{search-protocol}.
+
+\paragraph{Initial scoring.}
+Having identified the information basis for scoring an indicator, \numgraders researchers on the team independently scored the developer on the indicator.
+This entails specifying a \textit{score} (\ie 0 or 1), \textit{source} used in arriving at that score (\eg one or more webpages), and a textual \textit{justification} for how the evidence from sources is weighed against the criteria for the indicator in determining the score. 
+Given these initial score assignments, the researchers reviewed their scores to identify any errors. 
+
+Binary scoring provided several advantages. First, it simplified the scoring process by allowing researchers to focus on the sharp distinction between 0 and 1 point for each indicator. 
+Second, a narrow criterion for making a binary scoring decision for each indicator reduced subjectivity in the initial scoring. 
+Third, by reducing the level of complexity of each indicator we were able to reduce overlap between indicators, ensuring that we assess distinct dimensions of transparency.
+At the same time, binary scoring limits the level of complexity of each indicator, potentially leaving out valuable information that can be captured by more complex scoring schemes \citep[\cf][]{bommasani2023eu-ai-act}.\footnote{See \refsec{limitations} for further discussion.}
+
+In some instances, the researchers responsible for the same (indicator, developer) pair arrived at different scores, indicating disagreement. 
+Given the systematic information gathering process, the iterative refinement of indicator definitions, and the binary scoring scheme, we found that disagreements were fairly infrequent.
+Disagreements generally related to relevant information being erroneously neglected by one researcher or differences in the fine-grained interpretation of how to score an indicator.
+Overall, across all \numindicators $\times$ \numcompanies (indicator, developer) pairs, the agreement rate was 85.2\% \citep[Cohen's $\kappa = 0.67$, indicating substantial agreement;][]{landis1977agreement}. 
+To resolve disagreements, the researchers discussed and jointly came to a resolution.
+Following the disagreement resolution, the scores were finalized and sources and justifications were merged to yield an initial set of \numcells (score, source, justification) triples for all \numcells (indicator, developer) pairs. \clearpage
+
+\paragraph{Company feedback.}
+Given that these scores constitute a direct assessment of specific companies, we engaged these companies to provide them with the opportunity to review, respond, and potentially rebut or contest the scores we assigned. 
+Concretely, we contacted leaders at each of the companies with (i) a description of the \projectname, 
+(ii) the \numindicators indicators and their definitions, and (iii) their \numindicators (score, source, justification) triples. 
+We encouraged each company to review our scores, provide any general feedback and, especially, to directly contest any scores the company viewed as incorrect (by referencing public information available as of \informationfreezedate).
+Companies were provided two business weeks to respond with clear assurance that all correspondence would be strictly private. 
+
+Of the \numcompanies companies, all 10 responded.
+Of these, 8 companies (\amazon, \anthropic, \cohere, \huggingface, \inflection, \meta, \openai, \stability) provided rebuttals for specific scores, which we extensively reviewed. 
+In most cases, we did not change scores, though some rebuttals led to improvements in the scores (an average increase of 1.25 points across the 8 developers that contested on average 8.75 scores).
+Rather than improving developers' scores, these rebuttals often revealed misunderstandings regarding definitions of indicators or our justifications for scores, leading to more robust definitions and justifications.
+Beyond the scores, several companies scheduled calls with us or provided broader forms of feedback, which provided insight regarding how they conceptualize best practices for transparency and responsible AI.
+Following company feedback, we again verified all scores, sources, and justifications that constitute the finalized materials used throughout this paper and made publicly available. 
+
+We also notified the companies prior to the release of this paper, responding to their feedback. 
+In addition, we encouraged companies to provide a public written response regarding their perspective on this initiative, their specific scores, and their broader approach as an organization to transparency and responsible AI as it relates to foundation models.
+Moving forward, we hope these organizations implement more transparent practices and we provide specific recommendations to that effect in \refsec{recommendations-developers}.
+\clearpage

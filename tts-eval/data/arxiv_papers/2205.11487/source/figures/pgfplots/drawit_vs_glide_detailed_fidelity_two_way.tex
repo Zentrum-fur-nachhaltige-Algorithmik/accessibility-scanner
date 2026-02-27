@@ -1,0 +1,74 @@
+\begin{tikzpicture}
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\begin{axis}[
+name=fidelity,
+width=\textwidth,
+height=0.5\textwidth,
+ybar stacked,
+ymin=-0.1,
+ymax=1.1,
+xtick=data,
+xtick style={draw=none},
+symbolic x coords={Color,Conflicting,Count,DALL-E \cite{ramesh-dalle},Descriptions,Marcus et al. \cite{marcus-arxiv-2022},Misspellings,Positional,Rarewords,Reddit,Text},
+x tick label style={rotate=60},
+ytick={0,0.5,1},
+yticklabels={0\%, 50\%, 100\%},
+legend style={font=\tiny},
+legend cell align=left,
+legend image code/.code={
+    \draw [#1] (0cm, -0.1cm) rectangle (0.2cm, 0.25cm);
+},
+legend style={
+draw=none,
+at={(0.5, 1.1)},anchor=south,
+legend columns=3,
+/tikz/every even column/.append style={column sep=0.2cm}
+},
+bar width=0.6cm,
+]
+
+\addplot+[
+    fill=google_blue,
+    fill opacity=0.2,
+    draw=google_blue
+] coordinates {
+(Color, 0.610)
+(Conflicting, 0.593)
+(Count, 0.674)
+(DALL-E \cite{ramesh-dalle}, 0.597)
+(Descriptions, 0.631)
+(Marcus et al. \cite{marcus-arxiv-2022}, 0.568)
+(Misspellings, 0.459)
+(Positional, 0.575)
+(Rarewords, 0.609)
+(Reddit, 0.531)
+(Text, 0.677)
+};
+
+\addplot+[
+fill=google_green,
+fill opacity=0.2,
+draw=google_green
+] coordinates {
+(Color, 0.390)
+(Conflicting, 0.407)
+(Count, 0.326)
+(DALL-E \cite{ramesh-dalle}, 0.403)
+(Descriptions, 0.369)
+(Marcus et al. \cite{marcus-arxiv-2022}, 0.432)
+(Misspellings, 0.541)
+(Positional, 0.425)
+(Rarewords, 0.391)
+(Reddit, 0.469)
+(Text, 0.323)
+};
+
+\legend{}
+\end{axis}
+
+\end{tikzpicture}

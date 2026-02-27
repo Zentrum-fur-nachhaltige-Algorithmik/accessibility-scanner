@@ -1,0 +1,38 @@
+\begingroup
+\begin{table*}[!t]
+    \centering
+    \small
+    \scalebox{0.9}{
+    \begin{tabular}{p{\linewidth}}
+        \toprule
+        \underline{\textbf{\textsc{Exemplar for StrategyQA}}} \\
+        \vspace{-2mm}
+        // Q: Would a pear sink in water? \\
+        \vspace{-1mm}
+        // To answer this question, we answer the following subquestions: \\
+        // 1. What is the density of a pear? \\
+        // The density of a pear is about $0.6 g/cm^3$. \\
+        // 2. What is the density of water? \\
+        // Water has a density of $1 g/cm^3$. \\ \\
+        
+        // Then, we represent these answers in Datalog: \\
+        // 1. The density of a pear is about $0.6 g/cm^3$. \\
+        .decl Has\_density(Object:symbol, Density:float) \\
+        Has\_density("pear", 0.6). \\
+        // 2. Water has a density of $1 g/cm^3$. \\
+        Has\_density("water", 1). \\ \\
+        
+        // Now, we derive the final answer: Would a pear sink in water? \\
+        // The answer is Yes only if the density of a pear is more than the density of water. \\
+        .decl Answer() \\
+        Answer() :- Has\_density("pear", density1), Has\_density("water", density2), density1 > density2. \\
+        .output Answer \\
+        \bottomrule
+    \end{tabular}
+    }
+        \caption{
+    An exemplar from our prompt for StrategyQA.
+    }
+    \label{tab:appendix-StrategyQA_prompt}
+\end{table*}
+\endgroup

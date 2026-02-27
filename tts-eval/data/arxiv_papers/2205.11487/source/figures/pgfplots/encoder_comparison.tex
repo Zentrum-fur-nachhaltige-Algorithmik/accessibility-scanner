@@ -1,0 +1,33 @@
+\begin{tikzpicture}
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+
+\begin{axis}[width=10cm, height=5cm,
+  xlabel=Training Steps,
+  ylabel=CLIP Score,
+  legend columns=4,
+  legend pos=south east,
+  legend style={font=\tiny},
+  legend cell align=left,
+  xmin=0,
+  ymin=0.22,
+  xmax=500000,
+  every axis plot/.append style={thick}
+]
+\addplot +[mark=none, dashed, google_blue] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/bert_base.csv};
+\addplot +[mark=none, dashed, google_red] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/bert_large.csv};
+
+\addplot +[mark=none, solid, google_yellow] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/t5_small.csv};
+\addplot +[mark=none, solid, google_blue] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/t5_base.csv};
+\addplot +[mark=none, solid, google_red] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/t5_large.csv};
+\addplot +[mark=none, solid, google_green] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/t5_xl.csv};
+\addplot +[mark=none, solid, gray] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/t5_xxl.csv};
+\addplot +[mark=none, dotted] table [x=Step, y=Clip Score, col sep=comma] {embedding_comparison/clip.csv};
+\addplot[mark=none, dashdotted] coordinates {(0,0.27089) (1e6,0.27089)};
+\legend{BERT Base, BERT Large, T5 Small, T5 Base, T5 Large, T5 XL, T5 XXL, CLIP, Reference}
+\end{axis}
+\end{tikzpicture}

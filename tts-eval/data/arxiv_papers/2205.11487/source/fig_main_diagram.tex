@@ -1,0 +1,49 @@
+\tikzset{font=\small}
+\begin{tikzpicture}[scale=0.7, transform shape]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+
+\node[] (text) {Text};
+
+\node[draw=google_blue, below of=text, minimum height=0.5in, minimum width=1.5in, node distance=0.5in,align=center,fill=google_blue,fill opacity=0.1,text opacity=1.0,text=google_blue] (frozen_text_encoder) {Frozen Text Encoder};
+\draw[-Latex] (text)  -- (frozen_text_encoder);
+
+\node[draw=google_red, below of=frozen_text_encoder, minimum height=0.5in, minimum width=1.5in, node distance=1.0in and 0.5in,align=center,fill=google_red,fill opacity=0.1,text opacity=1.0,text=google_red] (cdm0) {Text-to-Image \\ Diffusion Model};
+\draw[-Latex] (frozen_text_encoder) -- node[midway, right] {Text Embedding} (cdm0) coordinate[midway] (start);
+
+\node[draw=google_yellow, below of=cdm0, minimum height=0.5in, minimum width=1.5in, node distance=0.9in and 0.5in,align=center,fill=google_yellow,fill opacity=0.1,text opacity=1.0,text=google_yellow] (cdm1) {Super-Resolution \\ Diffusion Model};
+\draw[-Latex] (cdm0) -- node[midway, right] {$64\times64$ Image} (cdm1);
+
+\node[draw=google_green, below of=cdm1, minimum height=0.5in, minimum width=1.5in, node distance=1.7in and 0.5in,align=center,fill=google_green,fill opacity=0.1,text opacity=1.0,text=google_green] (cdm2) {Super-Resolution \\ Diffusion Model};
+\draw[-Latex] (cdm1) -- node[midway, right] {$256\times256$ Image} (cdm2);
+
+\node[below of=cdm2, node distance=0.75in] (output) {$1024\times1024$ Image};
+\draw[-Latex] (cdm2) -- (output);
+
+\coordinate (cdm1_left) at ([xshift=-0.25in]cdm1.west);
+\draw[-Latex] (start) -| (cdm1_left) -- (cdm1.west);
+
+\coordinate (cdm2_left) at ([xshift=-0.25in]cdm2.west);
+\draw[-Latex] (cdm1_left) -| (cdm2_left) -- (cdm2.west);
+
+
+\node[right of=text,node distance=3in,align=center] (ex_text) {``A Golden Retriever dog wearing a blue \\ checkered beret and red dotted turtleneck.''};
+
+\node[draw,right of=cdm0,node distance=3in,minimum height=0.45in, minimum width=0.45in,inner sep=0in] (64x) {\includegraphics[width=0.45in]{figures/main_diagram/64x.jpg}};
+
+\node[draw,right of=cdm1,node distance=3in,minimum height=0.9in, minimum width=0.9in,inner sep=0in] (256x) {\includegraphics[width=0.9in]{figures/main_diagram/256x.jpg}};
+
+\node[draw,right of=cdm2,node distance=3in,minimum height=1.8in, minimum width=1.8in,inner sep=0in] (1024x) {\includegraphics[width=1.8in]{figures/main_diagram/1024x.jpg}};
+
+\draw[-Latex] (ex_text.south) -- (64x.north);
+
+\draw[-Latex] (64x.south) -- (256x.north);
+
+\draw[-Latex] (256x.south) -- (1024x.north);
+
+
+\end{tikzpicture}

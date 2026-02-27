@@ -1,0 +1,12 @@
+\section{Architecture Details}
+\subsection{Efficient U-Net}
+\label{sec:unet_vs_efficient_unet_appendix}
+We introduce a new architectural variant, which we term Efficient U-Net, for our super-resolution models. We find our Efficient U-Net to be simpler, converges faster, and is more memory efficient compared to some prior implementations \cite{nichol2021improved}, especially for high resolutions. We make several key modifications to the U-Net architecture, such as shifting of model parameters from high resolution blocks to low resolution, scaling the skip connections by $\sfrac{1}{\sqrt{2}}$ similar to \cite{song2020score, saharia2021image} and reversing the order of downsampling/upsampling operations in order to improve the speed of the forward pass.
+Efficient U-Net makes several key modifications to the typical U-Net model used in \cite{dhariwal2021diffusion, sahariac-palette}: 
+\begin{itemize}
+    \item We shift the model parameters from the high resolution blocks to the low resolution blocks, via adding more residual blocks for the lower resolutions. Since lower resolution blocks typically have many more channels, this allows us to increase the model capacity through more model parameters, without egregious memory and computation costs.
+    \item When using large number of residual blocks at lower-resolution (e.g. we use 8 residual blocks at lower-resolutions compared to typical 2-3 residual blocks used in standard U-Net architectures \cite{dhariwal2021diffusion, saharia2021image}) we find that scaling the skip connections by $\sfrac{1}{\sqrt{2}}$ similar to \cite{song2020score, saharia2021image} significantly improves convergence speed.
+    \item In a typical U-Net's downsampling block, the downsampling operation happens after the convolutions, and in an upsampling block, the upsampling operation happens prior the convolution. We reverse this order for both downsampling and upsampling blocks in order to significantly improve the speed of the forward pass of the U-Net, and find no performance degradation. 
+\end{itemize}  
+With these key simple modifications, Efficient U-Net is simpler, converges faster, and is more memory efficient compared to some prior U-Net implementations. \cref{fig:efficient_unet_fullarch} shows the full architecture of Efficient U-Net, while  \Cref{fig:efficient_unet_dblock,fig:efficient_unet_ublock} show detailed description of the Downsampling and Upsampling blocks of Efficient U-Net respectively. See  \cref{sec:unet_vs_efficientunet} for results. 
+

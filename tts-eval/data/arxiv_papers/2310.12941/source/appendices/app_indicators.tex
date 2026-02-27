@@ -1,0 +1,426 @@
+\hypertarget{indicators}{\section{Indicators}}
+\label{app:indicators}
+
+% Tagging system:
+% \begin{itemize}
+%     \item \textbf{TR} denotes  relevance for Technical Research
+%     \item \textbf{PS} denotes relevance for Policy and Society
+%     \item \textbf{D} denotes relevance Deployers
+%     \item \textbf{PS} denotes relevance for Social Media
+%     \item \textbf{P} denotes relevance for Policy
+%     \item \textbf{PS} denotes Quantitative result
+% \end{itemize}
+
+\input{appendices/indicator_output_tex}
+
+% 1. Upstream → Data → \textbf{Data Size}
+% \begin{itemize}
+%   \item \underline{Definition}: For the data used in building the model, is the data size disclosed? 
+%   \item \underline{Notes}: This should be reported in appropriate units (e.g. bytes, words, tokens, images, frames), broken down by modality. The precision required should be to one significant figure (e.g. 4 trillion tokens, 200 thousand images). No form of decomposition into data phases is required.
+% \end{itemize}
+
+% 2. Upstream → Data → \textbf{Data Sources}
+% \begin{itemize}
+%   \item \underline{Definition}: For all data used in building the model, are the content sources disclosed? 
+%   \item \underline{Notes}: To satisfy this criterion, a meaningful decomposition of sources must be listed in an understandable way (e.g. named URLs/domains/databases/data providers). It does not suffice to say data is "sourced from the Internet" or "licensed sources”.
+% \end{itemize}
+
+% %\begin{comment}
+% \todo{@rishi and @betty to input definitions from google sheet; all of these definitions/notes are not accurate}
+% 3. Upstream → Data → Data Creators
+% Definition: For all data used in building the model, does the provider give some characterization of the people who created the data? 
+% Notes: While this information may not be easily discernible for some data scraped from the web, the general sources (urls/domains) should be listed, and for other data bought, licensed, or collected, a reasonable attempt at characterizing the underlying human providers is required to satisfy this criterion. The relevant properties of people can vary depending on context: for example, relevant properties could include demographic information like fraction of Black individuals contributing to the dataset, geographic information like fraction of European individual contributing to the dataset, language information like fraction of L1 English speakers, occupational information like the fraction of professional artists.
+
+% 4. Upstream → Data → Data Source Selection
+% Definition: Are the selection protocols for including and excluding data sources disclosed? 
+% Notes: Full credit is awarded if the selection protocols are non-exhaustive.
+
+% 5. Upstream → Data → Data Curation
+% Definition: For all included data sources, are the curation protocols for those data sources disclosed? 
+% Notes: Curation protocols refer to procedures used to select, manage, annotate, and organize data, such as what data should be included to improve the quality, relevance, and representativeness of the data. Full credit is awarded if the developer reports that it does not perform any further selection or curation beyond the data sources.
+
+% 6. Upstream → Data → Data Augmentation
+% Definition: Does the developer disclose any steps it takes to augment its data sources?
+% Notes: Such steps might include augmenting data sources with synthetic data. Full credit is awarded if the developer reports that it does not take any steps to augment its data.
+
+% 7. Upstream → Data → Harmful Data Filtration 
+% Definition: If data is filtered to remove harmful content, is a description of the associated filter disclosed?
+% Notes: Such harmful content might relate to violence or child sexual abuse material. Full credit is awarded if the developer reports that it does not perform any harmful data filtration.
+
+% 8. Upstream → Data → Data Copyright Status 
+% Definition: For all data used in building the model, does the model developer disclose if it is copyrighted or in the public domain? 
+% Notes: To satisfy this criterion, the copyright status must relate to some decomposition of the data. We will award this point if there is some meaningful decomposition of the data, even if the decomposition is insufficient to receive the "Data Creators" point or if it not comprehensive relative to legal copyright standards. 
+
+% 9. Upstream → Data → Data License Status 
+% Definition: For all data used in building the model, is the associated license status disclosed? 
+% Notes: To satisfy this criterion, the license status must relate to some decomposition of the data. We will award this point if there is some meaningful decomposition of the data, even if the decomposition is insufficient to receive the "Data Creators" point.
+
+% 10. Upstream → Data → Personal Information in Data
+% Definition: For all data used in building the model, is the associated inclusion or exclusion of personal information disclosed? 
+% Notes: To satisfy this criterion, the disclosure of personal information must relate to some decomposition of the data. We will award this point assuming there is some meaningful decomposition of the data, even if the decomposition is insufficient to receive the "Data Creator" point. Full credit is awarded if the developer reports the inclusion of personal information, independent of if and how they mitigate related privacy concerns.
+
+% 11. Upstream → Data Labor → Use of Human Labor
+% Definition: Are the phases of the data pipeline where human labor is involved disclosed? 
+% Notes: Phases of the data pipeline that involve human labor include activities and tasks performed by people to collect, annotate, clean, or validate data. For full credit, providers must give a reasonable best-effort description of their labor pipeline.
+
+% 12. Upstream → Data Labor → Employers of Data Laborers
+% Definition: Does the model developer disclose who employs the people involved in data labor for each phase of the data pipeline?
+% Notes: Phases of the data pipeline that involve human labor include activities and tasks performed by people to collect, annotate, clean, or validate data. For full credit, providers must give a reasonable best-effort description of their labor pipeline.
+
+% 13. Upstream → Data Labor → Geographic Distribution of Data Laborers
+% Definition: Does the model developer disclose geographic information on the people involved in data labor for each phase of the data pipeline?
+% Notes: For full credit, providers must give a reasonable best-effort description of the geographic distribution of labor at the country-level.
+
+% 14. Upstream → Data Labor → Wages
+% Definition: For all data that is created by or on behalf of the model developer, are the associated wages for people who performed that data labor disclosed? 
+% Notes: This is inclusive of data labor at all points of the model development process, such as training data annotation or red teaming data used to control the model. Full credit is awarded if the developer reports that it does not compensate workers.
+
+% 15. Upstream → Data Labor → Instructions For Creating Data
+% Definition: For all data that is created by or on behalf of the model developer, are the instructions given to people who create this data disclosed? 
+% Notes: We will award credit for a reasonable best effort attempt to disclose instructions given to people who create data used to build the model for the bulk of the data phases involving human labor.
+
+% 16. Upstream → Data Labor → Labor Protections 
+% Definition: For all data that is created by or on behalf of the model developer, are the associated worker protections (e.g. protocols to reduce mental health harm due to exposure to violent content) disclosed? Or, is it clear that no data labor is involved and, thereby, there are no worker protections to report? 
+% Notes: This includes for data labor at all points of the model development process, such as training data annotation or red teaming data used to control the model. Full credit is awarded if the developer reports that it does not protect workers.
+
+
+% 17. Upstream → Data Access → Queryable External Data Access
+% Definition: Is there a protocol for external entities, potentially subject to authorization, to query the data used in building the model?
+% Notes: We will award this point for any reasonable protocol: direct access to the data, an interface to query the data, a developer-mediated access program where developers can inspect requests, etc. We may accept rate-limits on the number of queries permitted to an external entity and restrictions on the external entities permitted access, insofar as these limits and restrictions are clear and ensure a reasonable amount of external access. We may accept justifications for prohibiting the querying of specific parts of the data.
+
+% 18. Upstream → Data Access → Direct External Data Access
+% Definition: Is there direct access for external entities, potentially subject to authorization, to the data used in the building the model?
+% Notes: We will award this point only if external entities can directly access the data without any form of gating from the developer. With that said, we may accept justifications for prohibiting the access of specific parts of the data.
+
+% 19. Upstream → Compute → Compute Usage
+% Definition: Is the compute required for building the model disclosed? 
+% Notes: This should be reported in appropriate units, which most often will be floating point operations (FLOPS). The precision required should be to one significant figure (e.g. 5 x 10\^{}25 FLOPS). No form of decomposition into compute phases is required, but it should be clear whether the reported compute usage is for a single model run or includes additional runs, or hyperparameter tuning, or training other models like reward models, or other means for compute expenditure.
+
+% 20. Upstream → Compute → Development Duration
+% Definition: Is the continuous duration required for building the model disclosed? 
+% Notes: This should be reported at least the precision of weeks at least to one significant figure (e.g. 3 weeks). No form of decomposition into phases of building the model is required for this indicator, but it should be clear what the duration refers to (e.g. training the model, training and subsequent evaluation/redteaming).
+
+% 21. Upstream → Compute → Compute Hardware
+% Definition: For the primary hardware used in building the model, is the amount and type of hardware disclosed? 
+% Notes: In most cases, this will be the number and type of GPUs or TPUs used in training the model. The precision required should be to one significant figure (e.g. 800 NVIDIA H100 GPUs). We will not award this point if (i) the training hardware used by the developer in general is disclosed, but the specific hardware for the given model is not, or (ii) the training hardware is disclosed, but the amount of hardware is not. We do not require the interconnects between hardware units be disclosed in this version of the index, but we will consider this in subsequent versions of the index.
+
+% 22. Upstream → Compute → Hardware Owner
+% Definition: For the primary hardware used in building the model, is the owner of the hardware disclosed? 
+% Notes: For example, this may be the model developer in the case of a self-owned cluster, a cloud provider like Microsoft Azure, Google Cloud, or Amazon Web Services, or a national supercomputer. In the event that hardware is owned by multiple sources or is highly decentralized, for this version of the index, providers should make a reasonable effort to describe the distribution of hardware owners.
+
+% 23. Upstream → Compute → Energy Usage
+% Definition: Is the amount of energy expended in building the model disclosed? 
+% Notes: Energy usage should be reported in appropriate units, which most often will be megawatt-hours (mWh). The precision should be to one significant figure (e.g. 500 mWh). No form of decomposition into compute phases is required, but it should be clear whether the reported energy usage is for a single model run or includes additional runs, or hyperparameter tuning, or training other models like reward models, or other means for energy expenditure.
+
+% 24. Upstream → Compute → Carbon Emissions
+% Definition: Is the amount of carbon emitted (associated with the energy used) in building the model disclosed?  
+% Notes: Emissions should be reported in appropriate units, which most often will be tons of carbon dioxide emitted (tCO2). The precision should be to one significant figure (e.g. 500 tCO2). No form of decomposition into compute phases is required, but it should be clear whether the reported emissions is for a single model run or includes additional runs, or hyperparameter tuning, or training other models like reward models, or other means for emissions generation.
+
+% 25. Upstream → Compute →  Broader Environmental Impact
+% Definition: Are any broader environmental impacts from building the model besides carbon emissions disclosed?
+% Notes: While the most direct environmental impact of building a foundation model is the energy used and, therefore, the potential carbon emissions, there may be other environmental impacts. For example, these may include the use of other resources such as water for cooling or metals for producing specialized hardware. We recognize that there does not exist an authoritative or consensus list of broader environmental factors. For this reason, we will award this point if there is a meaningful, though potentially incomplete, discussion of broader environmental impact.
+
+
+% 26. Upstream → Methods → Model Stages
+% Definition: Are all stages in the model building process disclosed? 
+% Notes: Stages or phases refer to each identifiable step that constitutes a substantive change to the model during the model building process. We recognize that different developers may use different terminology for these stages, or conceptualize the stages differently. We will award this point for any clear and complete description of these stages.
+
+% 27. Upstream → Methods → Model Objectives
+% Definition: For all phases or stages that are described, is there a clear description of the associated (learning) objectives or a clear characterization of the nature of this update to the model?
+% Notes: We recognize that different developers may use different terminology for these stages, or conceptualize the stages differently. We will award this point for any clear description of the update to the model related to each stage, whether that is the intent of the stage (e.g. making the model less harmful), a mechanistic characterization (e.g. minimizing a specific loss function), or an empirical assessment (e.g. evaluation results conducted before and after the stage).
+
+% 28. Upstream → Methods → Core Frameworks
+% Definition: Are the core frameworks used for model development and data disclosed? 
+% Notes: Examples include Tensorflow, Pytorch, Jax, Hugging Face Transformers, Seqio, T5X, Keras, SciKit, Triton, etc. If there are significant internal frameworks, there should be some description of their function and/or a reasonably similar publicly-available analogue. We recognize that there does not exist an authoritative or consensus list of core frameworks. For this reason, we will award this point if there is a meaningful, though potentially incomplete, list of major frameworks for the first version of the index.
+
+% 29. Upstream → Methods → Additional Dependencies
+% Definition: Are any dependencies required to build the model, beyond data/compute/code (which are documented above), disclosed? Or is it clear that no additional dependencies are required? 
+% Notes: For example, if the model depends on an external search engine, programmable APIs, or tools, this should be disclosed. We recognize that there is not a precise characterization of what relevant dependencies would be beyond the data, compute, and code. Providers should give a reasonable best-effort description of any additional dependencies.
+
+% 30. Upstream → Partnerships → Third Party Partners
+% Definition: Does the model developer disclose the third parties who were/are involved in the development of the model?
+% Notes: Full credit is awarded if the developer reports that it was the sole entity involved in the development of the model.
+
+% 31. Upstream → Data Mitigations → Mitigations for Personally Identifiable Information
+% Definition: Does the model developer disclose whether it takes any steps to mitigate the presence of PII in its data? 
+% Notes: Such steps might include identifying personal information in the training data, filtering specific datasets to remove personal information, and taking steps to reduce the likelihood that models will output personal information.
+
+% 32. Upstream → Data Mitigations → Mitigations for Copyright
+% Definition: Does the model developer disclose whether it takes any steps to mitigate the presence of copyrighted information in its training data? 
+% Notes: Such measures might include identifying copyrighted data, filtering specific datasets to remove copyrighted data, and taking steps to reduce the likelihood that models will output copyrighted information.
+
+% 33. Model → Model Basics → Input Modality
+% Definition: Are the input modalities disclosed for the model? 
+% Notes: Input modalities refer to the types or formats of information that the model can accept as input. Examples of modalities: text, image, audio, video, tables, graphs.
+
+% 34. Model → Model Basics → Output Modality
+% Definition: Are the output modalities disclosed for the model? 
+% Notes: Output modalities refer to the types or formats of information that the model can accept as output. Examples of modalities: text, image, audio, video, tables, graphs.
+
+% 35. Model → Model Basics → Model Components
+% Definition: Are all components of the model disclosed? 
+% Notes: By components, we mean distinct and identifiable parts of the model. We recognize that different developers may use different terminology for model components, or conceptualize components differently. Here are several examples: 1. For a text-to-image model, components could refer to a text encoder and an image encoder, which may have been trained separately. 2. For a retrieval-augmented model, components could refer to a separate retriever module. We will award this point for any clear description of model components.
+
+% 36. Model → Model Basics → Model Size
+% Definition: For all components of the model, is the associated model size disclosed? 
+% Notes: This should be reported in appropriate units, which generally is the number of model parameters, broken down by named component. The precision required is to one significant figure (e.g. 500 billion parameters for text encoder, 20 billion parameters for image encoder).
+
+% 37. Model → Model Basics → Model Architecture
+% Definition: Is the model architecture disclosed? 
+% Notes: Model architecture is defined as the overall structure and organization of a foundation model, how any disclosed components are integrated and how data moves through the model during training or inference. We recognize that different developers may use different terminology for model architecture, or conceptualize the architecture differently. We will award this point for any clear, though potentially incomplete, description of the model architecture.
+
+% 38. Model → Model Basics → Centralized Model Documentation
+% Definition: Is key information about the model included in a centralized artifact such as a model card? 
+% Notes: We recognize that developers may share this information through different types of documentation, such as a system card or several clearly interrelated documents. We will award this point for the disclosure of any such centralized artifact that provides key information typically included in a model card, though the artifact may be of a longer form than a standard model card (e.g. a technical report).
+
+% 39. Model → Model Access → External Model Access Protocol
+% Definition: Is a protocol for granting external entities access to the model disclosed? 
+% Notes: A model access protocol refers to the steps, requirements, and considerations involved in granting authorized model access to external entities. For example, developers might provide: (i) an access request page for researchers; (ii) a list of explicit criteria for selecting external entities; and (iii) a transparent decision on whether access has been granted within two weeks of a request.
+
+% 40. Model → Model Access → Black Box External Model Access
+% Definition: Is black box model access provided to external researchers, policymakers, auditors, or other external entities that provide scrutiny, potentially subject to authorization? 
+% Notes: Black box model access refers to the ability to query the model with inputs and receive outputs, potentially without further access. We will award this point for any reasonable access level: direct access to the model weights, an interface to query the model, a developer-mediated access program where developers can inspect requests, etc. We may accept rate-limits on the number of queries permitted to an external entity and restrictions on the external entities permitted access, insofar as these limits and restrictions are transparent.
+
+% 41. Model → Model Access → Full External Model Access
+% Definition: Is full model access provided to external entities via disclosure of model weights?
+% Notes:  We may accept restrictions on the external entities that are permitted access, insofar as these limits and restrictions are transparent, potentially through the disclosure of who has been granted access to the foundation model.
+
+% 42. Model → Capabilities → Capabilities Description
+% Definition: Are the model's capabilities disclosed? 
+% Notes: Capabilities refer to the specific and distinctive functions that the model can perform. We recognize that different developers may use different terminology for capabilities, or conceptualize capabilities differently. We will award this point for any clear, but potentially incomplete, description of the multiple capabilities.
+
+% 43. Model → Capabilities → Capabilities Demonstration
+% Definition: Are the capabilities of the model demonstrated? 
+% Notes: Demonstrations refer to illustrative examples or other forms of showing the model's capabilities that are legible or understandable to the general public, without requiring specific technical expertise. We recognize that different developers may use different terminology for capabilities, or conceptualize capabilities differently. We will award this point for clear demonstrations of multiple capabilities. 
+
+% 44. Model → Capabilities → Evaluation of Capabilities
+% Definition: Are the capabilities rigorously evaluated, with the results of these evaluations reported prior to or concurrent with the initial deployment of the model? 
+% Notes: Rigorous evaluations refer to precise quantifications of the model's behavior in relation to its capabilities. We recognize that capabilities may not perfectly align with evaluations, and that different developers may associate capabilities with evaluations differently. We will award this point for clear evaluations of multiple capabilities. For example, this may include evaluations of world knowledge, reasoning, state tracking or other such proficiencies. Or it may include the measurement of average performance (e.g. accuracy, F1) on benchmarks for specific tasks (e.g. text summarization, image captioning). We note that evaluations on standard broad-coverage benchmarks are likely to suffice for this indicator, though they may not if the model's capabilities are presented as especially unusual such that standard evaluations will not suffice.
+
+% 45. Model → Capabilities → External Reproducibility of Capabilities Evaluation
+% Definition: Are the evaluations of capabilities reproducible by external entities? 
+% Notes: For an evaluation to be reproducible by an external entity, we require that the associated data either be (i) publicly available or (ii) described sufficiently such that a reasonable facsimile can be constructed by the external entity. In addition, the evaluation protocol should be sufficiently described such that if the evaluation is reproduced, any discrepancies from the developer's results can be resolved. We recognize that there does not exist an authoritative or consensus standard for what is required for an evaluation to be deemed externally reproducible. Evaluations on standard benchmarks are assumed to be reproducible. We will award this point for reproducibility of multiple disclosed evaluations. In the event that an evaluation is not reproducible, we may accept a justification by the model developer for why it is not possible for the evaluation to be made reproducible.
+
+% 46. Model → Capabilities → Third Party Capabilities Evaluation
+% Definition: Are the capabilities evaluated by third parties? 
+% Notes: By third party, we mean entities that are significantly or fully independent of the model developer. We will award this point if (i) a third party has conducted an evaluation of model capabilities, (ii) the results of this evaluation are publicly available, and (iii) these results are disclosed or referred to by the model developer or in their materials. If the results are not made public (but are disclosed to have been conducted) and/or the results are not discoverable from the model developer, we will not award this point.
+
+% 47. Model → Limitations → Limitations Description
+% Definition: Are the model's limitations disclosed? 
+% Notes: Limitations refer to the specific and distinctive functions that the model cannot perform (e.g., the model cannot answer questions about current events as it only contains data up to a certain time cutoff). Limitations might include applications where the model is not very capable or We recognize that different developers may use different terminology for limitations, or conceptualize limitations differently. We will award this point for any clear, but potentially incomplete, description of multiple limitations. 
+
+% 48. Model → Limitations → Limitations Demonstration
+% Definition: Are the limitations demonstrated? 
+% Notes: Demonstrations refer to illustrative examples or other forms of showing the limitations that are legible or understandable to the general public, without requiring specific technical expertise. We recognize that different developers may use different terminology for limitations, or conceptualize the limitations differently. We will award this point for clear demonstrations of multiple limitations.
+
+% 49. Model → Limitations → Third-Party Evaluation of Limitations
+% Definition: Can the limitations be evaluated by third parties? 
+% Notes: By third party, we mean entities that are significantly or fully independent of the model developers. Note that in contrast to the third-party evaluation requirements for capabilities and risks, we do not require these evaluations to be necessarily conducted, but for these evaluations to be possible, for this point to be awarded.
+
+% 50. Model → Risks → Risks Description
+% Definition: Are the model's risks disclosed? 
+% Notes: Risks refer to possible negative consequences or undesirable outcomes that can arise from the model's deployment and usage. We require disclosure of risks that may arise in the event of both (i) intentional, though possibly careless, use such as biases or hallucinations and (ii) malicious use, such as fraud or disinformation. We recognize that different developers may use different terminology for risks, or conceptualize risks differently. We will award this point for any clear, but potentially incomplete, description of the multiple risks.
+
+% 51. Model → Risks → Risks Demonstration
+% Definition: Are the model’s risks demonstrated? 
+% Notes: Demonstrations refer to illustrative examples or other forms of showing the risks that are legible or understandable to the general public, without requiring specific technical expertise. We require demonstration of risks that may arise in the event of both (i) intentional (though possibly careless) use, such as biases or hallucinations and (ii) malicious use, such as fraud or disinformation. We recognize that different developers may use different terminology for risks, or conceptualize risks differently. We will award this point for clear demonstrations of multiple risks.
+
+% 52. Model → Risks → Unintentional Harm Evaluation
+% Definition: Are the risks related to unintentional harm rigorously evaluated, with the results of these evaluations reported prior to or concurrent with the initial deployment of the model? 
+% Notes: Rigorous evaluations refer to precise quantifications of the model's behavior in relation to such risks. Unintional harms include bias, toxicity, and issues relating to fairness. We recognize that unintended harms may not perfectly align with risk evaluations, and that different developers may associate risks with evaluations differently. We will award this point for clear evaluations of multiple such risks. We note that evaluations on standard broad-coverage benchmarks are likely to suffice for this indicator, though they may not if the model's risks related to unintentional harm are presented as especially unusual such that standard evaluations will not suffice.
+
+% 53. Model → Risks → External Reproducibility of Unintentional Harm Evaluation
+% Definition: Are the pre-deployment evaluations of risks related to unintentional harm reproducible by external entities? 
+% Notes: For an evaluation to be reproducible by an external entity, we require that the associated data either be (i) publicly available or (ii) described sufficiently such that a reasonable facsimile can be constructed by the external entity. In addition, the evaluation protocol should be sufficiently described such that if the evaluation is reproduced, any discrepancies from the developer's results can be resolved. We recognize that there does not exist an authoritative or consensus standard for what is required for an evaluation to be deemed externally reproducible. Evaluations on standard benchmarks are assumed to be reproducible. We will award this point for reproducibility of multiple disclosed evaluations. In the event that an evaluation is not reproducible, we may accept a justification by the model developer for why it is not possible for the evaluation to be made reproducible.
+
+% 54. Model → Risks → Intentional Harm Evaluation
+% Definition: Are the risks related to intentional harm rigorously evaluated, with the results of these evaluations reported prior to or concurrent with the initial deployment of the model?. 
+% Notes: Rigorous evaluations refer to precise quantifications of the model's behavior in relation to such risks. Intentional harms include fraud, disinformation, scams, cybersecurity attacks, designing weapons or pathogens, and uses of the model for illegal purposes. We recognize that unintentional harms may not perfectly align with risk evaluations, and that different developers may associate risks with evaluations differently. We will award this point for clear evaluations of multiple such risks. We note that evaluations on standard broad-coverage benchmarks are likely to suffice for this indicator, though they may not if the model's risks related to unintentional harm are presented as especially unusual such that standard evaluations will not suffice.
+
+% 55. Model → Risks → External Reproducibility of Intentional Harm Evaluation
+% Definition: Are the pre-deployment evaluations of risks related to intentional harm reproducible by external entities? 
+% Notes: For an evaluation to be reproducible by an external entity, we require that the associated data either be (i) publicly available or (ii) described sufficiently such that a reasonable facsimile can be constructed by the external entity. In addition, the evaluation protocol should be sufficiently described such that if the evaluation is reproduced, any discrepancies from the developer's results can be resolved. We recognize that there does not exist an authoritative or consensus standard for what is required for an evaluation to be deemed externally reproducible. Evaluations on standard benchmarks are assumed to be reproducible. We will award this point for reproducibility of multiple disclosed evaluations. In the event that an evaluation is not reproducible, we may accept a justification by the model developer for why it is not possible for the evaluation to be made reproducible.
+
+% 56. Model → Risks → Third-Party Risk Evaluation
+% Definition: Are the risks evaluated by third parties? 
+% Notes: By third party, we mean entities that are significantly or fully independent of the model developers. We will award this point if (i) a third party has conducted an evaluation of model risks, (ii) the results of this evaluation are publicly available, and (iii) these results are disclosed or referred to by the model developer or in their materials. Notably, if the results are not made public (but are disclosed to have been conducted) and/or the results are not discoverable from the model developer, we will not award this point. We may accept a justification from either the third party or the developer for why part of the evaluation is not disclosed in relation to risks. A third-party risk evaluation might involve the developer allowing a third-party to choose a methodology for evaluating risk that differs from that of the developer.
+
+% 57. Model → Mitigations → Mitigations Description
+% Definition: Are the mitigations disclosed? 
+% Notes: By mitigations, we refer to interventions implemented by the developer to reduce the likelihood and/or the severity of the risk. We recognize that different developers may use different terminology for mitigations, or conceptualize mitigations differently. We will award this point for any clear, but potentially incomplete, description of multiple mitigations associated with the model's risks. This is a transparency requirement: full credit is awarded if the developer reports that it does not mitigate risk.
+	
+% 58. Model → Mitigations → Mitigations Demonstration
+% Definition: Are the mitigations demonstrated? 
+% Notes: Demonstrations refer to illustrative examples or other forms of showing the mitigations that are legible or understandable to the general public, without requiring specific technical expertise. We recognize that different developers may use different terminology for mitigations, or conceptualize mitigations differently. We will award this point for clear demonstrations of multiple mitigations.
+
+% 59. Model → Mitigations → Mitigations Evaluation
+% Definition: Are the mitigations rigorously evaluated, with the results of these evaluations disclosed? 
+% Notes: Rigorous evaluations refer to precise quantifications of the model's behavior in relation to the mitigations associated with its risks. We will award this point for clear evaluations of multiple mitigations.
+
+% 60. Model → Mitigations → External Reproducibility of Mitigations Evaluation
+% Definition: Are the mitigation evaluations reproducible by external entities? 
+% Notes: For an evaluation to be reproducible by an external entity, we require that the associated data either be (i) publicly available or (ii) described sufficiently such that a reasonable facsimile can be constructed by the external entity. In addition, the evaluation protocol should be sufficiently described such that if the evaluation is reproduced, any discrepancies with the developer's results can be resolved. In the case of mitigations evaluations, this will usually involve details about a comparison to some baseline, which may be a different, unmitigated version of the model. We recognize that there does not exist an authoritative or consensus standard for what is required for an evaluation to be deemed externally reproducible. We will award this point for reproducibility of multiple disclosed evaluations. In the event that an evaluation is not reproducible, we may accept a justification by the model developer for why it is not possible for the evaluation to be made reproducible.
+
+% 61. Model → Mitigations → Third Party Mitigations Evaluation
+% Definition: Can the mitigations be evaluated by third parties? 
+% Notes: By third party, we mean entities that are significantly or fully independent of the model developers. This indicator assesses whether it is possible for third parties to assess mitigations, which is not restricted to the methods the developer uses to assess mitigations. Note that in contrast to the third-party evaluation requirements for capabilities and risks, we do not require these evaluations to be necessarily conducted, but for these evaluations to be possible, for this point to be awarded.
+
+% 62. Model → Trustworthiness → Trustworthiness Evaluation
+% Definition: Is the trustworthiness of the model rigorously evaluated, with the results of these evaluations disclosed? 
+% Notes: Rigorous evaluations refer to precise quantifications of the model's behavior in relation to its trustworthiness. We recognize that trustworthiness may not perfectly align with evaluations, and that different developers may associate trustworthiness with evaluations differently. We will award this point for a clear evaluation of the trustworthiness of the model. For example, this may include evaluations of the model’s robustness/reliability/hallucinations, uncertainty/calibration/causality, and interpretability/explainability.
+
+
+% 63. Model → Trustworthiness → External Reproducibility of Trustworthiness Evaluation
+% Definition: Are the trustworthiness evaluations reproducible by external entities? 
+% Notes: For an evaluation to be reproducible by an external entity, we require that the associated data either be (i) publicly available or (ii) described sufficiently such that a reasonable facsimile can be constructed by the external entity. In addition, the evaluation protocol should be sufficiently described such that if the evaluation is reproduced, any discrepancies from the developer's results can be resolved. We recognize that there does not exist an authoritative or consensus standard for what is required for an evaluation to be deemed externally reproducible. Evaluations on standard benchmarks are assumed to be reproducible. We will award this point for reproducibility of multiple disclosed evaluations. In the event that an evaluation is not reproducible, we may accept a justification by the model developer for why it is not possible for the evaluation to be made reproducible.
+
+% 64. Model → Inference → Inference Duration Evaluation 
+% Definition: Is the time for model inference disclosed for a clearly-specified task on a clearly-specified hardware setup?
+% Notes: We required the duration be reported in seconds to a precision of one significant figure (e.g. 0.002 seconds). We recognize that no established standard exists for the standardized reporting of inference evaluation. Therefore, we permit the developer to specify the task and hardware setup, as long as both are clear. For example, the specific task might be generating 100k tokens as 5k sequences of length 20 and the fixed set of hardware might be 8 NVIDIA A100s. The hardware in this evaluation need not be the hardware the developer uses for inference if it in fact does any inference itself.
+
+% 65. Model → Inference → Inference Compute Evaluation 
+% Definition: Is the compute usage for model inference disclosed for a clearly-specified task on a clearly-specified hardware setup?
+% Notes: We required the compute usage to be reported in FLOPS to a precision of one significant figure (e.g. 5 x 10\^{}25 FLOPS). We recognize that no established standard exists for the standardized reporting of inference evaluation. Therefore, we permit the developer to specify the task and hardware setup, as long as both are clear. For example, the specific task might be generating 100k tokens as 5k sequences of length 20 and the fixed set of hardware might be 8 NVIDIA A100s. The hardware in this evaluation need not be the hardware the developer uses for inference if it in fact does any inference itself.
+
+
+% 66. Downstream → Distribution → Release Decision-Making
+% Definition: Does the model developer disclose its protocol for deciding whether or not to release a model? 
+% Notes: We recognize that the release of a foundation model falls along a spectrum, with many forms of partial release and that different developers may conceptualize release differently. Full credit will be awarded for any clear protocol that discusses the decision-making process, including if the protocol is more general to the developer rather than the specific foundation model under consideration. 
+
+% 67. Downstream → Distribution → Release Process
+% Definition: Does the model developer disclose information related to the process of how the model was released? 
+% Notes: We recognize that the release of a foundation model falls along a spectrum, with many forms of release and that different developers may conceptualize release differently. Full credit will be awarded for any detailed discussion of the release process, including if the discussion is at a higher level and concerns the process by which the developer releases its models (i.e. not necessarily specific to the foundation model under consideration). Such a discussion might include information about who received access to the model at what stage in the release process.
+
+% 68. Downstream → Distribution → Distribution Channels
+% Definition: Are all distribution channels disclosed? 
+% Notes: By distribution channel, we mean any pathway by which the model is made accessible to entities beyond the model developer organization. We recognize that distribution channels may arise without the knowledge of the model developer. For example, the weights of a model may be released through one distribution channel and then be distributed through other channels. We will award this point if the developer discloses the channels they intend for the model to be distributed through.
+
+% 69. Downstream → Distribution → Products and Services
+% Definition: Does the developer disclose whether any products and services offered by the developer are dependent on the model?
+% Notes:. We recognize that a developer may produce many products and services that depend on a foundation model or internal derivatives of the model. We will accept a reasonable best-effort description of any ways the developer makes internal use of the model in its products or services.
+
+% 70. Downstream → Distribution → Machine-Generated Content
+% Definition: Does the developer disclose whether they have a mechanism for detecting content generated by this model?
+% Notes: Such a mechanism might include storing a copy of all generated content to compare against, implementing a watermark when generating using the model, or training a detector post-hoc to identify such content. Full credit is awarded if the developer states that it has no such mechanism. 
+
+% 71. Downstream → Distribution → Model License
+% Definition: For all model assets, is an associated license disclosed? 
+% Notes: In the event that licenses are written more generally, it should be clear which assets they apply to. We recognize that different developers (may) adopt different business models. We require the appropriate document be (i) publicly available and (ii) disclosed by the model developer in their materials for this point to be awarded.
+
+% 72. Downstream → Distribution → Terms of Service
+% Definition: For all distribution channels, does the distribution channel disclose terms-of-service?
+% Notes: In the event that terms-of-service are written more generally, it should be clear they apply to the distribution channels in their function as distribution channels for the model in question. 
+
+% 73. Downstream → Usage Policy → Permitted, Restricted, and Prohibited Users
+% Definition: Does the developer detail who can and cannot use the foundation model? 
+% Notes: Such rules may relate to individuals (e.g. no children below the age of 18), institutions (e.g. no competitors), countries (e.g. US-only), or other relevant aspects. These restrictions on users are often contained in multiple policies; we group them here for simplicity. These restrictions should be detailed for all distribution channels, but full credit will be awarded if they are clearly described by the provider. Note: a generic statement (e.g., in the terms of service) indicating that the developer’s services are not intended for minors is insufficient to earn this point as it is not sufficiently specific to the model in question.
+
+% 74. Downstream → Usage Policy → Permitted, Restricted, and Prohibited Uses
+% Definition: Does the developer disclose a policy that outlines uses of the model that are permitted, restricted, and prohibited? 
+% Notes: We will award this point if at least two of the three categories are disclosed, referring to (i) permitted uses, (ii) restricted uses, and (iii) prohibited uses. By restricted uses, we mean uses that require a higher level of scrutiny (such as outreach to or a separate contract with the developer) to be permitted.
+
+% 75. Downstream → User Interface → User Interaction with AI System
+% Definition: Across all distribution channels with user-facing interfaces, are users notified that they are interacting with an AI system, the underlying foundation model, and when data is machine-generated?
+% Notes: A user-facing interface refers to the means by which the user interacts with the foundation model, including how the user can observe responses from the foundation model and other notifications. Full credit is awarded if, across all distribution channels with user-facing interfaces, the user is provided adequate transparency as to the foundation model being distributed and the potential presence of any machine-generated content/data.  
+
+% 76. Downstream → User Interface → Usage Disclaimers
+% Definition: Across all distribution channels with user-facing interfaces, are users notified with relevant disclaimers involving usage?
+% Notes: A user-facing interface refers to the means by which the user interacts with the foundation model, including how the user can observe responses from the foundation model and other notifications. For each distribution channel that has a user-facing interface, the disclaimers provided could include information about usage policy violations or how users should interpret model output.
+
+% 77. Downstream → Usage Policy → Usage Policy Enforcement
+% Definition: Is the enforcement protocol for the usage policy disclosed? 
+% Notes: By enforcement protocol, we refer to mechanisms for (i) identifying permitted and prohibited users, (ii) identifying permitted/restricted/prohibited uses, (iii) steps the developer takes to enforce its policies related to such uses, (iv) the procedures the developer takes to carry out such steps. We will award this for a reasonable best-effort attempt to provide the bulk of this information, though one line indicating the developer reserves the right to terminate accounts is insufficient. Full credit is awarded if the developer reports that it does not enforce its usage policy.
+
+% 78. Downstream → Usage Policy → Justification for Enforcement Action
+% Definition: Does the developer give justification to users when they are subject to an enforcement action for violating the usage policy?
+% Notes: For example, does the developer disclose that it has a protocol of telling the user which part of the usage policy they violated, when, and how? Enforcement actions could include banning a user or otherwise limiting their ability to use the model (e.g., by restricting their ability to purchase tokens). Full credit will be awarded if the developer discloses that it has no such protocol for providing justification for enforcement actions, that it does not enforce its policies, or if it discloses only a sparse description of its protocol.
+
+% 79. Downstream → Usage Policy → Usage Policy Violation Appeals Mechanism
+% Definition: Does the developer provide a mechanism for appealing potential usage policy violations? 
+% Notes: Though this appeals process should be provided via the model’s user interface, we will award full credit as long as a developer provides such an appeals mechanism.
+
+% 80. Downstream → Model Behavior Policy → Permitted, Restricted, and Prohibited Model Behaviors
+% Definition: Does the developer disclose a policy that outlines model behavior that is permitted, restricted, and prohibited?
+% Notes: We refer to such a policy as a model behavior policy, or a developer's policy on what the foundation model can and cannot do (e.g., such a policy may prohibit a model from generating child sexual abuse material). We will award this point if at least two of the three categories (i.e. permitted, restricted, and prohibited model behaviors) are disclosed. We recognize that different developers (may) adopt different business models. While some business models may make enforcement of a model behavior policy more or less possible, we nonetheless require that all developers disclose a model policy for this point to be awarded. Full credit is awarded if the developer reports that it does not impose any restrictions on its model's behavior.
+
+% 81. Downstream → Model Behavior Policy → Model Behavior Policy Enforcement
+% Definition: Is the enforcement protocol for the model behavior policy disclosed? 
+% Notes: By enforcement protocol, we refer to mechanisms for identifying whether model behavior is permitted or prohibited and actions that may arise in the event the model behavior policy is violated. Full credit is awarded if the developer reports that it does not enforce its model behavior policy or that it has no such restrictions on its model’s behavior.
+
+% 82. Downstream → Model Behavior Policy → Interoperability of Usage and Model Behavior Policies
+% Definition: Does the model developer disclose how the usage policy and the model behavior policy interoperate?
+% Notes: For example, if a user attempts to use the model for a prohibited use (e.g. spam), how does the model policy apply (if at all)? Full credit is awarded if the developer reports that it does not impose any restrictions on its model's behavior in the event of user policy violation.
+
+% 83. Downstream → User Data Protection → User Data Protection Policy
+% Definition: Does the developer disclose its protocols for storing, accessing, and sharing user data? 
+% Notes: Full credit will be awarded if the developer discloses that it has no user data protection policy.
+
+% 84. Downstream → User Data Protection → Permitted and Prohibited Use of User Data 
+% Definition: Does the developer disclose its policy for permitted and prohibited uses of user data?
+% Notes: Developers may use user data for a range of purposes such as building future models, updating existing models, and evaluating both existing and future models. Therefore, a developer must disclose its policy on the use of user data from interactions associated with this model, potentially across different distribution channels if multiple channels supply user data to the developer. Full credit is awarded if the developer reports both permitted and prohibited uses, including if the developer does not impose any restrictions on its use of user data. 
+
+% 85. Downstream → Model Updates → Versioning Protocol
+% Definition: Is there a disclosed version and versioning protocol for the model? 
+% Notes: By versioning, we mean that each instance of the model is uniquely identified with the model guaranteed to not change when referring to a fixed version number, or the version clearly indicating the model is able to change (e.g. "latest"/"unstable"). We recognize that different developers (may) adopt different versioning practices. We encourage developers to adopt standard semantic versioning practices used elsewhere in software engineering, though we do not require this for the first version of the index. We also encourage developers to give advanced notice of deprecation (e.g., at least 3 months). 
+
+% 86. Downstream → Model Updates → Change Log
+% Definition: Is there a disclosed change log for the model? 
+% Notes: By change log, we mean a description associated with each change to the model (which should be indicated by a change in version number). We recognize that different developers (may) adopt different practices for change logs. We encourage developers to emulate practices used elsewhere in software engineering, though we do not require this for the first version of the index. We will award this point if the change log provides a clear description of changes that is legible to a technical audience, though we encourage developers to make these change logs more broadly legible.
+
+% 87. Downstream →  Model Updates → Deprecation Policy
+% Definition: Is there a disclosed deprecation policy for the model developer? 
+% Notes: By deprecation policy, we refer to a description of what it means for a model to be deprecated and how users should respond to the deprecation (e.g. instructions to migrate to a newer version).
+
+% 88. Downstream → Feedback → Feedback Mechanism
+% Definition: Is a feedback mechanism disclosed? 
+% Notes: By feedback mechanism, we refer to a means for external entities to report feedback or issues that arise in relation to the foundation model. Such entities may include but are not necessarily limited to users. We will award this point if (i) a feedback mechanism is implemented and (ii) the mechanism is disclosed by the model developer in their materials. We require that the feedback mechanism be reasonably straightforward to discover for this point to be awarded.
+
+% 89. Downstream → Feedback → Feedback Summary
+% Definition: Is a report or summary of the feedback the developer received disclosed? Alternatively, is a report or summary of how the developer responded to the feedback disclosed publicly?
+% Notes: We recognize that there does not exist an authoritative or consensus standard for what is required in a feedback report. For this reason, we will award this point if there is a meaningful, though potentially incomplete or vague, summary of feedback received for the first version of the index.
+
+% 90. Downstream → Feedback→ Government Inquiries
+% Definition: Is a summary of government inquiries received by the developer disclosed?
+% Notes: Such inquiries might include requests for user data, requests that certain content be banned, or requests for information about a developer’s business practices. We recognize that there does not exist an authoritative or consensus standard for what is required for such a summary of government inquiries. For this reason, we will award this point if (i) there is a meaningful, though potentially incomplete or vague, summary of government inquiries or (ii) a summary of government inquiries related to user data. 
+
+% 91. Downstream → Impact → Monitoring Mechanism
+% Definition: For all distribution channels, is a monitoring mechanism for tracking model use disclosed? 
+% Notes: By monitoring mechanism, we refer to a specific protocol for tracking model usage that goes beyond an acknowledgement that usage data is collected. Full credit will be awarded if a developer discloses that a distribution channel is not monitored and provides a justification.
+
+% 92. Downstream → Impact → Downstream Applications
+% Definition: Across all forms of downstream use, is the number of applications dependent on the foundation model disclosed?
+% Notes: We recognize that there does not exist an authoritative or consensus standard for what qualifies as an application. For this reason, we will award this point if there is a meaningful estimate of the number of downstream applications for the first version of the index, along with a clear description of what it means for an application to be dependent on the model.
+
+% 93. Downstream → Impact → Affected Market Sectors
+% Definition: Across all downstream applications, is the fraction of applications  corresponding to each market sector disclosed? 
+% Notes: By market sector, we refer to an identifiable part of the economy. While established standards exist for describing market sectors, we recognize that model developers may provide vague or informal characterizations of market impact. We encourage developers to use standard taxonomies for sectors such as the Global Industry Classification Standard (GICS) for describing these sectors. For this reason, we will award this point if there is a meaningful, though potentially incomplete or vague, summary of affected market sectors for the first version of the index.
+
+% 94. Downstream → Impact → Affected Individuals
+% Definition: Across all forms of downstream use, is the number of individuals affected by the foundation model disclosed?
+% Notes: By affected individuals, we principally mean the number of potential users of applications. We recognize that there does not exist an authoritative or consensus standard for what qualifies as an affected individual. For this reason, we will award this point if there is a meaningful estimate of the number of affected individuals for the first version of the index, along with a clear description of what it means for an individual to be affected by the model.
+
+% 95. Downstream → Impact → Usage Reports
+% Definition: Does the developer provide a usage report describing the impact of its model on users via usage statistics? 
+% Notes: We recognize that there does not exist an authoritative or consensus standard for what is required in a usage report. For this reason, we will award this point if there is a meaningful, though potentially incomplete or vague, summary of usage statistics for the first version of the index. These usage statistics might include a description of the major categories of harmful uses.
+
+% 96. Downstream → Impact → Geographic Statistics
+% Definition: Across all forms of downstream use, are statistics of the usage across geographies of the foundation model disclosed? 
+% Notes: By geographies, we refer to countries or states. We will award this point if there is a meaningful, though potentially incomplete or vague, disclosure of geographic usage statistics for the first version of the index.
+
+% 97. Downstream → Impact → Redress Mechanism
+% Definition: Does the model developer disclose any mechanism to provide redress to users for harm? 
+% Notes: Full credit is awarded if the developer reports it does not have any such mechanism.
+
+% 98. Downstream → User Data Protection → Usage Data Access Protocol
+% Definition: Is a protocol for granting external entities access to the usage data disclosed? 
+% Notes: Usage data refers to the data created through user interaction with the model, such as user inputs to the model, model behavior in response to these inputs, and associated metadata such as the duration of the interaction. A usage data access protocol refers to the steps, requirements, and considerations involved in granting authorized access to usage data for external entities; this goes beyond stating the conditions under which related personal information may be shared with external entities. Full credit is awarded if the developer reports it does not share such data with external entities.
+
+% 99. Downstream → Documentation for Deployers → Centralized Documentation for Downstream Use
+% Definition: Does the developer provide a centralized documentation resource for downstream use?
+% Notes: Centralized documentation resource refers to an artifact, or closely-linked artifacts, that consolidate relevant information. We recognize that different developers may use different approaches to centralize information. Full credit is awarded if there is a clearly-identified artifact(s) that contains the majority of substantive information (e.g. capabilities, limitations, risks, evaluations, distribution channels, licenses, usage policies, model behavior policies, impact information, feedback and redress mechanisms). 
+% Examples: a website with dedicated documentation information, a github repo with dedicated documentation information, an ecosystem card.
+
+% 100. Downstream → Documentation for Deployers → Documentation for Responsible Downstream Use
+% Definition: Does the developer provide documentation for responsible downstream use?
+% Notes: Such documentation might include details on how to adjust API settings to promote responsible use, descriptions of how to implement mitigations, or guidelines for responsible usr. Full credit will be awarded if the developer states that the model is offered as is and downstream developers need only comply with relevant policies or similarly indicates that it does not disclose any such documentation.
+% %\end{comment}

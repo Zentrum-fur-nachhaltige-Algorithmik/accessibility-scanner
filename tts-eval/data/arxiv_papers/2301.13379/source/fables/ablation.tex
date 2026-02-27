@@ -1,0 +1,56 @@
+\begin{figure}[t!]
+\pgfplotsset{width=0.95\columnwidth, height=3cm}
+    \centering
+    \begin{tikzpicture}  
+        \begin{axis}
+        [  
+            ybar,
+            ymin=0, ymax=100,
+            ytick={0, 20, 40, 60, 80, 100},
+            major x tick style = transparent,
+            bar width=4pt,
+            enlarge x limits=0.25,
+            ylabel={Accuracy},
+            ylabel style={font=\small},
+            symbolic x coords={GSM8K, Date, SayCan, CLUTRR},  
+            xtick=data,
+            xticklabel style={font=\small},
+            yticklabel style={font=\scriptsize},
+                axis x line*=bottom,
+                axis y line*=left,
+                legend style={draw=none},
+        legend cell align=left,
+                legend style={
+                        at={(1.0,1.05)},
+                        anchor=south east,
+                        column sep=1ex,
+                        font=\tiny,
+                        legend columns=3
+                },
+            ]
+        \addplot[ybar,  fill=GnBu-C, postaction={}] coordinates {
+            (GSM8K, 72.3) (Date, 81.6) (SayCan, 89.3) (CLUTRR, 58.9)
+        };
+        \addplot[ybar,  fill=GnBu-E, postaction={pattern=north west lines}] coordinates {
+            (GSM8K, 75.4) (Date, 83.0) (SayCan, 0.0) (CLUTRR, 51.8)
+        };  
+        \addplot[ybar, fill=GnBu-G, postaction={pattern=north east lines}] coordinates {
+            (GSM8K, 73.5) (Date, 80.2) (SayCan, 0.0) (CLUTRR, 39.6)
+        };  
+        \addplot[ybar, fill=GnBu-I, postaction={pattern=dots}] coordinates {
+            (GSM8K, 72.8) (Date, 79.7)  (SayCan, 90.3) (CLUTRR, 9.3)
+        };  
+        \addplot[ybar, fill=GnBu-K, postaction={}] coordinates {
+            (GSM8K, 21.5) (Date, 57.9) (SayCan, 90.3) (CLUTRR, 40.9)
+        };  
+        \legend{Full, No rationale, No NL but nudge, No NL, No solver}  
+
+        \end{axis}  
+    \end{tikzpicture}
+    \vspace{-0.1in}
+    \caption{
+    Ablation study results: accuracy when we remove different parts of the prompt. See Section~\ref{sec:analysis_ablation} for details.
+    }
+    \vspace{-0.15in}
+    \label{fig:ablation}
+\end{figure}

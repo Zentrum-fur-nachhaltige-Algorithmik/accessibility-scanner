@@ -1,0 +1,62 @@
+\begin{tikzpicture}
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\begin{axis}[
+name=fidelity,
+width=\textwidth,
+height=0.75\textwidth,
+ybar,
+ymin=0.0,
+ymax=1.0,
+xtick={1, 2},
+xtick style={draw=none},
+xticklabels={Alignment, Fidelity},
+xticklabel style={yshift=-9pt},
+ytick={0,0.5,1},
+yticklabels={0\%, 50\%, 100\%},
+legend style={font=\tiny},
+legend cell align=left,
+legend image code/.code={
+    \draw [#1] (0cm, -0.1cm) rectangle (0.2cm, 0.25cm);
+},
+legend style={
+draw=none,
+at={(0.5, 0.925)}, anchor=north,
+legend columns=3,
+/tikz/every even column/.append style={column sep=0.2cm}
+},
+bar width=0.4cm,
+enlarge x limits={abs=0.4},
+]
+
+\addplot+[
+    fill=google_blue,
+    fill opacity=0.2,
+    draw=google_blue,
+    error bars/error bar style={google_blue},
+    error bars/.cd,
+    y dir=both,
+    y explicit
+] coordinates {
+(1.0,0.5867) +- (1.0, 0.02300842393320771)
+(2.0,0.530) +- (2.0, 0.02074325857730084)
+};
+\addplot+[
+fill=google_green,fill opacity=0.2,draw=google_green,
+    error bars/error bar style={google_green},
+    error bars/.cd,
+    y dir=both,
+    y explicit
+] coordinates {
+(1.0,0.4133) +- (1.0, 0.02158669186220008)
+(2.0,0.470) +- (2.0, 0.019597550393515743)
+};
+
+
+\legend{T5-XXL, CLIP}
+\end{axis}
+\end{tikzpicture}

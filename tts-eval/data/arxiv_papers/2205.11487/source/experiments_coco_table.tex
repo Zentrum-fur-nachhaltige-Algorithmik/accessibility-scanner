@@ -1,0 +1,55 @@
+\begin{table}[t]
+\small
+
+\parbox{.55\textwidth}{
+\centering
+\caption{MS-COCO $256\times256$ FID-30K. We use a guidance weight of 1.35 for our $64\times64$ model, and a guidance weight of 8.0 for our super-resolution model.}
+\vspace{.2cm}
+\label{tab:zero_shot_mscoco}
+\begin{tabular}{lcc}
+\toprule
+\multirow{2}{*}{\bfseries{Model}} & \multirow{2}{*}{\bfseries{FID-30K}} & \bfseries{Zero-shot}  \\
+& &  \bfseries{FID-30K} \\
+\midrule
+AttnGAN \citep{xu-cvpr-2018} & 35.49 & \\
+DM-GAN \citep{zhu2019dm} & 32.64 & \\
+DF-GAN \citep{tao2020df} & 21.42 & \\
+DM-GAN + CL \citep{ye2021improving} & 20.79 & \\
+XMC-GAN \citep{zhang2021cross} & 9.33 & \\
+LAFITE \citep{zhou2021lafite} & 8.12 & \\
+Make-A-Scene \citep{gafni2022make} & 7.55 & \\
+\midrule
+DALL-E \citep{ramesh-dalle} & & 17.89  \\
+LAFITE \citep{zhou2021lafite} & & 26.94 \\
+GLIDE \citep{nichol-glide} & & 12.24 \\
+DALL-E 2 \citep{ramesh-dalle2} & & 10.39 \\
+\midrule
+\textbf{\name (Our Work)} & & \textbf{\ourmscocofid} \\
+\bottomrule
+\end{tabular}
+}
+\hfill
+\parbox{.42\textwidth}{
+\setlength{\tabcolsep}{3pt}
+\centering
+\caption{COCO $256\times256$ human evaluation comparing model outputs and original images. For the bottom part (no people), we filter out prompts containing one of \texttt{man}, \texttt{men}, \texttt{woman}, \texttt{women}, \texttt{person}, \texttt{people}, \texttt{child}, \texttt{adult}, \texttt{adults}, \texttt{boy}, \texttt{boys}, \texttt{girl}, \texttt{girls}, \texttt{guy}, \texttt{lady}, \texttt{ladies}, \texttt{someone}, \texttt{toddler}, \texttt{(sport) player}, \texttt{workers}, \texttt{spectators}.}
+\vspace{.2cm}
+\label{tab:mscoco_human_eval}
+\begin{tabular}{lcc}
+    \toprule
+    \bfseries{Model} & \bfseries{Photorealism $\uparrow$} & \bfseries{Alignment $\uparrow$}  \\
+    \midrule
+    \textit{Original} \\
+    \quad Original & 50.0\% & 91.9 $\pm$ 0.42 \\
+    \quad \name & 39.5 $\pm$ 0.75\% & 91.4 $\pm$ 0.44 \\ 
+    \midrule
+    \textit{No people} \\
+    \quad Original & 50.0\% & 92.2 $\pm$ 0.54 \\
+    \quad \name & 43.9 $\pm$ 1.01\% & 92.1 $\pm$ 0.55 \\
+    \bottomrule
+    \end{tabular}
+}
+\end{table}
+
+
+

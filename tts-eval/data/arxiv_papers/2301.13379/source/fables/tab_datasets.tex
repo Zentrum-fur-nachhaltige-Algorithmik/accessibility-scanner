@@ -1,0 +1,25 @@
+\begin{table*}[h]
+\centering
+\scalebox{0.78}{
+\begin{tabular}{p{1.5cm}p{1.8CM}>{\raggedleft\arraybackslash}p{1.1cm}>{\raggedleft\arraybackslash}p{1cm}p{12.5cm}}
+    \toprule \textbf{Domain} & \textbf{Dataset} & \bf{\# Shot}  & \bf{\# Test} & \textbf{Example}  \\
+    \midrule \multirow{16}{1.5cm}{Math Word Problems} & GSM8K & 8 & 1,319 & Q: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May? \newline A: \texttt{72} \\
+    & SVAMP & 8 & 1,000 & Q: Each pack of dvds costs 76 dollars. If there is a discount of 25 dollars on each pack. How much do you have to pay to buy each pack? \newline A: \texttt{51} \\
+    & MultiArith & 8 & 600 &  Q: For Halloween Debby and her sister combined the candy they received. Debby had 32 pieces of candy while her sister had 42. If they ate 35 pieces the first night, how many pieces do they have left? \newline A: \texttt{39} \\
+    & ASDiv & 8 & 2,096 &  Q: Seven red apples and two green apples are in the basket. How many apples are in the basket? \newline A: \texttt{9} \\
+    & AQuA & 8 & 254 &  Q: A car finishes a journey in 20 hours at the speed of 60 km/hr. If the same distance is to be covered in 10 hours, how much speed does the car gain? \newline A: \texttt{``120 kmph''}\\
+    \midrule
+    \multirow{6}{1.5cm}{Multi-hop \newline QA} & StrategyQA & 6 & 2,290 & Q: Did Aristotle use a laptop? \newline A: \texttt{False} \\
+    & Date \newline Understanding & 10 & 359 & Q: Yesterday was April 30, 2021. What is the date tomorrow in MM/DD/YYYY? \newline A: \texttt{``05/02/2021''} \\
+    & Sports \newline Understanding & 10 & 977 &  Q: Is the following sentence plausible: ``Lebron James hit the turnaround jumper''? \newline A: \texttt{True} \\
+    \midrule
+    \multirow{3}{1.5cm}{Planning} & SayCan & 7 & 103 & Q: Could you get me a drink with caffeine? \newline A: \texttt{``1.find(redbull)\ 2.pick(redbull)\ 3.find(user)\ 4.put(redbull)\ 5.done().''} \\
+    \midrule
+    \multirow{4}{1.5cm}{Relational \newline Inference} & CLUTRR & 8 & 1,042 & Q: [Carlos] is [Clarence]'s brother. [Carlos] and his sister, [Annie], went shopping. [Annie] asked her mom [Valerie] if she wanted anything, but [Valerie] said no. How is [Valerie] related to [Clarence]? \newline A: \texttt{``mother''} \\
+    \bottomrule    
+\end{tabular}
+}
+\caption{Datasets used for evaluation. ``\# Shot'' stands for the number of few-shot examples in the prompt (following \citet{wei_chain_2022}) and ``\# Test'' stands for the number of test examples.}\label{table:datasets}
+
+ \vspace{-0.1in}
+\end{table*}

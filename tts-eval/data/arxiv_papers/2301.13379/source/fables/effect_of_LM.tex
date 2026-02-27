@@ -1,0 +1,47 @@
+\begin{figure*}[h]
+\pgfplotsset{width=0.5\columnwidth, height=4cm}
+    \centering
+    \begin{tikzpicture}  
+        \begin{axis}
+        [  
+            ybar,
+            ymin=0, ymax=100,
+            ytick={0, 20, 40, 60, 80, 100},
+            major x tick style = transparent,
+            bar width=9pt,
+            enlarge x limits=0.2,
+            ylabel={Accuracy},
+            symbolic x coords={GSM8K, Date, SayCan, CLUTRR},  
+            xtick=data,  
+                axis x line*=bottom,
+                axis y line*=left,
+                legend style={draw=none},
+        legend cell align=left,
+                legend style={
+                        at={(0.8,1.05)},
+                        anchor=south east,
+                        column sep=1ex,
+                        font=\scriptsize,
+                        legend columns=2
+                },
+            ]
+        \addplot[ybar,  fill=OrRd-C, postaction={}] coordinates {
+            (GSM8K, 71.6) (Date, 80.8) (SayCan, 89.3) (CLUTRR, 58.9)
+        };
+        \addplot[ybar,  fill=OrRd-E, postaction={pattern=north west lines}] coordinates {
+            (GSM8K, 62.1) (Date, 76.6) (SayCan, 79.6) (CLUTRR, 43.9)
+        };  
+        \addplot[ybar, fill=OrRd-I, postaction={pattern=north east lines}] coordinates {
+            (GSM8K, 26.5) (Date, 43.2) (SayCan, 66.0) (CLUTRR, 23.4)
+        };
+        \addplot[ybar, fill=OrRd-K, postaction={pattern=north east lines}] coordinates {
+            (GSM8K, 0) (Date, 0) (SayCan, 0) (CLUTRR, 17.3)
+        }; 
+        \legend{code-davinci-002, text-davinci-002, code-davinci-001, text-davinci-001}
+        \end{axis}  
+    \end{tikzpicture}
+    % \vspace{-4mm}
+    \caption{
+    Accuracy of Faithful COT with different LMs as the Translator. Due to the prompt length limit, \texttt{text-davinci-001} only allows us to experiment on CLUTRR.}
+    \label{fig:effect_of_LM}
+\end{figure*}

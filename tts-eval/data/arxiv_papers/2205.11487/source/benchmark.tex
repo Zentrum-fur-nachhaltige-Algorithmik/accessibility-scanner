@@ -1,0 +1,32 @@
+
+\input{drawbench_samples}
+
+\vspace{\presectionspace}
+\section{Evaluating Text-to-Image Models}
+\vspace{\postsectionspace}
+
+
+
+
+The COCO \cite{lin-eccv-2014} validation set is the standard benchmark for evaluating text-to-image models for both the supervised \cite{zhou2021lafite, gafni2022make} and the zero-shot setting \cite{ramesh-dalle, nichol-glide}. The key automated performance metrics used are FID \cite{heusel2017gans} to measure image fidelity, and CLIP score \cite{hessel2021clipscore, radford-icml-2021} to measure image-text alignment. Consistent with previous works, we report zero-shot FID-30K, for which 30K prompts are drawn randomly from the validation set, and the model samples generated on these prompts are compared with reference images from the full validation set. Since guidance weight is an important ingredient to control image quality and text alignment, we report most of our ablation results using trade-off (or \textit{pareto}) curves between CLIP and FID scores across a range of guidance weights. 
+
+Both FID and CLIP scores have limitations, for example FID is not fully aligned with perceptual quality~\cite{parmar-cvpr-2022}, and CLIP is ineffective at counting~\cite{radford-icml-2021}. Due to these limitations, we use human evaluation to assess image quality and caption similarity, with ground truth reference caption-image pairs as a baseline. We use two experimental paradigms:
+\begin{enumerate}[noitemsep,nolistsep,leftmargin=0.5cm]
+    \item To probe image quality, the rater is asked to select between the model generation and reference image using the question: ``Which image is more photorealistic (looks more real)?''. We report the percentage of times raters choose model generations over reference images (the \emph{preference rate}). 
+    
+    \item To probe alignment, human raters are shown an image and a prompt and asked ``Does the caption accurately describe the above image?''. They must respond with ``yes'', ``somewhat'', or ``no''. These responses are scored as 100, 50, and 0, respectively. These ratings are obtained independently for model samples and  reference images, and both are reported.
+\end{enumerate}
+
+For both cases we use 200 randomly chosen image-caption pairs from the COCO validation set. Subjects were shown batches of 50 images. We also used interleaved ``control" trials, and only include rater data from those who correctly answered at least 80\% of the control questions. This netted 73 and 51 ratings per image for image quality and image-text alignment evaluations, respectively.
+
+\textbf{DrawBench}:
+While COCO is a valuable benchmark, it is increasingly clear that it has a limited spectrum of prompts that do not readily provide insight into differences between models (e.g., see Sec.\  \ref{sec:experiments_mscoco}). 
+Recent work by \citep{dalleval} proposed a new evaluation set called PaintSkills to systematically evaluate visual reasoning skills and social biases beyond COCO. 
+With similar motivation, we introduce \emph{\benchmarkname}, a comprehensive and challenging set of prompts that support the evaluation and comparison of text-to-image models.
+\benchmarkname contains 11 categories of prompts, testing different capabilities of models such as the ability to faithfully render different colors, numbers of objects, spatial relations, text in the scene, and unusual interactions between objects. Categories also include complex prompts, including long, intricate textual descriptions, rare words, and also misspelled prompts. We also include sets of prompts collected from DALL-E \cite{ramesh-dalle}, Gary Marcus et al. \cite{marcus-arxiv-2022} and \href{https://reddit.com/r/dalle2/}{\color{black}{Reddit}}.
+Across these 11 categories,  \benchmarkname comprises 200 prompts in total, striking a good balance between the desire for a large, comprehensive dataset, and small enough that human evaluation remains feasible.
+(Appendix \ref{appendix:benchmark} provides a more detailed description of \benchmarkname. \cref{fig:drawbench_samples} shows example prompts from \benchmarkname with \name samples.)
+
+We use \benchmarkname to directly compare different models. To this end, human raters are presented with two sets of images, one from Model A and one from Model B, each of which has 8 samples. Human raters are asked to compare Model A and Model B on sample fidelity and image-text alignment. They respond with one of three choices: Prefer Model A; Indifferent; or Prefer Model B. 
+
+

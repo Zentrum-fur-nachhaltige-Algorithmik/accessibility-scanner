@@ -1,0 +1,34 @@
+\begingroup
+\begin{table*}[!t]
+    \centering
+    \small
+    \scalebox{0.9}{
+    \begin{tabular}{p{\linewidth}}
+        \toprule
+        \underline{\textbf{\textsc{Exemplar for Date Understanding}}} \\
+        \vspace{-2mm}
+        \# Q: Yesterday was April 30, 2021. What is the date tomorrow in MM/DD/YYYY? \\
+        \vspace{-1mm}
+        \# To answer this question, we write a program to answer the following subquestions: \\
+        \# import relevant packages \\
+        from datetime import date, time, datetime \\
+        from dateutil.relativedelta import relativedelta \\
+        \# 1. What is the date yesterday? (independent, support: ["Yesterday was April 30, 2021"]) \\
+        date\_yesterday = date(2021,4,30) \\
+        \# 2. What is the date today? (depends on 1, support: ["Yesterday was April 30, 2021"]) \\
+        date\_today = date\_yesterday + relativedelta(days=1) \\
+        \# 3. What is the date tomorrow? (depends on 2, support: []) \\
+        date\_tomorrow = date\_today + relativedelta(days=1) \\
+        \# 4. Final Answer: What is the date tomorrow in MM/DD/YYYY? (depends on 3, support: []) \\
+        answer = date\_tomorrow.strftime("\%m/\%d/\%Y") \\
+        \bottomrule
+    \end{tabular}
+    }
+        \caption{
+    An exemplar from our prompt for Date Understanding.
+    }
+        \label{tab:appendix-date_prompt}
+
+\end{table*}
+
+\endgroup

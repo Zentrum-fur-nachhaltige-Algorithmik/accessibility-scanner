@@ -1,0 +1,169 @@
+\newlist{myitemize}{itemize}{1}
+\setlist[myitemize]{label=$\bullet$, itemsep=5pt}
+
+\hypertarget{recommendations}{\section{Recommendations}}
+\label{sec:recommendations}
+The design of our indicators, execution of our assessment, and analysis of our results provide a rich supply of ideas for how to improve transparency. 
+We center our attention on foundation model developers and deployers, along with policymakers.
+For each group of stakeholders, we provide concrete recommendations on the basis of this research.
+Additionally, we encourage researchers to scrutinize our overall approach in order to clarify how transparency for foundation models can be better understood in the future. 
+
+\hypertarget{recommendations-developers}{\subsection{Recommendations for foundation model developers}}
+\label{sec:recommendations-developers}
+By directly scoring foundation model developers, we provide explicit feedback on where developers are and are not transparent.
+In itself, this provides immediate guidance for these \numcompanies companies in the context of their current flagship foundation models.
+Moreover, the \projectname provides valuable insights for these companies to consider related to their other models and future releases; it also has bearing on how foundation model developers that we did not assess can promote transparency. We provide 10 specific recommendations for foundation model developers.
+
+\paragraph{1.\phantom{X}Increase transparency for existing foundation models.} 
+    \begin{myitemize}
+        \item As our results show, the development and use of major foundation model developers' current flagship models is opaque. 
+        Developers should remedy this situation by releasing more information about the systems that are central to today's foundation model ecosystem. 
+        Increasing the transparency of future releases will not resolve this issue as there are hundreds of products, services, and other models that are built on top of today's flagship models.\footnote{Developers that signed on to the White House's first round of voluntary commitments (including Amazon, Anthropic, Google, Inflection, Meta, and OpenAI)  have pledged only to improve transparency "for all new significant model public releases within scope," where the scope is defined as "generative models that are overall more powerful than the current industry frontier (e.g. models that are overall more powerful than any currently released models, including GPT-4, Claude 2, PaLM 2, Titan and, in the case of image generation, DALL-E 2)." Developers that signed on to the White House's second round of voluntary commitments (including Cohere and Stability AI) have pledged only to improve transparency for "generative models that are overall more powerful than the current most advanced model produced by the company making the commitment." See \url{https://www.whitehouse.gov/wp-content/uploads/2023/07/Ensuring-Safe-Secure-and-Trustworthy-AI.pdf} and \url{https://www.whitehouse.gov/wp-content/uploads/2023/09/Voluntary-AI-Commitments-September-2023.pdf}}
+        \item Developers should begin by focusing on low-hanging fruit, such as clarifying ambiguous language in their documentation, centralizing existing information sources, and sharing information about models that poses minimal concerns related to market competitiveness or legal risk.
+        \footnote{For example, Anthropic released significantly more information about Claude 2 than its previous flagship model, Claude, including in the form of a model card.} 
+        Developers should also be clear about why they will not release certain information about their foundation models; developers should explicitly state the subdomains where they do not release information and explain why they do not do so. 
+    \end{myitemize}
+\paragraph{2.\phantom{X}Increase transparency for future foundation model releases.}
+    \begin{myitemize}
+        \item Developers should substantially increase the transparency of future foundation model releases. Wherever possible, they should publicly disclose information related to the 100 indicators we outline as well as additional information they feel is important to share with the industry, the public, and governments. This might look like taking a transparency-first approach in which the developer prioritizes transparency throughout the model development process and includes transparency as an important performance metric for research teams.\footnote{One relevant analogy is to the development of open foundation models. Much as some developers begin the process of building a foundation model with the intention of making all model assets openly available, then subsequently decide if the risks of making a model asset openly available outweigh the potential benefits, developers could begin the development process with the assumption of maximum transparency and remove only some items along the way \citep{klyman2023open}.}
+        \item Profit-oriented developers commonly argue that certain forms of transparency can endanger their competitive advantage.
+        Nevertheless, developers have a basic responsibility to weigh this concern against the the risks posed by their technology to society and the benefits of increasing societal understanding of this technology via transparency.
+        These risks should determined by not only the developer but also the assessment of third party experts. 
+        Voluntary access for \emph{independent}, third party audits (\ie auditors not selected by the developer itself), can achieve a greater degree of transparency, and safeguard competition concerns with non-disclosure agreements.
+        We would also argue audits are not always a good substitute for public transparency, and developers' arguments around competitive advantage should be carefully assessed for each indicator of transparency. 
+        These arguments are a common refrain to avoid meaningful community discussion about widespread practices that do not in actuality endanger competitive advantages.
+    \end{myitemize} \clearpage
+\paragraph{3.\phantom{X}Follow industry best practices with respect to transparency.}
+    \begin{myitemize}
+        \item Our findings suggest that every developer could significantly improve transparency by drawing on different approaches to transparency from across the industry. 
+        At least one developer scores points on \numfeasible of our 100 indicators: where developers are struggling to increase transparency in a specific issue area, they should look to developers that have already done so.
+        \item While the foundation model ecosystem is nascent, some developers have outlined best practices for responsible development that relate to transparency. For example, in their "Joint Recommendations for Language Model Development," OpenAI, Cohere, and AI21 Labs state that developers should "publish usage guidelines and terms of use ... document known weaknesses and vulnerabilities ... [and] model and use-case-specific safety best practices." (See \refapp{transparency} for additional examples of calls from developers for transparency.)
+    \end{myitemize}
+\paragraph{4.\phantom{X}Work with deployers to increase transparency.} 
+    \begin{itemize}
+        \item In cases where a developer is not the sole deployer of a foundation model, the developer should partner with deployers to increase transparency. 
+        For example, developers should attempt to require that deployers disclose usage statistics and provide usage disclaimers. Developers might do so through legal agreements that they sign with deployers that grant deployers the right to offer the foundation model. 
+        If a developer has little leverage over larger deployers it should consider partnering with similarly situated developers to increase their collective bargaining power.
+        Without such efforts, it may be difficult for a developer to assess the downstream impact of its foundation models. 
+    \end{itemize}
+\paragraph{5.\phantom{X}Work with downstream developers to increase transparency.} 
+    \begin{itemize}
+        \item Foundation model developers should make it easy for downstream developers to be transparent in their release of fine-tuned models. In addition to increasing transparency for their own models, foundation model developers should release documentation to help downstream developers be more transparent and actively encourage them to do so.
+    \end{itemize}
+\paragraph{6.\phantom{X}Work with regulators to increase transparency.} 
+    \begin{itemize}
+        \item While we believe that the public is entitled to information about each of the indicators of transparency that we examine, we recognize that it is unlikely that every foundation model developers will publicly release all of this information. 
+        In some cases, foundation model developers may argue the risks of disclosing such information are too great to justify public release. 
+        In many such cases, developers should still share this information with regulators such that governments have sufficient information to adequately scrutinize developers in the public interest.
+    \end{itemize}
+\paragraph{7.\phantom{X}Use transparency to improve trust, safety and reliability.} 
+    \begin{itemize}
+        \item Sharing internal practices, documentation, and details about risks can lead to short term criticism and negative media coverage, but in the long term it can foster greater community trust than is possible with a more opaque approach.
+        Investigative journalists will eventually expose practices that lead to systemic harms, and these harms are often exacerbated the longer they remain hidden, as illustrated by the Facebook Files \cite{wsj2021fb}.
+        Foundation models are technologies that could cause widespread harm, and the evidence suggests that safety and reliability will require dedicated and strong forms of transparency from foundation model developers.
+    \end{itemize} \clearpage
+\paragraph{8.\phantom{X}Dedicate resources to continue improving transparency over time.} 
+    \begin{itemize}
+        \item As technologies and risks rapidly evolve, the varieties of and baselines for meaningful transparency will also change.
+        Well-resourced developers should dedicate personnel to adapting their documentation and releases to take account of this shifting landscape, rather than adhering to static benchmarks.
+        Low-resourced developers should seek out funding in order to similarly improve transparency.
+    \end{itemize}
+\paragraph{9.\phantom{X}Work to improve transparency in the foundation model ecosystem.} 
+    \begin{myitemize}
+        \item There are many areas where transparency is sorely needed, ranging from the downstream impact of foundation model releases to the use of human labor in producing the data used to build foundation models. 
+        One cross-cutting issue is the fact that developers do not exist in a vacuum: the foundation models a developer releases depend on and significantly affect other parts of the ecosystem.
+        Taking this into account, developers should increase transparency as a means of improving the health of the overall ecosystem.
+        \item Developers should use semantic versioning for their models (as is the norm in software engineering) such that there is no ambiguity as to the version of the model that is being distributed.
+        Developers should also give as much notice as is practicable (\eg 3 months notice) in advance of deprecating models in order to give any downstream dependencies adequate time to migrate to a new version.
+        \item Developers should release an artifact alongside their foundation models that includes information about models' upstream and downstream dependencies \citep{bommasani2023ecosystem}.
+        Information about the datasets, software frameworks, and applications the model depends upon, as well as products, services, and other models that depend upon the model, are essential for effective supply chain monitoring. 
+    \end{myitemize}
+\paragraph{10.\phantom{X}Use the Foundation Model Transparency Index to increase transparency.} 
+    \begin{myitemize}
+        \item The Foundation Model Transparency Index provides an extensive taxonomy of the key elements of transparency in the field. 
+        We encourage developers to score their non-flagship models on the index and see where they have room for improvement. 
+        \item Each indicator contains significant detail that developers can utilize to increase transparency in specific issue areas. For quantitative metrics, indicators include information regarding the appropriate unit of measurement and level of precision. For qualitative metrics, indicators often provide de facto instructions for how to clearly share information about a specific subdomain with the public.
+    \end{myitemize}
+\clearpage
+
+\hypertarget{recommendations-deployers}{\subsection{Recommendations for foundation model deployers}}
+\label{sec:recommendations-deployers}
+Foundation model developers are not the only actors with a responsibility to promote transparency: deployers of foundation models such as cloud services providers and companies that license foundation models from developers also have a significant role to play. 
+Although deployers cannot unilaterally increase transparency as they are not the party responsible for building a foundation model, there are still some tools at their disposal for doing so and they should think seriously about the implications of relying on systems for which there is little publicly available information. 
+
+\paragraph{1.\phantom{X}Assess the risks of deploying a foundation model without adequate transparency.} 
+    \begin{itemize}
+        \item Deployers that make use of a developer's foundation model in their products and services should conduct pre-deployment risk assessments that include specific assessments of risks stemming from a lack of transparency. These risks may include increased legal liability for difficult-to-explain model behaviors, reduced trust from users due to the product's opacity, and lower product performance without adequate information about the data used to build the model. 
+    \end{itemize}
+ \paragraph{2.\phantom{X}Require sufficient transparency in working with foundation model developers} 
+    \begin{myitemize}
+        \item Foundation model deployers should work with developers to increase the level of transparency regarding their models. 
+        It is not only in a deployers' interest for developers to share information bilaterally, but also for developers to be transparent with the public about the risks and limitations of their models. 
+        Deployers themselves can help developers increase transparency by sharing usage statistics.
+        \item Deployers should go beyond information sharing requests to improve transparency. 
+        For example, deployers should aim to negotiate contracts with developers that require developers to publicly share information that is relevant to the developers' customers as well as the broader public, such as information regarding \updates, changes in \usagepolicy, and \impact. 
+        In cases where deployers have little leverage over larger developers they should consider partnering with similarly situated deployers to increase their collective bargaining power. 
+    \end{myitemize}
+ \paragraph{3.\phantom{X}Do not put undue trust in opaque foundation models.} 
+    \begin{itemize}
+        \item Some deployers may take a foundation model from a reputable company at face value, assuming that all of the relevant information about that system is available to deployers and regulators. 
+        This could be a serious misjudgment: as our findings show, developers are overwhelmingly not transparent about the development and use of their foundation models. 
+        Assuming that a model complies with regulatory requirements regarding information sharing could come with substantial legal risk; for example, if new regulations primarily place information sharing requirements on deployers, they may face legal exposure related to their deployment of opaque foundation models. 
+        While developers are presumably more transparent in their relationships with deployers than in their public facing documentation, this is no guarantee that relevant information is shared across the 23 subdomains we identify.
+    \end{itemize}
+\clearpage
+\hypertarget{recommendations-policy}{\subsection{Recommendations for policymakers}}
+\label{sec:recommendations-policy}
+
+Policymakers across the United States, China, Canada, the European Union, the United Kingdom, India, Japan, the G7, and many other governments have already taken specific actions on foundation models and generative AI (see \refapp{transparency}).
+Evidence-driven policy that is grounded in a rich and sophisticated understanding of the current foundation model market is likely to achieve the best outcomes.
+As a result, our extensive characterization of transparency provides three core insights: (i) what aspects of transparency are present in status quo absent regulatory intervention, (ii) if mandated and enforced, what aspects of transparency would change relative to the status quo, and (iii) what substantive requirements beyond transparency would be most appropriate given the newfound transparency?
+We hope that lawmakers will draw on the information we aggregate in the \projectname to better inform policy initiatives.
+To be clear, our intent is to not to make a claim about whether specific governments should or should not regulate foundation models at this time, though some policy intervention is likely needed. 
+Nor is our intent to recommend broad disclosure requirements, which could cause substantial harm if they are implemented without regard for differences in developers' business models and their level of financial resources, or without adequate government support for regulatory compliance.
+Our view is that a better understanding of the status quo will lead to smarter policy, which leads to the following recommendations.
+
+\paragraph{1.\phantom{X}Transparency should be a top priority for AI legislation.} 
+    \begin{myitemize}
+        \item Mechanisms to promote transparency should be among the suite of policy tools that lawmakers use to encourage responsible development of foundation models \citep{engler2023casc, hacker2023gpt}.
+        Unlike many other policy tools, transparency can be relatively low cost---where developers already possess the relevant information, sharing it does not require data collection. 
+        Another advantage of pro-transparency policies are that they can help solve collective action problems with respect to sharing information with the public. 
+        If one developer shares much more information about its foundation model with the public, then it could theoretically be penalized by investors or scrutinized by regulations for having more information about the model's risks and limitations publicly available than its competitors. 
+        As a result, a developer may be hesitant to be a first mover on transparency if its competitors are steadfast in maintaining opacity. 
+        By contrast, if that developer's peers must also share information about the risks and limitations of their foundation models, there is much less potential for transparency to represent a competitive disadvantage. 
+        \item Transparency is a fundamental prerequisite for accountability, robust science, continuous innovation, and effective regulation. 
+        With additional information about companies' business practices, the impact of their foundation models, the resources used to build models, and the AI supply chain, governments would be much better positioned to enact comprehensive AI regulations. 
+        \item Policymakers have a responsibility to ensure that the public has adequate information about extremely powerful AI systems that hundreds of millions of people use. 
+    \end{myitemize}
+\paragraph{2.\phantom{X}Regulators should enforce existing regulation to promote transparency for foundation model developers.} 
+    \begin{itemize}
+        \item Governments already have substantial authority to require companies to share information about their business practices \cite{ho2012fudging, hess2019ttrap, irion2022algoff}.
+        For example, in recent years data protection authorities have increased their efforts to regulate the development and use of AI \citep{zanfir-f2023fpf}; they should consider using these authorities to solicit additional information from foundation model developers regarding the data they use to build foundation models and the labor that goes into producing that data. 
+        Similarly, sectoral regulators should consider scrutinizing the deployment of foundation models within their purview and require transparency where appropriate.
+    \end{itemize}
+ \paragraph{3.\phantom{X}Policymakers should be realistic about the limits of transparency.}
+    \begin{myitemize}
+        \item Transparency is not an end in itself. 
+        While having more information about companies' business practices and the foundation model ecosystem will undoubtedly be helpful, the most significant benefits from transparency will stem from the ways in which it elicits changes in business practices and promotes responsible development and use of foundation models.
+        \item Transparency is not a viable alternative to substantive change.
+        Some interest groups and policymakers have nonetheless pushed for transparency requirements as a form of "light-touch" AI regulation.
+        Rather than mandating that companies change their policies and practices, this approach would merely require some level of information sharing with the government.
+        But transparency is only useful insofar as the information it yields is actionable.
+        Increased transparency can help policymakers have sufficient information about the state of the industry that many governments seek to regulate.
+        \item While transparency requirements may appear more feasible and even-handed than other policy interventions in the near term, policymakers should recognize that they are likely insufficient to reduce harm in many areas. 
+        Even if companies share more information about the impacts of their models on workers and the environment, that may not lead them to improve working conditions or reduce emissions. 
+        Policymakers should consider measures beyond transparency requirements in a wide variety of areas while balancing other important equities related to competition and algorithmic justice. 
+    \end{myitemize}
+\paragraph{4.\phantom{X}Governments should craft a policy architecture that enables responsible development of open foundation models, which will in turn promote transparency.}
+    \begin{myitemize}
+        \item Open foundation models are more transparent than closed foundation models, often by a significant margin. 
+        This means that policymakers with an interest in transparency should be hesitant to impose regulations on foundation model developers or deployers that make it considerably more difficult to build open foundation models. 
+        Measures that substantially increase the legal risk of developing open foundation models by holding foundation model developers liable for model outputs or by requiring comprehensive monitoring of downstream use may ultimately undermine transparency.
+        \item Pro-competitive policies such as those that encourage a variety of different business models in the foundation model ecosystem can promote transparency. 
+        If there are only a few major technology companies that develop flagship foundation models, it will be easier for those companies to circumvent transparency rules by coordinating their activities. 
+        For instance, a handful of major closed developers could agree that a certain level of transparency is sufficient to satisfy their goals and to meet regulatory requirements, leading them to obfuscate their business practices in similar ways.
+        If the foundation model ecosystem is dominated by a few incumbents, it will also be easier for those incumbents to jointly engage in regulatory capture as there will be no countervailing narrative from other developers in the ecosystem.
+        By contrast, policies that result in a diverse array of open and closed foundation model developers could create a positive feedback loop for transparency.
+        The higher level of transparency of open developers can help draw attention to the lack of information available about the resources required to build closed foundation models.
+        Some closed developers in this environment may see it as in their interest to share more information about their models in order to engender more trust in their products and services, which can in turn push less transparent closed developers to alter their business practices.
+    \end{myitemize}

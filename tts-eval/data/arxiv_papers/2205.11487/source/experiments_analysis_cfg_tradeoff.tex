@@ -1,0 +1,41 @@
+\subsection{Classifier-free Guidance and the Alignment-Fidelity Trade-off}
+
+\begin{figure}
+\centering
+\input{figures/pgfplots/clip_vs_scaled_clip_appendix.tex}
+\caption{CLIP Score vs FID trade-off across various $\hat{\bx}_0$ thresholding methods for the 64$\times$64 model. We sweep over guidance values of $[1, 1.25, 1.5, 1.75, 2, 3, 4, 5, 6, 7, 8, 9, 10]$.
+}
+\label{fig:clip_vs_scaled_clip}
+\end{figure}
+
+\input{clip_noclip_scaleclip}
+\input{clip_vs_scale_clip_fig}
+
+We observe that classifier-free guidance \cite{ho2021classifierfree} is a key contributor to generating samples with strong image-text alignment, this is also consistent with the observations of \cite{ramesh-dalle, ramesh-dalle2}. There is typically a trade-off between image fidelity and image-text alignment, as we iterate over the guidance weight. 
+While previous work has typically used relatively small guidance weights, \name uses relatively large guidance weights for all three diffusion models.  We found this to yield a good balance of sample quality and alignment.
+However, naive use of large guidance weights often produces relatively poor results. To enable the effective use of larger guidance we introduce several innovations, as described below.
+
+
+\textbf{Thresholding Techniques}: First, we compare various thresholding methods used with classifier-free guidance. Fig.  \ref{fig:clip_vs_scaled_clip} compares the CLIP vs.\ FID-10K score pareto frontiers for various thresholding methods of the base text-to-image $64\times64$ model. We observe that our dynamic thresholding technique results in significantly better CLIP scores, and comparable or better FID scores than the static thresholding technique for a wide range of guidance weights. \cref{fig:clip_noclip_scaledclip} shows qualitative samples for thresholding techniques.
+
+\textbf{Guidance for Super-Resolution}: We further analyze the impact of classifier-free guidance for our $64\times64 \rightarrow 256\times256$ model. \cref{fig:256x256_t_eval_and_gw} shows the pareto frontiers for CLIP vs. FID-10K score for the $64\times64 \rightarrow 256\times256$ super-resolution model. $\mathrm{aug\_level}$ specifies the level of noise augmentation applied to the input low-resolution image during inference ($\mathrm{aug\_level} = 0$ means no noise). We observe that $\mathrm{aug\_level} = 0$ gives the best FID score for all values of guidance weight. Furthermore, for all values of $\mathrm{aug\_level}$, we observe that FID improves considerably with increasing guidance weight upto around $7-10$. While generation using larger values of $\mathrm{aug\_level}$ gives slightly worse FID, it allows more varied range of CLIP scores, suggesting more diverse generations by the super-resolution model. In practice, for our best samples, we generally use $\mathrm{aug\_level}$ in $[0.1, 0.3]$. Using large values of $\mathrm{aug\_level}$ and high guidance weights for the super-resolution models, \name can create different variations of a given $64\times64$ image by altering the prompts to the super-resolution models (See \cref{fig:super_res_variations} for examples).
+
+\textbf{Impact of Conditioning Augmentation}: \cref{fig:super_res_ablation} shows the impact of training super-resolution models with noise conditioning augmentation. Training with no noise augmentation generally results in worse CLIP and FID scores, suggesting noise conditioning augmentation is critical to attaining best sample quality similar to prior work \cite{ho2021cascaded}. Interestingly, the model trained without noise augmentation has much less variations in CLIP and FID scores across different guidance weights compared to the model trained with conditioning augmentation. We hypothesize that this is primarily because strong noise augmented training reduces the low-resolution image conditioning signal considerably, encouraging higher degree of dependence on conditioned text for the model. 
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.49\textwidth}
+    \input{figures/pgfplots/super_res_guidance.tex}
+    \caption{Comparison between different values of $\mathrm{aug\_level}$.}
+     \label{fig:256x256_t_eval_and_gw}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.49\textwidth}
+     \centering
+     \input{figures/pgfplots/super_res_guidance2.tex}
+      \caption{Comparison between training with no noise augmentation ``A'' vs noise augmentation ``B''}
+      \label{fig:super_res_ablation}
+    \end{subfigure}
+    \caption{CLIP vs FID-10K pareto curves showing the impact of noise augmentation on our $64\times64 \rightarrow 256\times256$ model. For each study, we sweep over guidance values of $[1, 3, 5, 7, 8, 10, 12, 15, 18]$}
+\end{figure}
+
+\input{super_res_variations}

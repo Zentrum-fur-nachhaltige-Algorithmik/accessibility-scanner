@@ -1,0 +1,29 @@
+\begingroup
+\begin{table*}[!t]
+    \centering
+    \small
+    \scalebox{0.9}{
+    \begin{tabular}{p{\linewidth}}
+        \toprule
+        \underline{\textbf{\textsc{Exemplar for Sports Understanding}}} \\
+        \vspace{-2mm}
+        \# Q: Is the following statement plausible? Sam Darnold passed the puck \\
+        \vspace{-1mm}
+        \# To answer this question, write a Python program to answer the following subquestions: \\
+        \# 1. Sam Darnold is a player in which sport? (independent, support: ["Sam Darnold is an  NFL Quarterback", "NFL is the National Football League"]) \\
+        player\_sport = "football" \\
+        \# 2. The phrase "passed the puck" implies playing which sport? (independent, support: ["Players pass the puck in hockey"]) \\
+        playing\_sport = "hockey" \\
+        \# 3. Is the following statement plausible? Sam Darnold passed the puck (depends on 1 and 2, support: ["Sam Darnold is an  NFL Quarterback", "NFL is the National Football League", "Players pass the puck in hockey"]) \\
+        plausibility = (player\_sport == playing\_sport) \\
+        \# 4. Is the following statement plausible? Sam Darnold passed the puck (depends on 3, support: []) \\
+        answer = int(plausibility) \\
+        \bottomrule
+    \end{tabular}
+    }
+        \caption{
+    An exemplar from our prompt for Sports Understanding.
+    }
+    \label{tab:appendix-sports_prompt}
+\end{table*}
+\endgroup

@@ -1,0 +1,71 @@
+\section{\benchmarkname}
+\label{appendix:benchmark}
+
+In this section, we describe our new benchmark for fine-grained analysis of text-to-image models, namely,  \benchmarkname. \benchmarkname consists of 11 categories with approximately 200 text prompts. This is large enough to test the model well, while small enough to easily perform trials with human raters. Table \ref{tab:drawbench-categories} enumerates these categories along with description and few examples. We release the full set of samples \href{https://docs.google.com/spreadsheets/d/1y7nAbmR4FREi6npB1u-Bo3GFdwdOPYJc617rBOxIRHY/edit#gid=0}{\color{blue}{here}}.
+
+For evaluation on this benchmark, we conduct an independent human evaluation run for each category. For each prompt, the rater is shown two sets of images - one from Model A, and second from Model B. Each set contains 8 random (non-cherry picked)  generations from the corresponding model. The rater is asked two questions - 
+\begin{enumerate}[noitemsep,nolistsep]
+    \item Which set of images is of higher quality?
+    \item Which set of images better represents the text caption : \{Text Caption\}?
+\end{enumerate}
+where the questions are designed to measure: 1) image fidelity, and 2) image-text alignment. For each question, the rater is asked to select from three choices:
+\begin{enumerate}[noitemsep,nolistsep]
+    \item I prefer set A.
+    \item I am indifferent.
+    \item I prefer set B.
+\end{enumerate}
+
+We aggregate scores from 25 raters for each category (totalling to $25 \times 11 = 275$ raters). We do not perform any post filtering of the data to identify unreliable raters, both for expedience and because the task was straightforward to explain and execute. 
+
+\setlength{\tabcolsep}{7pt}
+\begin{table}[t]
+    \centering
+    \resizebox{\textwidth}{!}{
+    {\small
+    \begin{tabular}{lcc}
+    \toprule
+    \bfseries{Category} & \bfseries{Description} & \bfseries{Examples}  \\
+    \midrule
+    \multirow{2}{*}{Colors} & Ability to generate objects & ``A blue colored dog.'' \\
+    &  with specified colors. &  ``A black apple and a green backpack.'' \\
+    \midrule
+    \multirow{2}{*}{Counting} & Ability to generate specified & ``Three cats and one dog sitting on the grass.'' \\
+    &  number of objects. & ``Five cars on the street.'' \\
+    \midrule
+    \multirow{2}{*}{Conflicting} & Ability to generate conflicting & ``A horse riding an astronaut.'' \\
+    & interactions b/w objects. & ``A panda making latte art.'' \\
+    \midrule
+    \multirow{2}{*}{DALL-E \cite{ramesh-dalle}} & Subset of challenging prompts & ``A triangular purple flower pot.'' \\
+    & from \cite{ramesh-dalle}. & ``A cross-section view of a brain.'' \\
+    \midrule
+    \multirow{2}{*}{Description} & Ability to understand complex and long & ``A small vessel propelled on water by oars, sails, or an engine.'' \\
+    & text prompts describing objects. & ``A mechanical or electrical device for measuring time.'' \\
+    \midrule
+    \multirow{2}{*}{Marcus et al. \cite{marcus-arxiv-2022}} & Set of challenging prompts & ``A pear cut into seven pieces arranged in a ring.'' \\
+    & from \cite{marcus-arxiv-2022}. & ``Paying for a quarter-sized pizza with a pizza-sized quarter.'' \\
+    \midrule
+    \multirow{2}{*}{Misspellings} & Ability to understand & ``Rbefraigerator.'' \\
+    &  misspelled prompts. & ``Tcennis rpacket.'' \\
+    \midrule
+    \multirow{2}{*}{Positional} & Ability to generate objects with & ``A car on the left of a bus.'' \\
+    &  specified spatial positioning. & ``A stop sign on the right of a refrigerator.'' \\
+    \midrule
+    \multirow{2}{*}{Rare Words} & \multirow{2}{*}{Ability to understand rare words\footnote{https://www.merriam-webster.com/topics/obscure-words}.} & ``Artophagous.'' \\
+    & & ``Octothorpe.'' \\
+    \midrule
+    \multirow{2}{*}{Reddit} & Set of challenging prompts from & ``A yellow and black bus cruising through the rainforest.'' \\
+    & DALLE-2 Reddit\footnote{https://www.reddit.com/r/dalle2/}.& ``A medieval painting of the wifi not working.'' \\
+    \midrule
+    \multirow{2}{*}{Text} & \multirow{2}{*}{Ability to generate quoted text.} & ``A storefront with 'Deep Learning' written on it.'' \\
+    & & ``A sign that says 'Text to Image'.'' \\
+    \bottomrule
+    \end{tabular}
+    }
+    }
+    \vspace*{0.3cm}
+    \caption{Description and examples of the 11 categories in \benchmarkname.}
+    \label{tab:drawbench-categories}
+\end{table}
+
+
+

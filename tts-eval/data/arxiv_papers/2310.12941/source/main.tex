@@ -1,0 +1,199 @@
+% \pdfoutput=1
+% \documentclass[11pt]{article}
+
+% %\usepackage[review]{acl}
+% \usepackage{acl}
+% \usepackage{times}
+% \usepackage{latexsym}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{ifthen}
+% \usepackage{graphicx}
+% \usepackage{booktabs}
+% \usepackage{multirow}
+% \usepackage{subcaption}
+% \usepackage{xspace}
+% \usepackage[T1]{fontenc}
+% \usepackage[utf8]{inputenc}
+% \usepackage{microtype}
+% % \usepackage{abstract}
+
+% % use the same count for tables and figures 
+% \makeatletter
+% \let\c@table\c@figure % for (1)
+% \let\ftype@table\ftype@figure % for (2)
+% \makeatother
+
+% % For URL wrapping.
+% \expandafter\def\expandafter\UrlBreaks\expandafter{\UrlBreaks%  save the current one
+%   \do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j%
+%   \do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t%
+%   \do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D%
+%   \do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
+%   \do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
+%   \do\Y\do\Z}
+
+% \input std-macros
+% \input{macros}
+
+% \title{Holistic Evaluation of Language Models}
+% % \title{\frameworkName: A Modular Framework for Language Model Evaluation}
+
+% \author{
+% Center for Research on Foundation Models (CRFM) \\
+% Stanford University \\
+% Version: 0.1 (last updated Oct 6)
+% }
+
+
+\documentclass[screen, authorversion, acmsmall]{acmart}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{natbib}
+\usepackage{xcolor}
+\usepackage{ifthen}
+\usepackage[normalem]{ulem}
+\usepackage{svg}
+\usepackage{subfiles}
+\usepackage{xspace}
+\usepackage{cleveref}
+\usepackage{wrapfig}
+\usepackage{dialogue}
+\usepackage[most]{tcolorbox}
+\usepackage{subcaption}
+% \usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{glossaries}
+\usepackage{listings}
+\usepackage{duckuments}
+\usepackage{calc}
+
+% \usepackage[hang,flushmargin]{footmisc}
+% \setlength{\footnotemargin}{1em}
+
+\usepackage{enumitem}
+
+
+\input std-macros
+\input macros
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{authblk}
+\renewcommand\Authsep{\hskip1em\relax}  % separation between authors
+\renewcommand\Authands{\hskip1em\relax} % separation before last author
+
+% Store the initial values
+
+
+\makeatletter         
+\renewcommand\maketitle{
+{\raggedright 
+%\begin{center}
+\centering
+\vspace{-2.2in}
+{\Huge \bfseries \sffamily \@title }%\\[2ex]
+
+\vskip2ex
+
+{\@author}%\\[2ex] 
+
+\vskip2ex
+
+%\end{center}
+}}
+\makeatother
+
+\renewenvironment{abstract}{%
+    \newline
+    \itshape
+    }%
+{}
+% end hack
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\title{The Foundation Model Transparency Index}
+\input 
+\author[1]{Rishi Bommasani*}
+\author[1]{Kevin Klyman*}
+\author[2]{\\Shayne Longpre}
+\author[3]{Sayash Kapoor}
+\author[1]{Nestor Maslej}
+\author[1]{Betty Xiong}
+\author[1]{Daniel Zhang}
+\author[1]{\\Percy Liang}
+\affil[1]{Stanford University}
+\affil[2]{Massachusetts Institute of Technology}
+\affil[3]{Princeton University\authorcr
+\textcolor{white}{}
+\authorcr
+Stanford Center for Research on Foundation Models (CRFM)
+\authorcr
+Stanford Institute for Human-Centered Artificial Intelligence (HAI)
+}
+
+\renewcommand{\shortauthors}{
+Bommasani et al.
+}
+
+\maketitle
+% Need this hack for compilation to work
+\noindent %
+\vspace{-0.2in}
+\medskip
+\input{00_abstract}
+\newgeometry{top=2cm, head=10pt, left=2cm, right=2cm,bottom=2cm}
+\clearpage
+\renewcommand{\baselinestretch}{0.9685}\normalsize 
+\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+\tableofcontents
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\renewcommand{\baselinestretch}{1.0}\normalsize 
+\clearpage
+
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{4pt}
+\sloppy
+\input{01_introduction}
+\input{01a_findings}
+\input{01b_recommendations}
+\input{01c_contributions}
+\input{02_background}
+\clearpage
+\input{03_indicators}
+\clearpage
+\input{04_developers}
+\clearpage
+\input{05_scoring}
+\clearpage
+\input{06_results}
+\clearpage
+\input{07_recommendations}
+\clearpage
+\input{08_impact}
+\clearpage
+\input{09_conclusion}
+\input{acknowledgements}
+
+\newpage
+\bibliography{refdb/all, main}
+% ACM reference style
+% \bibliographystyle{ACM-Reference-Format}
+% ACL reference style
+\bibliographystyle{acl_natbib}
+
+\clearpage
+\appendix
+
+\input{appendices/app_author_contributions}
+\pagebreak
+\input{appendices/app_indicators}
+\pagebreak
+\input{appendices/app_search_protocol}
+\input{appendices/app_transparency}
+\end{document}

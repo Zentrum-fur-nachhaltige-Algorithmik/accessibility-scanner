@@ -1,0 +1,2168 @@
+\begin{thebibliography}{237}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Abebe et~al.(2020)Abebe, Barocas, Kleinberg, Levy, Raghavan, and
+  Robinson}]{abebe2020roles}
+Rediet Abebe, Solon Barocas, Jon Kleinberg, Karen Levy, Manish Raghavan, and
+  David~G Robinson. 2020.
+\newblock Roles for computing in social change.
+\newblock In \emph{Proceedings of the 2020 Conference on Fairness,
+  Accountability, and Transparency}, pages 252--260.
+
+\bibitem[{Abid et~al.(2021)Abid, Farooqi, and Zou}]{abid2021persistent}
+Abubakar Abid, Maheen Farooqi, and James Zou. 2021.
+\newblock Persistent anti-muslim bias in large language models.
+\newblock \emph{arXiv preprint arXiv:2101.05783}.
+
+\bibitem[{Ananny and Crawford(2018)}]{ananny2016limits}
+Mike Ananny and Kate Crawford. 2018.
+\newblock \href {https://doi.org/10.1177/1461444816676645} {Seeing without
+  knowing: Limitations of the transparency ideal and its application to
+  algorithmic accountability}.
+\newblock \emph{New Media \& Society}, 20(3):973--989.
+
+\bibitem[{Aristotle(350 B.C.E)}]{aristotle350deanima}
+Aristotle. 350 B.C.E.
+\newblock \emph{De Anima: On the Soul}.
+
+\bibitem[{Askell et~al.(2019)Askell, Brundage, and Hadfield}]{askell2019role}
+Amanda Askell, Miles Brundage, and Gillian Hadfield. 2019.
+\newblock \href {http://arxiv.org/abs/1907.04534} {The role of cooperation in
+  responsible ai development}.
+
+\bibitem[{Bai et~al.(2022)Bai, Kadavath, Kundu, Askell, Kernion, Jones, Chen,
+  Goldie, Mirhoseini, McKinnon, Chen, Olsson, Olah, Hernandez, Drain, Ganguli,
+  Li, Tran-Johnson, Perez, Kerr, Mueller, Ladish, Landau, Ndousse, Lukosuite,
+  Lovitt, Sellitto, Elhage, Schiefer, Mercado, DasSarma, Lasenby, Larson,
+  Ringer, Johnston, Kravec, Showk, Fort, Lanham, Telleen-Lawton, Conerly,
+  Henighan, Hume, Bowman, Hatfield-Dodds, Mann, Amodei, Joseph, McCandlish,
+  Brown, and Kaplan}]{bai2022constitutional}
+Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion,
+  Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon,
+  Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain,
+  Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared
+  Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosuite,
+  Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi
+  Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott
+  Johnston, Shauna Kravec, Sheer~El Showk, Stanislav Fort, Tamera Lanham,
+  Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel~R.
+  Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam
+  McCandlish, Tom Brown, and Jared Kaplan. 2022.
+\newblock \href {http://arxiv.org/abs/2212.08073} {Constitutional ai:
+  Harmlessness from ai feedback}.
+
+\bibitem[{Bandy and Vincent(2021)}]{bandy2021addressing}
+Jack Bandy and Nicholas Vincent. 2021.
+\newblock Addressing" documentation debt" in machine learning research: A
+  retrospective datasheet for bookcorpus.
+\newblock \emph{arXiv preprint arXiv:2105.05241}.
+
+\bibitem[{Barocas and Selbst(2016)}]{barocas2016}
+Solon Barocas and Andrew~D. Selbst. 2016.
+\newblock Big data's disparate impact.
+\newblock \emph{104 California Law Review}, 3:671--732.
+
+\bibitem[{Bates et~al.(2023)Bates, Kennedy, and
+  Medina~Perea}]{bates2023socially}
+J.~Bates, H.~Kennedy, and I.~et~al. Medina~Perea. 2023.
+\newblock \href {https://doi.org/10.1108/JD-01-2023-0006} {Socially meaningful
+  transparency in data-based systems: reflections and proposals from practice}.
+\newblock \emph{Journal of Documentation}.
+
+\bibitem[{Belli and Gaspar(2023)}]{belli2023igf}
+Luca Belli and Walter Gaspar. 2023.
+\newblock \emph{The Quest for AI Sovereignty, Transparency and Accountability}.
+\newblock UN Internet Governance Forum Data and Artificial Intelligence
+  Governance Coalition.
+
+\bibitem[{Bender and Friedman(2018{\natexlab{a}})}]{bender2018data}
+Emily~M Bender and Batya Friedman. 2018{\natexlab{a}}.
+\newblock Data statements for natural language processing: Toward mitigating
+  system bias and enabling better science.
+\newblock \emph{Transactions of the Association for Computational Linguistics
+  (TACL)}, 6:587--604.
+
+\bibitem[{Bender and Friedman(2018{\natexlab{b}})}]{bender-friedman-2018-data}
+Emily~M. Bender and Batya Friedman. 2018{\natexlab{b}}.
+\newblock \href {https://doi.org/10.1162/tacl_a_00041} {Data statements for
+  natural language processing: Toward mitigating system bias and enabling
+  better science}.
+\newblock \emph{Transactions of the Association for Computational Linguistics},
+  6:587--604.
+
+\bibitem[{Bender et~al.(2021)Bender, Gebru, McMillan-Major, and
+  Shmitchell}]{bender2021dangers}
+Emily~M Bender, Timnit Gebru, Angelina McMillan-Major, and Shmargaret
+  Shmitchell. 2021.
+\newblock On the dangers of stochastic parrots: Can language models be too big?
+\newblock In \emph{Proceedings of the 2021 ACM Conference on Fairness,
+  Accountability, and Transparency}, pages 610--623.
+
+\bibitem[{Benkler(2013)}]{benkler2013practical}
+Yochai Benkler. 2013.
+\newblock Practical anarchism: Peer mutualism, market power, and the fallible
+  state.
+\newblock \emph{Politics \& Society}, 41(2):213--251.
+
+\bibitem[{Birchall(2021)}]{birchall2021radical}
+Clare Birchall. 2021.
+\newblock \emph{Radical secrecy: The ends of transparency in datafied America},
+  volume~60.
+\newblock U of Minnesota Press.
+
+\bibitem[{Black et~al.(2022)Black, Biderman, Hallahan, Anthony, Gao, Golding,
+  He, Leahy, McDonell, Phang, Pieler, Prashanth, Purohit, Reynolds, Tow, Wang,
+  and Weinbach}]{black2022neox}
+Sid Black, Stella~Rose Biderman, Eric Hallahan, Quentin~G. Anthony, Leo Gao,
+  Laurence Golding, Horace He, Connor Leahy, Kyle McDonell, Jason Phang,
+  M.~Pieler, Usvsn~Sai Prashanth, Shivanshu Purohit, Laria Reynolds, J.~Tow,
+  Ben Wang, and Samuel Weinbach. 2022.
+\newblock {GPT-NeoX-20B}: An open-source autoregressive language model.
+\newblock \emph{arXiv}.
+
+\bibitem[{Bloomfield and O'Hara(1999)}]{bloomfield1999market}
+Robert Bloomfield and Maureen O'Hara. 1999.
+\newblock \href {http://www.jstor.org/stable/2645985} {Market transparency: Who
+  wins and who loses?}
+\newblock \emph{The Review of Financial Studies}, 12(1):5--35.
+
+\bibitem[{Bommasani(2023)}]{bommasani2022evaluation}
+Rishi Bommasani. 2023.
+\newblock \href {https://doi.org/10.18653/v1/2023.findings-acl.522} {Evaluation
+  for change}.
+\newblock In \emph{Findings of the Association for Computational Linguistics:
+  ACL 2023}, pages 8227--8239, Toronto, Canada. Association for Computational
+  Linguistics.
+
+\bibitem[{Bommasani et~al.(2021)Bommasani, Hudson, Adeli, Altman, Arora, von
+  Arx, Bernstein, Bohg, Bosselut, Brunskill, Brynjolfsson, Buch, Card,
+  Castellon, Chatterji, Chen, Creel, Davis, Demszky, Donahue, Doumbouya,
+  Durmus, Ermon, Etchemendy, Ethayarajh, Fei-Fei, Finn, Gale, Gillespie, Goel,
+  Goodman, Grossman, Guha, Hashimoto, Henderson, Hewitt, Ho, Hong, Hsu, Huang,
+  Icard, Jain, Jurafsky, Kalluri, Karamcheti, Keeling, Khani, Khattab, Koh,
+  Krass, Krishna, Kuditipudi, Kumar, Ladhak, Lee, Lee, Leskovec, Levent, Li,
+  Li, Ma, Malik, Manning, Mirchandani, Mitchell, Munyikwa, Nair, Narayan,
+  Narayanan, Newman, Nie, Niebles, Nilforoshan, Nyarko, Ogut, Orr,
+  Papadimitriou, Park, Piech, Portelance, Potts, Raghunathan, Reich, Ren, Rong,
+  Roohani, Ruiz, Ryan, Ré, Sadigh, Sagawa, Santhanam, Shih, Srinivasan,
+  Tamkin, Taori, Thomas, Tramèr, Wang, Wang, Wu, Wu, Wu, Xie, Yasunaga, You,
+  Zaharia, Zhang, Zhang, Zhang, Zhang, Zheng, Zhou, and
+  Liang}]{bommasani2021opportunities}
+Rishi Bommasani, Drew~A. Hudson, Ehsan Adeli, Russ Altman, Simran Arora, Sydney
+  von Arx, Michael~S. Bernstein, Jeannette Bohg, Antoine Bosselut, Emma
+  Brunskill, Erik Brynjolfsson, Shyamal Buch, Dallas Card, Rodrigo Castellon,
+  Niladri Chatterji, Annie Chen, Kathleen Creel, Jared~Quincy Davis, Dorottya
+  Demszky, Chris Donahue, Moussa Doumbouya, Esin Durmus, Stefano Ermon, John
+  Etchemendy, Kawin Ethayarajh, Li~Fei-Fei, Chelsea Finn, Trevor Gale, Lauren
+  Gillespie, Karan Goel, Noah Goodman, Shelby Grossman, Neel Guha, Tatsunori
+  Hashimoto, Peter Henderson, John Hewitt, Daniel~E. Ho, Jenny Hong, Kyle Hsu,
+  Jing Huang, Thomas Icard, Saahil Jain, Dan Jurafsky, Pratyusha Kalluri,
+  Siddharth Karamcheti, Geoff Keeling, Fereshte Khani, Omar Khattab, Pang~Wei
+  Koh, Mark Krass, Ranjay Krishna, Rohith Kuditipudi, Ananya Kumar, Faisal
+  Ladhak, Mina Lee, Tony Lee, Jure Leskovec, Isabelle Levent, Xiang~Lisa Li,
+  Xuechen Li, Tengyu Ma, Ali Malik, Christopher~D. Manning, Suvir Mirchandani,
+  Eric Mitchell, Zanele Munyikwa, Suraj Nair, Avanika Narayan, Deepak
+  Narayanan, Ben Newman, Allen Nie, Juan~Carlos Niebles, Hamed Nilforoshan,
+  Julian Nyarko, Giray Ogut, Laurel Orr, Isabel Papadimitriou, Joon~Sung Park,
+  Chris Piech, Eva Portelance, Christopher Potts, Aditi Raghunathan, Rob Reich,
+  Hongyu Ren, Frieda Rong, Yusuf Roohani, Camilo Ruiz, Jack Ryan, Christopher
+  Ré, Dorsa Sadigh, Shiori Sagawa, Keshav Santhanam, Andy Shih, Krishnan
+  Srinivasan, Alex Tamkin, Rohan Taori, Armin~W. Thomas, Florian Tramèr,
+  Rose~E. Wang, William Wang, Bohan Wu, Jiajun Wu, Yuhuai Wu, Sang~Michael Xie,
+  Michihiro Yasunaga, Jiaxuan You, Matei Zaharia, Michael Zhang, Tianyi Zhang,
+  Xikun Zhang, Yuhui Zhang, Lucia Zheng, Kaitlyn Zhou, and Percy Liang. 2021.
+\newblock On the opportunities and risks of foundation models.
+\newblock \emph{arXiv preprint arXiv:2108.07258}.
+
+\bibitem[{Bommasani et~al.(2023{\natexlab{a}})Bommasani, Klyman, Zhang, and
+  Liang}]{bommasani2023eu-ai-act}
+Rishi Bommasani, Kevin Klyman, Daniel Zhang, and Percy Liang.
+  2023{\natexlab{a}}.
+\newblock \href {https://crfm.stanford.edu/2023/06/15/eu-ai-act.html} {Do
+  foundation model providers comply with the eu ai act?}
+
+\bibitem[{Bommasani et~al.(2023{\natexlab{b}})Bommasani, Soylu, Liao, Creel,
+  and Liang}]{bommasani2023ecosystem}
+Rishi Bommasani, Dilara Soylu, Thomas Liao, Kathleen~A. Creel, and Percy Liang.
+  2023{\natexlab{b}}.
+\newblock \href {https://api.semanticscholar.org/CorpusID:257771875} {Ecosystem
+  graphs: The social footprint of foundation models}.
+\newblock \emph{ArXiv}, abs/2303.15772.
+
+\bibitem[{Bommasani et~al.(2023{\natexlab{c}})Bommasani, Zhang, Lee, and
+  Liang}]{bommasani2023transparency}
+Rishi Bommasani, Daniel Zhang, Tony Lee, and Percy Liang. 2023{\natexlab{c}}.
+\newblock \href {https://hai.stanford.edu/foundation-model-issue-brief-series}
+  {Improving transparency in ai language models: A holistic evaluation}.
+\newblock \emph{Foundation Model Issue Brief Series}.
+
+\bibitem[{Boyd(2016)}]{boyd2016algorithmic}
+Danah Boyd. 2016.
+\newblock \href
+  {http://opentranscripts.org/transcript/danah-boyd-algorithmic-accountability-transparency/}
+  {Algorithmic accountability and transparency}.
+\newblock Open Transcripts.
+\newblock Presented by danah boyd in Algorithmic Accountability and
+  Transparency in the Digital Economy.
+
+\bibitem[{Bresnahan and Trajtenberg(1995)}]{bresnahan1995gpt}
+Timothy~F. Bresnahan and M.~Trajtenberg. 1995.
+\newblock \href {https://doi.org/https://doi.org/10.1016/0304-4076(94)01598-T}
+  {General purpose technologies ‘engines of growth’?}
+\newblock \emph{Journal of Econometrics}, 65(1):83--108.
+
+\bibitem[{Brown et~al.(2022)Brown, Lee, Mireshghallah, Shokri, and
+  Tram{\`e}r}]{brown2022does}
+Hannah Brown, Katherine Lee, Fatemehsadat Mireshghallah, Reza Shokri, and
+  Florian Tram{\`e}r. 2022.
+\newblock What does it mean for a language model to preserve privacy?
+\newblock In \emph{Proceedings of the 2022 ACM Conference on Fairness,
+  Accountability, and Transparency}, pages 2280--2292.
+
+\bibitem[{Brown(2023)}]{brown2023allocating}
+Ian Brown. 2023.
+\newblock \href
+  {https://www.adalovelaceinstitute.org/resource/ai-supply-chains/} {Expert
+  explainer: Allocating accountability in ai supply chains}.
+\newblock \emph{The Ada Lovelace Institute}.
+
+\bibitem[{Brundage et~al.(2020)Brundage, Avin, Wang, Belfield, Krueger,
+  Hadfield, Khlaaf, Yang, Toner, Fong et~al.}]{brundage2020toward}
+Miles Brundage, Shahar Avin, Jasmine Wang, Haydn Belfield, Gretchen Krueger,
+  Gillian Hadfield, Heidy Khlaaf, Jingying Yang, Helen Toner, Ruth Fong, et~al.
+  2020.
+\newblock Toward trustworthy ai development: mechanisms for supporting
+  verifiable claims.
+\newblock \emph{arXiv preprint arXiv:2004.07213}.
+
+\bibitem[{Brynjolfsson et~al.(2021)Brynjolfsson, Rock, and
+  Syverson}]{brynjolfsson2021jcurve}
+Erik Brynjolfsson, Daniel Rock, and Chad Syverson. 2021.
+\newblock \href {https://doi.org/10.1257/mac.20180386} {The productivity
+  j-curve: How intangibles complement general purpose technologies}.
+\newblock \emph{American Economic Journal: Macroeconomics}, 13(1):333--72.
+
+\bibitem[{Buolamwini and Gebru(2018)}]{buolamwini2018gender}
+Joy Buolamwini and Timnit Gebru. 2018.
+\newblock Gender shades: Intersectional accuracy disparities in commercial
+  gender classification.
+\newblock In \emph{Conference on Fairness, Accountability and Transparency},
+  pages 77--91.
+
+\bibitem[{Cammarota et~al.(2020)Cammarota, Schunter, Rajan, Boemer, Kiss,
+  Treiber, Weinert, Schneider, Stapf, Sadeghi
+  et~al.}]{cammarota2020trustworthy}
+Rosario Cammarota, Matthias Schunter, Anand Rajan, Fabian Boemer, {\'A}gnes
+  Kiss, Amos Treiber, Christian Weinert, Thomas Schneider, Emmanuel Stapf,
+  Ahmad-Reza Sadeghi, et~al. 2020.
+\newblock Trustworthy ai inference systems: An industry research view.
+\newblock \emph{arXiv preprint arXiv:2008.04449}.
+
+\bibitem[{Casper et~al.(2023)Casper, Davies, Shi, Gilbert, Scheurer, Rando,
+  Freedman, Korbak, Lindner, Freire, Wang, Marks, Segerie, Carroll, Peng,
+  Christoffersen, Damani, Slocum, Anwar, Siththaranjan, Nadeau, Michaud, Pfau,
+  Krasheninnikov, Chen, Langosco, Hase, Bıyık, Dragan, Krueger, Sadigh, and
+  Hadfield-Menell}]{casper2023open}
+Stephen Casper, Xander Davies, Claudia Shi, Thomas~Krendl Gilbert, Jérémy
+  Scheurer, Javier Rando, Rachel Freedman, Tomasz Korbak, David Lindner, Pedro
+  Freire, Tony Wang, Samuel Marks, Charbel-Raphaël Segerie, Micah Carroll,
+  Andi Peng, Phillip Christoffersen, Mehul Damani, Stewart Slocum, Usman Anwar,
+  Anand Siththaranjan, Max Nadeau, Eric~J. Michaud, Jacob Pfau, Dmitrii
+  Krasheninnikov, Xin Chen, Lauro Langosco, Peter Hase, Erdem Bıyık, Anca
+  Dragan, David Krueger, Dorsa Sadigh, and Dylan Hadfield-Menell. 2023.
+\newblock \href {http://arxiv.org/abs/2307.15217} {Open problems and
+  fundamental limitations of reinforcement learning from human feedback}.
+
+\bibitem[{Castelvecchi(2016)}]{castelvecchi2016openblackbox}
+Davide Castelvecchi. 2016.
+\newblock \href
+  {https://www.nature.com/news/can-we-open-the-black-box-of-ai-1.20731} {Can we
+  open the black box of ai?}
+\newblock \emph{Nature}.
+\newblock Artificial intelligence is everywhere. But before scientists trust
+  it, they first need to understand how machines learn.
+
+\bibitem[{Cen et~al.(2023)Cen, Hopkins, Ilyas, Madry, Struckman, and
+  Videgaray}]{cen2023supplychain}
+Sarah~H. Cen, Aspen Hopkins, Andrew Ilyas, Aleksander Madry, Isabella
+  Struckman, and Luis Videgaray. 2023.
+\newblock \href {https://aipolicy.substack.com/p/supply-chains-2} {Ai supply
+  chains and why they matter}.
+\newblock \emph{AI Policy Substack}.
+
+\bibitem[{Chambon et~al.(2022)Chambon, Bl{\"u}thgen, Delbrouck, van~der Sluijs,
+  Polacin, Chaves, Abraham, Purohit, Langlotz, and
+  Chaudhari}]{chambon2022roentgen}
+Pierre Chambon, Christian Bl{\"u}thgen, Jean-Benoit Delbrouck, Rogier van~der
+  Sluijs, Malgorzata Polacin, Juan Manuel~Zambrano Chaves, T.~Abraham,
+  Shivanshu Purohit, Curt~P. Langlotz, and Akshay Chaudhari. 2022.
+\newblock \href {https://api.semanticscholar.org/CorpusID:253801600} {Roentgen:
+  Vision-language foundation model for chest x-ray generation}.
+\newblock \emph{ArXiv}, abs/2211.12737.
+
+\bibitem[{Chen et~al.(2021)Chen, Golubchik, and Pal}]{chen2021achieving}
+Chien-Lun Chen, Leana Golubchik, and Ranjan Pal. 2021.
+\newblock \href {http://arxiv.org/abs/2104.00137} {Achieving transparency
+  report privacy in linear time}.
+
+\bibitem[{Chen et~al.(2023{\natexlab{a}})Chen, Yoshida, and
+  Takada}]{chen2023investigation}
+Junyu Chen, Norihiro Yoshida, and Hiroaki Takada. 2023{\natexlab{a}}.
+\newblock \href {http://arxiv.org/abs/2303.13735} {An investigation of
+  licensing of datasets for machine learning based on the gqm model}.
+
+\bibitem[{Chen et~al.(2023{\natexlab{b}})Chen, Zaharia, and
+  Zou}]{chen2023chatgpts}
+Lingjiao Chen, Matei Zaharia, and James Zou. 2023{\natexlab{b}}.
+\newblock \href {http://arxiv.org/abs/2307.09009} {How is chatgpt's behavior
+  changing over time?}
+
+\bibitem[{Chou()}]{chou2012government}
+Dorothy Chou.
+\newblock \href
+  {https://blog.google/technology/safety-security/transparency-report-government-requests/}
+  {Transparency report: Government requests on the rise}.
+
+\bibitem[{Chung et~al.(2022)Chung, Hou, Longpre, Zoph, Tay, Fedus, Li, Wang,
+  Dehghani, Brahma, Webson, Gu, Dai, Suzgun, Chen, Chowdhery, Narang, Mishra,
+  Yu, Zhao, Huang, Dai, Yu, Petrov, Chi, Dean, Devlin, Roberts, Zhou, Le, and
+  Wei}]{chung2022scaling}
+Hyung~Won Chung, Le~Hou, S.~Longpre, Barret Zoph, Yi~Tay, William Fedus, Eric
+  Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, Albert Webson,
+  Shixiang~Shane Gu, Zhuyun Dai, Mirac Suzgun, Xinyun Chen, Aakanksha
+  Chowdhery, Sharan Narang, Gaurav Mishra, Adams~Wei Yu, Vincent Zhao, Yanping
+  Huang, Andrew~M. Dai, Hongkun Yu, Slav Petrov, Ed~Chi, Jeff Dean, Jacob
+  Devlin, Adam Roberts, Denny Zhou, Quoc Le, and Jason Wei. 2022.
+\newblock Scaling instruction-finetuned language models.
+\newblock \emph{ArXiv}, abs/2210.11416.
+
+\bibitem[{Cobbe et~al.(2023)Cobbe, Veale, and Singh}]{cobbe2023supply}
+Jennifer Cobbe, Michael Veale, and Jatinder Singh. 2023.
+\newblock \href {https://doi.org/10.1145/3593013.3594073} {Understanding
+  accountability in algorithmic supply chains}.
+\newblock In \emph{2023 {ACM} Conference on Fairness, Accountability, and
+  Transparency}. {ACM}.
+
+\bibitem[{Cohere(2022)}]{cohere2022}
+Cohere. 2022.
+\newblock \href
+  {https://txt.cohere.com/best-practices-for-deploying-language-models/} {Best
+  practices for deploying language models}.
+
+\bibitem[{Commission(2022)}]{dsa2022}
+European Commission. 2022.
+\newblock \href
+  {https://commission.europa.eu/strategy-and-policy/priorities-2019-2024/europe-fit-digital-age/digital-services-act-ensuring-safe-and-accountable-online-environment_en}
+  {The digital services act: ensuring a safe and accountable online
+  environment}.
+\newblock \emph{European Commission}.
+
+\bibitem[{Commission(2023)}]{ftc2023epicgames}
+Federal~Trade Commission. 2023.
+\newblock \href
+  {https://www.ftc.gov/news-events/news/press-releases/2023/03/ftc-finalizes-order-requiring-fortnite-maker-epic-games-pay-245-million-tricking-users-making}
+  {Ftc finalizes order requiring fortnite maker epic games to pay 245 million
+  for tricking users into making unwanted charges}.
+\newblock FTC will use the money to provide refunds to consumers.
+
+\bibitem[{Commission et~al.(2008)}]{joint2008handbook}
+Joint Research Centre-European Commission et~al. 2008.
+\newblock \emph{Handbook on constructing composite indicators: methodology and
+  user guide}.
+\newblock OECD publishing.
+
+\bibitem[{Coons et~al.(2021)Coons, Cassidy, Klobuchar, Blumenthal, and
+  Romney}]{pata2021}
+Chris Coons, Bill Cassidy, Amy Klobuchar, Richard Blumenthal, and Mitt Romney.
+  2021.
+\newblock \href
+  {https://www.coons.senate.gov/imo/media/doc/pata_one_pager_118th_congress_june_2023.pdf}
+  {The platform accountability and transparency act}.
+\newblock \emph{Congressional Bill}.
+
+\bibitem[{Cooper et~al.(2023)Cooper, Mimno, Choksi, and Lee}]{genlaw2023}
+A.~Feder Cooper, David Mimno, Madiha Choksi, and Katherine Lee. 2023.
+\newblock \href {https://genlaw.github.io/glossary.html#legal-concepts}
+  {Machine learning and artificial intelligence: Legal concepts}.
+\newblock \emph{Generative AI and Law Workshop at the International Conference
+  of Machine Learning}.
+
+\bibitem[{Corbett and Denton(2023)}]{corbett2023interrogating}
+Eric Corbett and Emily Denton. 2023.
+\newblock Interrogating the t in facct.
+\newblock In \emph{Proceedings of the 2023 ACM Conference on Fairness,
+  Accountability, and Transparency}, pages 1624--1634.
+
+\bibitem[{Costanza-Chock et~al.(2022)Costanza-Chock, Raji, and
+  Buolamwini}]{costanzachock2022audit}
+Sasha Costanza-Chock, Inioluwa~Deborah Raji, and Joy Buolamwini. 2022.
+\newblock \href {https://doi.org/10.1145/3531146.3533213} {Who audits the
+  auditors? recommendations from a field scan of the algorithmic auditing
+  ecosystem}.
+\newblock In \emph{Proceedings of the 2022 ACM Conference on Fairness,
+  Accountability, and Transparency}, FAccT '22, page 1571–1583, New York, NY,
+  USA. Association for Computing Machinery.
+
+\bibitem[{Crawford(2021)}]{crawford2021atlas}
+Kate Crawford. 2021.
+\newblock \emph{The atlas of AI: Power, politics, and the planetary costs of
+  artificial intelligence}.
+\newblock Yale University Press.
+
+\bibitem[{Crisan et~al.(2022)Crisan, Drouhard, Vig, and
+  Rajani}]{crisan2022interactive}
+Anamaria Crisan, Margaret Drouhard, Jesse Vig, and Nazneen Rajani. 2022.
+\newblock \href {https://doi.org/10.1145/3531146.3533108} {Interactive model
+  cards: A human-centered approach to model documentation}.
+\newblock In \emph{2022 ACM Conference on Fairness, Accountability, and
+  Transparency}, FAccT '22, page 427–439, New York, NY, USA. Association for
+  Computing Machinery.
+
+\bibitem[{Deng et~al.(2009)Deng, Dong, Socher, Li, Li, and
+  Fei-Fei}]{deng2009imagenet}
+Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li~Fei-Fei. 2009.
+\newblock {I}mage{N}et: A large-scale hierarchical image database.
+\newblock In \emph{Computer Vision and Pattern Recognition (CVPR)}, pages
+  248--255.
+
+\bibitem[{DiResta et~al.(2022)DiResta, Edelson, Nyhan, and
+  Zuckerman}]{diresta2022openblackbox}
+Renée DiResta, Laura Edelson, Brendan Nyhan, and Ethan Zuckerman. 2022.
+\newblock \href
+  {https://www.scientificamerican.com/article/its-time-to-open-the-black-box-of-social-media/}
+  {It’s time to open the black box of social media}.
+\newblock \emph{Scientific American}.
+\newblock Social media companies need to give their data to independent
+  researchers to better understand how to keep users safe.
+
+\bibitem[{Dodge et~al.(2021)Dodge, Sap, Marasovi{\'c}, Agnew, Ilharco,
+  Groeneveld, Mitchell, and Gardner}]{dodge2021c4}
+Jesse Dodge, Maarten Sap, Ana Marasovi{\'c}, William Agnew, Gabriel Ilharco,
+  Dirk Groeneveld, Margaret Mitchell, and Matt Gardner. 2021.
+\newblock \href {https://doi.org/10.18653/v1/2021.emnlp-main.98} {Documenting
+  large webtext corpora: A case study on the colossal clean crawled corpus}.
+\newblock In \emph{Proceedings of the 2021 Conference on Empirical Methods in
+  Natural Language Processing}, pages 1286--1305, Online and Punta Cana,
+  Dominican Republic. Association for Computational Linguistics.
+
+\bibitem[{Donoho(2017)}]{donoho2017fifty}
+David Donoho. 2017.
+\newblock \href {https://doi.org/10.1080/10618600.2017.1384734} {50 years of
+  data science}.
+\newblock \emph{Journal of Computational and Graphical Statistics},
+  26(4):745--766.
+
+\bibitem[{Dzieza(2023)}]{dzieza2023ai}
+Josh Dzieza. 2023.
+\newblock \href
+  {https://www.theverge.com/features/23764584/ai-artificial-intelligence-data-notation-labor-scale-surge-remotasks-openai-chatbots}
+  {Ai is a lot of work: As the technology becomes ubiquitous, a vast tasker
+  underclass is emerging — and not going anywhere.}
+\newblock \emph{The Verge}.
+\newblock Illustrations by Richard Parry.
+
+\bibitem[{Eloundou et~al.(2023)Eloundou, Manning, Mishkin, and
+  Rock}]{eloundou2023gpts}
+Tyna Eloundou, Sam Manning, Pamela Mishkin, and Daniel Rock. 2023.
+\newblock \href {http://arxiv.org/abs/2303.10130} {Gpts are gpts: An early look
+  at the labor market impact potential of large language models}.
+
+\bibitem[{Englehardt and Narayanan(2016)}]{englehardt2016online}
+Steven Englehardt and Arvind Narayanan. 2016.
+\newblock Online tracking: A 1-million-site measurement and analysis.
+\newblock In \emph{Proceedings of the 2016 ACM SIGSAC conference on computer
+  and communications security}, pages 1388--1401.
+
+\bibitem[{Englehardt et~al.(2015)Englehardt, Reisman, Eubank, Zimmerman, Mayer,
+  Narayanan, and Felten}]{englehardt2015cookies}
+Steven Englehardt, Dillon Reisman, Christian Eubank, Peter Zimmerman, Jonathan
+  Mayer, Arvind Narayanan, and Edward~W Felten. 2015.
+\newblock Cookies that give you away: The surveillance implications of web
+  tracking.
+\newblock In \emph{Proceedings of the 24th International Conference on World
+  Wide Web}, pages 289--299.
+
+\bibitem[{Engler(2023)}]{engler2023casc}
+Alex Engler. 2023.
+\newblock \href
+  {https://www.brookings.edu/articles/a-comprehensive-and-distributed-approach-to-ai-regulation/}
+  {A comprehensive and distributed approach to ai regulation}.
+
+\bibitem[{Ethayarajh and Jurafsky(2020)}]{ethayarajh2020utility}
+Kawin Ethayarajh and Dan Jurafsky. 2020.
+\newblock \href {https://doi.org/10.18653/v1/2020.emnlp-main.393} {Utility is
+  in the eye of the user: A critique of {NLP} leaderboards}.
+\newblock In \emph{Proceedings of the 2020 Conference on Empirical Methods in
+  Natural Language Processing (EMNLP)}, pages 4846--4853, Online. Association
+  for Computational Linguistics.
+
+\bibitem[{EU(2016)}]{eu2016}
+EU. 2016.
+\newblock \href
+  {https://eur-lex.europa.eu/legal-content/EN/TXT/?qid=1552662547490&uri=CELEX%3A32016R0679}
+  {Official journal of the european union 2016}.
+\newblock \emph{Official Journal of the European Union}, L 119/1.
+
+\bibitem[{Fjeld et~al.(2020)Fjeld, Achten, Hilligoss, Nagy, and
+  Srikumar}]{fjeld2020principled}
+Jessica Fjeld, Nele Achten, Hannah Hilligoss, Adam Nagy, and Madhulika
+  Srikumar. 2020.
+\newblock \href {https://doi.org/10.2139/ssrn.3518482} {Principled artificial
+  intelligence: Mapping consensus in ethical and rights-based approaches to
+  principles for ai}.
+\newblock \emph{Berkman Klein Center Research Publication}, (2020-1).
+
+\bibitem[{Florini(2007)}]{florini2007right}
+Ann Florini. 2007.
+\newblock \emph{The right to know: transparency for an open world}.
+\newblock Columbia University Press.
+
+\bibitem[{Gao et~al.(2021{\natexlab{a}})Gao, Biderman, Black, Golding, Hoppe,
+  Foster, Phang, He, Thite, Nabeshima, Presser, and Leahy}]{gao2021thepile}
+Leo Gao, Stella Biderman, Sid Black, Laurence Golding, Travis Hoppe, Charles
+  Foster, Jason Phang, Horace He, Anish Thite, Noa Nabeshima, Shawn Presser,
+  and Connor Leahy. 2021{\natexlab{a}}.
+\newblock \href {https://arxiv.org/abs/2101.00027} {{T}he {P}ile: {A}n 800{GB}
+  {D}ataset of {D}iverse {T}ext for {L}anguage {M}odeling}.
+\newblock \emph{arXiv preprint arXiv:2101.00027}.
+
+\bibitem[{Gao et~al.(2021{\natexlab{b}})Gao, Tow, Biderman, Black, DiPofi,
+  Foster, Golding, Hsu, McDonell, Muennighoff, Phang, Reynolds, Tang, Thite,
+  Wang, Wang, and Zou}]{gao2021harness}
+Leo Gao, Jonathan Tow, Stella Biderman, Sid Black, Anthony DiPofi, Charles
+  Foster, Laurence Golding, Jeffrey Hsu, Kyle McDonell, Niklas Muennighoff,
+  Jason Phang, Laria Reynolds, Eric Tang, Anish Thite, Ben Wang, Kevin Wang,
+  and Andy Zou. 2021{\natexlab{b}}.
+\newblock A framework for few-shot language model evaluation.
+\newblock \emph{Version v0. 0.1. Sept}.
+
+\bibitem[{Gebru et~al.(2021)Gebru, Morgenstern, Vecchione, Vaughan, Wallach,
+  Iii, and Crawford}]{gebru2021datasheets}
+Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer~Wortman Vaughan,
+  Hanna Wallach, Hal~Daum{\'e} Iii, and Kate Crawford. 2021.
+\newblock Datasheets for datasets.
+\newblock \emph{Communications of the ACM}, 64(12):86--92.
+
+\bibitem[{Gebru et~al.(2018)Gebru, Morgenstern, Vecchione, Vaughan, Wallach,
+  Ill, and Crawford}]{gebru2018datasheets}
+Timnit Gebru, Jamie Morgenstern, Briana Vecchione, Jennifer~Wortman Vaughan,
+  Hanna Wallach, Hal~Daumé Ill, and Kate Crawford. 2018.
+\newblock Datasheets for datasets.
+\newblock \emph{arXiv preprint arXiv:1803.09010}.
+
+\bibitem[{Ghosh and Faxon(2023)}]{doi:10.1177/20539517231164119}
+Ritwick Ghosh and Hilary~Oliva Faxon. 2023.
+\newblock \href {https://doi.org/10.1177/20539517231164119} {Smart corruption:
+  Satirical strategies for gaming accountability}.
+\newblock \emph{Big Data \& Society}, 10(1):20539517231164119.
+
+\bibitem[{Goodhart(1984)}]{goodhart1984problems}
+Charles~AE Goodhart. 1984.
+\newblock Problems of monetary management: the uk experience.
+\newblock In \emph{Monetary theory and practice}, pages 91--121. Springer.
+
+\bibitem[{Granados and Gupta(2013)}]{granados2013transparency}
+Nelson Granados and Alok Gupta. 2013.
+\newblock \href {http://www.jstor.org/stable/43825928} {Transparency strategy:
+  Competing with information in a digital world}.
+\newblock \emph{MIS Quarterly}, 37(2):637--641.
+
+\bibitem[{Gray and Suri(2019{\natexlab{a}})}]{gray2019ghost}
+Mary~L Gray and Siddharth Suri. 2019{\natexlab{a}}.
+\newblock \emph{Ghost work: How to stop Silicon Valley from building a new
+  global underclass}.
+\newblock Eamon Dolan Books.
+
+\bibitem[{Gray and Suri(2019{\natexlab{b}})}]{gray_ghost_2019}
+M.L. Gray and S.~Suri. 2019{\natexlab{b}}.
+\newblock \href {https://books.google.com/books?id=u10-uQEACAAJ} {\emph{Ghost
+  {Work}: {How} to {Stop} {Silicon} {Valley} from {Building} a {New} {Global}
+  {Underclass}}}.
+\newblock Houghton Mifflin Harcourt.
+
+\bibitem[{Greco et~al.(2019)Greco, Ishizaka, Tasiou, and
+  Torrisi}]{greco2019methodological}
+Salvatore Greco, Alessio Ishizaka, Menelaos Tasiou, and Gianpiero Torrisi.
+  2019.
+\newblock \href {https://doi.org/10.1007/s11205-017-1832-9} {On the
+  methodological framework of composite indices: A review of the issues of
+  weighting, aggregation, and robustness}.
+\newblock \emph{Social Indicators Research}, 141:1--34.
+
+\bibitem[{Gregory(2023)}]{gregory2023testimony}
+Sam Gregory. 2023.
+\newblock \href
+  {https://www.commerce.senate.gov/services/files/DAD2163A-EF02-41B5-B7BA-2BA8B568C977}
+  {The need for transparency in artificial intelligence}.
+\newblock Testimony before the U.S. Senate Committee on Commerce, Science and
+  Transportation, Subcommittee on Consumer Protection, Product Safety and Data
+  Security.
+\newblock Executive Director, WITNESS.
+
+\bibitem[{Hacker et~al.(2023)Hacker, Engel, and Mauer}]{hacker2023gpt}
+Philipp Hacker, Andreas Engel, and Marco Mauer. 2023.
+\newblock \href {https://doi.org/10.1145/3593013.3594067} {Regulating chatgpt
+  and other large generative ai models}.
+\newblock In \emph{Proceedings of the 2023 ACM Conference on Fairness,
+  Accountability, and Transparency}, FAccT '23, page 1112–1123, New York, NY,
+  USA. Association for Computing Machinery.
+
+\bibitem[{Hagendorff(2020)}]{Hagendorff2020}
+Thilo Hagendorff. 2020.
+\newblock \href {https://doi.org/10.1007/s11023-020-09517-8} {The ethics of ai
+  ethics: An evaluation of guidelines}.
+\newblock \emph{Minds and Machines}, 30(1):99--120.
+
+\bibitem[{Hagey and Horwitz(2021)}]{wsj2021fb}
+Keach Hagey and Jeff Horwitz. 2021.
+\newblock \href
+  {https://www.wsj.com/articles/facebook-algorithm-change-zuckerberg-11631654215}
+  {Facebook tried to make its platform a healthier place. it got angrier
+  instead.}
+
+\bibitem[{Han(2015)}]{han2015transparency}
+Byung-Chul Han. 2015.
+\newblock \emph{The transparency society}.
+\newblock Stanford University Press.
+
+\bibitem[{Hao and Seetharaman(2023)}]{hao2023cleaning}
+Karen Hao and Deepa Seetharaman. 2023.
+\newblock \href
+  {https://www.wsj.com/articles/chatgpt-openai-content-abusive-sexually-explicit-harassment-kenya-workers-on-human-workers-cf191483}
+  {Cleaning up chatgpt takes heavy toll on human workers}.
+\newblock \emph{The Wall Street Journal}.
+\newblock Photographs by Natalia Jidovanu.
+
+\bibitem[{Hardin(2002)}]{hardin2002trust}
+Russell Hardin. 2002.
+\newblock \emph{Trust and trustworthiness}.
+\newblock Russell Sage Foundation.
+
+\bibitem[{Hartzog(2023)}]{hartzog2023oversight}
+Woodrow Hartzog. 2023.
+\newblock \href
+  {https://www.judiciary.senate.gov/imo/media/doc/2023-09-12_pm_-_testimony_-_hartzog.pdf}
+  {Oversight of a.i.: Legislating on artificial intelligence}.
+\newblock Prepared Testimony and Statement for the Record before the U.S.
+  Senate Committee on the Judiciary, Subcommittee on Privacy, Technology, and
+  the Law.
+
+\bibitem[{Haryono et~al.(2020)Haryono, Thung, Kang, Serrano, Muller, Lawall,
+  Lo, and Jiang}]{haryono2020automatic}
+Stefanus~Agus Haryono, Ferdian Thung, Hong~Jin Kang, Lucas Serrano, Gilles
+  Muller, Julia Lawall, David Lo, and Lingxiao Jiang. 2020.
+\newblock \href {http://arxiv.org/abs/2005.13220} {Automatic android
+  deprecated-api usage update by learning from single updated example}.
+
+\bibitem[{Hashesh(2023)}]{hashesh2023version}
+Ahmed Hashesh. 2023.
+\newblock \href {https://neptune.ai/blog/version-control-for-ml-models}
+  {Version control for ml models: Why you need it, what it is, how to implement
+  it}.
+
+\bibitem[{Heikkilä(2023)}]{heikkila2023high}
+Melissa Heikkilä. 2023.
+\newblock \href
+  {https://www.technologyreview.com/2023/07/25/1076698/its-high-time-for-more-ai-transparency/}
+  {It’s high time for more ai transparency}.
+\newblock \emph{MIT Technology Review}.
+
+\bibitem[{Henderson et~al.(2020)Henderson, Hu, Romoff, Brunskill, Jurafsky, and
+  Pineau}]{henderson2020towards}
+Peter Henderson, Jieru Hu, Joshua Romoff, Emma Brunskill, Dan Jurafsky, and
+  Joelle Pineau. 2020.
+\newblock Towards the systematic reporting of the energy and carbon footprints
+  of machine learning.
+\newblock \emph{Journal of Machine Learning Research}, 21(248):1--43.
+
+\bibitem[{Henderson et~al.(2023)Henderson, Li, Jurafsky, Hashimoto, Lemley, and
+  Liang}]{henderson2023foundation}
+Peter Henderson, Xuechen Li, Dan Jurafsky, Tatsunori Hashimoto, Mark~A Lemley,
+  and Percy Liang. 2023.
+\newblock Foundation models and fair use.
+\newblock \emph{arXiv preprint arXiv:2303.15715}.
+
+\bibitem[{Hess(2019)}]{hess2019ttrap}
+David Hess. 2019.
+\newblock \href {https://doi.org/https://doi.org/10.1111/ablj.12134} {The
+  transparency trap: Non-financial disclosure and the responsibility of
+  business to respect human rights}.
+\newblock \emph{American Business Law Journal}, 56(1):5--53.
+
+\bibitem[{Ho(2012)}]{ho2012fudging}
+Daniel~E. Ho. 2012.
+\newblock Fudging the nudge: Information disclosure and restaurant grading.
+\newblock \emph{Yale Law Journal}, 122:574--583.
+
+\bibitem[{Hoffmann et~al.(2022{\natexlab{a}})Hoffmann, Borgeaud, Mensch,
+  Buchatskaya, Cai, Rutherford, de~Las~Casas, Hendricks, Welbl, Clark,
+  Hennigan, Noland, Millican, van~den Driessche, Damoc, Guy, Osindero,
+  Simonyan, Elsen, Rae, Vinyals, and Sifre}]{hoffmann2022chinchilla}
+Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor
+  Cai, Eliza Rutherford, Diego de~Las~Casas, Lisa~Anne Hendricks, Johannes
+  Welbl, Aidan Clark, Tom Hennigan, Eric Noland, Katie Millican, George van~den
+  Driessche, Bogdan Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich
+  Elsen, Jack~W. Rae, Oriol Vinyals, and L.~Sifre. 2022{\natexlab{a}}.
+\newblock Training compute-optimal large language models.
+\newblock \emph{ArXiv}, abs/2203.15556.
+
+\bibitem[{Hoffmann et~al.(2022{\natexlab{b}})Hoffmann, Borgeaud, Mensch,
+  Buchatskaya, Cai, Rutherford, de~Las~Casas, Hendricks, Welbl, Clark,
+  Hennigan, Noland, Millican, van~den Driessche, Damoc, Guy, Osindero,
+  Simonyan, Elsen, Rae, Vinyals, and Sifre}]{hoffmann2022training}
+Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor
+  Cai, Eliza Rutherford, Diego de~Las~Casas, Lisa~Anne Hendricks, Johannes
+  Welbl, Aidan Clark, Tom Hennigan, Eric Noland, Katie Millican, George van~den
+  Driessche, Bogdan Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich
+  Elsen, Jack~W. Rae, Oriol Vinyals, and Laurent Sifre. 2022{\natexlab{b}}.
+\newblock \href {http://arxiv.org/abs/2203.15556} {Training compute-optimal
+  large language models}.
+
+\bibitem[{Hopkins(1991)}]{hopkins1991human}
+Michael Hopkins. 1991.
+\newblock Human development revisited: A new undp report.
+\newblock \emph{World Development}, 19(10):1469--1473.
+
+\bibitem[{Huang et~al.(2023)Huang, Gupta, Xia, Li, and
+  Chen}]{huang2023catastrophic}
+Yangsibo Huang, Samyak Gupta, Mengzhou Xia, Kai Li, and Danqi Chen. 2023.
+\newblock \href {http://arxiv.org/abs/2310.06987} {Catastrophic jailbreak of
+  open-source llms via exploiting generation}.
+
+\bibitem[{Hutchinson et~al.(2021)Hutchinson, Smart, Hanna, Denton, Greer,
+  Kjartansson, Barnes, and Mitchell}]{hutchinson2021towards}
+Ben Hutchinson, Andrew Smart, Alex Hanna, Emily Denton, Christina Greer, Oddur
+  Kjartansson, Parker Barnes, and Margaret Mitchell. 2021.
+\newblock Towards accountability for machine learning datasets: Practices from
+  software engineering and infrastructure.
+\newblock In \emph{Proceedings of the 2021 ACM Conference on Fairness,
+  Accountability, and Transparency}, pages 560--575.
+
+\bibitem[{Irion(2022)}]{irion2022algoff}
+Kristina Irion. 2022.
+\newblock \href {https://doi.org/10.1145/3531146.3533212} {Algorithms
+  off-limits? if digital trade law restricts access to source code of software
+  then accountability will suffer}.
+\newblock In \emph{Proceedings of the 2022 ACM Conference on Fairness,
+  Accountability, and Transparency}, FAccT '22, page 1561–1570, New York, NY,
+  USA. Association for Computing Machinery.
+
+\bibitem[{Jernite et~al.(2022)Jernite, Nguyen, Biderman, Rogers, Masoud,
+  Danchev, Tan, Luccioni, Subramani, Johnson, Dupont, Dodge, Lo, Talat, Radev,
+  Gokaslan, Nikpoor, Henderson, Bommasani, and
+  Mitchell}]{jernite2022governance}
+Yacine Jernite, Huu Nguyen, Stella Biderman, Anna Rogers, Maraim Masoud,
+  Valentin Danchev, Samson Tan, Alexandra~Sasha Luccioni, Nishant Subramani,
+  Isaac Johnson, Gerard Dupont, Jesse Dodge, Kyle Lo, Zeerak Talat, Dragomir
+  Radev, Aaron Gokaslan, Somaieh Nikpoor, Peter Henderson, Rishi Bommasani, and
+  Margaret Mitchell. 2022.
+\newblock \href {https://doi.org/10.1145/3531146.3534637} {Data governance in
+  the age of large-scale data-driven language technology}.
+\newblock In \emph{2022 ACM Conference on Fairness, Accountability, and
+  Transparency}, FAccT '22, page 2206–2222, New York, NY, USA. Association
+  for Computing Machinery.
+
+\bibitem[{Jobin et~al.(2019)Jobin, Ienca, and Vayena}]{jobin2019global}
+Anna Jobin, Marcello Ienca, and Effy Vayena. 2019.
+\newblock \href {https://doi.org/10.1038/s42256-019-0088-2} {The global
+  landscape of ai ethics guidelines}.
+\newblock \emph{Nature Machine Intelligence}, 1(9):389--399.
+
+\bibitem[{Johnston(2006)}]{johnston2006good}
+Michael Johnston. 2006.
+\newblock Good governance: Rule of law, transparency, and accountability.
+\newblock \emph{New York: United Nations Public Administration Network}, pages
+  1--32.
+
+\bibitem[{Jones(2023)}]{jones2023foundationmodels}
+Elliot Jones. 2023.
+\newblock \href
+  {https://www.adalovelaceinstitute.org/resource/foundation-models-explainer/}
+  {Explainer: What is a foundation model?}
+\newblock \emph{Ada Lovelace Institute}.
+
+\bibitem[{Kalderon(2015)}]{kalderon2015transparency}
+Mark~Eli Kalderon. 2015.
+\newblock \href {https://doi.org/10.1093/acprof:oso/9780198717904.003.0003}
+  {{Transparency}}.
+\newblock In \emph{{Form without Matter: Empedocles and Aristotle on Color
+  Perception}}. Oxford University Press.
+
+\bibitem[{Kaminski(2020)}]{kaminski_2020}
+Margot~E. Kaminski. 2020.
+\newblock \href {https://doi.org/10.1017/9781108680844.006}
+  {\emph{Understanding Transparency in Algorithmic Accountability}}, Cambridge
+  Law Handbooks, page 121–138. Cambridge University Press.
+
+\bibitem[{Kandpal et~al.(2022)Kandpal, Wallace, and
+  Raffel}]{kandpal2022deduplicating}
+Nikhil Kandpal, Eric Wallace, and Colin Raffel. 2022.
+\newblock Deduplicating training data mitigates privacy risks in language
+  models.
+\newblock \emph{arXiv preprint arXiv:2202.06539}.
+
+\bibitem[{Kapoor et~al.(2023)Kapoor, Cantrell, Peng, Pham, Bail, Gundersen,
+  Hofman, Hullman, Lones, Malik, Nanayakkara, Poldrack, Raji, Roberts,
+  Salganik, Serra-Garcia, Stewart, Vandewiele, and
+  Narayanan}]{kapoor2023reforms}
+Sayash Kapoor, Emily Cantrell, Kenny Peng, Thanh~Hien Pham, Christopher~A.
+  Bail, Odd~Erik Gundersen, Jake~M. Hofman, Jessica Hullman, Michael~A. Lones,
+  Momin~M. Malik, Priyanka Nanayakkara, Russell~A. Poldrack, Inioluwa~Deborah
+  Raji, Michael Roberts, Matthew~J. Salganik, Marta Serra-Garcia, Brandon~M.
+  Stewart, Gilles Vandewiele, and Arvind Narayanan. 2023.
+\newblock \href {http://arxiv.org/abs/2308.07832} {Reforms: Reporting standards
+  for machine learning based science}.
+
+\bibitem[{Kapoor and Narayanan(2023)}]{kapoor2023leakage}
+Sayash Kapoor and Arvind Narayanan. 2023.
+\newblock \href {https://doi.org/https://doi.org/10.1016/j.patter.2023.100804}
+  {Leakage and the reproducibility crisis in machine-learning-based science}.
+\newblock \emph{Patterns}, 4(9):100804.
+
+\bibitem[{Keller(2022)}]{keller2022platform}
+Daphne Keller. 2022.
+\newblock \href
+  {https://www.judiciary.senate.gov/imo/media/doc/Keller%20Testimony1.pdf}
+  {Hearing on platform transparency: Understanding the impact of social media}.
+\newblock Technical report, United States Senate Committee on the Judiciary,
+  Subcommittee on Privacy, Technology and the Law.
+\newblock Statement of Daphne Keller, Stanford University Cyber Policy Center.
+
+\bibitem[{Kim et~al.(2023)Kim, Yun, Lee, Gubri, Yoon, and Oh}]{kim2023propile}
+Siwon Kim, Sangdoo Yun, Hwaran Lee, Martin Gubri, Sungroh Yoon, and Seong~Joon
+  Oh. 2023.
+\newblock \href {http://arxiv.org/abs/2307.01881} {Propile: Probing privacy
+  leakage in large language models}.
+
+\bibitem[{King(2020)}]{king2020privacy}
+Jen King. 2020.
+\newblock Redesigning data privacy: Reimagining notice and consent for human
+  technology interaction.
+\newblock Technical report, The Center for Internet and Society, Stanford Law
+  School.
+
+\bibitem[{Kirchenbauer et~al.(2023)Kirchenbauer, Geiping, Wen, Katz, Miers, and
+  Goldstein}]{pmlr-v202-kirchenbauer23a}
+John Kirchenbauer, Jonas Geiping, Yuxin Wen, Jonathan Katz, Ian Miers, and Tom
+  Goldstein. 2023.
+\newblock \href {https://proceedings.mlr.press/v202/kirchenbauer23a.html} {A
+  watermark for large language models}.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning}, volume 202 of \emph{Proceedings of Machine Learning Research},
+  pages 17061--17084. PMLR.
+
+\bibitem[{Kittur et~al.(2013)Kittur, Nickerson, Bernstein, Gerber, Shaw,
+  Zimmerman, Lease, and Horton}]{kittur2013future}
+Aniket Kittur, Jeffrey~V Nickerson, Michael Bernstein, Elizabeth Gerber, Aaron
+  Shaw, John Zimmerman, Matt Lease, and John Horton. 2013.
+\newblock The future of crowd work.
+\newblock In \emph{Proceedings of the 2013 conference on Computer supported
+  cooperative work}, pages 1301--1318.
+
+\bibitem[{Klyman(2023)}]{klyman2023open}
+Kevin Klyman. 2023.
+\newblock \href
+  {https://hai.stanford.edu/news/how-promote-responsible-open-foundation-models}
+  {How to promote responsible open foundation models}.
+
+\bibitem[{Kuditipudi et~al.(2023)Kuditipudi, Thickstun, Hashimoto, and
+  Liang}]{Kuditipudi2023RobustDW}
+Rohith Kuditipudi, John Thickstun, Tatsunori Hashimoto, and Percy Liang. 2023.
+\newblock \href {https://api.semanticscholar.org/CorpusID:260315804} {Robust
+  distortion-free watermarks for language models}.
+\newblock \emph{ArXiv}, abs/2307.15593.
+
+\bibitem[{Kumar et~al.(2020)Kumar, Braud, Tarkoma, and
+  Hui}]{kumar2020trustworthy}
+Abhishek Kumar, Tristan Braud, Sasu Tarkoma, and Pan Hui. 2020.
+\newblock Trustworthy ai in the age of pervasive computing and big data.
+\newblock In \emph{2020 IEEE International Conference on Pervasive Computing
+  and Communications Workshops (PerCom Workshops)}, pages 1--6. IEEE.
+
+\bibitem[{Kumar et~al.(2022)Kumar, Balachandran, Njoo, Anastasopoulos, and
+  Tsvetkov}]{kumar2022language}
+Sachin Kumar, Vidhisha Balachandran, Lucille Njoo, Antonios Anastasopoulos, and
+  Yulia Tsvetkov. 2022.
+\newblock Language generation models can cause harm: So what can we do about
+  it? an actionable survey.
+\newblock \emph{arXiv preprint arXiv:2210.07700}.
+
+\bibitem[{Lacoste et~al.(2023)Lacoste, Lehmann, L{\'o}pez, Sherwin, Kerner,
+  Lutjens, Irvin, Dao, Alemohammad, Drouin, Gunturkun, Huang, V{\'a}zquez,
+  Newman, Bengio, Ermon, and Zhu}]{lacoste2023geobench}
+Alexandre Lacoste, Nils Lehmann, Pau~Rodr{\'i}guez L{\'o}pez, Evan~D. Sherwin,
+  Hannah~Rae Kerner, Bjorn Lutjens, Jeremy~A. Irvin, David Dao, Hamed
+  Alemohammad, Alexandre Drouin, Mehmet Gunturkun, Gabriel Huang, David
+  V{\'a}zquez, Dava Newman, Yoshua Bengio, Stefano Ermon, and Xiao~Xiang Zhu.
+  2023.
+\newblock \href {https://api.semanticscholar.org/CorpusID:259088736}
+  {Geo-bench: Toward foundation models for earth monitoring}.
+\newblock \emph{ArXiv}, abs/2306.03831.
+
+\bibitem[{Lacoste et~al.(2019)Lacoste, Luccioni, Schmidt, and
+  Dandres}]{lacoste2019quantifying}
+Alexandre Lacoste, Alexandra Luccioni, Victor Schmidt, and Thomas Dandres.
+  2019.
+\newblock Quantifying the carbon emissions of machine learning.
+\newblock \emph{arXiv preprint arXiv:1910.09700}.
+
+\bibitem[{LAION(2023)}]{laion2023transparentai}
+LAION. 2023.
+\newblock \href {https://laion.ai/blog/transparent-ai/} {Towards a transparent
+  ai future: The call for less regulatory hurdles on open-source ai in europe}.
+\newblock Following our previous open letter to the European Parliament on the
+  significance of open-source AI, LAION, backed by European Laboratory for
+  Learning and Intelligent Systems (ELLIS) and a long list of very impactful AI
+  researchers, we submit this new open letter to the European Parliament.
+
+\bibitem[{Lam et~al.(2022)Lam, Gordon, Metaxa, Hancock, Landay, and
+  Bernstein}]{lam2022user}
+Michelle~S. Lam, Mitchell~L. Gordon, Dana\"{e} Metaxa, Jeffrey~T. Hancock,
+  James~A. Landay, and Michael~S. Bernstein. 2022.
+\newblock \href {https://doi.org/10.1145/3555625} {End-user audits: A system
+  empowering communities to lead large-scale investigations of harmful
+  algorithmic behavior}.
+\newblock \emph{Proc. ACM Hum.-Comput. Interact.}, 6(CSCW2).
+
+\bibitem[{Lam et~al.(2020)Lam, Dietrich, and Pearce}]{Lam2020}
+Patrick Lam, Jens Dietrich, and David~J. Pearce. 2020.
+\newblock \href {https://doi.org/10.1145/3426428.3426922} {Putting the
+  semantics into semantic versioning}.
+\newblock In \emph{Proceedings of the 2020 {ACM} {SIGPLAN} International
+  Symposium on New Ideas, New Paradigms, and Reflections on Programming and
+  Software}. {ACM}.
+
+\bibitem[{Landis and Koch(1977)}]{landis1977agreement}
+J.~Richard Landis and Gary~G. Koch. 1977.
+\newblock \href {http://www.jstor.org/stable/2529310} {The measurement of
+  observer agreement for categorical data}.
+\newblock \emph{Biometrics}, 33(1):159--174.
+
+\bibitem[{Lapowsky(2018)}]{lapowsky2018cambridge}
+Issie Lapowsky. 2018.
+\newblock \href
+  {https://www.wired.com/story/cambridge-analytica-facebook-privacy-awakening/}
+  {How cambridge analytica sparked the great privacy awakening}.
+
+\bibitem[{Lathrop and Ruma(2010)}]{lathrop2010open}
+Daniel Lathrop and Laurel Ruma. 2010.
+\newblock \emph{Open government: Collaboration, transparency, and participation
+  in practice}.
+\newblock " O'Reilly Media, Inc.".
+
+\bibitem[{Le~Scao et~al.(2022)Le~Scao, Fan, Akiki, Pavlick, Ilić, Hesslow,
+  Castagné, Luccioni, Yvon, Gallé, Tow, Rush, Biderman, Webson, Ammanamanchi,
+  Wang, Sagot, Muennighoff, del Moral, Ruwase, Bawden, Bekman, McMillan-Major,
+  Beltagy, Nguyen, Saulnier, Tan, Suarez, Sanh, Laurençon, Jernite, Launay,
+  Mitchell, Raffel, Gokaslan, Simhi, Soroa, Aji, Alfassy, Rogers, Nitzav, Xu,
+  Mou, Emezue, Klamm, Leong, van Strien, Adelani, Radev, Ponferrada, Levkovizh,
+  Kim, Natan, De~Toni, Dupont, Kruszewski, Pistilli, Elsahar, Benyamina, Tran,
+  Yu, Abdulmumin, Johnson, Gonzalez-Dios, de~la Rosa, Chim, Dodge, Zhu, Chang,
+  Frohberg, Tobing, Bhattacharjee, Almubarak, Chen, Lo, Von~Werra, Weber, Phan,
+  allal, Tanguy, Dey, Muñoz, Masoud, Grandury, Šaško, Huang, Coavoux, Singh,
+  Jiang, Vu, Jauhar, Ghaleb, Subramani, Kassner, Khamis, Nguyen, Espejel,
+  de~Gibert, Villegas, Henderson, Colombo, Amuok, Lhoest, Harliman, Bommasani,
+  López, Ribeiro, Osei, Pyysalo, Nagel, Bose, Muhammad, Sharma, Longpre,
+  Nikpoor, Silberberg, Pai, Zink, Torrent, Schick, Thrush, Danchev, Nikoulina,
+  Laippala, Lepercq, Prabhu, Alyafeai, Talat, Raja, Heinzerling, Si, Salesky,
+  Mielke, Lee, Sharma, Santilli, Chaffin, Stiegler, Datta, Szczechla,
+  Chhablani, Wang, Pandey, Strobelt, Fries, Rozen, Gao, Sutawika, Bari,
+  Al-shaibani, Manica, Nayak, Teehan, Albanie, Shen, Ben-David, Bach, Kim,
+  Bers, Fevry, Neeraj, Thakker, Raunak, Tang, Yong, Sun, Brody, Uri, Tojarieh,
+  Roberts, Chung, Tae, Phang, Press, Li, Narayanan, Bourfoune, Casper, Rasley,
+  Ryabinin, Mishra, Zhang, Shoeybi, Peyrounette, Patry, Tazi, Sanseviero, von
+  Platen, Cornette, Lavallée, Lacroix, Rajbhandari, Gandhi, Smith, Requena,
+  Patil, Dettmers, Baruwa, Singh, Cheveleva, Ligozat, Subramonian, Névéol,
+  Lovering, Garrette, Tunuguntla, Reiter, Taktasheva, Voloshina, Bogdanov,
+  Winata, Schoelkopf, Kalo, Novikova, Forde, Clive, Kasai, Kawamura, Hazan,
+  Carpuat, Clinciu, Kim, Cheng, Serikov, Antverg, van~der Wal, Zhang, Zhang,
+  Gehrmann, Pais, Shavrina, Scialom, Yun, Limisiewicz, Rieser, Protasov,
+  Mikhailov, Pruksachatkun, Belinkov, Bamberger, Kasner, Rueda, Pestana,
+  Feizpour, Khan, Faranak, Santos, Hevia, Unldreaj, Aghagol, Abdollahi,
+  Tammour, HajiHosseini, Behroozi, Ajibade, Saxena, Ferrandis, Contractor,
+  Lansky, David, Kiela, Nguyen, Tan, Baylor, Ozoani, Mirza, Ononiwu, Rezanejad,
+  Jones, Bhattacharya, Solaiman, Sedenko, Nejadgholi, Passmore, Seltzer, Sanz,
+  Fort, Dutra, Samagaio, Elbadri, Mieskes, Gerchick, Akinlolu, McKenna, Qiu,
+  Ghauri, Burynok, Abrar, Rajani, Elkott, Fahmy, Samuel, An, Kromann, Hao,
+  Alizadeh, Shubber, Wang, Roy, Viguier, Le, Oyebade, Le, Yang, Nguyen,
+  Kashyap, Palasciano, Callahan, Shukla, Miranda-Escalada, Singh, Beilharz,
+  Wang, Brito, Zhou, Jain, Xu, Fourrier, Periñán, Molano, Yu, Manjavacas,
+  Barth, Fuhrimann, Altay, Bayrak, Burns, Vrabec, Bello, Dash, Kang, Giorgi,
+  Golde, Posada, Sivaraman, Bulchandani, Liu, Shinzato, de~Bykhovetz, Takeuchi,
+  Pàmies, Castillo, Nezhurina, Sänger, Samwald, Cullan, Weinberg, De~Wolf,
+  Mihaljcic, Liu, Freidank, Kang, Seelam, Dahlberg, Broad, Muellner, Fung,
+  Haller, Chandrasekhar, Eisenberg, Martin, Canalli, Su, Su, Cahyawijaya,
+  Garda, Deshmukh, Mishra, Kiblawi, Ott, Sang-aroonsiri, Kumar, Schweter,
+  Bharati, Laud, Gigant, Kainuma, Kusa, Labrak, Bajaj, Venkatraman, Xu, Xu, Xu,
+  Tan, Xie, Ye, Bras, Belkada, and Wolf}]{scao2022bloom}
+Teven Le~Scao, Angela Fan, Christopher Akiki, Ellie Pavlick, Suzana Ilić,
+  Daniel Hesslow, Roman Castagné, Alexandra~Sasha Luccioni, François Yvon,
+  Matthias Gallé, Jonathan Tow, Alexander~M. Rush, Stella Biderman, Albert
+  Webson, Pawan~Sasanka Ammanamanchi, Thomas Wang, Benoît Sagot, Niklas
+  Muennighoff, Albert~Villanova del Moral, Olatunji Ruwase, Rachel Bawden, Stas
+  Bekman, Angelina McMillan-Major, Iz~Beltagy, Huu Nguyen, Lucile Saulnier,
+  Samson Tan, Pedro~Ortiz Suarez, Victor Sanh, Hugo Laurençon, Yacine Jernite,
+  Julien Launay, Margaret Mitchell, Colin Raffel, Aaron Gokaslan, Adi Simhi,
+  Aitor Soroa, Alham~Fikri Aji, Amit Alfassy, Anna Rogers, Ariel~Kreisberg
+  Nitzav, Canwen Xu, Chenghao Mou, Chris Emezue, Christopher Klamm, Colin
+  Leong, Daniel van Strien, David~Ifeoluwa Adelani, Dragomir Radev,
+  Eduardo~González Ponferrada, Efrat Levkovizh, Ethan Kim, Eyal~Bar Natan,
+  Francesco De~Toni, Gérard Dupont, Germán Kruszewski, Giada Pistilli, Hady
+  Elsahar, Hamza Benyamina, Hieu Tran, Ian Yu, Idris Abdulmumin, Isaac Johnson,
+  Itziar Gonzalez-Dios, Javier de~la Rosa, Jenny Chim, Jesse Dodge, Jian Zhu,
+  Jonathan Chang, Jörg Frohberg, Joseph Tobing, Joydeep Bhattacharjee, Khalid
+  Almubarak, Kimbo Chen, Kyle Lo, Leandro Von~Werra, Leon Weber, Long Phan,
+  Loubna~Ben allal, Ludovic Tanguy, Manan Dey, Manuel~Romero Muñoz, Maraim
+  Masoud, María Grandury, Mario Šaško, Max Huang, Maximin Coavoux, Mayank
+  Singh, Mike Tian-Jian Jiang, Minh~Chien Vu, Mohammad~A. Jauhar, Mustafa
+  Ghaleb, Nishant Subramani, Nora Kassner, Nurulaqilla Khamis, Olivier Nguyen,
+  Omar Espejel, Ona de~Gibert, Paulo Villegas, Peter Henderson, Pierre Colombo,
+  Priscilla Amuok, Quentin Lhoest, Rheza Harliman, Rishi Bommasani,
+  Roberto~Luis López, Rui Ribeiro, Salomey Osei, Sampo Pyysalo, Sebastian
+  Nagel, Shamik Bose, Shamsuddeen~Hassan Muhammad, Shanya Sharma, Shayne
+  Longpre, Somaieh Nikpoor, Stanislav Silberberg, Suhas Pai, Sydney Zink,
+  Tiago~Timponi Torrent, Timo Schick, Tristan Thrush, Valentin Danchev,
+  Vassilina Nikoulina, Veronika Laippala, Violette Lepercq, Vrinda Prabhu, Zaid
+  Alyafeai, Zeerak Talat, Arun Raja, Benjamin Heinzerling, Chenglei Si,
+  Elizabeth Salesky, Sabrina~J. Mielke, Wilson~Y. Lee, Abheesht Sharma, Andrea
+  Santilli, Antoine Chaffin, Arnaud Stiegler, Debajyoti Datta, Eliza Szczechla,
+  Gunjan Chhablani, Han Wang, Harshit Pandey, Hendrik Strobelt, Jason~Alan
+  Fries, Jos Rozen, Leo Gao, Lintang Sutawika, M~Saiful Bari, Maged~S.
+  Al-shaibani, Matteo Manica, Nihal Nayak, Ryan Teehan, Samuel Albanie, Sheng
+  Shen, Srulik Ben-David, Stephen~H. Bach, Taewoon Kim, Tali Bers, Thibault
+  Fevry, Trishala Neeraj, Urmish Thakker, Vikas Raunak, Xiangru Tang, Zheng-Xin
+  Yong, Zhiqing Sun, Shaked Brody, Yallow Uri, Hadar Tojarieh, Adam Roberts,
+  Hyung~Won Chung, Jaesung Tae, Jason Phang, Ofir Press, Conglong Li, Deepak
+  Narayanan, Hatim Bourfoune, Jared Casper, Jeff Rasley, Max Ryabinin, Mayank
+  Mishra, Minjia Zhang, Mohammad Shoeybi, Myriam Peyrounette, Nicolas Patry,
+  Nouamane Tazi, Omar Sanseviero, Patrick von Platen, Pierre Cornette,
+  Pierre~François Lavallée, Rémi Lacroix, Samyam Rajbhandari, Sanchit
+  Gandhi, Shaden Smith, Stéphane Requena, Suraj Patil, Tim Dettmers, Ahmed
+  Baruwa, Amanpreet Singh, Anastasia Cheveleva, Anne-Laure Ligozat, Arjun
+  Subramonian, Aurélie Névéol, Charles Lovering, Dan Garrette, Deepak
+  Tunuguntla, Ehud Reiter, Ekaterina Taktasheva, Ekaterina Voloshina, Eli
+  Bogdanov, Genta~Indra Winata, Hailey Schoelkopf, Jan-Christoph Kalo,
+  Jekaterina Novikova, Jessica~Zosa Forde, Jordan Clive, Jungo Kasai, Ken
+  Kawamura, Liam Hazan, Marine Carpuat, Miruna Clinciu, Najoung Kim, Newton
+  Cheng, Oleg Serikov, Omer Antverg, Oskar van~der Wal, Rui Zhang, Ruochen
+  Zhang, Sebastian Gehrmann, Shani Pais, Tatiana Shavrina, Thomas Scialom, Tian
+  Yun, Tomasz Limisiewicz, Verena Rieser, Vitaly Protasov, Vladislav Mikhailov,
+  Yada Pruksachatkun, Yonatan Belinkov, Zachary Bamberger, Zdeněk Kasner,
+  Alice Rueda, Amanda Pestana, Amir Feizpour, Ammar Khan, Amy Faranak, Ana
+  Santos, Anthony Hevia, Antigona Unldreaj, Arash Aghagol, Arezoo Abdollahi,
+  Aycha Tammour, Azadeh HajiHosseini, Bahareh Behroozi, Benjamin Ajibade,
+  Bharat Saxena, Carlos~Muñoz Ferrandis, Danish Contractor, David Lansky,
+  Davis David, Douwe Kiela, Duong~A. Nguyen, Edward Tan, Emi Baylor, Ezinwanne
+  Ozoani, Fatima Mirza, Frankline Ononiwu, Habib Rezanejad, Hessie Jones,
+  Indrani Bhattacharya, Irene Solaiman, Irina Sedenko, Isar Nejadgholi, Jesse
+  Passmore, Josh Seltzer, Julio~Bonis Sanz, Karen Fort, Livia Dutra, Mairon
+  Samagaio, Maraim Elbadri, Margot Mieskes, Marissa Gerchick, Martha Akinlolu,
+  Michael McKenna, Mike Qiu, Muhammed Ghauri, Mykola Burynok, Nafis Abrar,
+  Nazneen Rajani, Nour Elkott, Nour Fahmy, Olanrewaju Samuel, Ran An, Rasmus
+  Kromann, Ryan Hao, Samira Alizadeh, Sarmad Shubber, Silas Wang, Sourav Roy,
+  Sylvain Viguier, Thanh Le, Tobi Oyebade, Trieu Le, Yoyo Yang, Zach Nguyen,
+  Abhinav~Ramesh Kashyap, Alfredo Palasciano, Alison Callahan, Anima Shukla,
+  Antonio Miranda-Escalada, Ayush Singh, Benjamin Beilharz, Bo~Wang, Caio
+  Brito, Chenxi Zhou, Chirag Jain, Chuxin Xu, Clémentine Fourrier,
+  Daniel~León Periñán, Daniel Molano, Dian Yu, Enrique Manjavacas, Fabio
+  Barth, Florian Fuhrimann, Gabriel Altay, Giyaseddin Bayrak, Gully Burns,
+  Helena~U. Vrabec, Imane Bello, Ishani Dash, Jihyun Kang, John Giorgi, Jonas
+  Golde, Jose~David Posada, Karthik~Rangasai Sivaraman, Lokesh Bulchandani,
+  Lu~Liu, Luisa Shinzato, Madeleine~Hahn de~Bykhovetz, Maiko Takeuchi, Marc
+  Pàmies, Maria~A Castillo, Marianna Nezhurina, Mario Sänger, Matthias
+  Samwald, Michael Cullan, Michael Weinberg, Michiel De~Wolf, Mina Mihaljcic,
+  Minna Liu, Moritz Freidank, Myungsun Kang, Natasha Seelam, Nathan Dahlberg,
+  Nicholas~Michio Broad, Nikolaus Muellner, Pascale Fung, Patrick Haller, Ramya
+  Chandrasekhar, Renata Eisenberg, Robert Martin, Rodrigo Canalli, Rosaline Su,
+  Ruisi Su, Samuel Cahyawijaya, Samuele Garda, Shlok~S Deshmukh, Shubhanshu
+  Mishra, Sid Kiblawi, Simon Ott, Sinee Sang-aroonsiri, Srishti Kumar, Stefan
+  Schweter, Sushil Bharati, Tanmay Laud, Théo Gigant, Tomoya Kainuma, Wojciech
+  Kusa, Yanis Labrak, Yash~Shailesh Bajaj, Yash Venkatraman, Yifan Xu, Yingxin
+  Xu, Yu~Xu, Zhe Tan, Zhongli Xie, Zifan Ye, Mathilde Bras, Younes Belkada, and
+  Thomas Wolf. 2022.
+\newblock \href {https://doi.org/10.48550/ARXIV.2211.05100} {Bloom: A
+  176b-parameter open-access multilingual language model}.
+
+\bibitem[{Lee et~al.(2023{\natexlab{a}})Lee, Cooper, and
+  Grimmelmann}]{lee2023talkin}
+Katherine Lee, A~Feder Cooper, and James Grimmelmann. 2023{\natexlab{a}}.
+\newblock Talkin''bout ai generation: Copyright and the generative-ai supply
+  chain.
+\newblock \emph{arXiv preprint arXiv:2309.08133}.
+
+\bibitem[{Lee et~al.(2023{\natexlab{b}})Lee, Srivastava, Hardy, Thickstun,
+  Durmus, Paranjape, Gerard-Ursin, Li, Ladhak, Rong, Wang, Kwon, Park, Cao,
+  Lee, Bommasani, Bernstein, and Liang}]{lee2023evaluating}
+Mina Lee, Megha Srivastava, Amelia Hardy, John Thickstun, Esin Durmus, Ashwin
+  Paranjape, Ines Gerard-Ursin, Xiang~Lisa Li, Faisal Ladhak, Frieda Rong,
+  Rose~E Wang, Minae Kwon, Joon~Sung Park, Hancheng Cao, Tony Lee, Rishi
+  Bommasani, Michael~S. Bernstein, and Percy Liang. 2023{\natexlab{b}}.
+\newblock \href {https://openreview.net/forum?id=hjDYJUn9l1} {Evaluating
+  human-language model interaction}.
+\newblock \emph{Transactions on Machine Learning Research}.
+
+\bibitem[{Lemley and Casey(2020)}]{lemley2020fair}
+Mark~A Lemley and Bryan Casey. 2020.
+\newblock Fair learning.
+\newblock \emph{Tex. L. Rev.}, 99:743.
+
+\bibitem[{Li et~al.(2016)Li, Li, Kim, Bissyandé, Lo, and Traon}]{li2016watch}
+Daoyuan Li, Li~Li, Dongsun Kim, Tegawendé~F. Bissyandé, David Lo, and Yves~Le
+  Traon. 2016.
+\newblock \href {http://arxiv.org/abs/1606.03266} {Watch out for this commit! a
+  study of influential software changes}.
+
+\bibitem[{Liang(2022)}]{liang2022thetime}
+Percy Liang. 2022.
+\newblock \href
+  {https://hai.stanford.edu/news/time-now-develop-community-norms-release-foundation-models}
+  {The time is now to develop community norms for the release of foundation
+  models}.
+
+\bibitem[{Liang et~al.(2022{\natexlab{a}})Liang, Bommasani, Creel, and
+  Reich}]{liang2022norms}
+Percy Liang, Rishi Bommasani, Kathleen~A. Creel, and Rob Reich.
+  2022{\natexlab{a}}.
+\newblock \href {https://crfm.stanford.edu/2022/05/17/community-norms.html}
+  {The time is now to develop community norms for the release of foundation
+  models}.
+
+\bibitem[{Liang et~al.(2022{\natexlab{b}})Liang, Bommasani, Creel, and
+  Reich}]{liang2022community-norms}
+Percy Liang, Rishi Bommasani, Kathleen~A. Creel, and Rob Reich.
+  2022{\natexlab{b}}.
+\newblock \href {https://crfm.stanford.edu/2022/05/17/community-norms.html}
+  {The time is now to develop community norms for the release of foundation
+  models}.
+
+\bibitem[{Liang et~al.(2022{\natexlab{c}})Liang, Bommasani, Lee, Tsipras,
+  Soylu, Yasunaga, Zhang, Narayanan, Wu, Kumar, Newman, Yuan, Yan, Zhang,
+  Cosgrove, Manning, R'e, Acosta-Navas, Hudson, Zelikman, Durmus, Ladhak, Rong,
+  Ren, Yao, Wang, Santhanam, Orr, Zheng, Yuksekgonul, Suzgun, Kim, Guha,
+  Chatterji, Khattab, Henderson, Huang, Chi, Xie, Santurkar, Ganguli,
+  Hashimoto, Icard, Zhang, Chaudhary, Wang, Li, Mai, Zhang, and
+  Koreeda}]{liang2022helm}
+Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu,
+  Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar,
+  Benjamin Newman, Binhang Yuan, Bobby Yan, Ce~Zhang, Christian Cosgrove,
+  Christopher~D. Manning, Christopher R'e, Diana Acosta-Navas, Drew~A. Hudson,
+  E.~Zelikman, Esin Durmus, Faisal Ladhak, Frieda Rong, Hongyu Ren, Huaxiu Yao,
+  Jue Wang, Keshav Santhanam, Laurel~J. Orr, Lucia Zheng, Mert Yuksekgonul,
+  Mirac Suzgun, Nathan~S. Kim, Neel Guha, Niladri~S. Chatterji, O.~Khattab,
+  Peter Henderson, Qian Huang, Ryan Chi, Sang~Michael Xie, Shibani Santurkar,
+  Surya Ganguli, Tatsunori Hashimoto, Thomas~F. Icard, Tianyi Zhang, Vishrav
+  Chaudhary, William Wang, Xuechen Li, Yifan Mai, Yuhui Zhang, and Yuta
+  Koreeda. 2022{\natexlab{c}}.
+\newblock Holistic evaluation of language models.
+\newblock \emph{ArXiv}, abs/2211.09110.
+
+\bibitem[{Liang et~al.(2023)Liang, Bommasani, Lee, Tsipras, Soylu, Yasunaga,
+  Zhang, Narayanan, Wu, Kumar, Newman, Yuan, Yan, Zhang, Cosgrove, Manning, Re,
+  Acosta-Navas, Hudson, Zelikman, Durmus, Ladhak, Rong, Ren, Yao, WANG,
+  Santhanam, Orr, Zheng, Yuksekgonul, Suzgun, Kim, Guha, Chatterji, Khattab,
+  Henderson, Huang, Chi, Xie, Santurkar, Ganguli, Hashimoto, Icard, Zhang,
+  Chaudhary, Wang, Li, Mai, Zhang, and Koreeda}]{liang2023holistic}
+Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu,
+  Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar,
+  Benjamin Newman, Binhang Yuan, Bobby Yan, Ce~Zhang, Christian~Alexander
+  Cosgrove, Christopher~D Manning, Christopher Re, Diana Acosta-Navas,
+  Drew~Arad Hudson, Eric Zelikman, Esin Durmus, Faisal Ladhak, Frieda Rong,
+  Hongyu Ren, Huaxiu Yao, Jue WANG, Keshav Santhanam, Laurel Orr, Lucia Zheng,
+  Mert Yuksekgonul, Mirac Suzgun, Nathan Kim, Neel Guha, Niladri~S. Chatterji,
+  Omar Khattab, Peter Henderson, Qian Huang, Ryan~Andrew Chi, Sang~Michael Xie,
+  Shibani Santurkar, Surya Ganguli, Tatsunori Hashimoto, Thomas Icard, Tianyi
+  Zhang, Vishrav Chaudhary, William Wang, Xuechen Li, Yifan Mai, Yuhui Zhang,
+  and Yuta Koreeda. 2023.
+\newblock \href {https://openreview.net/forum?id=iO4LZibEqW} {Holistic
+  evaluation of language models}.
+\newblock \emph{Transactions on Machine Learning Research}.
+\newblock Featured Certification, Expert Certification.
+
+\bibitem[{Liang and Reich(2022)}]{liang2022condemning}
+Percy Liang and Rob Reich. 2022.
+\newblock \href
+  {https://docs.google.com/forms/d/e/1FAIpQLSdh3Pgh0sGrYtRihBu-GPN7FSQoODBLvF7dVAFLZk2iuMgoLw/viewform}
+  {Condemning the deployment of gpt-4chan}.
+
+\bibitem[{Liao and Vaughan(2023)}]{liao2023transparency}
+Qingzi~Vera Liao and Jennifer~Wortman Vaughan. 2023.
+\newblock \href {https://api.semanticscholar.org/CorpusID:259075521} {Ai
+  transparency in the age of llms: A human-centered research roadmap}.
+\newblock \emph{ArXiv}, abs/2306.01941.
+
+\bibitem[{Liesenfeld et~al.(2023)Liesenfeld, Lopez, and
+  Dingemanse}]{liesenfeld2023opening}
+Andreas Liesenfeld, Alianda Lopez, and Mark Dingemanse. 2023.
+\newblock \href {https://doi.org/10.1145/3571884.3604316} {Opening up chatgpt:
+  Tracking openness, transparency, and accountability in instruction-tuned text
+  generators}.
+\newblock In \emph{Proceedings of the 5th International Conference on
+  Conversational User Interfaces}, CUI '23, New York, NY, USA. Association for
+  Computing Machinery.
+
+\bibitem[{Lin et~al.(2023)Lin, Akin, Rao, Hie, Zhu, Lu, Smetanin, Verkuil,
+  Kabeli, Shmueli, dos Santos~Costa, Fazel-Zarandi, Sercu, Candido, and
+  Rives}]{lin2023evolutionary}
+Zeming Lin, Halil Akin, Roshan Rao, Brian Hie, Zhongkai Zhu, Wenting Lu, Nikita
+  Smetanin, Robert Verkuil, Ori Kabeli, Yaniv Shmueli, Allan dos Santos~Costa,
+  Maryam Fazel-Zarandi, Tom Sercu, Salvatore Candido, and Alexander Rives.
+  2023.
+\newblock \href {https://doi.org/10.1126/science.ade2574} {Evolutionary-scale
+  prediction of atomic-level protein structure with a language model}.
+\newblock \emph{Science}, 379(6637):1123--1130.
+
+\bibitem[{Lipton and Steinhardt(2019)}]{lipton2019troubling}
+Zachary~C. Lipton and Jacob Steinhardt. 2019.
+\newblock \href {https://doi.org/10.1145/3317287.3328534} {Troubling trends in
+  machine learning scholarship: Some ml papers suffer from flaws that could
+  mislead the public and stymie future research.}
+\newblock \emph{Queue}, 17(1):45–77.
+
+\bibitem[{Liu et~al.(2022)Liu, Wang, Fan, Liu, Li, Jain, Liu, Jain, and
+  Tang}]{liu2022trustworthy}
+Haochen Liu, Yiqi Wang, Wenqi Fan, Xiaorui Liu, Yaxin Li, Shaili Jain, Yunhao
+  Liu, Anil Jain, and Jiliang Tang. 2022.
+\newblock Trustworthy ai: A computational perspective.
+\newblock \emph{ACM Transactions on Intelligent Systems and Technology},
+  14(1):1--59.
+
+\bibitem[{Liu et~al.(2021)Liu, Sun, and Hong}]{liu2021identifying}
+Xingyu Liu, Annabel Sun, and Jason~I. Hong. 2021.
+\newblock \href {http://arxiv.org/abs/2111.12182} {Identifying terms and
+  conditions important to consumers using crowdsourcing}.
+
+\bibitem[{Liu et~al.(2023)Liu, Heinberg, Huang, and
+  Eisingerich}]{liu2023competitive}
+Yeyi Liu, Martin Heinberg, Xuan Huang, and Andreas~B. Eisingerich. 2023.
+\newblock \href {https://doi.org/https://doi.org/10.1016/j.bushor.2022.10.004}
+  {Building a competitive advantage based on transparency: When and why does
+  transparency matter for corporate social responsibility?}
+\newblock \emph{Business Horizons}, 66(4):517--527.
+
+\bibitem[{Longpre et~al.(2023)Longpre, Yauney, Reif, Lee, Roberts, Zoph, Zhou,
+  Wei, Robinson, Mimno et~al.}]{longpre2023pretrainer}
+Shayne Longpre, Gregory Yauney, Emily Reif, Katherine Lee, Adam Roberts, Barret
+  Zoph, Denny Zhou, Jason Wei, Kevin Robinson, David Mimno, et~al. 2023.
+\newblock A pretrainer's guide to training data: Measuring the effects of data
+  age, domain coverage, quality, \& toxicity.
+\newblock \emph{arXiv preprint arXiv:2305.13169}.
+
+\bibitem[{Luccioni and Hern{\'a}ndez-Garc{\'i}a(2023)}]{luccioni2023counting}
+Alexandra~Sasha Luccioni and Alex Hern{\'a}ndez-Garc{\'i}a. 2023.
+\newblock Counting carbon: A survey of factors influencing the emissions of
+  machine learning.
+\newblock \emph{ArXiv}, abs/2302.08476.
+
+\bibitem[{Luccioni et~al.(2022)Luccioni, Viguier, and
+  Ligozat}]{luccioni2022estimating}
+Alexandra~Sasha Luccioni, Sylvain Viguier, and Anne-Laure Ligozat. 2022.
+\newblock \href {https://api.semanticscholar.org/CorpusID:253265387}
+  {Estimating the carbon footprint of bloom, a 176b parameter language model}.
+\newblock \emph{ArXiv}, abs/2211.02001.
+
+\bibitem[{Lukas et~al.(2023)Lukas, Salem, Sim, Tople, Wutschitz, and
+  Zanella-Béguelin}]{lukas2023analyzing}
+Nils Lukas, Ahmed Salem, Robert Sim, Shruti Tople, Lukas Wutschitz, and
+  Santiago Zanella-Béguelin. 2023.
+\newblock \href {http://arxiv.org/abs/2302.00539} {Analyzing leakage of
+  personally identifiable information in language models}.
+
+\bibitem[{Maslej et~al.(2023)Maslej, Fattorini, Brynjolfsson, Etchemendy,
+  Ligett, Lyons, Manyika, Ngo, Niebles, Parli et~al.}]{maslej2023ai}
+Nestor Maslej, Loredana Fattorini, Erik Brynjolfsson, John Etchemendy, Katrina
+  Ligett, Terah Lyons, James Manyika, Helen Ngo, Juan~Carlos Niebles, Vanessa
+  Parli, et~al. 2023.
+\newblock The ai index 2023 annual report.
+\newblock \emph{AI Index Steering Committee, Institute for Human-Centered AI,
+  Stanford University, Stanford, CA}.
+
+\bibitem[{Mathur et~al.(2019)Mathur, Acar, Friedman, Lucherini, Mayer, Chetty,
+  and Narayanan}]{10.1145/3359183}
+Arunesh Mathur, Gunes Acar, Michael~J. Friedman, Eli Lucherini, Jonathan Mayer,
+  Marshini Chetty, and Arvind Narayanan. 2019.
+\newblock \href {https://doi.org/10.1145/3359183} {Dark patterns at scale:
+  Findings from a crawl of 11k shopping websites}.
+\newblock \emph{Proc. ACM Hum.-Comput. Interact.}, 3(CSCW).
+
+\bibitem[{Meta(2023)}]{meta2023}
+Meta. 2023.
+\newblock \href {https://developers.facebook.com/terms/#datause} {Meta platform
+  terms}.
+
+\bibitem[{Metaxa et~al.(2021)Metaxa, Park, Robertson, Karahalios, Wilson,
+  Hancock, and Sandvig}]{metaxa2021audit}
+Danaë Metaxa, Joon~Sung Park, Ronald~E. Robertson, Karrie Karahalios, Christo
+  Wilson, Jeff Hancock, and Christian Sandvig. 2021.
+\newblock \href {https://doi.org/10.1561/1100000083} {Auditing algorithms:
+  Understanding algorithmic systems from the outside in}.
+\newblock \emph{Foundations and Trends® in Human–Computer Interaction},
+  14(4):272--344.
+
+\bibitem[{Miller(2021)}]{miller2021radical}
+Katharine Miller. 2021.
+\newblock \href
+  {https://hai.stanford.edu/news/radical-proposal-third-party-auditor-access-ai-accountability}
+  {Radical proposal: Third-party auditor access for ai accountability}.
+
+\bibitem[{Mitchell et~al.(2018)Mitchell, Wu, Zaldivar, Barnes, Vasserman,
+  Hutchinson, Spitzer, Raji, and Gebru}]{mitchell2018modelcards}
+Margaret Mitchell, Simone Wu, Andrew Zaldivar, Parker Barnes, Lucy Vasserman,
+  Ben Hutchinson, Elena Spitzer, Inioluwa~Deborah Raji, and Timnit Gebru. 2018.
+\newblock Model cards for model reporting.
+\newblock \emph{Proceedings of the Conference on Fairness, Accountability, and
+  Transparency}.
+
+\bibitem[{Mitchell et~al.(2019)Mitchell, Wu, Zaldivar, Barnes, Vasserman,
+  Hutchinson, Spitzer, Raji, and Gebru}]{mitchell2019model}
+Margaret Mitchell, Simone Wu, Andrew Zaldivar, Parker Barnes, Lucy Vasserman,
+  Ben Hutchinson, Elena Spitzer, Inioluwa~Deborah Raji, and Timnit Gebru. 2019.
+\newblock Model cards for model reporting.
+\newblock In \emph{Proceedings of the conference on fairness, accountability,
+  and transparency}, pages 220--229.
+
+\bibitem[{Mittelstadt(2019)}]{Mittelstadt2019}
+Brent Mittelstadt. 2019.
+\newblock \href {https://doi.org/10.1038/s42256-019-0114-4} {Principles alone
+  cannot guarantee ethical ai}.
+\newblock \emph{Nature Machine Intelligence}, 1(11):501--507.
+
+\bibitem[{Mohamed et~al.(2020)Mohamed, Png, and Isaac}]{Mohamed2020}
+Shakir Mohamed, Marie-Therese Png, and William Isaac. 2020.
+\newblock \href {https://doi.org/10.1007/s13347-020-00405-8} {Decolonial ai:
+  Decolonial theory as sociotechnical foresight in artificial intelligence}.
+\newblock \emph{Philosophy \& Technology}, 33(4):659--684.
+
+\bibitem[{Muennighoff et~al.(2022)Muennighoff, Wang, Sutawika, Roberts,
+  Biderman, Scao, Bari, Shen, Yong, Schoelkopf, Tang, Radev, Aji, Almubarak,
+  Albanie, Alyafeai, Webson, Raff, and Raffel}]{muennighoff2022crosslingual}
+Niklas Muennighoff, Thomas Wang, Lintang Sutawika, Adam Roberts, Stella~Rose
+  Biderman, Teven~Le Scao, M~Saiful Bari, Sheng Shen, Zheng~Xin Yong, Hailey
+  Schoelkopf, Xiangru Tang, Dragomir Radev, Alham~Fikri Aji, Khalid Almubarak,
+  Samuel Albanie, Zaid Alyafeai, Albert Webson, Edward Raff, and Colin Raffel.
+  2022.
+\newblock Crosslingual generalization through multitask finetuning.
+\newblock \emph{ArXiv}, abs/2211.01786.
+
+\bibitem[{Mulligan et~al.(2016)Mulligan, Koopman, and
+  Doty}]{mulligan2017privacy}
+Deirdre~K. Mulligan, Colin Koopman, and Nick Doty. 2016.
+\newblock Privacy is an essentially contested concept: a multi-dimensional
+  analytic for mapping privacy.
+\newblock \emph{Philosophical Transactions Royal Society A}, 374.
+
+\bibitem[{Nakao et~al.(2022)Nakao, Strappelli, Stumpf, Naseer, Regoli, and
+  Gamba}]{nakao2022responsible}
+Yuri Nakao, Lorenzo Strappelli, Simone Stumpf, Aisha Naseer, Daniele Regoli,
+  and Giulia~Del Gamba. 2022.
+\newblock \href {http://arxiv.org/abs/2206.00474} {Towards responsible ai: A
+  design space exploration of human-centered artificial intelligence user
+  interfaces to investigate fairness}.
+
+\bibitem[{Narayanan and Kapoor(2023)}]{narayanan2023transparencyreports}
+Arvind Narayanan and Sayash Kapoor. 2023.
+\newblock \href
+  {https://knightcolumbia.org/blog/generative-ai-companies-must-publish-transparency-reports}
+  {Generative ai companies must publish transparency reports}.
+
+\bibitem[{Narayanan and Reisman(2017)}]{narayanan2017princeton}
+Arvind Narayanan and Dillon Reisman. 2017.
+\newblock The princeton web transparency and accountability project.
+\newblock \emph{Transparent data mining for big and small data}, pages 45--67.
+
+\bibitem[{Narayanan et~al.(2023)Narayanan, Santhanam, Henderson, Bommasani,
+  Lee, and Liang}]{narayanan2023cheaply}
+Deepak Narayanan, Keshav Santhanam, Peter Henderson, Rishi Bommasani, Tony Lee,
+  and Percy Liang. 2023.
+\newblock \href {https://openreview.net/forum?id=RJpAz15D0S} {Cheaply
+  evaluating inference efficiency metrics for autoregressive transformer
+  {API}s}.
+\newblock In \emph{Thirty-seventh Conference on Neural Information Processing
+  Systems}.
+
+\bibitem[{Ng et~al.(2021)Ng, Leung, Chu, and Qiao}]{ng_conceptualizing_2021}
+Davy Tsz~Kit Ng, Jac Ka~Lok Leung, Samuel Kai~Wah Chu, and Maggie~Shen Qiao.
+  2021.
+\newblock \href {https://doi.org/https://doi.org/10.1016/j.caeai.2021.100041}
+  {Conceptualizing {AI} literacy: {An} exploratory review}.
+\newblock \emph{Computers and Education: Artificial Intelligence}, 2:100041.
+
+\bibitem[{Nguyen et~al.(2023)Nguyen, Ting, Ciucă, O'Neill, Sun, Jablo'nska,
+  Kruk, Perkowski, Miller, Li, Peek, Iyer, R'o.za'nski, Khetarpal, Zaman,
+  Brodrick, M'endez, Bui, Goodman, Accomazzi, Naiman, Cranney, Schawinski, and
+  UniverseTBD}]{nguyen2023astrollama}
+Tuan~Dung Nguyen, Yuan-Sen Ting, Ioana Ciucă, Charlie O'Neill, Ze-Chang Sun,
+  Maja Jablo'nska, Sandor Kruk, Ernest Perkowski, Jack~W. Miller, Jason Li,
+  Josh Peek, Kartheik Iyer, Tomasz R'o.za'nski, Pranav Khetarpal, Sharaf Zaman,
+  David Brodrick, Sergio J.~Rodr'iguez M'endez, Thang Bui, Alyssa Goodman,
+  Alberto Accomazzi, Jill~P. Naiman, Jesse Cranney, Kevin Schawinski, and
+  UniverseTBD. 2023.
+\newblock \href {https://api.semanticscholar.org/CorpusID:261696577}
+  {Astrollama: Towards specialized foundation models in astronomy}.
+\newblock \emph{ArXiv}, abs/2309.06126.
+
+\bibitem[{Nissenbaum(2024)}]{nissenbaum2004contextual}
+Helen Nissenbaum. 2024.
+\newblock \href {https://digitalcommons.law.uw.edu/wlr/vol79/iss1/10} {Privacy
+  as contextual integrity}.
+\newblock In \emph{Washington Law Review}.
+
+\bibitem[{OECD et~al.(2008)OECD, Union, and Commission}]{oecd2008handbook}
+OECD, European Union, and Joint Research Centre~European Commission. 2008.
+\newblock \href
+  {https://doi.org/https://doi.org/https://doi.org/10.1787/9789264043466-en}
+  {\emph{Handbook on Constructing Composite Indicators: Methodology and User
+  Guide}}.
+
+\bibitem[{{Open X-Embodiment Collaboration} et~al.(2023){Open X-Embodiment
+  Collaboration}, Padalkar, Pooley, Jain, Bewley, Herzog, Irpan, Khazatsky,
+  Rai, Singh, Brohan, Raffin, Wahid, Burgess-Limerick, Kim, Schölkopf, Ichter,
+  Lu, Xu, Finn, Xu, Chi, Huang, Chan, Pan, Fu, Devin, Driess, Pathak, Shah,
+  Büchler, Kalashnikov, Sadigh, Johns, Ceola, Xia, Stulp, Zhou, Sukhatme,
+  Salhotra, Yan, Schiavi, Su, Fang, Shi, Amor, Christensen, Furuta, Walke,
+  Fang, Mordatch, Radosavovic, Leal, Liang, Kim, Schneider, Hsu, Bohg, Bingham,
+  Wu, Wu, Luo, Gu, Tan, Oh, Malik, Tompson, Yang, Lim, Silvério, Han, Rao,
+  Pertsch, Hausman, Go, Gopalakrishnan, Goldberg, Byrne, Oslund, Kawaharazuka,
+  Zhang, Majd, Rana, Srinivasan, Chen, Pinto, Tan, Ott, Lee, Tomizuka, Du, Ahn,
+  Zhang, Ding, Srirama, Sharma, Kim, Kanazawa, Hansen, Heess, Joshi,
+  Suenderhauf, Palo, Shafiullah, Mees, Kroemer, Sanketi, Wohlhart, Xu,
+  Sermanet, Sundaresan, Vuong, Rafailov, Tian, Doshi, Martín-Martín,
+  Mendonca, Shah, Hoque, Julian, Bustamante, Kirmani, Levine, Moore, Bahl,
+  Dass, Song, Xu, Haldar, Adebola, Guist, Nasiriany, Schaal, Welker, Tian,
+  Dasari, Belkhale, Osa, Harada, Matsushima, Xiao, Yu, Ding, Davchev, Zhao,
+  Armstrong, Darrell, Jain, Vanhoucke, Zhan, Zhou, Burgard, Chen, Wang, Zhu,
+  Li, Lu, Chebotar, Zhou, Zhu, Xu, Wang, Bisk, Cho, Lee, Cui, hua Wu, Tang,
+  Zhu, Li, Iwasawa, Matsuo, Xu, and Cui}]{openx2023openx}
+{Open X-Embodiment Collaboration}, Abhishek Padalkar, Acorn Pooley, Ajinkya
+  Jain, Alex Bewley, Alex Herzog, Alex Irpan, Alexander Khazatsky, Anant Rai,
+  Anikait Singh, Anthony Brohan, Antonin Raffin, Ayzaan Wahid, Ben
+  Burgess-Limerick, Beomjoon Kim, Bernhard Schölkopf, Brian Ichter, Cewu Lu,
+  Charles Xu, Chelsea Finn, Chenfeng Xu, Cheng Chi, Chenguang Huang, Christine
+  Chan, Chuer Pan, Chuyuan Fu, Coline Devin, Danny Driess, Deepak Pathak, Dhruv
+  Shah, Dieter Büchler, Dmitry Kalashnikov, Dorsa Sadigh, Edward Johns,
+  Federico Ceola, Fei Xia, Freek Stulp, Gaoyue Zhou, Gaurav~S. Sukhatme, Gautam
+  Salhotra, Ge~Yan, Giulio Schiavi, Hao Su, Hao-Shu Fang, Haochen Shi, Heni~Ben
+  Amor, Henrik~I Christensen, Hiroki Furuta, Homer Walke, Hongjie Fang, Igor
+  Mordatch, Ilija Radosavovic, Isabel Leal, Jacky Liang, Jaehyung Kim, Jan
+  Schneider, Jasmine Hsu, Jeannette Bohg, Jeffrey Bingham, Jiajun Wu, Jialin
+  Wu, Jianlan Luo, Jiayuan Gu, Jie Tan, Jihoon Oh, Jitendra Malik, Jonathan
+  Tompson, Jonathan Yang, Joseph~J. Lim, João Silvério, Junhyek Han, Kanishka
+  Rao, Karl Pertsch, Karol Hausman, Keegan Go, Keerthana Gopalakrishnan, Ken
+  Goldberg, Kendra Byrne, Kenneth Oslund, Kento Kawaharazuka, Kevin Zhang,
+  Keyvan Majd, Krishan Rana, Krishnan Srinivasan, Lawrence~Yunliang Chen,
+  Lerrel Pinto, Liam Tan, Lionel Ott, Lisa Lee, Masayoshi Tomizuka, Maximilian
+  Du, Michael Ahn, Mingtong Zhang, Mingyu Ding, Mohan~Kumar Srirama, Mohit
+  Sharma, Moo~Jin Kim, Naoaki Kanazawa, Nicklas Hansen, Nicolas Heess, Nikhil~J
+  Joshi, Niko Suenderhauf, Norman~Di Palo, Nur Muhammad~Mahi Shafiullah, Oier
+  Mees, Oliver Kroemer, Pannag~R Sanketi, Paul Wohlhart, Peng Xu, Pierre
+  Sermanet, Priya Sundaresan, Quan Vuong, Rafael Rafailov, Ran Tian, Ria Doshi,
+  Roberto Martín-Martín, Russell Mendonca, Rutav Shah, Ryan Hoque, Ryan
+  Julian, Samuel Bustamante, Sean Kirmani, Sergey Levine, Sherry Moore, Shikhar
+  Bahl, Shivin Dass, Shuran Song, Sichun Xu, Siddhant Haldar, Simeon Adebola,
+  Simon Guist, Soroush Nasiriany, Stefan Schaal, Stefan Welker, Stephen Tian,
+  Sudeep Dasari, Suneel Belkhale, Takayuki Osa, Tatsuya Harada, Tatsuya
+  Matsushima, Ted Xiao, Tianhe Yu, Tianli Ding, Todor Davchev, Tony~Z. Zhao,
+  Travis Armstrong, Trevor Darrell, Vidhi Jain, Vincent Vanhoucke, Wei Zhan,
+  Wenxuan Zhou, Wolfram Burgard, Xi~Chen, Xiaolong Wang, Xinghao Zhu, Xuanlin
+  Li, Yao Lu, Yevgen Chebotar, Yifan Zhou, Yifeng Zhu, Ying Xu, Yixuan Wang,
+  Yonatan Bisk, Yoonyoung Cho, Youngwoon Lee, Yuchen Cui, Yueh hua Wu, Yujin
+  Tang, Yuke Zhu, Yunzhu Li, Yusuke Iwasawa, Yutaka Matsuo, Zhuo Xu, and
+  Zichen~Jeff Cui. 2023.
+\newblock Open {X-E}mbodiment: Robotic learning datasets and {RT-X} models.
+\newblock \url{https://robotics-transformer-x.github.io}.
+
+\bibitem[{OpenAI(2023)}]{openai2023gpt4}
+OpenAI. 2023.
+\newblock \href {http://arxiv.org/abs/2303.08774} {Gpt-4 technical report}.
+
+\bibitem[{Ouyang et~al.(2022)Ouyang, Wu, Jiang, Almeida, Wainwright, Mishkin,
+  Zhang, Agarwal, Slama, Ray, Schulman, Hilton, Kelton, Miller, Simens, Askell,
+  Welinder, Christiano, Leike, and Lowe}]{ouyang2022instructions}
+Long Ouyang, Jeff Wu, Xu~Jiang, Diogo Almeida, Carroll~L. Wainwright, Pamela
+  Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray,
+  J.~Schulman, Jacob Hilton, Fraser Kelton, Luke~E. Miller, Maddie Simens,
+  Amanda Askell, P.~Welinder, P.~Christiano, J.~Leike, and Ryan~J. Lowe. 2022.
+\newblock Training language models to follow instructions with human feedback.
+\newblock \emph{arXiv}.
+
+\bibitem[{Parasuraman and Manzey(2010)}]{parasuraman2010complacency}
+Raja Parasuraman and Dietrich~H. Manzey. 2010.
+\newblock \href {https://doi.org/10.1177/0018720810376055} {Complacency and
+  bias in human use of automation: An attentional integration}.
+\newblock \emph{Human Factors}, 52(3):381--410.
+\newblock PMID: 21077562.
+
+\bibitem[{Pasquale(2015)}]{pasquale2015black}
+Frank Pasquale. 2015.
+\newblock \emph{The black box society: The secret algorithms that control money
+  and information}.
+\newblock Harvard University Press.
+
+\bibitem[{Patterson et~al.(2021)Patterson, Gonzalez, Le, Liang, Munguia,
+  Rothchild, So, Texier, and Dean}]{patterson2021carbon}
+David Patterson, Joseph Gonzalez, Quoc Le, Chen Liang, Lluis-Miquel Munguia,
+  Daniel Rothchild, David So, Maud Texier, and Jeff Dean. 2021.
+\newblock Carbon emissions and large neural network training.
+\newblock \emph{arXiv preprint arXiv:2104.10350}.
+
+\bibitem[{Perez et~al.(2022)Perez, Huang, Song, Cai, Ring, Aslanides, Glaese,
+  McAleese, and Irving}]{perez2022red}
+Ethan Perez, Saffron Huang, Francis Song, Trevor Cai, Roman Ring, John
+  Aslanides, Amelia Glaese, Nathan McAleese, and Geoffrey Irving. 2022.
+\newblock Red teaming language models with language models.
+\newblock \emph{ArXiv}, abs/2202.03286.
+
+\bibitem[{Phang et~al.(2022)Phang, Bradley, Gao, Castricato, and
+  Biderman}]{phang2022eleutherai}
+Jason Phang, Herbie Bradley, Leo Gao, Louis Castricato, and Stella Biderman.
+  2022.
+\newblock \href {http://arxiv.org/abs/2210.06413} {Eleutherai: Going beyond
+  "open science" to "science in the open"}.
+
+\bibitem[{Piktus et~al.(2023)Piktus, Akiki, Villegas, Laurençon, Dupont,
+  Luccioni, Jernite, and Rogers}]{piktus2023roots}
+Aleksandra Piktus, Christopher Akiki, Paulo Villegas, Hugo Laurençon, Gérard
+  Dupont, Alexandra~Sasha Luccioni, Yacine Jernite, and Anna Rogers. 2023.
+\newblock \href {http://arxiv.org/abs/2302.14035} {The roots search tool: Data
+  transparency for llms}.
+
+\bibitem[{Piorkowski et~al.(2022)Piorkowski, Richards, and
+  Hind}]{piorkowski2022evaluating}
+David Piorkowski, John Richards, and Michael Hind. 2022.
+\newblock \href {http://arxiv.org/abs/2201.13224} {Evaluating a methodology for
+  increasing ai transparency: A case study}.
+
+\bibitem[{Pistilli et~al.(2023)Pistilli, Ferrandis, Jernite, and
+  Mitchell}]{Pistilli2023}
+Giada Pistilli, Carlos~Mu{\~{n}}oz Ferrandis, Yacine Jernite, and Margaret
+  Mitchell. 2023.
+\newblock \href {https://doi.org/10.1145/3593013.3594002} {Stronger together:
+  on the articulation of ethical charters, legal tools, and technical
+  documentation in {ML}}.
+\newblock In \emph{2023 {ACM} Conference on Fairness, Accountability, and
+  Transparency}. {ACM}.
+
+\bibitem[{Pushkarna et~al.(2022)Pushkarna, Zaldivar, and
+  Kjartansson}]{pushkarna2022data}
+Mahima Pushkarna, Andrew Zaldivar, and Oddur Kjartansson. 2022.
+\newblock Data cards: Purposeful and transparent dataset documentation for
+  responsible ai.
+\newblock In \emph{2022 ACM Conference on Fairness, Accountability, and
+  Transparency}, pages 1776--1826.
+
+\bibitem[{Qi et~al.(2023)Qi, Zeng, Xie, Chen, Jia, Mittal, and
+  Henderson}]{qi2023finetuning}
+Xiangyu Qi, Yi~Zeng, Tinghao Xie, Pin-Yu Chen, Ruoxi Jia, Prateek Mittal, and
+  Peter Henderson. 2023.
+\newblock \href {http://arxiv.org/abs/2310.03693} {Fine-tuning aligned language
+  models compromises safety, even when users do not intend to!}
+
+\bibitem[{Radford et~al.(2022)Radford, Kim, Xu, Brockman, McLeavey, and
+  Sutskever}]{radford2022whisper}
+Alec Radford, Jong~Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and
+  Ilya Sutskever. 2022.
+\newblock \href {https://api.semanticscholar.org/CorpusID:252923993} {Robust
+  speech recognition via large-scale weak supervision}.
+\newblock \emph{ArXiv}, abs/2212.04356.
+
+\bibitem[{Raji(2022)}]{raji2022mozilla}
+Deb Raji. 2022.
+\newblock Mozilla open source audit tooling (oat) project.
+\newblock Project documentation or description at Mozilla.
+
+\bibitem[{Raji and Buolamwini(2019)}]{raji2019actionable}
+Inioluwa~Deborah Raji and Joy Buolamwini. 2019.
+\newblock \href {https://doi.org/10.1145/3306618.3314244} {Actionable auditing:
+  Investigating the impact of publicly naming biased performance results of
+  commercial ai products}.
+\newblock In \emph{Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics,
+  and Society}, AIES '19, page 429–435, New York, NY, USA. Association for
+  Computing Machinery.
+
+\bibitem[{Raji et~al.(2021)Raji, Denton, Bender, Hanna, and
+  Paullada}]{raji2021benchmark}
+Inioluwa~Deborah Raji, Emily Denton, Emily~M. Bender, Alex Hanna, and
+  Amandalynne Paullada. 2021.
+\newblock \href {https://openreview.net/forum?id=j6NxpQbREA1} {{AI} and the
+  everything in the whole wide world benchmark}.
+\newblock In \emph{Thirty-fifth Conference on Neural Information Processing
+  Systems Datasets and Benchmarks Track (Round 2)}.
+
+\bibitem[{Raji et~al.(2022{\natexlab{a}})Raji, Kumar, Horowitz, and
+  Selbst}]{raji2022fallacy}
+Inioluwa~Deborah Raji, I.~Elizabeth Kumar, Aaron Horowitz, and Andrew Selbst.
+  2022{\natexlab{a}}.
+\newblock \href {https://doi.org/10.1145/3531146.3533158} {The fallacy of ai
+  functionality}.
+\newblock In \emph{2022 ACM Conference on Fairness, Accountability, and
+  Transparency}, FAccT '22, page 959–972, New York, NY, USA. Association for
+  Computing Machinery.
+
+\bibitem[{Raji et~al.(2022{\natexlab{b}})Raji, Xu, Honigsberg, and
+  Ho}]{raji2022audit}
+Inioluwa~Deborah Raji, Peggy Xu, Colleen Honigsberg, and Daniel Ho.
+  2022{\natexlab{b}}.
+\newblock \href {https://doi.org/10.1145/3514094.3534181} {Outsider oversight:
+  Designing a third party audit ecosystem for ai governance}.
+\newblock In \emph{Proceedings of the 2022 AAAI/ACM Conference on AI, Ethics,
+  and Society}, AIES '22, page 557–571, New York, NY, USA. Association for
+  Computing Machinery.
+
+\bibitem[{Rakova et~al.(2022)Rakova, Ma, and
+  Shelby}]{rakova2022termsweservewith}
+Bogdana Rakova, Megan Ma, and Renee Shelby. 2022.
+\newblock \href {http://arxiv.org/abs/2206.02492} {Terms-we-serve-with: a
+  feminist-inspired social imaginary for improved transparency and engagement
+  in ai}.
+
+\bibitem[{RDR(2020)}]{rdr2020index}
+RDR. 2020.
+\newblock \href {https://rankingdigitalrights.org/index2020/} {2020 ranking
+  digital rights corporate accountability index}.
+
+\bibitem[{Reddi et~al.(2020)Reddi, Cheng, Kanter, Mattson, Schmuelling, Wu,
+  Anderson, Breughe, Charlebois, Chou et~al.}]{reddi2020mlperf}
+Vijay~Janapa Reddi, Christine Cheng, David Kanter, Peter Mattson, Guenther
+  Schmuelling, Carole-Jean Wu, Brian Anderson, Maximilien Breughe, Mark
+  Charlebois, William Chou, et~al. 2020.
+\newblock Mlperf inference benchmark.
+\newblock In \emph{2020 ACM/IEEE 47th Annual International Symposium on
+  Computer Architecture (ISCA)}, pages 446--459. IEEE.
+
+\bibitem[{Reuter and Schulze(2023)}]{reuter2023im}
+Max Reuter and William Schulze. 2023.
+\newblock \href {http://arxiv.org/abs/2306.03423} {I'm afraid i can't do that:
+  Predicting prompt refusal in black-box generative language models}.
+
+\bibitem[{Ribeiro et~al.(2020)Ribeiro, Wu, Guestrin, and
+  Singh}]{ribeiro2020beyond}
+Marco~Tulio Ribeiro, Tongshuang Wu, Carlos Guestrin, and Sameer Singh. 2020.
+\newblock Beyond accuracy: Behavioral testing of {NLP} models with
+  {C}heck{L}ist.
+\newblock In \emph{Association for Computational Linguistics (ACL)}, pages
+  4902--4912.
+
+\bibitem[{Robinson and Acemoglu(2012)}]{robinson2012nations}
+James~A Robinson and Daron Acemoglu. 2012.
+\newblock \emph{Why nations fail: The origins of power, prosperity and
+  poverty}.
+\newblock Profile London.
+
+\bibitem[{Rosenblat and Stark(2016)}]{rosenblat2016algorithmic}
+Alex Rosenblat and Luke Stark. 2016.
+\newblock \href {https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2686227}
+  {Algorithmic labor and information asymmetries: A case study of uber’s
+  drivers}.
+\newblock \emph{International Journal Of Communication}, 10:27.
+\newblock Posted: 5 Nov 2015; Last revised: 25 Jul 2017.
+
+\bibitem[{Saisana and Tarantola(2002)}]{saisana2002state}
+Michaela Saisana and Stefano Tarantola. 2002.
+\newblock \emph{State-of-the-art report on current methodologies and practices
+  for composite indicator development}, volume 214.
+
+\bibitem[{Sambasivan et~al.(2021)Sambasivan, Kapania, Highfill, Akrong,
+  Paritosh, and Aroyo}]{sambasivan2021everyone}
+Nithya Sambasivan, Shivani Kapania, Hannah Highfill, Diana Akrong, Praveen
+  Paritosh, and Lora~M Aroyo. 2021.
+\newblock “everyone wants to do the model work, not the data work”: Data
+  cascades in high-stakes ai.
+\newblock In \emph{proceedings of the 2021 CHI Conference on Human Factors in
+  Computing Systems}, pages 1--15.
+
+\bibitem[{Sandvig et~al.(2014)Sandvig, Hamilton, Karahalios, and
+  Langbort}]{sandvig2014auditing}
+Christian Sandvig, Kevin Hamilton, Karrie Karahalios, and C{\'e}dric Langbort.
+  2014.
+\newblock \href {https://api.semanticscholar.org/CorpusID:15686114} {Auditing
+  algorithms : Research methods for detecting discrimination on internet
+  platforms}.
+
+\bibitem[{Sastry(2021)}]{sastry2021release}
+Girish Sastry. 2021.
+\newblock \href {https://crfm.stanford.edu/commentary/2021/10/18/sastry.html}
+  {Beyond “release” vs. “not release”}.
+
+\bibitem[{Sathyavageesran et~al.(2022)Sathyavageesran, Yates, Sarwate, and
+  Mandayam}]{sathyavageesran2022privacy}
+Nitya Sathyavageesran, Roy~D. Yates, Anand~D. Sarwate, and Narayan Mandayam.
+  2022.
+\newblock \href {http://arxiv.org/abs/2205.15630} {Privacy leakage in discrete
+  time updating systems}.
+
+\bibitem[{Saveri et~al.(2023)Saveri, Zirpoli, Young, and
+  McMahon}]{tremblay2023openai}
+Joseph~R. Saveri, Cadio Zirpoli, Christopher~K.L. Young, and Kathleen~J.
+  McMahon. 2023.
+\newblock \href
+  {https://storage.courtlistener.com/recap/gov.uscourts.cand.414822/gov.uscourts.cand.414822.1.0_1.pdf}
+  {Paul tremblay, mona awad vs. openai, inc., et al.}
+\newblock Case 3:23-cv-03223-AMO Document 1 Filed 06/28/23, UNITED STATES
+  DISTRICT COURT, NORTHERN DISTRICT OF CALIFORNIA, SAN FRANCISCO DIVISION.
+
+\bibitem[{Schudson(2015)}]{schudson2015rise}
+Michael Schudson. 2015.
+\newblock \emph{The rise of the right to know: Politics and the culture of
+  transparency, 1945-1975}.
+\newblock Harvard University Press.
+
+\bibitem[{Schwartz et~al.(2020)Schwartz, Dodge, Smith, and
+  Etzioni}]{schwartz2020green}
+Roy Schwartz, Jesse Dodge, Noah~A Smith, and Oren Etzioni. 2020.
+\newblock Green ai.
+\newblock \emph{Communications of the ACM}, 63(12):54--63.
+
+\bibitem[{Seger et~al.(2023)Seger, Dreksler, Moulange, Dardaman, Schuett, Wei,
+  Winter, Arnold, Ó~hÉigeartaigh, Korinek, Anderljung, Bucknall, Chan,
+  Stafford, Koessler, Ovadya, Garfinkel, Bluemke, Aird, Levermore, Hazell, and
+  Gupta}]{seger2023open}
+Elizabeth Seger, Noemi Dreksler, Richard Moulange, Emily Dardaman, Jonas
+  Schuett, K.~Wei, Christoph Winter, Mackenzie Arnold, Seán Ó~hÉigeartaigh,
+  Anton Korinek, Markus Anderljung, Ben Bucknall, Alan Chan, Eoghan Stafford,
+  Leonie Koessler, Aviv Ovadya, Ben Garfinkel, Emma Bluemke, Michael Aird,
+  Patrick Levermore, Julian Hazell, and Abhishek Gupta. 2023.
+\newblock {Open-Sourcing Highly Capable Foundation Models: An Evaluation of
+  Risks, Benefits, and Alternative Methods for Pursuing Open-Source
+  Objectives}.
+
+\bibitem[{Service(2021)}]{crs2021netneutrality}
+Congressional~Research Service. 2021.
+\newblock \href {https://crsreports.congress.gov/product/pdf/R/R40616} {The
+  federal net neutrality debate: Access to broadband networks}.
+\newblock Technical report, Congressional Research Service.
+\newblock Report Number: R40616.
+
+\bibitem[{Sevilla et~al.(2022)Sevilla, Heim, Ho, Besiroglu, Hobbhahn, and
+  Villalobos}]{sevilla2022compute}
+Jaime Sevilla, Lennart Heim, Anson Ho, Tamay Besiroglu, Marius Hobbhahn, and
+  Pablo Villalobos. 2022.
+\newblock \href {http://arxiv.org/abs/2202.05924} {Compute trends across three
+  eras of machine learning}.
+
+\bibitem[{Shevlane(2022)}]{shevlane2022structured}
+Toby Shevlane. 2022.
+\newblock \href {https://doi.org/10.48550/ARXIV.2201.05159} {Structured access:
+  an emerging paradigm for safe ai deployment}.
+
+\bibitem[{Shneiderman(2020)}]{shneiderman2020bridging}
+Ben Shneiderman. 2020.
+\newblock \href {https://doi.org/10.1145/3419764} {Bridging the gap between
+  ethics and practice: Guidelines for reliable, safe, and trustworthy
+  human-centered ai systems}.
+\newblock \emph{ACM Trans. Interact. Intell. Syst.}, 10(4).
+
+\bibitem[{Singer et~al.(2022)Singer, Polyak, Hayes, Yin, An, Zhang, Hu, Yang,
+  Ashual, Gafni, Parikh, Gupta, and Taigman}]{singer2022makeavideo}
+Uriel Singer, Adam Polyak, Thomas Hayes, Xiaoyue Yin, Jie An, Songyang Zhang,
+  Qiyuan Hu, Harry Yang, Oron Ashual, Oran Gafni, Devi Parikh, Sonal Gupta, and
+  Yaniv Taigman. 2022.
+\newblock Make-a-video: Text-to-video generation without text-video data.
+\newblock \emph{ArXiv}, abs/2209.14792.
+
+\bibitem[{Skowron and Biderman(2023)}]{skowron2023euaiact}
+Aviya Skowron and Stella Biderman. 2023.
+\newblock \href {https://blog.eleuther.ai/eu-aia/} {Eleutherai's thoughts on
+  the eu ai act}.
+\newblock How we are supporting open source and open science in the EU AI Act.
+
+\bibitem[{Sobel(2017)}]{sobel2017artificial}
+Benjamin~LW Sobel. 2017.
+\newblock Artificial intelligence's fair use crisis.
+\newblock \emph{Colum. JL \& Arts}, 41:45.
+
+\bibitem[{Solaiman(2023)}]{solaiman2023gradient}
+Irene Solaiman. 2023.
+\newblock The gradient of generative ai release: Methods and considerations.
+\newblock In \emph{Proceedings of the 2023 ACM Conference on Fairness,
+  Accountability, and Transparency}, pages 111--122.
+
+\bibitem[{Solaiman et~al.(2019)Solaiman, Brundage, Clark, Askell, Herbert-Voss,
+  Wu, Radford, and Wang}]{solaiman2019release}
+Irene Solaiman, Miles Brundage, Jack Clark, Amanda Askell, Ariel Herbert-Voss,
+  Jeff Wu, Alec Radford, and Jasmine Wang. 2019.
+\newblock Release strategies and the social impacts of language models.
+\newblock \emph{ArXiv}, abs/1908.09203.
+
+\bibitem[{Solaiman et~al.(2023)Solaiman, Talat, Agnew, Ahmad, Baker, Blodgett,
+  au2, Dodge, Evans, Hooker, Jernite, Luccioni, Lusoli, Mitchell, Newman, Png,
+  Strait, and Vassilev}]{solaiman2023evaluating}
+Irene Solaiman, Zeerak Talat, William Agnew, Lama Ahmad, Dylan Baker, Su~Lin
+  Blodgett, Hal Daumé~III au2, Jesse Dodge, Ellie Evans, Sara Hooker, Yacine
+  Jernite, Alexandra~Sasha Luccioni, Alberto Lusoli, Margaret Mitchell, Jessica
+  Newman, Marie-Therese Png, Andrew Strait, and Apostol Vassilev. 2023.
+\newblock \href {http://arxiv.org/abs/2306.05949} {Evaluating the social impact
+  of generative ai systems in systems and society}.
+
+\bibitem[{Springer and Whittaker(2018)}]{springer2018progressive}
+Aaron Springer and Steve Whittaker. 2018.
+\newblock \href {http://arxiv.org/abs/1811.02164} {Progressive disclosure:
+  Designing for effective transparency}.
+
+\bibitem[{Srivastava et~al.(2022)Srivastava, Rastogi, Rao, Shoeb, Abid, Fisch,
+  Brown, Santoro, Gupta, Garriga-Alonso, Kluska, Lewkowycz, Agarwal, Power,
+  Ray, Warstadt, Kocurek, Safaya, Tazarv, Xiang, Parrish, Nie, Hussain, Askell,
+  Dsouza, Rahane, Iyer, Andreassen, Santilli, Stuhlmuller, Dai, La, Lampinen,
+  Zou, Jiang, Chen, Vuong, Gupta, Gottardi, Norelli, Venkatesh, Gholamidavoodi,
+  Tabassum, Menezes, Kirubarajan, Mullokandov, Sabharwal, Herrick, Efrat,
+  Erdem, Karakacs, Roberts, Loe, Zoph, Bojanowski, Ozyurt, Hedayatnia,
+  Neyshabur, Inden, Stein, Ekmekci, Lin, Howald, Diao, Dour, Stinson, Argueta,
+  Ram'irez, Singh, Rathkopf, Meng, Baral, Wu, Callison-Burch, Waites, Voigt,
+  Manning, Potts, Ramirez, Rivera, Siro, Raffel, Ashcraft, Garbacea, Sileo,
+  Garrette, Hendrycks, Kilman, Roth, Freeman, Khashabi, Levy, Gonz'alez,
+  Hernandez, Chen, Ippolito, Gilboa, Dohan, Drakard, Jurgens, Datta, Ganguli,
+  Emelin, Kleyko, Yuret, Chen, Tam, Hupkes, Misra, Buzan, Mollo, Yang, Lee,
+  Shutova, Cubuk, Segal, Hagerman, Barnes, Donoway, Pavlick, Rodol{\`a}, Lam,
+  Chu, Tang, Erdem, Chang, Chi, Dyer, Jerzak, Kim, Manyasi, Zheltonozhskii,
+  Xia, Siar, Mart'inez-Plumed, Happ'e, Chollet, Rong, Mishra, Winata, de~Melo,
+  Kruszewski, Parascandolo, Mariani, Wang, Jaimovitch-L'opez, Betz, Gur-Ari,
+  Galijasevic, Kim, Rashkin, Hajishirzi, Mehta, Bogar, Shevlin, Sch{\"u}tze,
+  Yakura, Zhang, Wong, Ng, Noble, Jumelet, Geissinger, Kernion, Hilton, Lee,
+  Fisac, Simon, Koppel, Zheng, Zou, Koco'n, Thompson, Kaplan, Radom,
+  Sohl-Dickstein, Phang, Wei, Yosinski, Novikova, Bosscher, Marsh, Kim, Taal,
+  Engel, Alabi, Xu, Song, Tang, Waweru, Burden, Miller, Balis, Berant,
+  Frohberg, Rozen, Hern{\'a}ndez-Orallo, Boudeman, Jones, Tenenbaum, Rule,
+  Chua, Kanclerz, Livescu, Krauth, Gopalakrishnan, Ignatyeva, Markert, Dhole,
+  Gimpel, Omondi, Mathewson, Chiafullo, Shkaruta, Shridhar, McDonell,
+  Richardson, Reynolds, Gao, Zhang, Dugan, Qin, Contreras-Ochando, Morency,
+  Moschella, Lam, Noble, Schmidt, He, Col'on, Metz, cSenel, Bosma, Sap, ter
+  Hoeve, Andrea, Farooqi, Faruqui, Mazeika, Baturan, Marelli, Maru, Quintana,
+  Tolkiehn, Giulianelli, Lewis, Potthast, Leavitt, Hagen, Schubert,
+  Baitemirova, Arnaud, McElrath, Yee, Cohen, Gu, Ivanitskiy, Starritt, Strube,
+  Swkedrowski, Bevilacqua, Yasunaga, Kale, Cain, Xu, Suzgun, Tiwari, Bansal,
+  Aminnaseri, Geva, Gheini, MukundVarma, Peng, Chi, Lee, Krakover, Cameron,
+  Roberts, Doiron, Nangia, Deckers, Muennighoff, Keskar, Iyer, Constant,
+  Fiedel, Wen, Zhang, Agha, Elbaghdadi, Levy, Evans, Casares, Doshi, Fung,
+  Liang, Vicol, Alipoormolabashi, Liao, Liang, Chang, Eckersley, Htut, Hwang,
+  Milkowski, Patil, Pezeshkpour, Oli, Mei, LYU, Chen, Banjade, Rudolph,
+  Gabriel, Habacker, Delgado, Milli{\`e}re, Garg, Barnes, Saurous, Arakawa,
+  Raymaekers, Frank, Sikand, Novak, Sitelew, Bras, Liu, Jacobs, Zhang,
+  Salakhutdinov, Chi, Lee, Stovall, Teehan, Yang, Singh, Mohammad, Anand,
+  Dillavou, Shleifer, Wiseman, Gruetter, Bowman, Schoenholz, Han, Kwatra, Rous,
+  Ghazarian, Ghosh, Casey, Bischoff, Gehrmann, Schuster, Sadeghi, Hamdan, Zhou,
+  Srivastava, Shi, Singh, Asaadi, Gu, Pachchigar, Toshniwal, Upadhyay, Debnath,
+  Shakeri, Thormeyer, Melzi, Reddy, Makini, hwan Lee, Torene, Hatwar, Dehaene,
+  Divic, Ermon, Biderman, Lin, Prasad, Piantadosi, Shieber, Misherghi,
+  Kiritchenko, Mishra, Linzen, Schuster, Li, Yu, Ali, Hashimoto, Wu, Desbordes,
+  Rothschild, Phan, Wang, Nkinyili, Schick, Kornev, Telleen-Lawton, Tunduny,
+  Gerstenberg, Chang, Neeraj, Khot, Shultz, Shaham, Misra, Demberg, Nyamai,
+  Raunak, Ramasesh, Prabhu, Padmakumar, Srikumar, Fedus, Saunders, Zhang,
+  Vossen, Ren, Tong, Wu, Shen, Yaghoobzadeh, Lakretz, Song, Bahri, Choi, Yang,
+  Hao, Chen, Belinkov, Hou, Hou, Bai, Seid, Xinran, Zhao, Wang, Wang, Wang, and
+  Wu}]{srivastava2022bigbench}
+Aarohi Srivastava, Abhinav Rastogi, Abhishek~B Rao, Abu Awal~Md Shoeb, Abubakar
+  Abid, Adam Fisch, Adam~R. Brown, Adam Santoro, Aditya Gupta, Adri{\`a}
+  Garriga-Alonso, Agnieszka Kluska, Aitor Lewkowycz, Akshat Agarwal, Alethea
+  Power, Alex Ray, Alex Warstadt, Alexander~W. Kocurek, Ali Safaya, Ali Tazarv,
+  Alice Xiang, Alicia Parrish, Allen Nie, Aman Hussain, Amanda Askell, Amanda
+  Dsouza, Ameet~Annasaheb Rahane, Anantharaman~S. Iyer, Anders~Johan
+  Andreassen, Andrea Santilli, Andreas Stuhlmuller, Andrew~M. Dai, Andrew~D.
+  La, Andrew~Kyle Lampinen, Andy Zou, Angela Jiang, Angelica Chen, Anh Vuong,
+  Animesh Gupta, Anna Gottardi, Antonio Norelli, Anu Venkatesh, Arash
+  Gholamidavoodi, Arfa Tabassum, Arul Menezes, Arun Kirubarajan, Asher
+  Mullokandov, Ashish Sabharwal, Austin Herrick, Avia Efrat, Aykut Erdem, Ayla
+  Karakacs, Bridget~R. Roberts, Bao~Sheng Loe, Barret Zoph, Bartlomiej
+  Bojanowski, Batuhan Ozyurt, Behnam Hedayatnia, Behnam Neyshabur, Benjamin
+  Inden, Benno Stein, Berk Ekmekci, Bill~Yuchen Lin, Blake~Stephen Howald,
+  Cameron Diao, Cameron Dour, Catherine Stinson, Cedrick Argueta, C'esar~Ferri
+  Ram'irez, Chandan Singh, Charles Rathkopf, Chenlin Meng, Chitta Baral, Chiyu
+  Wu, Chris Callison-Burch, Chris Waites, Christian Voigt, Christopher~D.
+  Manning, Christopher Potts, Cindy~Tatiana Ramirez, Clara Rivera, Clemencia
+  Siro, Colin Raffel, Courtney Ashcraft, Cristina Garbacea, Damien Sileo,
+  Daniel~H Garrette, Dan Hendrycks, Dan Kilman, Dan Roth, Daniel Freeman,
+  Daniel Khashabi, Daniel Levy, Daniel Gonz'alez, Danny Hernandez, Danqi Chen,
+  Daphne Ippolito, Dar Gilboa, David Dohan, D.~Drakard, David Jurgens,
+  Debajyoti Datta, Deep Ganguli, Denis Emelin, Denis Kleyko, Deniz Yuret, Derek
+  Chen, Derek Tam, Dieuwke Hupkes, Diganta Misra, Dilyar Buzan, Dimitri~Coelho
+  Mollo, Diyi Yang, Dong-Ho Lee, Ekaterina Shutova, Ekin~Dogus Cubuk, Elad
+  Segal, Eleanor Hagerman, Elizabeth Barnes, Elizabeth~P. Donoway, Ellie
+  Pavlick, Emanuele Rodol{\`a}, Emma~FC Lam, Eric Chu, Eric Tang, Erkut Erdem,
+  Ernie Chang, Ethan~A. Chi, Ethan Dyer, Ethan Jerzak, Ethan Kim, Eunice~Engefu
+  Manyasi, Evgenii Zheltonozhskii, Fan Xia, Fatemeh Siar, Fernando
+  Mart'inez-Plumed, Francesca Happ'e, François Chollet, Frieda Rong, Gaurav
+  Mishra, Genta~Indra Winata, Gerard de~Melo, Germ{\'a}n Kruszewski,
+  Giambattista Parascandolo, Giorgio Mariani, Gloria Wang, Gonzalo
+  Jaimovitch-L'opez, Gregor Betz, Guy Gur-Ari, Hana Galijasevic, Han~Sol Kim,
+  Hannah Rashkin, Hanna Hajishirzi, Harsh Mehta, Hayden Bogar, Henry Shevlin,
+  Hinrich Sch{\"u}tze, Hiromu Yakura, Hongming Zhang, Hubert Wong, Ian Aik-Soon
+  Ng, Isaac Noble, Jaap Jumelet, Jack Geissinger, John Kernion, Jacob Hilton,
+  Jaehoon Lee, Jaime~Fern{\'a}ndez Fisac, J.~Brooker Simon, James Koppel, James
+  Zheng, James Zou, Jan Koco'n, Jana Thompson, Jared Kaplan, Jarema Radom,
+  Jascha~Narain Sohl-Dickstein, Jason Phang, Jason Wei, Jason Yosinski,
+  Jekaterina Novikova, Jelle Bosscher, Jenni Marsh, Jeremy Kim, Jeroen Taal,
+  Jesse Engel, Jesujoba~Oluwadara Alabi, Jiacheng Xu, Jiaming Song, Jillian
+  Tang, Jane~W Waweru, John Burden, John Miller, John~U. Balis, Jonathan
+  Berant, Jorg Frohberg, Jos Rozen, Jos{\'e} Hern{\'a}ndez-Orallo, Joseph
+  Boudeman, Joseph Jones, Joshua~B. Tenenbaum, Joshua~S. Rule, Joyce Chua,
+  Kamil Kanclerz, Karen Livescu, Karl Krauth, Karthik Gopalakrishnan, Katerina
+  Ignatyeva, Katja Markert, Kaustubh~D. Dhole, Kevin Gimpel, Kevin~Ochieng’
+  Omondi, Kory~Wallace Mathewson, Kristen Chiafullo, Ksenia Shkaruta, Kumar
+  Shridhar, Kyle McDonell, Kyle Richardson, Laria Reynolds, Leo Gao, Li~Zhang,
+  Liam Dugan, Lianhui Qin, Lidia Contreras-Ochando, Louis-Philippe Morency,
+  Luca Moschella, Luca Lam, Lucy Noble, Ludwig Schmidt, Luheng He,
+  Luis~Oliveros Col'on, Luke Metz, Lutfi~Kerem cSenel, Maarten Bosma, Maarten
+  Sap, Maartje ter Hoeve, Madotto Andrea, Maheen~Saleem Farooqi, Manaal
+  Faruqui, Mantas Mazeika, Marco Baturan, Marco Marelli, Marco Maru,
+  M~Quintana, Marie Tolkiehn, Mario Giulianelli, Martha Lewis, Martin Potthast,
+  Matthew Leavitt, Matthias Hagen, M'aty'as Schubert, Medina Baitemirova,
+  Melissa Arnaud, Melvin~Andrew McElrath, Michael~A. Yee, Michael Cohen, Mi~Gu,
+  Michael~I. Ivanitskiy, Michael Starritt, Michael Strube, Michal Swkedrowski,
+  Michele Bevilacqua, Michihiro Yasunaga, Mihir Kale, Mike Cain, Mimee Xu,
+  Mirac Suzgun, Monica Tiwari, Mohit Bansal, Moin Aminnaseri, Mor Geva, Mozhdeh
+  Gheini, T~MukundVarma, Nanyun Peng, Nathan Chi, Nayeon Lee, Neta Gur-Ari
+  Krakover, Nicholas Cameron, Nicholas~S. Roberts, Nicholas Doiron, Nikita
+  Nangia, Niklas Deckers, Niklas Muennighoff, Nitish~Shirish Keskar, Niveditha
+  Iyer, Noah Constant, Noah Fiedel, Nuan Wen, Oliver Zhang, Omar Agha, Omar
+  Elbaghdadi, Omer Levy, Owain Evans, Pablo Antonio~Moreno Casares, Parth
+  Doshi, Pascale Fung, Paul~Pu Liang, Paul Vicol, Pegah Alipoormolabashi,
+  Peiyuan Liao, Percy Liang, Peter~W. Chang, Peter Eckersley, Phu~Mon Htut,
+  Pi-Bei Hwang, P.~Milkowski, Piyush~S. Patil, Pouya Pezeshkpour, Priti Oli,
+  Qiaozhu Mei, QING LYU, Qinlang Chen, Rabin Banjade, Rachel~Etta Rudolph,
+  Raefer Gabriel, Rahel Habacker, Ram'on~Risco Delgado, Rapha{\"e}l
+  Milli{\`e}re, Rhythm Garg, Richard Barnes, Rif~A. Saurous, Riku Arakawa,
+  Robbe Raymaekers, Robert Frank, Rohan Sikand, Roman Novak, Roman Sitelew,
+  Ronan~Le Bras, Rosanne Liu, Rowan Jacobs, Rui Zhang, Ruslan Salakhutdinov,
+  Ryan Chi, Ryan Lee, Ryan Stovall, Ryan Teehan, Rylan Yang, Sahib~J. Singh,
+  Saif~M. Mohammad, Sajant Anand, Sam Dillavou, Sam Shleifer, Sam Wiseman,
+  Samuel Gruetter, Sam Bowman, Samuel~S. Schoenholz, Sanghyun Han, Sanjeev
+  Kwatra, Sarah~A. Rous, Sarik Ghazarian, Sayan Ghosh, Sean Casey, Sebastian
+  Bischoff, Sebastian Gehrmann, Sebastian Schuster, Sepideh Sadeghi,
+  Shadi~Sameh Hamdan, Sharon Zhou, Shashank Srivastava, Sherry Shi, Shikhar
+  Singh, Shima Asaadi, Shixiang~Shane Gu, Shubh Pachchigar, Shubham Toshniwal,
+  Shyam Upadhyay, Shyamolima Debnath, Siamak Shakeri, Simon Thormeyer, Simone
+  Melzi, Siva Reddy, Sneha~Priscilla Makini, Soo hwan Lee, Spencer~Bradley
+  Torene, Sriharsha Hatwar, Stanislas Dehaene, Stefan Divic, Stefano Ermon,
+  Stella~Rose Biderman, Stephanie~C. Lin, Stephen Prasad, Steven~T. Piantadosi,
+  Stuart~M. Shieber, Summer Misherghi, Svetlana Kiritchenko, Swaroop Mishra,
+  Tal Linzen, Tal Schuster, Tao Li, Tao Yu, Tariq~A. Ali, Tatsuo Hashimoto,
+  Te-Lin Wu, Theo Desbordes, Theodore Rothschild, Thomas Phan, Tianle Wang,
+  Tiberius Nkinyili, Timo Schick, T.~N. Kornev, Timothy Telleen-Lawton, Titus
+  Tunduny, Tobias Gerstenberg, Trenton Chang, Trishala Neeraj, Tushar Khot,
+  Tyler~O. Shultz, Uri Shaham, Vedant Misra, Vera Demberg, Victoria Nyamai,
+  Vikas Raunak, Vinay~V. Ramasesh, Vinay~Uday Prabhu, Vishakh Padmakumar, Vivek
+  Srikumar, William Fedus, William Saunders, William Zhang, W~Vossen, Xiang
+  Ren, Xiaoyu~F Tong, Xinyi Wu, Xudong Shen, Yadollah Yaghoobzadeh, Yair
+  Lakretz, Yang Song, Yasaman Bahri, Ye~Ji Choi, Yichi Yang, Yiding Hao, Yifu
+  Chen, Yonatan Belinkov, Yu~Hou, Yu~Hou, Yushi Bai, Zachary Seid, Zhao Xinran,
+  Zhuoye Zhao, Zi~Fu Wang, Zijie~J. Wang, Zirui Wang, and Ziyi Wu. 2022.
+\newblock Beyond the imitation game: Quantifying and extrapolating the
+  capabilities of language models.
+\newblock \emph{ArXiv}, abs/2206.04615.
+
+\bibitem[{Srivastava et~al.(2021)Srivastava, Li, Lingelbach, Mart\'in-Mart\'in,
+  Xia, Vainio, Lian, Gokmen, Buch, Liu, Savarese, Gweon, Wu, and
+  Fei-Fei}]{srivastava2021behavior}
+Sanjana Srivastava, Chengshu Li, Michael Lingelbach, Roberto Mart\'in-Mart\'in,
+  Fei Xia, Kent Vainio, Zheng Lian, Cem Gokmen, Shyamal Buch, Karen Liu, Silvio
+  Savarese, Hyowon Gweon, Jiajun Wu, and Li~Fei-Fei. 2021.
+\newblock Behavior: Benchmark for everyday household activities in virtual,
+  interactive, and ecological environments.
+\newblock In \emph{Conference in Robot Learning (CoRL)}, page accepted.
+
+\bibitem[{Strubell et~al.(2019)Strubell, Ganesh, and
+  McCallum}]{strubell2019energy}
+Emma Strubell, Ananya Ganesh, and Andrew McCallum. 2019.
+\newblock Energy and policy considerations for deep learning in {NLP}.
+\newblock \emph{arXiv preprint arXiv:1906.02243}.
+
+\bibitem[{Tabassi(2023{\natexlab{a}})}]{tabassi2023airmf}
+Elham Tabassi. 2023{\natexlab{a}}.
+\newblock \href {https://doi.org/https://doi.org/10.6028/NIST.AI.100-1}
+  {Artificial intelligence risk management framework (ai rmf 1.0)}.
+
+\bibitem[{Tabassi(2023{\natexlab{b}})}]{nist2023airmf}
+Elham Tabassi. 2023{\natexlab{b}}.
+\newblock \href {https://doi.org/https://doi.org/10.6028/NIST.AI.100-1}
+  {Artificial intelligence risk management framework (ai rmf 1.0)}.
+
+\bibitem[{Touvron et~al.(2023)Touvron, Lavril, Izacard, Martinet, Lachaux,
+  Lacroix, Rozi{\`e}re, Goyal, Hambro, Azhar et~al.}]{touvron2023llama}
+Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne
+  Lachaux, Timoth{\'e}e Lacroix, Baptiste Rozi{\`e}re, Naman Goyal, Eric
+  Hambro, Faisal Azhar, et~al. 2023.
+\newblock Llama: Open and efficient foundation language models.
+\newblock \emph{arXiv preprint arXiv:2302.13971}.
+
+\bibitem[{{Transparency International}(2023)}]{ti2022corrupt}
+{Transparency International}. 2023.
+\newblock \href {http://www.transparency.org/cpi} {Corruption perception index
+  2022}.
+
+\bibitem[{UNDP(2022)}]{undp2022hdr}
+UNDP. 2022.
+\newblock \href {http://report.hdr.undp.org} {Human development report
+  2021-22}.
+
+\bibitem[{Vipra and Korinek(2023)}]{vipra2023concentration}
+Jai Vipra and Anton Korinek. 2023.
+\newblock \href
+  {https://www.brookings.edu/articles/market-concentration-implications-of-foundation-models-the-invisible-hand-of-chatgpt}
+  {Market concentration implications of foundation models: The invisible hand
+  of chatgpt}.
+\newblock \emph{The Brookings Institution}.
+
+\bibitem[{Vipra and Myers~West(2023)}]{vipra2023}
+Jai Vipra and Sarah Myers~West. 2023.
+\newblock \href {https://ainowinstitute.org/publication/policy/compute-and-ai}
+  {Computational power and ai}.
+
+\bibitem[{Vipra and West(2023)}]{vipra2023comments}
+Jai Vipra and Sarah~Myers West. 2023.
+\newblock \href
+  {https://ainowinstitute.org/wp-content/uploads/2023/06/Cloud-RFI-Submission_06222023.pdf}
+  {Comments on the business practices of cloud computing providers}.
+\newblock Technical report, AI Now Institute.
+\newblock Filed before the Federal Trade Commission, Docket ID FTC-2023-0028.
+
+\bibitem[{Vogus and Llansó(2021)}]{cdt2021}
+Caitlin Vogus and Emma Llansó. 2021.
+\newblock \href
+  {https://cdt.org/insights/report-making-transparency-meaningful-a-framework-for-policymakers/}
+  {Making transparency meaningful: A framework for policymakers}.
+\newblock \emph{Center for Democracy and Technology}.
+
+\bibitem[{Wang et~al.(2019)Wang, Pruksachatkun, Nangia, Singh, Michael, Hill,
+  Levy, and Bowman}]{wang2019superglue}
+Alex Wang, Yada Pruksachatkun, Nikita Nangia, Amanpreet Singh, Julian Michael,
+  Felix Hill, Omer Levy, and Samuel~R. Bowman. 2019.
+\newblock {SuperGLUE}: A stickier benchmark for general-purpose language
+  understanding systems.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}.
+
+\bibitem[{Wang et~al.(2023{\natexlab{a}})Wang, Chen, Pei, Xie, Kang, Zhang, Xu,
+  Xiong, Dutta, Schaeffer, Truong, Arora, Mazeika, Hendrycks, Lin, Cheng,
+  Koyejo, Song, and Li}]{wang2023decodingtrust}
+Boxin Wang, Weixin Chen, Hengzhi Pei, Chulin Xie, Mintong Kang, Chenhui Zhang,
+  Chejian Xu, Zidi Xiong, Ritik Dutta, Rylan Schaeffer, Sang~T. Truong, Simran
+  Arora, Mantas Mazeika, Dan Hendrycks, Zinan Lin, Yu~Cheng, Sanmi Koyejo, Dawn
+  Song, and Bo~Li. 2023{\natexlab{a}}.
+\newblock \href {http://arxiv.org/abs/2306.11698} {Decodingtrust: A
+  comprehensive assessment of trustworthiness in gpt models}.
+
+\bibitem[{Wang et~al.(2023{\natexlab{b}})Wang, Madaio, Kane, Kapania, Terry,
+  and Wilcox}]{qiaosi2023ux}
+Qiaosi Wang, Michael Madaio, Shaun Kane, Shivani Kapania, Michael Terry, and
+  Lauren Wilcox. 2023{\natexlab{b}}.
+\newblock \href {https://doi.org/10.1145/3544548.3581278} {Designing
+  responsible ai: Adaptations of ux practice to meet responsible ai
+  challenges}.
+\newblock In \emph{Proceedings of the 2023 CHI Conference on Human Factors in
+  Computing Systems}, CHI '23, New York, NY, USA. Association for Computing
+  Machinery.
+
+\bibitem[{WEF(2023)}]{wef2023presidio}
+WEF. 2023.
+\newblock \href
+  {https://www3.weforum.org/docs/WEF_Presidio_Recommendations_on_Responsible_Generative_AI_2023.pdf}
+  {The presidio recommendations on responsible generative ai}.
+
+\bibitem[{Weidinger et~al.(2021)Weidinger, Mellor, Rauh, Griffin, Uesato,
+  Huang, Cheng, Glaese, Balle, Kasirzadeh et~al.}]{weidinger2021ethical}
+Laura Weidinger, John Mellor, Maribeth Rauh, Conor Griffin, Jonathan Uesato,
+  Po-Sen Huang, Myra Cheng, Mia Glaese, Borja Balle, Atoosa Kasirzadeh, et~al.
+  2021.
+\newblock Ethical and social risks of harm from language models.
+\newblock \emph{arXiv preprint arXiv:2112.04359}.
+
+\bibitem[{Weidinger et~al.(2023)Weidinger, Rauh, Marchal, Manzini, Hendricks,
+  Mateos-Garcia, Bergman, Kay, Griffin, Bariach, Gabriel, Rieser, and
+  Isaac}]{weidinger2023sociotechnical}
+Laura Weidinger, Maribeth Rauh, Nahema Marchal, Arianna Manzini, Lisa~Anne
+  Hendricks, Juan Mateos-Garcia, Stevie Bergman, Jackie Kay, Conor Griffin, Ben
+  Bariach, Iason Gabriel, Verena Rieser, and William~S. Isaac. 2023.
+\newblock \href {https://arxiv.org/abs/2310.11986} {Sociotechnical safety
+  evaluation of generative ai systems}.
+
+\bibitem[{Weidinger et~al.(2022)Weidinger, Uesato, Rauh, Griffin, Huang,
+  Mellor, Glaese, Cheng, Balle, Kasirzadeh, Biles, Brown, Kenton, Hawkins,
+  Stepleton, Birhane, Hendricks, Rimell, Isaac, Haas, Legassick, Irving, and
+  Gabriel}]{weidinger2022taxonomy}
+Laura Weidinger, Jonathan Uesato, Maribeth Rauh, Conor Griffin, Po-Sen Huang,
+  John Mellor, Amelia Glaese, Myra Cheng, Borja Balle, Atoosa Kasirzadeh,
+  Courtney Biles, Sasha Brown, Zac Kenton, Will Hawkins, Tom Stepleton, Abeba
+  Birhane, Lisa~Anne Hendricks, Laura Rimell, William Isaac, Julia Haas, Sean
+  Legassick, Geoffrey Irving, and Iason Gabriel. 2022.
+\newblock \href {https://doi.org/10.1145/3531146.3533088} {Taxonomy of risks
+  posed by language models}.
+\newblock In \emph{2022 ACM Conference on Fairness, Accountability, and
+  Transparency}, FAccT '22, page 214–229, New York, NY, USA. Association for
+  Computing Machinery.
+
+\bibitem[{West(2019)}]{west2019data}
+Sarah~Myers West. 2019.
+\newblock Data capitalism: Redefining the logics of surveillance and privacy.
+\newblock \emph{Business \& society}, 58(1):20--41.
+
+\bibitem[{Whitford and Wong(2009)}]{whitford2009political}
+Andrew~B Whitford and Karen Wong. 2009.
+\newblock Political and social foundations for environmental sustainability.
+\newblock \emph{Political Research Quarterly}, 62(1):190--204.
+
+\bibitem[{Widder et~al.(2023)Widder, West, and Whittaker}]{widder2023open}
+David~Gray Widder, Sarah West, and Meredith Whittaker. 2023.
+\newblock Open (for business): Big tech, concentrated power, and the political
+  economy of open ai.
+
+\bibitem[{Widder and Wong(2023)}]{widder2023thinking}
+David~Gray Widder and Richmond Wong. 2023.
+\newblock \href {http://arxiv.org/abs/2303.07529} {Thinking upstream: Ethics
+  and policy opportunities in ai supply chains}.
+
+\bibitem[{Winograd(2023)}]{winograd2023privacy}
+Amy Winograd. 2023.
+\newblock Loose-lipped large language modells spill your secrets: The privacy
+  implications of large language models.
+\newblock \emph{Harvard Journal of Law and Technology}, 36(2).
+
+\bibitem[{Zalnieriute(2021)}]{zalnieriute2021transparency}
+Monika Zalnieriute. 2021.
+\newblock \href {http://hdl.handle.net/11159/468588}
+  {\textquotedblleft{}transparency-washing\textquotedblright{} in the digital
+  age : A corporate agenda of procedural fetishism}.
+\newblock Technical report.
+
+\bibitem[{Zanfir-Fortuna(2023)}]{zanfir-f2023fpf}
+Gabriela Zanfir-Fortuna. 2023.
+\newblock \href
+  {https://fpf.org/blog/how-data-protection-authorities-are-de-facto-regulating-generative-ai/}
+  {How data protection authorities are de facto regulating generative ai}.
+
+\bibitem[{Zhang et~al.(2022{\natexlab{a}})Zhang, Maslej, Brynjolfsson,
+  Etchemendy, Lyons, Manyika, Ngo, Niebles, Sellitto, Sakhaee
+  et~al.}]{zhang2022ai}
+Daniel Zhang, Nestor Maslej, Erik Brynjolfsson, John Etchemendy, Terah Lyons,
+  James Manyika, Helen Ngo, Juan~Carlos Niebles, Michael Sellitto, Ellie
+  Sakhaee, et~al. 2022{\natexlab{a}}.
+\newblock The ai index 2022 annual report. ai index steering committee.
+\newblock \emph{Stanford Institute for Human-Centered AI, Stanford University},
+  page 123.
+
+\bibitem[{Zhang et~al.(2022{\natexlab{b}})Zhang, Roller, Goyal, Artetxe, Chen,
+  Chen, Dewan, Diab, Li, Lin, Mihaylov, Ott, Shleifer, Shuster, Simig, Koura,
+  Sridhar, Wang, and Zettlemoyer}]{zhang2022opt}
+Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui
+  Chen, Christopher Dewan, Mona Diab, Xian Li, Xi~Victoria Lin, Todor Mihaylov,
+  Myle Ott, Sam Shleifer, Kurt Shuster, Daniel Simig, Punit~Singh Koura, Anjali
+  Sridhar, Tianlu Wang, and Luke Zettlemoyer. 2022{\natexlab{b}}.
+\newblock {OPT}: Open pre-trained transformer language models.
+\newblock \emph{arXiv}.
+
+\bibitem[{Ziegler et~al.(2019)Ziegler, Stiennon, Wu, Brown, Radford, Amodei,
+  Christiano, and Irving}]{ziegler2019finetuning}
+Daniel~M. Ziegler, Nisan Stiennon, Jeff Wu, Tom~B. Brown, Alec Radford, Dario
+  Amodei, Paul Christiano, and Geoffrey Irving. 2019.
+\newblock \href {https://api.semanticscholar.org/CorpusID:202660943}
+  {Fine-tuning language models from human preferences}.
+\newblock \emph{ArXiv}, abs/1909.08593.
+
+\bibitem[{Zou et~al.(2023)Zou, Phan, Chen, Campbell, Guo, Ren, Pan, Yin,
+  Mazeika, Dombrowski, Goel, Li, Byun, Wang, Mallen, Basart, Koyejo, Song,
+  Fredrikson, Kolter, and Hendrycks}]{zou2023representation}
+Andy Zou, Long Phan, Sarah Chen, James Campbell, Phillip Guo, Richard Ren,
+  Alexander Pan, Xuwang Yin, Mantas Mazeika, Ann-Kathrin Dombrowski, Shashwat
+  Goel, Nathaniel Li, Michael~J. Byun, Zifan Wang, Alex Mallen, Steven Basart,
+  Sanmi Koyejo, Dawn Song, Matt Fredrikson, J.~Zico Kolter, and Dan Hendrycks.
+  2023.
+\newblock \href {http://arxiv.org/abs/2310.01405} {Representation engineering:
+  A top-down approach to ai transparency}.
+
+\end{thebibliography}

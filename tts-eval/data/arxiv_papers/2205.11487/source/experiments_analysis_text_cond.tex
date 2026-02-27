@@ -1,0 +1,23 @@
+\subsubsection{Impact of Text Conditioning Schemas}
+\label{sec:text_conditioning_ablation}
+
+We ablate various schemas for conditioning the frozen text embeddings in the base $64\times64$ text-to-image diffusion model. Fig. \ref{fig:text_cond_comparison} compares the CLIP-FID pareto curves for mean pooling, attention pooling, and cross attention. We find using any pooled embedding configuration (mean or attention pooling) performs noticeably worse compared to attending over the sequence of contextual embeddings in the attention layers. We implement the cross attention by concatenating the text embedding sequence to the key-value pairs of each self-attention layer in the base $64\times64$ and $64\times64 \rightarrow 256\times256$ models. %
+For our $256\times256 \rightarrow 1024\times1024$ model, since we have no self-attention layers, we simply added explicit cross-attention layers to attend over the text embeddings. We found this to improve both fidelity and image-text alignment with minimal computational costs. 
+
+
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.49\textwidth}
+    \input{figures/pgfplots/text_cond_pareto.tex}
+    \caption{Comparison between different text encoders.}
+     \label{fig:text_cond_comparison}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.49\textwidth}
+     \centering
+     \input{figures/pgfplots/model_size_pareto_appendix.tex}
+      \caption{Comparison between different model sizes.}
+      \label{fig:model_size_comparison}
+    \end{subfigure}
+    \caption{CLIP vs FID-10K pareto curves for different ablation studies for the base $64\times64$ model. For each study, we sweep over guidance values of $[1, 1.25, 1.5, 1.75, 2, 3, 4, 5, 6, 7, 8, 9, 10]$}
+\end{figure}

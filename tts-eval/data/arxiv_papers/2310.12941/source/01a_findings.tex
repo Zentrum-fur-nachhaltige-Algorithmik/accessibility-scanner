@@ -1,0 +1,58 @@
+\hypertarget{findings}{\subsection{Findings}}
+\label{sec:findings}
+
+On the basis of conducting the index, we extensively catalogue \numtotalfindings empirical findings in \refsec{results} spanning overarching trends, domain-level analyses, breakdowns for open vs. closed developers, and similarities in developer practices.
+We summarize the \numbigfindings most critical findings.
+
+\paragraph{Significant but obtainable headroom in overall transparency scores (\reffig{overall-scores}).}
+Given that the highest overall score is \maxscore out of \numindicators and the mean overall score is \meanscore, all developers have significant room for improvement.
+In many cases, such improvement is already feasible: \numfeasible of the indicators are achieved by some developer, and \numfeasiblemultiple are achieved by multiple developers.
+
+
+\paragraph{Significant unevenness in overall scores with three major clusters (\reffig{overall-scores}).}
+Overall scores vary significantly given a range of \scorerange between the highest-scoring developer, \meta, at \maxscore and the lowest-scoring developer, \amazon, at \minscore. 
+Relative to the mean overall score of \meanscore, organizations group into three clusters: four well-above the mean (\meta, \huggingface, \openai, \stability), three around the mean (\google, \anthropic, \cohere), and three well-below the mean (\aitwentyone, \inflection, \amazon).
+
+\paragraph{Upstream resource transparency scores the worst (\reffig{domain-scores}).}
+Breaking down the trends by domain, scores are consistently the worst for the upstream domain, particularly the \data, \labor, and \compute subdomains.
+Several developers (\aitwentyone, \inflection, \amazon) receive 0 points across the entire set of \numupstreamindicators indicators for the upstream domain.
+
+\paragraph{Several upstream matters surrounding data creation are fully opaque (\reffig{upstream-scores}).}
+Within the upstream domain, no company scores points for indicators about data creators, the copyright and license status of data, and mitigations related to copyright.
+The industry-wide lack of transparency on these issues relates directly to pressing societal concerns related to copyright and intellectual property, which are the subject of ongoing litigation.
+
+\paragraph{Transparency is highest, but still imperfect, for very basic model information and downstream distribution (\reffig{major-subdomain-scores}).}
+Breaking down the trends by major dimensions of transparency, the highest-scoring dimensions are \methods, \modelbasics, \capabilities, and \distribution.
+However, even when considering indicators for these high-scoring dimensions of transparency, most companies do not reveal basic information like model size nor do they explain how or why they made certain release decisions. 
+
+\paragraph{Developer transparency on \capabilities does not translate to transparency on \limitations, \risks, and \modelmitigations (\reffig{model-scores}).}
+Within the model domain, we consider \capabilities, \limitations, \risks, and \modelmitigations as four tightly-related subdomains that characterize a model's potential societal impact.
+While many developers score well on \capabilities by describing, demonstrating, and evaluating capabilities, which reflect their models' strengths, the same cannot be said for the other three subdomains.
+Instead, transparency is significantly worse: just two developers demonstrate limitations, none evaluate multiple intentional harms their models could facilitate, and none provide either externally reproducible or third-party assessments of mitigation efficacy.
+
+\paragraph{There is virtually no transparency about the downstream impact of foundation models  (\reffig{downstream-scores}).}
+Within the downstream domain, no developer provides any transparency into the affected market sectors, affected individuals, affected geographies, or any form of usage reporting.
+Overall, the average score on the \impact subdomain is the worst in the entire index at 11\%; only three developers provide even the most minimal characterization of the number of downstream applications, and no developer provides a mechanism for users to seek redress.
+
+\paragraph{Open developers are consistently more transparent than closed developers (\reffig{open-closed}).}
+Breaking down trends by how developers release their models, open developers (\ie those that release model weights and, potentially, data) show a clear edge in transparency over closed counterparts (\eg API providers). 
+Two of the three open developers (\meta and \huggingface) score better than all other developers, while the third (\stability) scores one point below the highest-performing closed developer (\openai). Open developers have higher average scores on 17 of the \numsubdomains subdomains. 
+
+\paragraph{Open developers are much more transparent on upstream resources and comparably transparent on downstream use when compared to closed developers (\reffig{open-closed}).}
+The average score for open developers on upstream indicators is 53\% compared to a paltry 9\% of closed developers.
+However, while closed developers have greater control over the downstream use of their foundation models, this does not translate to greater downstream transparency as the average for open developers on downstream indicators is 49\% compared to 43\% from closed developers.
+
+\paragraph{Some companies have highly correlated scores (\reffig{overall-correlations}).}
+Considering pairs of companies, we analyze the extent to which they agree on the indicators where they do and do not score points.
+In particular, the three members of the Frontier Model Forum (\anthropic, \google, \openai) exhibit high indicator-level similarity, as do the two companies that release both model weights and data (\huggingface, \stability) and the four lowest-scoring companies (\cohere, \aitwentyone, \inflection, \amazon).
+This leaves \meta as the sole outlier in terms of developer-developer indicator-level similarity.
+\clearpage
+
+
+
+
+
+
+
+
+

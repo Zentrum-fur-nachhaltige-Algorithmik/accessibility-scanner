@@ -1,0 +1,34 @@
+\begingroup
+\begin{table*}[!t]
+    \centering
+    \small
+    \scalebox{0.9}{
+
+    \begin{tabular}{p{\linewidth}}
+        \toprule
+        \underline{\textbf{\textsc{Exemplar for SayCan}}} \\
+        \vspace{-2mm}
+        User query: Bring me something not sweet to eat. \\
+        \vspace{-1mm}
+        Goal in PDDL: \\
+        (:goal \\
+        	\hspace{0.2in} ; I need to find a snack \\
+        	\hspace{0.2in} (exists (?s - snack) \\
+        		\hspace{0.2in} \hspace{0.2in} ; it has to satisfy the following conditions \\
+        		\hspace{0.2in} \hspace{0.2in} (and \\
+        			\hspace{0.2in} \hspace{0.2in} \hspace{0.2in} ; the snack must not be sweet \\
+        			\hspace{0.2in} \hspace{0.2in} \hspace{0.2in} (not (is-sweet ?s)) \\
+        			\hspace{0.2in} \hspace{0.2in} \hspace{0.2in} ; bring it to the user \\
+        			\hspace{0.2in} \hspace{0.2in} \hspace{0.2in} (at ?s user) \\
+        		\hspace{0.2in} \hspace{0.2in} ) \\
+        	\hspace{0.2in} ) \\
+        ) \\
+        \bottomrule
+    \end{tabular}
+    }
+    \label{tab:appendix-saycan_prompt}
+        \caption{
+    An exemplar from our prompt for SayCan.
+    }
+\end{table*}
+\endgroup

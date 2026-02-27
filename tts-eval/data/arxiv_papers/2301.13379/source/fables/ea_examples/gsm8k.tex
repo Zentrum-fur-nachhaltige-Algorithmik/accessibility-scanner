@@ -1,0 +1,30 @@
+\begingroup
+\begin{table*}[h]
+    \centering
+    \small
+    \begin{tabular}{p{0.9\linewidth}}
+        \toprule
+        \vspace{-2mm}
+                  \# 1. How many pounds will Martin lose per week if he eats Cheerios every day for breakfast? (independent, support: ["he'll lose 1.25 pounds/week"])\\
+pounds\_lost\_cheerios = 1.25\\
+\# 2. How many pounds will Martin gain per week if he eats donuts every day for breakfast? (independent, support: ["he'll gain 1.75 pounds/week"])
+pounds\_gained\_donuts = 1.75\\
+\# 3. How many weeks are there in 5 weeks? (independent, support: ["External knowledge: there are 7 days in a week"])\\
+weeks\_in\_5\_weeks = 5\\
+\# 4. How many pounds will Martin lose in 5 weeks if he eats Cheerios every day for breakfast? (depends on 1 and 3, support: [])\\
+pounds\_lost\_cheerios\_5\_weeks = pounds\_lost\_cheerios * weeks\_in\_5\_weeks\\
+\# 5. How many pounds will Martin gain in 5 weeks if he eats donuts every day for breakfast? (depends on 2 and 3, support: [])\\
+pounds\_gained\_donuts\_5\_weeks = pounds\_gained\_donuts * weeks\_in\_5\_weeks\\
+\# 6. What will be the difference in his weight at the end of 5 weeks between the two breakfast options? (depends on 4 and 5, support: [])\\
+difference\_5\_weeks = pounds\_gained\_donuts\_5\_weeks - pounds\_lost\_cheerios\_5\_weeks\\
+\# 7. Final Answer: What will be the difference in his weight at the end of 5 weeks between the two breakfast options? (depends on 6, support: [])\\
+answer = difference\_5\_weeks\\
+        \bottomrule
+    \end{tabular}
+       \caption{
+    Generated code for the question in Appendix~\ref{sec:appendix_gsm8k_error_analysis}, as an example of "semantic understanding error".
+    } 
+    \label{tab:appendix-ea}
+    
+\end{table*}
+\endgroup

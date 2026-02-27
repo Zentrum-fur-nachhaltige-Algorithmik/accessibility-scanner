@@ -40,8 +40,8 @@ const config = {
 
   // arXiv paper selection criteria
   arxiv: {
-    categories: ['math.LA', 'math.AP', 'stat.ML'],
-    minDisplayFormulas: 30,
+    categories: ['math.RA', 'math.AP', 'stat.ML'],
+    minDisplayFormulas: 15,
     minInlineFormulas: 20,
     minPages: 15,
     targetPaperCount: 5,

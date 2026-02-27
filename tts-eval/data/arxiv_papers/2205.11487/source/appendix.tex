@@ -1,0 +1,28 @@
+\input{full_page_collage_appendix}
+
+\begin{figure}[t]
+    \centering
+    \input{fig_main_diagram}
+    \caption{Visualization of \name. \name uses a frozen text encoder to encode the input text into text embeddings. A conditional diffusion model maps the text embedding into a $64\times64$ image. \name further utilizes text-conditional super-resolution diffusion models to upsample the image, first  $64\times64\rightarrow256\times256$, and then  $256\times256\rightarrow1024\times1024$.}
+    \label{fig:main_diagram}
+\end{figure}
+
+\FloatBarrier
+
+\input{appendix_background}
+\input{appendix_arch}
+\input{appendix_benchmark_details}
+\input{experiments_analysis}
+\input{appendix_results}
+\input{appendix_arch2}
+
+\input{appendix_impl_details}
+\input{appendix_frozentextencoder}
+
+
+\nocite{de2021diffusion}
+\nocite{esser2021taming}
+\nocite{van2017neural,razavi2019generating,yu2021vector}
+\nocite{ding2021cogview,ramesh-dalle}
+\nocite{reed2016generative,wang2018high,xu2018attngan,zhu2019dm,tao2020df}
+\nocite{ye2021improving,zhang2021cross,zhou2021lafite}

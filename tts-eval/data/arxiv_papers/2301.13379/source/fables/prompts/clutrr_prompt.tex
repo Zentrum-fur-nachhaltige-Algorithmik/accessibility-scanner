@@ -1,0 +1,28 @@
+\begingroup
+\begin{table*}[!t]
+    \centering
+    \small
+    \scalebox{0.9}{
+    \begin{tabular}{p{\linewidth}}
+        \toprule
+        \underline{\textbf{\textsc{Exemplar for CLUTRR}}} \\
+        \vspace{-2mm}
+        \# Context: [Jason] always had some great adventure planned for his granddaughter [Guillermina] when she came to visit. So, naturally, when [Myrna] told her daughter [Guillermina] that they would be going to visit [Jason] she could hardly contain herself. \\
+        \vspace{-1mm}
+        \# Question: How is [Jason] related to [Myrna]? \\
+        \# To answer this question, we write a program to answer the following subquestions: \\
+        \# 1. How is [Jason] related to [Guillermina]? (independent, support: "[Jason] always had some great adventure planned for his granddaughter [Guillermina] when she came to visit.") \\
+        relation(Jason, Guillermina) = grandfather \\
+        \# 2. How is [Guillermina] related to [Myrna]? (independent, support: "So, naturally, when [Myrna] told her daughter [Guillermina] that they would be going to visit [Jason] she could hardly contain herself.") \\
+        relation(Guillermina, Myrna) = daughter \\
+        \# 3. Final answer: How is [Jason] related to [Myrna]? (depends on 1, 2) \\
+        relation(Jason, Myrna) = relation(Jason, Guillermina) @ relation(Guillermina, Myrna) \\
+        \bottomrule
+    \end{tabular}
+    }
+        \caption{
+    An exemplar from our prompt for CLUTRR.
+    }
+    \label{tab:appendix-CLUTRR_prompt}
+\end{table*}
+\endgroup

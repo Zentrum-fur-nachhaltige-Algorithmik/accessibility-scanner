@@ -1,0 +1,29 @@
+\begin{tikzpicture}[scale=0.7]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+
+\begin{axis}[width=8cm, height=6cm,
+  xlabel=CLIP Score,
+  ylabel=FID-10K,
+  legend columns=1,
+  legend pos=south west,
+  legend style={font=\tiny},
+  xmin=0.285,
+  ymin=9.4,
+  ymax=13.5,
+  xmax=0.297,
+  xtick = {0.286, 0.29, 0.295},
+  xticklabels = {0.286, 0.29, 0.295},
+  every axis plot/.append style={very thick}
+]
+\addplot +[mark=*, solid, google_blue, mark options={scale=0.4}] coordinates {(0.2899, 11.5946)(0.29, 11.45)(0.2902, 11.3181)(0.2907, 11.1728)(0.2908, 11.1542)(0.2911, 11.1761)(0.2913, 11.038)(0.2915, 11.1443)(0.292, 11.341)};
+\addplot +[mark=*, solid, google_red, mark options={scale=0.4}] coordinates {(0.2903, 12.029)(0.2918, 11.4921)(0.2928, 11.2132)(0.2934, 10.9514)(0.2936, 10.8039)(0.2942, 10.6215)(0.2947, 10.6294)(0.2955, 10.7032)(0.296, 10.974)};
+\addplot +[mark=*, solid, google_green, mark options={scale=0.4}] coordinates {(0.2883, 12.4993)(0.2912, 11.7119)(0.2931, 11.5148)(0.2942, 11.3467)(0.2946, 11.2633)(0.2952, 11.3083)(0.2957, 11.3226)(0.2961, 11.5953)(0.2964, 11.9972)};
+\addplot +[mark=*, solid, google_yellow, mark options={scale=0.4}] coordinates {(0.2861, 13.1623)(0.2907, 11.9674)(0.2927, 11.745)(0.2941, 11.5647)(0.2944, 11.5996)(0.2954, 11.7032)(0.2958, 12.0862)(0.2962, 12.3539)(0.2964, 12.8817)};
+\legend{ A,  B ($\mathrm{aug\_level} = 0.0$),  B ($\mathrm{aug\_level} = 0.1$),  B ($\mathrm{aug\_level} = 0.2$)}
+\end{axis}
+\end{tikzpicture}

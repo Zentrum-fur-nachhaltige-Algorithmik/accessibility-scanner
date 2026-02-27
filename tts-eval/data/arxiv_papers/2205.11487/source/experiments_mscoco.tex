@@ -1,0 +1,15 @@
+\subsection{Results on COCO}
+\label{sec:experiments_mscoco}
+\input{experiments_coco_table}
+    
+    
+
+
+
+
+
+\label{sec:zero_shot_mscoco}
+We evaluate \name on the COCO validation set using FID score, similar to~\citep{ramesh-dalle, nichol-glide}.
+\Cref{tab:zero_shot_mscoco} displays the results. \name achieves state of the art \emph{zero-shot} FID on COCO at \ourmscocofid,  outperforming the concurrent work of DALL-E~2~\cite{ramesh-dalle2} and even models trained on COCO.
+\Cref{tab:mscoco_human_eval} reports the human evaluation to test image quality and alignment on the COCO validation set. 
+We report results on the original COCO validation set, as well as a filtered version in which all reference data with people have been removed. For photorealism, \name achieves 39.2\% preference rate indicating high image quality  generation.  On the set with no people, there is a boost in preference rate of \name to 43.6\%,  indicating \name's limited ability to generate photorealistic people. On caption similarity, \name's score is on-par with the original reference images, suggesting \name's ability to generate images that align well with COCO captions.

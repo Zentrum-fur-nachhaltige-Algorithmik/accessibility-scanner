@@ -1,0 +1,43 @@
+\section{Background}
+\label{sec:app_background}
+\label{sec:app_background_diffusion}
+
+Diffusion models are latent variable models with latents $\bz = \{\bz_t \,|\, t \in [0,1]\}$ that obey a \emph{forward process} $q(\bz|\bx)$ starting at data $\bx \sim p(\bx)$. This forward process is a Gaussian process that satisfies the Markovian structure:
+\begin{align}
+    q(\bz_t|\bx) = \mathcal{N}(\bz_t; \alpha_t \bx, \sigma_t^2 \bI), \quad
+    q(\bz_t | \bz_s) = \mathcal{N}(\bz_t; (\alpha_t/\alpha_s)\bz_s, \sigma_{t|s}^2\bI)
+\end{align}
+where $0 \leq s < t \leq 1$, $\sigma^2_{t|s} = (1-e^{\lambda_t-\lambda_s})\sigma_t^2$, and $\alpha_t, \sigma_t$ specify a differentiable \emph{noise schedule} whose log signal-to-noise-ratio,
+i.e., $\lambda_t = \log[\alpha_t^2/\sigma_t^2]$,  decreases with $t$ until $q(\bz_1) \approx \mathcal{N}(\bzero, \bI)$. 
+For generation, the diffusion model is learned to \emph{reverse} this forward process.
+
+Learning to reverse the forward process can be reduced to learning to denoise $\bz_t\sim q(\bz_t|\bx)$ into an estimate $\hat\bx_\theta(\bz_t, \lambda_t, \bc) \approx \bx$ for all $t$, where $\bc$ is an optional conditioning signal (such as text embeddings or a low resolution image) drawn from the dataset jointly with~$\bx$. This is accomplished training~$\hat\bx_\theta$ using a weighted squared error loss
+\begin{align}
+    \Eb{\bepsilon,t}{w(\lambda_t) \|\hat\bx_\theta(\bz_t, \lambda_t, \bc) - \bx \|^2_2}
+\end{align}
+where $t \sim \mathcal{U}([0, 1])$, $\bepsilon \sim \mathcal{N}(\bzero,\bI)$, and $\bz_t = \alpha_t\bx + \sigma_t\bepsilon$. This reduction of generation to denoising is justified as optimizing a weighted variational lower bound on the data log likelihood under the diffusion model, or as a form of denoising score matching \citep{vincent2011connection, song2019generative, ho2020denoising, kingma2021variational}. We use the $\bepsilon$-prediction parameterization, defined as $\hat\bx_\theta(\bz_t,\lambda_t,\bc) =  (\bz_t - \sigma_t \bepsilon_\theta(\bz_t,\lambda_t,\bc))/\alpha_t$, and we impose a squared error loss on $\bepsilon_\theta$ in $\bepsilon$ space with $t$ sampled according to a cosine schedule~\citep{nichol2021improved}. This corresponds to a particular weighting $w(\lambda_t)$ and leads to a scaled score estimate $\bepsilon_\theta(\bz_t,\lambda_t,\bc) \approx -\sigma_t \nabla_{\bz_t}\log p(\bz_t|\bc)$, where $p(\bz_t|\bc)$ is the true density of $\bz_t$ given $\bc$ under the forward process starting at~$\bx \sim p(\bx)$~\citep{ho2020denoising,kingma2021variational,song2020score}. Related model designs include the work of~\citep{tzen2019neural,kadkhodaie2020solving,kadkhodaie2021stochastic}.
+
+To sample from the diffusion model, we start at $\bz_1 \sim \mathcal{N}(\bzero, \bI)$ and use the discrete time ancestral sampler \citep{ho2020denoising} and DDIM~\citep{song2020denoising} for certain models. DDIM follows the deterministic update rule
+\begin{align}
+    \bz_s = \alpha_s \hat\bx_\theta(\bz_t,\lambda_t,\bc) + \frac{\sigma_s}{\sigma_t}(\bz_t - \alpha_t\hat\bx_\theta(\bz_t,\lambda_t,\bc)) \label{eq:ddim_sampler}
+\end{align}
+where $s < t$ follow a uniformly spaced sequence from 1 to 0. The ancestral sampler arises from a reversed description of the forward process; noting that $q(\bz_s|\bz_t,\bx) = \mathcal{N}(\bz_s; \tilde\bmu_{s|t}(\bz_t,\bx), \tilde\sigma^2_{s|t}\bI)$, where
+$\tilde\bmu_{s|t}(\bz_t,\bx) = e^{\lambda_t-\lambda_s}(\alpha_s/\alpha_t)\bz_t + (1-e^{\lambda_t-\lambda_s})\alpha_s\bx$ and $\tilde\sigma^2_{s|t} = (1-e^{\lambda_t-\lambda_s})\sigma_s^2$, it follows the stochastic update rule
+\begin{align}
+    \bz_s &= \tilde\bmu_{s|t}(\bz_t, \hat\bx_\theta(\bz_t,\lambda_t,\bc)) + \sqrt{(\tilde\sigma^2_{s|t})^{1-\gamma} (\sigma^2_{t|s})^\gamma}\, \bepsilon  \label{eq:ancestral_sampler}
+\end{align}
+where $\bepsilon \sim \mathcal{N}(\bzero,\bI)$, and $\gamma$ controls the stochasticity of the sampler~\citep{nichol2021improved}.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

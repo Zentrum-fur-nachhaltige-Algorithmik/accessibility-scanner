@@ -1,0 +1,63 @@
+\begin{tikzpicture}
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\begin{axis}[
+name=fidelity,
+width=1.3\textwidth,
+height=1.35\textwidth,
+ybar,
+ymin=0.0,
+ymax=1.0,
+xtick={1, 2},
+xtick style={draw=none},
+xticklabels={Alignment, Fidelity},
+every tick label/.append style={font=\scriptsize},
+ytick={0,0.5,1},
+yticklabels={},
+legend style={font=\tiny},
+legend cell align=left,
+legend image code/.code={
+    \draw [#1] (0cm, -0.1cm) rectangle (0.2cm, 0.25cm);
+},
+legend style={
+draw=none,
+at={(0.5, 1.0)},anchor=south,
+legend columns=3,
+/tikz/every even column/.append style={column sep=0.2cm}
+},
+bar width=0.4cm,
+enlarge x limits={abs=0.4},
+]
+
+\addplot+[
+    fill=google_blue,
+    fill opacity=0.2,
+    draw=google_blue,
+    error bars/error bar style={google_blue},
+    error bars/.cd,
+    y dir=both,
+    y explicit
+] coordinates {
+(1.0,0.7837) +- (1.0, 0.028497994689556643)
+(2.0,0.6652) +- (2.0, 0.02454522731413525)
+};
+
+\addplot+[
+fill=google_green,fill opacity=0.2,draw=google_green,
+    error bars/error bar style={google_green},
+    error bars/.cd,
+    y dir=both,
+    y explicit
+] coordinates {
+(1.0,0.2136) +- (1.0, 0.01993785825157147)
+(2.0,0.3348) +- (2.0, 0.025427213103106437)
+};
+
+\legend{\name, Latent Diffusion}
+\end{axis}
+
+\end{tikzpicture}

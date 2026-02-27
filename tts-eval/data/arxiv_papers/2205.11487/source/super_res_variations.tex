@@ -1,0 +1,24 @@
+\begin{figure}[t]
+\captionsetup[subfigure]{labelformat=empty}
+\centering
+\begin{tabular}{c|@{\hskip 6pt}c@{\hskip 2pt}c@{\hskip 2pt}c}
+Input & Unmodified & Oil Painting & Illustration \\
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/64x64_2.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/original2.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/oil_painting2.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/illustration2.jpeg} \caption{} \end{subfigure} \\[-12pt]
+
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/64x64_3.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/original3.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/oil_painting3.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/illustration3.jpeg} \caption{} \end{subfigure} \\[-12pt]
+
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/64x64_4.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/original4.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/oil_painting4.jpeg} \caption{} \end{subfigure} &
+\begin{subfigure}[t]{0.24\textwidth} \centering \includegraphics[width=\textwidth]{figures/super_res_variations/illustration4.jpeg} \caption{} \end{subfigure} \\
+
+\end{tabular}
+\caption{Super-resolution variations for some $64\times64$ generated images. We first generate the 64$\times$64 image using ``A photo of ... .''. Given generated $64\times64$ images, we condition both the super-resolution models on different prompts in order to generate different upsampled variations. e.g. for oil painting we condition the super-resolution models on the prompt ``An oil painting of ... .''. Through a combination of large guidance weights and $\mathrm{aug\_level} = 0.3$ for both super-res models we can generate different styles based on the style query through text.}
+\label{fig:super_res_variations}
+\end{figure}

@@ -1,0 +1,15 @@
+{
+  "arxivId": "2303.09244",
+  "title": "Random Matrix Theory Test",
+  "mainTexFile": "/mnt/c/Users/T14/Desktop/accessability/tts-eval/data/arxiv_papers/2303.09244/source/main.tex",
+  "texFiles": [
+    "/mnt/c/Users/T14/Desktop/accessability/tts-eval/data/arxiv_papers/2303.09244/source/main.tex",
+    "/mnt/c/Users/T14/Desktop/accessability/tts-eval/data/arxiv_papers/2303.09244/source/preamble.tex"
+  ],
+  "formulaCounts": {
+    "displayCount": 86,
+    "inlineCount": 242,
+    "total": 328
+  },
+  "downloadedAt": "2026-02-27T11:00:37.779Z"
+}

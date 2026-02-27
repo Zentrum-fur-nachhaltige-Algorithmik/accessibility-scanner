@@ -1,0 +1,37 @@
+\subsection{Results on \benchmarkname}
+\vspace{-0.15cm}
+\label{sec:experiments_drawbench}
+
+\begin{figure}[tb]
+    \centering
+    \begin{tabularx}{\linewidth}{XXXX}
+        \centering
+        \begin{subfigure}[t]{0.25\textwidth}
+        \centering
+        \hspace*{-9pt}\input{figures/pgfplots/drawit_vs_dalle2_twoway.tex}    
+        \label{fig:drawit_vs_dalle2_drawbench}
+        \end{subfigure} & 
+        \begin{subfigure}[t]{0.25\textwidth}
+        \centering
+        \input{figures/pgfplots/drawit_vs_glide_twoway.tex}    
+        \label{fig:drawit_vs_glide_drawbench}
+        \end{subfigure} & 
+        \begin{subfigure}[t]{0.25\textwidth}
+        \centering
+        \input{figures/pgfplots/drawit_vs_vqganclip_twoway}
+        \label{fig:drawit_vs_vaganclip_drawbench}
+        \end{subfigure} &
+        \begin{subfigure}[t]{0.25\textwidth}
+        \centering
+        \input{figures/pgfplots/drawit_vs_latentdiffusion_twoway.tex}
+        \label{fig:drawit_vs_latentdiffusion_drawbench}
+        \end{subfigure} \\
+    \end{tabularx}
+    \caption{Comparison between \name and DALL-E 2~\citep{ramesh-dalle2}, GLIDE~\citep{nichol-glide}, VQ-GAN+CLIP~\citep{crowson2022vqgan} and Latent Diffusion~\citep{rombach-cvpr-2022} on \benchmarkname: User preference rates (with 95\% confidence intervals) for image-text alignment and image fidelity.}
+    \label{fig:drawbench-comparison}
+    \vspace{-1em}
+\end{figure}
+
+
+Using \benchmarkname, we compare \name with \mbox{DALL-E 2} (the public version)~\cite{ramesh-dalle2}, \mbox{GLIDE}~\cite{nichol-glide}, \href{https://github.com/CompVis/latent-diffusion}{\color{black}{Latent Diffusion}}~\cite{rombach-cvpr-2022}, and \href{https://github.com/EleutherAI/vqgan-clip}{\color{black}{CLIP-guided VQ-GAN}}~\cite{crowson2022vqgan}. %
+\cref{fig:drawbench-comparison} shows the human evaluation results for pairwise comparison of \name with each of the three models. We report the percentage of time raters prefer Model A, Model B, or are indifferent for both image fidelity and image-text alignment. We aggregate the scores across all the categories and raters. We find the human raters to exceedingly prefer \name over all others models in both image-text alignment and image fidelity. We refer the reader to \cref{sec:benchmark_comparison} for a more detailed category wise comparison and qualitative comparison. 

@@ -1,0 +1,56 @@
+\subsection{Pre-trained Text Encoders}
+\label{sec:frozen_text_encoders}
+We explore several families of pre-trained text encoders: BERT \cite{devlin-naacl-2019}, T5 \cite{raffel-jmlr-2020}, and CLIP \cite{radford-icml-2021}. 
+There are several key differences between these encoders. BERT is trained on a smaller text-only corpus (approximately 20 GB, Wikipedia and BooksCorpus \cite{zhu-iccv-2015}) with a masking objective, and has relatively small model variants (upto 340M parameters). T5 is trained on a much larger C4 text-only corpus (approximately 800 GB) with a denoising objective, and has larger model variants (up to 11B parameters). The CLIP model\footnote{\url{https://github.com/openai/CLIP/blob/main/model-card.md}} is trained on an image-text corpus with an image-text contrastive objective. For T5 we use the encoder part for the contextual embeddings. For CLIP, we use the penultimate layer of the text encoder to get contextual embeddings. Note that we freeze the weights of these text encoders (i.e., we use off the shelf text encoders, without any fine-tuning on the text-to-image generation task). We explore a variety of model sizes for these text encoders.
+
+We train a $64\times64$, 300M parameter diffusion model, conditioned on the text embeddings generated from BERT (base, and large), T5 (small, base, large, XL, and XXL), and CLIP (ViT-L/14). We observe that scaling the size of the language model text encoders generally results in better image-text alignment as captured by the CLIP score as a function of number of training steps (see \cref{Fig:EmbeddingTrainingCurves}).
+One can see that the best CLIP scores are obtained with the T5-XXL text encoder. 
+
+Since guidance weights are used to control image quality and text alignment, we also report ablation results using curves that show the trade-off between CLIP and FID scores as a function of the guidance weights (see \cref{fig:embedding_comparison_pareto}). We observe that larger variants of T5 encoder results in both better image-text alignment, and image fidelity. This emphasizes the effectiveness of large frozen text encoders for text-to-image models. Interestingly, we also observe that the T5-XXL encoder is on-par with the CLIP encoder when measured with CLIP and FID-10K on MS-COCO.
+
+\textbf{T5-XXL vs CLIP on DrawBench}: We further compare T5-XXL and CLIP on \benchmarkname to perform a more comprehensive comparison of the abilities of these two text encoders. In our initial evaluations we observed that the 300M parameter models significantly underperformed on \benchmarkname. We believe this is primarily because \benchmarkname prompts are considerably more difficult than MS-COCO prompts. 
+
+In order to perform a meaningful comparison, we train 64$\times$64 1B parameter diffusion models with T5-XXL and CLIP text encoders for this evaluation. \cref{fig:drawit_t5_vs_clip} shows the results. We find that raters are considerably more likely to prefer the generations from the model trained with the T5-XXL encoder over the CLIP text encoder, especially for image-text alignment. This indicates that language models are better than text encoders trained on image-text contrastive objectives in encoding complex and compositional text prompts. 
+\cref{fig:t5xx_vs_clip_drawbench_details} shows the category specific comparison between the two models. We observe that human raters prefer T5-XXL samples over CLIP samples in all 11 categories for image-text alignment  demonstrating the effectiveness of large language models as text encoders for text to image generation.  
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.49\textwidth}
+    \input{figures/pgfplots/encoder_pareto_comparison_appendix}
+    \caption{Pareto curves comparing various text encoders.}
+     \label{fig:embedding_comparison_pareto}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+     \centering
+     \input{figures/pgfplots/drawit_t5_vs_clip_two_way}
+      \caption{Comparing T5-XXL and CLIP on \benchmarkname.}
+      \label{fig:drawit_t5_vs_clip}
+    \end{subfigure}
+    \caption{Comparison between text encoders for text-to-image generation. For \cref{fig:embedding_comparison_pareto}, we sweep over guidance values of $[1, 1.25, 1.5, 1.75, 2, 3, 4, 5, 6, 7, 8, 9, 10]$}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \input{figures/pgfplots/encoder_comparison}
+    \caption{Training convergence comparison between text encoders for text-to-image generation.}
+    \label{Fig:EmbeddingTrainingCurves}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[t]{\textwidth}
+    \input{figures/pgfplots/drawit_t5xxl_vs_clip_detailed_alignment_two_way}
+    \caption{Alignment}
+    \label{fig:t5xxl_vs_clip_detailed_alignment_alignment}
+    \vspace*{0.5cm}
+    \end{subfigure}
+    \begin{subfigure}[t]{\textwidth}
+    \input{figures/pgfplots/drawit_t5xxl_vs_clip_detailed_fidelity_two_way}
+    \caption{Fidelity}
+    \label{fig:t5xxl_vs_clip_detailed_alignment_fidelity}
+    \end{subfigure}
+    \caption{T5-XXL vs. CLIP text encoder on \benchmarkname \subref{fig:t5xxl_vs_clip_detailed_alignment_alignment}) image-text alignment, and \subref{fig:t5xxl_vs_clip_detailed_alignment_fidelity}) image fidelity.}
+    \label{fig:t5xx_vs_clip_drawbench_details}
+\end{figure}
+

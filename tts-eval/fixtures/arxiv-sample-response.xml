@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/test</id>
+  <title>arXiv Query: test</title>
+  <updated>2026-02-27T00:00:00Z</updated>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <entry>
+    <id>http://arxiv.org/abs/2301.12345v2</id>
+    <title>On the Eigenvalues of Random Matrices with Applications</title>
+    <summary>We study the spectral properties of large random matrices $A \in \mathbb{R}^{n \times n}$ with applications to $\sum_{i=1}^{n} \lambda_i^2$.</summary>
+    <category term="math.RA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+    <link href="https://arxiv.org/pdf/2301.12345v2" rel="related" type="application/pdf" title="pdf"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2402.67890v1</id>
+    <title>Spectral Analysis of Differential Operators</title>
+    <summary>This paper analyzes the spectrum of $\Delta u + \lambda u = 0$ on bounded domains using $\int_\Omega |\nabla u|^2 dx$.</summary>
+    <category term="math.AP" scheme="http://arxiv.org/schemas/atom"/>
+    <link href="https://arxiv.org/pdf/2402.67890v1" rel="related" type="application/pdf" title="pdf"/>
+  </entry>
+</feed>

@@ -1,0 +1,3 @@
+\subsection{Impact of Model Size}
+
+Fig. \ref{fig:model_size_comparison} plots the CLIP-FID score trade-off curves for various model sizes of the $64\times64$ text-to-image U-Net model. We train each of the models with a batch size of 2048, and 400K training steps. As we scale from 300M parameters to 2B parameters for the U-Net model, we obtain better trade-off curves with increasing model capacity. Interestingly, scaling the frozen text encoder model size yields more improvement in model quality over scaling the U-Net model size. Scaling with a frozen text encoder is also easier since the text embeddings can be computed and stored offline during training.

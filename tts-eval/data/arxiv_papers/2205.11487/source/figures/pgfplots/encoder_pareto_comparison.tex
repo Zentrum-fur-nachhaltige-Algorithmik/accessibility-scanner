@@ -1,0 +1,41 @@
+\begin{tikzpicture}[scale=0.55]
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+
+\begin{axis}[
+width=8cm,
+height=6cm,
+  xlabel=CLIP Score,
+  ylabel=FID-10K,
+  legend columns=1,
+  legend pos=north west,
+  legend cell align=left,
+  y label style={at={(axis description cs:0.03,.5)}},
+  legend style={font=\footnotesize},
+  xmin=0.216,
+  ymin=7.5,
+  ymax=29,
+  xmax=0.295,
+  every axis plot/.append style={very thick},
+  yticklabel style={xshift=-5pt}
+]
+
+\addplot +[mark=*, solid, google_yellow, mark options={scale=0.4}] coordinates {(0.2186, 17.1279)(0.2272, 14.9052)(0.2332, 14.4287)(0.2379, 14.0655)(0.2418, 14.1945)(0.2499, 16.339)(0.2543, 18.8731)(0.2563, 21.2413)(0.2586, 22.5724)(0.2596, 23.7404)(0.2604, 24.7911)(0.2609, 25.5612)(0.2615, 26.0648)};
+
+
+\addplot +[mark=*, solid, google_green, mark options={scale=0.4}] coordinates {(0.2242, 15.7681)(0.2338, 13.4837)(0.2412, 12.5508)(0.2461, 12.2109)(0.25, 12.7537)(0.2594, 15.1684)(0.2638, 17.8411)(0.2666, 19.9616)(0.2683, 21.6277)(0.2691, 22.8355)(0.2701, 23.7544)(0.271, 24.3638)(0.2714, 25.1119)};
+
+
+\addplot +[mark=*, solid, google_red, mark options={scale=0.4}] coordinates {(0.2316, 14.4068)(0.2422, 12.2246)(0.2499, 11.2804)(0.2552, 11.3188)(0.2593, 11.6776)(0.2685, 15.0103)(0.2731, 17.9712)(0.2749, 20.454)(0.2767, 22.132)(0.2774, 23.5054)(0.2783, 24.6424)(0.2788, 25.485)(0.2792, 26.1941)};
+
+
+\addplot +[mark=*, solid, google_blue, mark options={scale=0.4}] coordinates {(0.2392, 13.33)(0.2508, 11.0229)(0.2584, 10.688)(0.2637, 11.2378)(0.268, 12.0375)(0.2764, 16.3064)(0.2797, 19.7633)(0.2822, 22.2284)(0.283, 24.3269)(0.2836, 25.5622)(0.2843, 26.6161)(0.2845, 27.1637)(0.2847, 28.0816)};
+
+
+
+\legend{T5-Small, T-Large, T5-XL, T5-XXL}
+\end{axis}
+\end{tikzpicture}

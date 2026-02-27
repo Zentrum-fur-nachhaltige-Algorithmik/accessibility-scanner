@@ -1,0 +1,76 @@
+\vspace{-0.25cm}
+\section{\name}
+\vspace{-0.3cm}
+\name consists of a text encoder that maps text to a sequence of embeddings and a cascade of conditional diffusion models that map these embeddings to images of increasing resolutions (see \cref{fig:main_diagram}). In the following subsections, we describe each of these components in detail.
+
+
+
+\vspace{-0.3cm}
+\subsection{Pretrained text encoders}
+\vspace{\postsectionspace}
+
+
+
+
+
+Text-to-image models need powerful semantic text encoders to capture the complexity and compositionality of arbitrary natural language text inputs. Text encoders trained on paired image-text data are standard in current text-to-image models; they can be trained from scratch \cite{nichol-glide, ramesh-dalle} or pretrained on image-text data \cite{ramesh-dalle2} (e.g., CLIP~\cite{radford-icml-2021}). The image-text training objectives suggest that these text encoders may encode visually semantic and meaningful representations especially relevant for the text-to-image generation task. Large language models can be another models of choice to encode text for text-to-image generation. Recent progress in large language models (e.g., BERT~\cite{devlin-naacl-2019}, GPT~\cite{radford-gpt,radford-gpt2,brown-neurips-2020}, T5~\cite{raffel-jmlr-2020}) have led to leaps in textual understanding and generative capabilities. Language models are trained on text only corpus significantly larger than paired image-text data, thus being exposed to a very rich and wide distribution of text. These models are also generally much larger than text encoders in current image-text models~\cite{radford-icml-2021,jia2021scaling,yu2022coca} (e.g. PaLM \cite{palm-2022} has 540B parameters, while CoCa \cite{yu2022coca} has a $\approx$~1B parameter text encoder).
+
+It thus becomes natural to explore both families of text encoders for the text-to-image task. \name explores pretrained text encoders: BERT \cite{devlin-naacl-2019}, T5 \cite{raffel-icml-2017} and CLIP \cite{radford-arxiv-2017}. For simplicity, we freeze the weights of these text encoders. Freezing has several advantages such as offline computation of embeddings, resulting in negligible computation or memory footprint during training of the text-to-image model. In our work, we find that there is a clear conviction that scaling the text encoder size improves the quality of text-to-image generation. We also find that while T5-XXL and CLIP text encoders perform similarly on simple benchmarks such as MS-COCO, human evaluators prefer T5-XXL encoders over CLIP text encoders in both image-text alignment and image fidelity on \benchmarkname, a set of challenging and compositional prompts. We refer the reader to Section \ref{sec:short_further_analysis} for summary of our findings, and Appendix \ref{sec:frozen_text_encoders} for detailed ablations.
+
+
+
+\subsection{Diffusion models and classifier-free guidance}
+\vspace{-0.15cm}
+Here we give a brief introduction to diffusion models; a precise description is  in~\cref{sec:app_background_diffusion}. Diffusion models \citep{sohl2015deep, ho2020denoising, song2019generative} are a class of generative models that convert Gaussian noise into samples from a learned data distribution via an iterative denoising process. These models can be conditional, for example on class labels, text, or low-resolution images~\citep[e.g.][]{dhariwal2021diffusion,ho2021cascaded,saharia2021image,sahariac-palette,whang2021deblurring,nichol-glide,ramesh-dalle2}.
+A diffusion model $\hat\bx_\theta$ is trained on a denoising objective of the form
+\begin{align}
+    \Eb{\bx,\bc,\bepsilon,t}{w_t \|\hat\bx_\theta(\alpha_t \bx + \sigma_t \bepsilon, \bc) - \bx \|^2_2}
+\end{align}
+where $(\bx, \bc)$ are data-conditioning pairs, $t \sim \mathcal{U}([0, 1])$, $\bepsilon \sim \mathcal{N}(\bzero, \bI)$, and $\alpha_t, \sigma_t, w_t$ are functions of $t$ that influence sample quality. Intuitively, $\hat\bx_\theta$ is trained to denoise $\bz_t \defeq \alpha_t \bx + \sigma_t \bepsilon$ into $\bx$ using a squared error loss, weighted to emphasize certain values of $t$. 
+Sampling such as the ancestral sampler~\citep{ho2020denoising} and DDIM~\citep{song2020denoising} start from pure noise $\bz_1 \sim \mathcal{N}(\bzero, \bI)$ and iteratively generate points $\bz_{t_1}, \dotsc, \bz_{t_T}$, where $1 = t_1 > \cdots > t_T = 0$, that gradually decrease in noise content. These points are functions of the $\bx$-predictions $\hat{\bx}^t_0 \defeq \hat\bx_\theta(\bz_t, \bc)$. %
+
+
+
+Classifier guidance \cite{dhariwal2021diffusion} is a technique to improve sample quality while reducing diversity in conditional diffusion models using gradients from a pretrained model $p(\bc|\bz_t)$ during sampling.
+\emph{Classifier-free guidance}~\citep{ho2021classifierfree} is an alternative technique that avoids this pretrained model by instead jointly training a single diffusion model on conditional and unconditional objectives via randomly dropping~$\bc$ during training (e.g. with 10\% probability). %
+Sampling is performed using the adjusted $\bx$-prediction $(\bz_t - \sigma\tilde\bepsilon_\theta)/\alpha_t$, where
+\begin{align}
+    \tilde{\bepsilon}_\theta(\bz_t, \bc) = w\bepsilon_\theta(\bz_t, \bc) + (1-w)\bepsilon_{\theta}(\bz_t). \label{eq:classifier_free_score}
+\end{align}
+Here, $\bepsilon_\theta(\bz_t, \bc)$ and $\bepsilon_{\theta}(\bz_t)$ are conditional and unconditional $\bepsilon$-predictions, given by $\bepsilon_\theta \defeq (\bz_t - \alpha_t\hat\bx_\theta)/\sigma_t$, and $w$ is the \emph{guidance weight}. Setting $w = 1$ disables classifier-free guidance, while increasing $w > 1$ strengthens the effect of guidance. \name depends critically on classifier-free guidance for effective text conditioning.
+
+
+
+
+\subsection{Large guidance weight samplers}
+\vspace{-0.15cm}
+We corroborate the results of recent text-guided diffusion work~\cite{dhariwal2021diffusion, nichol-glide, ramesh-dalle2} and find that increasing the classifier-free guidance weight improves image-text alignment, but damages image fidelity producing highly saturated and unnatural images~\citep{ho2021classifierfree}.
+We find that this is due to a train-test mismatch arising from high guidance weights. At each sampling step $t$, the $\bx$-prediction $\hat{\bx}^t_0$ must be within the same bounds as training data $\bx$, i.e. within $[-1, 1]$, but we find empirically that high guidance weights cause $\bx$-predictions to exceed these bounds. This is a train-test mismatch, and since the diffusion model is iteratively applied on its own output throughout sampling, the sampling process produces unnatural images and sometimes even diverges. To counter this problem, we investigate \emph{static thresholding} and \emph{dynamic thresholding}. See Appendix  \cref{fig:clip_vs_scaled_clip_impl} for reference implementation of the techniques and Appendix \cref{fig:clip_noclip_scaledclip} for visualizations of their effects.
+
+
+\textbf{Static thresholding}: We refer to elementwise clipping the $\bx$-prediction to $[-1, 1]$ as \emph{static thresholding}. This method was in fact used but not emphasized in previous work~\citep{ho2020denoising}, and to our knowledge its importance has not been investigated in the context of guided sampling. We discover that static thresholding is essential to sampling with large guidance weights and prevents generation of blank images. Nonetheless, static thresholding still results in over-saturated and less detailed images as the guidance weight further increases.
+
+\textbf{Dynamic thresholding}: We introduce a new \emph{dynamic thresholding} method: at each sampling step we set $s$ to a certain percentile absolute pixel value in $\hat{\bx}^t_0$, and if $s>1$, then we threshold $\hat{\bx}^t_0$ to the range $[-s, s]$ and then divide by $s$. Dynamic thresholding pushes saturated pixels (those near -1 and 1) inwards, thereby actively preventing pixels from saturation at each step. We find that dynamic thresholding results in significantly better photorealism as well as better image-text alignment, especially when using very large guidance weights. 
+
+
+
+
+
+
+\vspace{\presectionspace}
+\subsection{Robust cascaded diffusion models}
+\vspace{\postsectionspace}
+\name utilizes a pipeline of a base $64\times64$ model, and two text-conditional super-resolution diffusion models to upsample a $64\times64$ generated image into a $256\times256$ image, and then to $1024\times1024$ image. Cascaded diffusion models with noise conditioning augmentation \citep{ho2021cascaded} have been extremely effective in progressively generating high-fidelity images. Furthermore, making the super-resolution models aware of the amount of noise added, via noise level conditioning, significantly improves the sample quality and helps improving the robustness of the super-resolution models to handle artifacts generated by lower resolution models \cite{ho2021cascaded}.
+\name uses noise conditioning augmentation for both the super-resolution models. We find this to be a critical for generating high fidelity images.
+
+Given a conditioning low-resolution image and augmentation level (a.k.a $\mathrm{aug\_level}$) (e.g., strength of Gaussian noise or blur), we corrupt the low-resolution image with the augmentation (corresponding to $\mathrm{aug\_level}$), and condition the diffusion model on $\mathrm{aug\_level}$. During training, $\mathrm{aug\_level}$ is chosen randomly, while during inference, we sweep over its different values to find the best sample quality. In our case, we use Gaussian noise as a form of augmentation, and apply variance preserving Gaussian noise augmentation resembling the forward process used in diffusion models~(\cref{sec:app_background}). The augmentation level is specified using $\mathrm{aug\_level} \in [0, 1]$. See \cref{fig:cond_aug_impl} for reference pseudocode.
+
+
+\subsection{Neural network architecture}
+\vspace{-0.15cm}
+\label{sec:architecture}
+\textbf{Base model}: We adapt the U-Net architecture from \cite{nichol2021improved} for our base $64\times64$ text-to-image diffusion model. The network is conditioned on text embeddings via a pooled embedding vector, added to the diffusion timestep embedding similar to the class embedding conditioning method used in \cite{dhariwal2021diffusion, ho2021cascaded}. We further condition on the entire sequence of text embeddings by adding cross attention \cite{rombach-cvpr-2022} over the text embeddings at multiple resolutions. We study various methods of text conditioning in \cref{sec:text_conditioning_ablation}. Furthermore, we found Layer Normalization \cite{ba2016layer} for text embeddings in the attention and pooling layers to help considerably improve performance. 
+
+
+
+\textbf{Super-resolution models}: For $64\times64 \rightarrow 256\times256$ super-resolution, we use the U-Net model adapted from \cite{nichol2021improved, sahariac-palette}. We make several modifications to this U-Net model for improving memory efficiency, inference time and convergence speed (our variant is 2-3x faster in steps/second over the U-Net used in \cite{nichol2021improved, sahariac-palette}). We call this variant \textit{Efficient U-Net} (See Appendix \ref{sec:unet_vs_efficient_unet_appendix} for more details and comparisons). Our $256\times256 \rightarrow 1024\times1024$ super-resolution model trains on $64\times64 \rightarrow 256\times 256$ crops of the $1024\times1024$ image. To facilitate this, we remove the self-attention layers, however we keep the text cross-attention layers which we found to be critical. During inference, the model receives the full $256\times256$ low-resolution images as inputs, and returns upsampled $1024\times1024$ images as outputs. Note that we use text cross attention for both our super-resolution models.

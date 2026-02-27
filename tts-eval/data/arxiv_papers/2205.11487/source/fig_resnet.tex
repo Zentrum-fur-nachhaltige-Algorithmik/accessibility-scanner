@@ -1,0 +1,207 @@
+\begin{figure}
+\centering
+\begin{tikzpicture}[font={\small}]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\node[] (input) {};
+
+\node[draw=google_blue, below=0.5 in of input, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center,fill=google_blue,fill opacity=0.1,text opacity=1.0,text=google_blue] (group_norm0) {\tt GroupNorm};
+\draw[-Latex] (input) -- (group_norm0) coordinate[midway] (start);
+
+\node[draw=google_red, below=1pt of group_norm0, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (swish0) {\texttt{swish}};
+
+\node[draw=google_green, below=1pt of swish0, minimum height=0.75in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_green, fill opacity=0.1, text opacity=1.0,text=google_green] (conv0) {\tt Conv \\ \scriptsize \tt kernel\_size=3$\times$3 \\ \scriptsize \tt channels=channels};
+
+\node[draw=google_blue, below=1pt of conv0, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center,fill=google_blue,fill opacity=0.1,text opacity=1.0,text=google_blue] (group_norm1) {\texttt{GroupNorm}};
+
+\node[draw=google_red, below=1pt of group_norm1, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (swish1) {\texttt{swish}};
+
+\node[draw=google_green, below=1pt of swish1, minimum height=0.75in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_green, fill opacity=0.1, text opacity=1.0,text=google_green] (conv1) {\tt Conv \\ \scriptsize \tt kernel\_size=3$\times$3 \\ \scriptsize \tt channels=channels};
+
+
+\node[below=0.5in of conv1] (output) {};
+\draw[-Latex] (conv1) -- (output) coordinate[midway] (end);
+
+
+\node[draw=google_green, above right=-0.375in and 0.25in of group_norm1, minimum height=0.75in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_green, fill opacity=0.1, text opacity=1.0,text=google_green] (conv_skip) {\tt Conv \\ \scriptsize \tt kernel\_size=1$\times$1 \\ \scriptsize \tt channels=channels};
+
+\draw[-Latex] (start) -| (conv_skip.north);
+\draw (conv_skip.south) |- (end);
+
+
+\end{tikzpicture}
+\caption{Efficient U-Net \texttt{ResNetBlock}. The \texttt{ResNetBlock} is used both by the \texttt{DBlock} and \texttt{UBlock}. Hyperparameter of the \texttt{ResNetBlock} is the number of channels \texttt{channels:~int}.}
+\end{figure}
+
+
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[font={\small}]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\node[] (input) {Previous \texttt{DBlock}};
+
+\node[draw=google_green, dashed, below=0.25in of input, minimum height=1.0in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_green, fill opacity=0.1, text opacity=1.0,text=google_green] (conv_stride) {\tt Conv \\ \scriptsize \tt kernel\_size=3$\times$3 \\ \scriptsize \tt strides=stride \\ \scriptsize \tt channels=channels};
+
+\draw[-Latex] (input) -- (conv_stride);
+
+\node[draw=google_red, below=1pt of conv_stride, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (cembs) {\tt CombineEmbs};
+
+\node[left=0.25in of cembs, align=center] (conditional) {Conditional Embeddings \\ (e.g., Time, Pooled Text Embeddings)};
+\draw[-Latex] (conditional) -- (cembs);
+
+\node[draw=google_yellow, below=1pt of cembs, minimum height=0.5in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_yellow, fill opacity=0.1, text opacity=1.0,text=google_yellow] (resnetblocks) {\tt ResNetBlock \\ \scriptsize \tt channels=channels};
+
+\node[right=0.25 of resnetblocks,text=google_yellow] (ResNetBlockCount) {$\times$ \tt numResNetBlocksPerBlock};
+
+\node[draw=google_blue, dashed, below=1pt of resnetblocks, minimum height=1.0in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (selfattention) {\tt SelfAttention \\ \scriptsize \tt attention\_heads=8 \\ \scriptsize \tt hidden\_size=2$\times$channels \\ \scriptsize \tt output\_size=channels};
+
+\node[left=0.25in of selfattention, align=center] (fullconditional) {Full Contextual Text Embeddings};
+\draw[-Latex] (fullconditional) -- (selfattention);
+
+\node[below=0.25in of selfattention] (output) {};
+
+\draw[-Latex] (selfattention) -- (output);
+
+\end{tikzpicture}
+\caption{Efficient UNet \texttt{DBlock}. Hyperparameters of \texttt{DBlock} are: the stride of the block if there is downsampling \texttt{stride:~Optional[Tuple[int, int]]}, number of \texttt{ResNetBlock} per \texttt{DBlock} \texttt{numResNetBlocksPerBlock:~int}, and number of channels \texttt{channels:~int}. The dashed lined blocks are optional, e.g., not every \texttt{DBlock} needs to downsample or needs self-attention.}
+\label{fig:efficient_unet_dblock}
+\end{figure}
+
+
+
+
+
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[font={\small}]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\node[] (input) {Previous \texttt{UBlock}};
+\node[draw,circle,below=0.25in of input] (input_plus_cemb) {$+$};
+\node[draw,circle,below=0.25in of input] (input_plus_skip) {$+$};
+\node[left=0.25in of input_plus_skip] (dblock) {Skip Connection from \texttt{DBlock}};
+
+\draw[-Latex] (input) -- (input_plus_cemb);
+\draw[-Latex] (dblock) -- (input_plus_skip);
+
+
+\node[draw=google_red, below=0.25in of input_plus_skip, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (cembs) {\tt CombineEmbs};
+
+\node[left=0.25in of cembs] (pooledembs) {Conditional Embeddings};
+
+\draw[-Latex] (pooledembs) -- (cembs);
+\draw[-Latex] (input_plus_skip) -- (cembs);
+
+\node[draw=google_yellow, below=1pt of cembs, minimum height=0.5in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_yellow, fill opacity=0.1, text opacity=1.0,text=google_yellow] (resnetblocks) {\tt ResNetBlock \\ \scriptsize \tt channels=channels};
+
+\node[right=0.25 of resnetblocks,text=google_yellow] (ResNetBlockCount) {$\times$ \tt numResNetBlocksPerBlock};
+
+
+
+\node[draw=google_blue, dashed, below=1pt of resnetblocks, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (selfattention) {\tt SelfAttention};
+
+
+\node[draw=google_green, dashed, below=1pt of selfattention, minimum height=1.0in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_green, fill opacity=0.1, text opacity=1.0,text=google_green] (conv_stride) {\tt Conv \\ \scriptsize \tt kernel\_size=3$\times$3 \\ \scriptsize \tt strides=stride \\ \scriptsize \tt channels=channels};
+
+\node[below=0.25in of conv_stride] (output) {};
+\draw[-Latex] (conv_stride) -- (output);
+
+
+
+\end{tikzpicture}
+\caption{Efficient U-Net \texttt{UBlock}. Hyperparameters of \texttt{UBlock} are: the stride of the block if there is upsampling \texttt{stride:~Optional[Tuple[int, int]]}, number of \texttt{ResNetBlock} per \texttt{DBlock} \texttt{numResNetBlocksPerBlock:~int}, and number of channels \texttt{channels:~int}. The dashed lined blocks are optional, e.g., not every \texttt{UBlock} needs to upsample or needs self-attention.}
+\label{fig:efficient_unet_ublock}
+\end{figure}
+
+
+
+
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[font={\small}]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+\node[] (input) {};
+
+\node[draw=google_green, below=0.25in of input, minimum height=0.75in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_green, fill opacity=0.1, text opacity=1.0,text=google_green] (conv_begin) {\tt Conv \\ \scriptsize \tt kernel\_size=3$\times$3 \\ \scriptsize \tt channels=128};
+\draw[-Latex] (input) -- (conv_begin);
+
+\node[draw=google_blue, below=0.125in of conv_begin, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (dblock256) {\texttt{DBlock 256x}};
+\draw[-Latex] (conv_begin) -- (dblock256);
+
+\node[draw=google_blue, below=0.125in of dblock256, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (dblock128) {\texttt{DBlock 128x}};
+\draw[-Latex] (dblock256) -- (dblock128);
+
+\node[draw=google_blue, below=0.125in of dblock128, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (dblock64) {\texttt{DBlock 64x}};
+\draw[-Latex] (dblock128) -- (dblock64);
+
+
+\node[draw=google_blue, below=0.125in of dblock64, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (dblock32) {\texttt{DBlock 32x}};
+\draw[-Latex] (dblock64) -- (dblock32);
+
+
+\node[draw=google_blue, below=0.125in of dblock32, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_blue, fill opacity=0.1, text opacity=1.0,text=google_blue] (dblock16) {\texttt{DBlock 16x}};
+\draw[-Latex] (dblock32) -- (dblock16);
+
+
+\node[draw=google_red, below=0.125in of dblock16, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (ublock16) {\texttt{UBlock 16x}};
+\draw[-Latex] (dblock16) -- (ublock16);
+
+
+\node[draw=google_red, below=0.125in of ublock16, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (ublock32) {\texttt{UBlock 32x}};
+\draw[-Latex] (ublock16) -- (ublock32);
+\draw[-Latex] (dblock32.east) -- ++(0.25in,0) |- (ublock32.east);
+
+\node[draw=google_red, below=0.125in of ublock32, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (ublock64) {\texttt{UBlock 64x}};
+\draw[-Latex] (ublock32) -- (ublock64);
+\draw[-Latex] (dblock64.east) -- ++(0.375in,0) |- (ublock64.east);
+
+
+\node[draw=google_red, below=0.125in of ublock64, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (ublock128) {\texttt{UBlock 128x}};
+\draw[-Latex] (ublock64) -- (ublock128);
+\draw[-Latex] (dblock128.east) -- ++(0.5in,0) |- (ublock128.east);
+
+
+\node[draw=google_red, below=0.125in of ublock128, minimum height=0.25in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_red, fill opacity=0.1, text opacity=1.0,text=google_red] (ublock256) {\texttt{UBlock 256x}};
+\draw[-Latex] (ublock128) -- (ublock256);
+\draw[-Latex] (dblock256.east) -- ++(0.625in,0) |- (ublock256.east);
+
+\node[draw=google_yellow, below=0.125in of ublock256, minimum height=0.5in, minimum width=1.5in, node distance=0.25in, align=center, fill=google_yellow, fill opacity=0.1, text opacity=1.0,text=google_yellow] (dense) {\texttt{Dense} \\ \scriptsize \texttt{channels=3}};
+\draw[-Latex] (ublock256) -- (dense);
+
+\node[below=0.25in of dense] (output) {$256^2$ Image};
+\draw[-Latex] (dense) -- (output);
+
+\end{tikzpicture}
+\caption{Efficient U-Net architecture for $64^2\rightarrow256^2$.}
+\label{fig:efficient_unet_fullarch}
+\end{figure}
+
+
+
+
+
+
+
+
+

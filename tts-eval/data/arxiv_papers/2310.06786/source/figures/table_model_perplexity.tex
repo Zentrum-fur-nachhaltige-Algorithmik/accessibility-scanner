@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Training Dataset} & \multicolumn{1}{c}{\textbf{GSM8k}} & \multicolumn{7}{c}{\textbf{MATH}} \\
+                & & Prealgebra & Algebra & \makecell{Intermediate\\Algebra} & \makecell{Counting \&\\Probability} & \makecell{Number\\Theory} & \makecell{Precalculus} & Geometry\\
+\midrule
+\textbf{The Pile} (14.7B tokens) & 2.2032 & 1.9127 & 1.9751 & 1.8420 & 1.8193 & 1.9227 & 1.6847 & 1.9499 \\
+\textbf{ProofPile} (14.7B tokens) & 2.2350 & 1.7370 & 1.7214 & 1.5739 & 1.6462 & 1.7291 & 1.4838 & 1.7229 \\
+\textbf{OpenWebMath} (14.7B tokens) & 1.9075 & 1.6285 & 1.6503 & 1.5949 & 1.6002 & 1.6894 & 1.4542 & 1.5748 \\
+\textbf{Mixture} (14.7B tokens) & \textbf{1.8968} & \textbf{1.6055} & \textbf{1.6190} & \textbf{1.5301} & \textbf{1.5719} & \textbf{1.6607} & \textbf{1.4119} & \textbf{1.5599} \\
+\midrule
+\textbf{The Pile} (300B tokens; Pythia 1.4B) & 1.9430 & 1.7117 & 1.7560 & 1.6358 & 1.6359 & 1.7460 & 1.5191 & 1.7252 \\
+ % \midrule
+ % Code Llama 7b $\cup$ Sledgehammer   & 20.17\% & 25.00\% \\
+\bottomrule
+\end{tabular}
+}
+\caption{We trained 1.4B parameter models for 14.7B tokens on various datasets and measured their perplexity on different mathematics benchmarks. Both OpenWebMath and a 50/50 mixture of ProofPile \cite{azerbayev2023proofnet} and OpenWebMath perform well - outperforming Pythia 1.4B \citep{pythia} trained on 300B tokens of The Pile \citep{gao2020pile}.}
+\vspace{-1.5em}
+\label{table:math-perplexity-comparison}
+\end{table}

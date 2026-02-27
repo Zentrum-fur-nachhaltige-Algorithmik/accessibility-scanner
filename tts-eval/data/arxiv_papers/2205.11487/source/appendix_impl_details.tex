@@ -1,0 +1,240 @@
+\clearpage
+\begin{figure}
+\centering
+\begin{subfigure}{.49\textwidth}
+  \centering
+    \begin{Verbatim}[fontsize=\scriptsize]
+    def sample():
+      for t in reversed(range(T)):
+        # Forward pass to get x0_t from z_t.
+        x0_t = nn(z_t, t)
+        
+        # Static thresholding.
+        x0_t = jnp.clip(x0_t, -1.0, 1.0)
+        
+        
+        
+        
+        
+        # Sampler step.
+        z_tm1 = sampler_step(x0_t, z_t, t)
+        z_t = z_tm1
+      return x0_t
+    \end{Verbatim}
+  \caption{Implementation for static thresholding.}
+\end{subfigure}%
+\hfill%
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \begin{Verbatim}[fontsize=\scriptsize]
+    def sample(p: float):
+      for t in reversed(range(T)):
+        # Forward pass to get x0_t from z_t.
+        x0_t = nn(z_t, t)
+        
+        # Dynamic thresholding (ours).
+        s = jnp.percentile(
+            jnp.abs(x0_t), p, 
+            axis=tuple(range(1, x0_t.ndim)))
+        s = jnp.max(s, 1.0)
+        x0_t = jnp.clip(x0_t, -s, s) / s
+
+        # Sampler step.
+        z_tm1 = sampler_step(x0_t, z_t, t)
+        z_t = z_tm1
+      return x0_t
+  \end{Verbatim}
+  \caption{Implementation for dynamic thresholding.}
+\end{subfigure}
+\caption{Pseudo code implementation comparing static thresholding and dynamic thresholding.}
+\label{fig:clip_vs_scaled_clip_impl}
+\end{figure}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}{.49\textwidth}
+  \centering
+  \begin{Verbatim}[fontsize=\scriptsize]
+    def train_step(
+        x_lr: jnp.ndarray, x_hr: jnp.ndarray):
+      # Add augmentation to the low-resolution image.
+      aug_level = jnp.random.uniform(0.0, 1.0)
+      x_lr = apply_aug(x_lr, aug_level)
+      
+      # Diffusion forward process.
+      t = jnp.random.uniform(0.0, 1.0)
+      z_t = forward_process(x_hr, t)
+      
+      Optimize loss(x_hr, nn(z_t, x_lr, t, aug_level))
+  \end{Verbatim}
+  \caption{Training using conditioning augmentation.}
+\end{subfigure}%
+\hfill%
+\begin{subfigure}{.49\textwidth}
+  \centering
+    \begin{Verbatim}[fontsize=\scriptsize]
+    def sample(aug_level: float, x_lr: jnp.ndarray):
+      # Add augmentation to the low-resolution image.
+      x_lr = apply_aug(x_lr, aug_level)
+
+      for t in reversed(range(T)):
+        x_hr_t = nn(z_t, x_lr, t, aug_level)
+
+        # Sampler step.
+        z_tm1 = sampler_step(x_hr_t, z_t, t)
+        z_t = z_tm1
+      return x_hr_t
+  \end{Verbatim}
+  \caption{Sampling using conditioning augmentation. }
+\end{subfigure}
+\caption{Pseudo-code implementation for training and sampling using conditioning augmentation. Text conditioning has not been shown for brevity.}
+\label{fig:cond_aug_impl}
+\end{figure}
+
+
+\FloatBarrier
+\newpage
+\section{Implementation Details}
+\label{sec:impl_details_appendix}
+
+\subsection{$64\times64$}
+\textbf{Architecture}: We adapt the architecture used in \cite{dhariwal2021diffusion}. We use larger \emph{embed\_dim} for scaling up the architecture size. For conditioning on text, we use text cross attention at resolutions $[32, 16, 8]$ as well as attention pooled text embedding.
+
+\textbf{Optimizer}: We use the Adafactor optimizer for training the base model. We use the default \href{https://optax.readthedocs.io/en/latest/api.html#adafactor}{optax.adafactor} parameters. We use a learning rate of 1e-4 with 10000 linear warmup steps.
+
+\textbf{Diffusion}: We use the cosine noise schedule similar to \cite{nichol2021improved}. We train using continuous time steps $t \sim \mathcal{U}(0, 1)$.
+\begin{Verbatim}[fontsize=\scriptsize]
+ # 64 X 64 model.
+ architecture = {
+      "attn_resolutions": [32, 16, 8],
+      "channel_mult": [1, 2, 3, 4],
+      "dropout": 0,
+      "embed_dim": 512,
+      "num_res_blocks": 3,
+      "per_head_channels": 64,
+      "res_block_type": "biggan",
+      "text_cross_attn_res": [32, 16, 8],
+      "feature_pooling_type": "attention",
+      "use_scale_shift_norm": True,
+  }
+
+  learning_rate = optax.warmup_cosine_decay_schedule(
+      init_value=0.0,
+      peak_value=1e-4,
+      warmup_steps=10000,
+      decay_steps=2500000,
+      end_value=2500000)
+
+  optimizer = optax.adafactor(lrs=learning_rate, weight_decay=0)
+  diffusion_params = {
+    "continuous_time": True,
+    "schedule": {
+      "name": "cosine",
+    }
+  }
+\end{Verbatim}
+
+\subsection{$64\times64 \rightarrow 256\times256$}
+\textbf{Architecture}: Below is the architecture specification for our $64\times64 \rightarrow 256\times256$ super-resolution model. We use an Efficient U-Net architecture for this model.
+
+\textbf{Optimizer}: We use the standard Adam optimizer with 1e-4 learning rate, and 10000 warmup steps.
+
+\textbf{Diffusion}: We use the same cosine noise schedule as the base $64\times64$ model. We train using continuous time steps $t \sim \mathcal{U}(0, 1)$.
+
+\begin{Verbatim}[fontsize=\scriptsize]
+    architecture = {
+        "dropout": 0.0,
+        "feature_pooling_type": "attention",
+        "use_scale_shift_norm": True,
+        "blocks": [
+            {
+              "channels": 128,
+              "strides": (2, 2),
+              "kernel_size": (3, 3),
+              "num_res_blocks": 2,
+            },
+            {
+              "channels": 256,
+              "strides": (2, 2),
+              "kernel_size": (3, 3),
+              "num_res_blocks": 4,
+            },
+            {
+              "channels": 512,
+              "strides": (2, 2),
+              "kernel_size": (3, 3),
+              "num_res_blocks": 8,
+            },
+            {
+              "channels": 1024,
+              "strides": (2, 2),
+              "kernel_size": (3, 3),
+              "num_res_blocks": 8,
+              "self_attention": True,
+              "text_cross_attention": True,
+              "num_attention_heads": 8
+            }
+        ]
+    }
+
+    learning_rate = optax.warmup_cosine_decay_schedule(
+        init_value=0.0,
+        peak_value=1e-4,
+        warmup_steps=10000,
+        decay_steps=2500000,
+        end_value=2500000)
+    
+    optimizer = optax.adam(
+        lrs=learning_rate, b1=0.9, b2=0.999, eps=1e-8, weight_decay=0)
+    
+    diffusion_params = {
+      "continuous_time": True,
+      "schedule": {
+        "name": "cosine",
+      }
+    }
+\end{Verbatim}
+
+\subsection{$256\times256 \rightarrow 1024\times1024$}
+\textbf{Architecture}: Below is the architecture specification for our $256\times256 \rightarrow 1024\times1024$ super-resolution model. We use the same configuration as the $64\times64 \rightarrow 256\times256$ super-resolution model, except we do not use self-attention layers but rather have cross-attention layers (to the text embeddings). 
+
+\textbf{Optimizer}: We use the standard Adam optimizer with 1e-4 learning rate, and 10000 linear warmup steps.
+
+\textbf{Diffusion}: We use the 1000 step linear noise schedule with start and end set to 1e-4 and 0.02 respectively. We train using continuous time steps $t \sim \mathcal{U}(0, 1)$.
+
+\begin{Verbatim}[fontsize=\scriptsize]
+    "dropout": 0.0,
+    "feature_pooling_type": "attention",
+    "use_scale_shift_norm": true,
+    "blocks"=[
+        {
+          "channels": 128,
+          "strides": (2, 2),
+          "kernel_size": (3, 3),
+          "num_res_blocks": 2,
+        },
+        {
+          "channels": 256,
+          "strides": (2, 2),
+          "kernel_size": (3, 3),
+          "num_res_blocks": 4,
+        },
+        {
+          "channels": 512,
+          "strides": (2, 2),
+          "kernel_size": (3, 3),
+          "num_res_blocks": 8,
+        },
+        {
+          "channels": 1024,
+          "strides": (2, 2),
+          "kernel_size": (3, 3),
+          "num_res_blocks": 8,
+          "text_cross_attention": True,
+          "num_attention_heads": 8
+        }
+    ]
+\end{Verbatim}
+
+\FloatBarrier

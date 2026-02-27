@@ -1,0 +1,35 @@
+
+
+\vspace{\presectionspace}
+\section{Introduction}
+\vspace{\postsectionspace}
+Multimodal learning has come into prominence recently, with text-to-image synthesis~\cite{ramesh-dalle, crowson2022vqgan, rombach-cvpr-2022} and image-text contrastive learning~\cite{radford-icml-2021,jia2021scaling,weston2011wsabie} at the forefront.
+These models have transformed the research community and captured widespread public attention with creative image generation \cite{gafni2022make, ramesh-dalle2} and editing applications~\cite{fu2021language, nichol-glide, kim2021diffusionclip}.
+To pursue this research direction further, we introduce \name, a text-to-image diffusion model that combines the power of transformer language models (LMs)~\cite{devlin-naacl-2019,raffel-jmlr-2020} with high-fidelity diffusion models~\cite{ho2020denoising, ho2021cascaded, dhariwal2021diffusion, nichol-glide} to deliver an unprecedented degree of photorealism and a deep level of language understanding in text-to-image synthesis.
+In contrast to prior work that uses only image-text data for model training~\cite[e.g.,][]{ramesh-dalle, nichol-glide}, the key finding behind \name is that text embeddings from large LMs~\cite{raffel-jmlr-2020, devlin-naacl-2019},
+pretrained on text-only corpora, are remarkably effective for text-to-image synthesis.
+See \cref{fig:full_page_collage} for select samples.
+\input{full_page_collage}
+
+
+\name comprises a frozen T5-XXL~\cite{raffel-jmlr-2020} encoder to map input text into a sequence of embeddings and a $64\!\times\!64$ image diffusion model, followed by two super-resolution diffusion models for generating $256\!\times\!256$ and $1024\!\times\!1024$ images (see \cref{fig:main_diagram}). All diffusion models are conditioned on the text embedding sequence and use classifier-free guidance \cite{ho2021classifierfree}. \name relies on new sampling techniques to allow usage of large guidance weights without sample quality degradation observed in prior work, resulting in images with higher fidelity and better image-text alignment than previously possible. 
+
+While conceptually simple and easy to train, \name yields surprisingly strong results.  \name outperforms other methods on COCO~\cite{lin-eccv-2014} with zero-shot FID-30K of~\ourmscocofid, significantly outperforming prior work such as GLIDE~\cite{nichol-glide} (at 12.4) and the concurrent work of DALL-E~2~\cite{ramesh-dalle2} (at 10.4). Our zero-shot FID score is also better than state-of-the-art models trained on COCO, e.g., Make-A-Scene~\cite{gafni2022make} (at 7.6). 
+Additionally, human raters indicate that generated samples from \name are on-par in image-text alignment to the reference images on COCO captions.
+
+We introduce \benchmarkname, a new structured suite of text prompts for text-to-image evaluation. 
+\benchmarkname enables deeper insights through a multi-dimensional evaluation of  text-to-image
+models, with text prompts designed to probe different semantic properties of models.  These include compositionality, cardinality, spatial relations, the ability to handle complex text prompts or prompts with rare words, and they include creative prompts that push the limits of models' ability to generate highly implausible scenes well beyond the scope of the training data.
+With \benchmarkname, extensive human evaluation shows that \name outperforms other recent methods~\cite{rombach-cvpr-2022, crowson2022vqgan, ramesh-dalle2} by a significant margin. 
+We further demonstrate some of the clear advantages of the use of large pre-trained language models~\cite{raffel-jmlr-2020} over multi-modal embeddings such as CLIP~\cite{radford-icml-2021} as a text encoder for \name.
+
+
+Key contributions of the paper include:
+\begin{enumerate}[noitemsep,nolistsep,leftmargin=0.5cm]
+    \item We discover that large frozen language models trained only on text data are surprisingly very effective text encoders for text-to-image generation, and that scaling the size of frozen text encoder improves sample quality significantly more than scaling the size of image diffusion model.
+    \item We introduce \emph{dynamic thresholding}, a %
+    new diffusion sampling technique to leverage high guidance weights and generating more photorealistic and detailed images than previously possible.
+    \item We highlight several important diffusion architecture design choices and propose \mbox{\emph{Efficient U-Net}}, a new architecture variant which is simpler, converges faster and is more memory efficient. 
+    \item We achieve a new state-of-the-art COCO FID of \ourmscocofid. Human raters find \name to be on-par with the reference images in terms of image-text alignment. 
+    \item We introduce \benchmarkname, a new comprehensive and challenging evaluation benchmark for the text-to-image task. On \benchmarkname human evaluation, we find \name to outperform all other work, including the concurrent work of DALL-E 2 \cite{ramesh-dalle2}.
+\end{enumerate}

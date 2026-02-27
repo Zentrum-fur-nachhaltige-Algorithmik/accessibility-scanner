@@ -1,0 +1,9 @@
+\vspace{\presectionspace}
+\section{Related Work}
+\vspace{\postsectionspace}
+Diffusion models have seen wide success in image generation~\cite{ho2020denoising,nichol2021improved,saharia2021image,dhariwal2021diffusion,ho2021cascaded,sahariac-palette}, outperforming GANs in fidelity and diversity, without training instability and mode collapse issues~\cite{brock2018large,dhariwal2021diffusion,ho2021cascaded}.
+Autoregressive models \cite{mansimov-iclr-2016}, GANs \cite{xu-cvpr-2018,zhang2021cross}, VQ-VAE Transformer-based methods~\cite{ramesh-dalle,gafni2022make}, and diffusion models have seen remarkable progress in text-to-image~\cite{rombach-cvpr-2022,nichol-glide,rombach-cvpr-2022}, including the concurrent \mbox{DALL-E 2}~\cite{ramesh-dalle2}, which uses a diffusion prior on CLIP text latents and cascaded diffusion models to generate high resolution $1024\times1024$ images; we believe \name is much simpler, as \name does not need to learn a latent prior, yet achieves better results in both MS-COCO FID and human evaluation on \benchmarkname.
+GLIDE \cite{nichol-glide} also uses cascaded diffusion models for text-to-image, but we use large pretrained frozen language models, which we found to be instrumental to both image fidelity and image-text alignment.
+XMC-GAN \cite{zhang2021cross} also uses BERT as a text encoder, but we scale to much larger text encoders and demonstrate the effectiveness thereof.
+The use of cascaded models is also popular throughout the literature \cite{denton-nips-2015,menick-iclr-2019} and has been used with success in diffusion models to generate high resolution images \cite{dhariwal2021diffusion,ho2021cascaded}. %
+

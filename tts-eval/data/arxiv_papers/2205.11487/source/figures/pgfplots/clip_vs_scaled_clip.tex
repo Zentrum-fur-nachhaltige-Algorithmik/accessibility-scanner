@@ -1,0 +1,32 @@
+\begin{tikzpicture}[scale=0.55]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+
+\begin{axis}[
+width=8cm,
+height=6cm,
+  xlabel=CLIP Score,
+  ylabel=FID@10K,
+  legend columns=1,
+  legend pos=north west,
+  y label style={at={(axis description cs:0.03,.5)}},
+  legend style={font=\footnotesize},
+  legend cell align=left,
+  xmin=0.255,
+  ymin=7.5,
+  ymax=27,
+  xmax=0.295,
+  every axis plot/.append style={very thick}
+]
+\addplot +[mark=*, solid, google_blue, mark options={scale=0.4}] coordinates {(0.2573, 9.5976)(0.2686, 8.3913)(0.2755, 9.1741)(0.2794, 10.3238)(0.282, 11.6418)(0.2867, 15.9009)(0.2881, 18.2998)(0.288, 19.4781)(0.2881, 20.3822)(0.2877, 20.9476)(0.2872, 21.4995)(0.2869, 22.526)(0.2866, 23.1381)};
+
+\addplot +[mark=*, solid, google_red, mark options={scale=0.4}] coordinates {(0.2574, 9.2972)(0.2692, 8.0746)(0.2756, 8.8401)(0.2798, 10.0002)(0.2827, 11.3142)(0.2884, 14.7455)(0.2903, 16.8102)(0.2913, 18.092)(0.2921, 19.6666)(0.292, 21.2374)(0.2923, 22.3307)(0.292, 24.3588)(0.2918, 25.9931)};
+
+
+\legend{static thresholding, dynamic thresholding}
+\end{axis}
+\end{tikzpicture}

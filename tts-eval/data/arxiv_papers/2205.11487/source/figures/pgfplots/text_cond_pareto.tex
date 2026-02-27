@@ -1,0 +1,30 @@
+\begin{tikzpicture}[scale=0.7]
+
+\definecolor{google_blue}{RGB}{66,133,244}
+\definecolor{google_red}{RGB}{219,68,55}
+\definecolor{google_yellow}{RGB}{194,144,0}
+\definecolor{google_green}{RGB}{15,157,88}
+
+
+\begin{axis}[width=8cm, height=6cm,
+  xlabel=CLIP Score,
+  ylabel=FID-10K,
+  legend columns=1,
+  legend pos=north west,
+  legend cell align=left,
+  legend style={font=\tiny},
+  xmin=0.23,
+  ymin=7.5,
+  ymax=29,
+  xmax=0.295,
+  every axis plot/.append style={very thick}
+]
+\addplot +[mark=*, solid, google_blue, mark options={scale=0.4}] coordinates {(0.2331, 12.9559)(0.2431, 10.874)(0.2497, 10.556)(0.254, 10.9103)(0.2573, 11.6425)(0.2651, 15.0507)(0.2684, 17.7926)(0.2705, 19.9939)(0.2716, 21.5785)(0.2726, 22.7001)(0.2733, 23.0793)(0.2734, 23.8903)(0.2738, 24.4911)};
+
+\addplot +[mark=*, solid, google_red, mark options={scale=0.4}] coordinates {(0.2395, 12.0989)(0.2503, 10.0628)(0.2569, 9.9583)(0.2624, 10.6117)(0.2654, 11.3276)(0.2729, 15.1281)(0.2763, 18.5341)(0.2779, 20.1554)(0.2788, 21.6792)(0.2796, 22.8844)(0.28, 23.4682)(0.2802, 24.2021)(0.2805, 24.8261)};
+
+\addplot +[mark=*, solid, google_yellow, mark options={scale=0.4}] coordinates {(0.2451, 11.3483)(0.2572, 9.4933)(0.2652, 9.4017)(0.2699, 10.2998)(0.2738, 11.3422)(0.281, 16.4762)(0.2837, 19.563)(0.285, 21.9303)(0.286, 23.5618)(0.2862, 24.8776)(0.2865, 25.403)(0.2862, 26.2234)(0.2865, 26.5037)};
+
+\legend{Mean Pooling, Attention Pooling, Cross Attention}
+\end{axis}
+\end{tikzpicture}

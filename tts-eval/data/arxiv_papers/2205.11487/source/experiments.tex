@@ -1,0 +1,58 @@
+\vspace{\presectionspace}
+\section{Experiments}
+\vspace{\postsectionspace}
+\label{sec:experiments}
+\Cref{sec:experiments_trainingdetails} describes training details, \cref{sec:experiments_mscoco,sec:experiments_drawbench} analyze results on MS-COCO and  \benchmarkname, and \cref{sec:short_further_analysis} summarizes our ablation studies and key findings. For all experiments below, the images are fair random samples from \name with no post-processing or re-ranking.
+
+
+\input{experiments_trainingdetails}
+\input{experiments_mscoco}
+\input{experiments_drawbench}
+
+\subsection{Analysis of \name}
+\vspace{-0.15cm}
+\label{sec:short_further_analysis}
+For a detailed analysis of \name see \cref{sec:experiments_analysis}. Key findings are discussed in \cref{fig:main_ablations} and below.
+
+
+
+
+\textbf{Scaling text encoder size is extremely effective.} We observe that scaling the size of the text encoder leads to consistent improvement in both image-text alignment and image fidelity. \name trained with our largest text encoder, T5-XXL (4.6B parameters), yields the best results (\cref{fig:encoder_size_main_paper}).
+
+\textbf{Scaling text encoder size is more important than U-Net size.} While scaling the size of the diffusion model U-Net improves sample quality, we found scaling the text encoder size to be significantly more impactful than the U-Net size (\cref{fig:unet_main_paper}).
+
+\textbf{Dynamic thresholding is critical.} We show that dynamic thresholding results in samples with significantly better photorealism and alignment with text, over static or no thresholding, especially under the presence of large classifier-free guidance weights (\cref{fig:clip_vs_scaled_clip_main_paper}).
+
+\textbf{Human raters prefer T5-XXL over CLIP on \benchmarkname.} The models trained with T5-XXL and CLIP text encoders perform similarly on the COCO validation set in terms of CLIP and FID scores. However, we find that human raters prefer T5-XXL over CLIP on \benchmarkname across all 11 categories.
+
+\textbf{Noise conditioning augmentation is critical.} We show that training the super-resolution models with noise conditioning augmentation leads to better CLIP and FID scores. We also show that noise conditioning augmentation enables stronger text conditioning for the super-resolution model, resulting in improved CLIP and FID scores at higher guidance weights. Adding noise to the low-res image during inference along with the use of large guidance weights allows the super-resolution models to generate diverse upsampled outputs while removing artifacts from the low-res image.
+
+\textbf{Text conditioning method is critical.} We observe that conditioning over the sequence of text embeddings with cross attention significantly outperforms simple mean or attention based pooling in both sample fidelity as well as image-text alignment.
+
+\textbf{Efficient U-Net is critical.} Our Efficient U-Net implementation uses less memory, converges faster, and has better sample quality with faster inference.
+
+
+\begin{figure}[t]
+    \centering
+        \begin{subfigure}[t]{0.33\textwidth}
+        \centering
+        \input{figures/pgfplots/encoder_pareto_comparison}
+        \caption{Impact of encoder size.}
+        \label{fig:encoder_size_main_paper}
+        \end{subfigure}%
+        \begin{subfigure}[t]{0.33\textwidth}
+        \centering
+        \input{figures/pgfplots/model_size_pareto}
+        \caption{Impact of U-Net size.}
+        \label{fig:unet_main_paper}
+        \end{subfigure}%
+        \begin{subfigure}[t]{0.33\textwidth}
+        \centering
+        \input{figures/pgfplots/clip_vs_scaled_clip}
+        \caption{Impact of thresholding.}
+        \label{fig:clip_vs_scaled_clip_main_paper}
+        \end{subfigure}
+    \caption{Summary of some of the critical findings of \name with pareto curves sweeping over different guidance values. See \cref{sec:experiments_analysis} for more details.}
+    \label{fig:main_ablations}
+    \vspace{-1em}
+\end{figure}

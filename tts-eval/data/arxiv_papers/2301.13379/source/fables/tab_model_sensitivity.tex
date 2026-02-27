@@ -1,0 +1,97 @@
+% \begin{table*}[!t]
+% \centering
+% \scalebox{0.7}{
+% \begin{tabular}{c|rrrrr|r|rrr|r}
+%     \toprule
+%      & \multicolumn{5}{c|}{\textbf{Math Word Problems}} & \textbf{Planning} & \multicolumn{3}{c|}{\textbf{Multi-hop QA}} & \textbf{Logic} \\
+%      \textbf{Method} & GSM8K & SVAMP & MultiArith & ASDiv & AQuA & SayCan & StrategyQA & Date & Sport  & CLUTRR \\
+%      \hline
+%      \multicolumn{11}{c}{LM: \texttt{code-davinci-001}} \vspace{0.05cm} \\
+%      \hline
+%      Standard & 5.2 & 28.7 & 8.6 & 38.5 & \textbf{22.8} & \textbf{74.8} & 49.5 & 27.6 & 58.0 & 24.0 \\ 
+%      CoT & 14.7 & 41.2 & 57.2 & 50.4 & 22.4 & 69.9 & \textbf{52.9} & 34.0 & 60.4 & 35.4 \\ 
+%      LtM &  9.8 & 44.9 & 18.5 & 46.6 & 20.5 & 62.1 & 51.2 & 31.5 & 64.5 & \textbf{36.3} \\ 
+%      Faithful CoT (ours) & \textbf{27.4} & \textbf{50.8} & \textbf{63.3} & \textbf{53.7} & 20.9 & 67.0 & 52.0 & \textbf{43.2} & \textbf{75.6} & 23.4 \\ 
+
+     
+%      \hline
+%      \multicolumn{11}{c}{LM: \texttt{text-davinci-002}} \vspace{0.05cm} \\
+%      \hline
+%      Standard &  15.4 & 65.2 & 34.1 & 64.8 & 24.0 & 82.5 & 64.6 & 47.9 & 73.9 & 39.0 \\ 
+%      CoT &  47.2 & 68.0 & 91.1 & 69.9 & 40.6 & \textbf{87.4} & 37.1 & 60.4 & 76.3 & 45.4 \\ 
+%      LtM &  32.9 & 73.8 & 68.3 & 70.9 & 34.6 & 85.4 & \textbf{65.5} & 57.4 & 78.5 & \textbf{45.8} \\ 
+%      Faithful CoT (ours) &  \textbf{62.7} & \textbf{80.0} & \textbf{92.8} & \textbf{75.4} & \textbf{41.3} & 84.5 & 54.8 & \textbf{76.6} & \textbf{86.4} & 43.9 \\ 
+
+
+%      \hline
+%      \multicolumn{11}{c}{LM: \texttt{text-davinci-003}} \vspace{0.05cm} \\
+%      \hline
+%      Standard &  16.9 & 69.4 & 38.8 & 59.1 & 29.5 & 83.5 & 62.8 & 49.0 & 71.6 & 40.2 \\ 
+%      CoT &  59.6 & 79.5 & \textbf{95.0} & 69.1 & 46.9 & 82.5 & 69.1 & 68.2 & 91.9 & 46.2 \\ 
+%      LtM &  34.6 & 79.5 & 73.7 & 70.0 & 44.5 & 82.5 & \textbf{70.1} & 75.2 & \textbf{94.2} & \textbf{46.6} \\ 
+%      Faithful CoT (ours) & \textbf{71.7} & \textbf{85.1} & 94.5 & \textbf{80.7} & \textbf{50.8} & \textbf{92.2} & 52.5 & \textbf{81.9} & 91.8 & 39.9 \\ 
+
+
+%      \hline
+%      \multicolumn{11}{c}{LM: \texttt{gpt-4}} \vspace{0.05cm} \\
+%      \hline
+%      Standard & 46.9 & 88.4 & \textbf{98.7} & 70.2 & 50.4 & \textbf{96.1} & \textbf{66.6} & 77.4 & 91.1 & 48.3 \\ 
+%      CoT &  64.9 & 80.0 & 94.0 & 71.6 & \textbf{75.2} & 96.1 & 39.0 & 89.1 & 78.8 & 54.2 \\ 
+%      LtM &  91.8 & 92.9 & 98.3 & 86.7 & 72.0 & 80.6 & 61.0 & 94.2 & 92.5 & 53.4 \\ 
+%      Faithful CoT (ours) &  \textbf{95.0} & \textbf{95.4} & 98.5 & \textbf{95.6} & 73.6 & 92.2 & 54.0 & \textbf{95.8} & \textbf{99.3} & \textbf{62.7} \\ 
+
+%      \bottomrule
+% \end{tabular}
+% }
+% \caption{Accuracy of different prompting methods with each underlying LM on 10 reasoning datasets.}
+% \label{tab:model_sensitivity}
+% \end{table*}
+
+
+\begin{table*}[h]
+\centering
+\scalebox{0.7}{
+\begin{tabular}{c|rrrrr|r}
+    \toprule
+     \textbf{Method / Dataset} & GSM8K & SVAMP & MultiArith & ASDiv & AQuA & Average \\
+     \hline
+     & \multicolumn{5}{c}{LM: \texttt{code-davinci-001}} \vspace{0.05cm} \\
+     \hline
+     Standard & 5.2 & 28.7 & 8.6 & 38.5 & \textbf{22.8} & 20.8 \\ 
+     CoT & 14.7 & 41.2 & 57.2 & 50.4 & 22.4 & 37.2 \\ 
+     LtM &  9.8 & 44.9 & 18.5 & 46.6 & 20.5 & 28.1 \\ 
+     Faithful CoT (ours) & \textbf{27.4} & \textbf{50.8} & \textbf{63.3} & \textbf{53.7} & 20.9 & \textbf{43.2} \\ 
+
+     
+     \hline
+     & \multicolumn{5}{c}{LM: \texttt{text-davinci-002}} \vspace{0.05cm} \\
+     \hline
+     Standard &  15.4 & 65.2 & 34.1 & 64.8 & 24.0 & 40.7 \\ 
+     CoT &  47.2 & 68.0 & 91.1 & 69.9 & 40.6 & 63.4 \\ 
+     LtM &  32.9 & 73.8 & 68.3 & 70.9 & 34.6 & 56.1 \\ 
+     Faithful CoT (ours) &  \textbf{62.7} & \textbf{80.0} & \textbf{92.8} & \textbf{75.4} & \textbf{41.3} & \textbf{70.4} \\ 
+
+
+     \hline
+     & \multicolumn{5}{c}{LM: \texttt{text-davinci-003}} \vspace{0.05cm} \\
+     \hline
+     Standard &  16.9 & 69.4 & 38.8 & 59.1 & 29.5 & 42.7 \\ 
+     CoT &  59.6 & 79.5 & \textbf{95.0} & 69.1 & 46.9 & 70.0 \\ 
+     LtM &  34.6 & 79.5 & 73.7 & 70.0 & 44.5 & 60.5 \\ 
+     Faithful CoT (ours) & \textbf{71.7} & \textbf{85.1} & 94.5 & \textbf{80.7} & \textbf{50.8} & \textbf{76.6} \\ 
+
+
+     \hline
+     & \multicolumn{5}{c}{LM: \texttt{gpt-4}} \vspace{0.05cm} \\
+     \hline
+     Standard & 46.9 & 88.4 & \textbf{98.7} & 70.2 & 50.4 & 70.9 \\ 
+     CoT &  64.9 & 80.0 & 94.0 & 71.6 & \textbf{75.2} & 77.1  \\ 
+     LtM &  91.8 & 92.9 & 98.3 & 86.7 & 72.0 & 87.5 \\ 
+     Faithful CoT (ours) &  \textbf{95.0} & \textbf{95.4} & 98.5 & \textbf{95.6} & 73.6 & \textbf{91.6} \\ 
+
+     \bottomrule
+\end{tabular}
+}
+\caption{Accuracy of different prompting methods with each underlying LM on 5 MWP reasoning datasets.}
+\label{tab:model_sensitivity}
+\end{table*}

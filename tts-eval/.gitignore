@@ -1,0 +1,8 @@
+node_modules/
+__pycache__/
+*.pyc
+data/arxiv_papers/*/paper.pdf
+data/cache/
+output/html/
+output/reports/
+.env

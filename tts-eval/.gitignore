@@ -5,5 +5,4 @@ data/arxiv_papers/*/paper.pdf
 data/arxiv_papers/*/source/
 data/cache/
 output/html/
-output/reports/
 .env

@@ -1,0 +1,4220 @@
+{
+  "paperId": "2303.16681",
+  "title": "Spectral Theory Paper",
+  "totalFormulas": 524,
+  "formulas": [
+    {
+      "index": 0,
+      "type": "display",
+      "latex": "\\sigma_{tot}(e^+e^- \\to p \\bar p)=\\frac{4 \\pi \\alpha^2 C_p \\beta_p(s)}{3 s} \\Big[|G^p_M(s)|^2+\\frac{2m_p^2}{s}|G^p_E(s)|^2\\Big],",
+      "latexOriginal": "\\label{totcspp}\r\n\t\\sigma_{tot}(e^+e^- \\to p \\bar p)=\\frac{4 \\pi \\alpha^2 C_p \\beta_p(s)}{3 s}\r\n\t\\Big[|G^p_M(s)|^2+\\frac{2m_p^2}{s}|G^p_E(s)|^2\\Big],",
+      "tier": 3,
+      "lineNumber": 64,
+      "context": "...}_{tot}(e^+e^- \\to p \\bar p)$ is described by the relation [FORMULA] with $\\beta_p(s)=\\sqrt{1-\\frac{4 m^2_p}{s}}$, $\\alpha$=1/1..."
+    },
+    {
+      "index": 1,
+      "type": "display",
+      "latex": "G^p_E(s)&= F_1^p(s) + \\frac{s}{4m_p^2}F_2^p(s)\\\\ G^p_M(s)&= F_1^p(s) + F_2^p(s).",
+      "latexOriginal": "\\label{EMFFbyDP}\r\n\tG^p_E(s)&= F_1^p(s) + \\frac{s}{4m_p^2}F_2^p(s)\\\\\r\n\tG^p_M(s)&= F_1^p(s) + F_2^p(s).",
+      "tier": 2,
+      "lineNumber": 72,
+      "context": "...oton Dirac $F_1^p(s)$ and the proton Pauli $F_2^p(s)$ FFs; [FORMULA] As one could not determine both proton EM FFs from measu..."
+    },
+    {
+      "index": 2,
+      "type": "display",
+      "latex": "|G^p_{eff}(s)|=\\sqrt{\\frac{\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)}{\\frac{4\\pi\\alpha^2C_p\\beta_p(s)}{3s}\\Big(1+\\frac{2m^2_p}{s}\\Big)}}",
+      "tier": 3,
+      "lineNumber": 78,
+      "context": "...with errors obtained by means of the consequent expression [FORMULA] have been named the proton ``effective'' FF data. Immediat..."
+    },
+    {
+      "index": 3,
+      "type": "display",
+      "latex": "G^p_{eff}=\\frac{A}{(1+s/m_a^2)(1-s/0.71\\,\\mathrm{GeV}^2)^2},",
+      "latexOriginal": "\\label{fortfunct}\r\n\tG^p_{eff}=\\frac{A}{(1+s/m_a^2)(1-s/0.71\\,\\mathrm{GeV}^2)^2},",
+      "tier": 2,
+      "lineNumber": 82,
+      "context": "...rmula for nucleon EM FFs behaviors in the spacelike region [FORMULA] with the nucleon ``magic'' number $0.71$ GeV$^2$ has been..."
+    },
+    {
+      "index": 4,
+      "type": "display",
+      "latex": "G^p_E(t)\\approx \\frac{G^p_M(t)}{\\mu_p}\\approx \\frac{G^n_M(t)}{\\mu_n}\\approx -\\frac{4m_n^2}{t}\\frac{G^n_E(t)}{\\mu_n}\\approx \\frac{1}{(1-\\frac{t}{0.71\\,\\mathrm{GeV}^2})^2}",
+      "latexOriginal": "\\label{EMFFdip}\r\n\tG^p_E(t)\\approx \\frac{G^p_M(t)}{\\mu_p}\\approx  \\frac{G^n_M(t)}{\\mu_n}\\approx -\\frac{4m_n^2}{t}\\frac{G^n_E(t)}{\\mu_n}\\approx \\frac{1}{(1-\\frac{t}{0.71\\,\\mathrm{GeV}^2})^2}",
+      "tier": 3,
+      "lineNumber": 88,
+      "context": "...FFs $G^n_E(t)$, $G^n_M(t)$ data by only one dipole formula [FORMULA] where ``\\emph{t}'' is the momentum transfer squared of the..."
+    },
+    {
+      "index": 5,
+      "type": "display",
+      "latex": "\\frac{d \\sigma}{d \\Omega}= \\left (\\frac{d \\sigma}{d \\Omega}\\right )_{Mott}\\left\\{\\frac{\\big(G^p_E(t)\\big)^2 - \\frac{t}{4 m_p^2} \\big(G^p_M(t)\\big)^2}{1 - \\frac{t}{4 m_p^2}} - \\frac{t}{2 m_p^2} \\big(G^p_M(t)\\big)^2 \\tan^2 \\theta/2 \\right\\}",
+      "tier": 3,
+      "lineNumber": 94,
+      "context": "...lastic scattering of electrons on protons looks as follows [FORMULA] with $E$ the electron energy and $\\theta$ the electron sca..."
+    },
+    {
+      "index": 6,
+      "type": "display",
+      "latex": "\\left(\\frac{d \\sigma}{d \\Omega}\\right )_{Mott} = \\frac{\\alpha^2}{4E^2\\sin^2\\theta/2} \\cdot\\frac{\\cos^2\\theta/2}{1 + \\frac{2E}{m_p}\\sin^2\\theta/2}",
+      "tier": 3,
+      "lineNumber": 98,
+      "context": "...lectron energy and $\\theta$ the electron scattering angle, [FORMULA] represents the cross section for a structureless proton. T..."
+    },
+    {
+      "index": 7,
+      "type": "display",
+      "latex": "P_t=\\frac{h}{I_0}(-2)\\sqrt{\\tau(1+\\tau)} G^N_EG^N_M \\tan(\\theta/2)",
+      "tier": 2,
+      "lineNumber": 104,
+      "context": "...sisting in the simultaneous measurements of the transverse [FORMULA] and longitudinal \\begin{equation} P_l=\\frac{h(E+E')}{I_..."
+    },
+    {
+      "index": 8,
+      "type": "display",
+      "latex": "P_l=\\frac{h(E+E')}{I_0m_N}\\sqrt{\\tau(1+\\tau)} G^{N2}_M \\tan^2(\\theta/2)",
+      "tier": 2,
+      "lineNumber": 108,
+      "context": "...^N_EG^N_M \\tan(\\theta/2) \\end{equation} and longitudinal [FORMULA] components of the recoil nucleon's polarization in the ele..."
+    },
+    {
+      "index": 9,
+      "type": "display",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)=\\frac{\\pi \\alpha^2 \\beta^3_\\pi(s)} {3 s}{\\Big|F^c_\\pi(s)+Re^{i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s-im_{\\omega}\\Gamma_{\\omega}}\\Big|^2},",
+      "latexOriginal": "\\label{totcspipi}\r\n\t\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)=\\frac{\\pi \\alpha^2 \\beta^3_\\pi(s)}\r\n\t{3 s}{\\Big|F^c_\\pi(s)+Re^{i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s-im_{\\omega}\\Gamma_{\\omega}}\\Big|^2},",
+      "tier": 3,
+      "lineNumber": 153,
+      "context": "...ntribution (further denoted by $F^{'}_\\pi(s)$) in the form [FORMULA] where $F^c_\\pi(s)$ is just the pure isovector charged pion..."
+    },
+    {
+      "index": 10,
+      "type": "display",
+      "latex": "F^{th}_{\\pi}[W(s)]=&(\\frac{1-W^2}{1-W^2_N})^2\\frac{(W-W_Z)(W_N-W_P)}{(W_N-W_Z)(W-W_P)}\\\\ &\\times [\\frac{(W_N-W_{\\rho})(W_N-W^*_{\\rho})(W_N-1/W_{\\rho})(W_N-1/W^*_{\\rho})}{(W-W_{\\rho})(W-W^*_{\\rho}) (W-1/W_{\\rho})(W-1/W^*_{\\rho})}(\\frac{f_{\\rho\\pi\\pi}}{f_{\\rho}})\\\\ &+\\sum_{v=\\rho',\\rho'',\\rho'''}\\frac{(W_N-W_v)(W_N-W^*_v)(W_N+W_v)(W_N+W^*_v)} {(W-W_v)(W-W^*_v)(W+W_v)(W+W^*_v)}(\\frac{f_{v\\pi\\pi}}{f_v})],",
+      "latexOriginal": "\\label{pioFF}\r\n\tF^{th}_{\\pi}[W(s)]=&(\\frac{1-W^2}{1-W^2_N})^2\\frac{(W-W_Z)(W_N-W_P)}{(W_N-W_Z)(W-W_P)}\\nonumber\\\\\r\n\t&\\times [\\frac{(W_N-W_{\\rho})(W_N-W^*_{\\rho})(W_N-1/W_{\\rho})(W_N-1/W^*_{\\rho})}{(W-W_{\\rho})(W-W^*_{\\rho})\r\n\t\t(W-1/W_{\\rho})(W-1/W^*_{\\rho})}(\\frac{f_{\\rho\\pi\\pi}}{f_{\\rho}})\\\\\r\n\t&+\\sum_{v=\\rho',\\rho'',\\rho'''}\\frac{(W_N-W_v)(W_N-W^*_v)(W_N+W_v)(W_N+W^*_v)}\r\n\t{(W-W_v)(W-W^*_v)(W+W_v)(W+W^*_v)}(\\frac{f_{v\\pi\\pi}}{f_v})],\\nonumber",
+      "tier": 3,
+      "lineNumber": 158,
+      "context": "...U$\\&$A) model given over the Formula (3.66) from~\\cite{DD} [FORMULA] which respects all well known properties of the isovector..."
+    },
+    {
+      "index": 11,
+      "type": "display",
+      "latex": "W(s)=i\\frac{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s-s_0}{s_0})^{1/2}}- \\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s-s_0}{s_0})^{1/2}}} {\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s-s_0}{s_0})^{1/2}}+ \\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s-s_0}{s_0})^{1/2}}}",
+      "latexOriginal": "\\label{comftrs}\r\n\tW(s)=i\\frac{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s-s_0}{s_0})^{1/2}}-\r\n\t\t\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s-s_0}{s_0})^{1/2}}}\r\n\t{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s-s_0}{s_0})^{1/2}}+\r\n\t\t\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s-s_0}{s_0})^{1/2}}}",
+      "tier": 3,
+      "lineNumber": 167,
+      "context": "...rically evaluated in a fitting procedure of existing data. [FORMULA] is the conformal mapping of the four sheeted Riemann surfa..."
+    },
+    {
+      "index": 12,
+      "type": "display",
+      "latex": "W_N=W(0)=i\\frac{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+i}- \\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-i}} {\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+i}+ \\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-i}}",
+      "latexOriginal": "\\label{norm}\r\n\tW_N=W(0)=i\\frac{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+i}-\r\n\t\t\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-i}}\r\n\t{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+i}+\r\n\t\t\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-i}}",
+      "tier": 3,
+      "lineNumber": 174,
+      "context": "...d Riemann surface in $s$ variable into \\mbox{one W-plane,} [FORMULA] is the normalization point in W-plane and \\begin{equation..."
+    },
+    {
+      "index": 13,
+      "type": "display",
+      "latex": "W_v=W(s_v)=i\\frac{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s_v-s_0}{s_0})^{1/2}}- \\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s_v-s_0}{s_0})^{1/2}}} {\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s_v-s_0}{s_0})^{1/2}}+ \\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s_v-s_0}{s_0})^{1/2}}}.",
+      "latexOriginal": "\\label{transVmes}\r\n\tW_v=W(s_v)=i\\frac{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s_v-s_0}{s_0})^{1/2}}-\r\n\t\t\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s_v-s_0}{s_0})^{1/2}}}\r\n\t{\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}+(\\frac{s_v-s_0}{s_0})^{1/2}}+\r\n\t\t\\sqrt{(\\frac{s_{in}-s_0}{s_0})^{1/2}-(\\frac{s_v-s_0}{s_0})^{1/2}}}.",
+      "tier": 3,
+      "lineNumber": 181,
+      "context": "...\\end{equation} is the normalization point in W-plane and [FORMULA] is a position of poles corresponding to all isovector vect..."
+    },
+    {
+      "index": 14,
+      "type": "display",
+      "latex": "|F^c_\\pi(s)+R e^{i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s-im_{\\omega}\\Gamma_{\\omega}}|^2 = \\\\ \\{F^c_\\pi(s)+R e^{i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s-im_{\\omega}\\Gamma_{\\omega}}\\} .\\{F^{c*}_\\pi(s)+R e^{-i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s+im_{\\omega}\\Gamma_{\\omega}}\\},",
+      "latexOriginal": "|F^c_\\pi(s)+R e^{i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s-im_{\\omega}\\Gamma_{\\omega}}|^2\r\n\t\t= \\\\ \\{F^c_\\pi(s)+R e^{i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s-im_{\\omega}\\Gamma_{\\omega}}\\}\r\n\t\t.\\{F^{c*}_\\pi(s)+R e^{-i\\phi}\\frac{m^2_{\\omega}}{m^2_{\\omega}-s+im_{\\omega}\\Gamma_{\\omega}}\\},",
+      "tier": 3,
+      "lineNumber": 209,
+      "context": "...s a product of the complex and the complex conjugate terms [FORMULA] and by using expressions $F^c_\\pi(s) = |F^c_\\pi(s)|e^{i\\de..."
+    },
+    {
+      "index": 15,
+      "type": "display",
+      "latex": "|F^c_\\pi(s)|^2+|F^c_\\pi(s)| \\frac{2 R m^2_{\\omega}}{( m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}} [(m^2_{\\omega}-s)\\cos(\\delta^1_1-\\phi)+m_{\\omega} \\Gamma_{\\omega}\\sin(\\delta^1_1-\\phi)]\\\\ +\\frac{R^2 m^4_{\\omega}}{(m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}}-\\frac{3s}{\\pi \\alpha^2 \\beta^3_{\\pi}(s)} \\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-) = 0.",
+      "latexOriginal": "|F^c_\\pi(s)|^2+|F^c_\\pi(s)| \\frac{2 R m^2_{\\omega}}{( m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}}\r\n\t\t[(m^2_{\\omega}-s)\\cos(\\delta^1_1-\\phi)+m_{\\omega} \\Gamma_{\\omega}\\sin(\\delta^1_1-\\phi)]\\nonumber\\\\\r\n\t\t+\\frac{R^2 m^4_{\\omega}}{(m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}}-\\frac{3s}{\\pi \\alpha^2 \\beta^3_{\\pi}(s)} \\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-) = 0.",
+      "tier": 3,
+      "lineNumber": 215,
+      "context": "...pure isovector charged pion EM FF $|F^c_\\pi(s)|$ is found [FORMULA] \\begin{figure}[!ht] \\hspace{-10pt} \\includegraphics[..."
+    },
+    {
+      "index": 16,
+      "type": "display",
+      "latex": "|F^c_\\pi(s)|=&-\\frac{ R m^2_{\\omega}}{( m^2_{\\omega}-s)^2+m^2_{\\omega}\\Gamma^2_{\\omega}} [(m^2_{\\omega}-s)\\cos(\\delta^1_1-\\phi)+m_{\\omega}\\Gamma_{\\omega}\\sin(\\delta^1_1-\\phi)]\\\\ &\\pm\\{\\frac{R^2 m^4_{\\omega}}{[(m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}]^2} [(m^2_{\\omega}-s)\\cos(\\delta^1_1-\\phi)+m_{\\omega}\\Gamma_{\\omega}\\sin(\\delta^1_1-\\phi)]^2\\\\ &-\\frac{R^2 m^4_{\\omega}}{(m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}} +\\frac{3s}{\\pi \\alpha^2 \\beta^3_{\\pi}(s)} \\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)\\}^{1/2}",
+      "latexOriginal": "\\label{gensol}\r\n\t\t|F^c_\\pi(s)|=&-\\frac{ R m^2_{\\omega}}{( m^2_{\\omega}-s)^2+m^2_{\\omega}\\Gamma^2_{\\omega}}\r\n\t\t[(m^2_{\\omega}-s)\\cos(\\delta^1_1-\\phi)+m_{\\omega}\\Gamma_{\\omega}\\sin(\\delta^1_1-\\phi)]\\nonumber\\\\\r\n\t\t&\\pm\\{\\frac{R^2 m^4_{\\omega}}{[(m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}]^2}\r\n\t\t[(m^2_{\\omega}-s)\\cos(\\delta^1_1-\\phi)+m_{\\omega}\\Gamma_{\\omega}\\sin(\\delta^1_1-\\phi)]^2\\\\\r\n\t\t&-\\frac{R^2 m^4_{\\omega}}{(m^2_{\\omega}-s)^2+m^2_{\\omega} \\Gamma^2_{\\omega}}\r\n\t\t+\\frac{3s}{\\pi \\alpha^2 \\beta^3_{\\pi}(s)} \\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)\\}^{1/2}\\nonumber",
+      "tier": 3,
+      "lineNumber": 234,
+      "context": "...{fig:4}} \\end{figure} Its solution gives the relation [FORMULA] in which a physical solution is given by the ``+'' sign of..."
+    },
+    {
+      "index": 17,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to p\\bar p)",
+      "tier": 1,
+      "lineNumber": 34,
+      "context": "...m factor data extracted of the measured total cross section [FORMULA] still seem to have an unknown origin. The conjectures of th..."
+    },
+    {
+      "index": 18,
+      "type": "inline",
+      "latex": "e^+e^-\\to \\pi^+ \\pi^-",
+      "tier": 1,
+      "lineNumber": 36,
+      "context": "...agnetic form factor timelike data, extracted of the process [FORMULA] are investigated by using the same procedure as in the case..."
+    },
+    {
+      "index": 19,
+      "type": "inline",
+      "latex": "\\chi^2/ndf",
+      "tier": 1,
+      "lineNumber": 38,
+      "context": "...ta by three parametric formula with a rather large value of [FORMULA] , while the description of the data by the physically well-f..."
+    },
+    {
+      "index": 20,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)",
+      "tier": 1,
+      "lineNumber": 54,
+      "context": "...etitle \\section{Introduction} The total cross section [FORMULA] has been measured by two different methods, the~so called s..."
+    },
+    {
+      "index": 21,
+      "type": "inline",
+      "latex": "e^+e^- \\to p \\bar p",
+      "tier": 1,
+      "lineNumber": 56,
+      "context": "...n method consists of taking energy scan data on the process [FORMULA] , whereby the c.~m. energy of the $e^+e^-$ collider is syste..."
+    },
+    {
+      "index": 22,
+      "type": "inline",
+      "latex": "e^+e^-",
+      "tier": 1,
+      "lineNumber": 56,
+      "context": "...cess $e^+e^- \\to p \\bar p$, whereby the c.~m. energy of the [FORMULA] collider is systematically changed from one energy value t..."
+    },
+    {
+      "index": 23,
+      "type": "inline",
+      "latex": "e^+e^- \\to p \\bar p \\gamma",
+      "tier": 1,
+      "lineNumber": 59,
+      "context": "...gy value. The ISR technique provides data on the process [FORMULA] at a fixed c.~m. energy value of the $e^+e^-$ collider at w..."
+    },
+    {
+      "index": 24,
+      "type": "inline",
+      "latex": "e^+e^-",
+      "tier": 1,
+      "lineNumber": 59,
+      "context": "...- \\to p \\bar p \\gamma$ at a fixed c.~m. energy value of the [FORMULA] collider at which maximal value of the luminosity is achiev..."
+    },
+    {
+      "index": 25,
+      "type": "inline",
+      "latex": "q^2",
+      "tier": 1,
+      "lineNumber": 59,
+      "context": "...l electron or positron, thus reducing the momentum transfer [FORMULA] of the process. This method allows for the measurement of $..."
+    },
+    {
+      "index": 26,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)",
+      "tier": 1,
+      "lineNumber": 59,
+      "context": "...$ of the process. This method allows for the measurement of [FORMULA] from the threshold of the reaction $e^+e^- \\to p \\bar p$ up..."
+    },
+    {
+      "index": 27,
+      "type": "inline",
+      "latex": "e^+e^- \\to p \\bar p",
+      "tier": 1,
+      "lineNumber": 59,
+      "context": "...t}(e^+e^- \\to p \\bar p)$ from the threshold of the reaction [FORMULA] up to the fixed c.~m. energy \\mbox{of the $e^+e^-$ collider..."
+    },
+    {
+      "index": 28,
+      "type": "inline",
+      "latex": "e^+e^-",
+      "tier": 1,
+      "lineNumber": 59,
+      "context": "...e^- \\to p \\bar p$ up to the fixed c.~m. energy \\mbox{of the [FORMULA] collider}. In practical applications of both methods for..."
+    },
+    {
+      "index": 29,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)",
+      "tier": 1,
+      "lineNumber": 61,
+      "context": "...s of both methods for obtaining experimental information on [FORMULA] , and~so also on electromagnetic (EM) form factors (FFs), it..."
+    },
+    {
+      "index": 30,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)",
+      "tier": 1,
+      "lineNumber": 63,
+      "context": "...R technique will be~preferred. A theoretical behavior of [FORMULA] is described by the relation \\begin{eqnarray}\\label{totcsp..."
+    },
+    {
+      "index": 31,
+      "type": "inline",
+      "latex": "\\beta_p(s)=\\sqrt{1-\\frac{4 m^2_p}{s}}",
+      "tier": 2,
+      "lineNumber": 68,
+      "context": "...^2+\\frac{2m_p^2}{s}|G^p_E(s)|^2\\Big], \\end{eqnarray} with [FORMULA] , $\\alpha$=1/137 and $C_p=\\frac{\\pi \\alpha / \\beta_p(s)}{1-\\..."
+    },
+    {
+      "index": 32,
+      "type": "inline",
+      "latex": "\\alpha",
+      "tier": 1,
+      "lineNumber": 68,
+      "context": "...nd{eqnarray} with $\\beta_p(s)=\\sqrt{1-\\frac{4 m^2_p}{s}}$, [FORMULA] =1/137 and $C_p=\\frac{\\pi \\alpha / \\beta_p(s)}{1-\\exp(-\\pi \\..."
+    },
+    {
+      "index": 33,
+      "type": "inline",
+      "latex": "C_p=\\frac{\\pi \\alpha / \\beta_p(s)}{1-\\exp(-\\pi \\alpha / \\beta_p(s))}",
+      "tier": 2,
+      "lineNumber": 68,
+      "context": "...$\\beta_p(s)=\\sqrt{1-\\frac{4 m^2_p}{s}}$, $\\alpha$=1/137 and [FORMULA] to be the so-called Sommerfeld-Gamov-Sakharov Coulomb enha..."
+    },
+    {
+      "index": 34,
+      "type": "inline",
+      "latex": "G^p_E(s)",
+      "tier": 1,
+      "lineNumber": 71,
+      "context": "...etween the outgoing proton and~antiproton. The functions [FORMULA] and $G^p_M(s)$ in Equation~(\\ref{totcspp}) are the Sachs pr..."
+    },
+    {
+      "index": 35,
+      "type": "inline",
+      "latex": "G^p_M(s)",
+      "tier": 1,
+      "lineNumber": 71,
+      "context": "...oing proton and~antiproton. The functions $G^p_E(s)$ and [FORMULA] in Equation~(\\ref{totcspp}) are the Sachs proton electric a..."
+    },
+    {
+      "index": 36,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 71,
+      "context": "...ic FFs, respectively, depending on the c.~m. energy squared [FORMULA] differently, however, at~the proton-antiproton threshold th..."
+    },
+    {
+      "index": 37,
+      "type": "inline",
+      "latex": "F_1^p(s)",
+      "tier": 1,
+      "lineNumber": 71,
+      "context": "...it follows from their expressions through the proton Dirac [FORMULA] and the proton Pauli $F_2^p(s)$ FFs; \\begin{align}\\label{E..."
+    },
+    {
+      "index": 38,
+      "type": "inline",
+      "latex": "F_2^p(s)",
+      "tier": 1,
+      "lineNumber": 71,
+      "context": "...ns through the proton Dirac $F_1^p(s)$ and the proton Pauli [FORMULA] FFs; \\begin{align}\\label{EMFFbyDP} G^p_E(s)&= F_1^p(s) +..."
+    },
+    {
+      "index": 39,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)",
+      "tier": 1,
+      "lineNumber": 77,
+      "context": "...As one could not determine both proton EM FFs from measured [FORMULA] at any value $s>4m^2_p$ simultaneously, experimental groups..."
+    },
+    {
+      "index": 40,
+      "type": "inline",
+      "latex": "s>4m^2_p",
+      "tier": 1,
+      "lineNumber": 77,
+      "context": "...red $\\sigma^{bare}_{tot}(e^+e^- \\to p \\bar p)$ at any value [FORMULA] simultaneously, experimental groups in~\\cite{Lees1, Ablikim..."
+    },
+    {
+      "index": 41,
+      "type": "inline",
+      "latex": "|G^p_E(4m^2_p)|\\equiv|G^p_M(4m^2_p)|",
+      "tier": 1,
+      "lineNumber": 77,
+      "context": "...n the proton structure, generalized the threshold identity [FORMULA] in Equation~(\\ref{totcspp}) for all higher $s$-values up to..."
+    },
+    {
+      "index": 42,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 77,
+      "context": "...|G^p_M(4m^2_p)|$ in Equation~(\\ref{totcspp}) for all higher [FORMULA] -values up to $+\\infty$, and~the data with errors obtained b..."
+    },
+    {
+      "index": 43,
+      "type": "inline",
+      "latex": "+\\infty",
+      "tier": 1,
+      "lineNumber": 77,
+      "context": "...in Equation~(\\ref{totcspp}) for all higher $s$-values up to [FORMULA] , and~the data with errors obtained by means of the conseque..."
+    },
+    {
+      "index": 44,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 85,
+      "context": "...\\end{eqnarray} with the nucleon ``magic'' number $0.71$ GeV [FORMULA] has been applied successfully for their~description. Her..."
+    },
+    {
+      "index": 45,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 87,
+      "context": "...d like to note, that the nucleon ``magic'' number $0.71$ GeV [FORMULA] in \\mbox{Equation (\\ref{fortfunct})} has its historical ori..."
+    },
+    {
+      "index": 46,
+      "type": "inline",
+      "latex": "G^p_E(t)",
+      "tier": 1,
+      "lineNumber": 87,
+      "context": "...scription of all spacelike data on the EM FFs of the proton [FORMULA] , $G^p_M(t)$ obtained from the corresponding differential cr..."
+    },
+    {
+      "index": 47,
+      "type": "inline",
+      "latex": "G^p_M(t)",
+      "tier": 1,
+      "lineNumber": 87,
+      "context": "...all spacelike data on the EM FFs of the proton $G^p_E(t)$, [FORMULA] obtained from the corresponding differential cross section..."
+    },
+    {
+      "index": 48,
+      "type": "inline",
+      "latex": "G^n_E(t)",
+      "tier": 1,
+      "lineNumber": 87,
+      "context": "...s of the Rosembluth method and the spacelike neutron EM FFs [FORMULA] , $G^n_M(t)$ data by only one dipole formula \\begin{equatio..."
+    },
+    {
+      "index": 49,
+      "type": "inline",
+      "latex": "G^n_M(t)",
+      "tier": 1,
+      "lineNumber": 87,
+      "context": "...embluth method and the spacelike neutron EM FFs $G^n_E(t)$, [FORMULA] data by only one dipole formula \\begin{equation}\\label{EMF..."
+    },
+    {
+      "index": 50,
+      "type": "inline",
+      "latex": "\\mu_p",
+      "tier": 1,
+      "lineNumber": 91,
+      "context": "...of electrons on nucleons and magnetic moments of the proton [FORMULA] and the neutron $\\mu_n$, respectively, which, however, is n..."
+    },
+    {
+      "index": 51,
+      "type": "inline",
+      "latex": "\\mu_n",
+      "tier": 1,
+      "lineNumber": 91,
+      "context": "...and magnetic moments of the proton $\\mu_p$ and the neutron [FORMULA] , respectively, which, however, is no longer valid for the f..."
+    },
+    {
+      "index": 52,
+      "type": "inline",
+      "latex": "E",
+      "tier": 1,
+      "lineNumber": 97,
+      "context": "..._M(t)\\big)^2 \\tan^2 \\theta/2 \\right\\} \\end{equation} with [FORMULA] the electron energy and $\\theta$ the electron scattering an..."
+    },
+    {
+      "index": 53,
+      "type": "inline",
+      "latex": "\\theta",
+      "tier": 1,
+      "lineNumber": 97,
+      "context": "...\\right\\} \\end{equation} with $E$ the electron energy and [FORMULA] the electron scattering angle, \\begin{equation} \\left(\\f..."
+    },
+    {
+      "index": 54,
+      "type": "inline",
+      "latex": "\\left(\\frac{d \\sigma}{d \\Omega}\\right )/\\left(\\frac{d \\sigma}{d \\Omega}\\right )_{Mott}",
+      "tier": 3,
+      "lineNumber": 101,
+      "context": "...e cross section for a structureless proton. Then, the ratio [FORMULA] when evaluated for a fixed momentum transfer squared ``$-t'..."
+    },
+    {
+      "index": 55,
+      "type": "inline",
+      "latex": "-t'",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": "...tt}$ when evaluated for a fixed momentum transfer squared `` [FORMULA] ' yields a straight line when plotted against $\\tan^2 \\theta..."
+    },
+    {
+      "index": 56,
+      "type": "inline",
+      "latex": "\\tan^2 \\theta/2",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": "...quared ``$-t'$' yields a straight line when plotted against [FORMULA] . The~slope of this straight line and intercept give the $G^..."
+    },
+    {
+      "index": 57,
+      "type": "inline",
+      "latex": "G^p_E(t)",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": ".../2$. The~slope of this straight line and intercept give the [FORMULA] and $G^p_M(t)$ FFs values. Such method of experimental dete..."
+    },
+    {
+      "index": 58,
+      "type": "inline",
+      "latex": "G^p_M(t)",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": "...of this straight line and intercept give the $G^p_E(t)$ and [FORMULA] FFs values. Such method of experimental determination of $G..."
+    },
+    {
+      "index": 59,
+      "type": "inline",
+      "latex": "G^p_E(t)",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": "...)$ FFs values. Such method of experimental determination of [FORMULA] indicated its dipole behaviour, but~with increased ``$-t$''..."
+    },
+    {
+      "index": 60,
+      "type": "inline",
+      "latex": "-t",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": "..._E(t)$ indicated its dipole behaviour, but~with increased `` [FORMULA] '' the reliability of determined $G^p_E(t)$ values acquired..."
+    },
+    {
+      "index": 61,
+      "type": "inline",
+      "latex": "G^p_E(t)",
+      "tier": 1,
+      "lineNumber": 101,
+      "context": "..., but~with increased ``$-t$'' the reliability of determined [FORMULA] values acquired decreasing~tendency. Starting from 2000,..."
+    },
+    {
+      "index": 62,
+      "type": "inline",
+      "latex": "\\overrightarrow{e^-}N \\to e^- \\overrightarrow{N}",
+      "tier": 1,
+      "lineNumber": 111,
+      "context": "...the electron scattering plane of the polarization transfer [FORMULA] process, with~$h$ as the electron beam helicity, $I_0$ as t..."
+    },
+    {
+      "index": 63,
+      "type": "inline",
+      "latex": "h",
+      "tier": 1,
+      "lineNumber": 111,
+      "context": "...rrightarrow{e^-}N \\to e^- \\overrightarrow{N}$ process, with~ [FORMULA] as the electron beam helicity, $I_0$ as the unpolarized cro..."
+    },
+    {
+      "index": 64,
+      "type": "inline",
+      "latex": "I_0",
+      "tier": 1,
+      "lineNumber": 111,
+      "context": "...tarrow{N}$ process, with~$h$ as the electron beam helicity, [FORMULA] as the unpolarized cross section excluding $\\left (\\frac{d..."
+    },
+    {
+      "index": 65,
+      "type": "inline",
+      "latex": "\\left (\\frac{d \\sigma}{d \\Omega}\\right )_{Mott}",
+      "tier": 2,
+      "lineNumber": 111,
+      "context": "...helicity, $I_0$ as the unpolarized cross section excluding [FORMULA] and $\\tau=Q^2/{4m^2_N}=-s/4m^2_N$, new more reliable data i..."
+    },
+    {
+      "index": 66,
+      "type": "inline",
+      "latex": "\\tau=Q^2/{4m^2_N}=-s/4m^2_N",
+      "tier": 1,
+      "lineNumber": 111,
+      "context": "...uding $\\left (\\frac{d \\sigma}{d \\Omega}\\right )_{Mott}$ and [FORMULA] , new more reliable data in comparison with those obtained b..."
+    },
+    {
+      "index": 67,
+      "type": "inline",
+      "latex": "\\frac{G^N_E(s)}{G^N_M(s)}=-\\frac{P_t}{P_l}\\frac{(E+E')}{2m_N}\\tan(\\theta/2)",
+      "tier": 3,
+      "lineNumber": 111,
+      "context": "...ose obtained by means of the Rosenbluth method on the ratio [FORMULA] have been measured~\\cite{Jones,Gayou,Punjabi,Zhan,Puckett2}..."
+    },
+    {
+      "index": 68,
+      "type": "inline",
+      "latex": "m^2_a",
+      "tier": 1,
+      "lineNumber": 111,
+      "context": "...rtfunct})} and the value of the free parameters A = 7.7 and [FORMULA] = 14.8 GeV$^2$ have been subtracted from BABAR data~\\cite{L..."
+    },
+    {
+      "index": 69,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 111,
+      "context": "...value of the free parameters A = 7.7 and $m^2_a$ = 14.8 GeV [FORMULA] have been subtracted from BABAR data~\\cite{Lees1, Lees2} on..."
+    },
+    {
+      "index": 70,
+      "type": "inline",
+      "latex": "p(s)=\\sqrt{s(\\frac{s}{4m^2_p}-1)}",
+      "tier": 2,
+      "lineNumber": 111,
+      "context": "...ese differences with errors as a function of three momentum [FORMULA] of one of the proton or antiproton in the frame where other..."
+    },
+    {
+      "index": 71,
+      "type": "inline",
+      "latex": "\\sqrt{s}",
+      "tier": 1,
+      "lineNumber": 118,
+      "context": "...f the previous analysis are plotted simply as a function of [FORMULA] , (see Figure~13 of~\\cite{Ablikim4}), consequently as a func..."
+    },
+    {
+      "index": 72,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 118,
+      "context": "...igure~13 of~\\cite{Ablikim4}), consequently as a function of [FORMULA] too, and~there is no need to plot them as a function of thr..."
+    },
+    {
+      "index": 73,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to p\\bar p)",
+      "tier": 1,
+      "lineNumber": 120,
+      "context": "...Similar results are obtained in all other measurements of [FORMULA] after the year 2013 and also in the recent measurement of $..."
+    },
+    {
+      "index": 74,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to n\\bar n)",
+      "tier": 1,
+      "lineNumber": 120,
+      "context": "...$ after the year 2013 and also in the recent measurement of [FORMULA] \\cite{Ablikim6}, however, in~this case with an opposite~beh..."
+    },
+    {
+      "index": 75,
+      "type": "inline",
+      "latex": "A=8.9\\pm0.3",
+      "tier": 1,
+      "lineNumber": 122,
+      "context": "...}). The~result with slightly different values of parameters [FORMULA] and $m^2_a=9.2\\pm0.8$ GeV$^2$ confirm the analysis of the p..."
+    },
+    {
+      "index": 76,
+      "type": "inline",
+      "latex": "m^2_a=9.2\\pm0.8",
+      "tier": 1,
+      "lineNumber": 122,
+      "context": "...h slightly different values of parameters $A=8.9\\pm0.3$ and [FORMULA] GeV$^2$ confirm the analysis of the paper~\\cite{BianTom}, s..."
+    },
+    {
+      "index": 77,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 122,
+      "context": "...values of parameters $A=8.9\\pm0.3$ and $m^2_a=9.2\\pm0.8$ GeV [FORMULA] confirm the analysis of the paper~\\cite{BianTom}, see Figur..."
+    },
+    {
+      "index": 78,
+      "type": "inline",
+      "latex": "\\chi^2/ndf\\approx 5",
+      "tier": 1,
+      "lineNumber": 122,
+      "context": "...paper~\\cite{BianTom}, see Figure~\\ref{fig:2}, however with [FORMULA] to be not acceptable from the statistical point of view dec..."
+    },
+    {
+      "index": 79,
+      "type": "inline",
+      "latex": "\\chi^2/ndf",
+      "tier": 1,
+      "lineNumber": 122,
+      "context": "...good description of the experimental data. As~the value of [FORMULA] is not quoted in the paper~\\cite{BianTom}, we contend that..."
+    },
+    {
+      "index": 80,
+      "type": "inline",
+      "latex": "F^c_\\pi(s)",
+      "tier": 1,
+      "lineNumber": 144,
+      "context": "...melike~Data} The timelike data on the charged pion EM FF [FORMULA] with errors are hidden in the measured total cross section..."
+    },
+    {
+      "index": 81,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 144,
+      "context": "...with errors are hidden in the measured total cross section [FORMULA] . We would like to point out at once at the beginning tha..."
+    },
+    {
+      "index": 82,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 146,
+      "context": "...e beginning that in the process of obtaining information on [FORMULA] from $\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)$, no nonp..."
+    },
+    {
+      "index": 83,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 146,
+      "context": "...the process of obtaining information on $|F^c_\\pi(s)|$ from [FORMULA] , no nonphysical demands are needed, unlike the nucleon ``ef..."
+    },
+    {
+      "index": 84,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 146,
+      "context": "...n ``effective'' FF data, because~there is only one function [FORMULA] completely describing the measured total cross~section...."
+    },
+    {
+      "index": 85,
+      "type": "inline",
+      "latex": "F^c_\\pi(s)",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...wever, we meet another problem here. The~charged pion EM FF [FORMULA] represents the $\\gamma \\pi^+ \\pi^-$ vertex generated by the..."
+    },
+    {
+      "index": 86,
+      "type": "inline",
+      "latex": "\\gamma \\pi^+ \\pi^-",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...em here. The~charged pion EM FF $F^c_\\pi(s)$ represents the [FORMULA] vertex generated by the strong interactions and not all of..."
+    },
+    {
+      "index": 87,
+      "type": "inline",
+      "latex": "\\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...vertex generated by the strong interactions and not all of [FORMULA] pairs in the measured total cross section $\\sigma^{bare}_{t..."
+    },
+    {
+      "index": 88,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...l of $\\pi^+\\pi^-$ pairs in the measured total cross section [FORMULA] have strong interaction origin. Some part of them appears d..."
+    },
+    {
+      "index": 89,
+      "type": "inline",
+      "latex": "\\omega(782) \\to \\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...m appears due to electromagnetic isospin violating decay of [FORMULA] responsible for a deformation of the right wing of the $\\rh..."
+    },
+    {
+      "index": 90,
+      "type": "inline",
+      "latex": "\\rho(770)",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...i^-$ responsible for a deformation of the right wing of the [FORMULA] meson peak, well known as the $\\rho-\\omega$-interference ef..."
+    },
+    {
+      "index": 91,
+      "type": "inline",
+      "latex": "\\rho-\\omega",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...right wing of the $\\rho(770)$ meson peak, well known as the [FORMULA] -interference effect. Since we are investigating oscillation..."
+    },
+    {
+      "index": 92,
+      "type": "inline",
+      "latex": "\\omega(782) \\to \\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...o get rid of the electromagnetic isospin violating decay of [FORMULA] contribution somehow. Experimentalists are unable to isolat..."
+    },
+    {
+      "index": 93,
+      "type": "inline",
+      "latex": "\\omega(782) \\to \\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 148,
+      "context": "...are unable to isolate the electromagnetic isospin violating [FORMULA] decay contribution from~remaining. In three of the most..."
+    },
+    {
+      "index": 94,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to\\pi^+\\pi^-(\\gamma))",
+      "tier": 1,
+      "lineNumber": 150,
+      "context": "...l now~\\cite{Lees3,Xiao,Ablikim7} of the total cross section [FORMULA] with the initial state radiation (ISR) method, covering the..."
+    },
+    {
+      "index": 95,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 150,
+      "context": "...od, covering the energy range from the threshold up to 9 GeV [FORMULA] , for~elimination of the electromagnetic isospin violating d..."
+    },
+    {
+      "index": 96,
+      "type": "inline",
+      "latex": "\\omega(782) \\to \\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 150,
+      "context": "...imination of the electromagnetic isospin violating decay of [FORMULA] contribution the following procedure will be~applied. Fi..."
+    },
+    {
+      "index": 97,
+      "type": "inline",
+      "latex": "e^+e^- \\to \\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 152,
+      "context": "...e will be~applied. First, the~total cross section of the [FORMULA] process is expressed by means of the absolute value squared..."
+    },
+    {
+      "index": 98,
+      "type": "inline",
+      "latex": "F^c_\\pi(s)",
+      "tier": 1,
+      "lineNumber": 152,
+      "context": "...ressed by means of the absolute value squared of the sum of [FORMULA] and the isospin violating $\\omega(782) \\to \\pi^+\\pi^-$ deca..."
+    },
+    {
+      "index": 99,
+      "type": "inline",
+      "latex": "\\omega(782) \\to \\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 152,
+      "context": "...quared of the sum of $F^c_\\pi(s)$ and the isospin violating [FORMULA] decay contribution (further denoted by $F^{'}_\\pi(s)$) in t..."
+    },
+    {
+      "index": 100,
+      "type": "inline",
+      "latex": "F^{'}_\\pi(s)",
+      "tier": 1,
+      "lineNumber": 152,
+      "context": "...782) \\to \\pi^+\\pi^-$ decay contribution (further denoted by [FORMULA] ) in the form \\begin{equation}\\label{totcspipi} \\sigma^{b..."
+    },
+    {
+      "index": 101,
+      "type": "inline",
+      "latex": "F^c_\\pi(s)",
+      "tier": 1,
+      "lineNumber": 157,
+      "context": "...im_{\\omega}\\Gamma_{\\omega}}\\Big|^2}, \\end{equation} where [FORMULA] is just the pure isovector charged pion EM FF to be express..."
+    },
+    {
+      "index": 102,
+      "type": "inline",
+      "latex": "\\&",
+      "tier": 1,
+      "lineNumber": 157,
+      "context": "...essed by the physically well founded Unitary and Analytic (U [FORMULA] A) model given over the Formula (3.66) from~\\cite{DD} \\begi..."
+    },
+    {
+      "index": 103,
+      "type": "inline",
+      "latex": "s_0=4m^2_{\\pi}",
+      "tier": 1,
+      "lineNumber": 166,
+      "context": "...branch points approximation, first by the lowest threshold [FORMULA] and the second $s_{in}$ representing contributions of all h..."
+    },
+    {
+      "index": 104,
+      "type": "inline",
+      "latex": "s_{in}",
+      "tier": 1,
+      "lineNumber": 166,
+      "context": "...rst by the lowest threshold $s_0=4m^2_{\\pi}$ and the second [FORMULA] representing contributions of all higher eventual inelastic..."
+    },
+    {
+      "index": 105,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 173,
+      "context": "...he conformal mapping of the four sheeted Riemann surface in [FORMULA] variable into \\mbox{one W-plane,} \\begin{equation}\\label{n..."
+    },
+    {
+      "index": 106,
+      "type": "inline",
+      "latex": "(f_{v\\pi\\pi}/{f_v})",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "...a reduction of the number of free coupling constant ratios [FORMULA] in Equation~(\\ref{pioFF}) and the isovector nature of it is..."
+    },
+    {
+      "index": 107,
+      "type": "inline",
+      "latex": "\\rho(770), \\rho'(1450), \\rho''(1700)",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "...nse that only rho-meson and its excited states, i.e,. \\mbox{ [FORMULA] \\cite{PDG}} and also the hypothetical $\\rho'''(2150)$ \\cite..."
+    },
+    {
+      "index": 108,
+      "type": "inline",
+      "latex": "\\rho'''(2150)",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "...(1450), \\rho''(1700)$ \\cite{PDG}} and also the hypothetical [FORMULA] \\cite{BDEK}, in~order to cover the energetic region of data..."
+    },
+    {
+      "index": 109,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "..., in~order to cover the energetic region of data up to 9 GeV [FORMULA] , can contribute to the FF behavior. The~reality condition $..."
+    },
+    {
+      "index": 110,
+      "type": "inline",
+      "latex": "F^*_\\pi(s)=F_\\pi(s^*)",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "...$, can contribute to the FF behavior. The~reality condition [FORMULA] has an effect of an appearance always two complex conjugate..."
+    },
+    {
+      "index": 111,
+      "type": "inline",
+      "latex": "W_P",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "...condition, is approximated, in~a sense of Padé, by~one pole [FORMULA] and one zero $W_Z$, with~their free~positions. Further,..."
+    },
+    {
+      "index": 112,
+      "type": "inline",
+      "latex": "W_Z",
+      "tier": 1,
+      "lineNumber": 189,
+      "context": "...ximated, in~a sense of Padé, by~one pole $W_P$ and one zero [FORMULA] , with~their free~positions. Further, in Equation~(\\ref{t..."
+    },
+    {
+      "index": 113,
+      "type": "inline",
+      "latex": "\\phi=\\arctan\\frac{m_{\\omega}\\Gamma_{\\omega}}{m^2_{\\rho}-m^2_{\\omega}}",
+      "tier": 2,
+      "lineNumber": 191,
+      "context": "...r free~positions. Further, in Equation~(\\ref{totcspipi}) [FORMULA] is the $\\rho-\\omega$ interference phase and $R$ is the $\\rh..."
+    },
+    {
+      "index": 114,
+      "type": "inline",
+      "latex": "\\rho-\\omega",
+      "tier": 1,
+      "lineNumber": 191,
+      "context": "...m_{\\omega}\\Gamma_{\\omega}}{m^2_{\\rho}-m^2_{\\omega}}$ is the [FORMULA] interference phase and $R$ is the $\\rho-\\omega$ interferenc..."
+    },
+    {
+      "index": 115,
+      "type": "inline",
+      "latex": "R",
+      "tier": 1,
+      "lineNumber": 191,
+      "context": "...-m^2_{\\omega}}$ is the $\\rho-\\omega$ interference phase and [FORMULA] is the $\\rho-\\omega$ interference real~amplitude. In ord..."
+    },
+    {
+      "index": 116,
+      "type": "inline",
+      "latex": "\\rho-\\omega",
+      "tier": 1,
+      "lineNumber": 191,
+      "context": "...a}}$ is the $\\rho-\\omega$ interference phase and $R$ is the [FORMULA] interference real~amplitude. In order to recognize all o..."
+    },
+    {
+      "index": 117,
+      "type": "inline",
+      "latex": "|F^{'}_\\pi(s)|^2",
+      "tier": 1,
+      "lineNumber": 193,
+      "context": "...~analysis of existing data in~\\cite{Lees3,Xiao,Ablikim7} on [FORMULA] has been carried out and the obtained results are presented..."
+    },
+    {
+      "index": 118,
+      "type": "inline",
+      "latex": "\\rho-\\omega",
+      "tier": 1,
+      "lineNumber": 193,
+      "context": "...ly by the curves in Figure~\\ref{fig:3} and in detail of the [FORMULA] interference effect in Figure~\\ref{fig:4}. \\begin{table}[h..."
+    },
+    {
+      "index": 119,
+      "type": "inline",
+      "latex": "\\chi^2/ndf=0.988",
+      "tier": 1,
+      "lineNumber": 196,
+      "context": "...lysis of data in~\\cite{Lees3,Xiao,Ablikim7} with minimum of [FORMULA] . \\label{tab:1}} \\begin{tabularx}{\\textwidth}{cCC} \\top..."
+    },
+    {
+      "index": 120,
+      "type": "inline",
+      "latex": "s_{in}=1.2730\\pm0.0130",
+      "tier": 1,
+      "lineNumber": 199,
+      "context": "...{tab:1}} \\begin{tabularx}{\\textwidth}{cCC} \\toprule [FORMULA] (GeV$^2$) & $m_\\rho =0.7620\\pm0.0080$ (GeV) & $\\Gamma_\\..."
+    },
+    {
+      "index": 121,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 199,
+      "context": "...textwidth}{cCC} \\toprule $s_{in}=1.2730\\pm0.0130$ (GeV [FORMULA] ) & $m_\\rho =0.7620\\pm0.0080$ (GeV) & $\\Gamma_\\rho=0.144..."
+    },
+    {
+      "index": 122,
+      "type": "inline",
+      "latex": "m_\\rho =0.7620\\pm0.0080",
+      "tier": 1,
+      "lineNumber": 199,
+      "context": "...h}{cCC} \\toprule $s_{in}=1.2730\\pm0.0130$ (GeV$^2$) & [FORMULA] (GeV) & $\\Gamma_\\rho=0.1442\\pm0.0014$ (GeV) \\\\ $(f_..."
+    },
+    {
+      "index": 123,
+      "type": "inline",
+      "latex": "\\Gamma_\\rho=0.1442\\pm0.0014",
+      "tier": 1,
+      "lineNumber": 199,
+      "context": "...pm0.0130$ (GeV$^2$) & $m_\\rho =0.7620\\pm0.0080$ (GeV) & [FORMULA] (GeV) \\\\ $(f_{\\rho'\\pi\\pi}/f_{\\rho'})=-0.0706 \\pm 0.001..."
+    },
+    {
+      "index": 124,
+      "type": "inline",
+      "latex": "(f_{\\rho'\\pi\\pi}/f_{\\rho'})=-0.0706 \\pm 0.0012",
+      "tier": 1,
+      "lineNumber": 200,
+      "context": "...080$ (GeV) & $\\Gamma_\\rho=0.1442\\pm0.0014$ (GeV) \\\\ [FORMULA] & $m_{\\rho'}=1.3500\\pm0.0110$ (GeV) & $\\Gamma_{\\rho'}=0.33..."
+    },
+    {
+      "index": 125,
+      "type": "inline",
+      "latex": "m_{\\rho'}=1.3500\\pm0.0110",
+      "tier": 1,
+      "lineNumber": 200,
+      "context": "...) \\\\ $(f_{\\rho'\\pi\\pi}/f_{\\rho'})=-0.0706 \\pm 0.0012$ & [FORMULA] (GeV) & $\\Gamma_{\\rho'}=0.3320\\pm0.0033$ (GeV)\\\\ $(f_{\\..."
+    },
+    {
+      "index": 126,
+      "type": "inline",
+      "latex": "\\Gamma_{\\rho'}=0.3320\\pm0.0033",
+      "tier": 1,
+      "lineNumber": 200,
+      "context": "...=-0.0706 \\pm 0.0012$ & $m_{\\rho'}=1.3500\\pm0.0110$ (GeV) & [FORMULA] (GeV)\\\\ $(f_{\\rho''\\pi\\pi}/f_{\\rho''})=0.0580 \\pm 0.0010..."
+    },
+    {
+      "index": 127,
+      "type": "inline",
+      "latex": "(f_{\\rho''\\pi\\pi}/f_{\\rho''})=0.0580 \\pm 0.0010",
+      "tier": 1,
+      "lineNumber": 201,
+      "context": "....0110$ (GeV) & $\\Gamma_{\\rho'}=0.3320\\pm0.0033$ (GeV)\\\\ [FORMULA] & $m_{\\rho''}=1.7690\\pm 0.0180$ (GeV) & $\\Gamma_{\\rho''}=0...."
+    },
+    {
+      "index": 128,
+      "type": "inline",
+      "latex": "m_{\\rho''}=1.7690\\pm 0.0180",
+      "tier": 1,
+      "lineNumber": 201,
+      "context": "...V)\\\\ $(f_{\\rho''\\pi\\pi}/f_{\\rho''})=0.0580 \\pm 0.0010$ & [FORMULA] (GeV) & $\\Gamma_{\\rho''}=0.2531\\pm 0.0025$ (GeV)\\\\ $(f_{..."
+    },
+    {
+      "index": 129,
+      "type": "inline",
+      "latex": "\\Gamma_{\\rho''}=0.2531\\pm 0.0025",
+      "tier": 1,
+      "lineNumber": 201,
+      "context": "...=0.0580 \\pm 0.0010$ & $m_{\\rho''}=1.7690\\pm 0.0180$ (GeV) & [FORMULA] (GeV)\\\\ $(f_{\\rho'''\\pi\\pi}/f_{\\rho'''})=0.0021 \\pm 0.00..."
+    },
+    {
+      "index": 130,
+      "type": "inline",
+      "latex": "(f_{\\rho'''\\pi\\pi}/f_{\\rho'''})=0.0021 \\pm 0.0005",
+      "tier": 1,
+      "lineNumber": 202,
+      "context": "...0180$ (GeV) & $\\Gamma_{\\rho''}=0.2531\\pm 0.0025$ (GeV)\\\\ [FORMULA] & $m_{\\rho'''}=2.2470\\pm 0.0110$ (GeV) & $\\Gamma_{\\rho'''}=..."
+    },
+    {
+      "index": 131,
+      "type": "inline",
+      "latex": "m_{\\rho'''}=2.2470\\pm 0.0110",
+      "tier": 1,
+      "lineNumber": 202,
+      "context": "...\\\\ $(f_{\\rho'''\\pi\\pi}/f_{\\rho'''})=0.0021 \\pm 0.0005$ & [FORMULA] (GeV) & $\\Gamma_{\\rho'''}=0.0700\\pm 0.0007$ (GeV) \\\\ $R=..."
+    },
+    {
+      "index": 132,
+      "type": "inline",
+      "latex": "\\Gamma_{\\rho'''}=0.0700\\pm 0.0007",
+      "tier": 1,
+      "lineNumber": 202,
+      "context": "...0.0021 \\pm 0.0005$ & $m_{\\rho'''}=2.2470\\pm 0.0110$ (GeV) & [FORMULA] (GeV) \\\\ $R=0.0113 \\pm 0.0002$ & $W_Z=0.2845\\pm 0.0033$..."
+    },
+    {
+      "index": 133,
+      "type": "inline",
+      "latex": "R=0.0113 \\pm 0.0002",
+      "tier": 1,
+      "lineNumber": 203,
+      "context": "...10$ (GeV) & $\\Gamma_{\\rho'''}=0.0700\\pm 0.0007$ (GeV) \\\\ [FORMULA] & $W_Z=0.2845\\pm 0.0033$ & $W_P=0.3830\\pm 0.0060$ \\\\ \\bo..."
+    },
+    {
+      "index": 134,
+      "type": "inline",
+      "latex": "W_Z=0.2845\\pm 0.0033",
+      "tier": 1,
+      "lineNumber": 203,
+      "context": "...o'''}=0.0700\\pm 0.0007$ (GeV) \\\\ $R=0.0113 \\pm 0.0002$ & [FORMULA] & $W_P=0.3830\\pm 0.0060$ \\\\ \\bottomrule \\end{tabularx}..."
+    },
+    {
+      "index": 135,
+      "type": "inline",
+      "latex": "W_P=0.3830\\pm 0.0060",
+      "tier": 1,
+      "lineNumber": 203,
+      "context": "...GeV) \\\\ $R=0.0113 \\pm 0.0002$ & $W_Z=0.2845\\pm 0.0033$ & [FORMULA] \\\\ \\bottomrule \\end{tabularx} \\end{table} Now, in~..."
+    },
+    {
+      "index": 136,
+      "type": "inline",
+      "latex": "F^c_\\pi(s) = |F^c_\\pi(s)|e^{i\\delta_\\pi}",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...amma_{\\omega}}\\}, \\end{multline} and by using expressions [FORMULA] , $F^{c*}_\\pi(s)=|F^c_\\pi(s)|e^{-i\\delta_\\pi}$, also the ide..."
+    },
+    {
+      "index": 137,
+      "type": "inline",
+      "latex": "F^{c*}_\\pi(s)=|F^c_\\pi(s)|e^{-i\\delta_\\pi}",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...ing expressions $F^c_\\pi(s) = |F^c_\\pi(s)|e^{i\\delta_\\pi}$, [FORMULA] , also the identity of the pion EM FF phase with the P-wave..."
+    },
+    {
+      "index": 138,
+      "type": "inline",
+      "latex": "\\pi\\pi",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...identity of the pion EM FF phase with the P-wave isovector [FORMULA] -phase shift $\\delta_{\\pi}(s)$ = $\\delta^1_1(s)$, following..."
+    },
+    {
+      "index": 139,
+      "type": "inline",
+      "latex": "\\delta_{\\pi}(s)",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...EM FF phase with the P-wave isovector $\\pi\\pi$-phase shift [FORMULA] = $\\delta^1_1(s)$, following from the charge pion EM FF ela..."
+    },
+    {
+      "index": 140,
+      "type": "inline",
+      "latex": "\\delta^1_1(s)",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...e P-wave isovector $\\pi\\pi$-phase shift $\\delta_{\\pi}(s)$ = [FORMULA] , following from the charge pion EM FF elastic unitarity con..."
+    },
+    {
+      "index": 141,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...ty condition, practically considered to be valid up to 1~GeV [FORMULA] , the~quadratic equation for the absolute value of the pure..."
+    },
+    {
+      "index": 142,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 214,
+      "context": "...the absolute value of the pure isovector charged pion EM FF [FORMULA] is found \\begin{eqnarray} |F^c_\\pi(s)|^2+|F^c_\\pi(s)| \\..."
+    },
+    {
+      "index": 143,
+      "type": "inline",
+      "latex": "|F^{'}_\\pi(s)|^2",
+      "tier": 1,
+      "lineNumber": 224,
+      "context": "...h=\\textwidth]{fig1.eps}\\\\ \\caption{Optimal description of [FORMULA] data from~\\cite{Lees3,Xiao,Ablikim7} in the energy range fr..."
+    },
+    {
+      "index": 144,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 224,
+      "context": "...blikim7} in the energy range from the threshold {up to 9 GeV [FORMULA] }.\\label{fig:3}} \\end{figure} \\begin{figure}[!ht] \\hsp..."
+    },
+    {
+      "index": 145,
+      "type": "inline",
+      "latex": "|F^{'}_\\pi(s)|^2",
+      "tier": 1,
+      "lineNumber": 230,
+      "context": "...h=\\textwidth]{fig2.eps}\\\\ \\caption{Optimal description of [FORMULA] data from~\\cite{Lees3,Xiao,Ablikim7} in the region of the $..."
+    },
+    {
+      "index": 146,
+      "type": "inline",
+      "latex": "\\rho-\\omega",
+      "tier": 1,
+      "lineNumber": 230,
+      "context": "...$ data from~\\cite{Lees3,Xiao,Ablikim7} in the region of the [FORMULA] -interference~effect.\\label{fig:4}} \\end{figure} Its so..."
+    },
+    {
+      "index": 147,
+      "type": "inline",
+      "latex": "\\delta^1_1(s)",
+      "tier": 1,
+      "lineNumber": 244,
+      "context": "...f{gensol}) with the ``+'' sign, the~most accurate up-to-now [FORMULA] data~\\cite{Garcia} described by the most model independent..."
+    },
+    {
+      "index": 148,
+      "type": "inline",
+      "latex": "q=[(s-4m^2_\\pi)/4]^{1/2}",
+      "tier": 1,
+      "lineNumber": 244,
+      "context": "...model independent parametrization~\\cite{Bartos} with\\mbox{ [FORMULA] }, numerical values of parameters of Table~\\ref{tab:1} and $..."
+    },
+    {
+      "index": 149,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 244,
+      "context": "...$}, numerical values of parameters of Table~\\ref{tab:1} and [FORMULA] as measured in~\\cite{Lees3}, the~data on the absolute value..."
+    },
+    {
+      "index": 150,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 244,
+      "context": "...as measured in~\\cite{Lees3}, the~data on the absolute value [FORMULA] of the pure isovector EM FF of the charged pion with errors..."
+    },
+    {
+      "index": 151,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 247,
+      "context": "....} \\begin{longtable}{ccccccccc} \\caption{The values of [FORMULA] with errors from measurements of J.N.~Lees~et~al.~\\cite{Lee..."
+    },
+    {
+      "index": 152,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...f J.N.~Lees~et~al.~\\cite{Lees3}. \\label{tab:2}}\\\\ \\hline [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 153,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...ees~et~al.~\\cite{Lees3}. \\label{tab:2}}\\\\ \\hline $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 154,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...~\\cite{Lees3}. \\label{tab:2}}\\\\ \\hline $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] &..."
+    },
+    {
+      "index": 155,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...{tab:2}}\\\\ \\hline $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 156,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...\\\\ \\hline $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 157,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...e $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] &..."
+    },
+    {
+      "index": 158,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...$|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 159,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 160,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...& $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirs..."
+    },
+    {
+      "index": 161,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...$|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirsthead..."
+    },
+    {
+      "index": 162,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirsthead \\caption{c..."
+    },
+    {
+      "index": 163,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 249,
+      "context": "...& $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] \\\\ \\hline \\endfirsthead \\caption{continued from previous..."
+    },
+    {
+      "index": 164,
+      "type": "inline",
+      "latex": "1.2877 \\pm 0.0682",
+      "tier": 1,
+      "lineNumber": 254,
+      "context": "...tion{continued from previous page} \\\\ \\endhead $0.0930$ & [FORMULA] & $0.3982$ & $3.3075 \\pm 0.0278$ & $0.6384$ & $5.6773 \\pm 0..."
+    },
+    {
+      "index": 165,
+      "type": "inline",
+      "latex": "3.3075 \\pm 0.0278",
+      "tier": 1,
+      "lineNumber": 254,
+      "context": "...} \\\\ \\endhead $0.0930$ & $1.2877 \\pm 0.0682$ & $0.3982$ & [FORMULA] & $0.6384$ & $5.6773 \\pm 0.0332$ & $0.9351$ & $2.0270 \\pm 0..."
+    },
+    {
+      "index": 166,
+      "type": "inline",
+      "latex": "5.6773 \\pm 0.0332",
+      "tier": 1,
+      "lineNumber": 254,
+      "context": "...7 \\pm 0.0682$ & $0.3982$ & $3.3075 \\pm 0.0278$ & $0.6384$ & [FORMULA] & $0.9351$ & $2.0270 \\pm 0.0272$ \\\\ $0.1056$ & $1.2825 \\..."
+    },
+    {
+      "index": 167,
+      "type": "inline",
+      "latex": "2.0270 \\pm 0.0272",
+      "tier": 1,
+      "lineNumber": 254,
+      "context": "...5 \\pm 0.0278$ & $0.6384$ & $5.6773 \\pm 0.0332$ & $0.9351$ & [FORMULA] \\\\ $0.1056$ & $1.2825 \\pm 0.0429$ & $0.4032$ & $3.3534 \\..."
+    },
+    {
+      "index": 168,
+      "type": "inline",
+      "latex": "1.2825 \\pm 0.0429",
+      "tier": 1,
+      "lineNumber": 256,
+      "context": "...m 0.0332$ & $0.9351$ & $2.0270 \\pm 0.0272$ \\\\ $0.1056$ & [FORMULA] & $0.4032$ & $3.3534 \\pm 0.0282$ & $0.6448$ & $5.5609 \\pm 0..."
+    },
+    {
+      "index": 169,
+      "type": "inline",
+      "latex": "3.3534 \\pm 0.0282",
+      "tier": 1,
+      "lineNumber": 256,
+      "context": "...m 0.0272$ \\\\ $0.1056$ & $1.2825 \\pm 0.0429$ & $0.4032$ & [FORMULA] & $0.6448$ & $5.5609 \\pm 0.0355$ & $0.9428$ & $2.0118 \\pm 0..."
+    },
+    {
+      "index": 170,
+      "type": "inline",
+      "latex": "5.5609 \\pm 0.0355",
+      "tier": 1,
+      "lineNumber": 256,
+      "context": "...5 \\pm 0.0429$ & $0.4032$ & $3.3534 \\pm 0.0282$ & $0.6448$ & [FORMULA] & $0.9428$ & $2.0118 \\pm 0.0307$ \\\\ $0.1190$ & $1.3199 \\..."
+    },
+    {
+      "index": 171,
+      "type": "inline",
+      "latex": "2.0118 \\pm 0.0307",
+      "tier": 1,
+      "lineNumber": 256,
+      "context": "...4 \\pm 0.0282$ & $0.6448$ & $5.5609 \\pm 0.0355$ & $0.9428$ & [FORMULA] \\\\ $0.1190$ & $1.3199 \\pm 0.0358$ & $0.4083$ & $3.3614 \\..."
+    },
+    {
+      "index": 172,
+      "type": "inline",
+      "latex": "1.3199 \\pm 0.0358",
+      "tier": 1,
+      "lineNumber": 258,
+      "context": "...m 0.0355$ & $0.9428$ & $2.0118 \\pm 0.0307$ \\\\ $0.1190$ & [FORMULA] & $0.4083$ & $3.3614 \\pm 0.0282$ & $0.6512$ & $5.4027 \\pm 0..."
+    },
+    {
+      "index": 173,
+      "type": "inline",
+      "latex": "3.3614 \\pm 0.0282",
+      "tier": 1,
+      "lineNumber": 258,
+      "context": "...m 0.0307$ \\\\ $0.1190$ & $1.3199 \\pm 0.0358$ & $0.4083$ & [FORMULA] & $0.6512$ & $5.4027 \\pm 0.0306$ & $0.9506$ & $1.9786 \\pm 0..."
+    },
+    {
+      "index": 174,
+      "type": "inline",
+      "latex": "5.4027 \\pm 0.0306",
+      "tier": 1,
+      "lineNumber": 258,
+      "context": "...9 \\pm 0.0358$ & $0.4083$ & $3.3614 \\pm 0.0282$ & $0.6512$ & [FORMULA] & $0.9506$ & $1.9786 \\pm 0.0233$ \\\\ $0.1332$ & $1.3583 \\..."
+    },
+    {
+      "index": 175,
+      "type": "inline",
+      "latex": "1.9786 \\pm 0.0233",
+      "tier": 1,
+      "lineNumber": 258,
+      "context": "...4 \\pm 0.0282$ & $0.6512$ & $5.4027 \\pm 0.0306$ & $0.9506$ & [FORMULA] \\\\ $0.1332$ & $1.3583 \\pm 0.0328$ & $0.4134$ & $3.4846 \\..."
+    },
+    {
+      "index": 176,
+      "type": "inline",
+      "latex": "1.3583 \\pm 0.0328",
+      "tier": 1,
+      "lineNumber": 260,
+      "context": "...m 0.0306$ & $0.9506$ & $1.9786 \\pm 0.0233$ \\\\ $0.1332$ & [FORMULA] & $0.4134$ & $3.4846 \\pm 0.0292$ & $0.6577$ & $5.2312 \\pm 0..."
+    },
+    {
+      "index": 177,
+      "type": "inline",
+      "latex": "3.4846 \\pm 0.0292",
+      "tier": 1,
+      "lineNumber": 260,
+      "context": "...m 0.0233$ \\\\ $0.1332$ & $1.3583 \\pm 0.0328$ & $0.4134$ & [FORMULA] & $0.6577$ & $5.2312 \\pm 0.0342$ & $0.9584$ & $1.9563 \\pm 0..."
+    },
+    {
+      "index": 178,
+      "type": "inline",
+      "latex": "5.2312 \\pm 0.0342",
+      "tier": 1,
+      "lineNumber": 260,
+      "context": "...3 \\pm 0.0328$ & $0.4134$ & $3.4846 \\pm 0.0292$ & $0.6577$ & [FORMULA] & $0.9584$ & $1.9563 \\pm 0.0286$ \\\\ $0.1482$ & $1.4659 \\..."
+    },
+    {
+      "index": 179,
+      "type": "inline",
+      "latex": "1.9563 \\pm 0.0286",
+      "tier": 1,
+      "lineNumber": 260,
+      "context": "...6 \\pm 0.0292$ & $0.6577$ & $5.2312 \\pm 0.0342$ & $0.9584$ & [FORMULA] \\\\ $0.1482$ & $1.4659 \\pm 0.0309$ & $0.4186$ & $3.5426 \\..."
+    },
+    {
+      "index": 180,
+      "type": "inline",
+      "latex": "1.4659 \\pm 0.0309",
+      "tier": 1,
+      "lineNumber": 262,
+      "context": "...m 0.0342$ & $0.9584$ & $1.9563 \\pm 0.0286$ \\\\ $0.1482$ & [FORMULA] & $0.4186$ & $3.5426 \\pm 0.0289$ & $0.6642$ & $5.1332 \\pm 0..."
+    },
+    {
+      "index": 181,
+      "type": "inline",
+      "latex": "3.5426 \\pm 0.0289",
+      "tier": 1,
+      "lineNumber": 262,
+      "context": "...m 0.0286$ \\\\ $0.1482$ & $1.4659 \\pm 0.0309$ & $0.4186$ & [FORMULA] & $0.6642$ & $5.1332 \\pm 0.0335$ & $0.9663$ & $1.9340 \\pm 0..."
+    },
+    {
+      "index": 182,
+      "type": "inline",
+      "latex": "5.1332 \\pm 0.0335",
+      "tier": 1,
+      "lineNumber": 262,
+      "context": "...9 \\pm 0.0309$ & $0.4186$ & $3.5426 \\pm 0.0289$ & $0.6642$ & [FORMULA] & $0.9663$ & $1.9340 \\pm 0.0250$ \\\\ $0.1640$ & $1.5359 \\..."
+    },
+    {
+      "index": 183,
+      "type": "inline",
+      "latex": "1.9340 \\pm 0.0250",
+      "tier": 1,
+      "lineNumber": 262,
+      "context": "...6 \\pm 0.0289$ & $0.6642$ & $5.1332 \\pm 0.0335$ & $0.9663$ & [FORMULA] \\\\ $0.1640$ & $1.5359 \\pm 0.0266$ & $0.4238$ & $3.6764 \\..."
+    },
+    {
+      "index": 184,
+      "type": "inline",
+      "latex": "1.5359 \\pm 0.0266",
+      "tier": 1,
+      "lineNumber": 264,
+      "context": "...m 0.0335$ & $0.9663$ & $1.9340 \\pm 0.0250$ \\\\ $0.1640$ & [FORMULA] & $0.4238$ & $3.6764 \\pm 0.0266$ & $0.6708$ & $4.9312 \\pm 0..."
+    },
+    {
+      "index": 185,
+      "type": "inline",
+      "latex": "3.6764 \\pm 0.0266",
+      "tier": 1,
+      "lineNumber": 264,
+      "context": "...m 0.0250$ \\\\ $0.1640$ & $1.5359 \\pm 0.0266$ & $0.4238$ & [FORMULA] & $0.6708$ & $4.9312 \\pm 0.0304$ & $0.9742$ & $1.8966 \\pm 0..."
+    },
+    {
+      "index": 186,
+      "type": "inline",
+      "latex": "4.9312 \\pm 0.0304",
+      "tier": 1,
+      "lineNumber": 264,
+      "context": "...9 \\pm 0.0266$ & $0.4238$ & $3.6764 \\pm 0.0266$ & $0.6708$ & [FORMULA] & $0.9742$ & $1.8966 \\pm 0.0279$ \\\\ $0.1806$ & $1.5775 \\..."
+    },
+    {
+      "index": 187,
+      "type": "inline",
+      "latex": "1.8966 \\pm 0.0279",
+      "tier": 1,
+      "lineNumber": 264,
+      "context": "...4 \\pm 0.0266$ & $0.6708$ & $4.9312 \\pm 0.0304$ & $0.9742$ & [FORMULA] \\\\ $0.1806$ & $1.5775 \\pm 0.0258$ & $0.4290$ & $3.7338 \\..."
+    },
+    {
+      "index": 188,
+      "type": "inline",
+      "latex": "1.5775 \\pm 0.0258",
+      "tier": 1,
+      "lineNumber": 266,
+      "context": "...m 0.0304$ & $0.9742$ & $1.8966 \\pm 0.0279$ \\\\ $0.1806$ & [FORMULA] & $0.4290$ & $3.7338 \\pm 0.0292$ & $0.6773$ & $4.8596 \\pm 0..."
+    },
+    {
+      "index": 189,
+      "type": "inline",
+      "latex": "3.7338 \\pm 0.0292",
+      "tier": 1,
+      "lineNumber": 266,
+      "context": "...m 0.0279$ \\\\ $0.1806$ & $1.5775 \\pm 0.0258$ & $0.4290$ & [FORMULA] & $0.6773$ & $4.8596 \\pm 0.0331$ & $0.9821$ & $1.8682 \\pm 0..."
+    },
+    {
+      "index": 190,
+      "type": "inline",
+      "latex": "4.8596 \\pm 0.0331",
+      "tier": 1,
+      "lineNumber": 266,
+      "context": "...5 \\pm 0.0258$ & $0.4290$ & $3.7338 \\pm 0.0292$ & $0.6773$ & [FORMULA] & $0.9821$ & $1.8682 \\pm 0.0310$ \\\\ $0.1980$ & $1.6306 \\..."
+    },
+    {
+      "index": 191,
+      "type": "inline",
+      "latex": "1.8682 \\pm 0.0310",
+      "tier": 1,
+      "lineNumber": 266,
+      "context": "...8 \\pm 0.0292$ & $0.6773$ & $4.8596 \\pm 0.0331$ & $0.9821$ & [FORMULA] \\\\ $0.1980$ & $1.6306 \\pm 0.0244$ & $0.4343$ & $3.8258 \\..."
+    },
+    {
+      "index": 192,
+      "type": "inline",
+      "latex": "1.6306 \\pm 0.0244",
+      "tier": 1,
+      "lineNumber": 268,
+      "context": "...m 0.0331$ & $0.9821$ & $1.8682 \\pm 0.0310$ \\\\ $0.1980$ & [FORMULA] & $0.4343$ & $3.8258 \\pm 0.0295$ & $0.6839$ & $4.7191 \\pm 0..."
+    },
+    {
+      "index": 193,
+      "type": "inline",
+      "latex": "3.8258 \\pm 0.0295",
+      "tier": 1,
+      "lineNumber": 268,
+      "context": "...m 0.0310$ \\\\ $0.1980$ & $1.6306 \\pm 0.0244$ & $0.4343$ & [FORMULA] & $0.6839$ & $4.7191 \\pm 0.0322$ & $0.9900$ & $1.8280 \\pm 0..."
+    },
+    {
+      "index": 194,
+      "type": "inline",
+      "latex": "4.7191 \\pm 0.0322",
+      "tier": 1,
+      "lineNumber": 268,
+      "context": "...6 \\pm 0.0244$ & $0.4343$ & $3.8258 \\pm 0.0295$ & $0.6839$ & [FORMULA] & $0.9900$ & $1.8280 \\pm 0.0253$ \\\\ $0.2162$ & $1.7123 \\..."
+    },
+    {
+      "index": 195,
+      "type": "inline",
+      "latex": "1.8280 \\pm 0.0253",
+      "tier": 1,
+      "lineNumber": 268,
+      "context": "...8 \\pm 0.0295$ & $0.6839$ & $4.7191 \\pm 0.0322$ & $0.9900$ & [FORMULA] \\\\ $0.2162$ & $1.7123 \\pm 0.0232$ & $0.4396$ & $3.9133 \\..."
+    },
+    {
+      "index": 196,
+      "type": "inline",
+      "latex": "1.7123 \\pm 0.0232",
+      "tier": 1,
+      "lineNumber": 270,
+      "context": "...m 0.0322$ & $0.9900$ & $1.8280 \\pm 0.0253$ \\\\ $0.2162$ & [FORMULA] & $0.4396$ & $3.9133 \\pm 0.0283$ & $0.6906$ & $4.5615 \\pm 0..."
+    },
+    {
+      "index": 197,
+      "type": "inline",
+      "latex": "3.9133 \\pm 0.0283",
+      "tier": 1,
+      "lineNumber": 270,
+      "context": "...m 0.0253$ \\\\ $0.2162$ & $1.7123 \\pm 0.0232$ & $0.4396$ & [FORMULA] & $0.6906$ & $4.5615 \\pm 0.0322$ & $0.9980$ & $1.8009 \\pm 0..."
+    },
+    {
+      "index": 198,
+      "type": "inline",
+      "latex": "4.5615 \\pm 0.0322",
+      "tier": 1,
+      "lineNumber": 270,
+      "context": "...3 \\pm 0.0232$ & $0.4396$ & $3.9133 \\pm 0.0283$ & $0.6906$ & [FORMULA] & $0.9980$ & $1.8009 \\pm 0.0314$ \\\\ $0.2352$ & $1.8263 \\..."
+    },
+    {
+      "index": 199,
+      "type": "inline",
+      "latex": "1.8009 \\pm 0.0314",
+      "tier": 1,
+      "lineNumber": 270,
+      "context": "...3 \\pm 0.0283$ & $0.6906$ & $4.5615 \\pm 0.0322$ & $0.9980$ & [FORMULA] \\\\ $0.2352$ & $1.8263 \\pm 0.0235$ & $0.4449$ & $3.9924 \\..."
+    },
+    {
+      "index": 200,
+      "type": "inline",
+      "latex": "1.8263 \\pm 0.0235",
+      "tier": 1,
+      "lineNumber": 272,
+      "context": "...m 0.0322$ & $0.9980$ & $1.8009 \\pm 0.0314$ \\\\ $0.2352$ & [FORMULA] & $0.4449$ & $3.9924 \\pm 0.0271$ & $0.6972$ & $4.4369 \\pm 0..."
+    },
+    {
+      "index": 201,
+      "type": "inline",
+      "latex": "3.9924 \\pm 0.0271",
+      "tier": 1,
+      "lineNumber": 272,
+      "context": "...m 0.0314$ \\\\ $0.2352$ & $1.8263 \\pm 0.0235$ & $0.4449$ & [FORMULA] & $0.6972$ & $4.4369 \\pm 0.0315$ & $1.0302$ & $1.6764 \\pm 0..."
+    },
+    {
+      "index": 202,
+      "type": "inline",
+      "latex": "4.4369 \\pm 0.0315",
+      "tier": 1,
+      "lineNumber": 272,
+      "context": "...3 \\pm 0.0235$ & $0.4449$ & $3.9924 \\pm 0.0271$ & $0.6972$ & [FORMULA] & $1.0302$ & $1.6764 \\pm 0.0263$ \\\\ $0.2510$ & $1.8588 \\..."
+    },
+    {
+      "index": 203,
+      "type": "inline",
+      "latex": "1.6764 \\pm 0.0263",
+      "tier": 1,
+      "lineNumber": 272,
+      "context": "...4 \\pm 0.0271$ & $0.6972$ & $4.4369 \\pm 0.0315$ & $1.0302$ & [FORMULA] \\\\ $0.2510$ & $1.8588 \\pm 0.0271$ & $0.4502$ & $4.1074 \\..."
+    },
+    {
+      "index": 204,
+      "type": "inline",
+      "latex": "1.8588 \\pm 0.0271",
+      "tier": 1,
+      "lineNumber": 274,
+      "context": "...m 0.0315$ & $1.0302$ & $1.6764 \\pm 0.0263$ \\\\ $0.2510$ & [FORMULA] & $0.4502$ & $4.1074 \\pm 0.0293$ & $0.7039$ & $4.3270 \\pm 0..."
+    },
+    {
+      "index": 205,
+      "type": "inline",
+      "latex": "4.1074 \\pm 0.0293",
+      "tier": 1,
+      "lineNumber": 274,
+      "context": "...m 0.0263$ \\\\ $0.2510$ & $1.8588 \\pm 0.0271$ & $0.4502$ & [FORMULA] & $0.7039$ & $4.3270 \\pm 0.0284$ & $1.0712$ & $1.5936 \\pm 0..."
+    },
+    {
+      "index": 206,
+      "type": "inline",
+      "latex": "4.3270 \\pm 0.0284",
+      "tier": 1,
+      "lineNumber": 274,
+      "context": "...8 \\pm 0.0271$ & $0.4502$ & $4.1074 \\pm 0.0293$ & $0.7039$ & [FORMULA] & $1.0712$ & $1.5936 \\pm 0.0257$ \\\\ $0.2550$ & $1.8997 \\..."
+    },
+    {
+      "index": 207,
+      "type": "inline",
+      "latex": "1.5936 \\pm 0.0257",
+      "tier": 1,
+      "lineNumber": 274,
+      "context": "...4 \\pm 0.0293$ & $0.7039$ & $4.3270 \\pm 0.0284$ & $1.0712$ & [FORMULA] \\\\ $0.2550$ & $1.8997 \\pm 0.0243$ & $0.4556$ & $4.2332 \\..."
+    },
+    {
+      "index": 208,
+      "type": "inline",
+      "latex": "1.8997 \\pm 0.0243",
+      "tier": 1,
+      "lineNumber": 276,
+      "context": "...m 0.0284$ & $1.0712$ & $1.5936 \\pm 0.0257$ \\\\ $0.2550$ & [FORMULA] & $0.4556$ & $4.2332 \\pm 0.0306$ & $0.7106$ & $4.1883 \\pm 0..."
+    },
+    {
+      "index": 209,
+      "type": "inline",
+      "latex": "4.2332 \\pm 0.0306",
+      "tier": 1,
+      "lineNumber": 276,
+      "context": "...m 0.0257$ \\\\ $0.2550$ & $1.8997 \\pm 0.0243$ & $0.4556$ & [FORMULA] & $0.7106$ & $4.1883 \\pm 0.0319$ & $1.1130$ & $1.4881 \\pm 0..."
+    },
+    {
+      "index": 210,
+      "type": "inline",
+      "latex": "4.1883 \\pm 0.0319",
+      "tier": 1,
+      "lineNumber": 276,
+      "context": "...7 \\pm 0.0243$ & $0.4556$ & $4.2332 \\pm 0.0306$ & $0.7106$ & [FORMULA] & $1.1130$ & $1.4881 \\pm 0.0225$ \\\\ $0.2591$ & $1.9009 \\..."
+    },
+    {
+      "index": 211,
+      "type": "inline",
+      "latex": "1.4881 \\pm 0.0225",
+      "tier": 1,
+      "lineNumber": 276,
+      "context": "...2 \\pm 0.0306$ & $0.7106$ & $4.1883 \\pm 0.0319$ & $1.1130$ & [FORMULA] \\\\ $0.2591$ & $1.9009 \\pm 0.0288$ & $0.4610$ & $4.3613 \\..."
+    },
+    {
+      "index": 212,
+      "type": "inline",
+      "latex": "1.9009 \\pm 0.0288",
+      "tier": 1,
+      "lineNumber": 278,
+      "context": "...m 0.0319$ & $1.1130$ & $1.4881 \\pm 0.0225$ \\\\ $0.2591$ & [FORMULA] & $0.4610$ & $4.3613 \\pm 0.0294$ & $0.7174$ & $4.1039 \\pm 0..."
+    },
+    {
+      "index": 213,
+      "type": "inline",
+      "latex": "4.3613 \\pm 0.0294",
+      "tier": 1,
+      "lineNumber": 278,
+      "context": "...m 0.0225$ \\\\ $0.2591$ & $1.9009 \\pm 0.0288$ & $0.4610$ & [FORMULA] & $0.7174$ & $4.1039 \\pm 0.0318$ & $1.1556$ & $1.4378 \\pm 0..."
+    },
+    {
+      "index": 214,
+      "type": "inline",
+      "latex": "4.1039 \\pm 0.0318",
+      "tier": 1,
+      "lineNumber": 278,
+      "context": "...9 \\pm 0.0288$ & $0.4610$ & $4.3613 \\pm 0.0294$ & $0.7174$ & [FORMULA] & $1.1556$ & $1.4378 \\pm 0.0252$ \\\\ $0.2632$ & $1.9705 \\..."
+    },
+    {
+      "index": 215,
+      "type": "inline",
+      "latex": "1.4378 \\pm 0.0252",
+      "tier": 1,
+      "lineNumber": 278,
+      "context": "...3 \\pm 0.0294$ & $0.7174$ & $4.1039 \\pm 0.0318$ & $1.1556$ & [FORMULA] \\\\ $0.2632$ & $1.9705 \\pm 0.0300$ & $0.4665$ & $4.4600 \\..."
+    },
+    {
+      "index": 216,
+      "type": "inline",
+      "latex": "1.9705 \\pm 0.0300",
+      "tier": 1,
+      "lineNumber": 280,
+      "context": "...m 0.0318$ & $1.1556$ & $1.4378 \\pm 0.0252$ \\\\ $0.2632$ & [FORMULA] & $0.4665$ & $4.4600 \\pm 0.0308$ & $0.7242$ & $3.9646 \\pm 0..."
+    },
+    {
+      "index": 217,
+      "type": "inline",
+      "latex": "4.4600 \\pm 0.0308",
+      "tier": 1,
+      "lineNumber": 280,
+      "context": "...m 0.0252$ \\\\ $0.2632$ & $1.9705 \\pm 0.0300$ & $0.4665$ & [FORMULA] & $0.7242$ & $3.9646 \\pm 0.0298$ & $1.1990$ & $1.3746 \\pm 0..."
+    },
+    {
+      "index": 218,
+      "type": "inline",
+      "latex": "3.9646 \\pm 0.0298",
+      "tier": 1,
+      "lineNumber": 280,
+      "context": "...5 \\pm 0.0300$ & $0.4665$ & $4.4600 \\pm 0.0308$ & $0.7242$ & [FORMULA] & $1.1990$ & $1.3746 \\pm 0.0230$ \\\\ $0.2673$ & $1.9726 \\..."
+    },
+    {
+      "index": 219,
+      "type": "inline",
+      "latex": "1.3746 \\pm 0.0230",
+      "tier": 1,
+      "lineNumber": 280,
+      "context": "...0 \\pm 0.0308$ & $0.7242$ & $3.9646 \\pm 0.0298$ & $1.1990$ & [FORMULA] \\\\ $0.2673$ & $1.9726 \\pm 0.0239$ & $0.4720$ & $4.6090 \\..."
+    },
+    {
+      "index": 220,
+      "type": "inline",
+      "latex": "1.9726 \\pm 0.0239",
+      "tier": 1,
+      "lineNumber": 282,
+      "context": "...m 0.0298$ & $1.1990$ & $1.3746 \\pm 0.0230$ \\\\ $0.2673$ & [FORMULA] & $0.4720$ & $4.6090 \\pm 0.0285$ & $0.7310$ & $3.7943 \\pm 0..."
+    },
+    {
+      "index": 221,
+      "type": "inline",
+      "latex": "4.6090 \\pm 0.0285",
+      "tier": 1,
+      "lineNumber": 282,
+      "context": "...m 0.0230$ \\\\ $0.2673$ & $1.9726 \\pm 0.0239$ & $0.4720$ & [FORMULA] & $0.7310$ & $3.7943 \\pm 0.0308$ & $1.2432$ & $1.2880 \\pm 0..."
+    },
+    {
+      "index": 222,
+      "type": "inline",
+      "latex": "3.7943 \\pm 0.0308",
+      "tier": 1,
+      "lineNumber": 282,
+      "context": "...6 \\pm 0.0239$ & $0.4720$ & $4.6090 \\pm 0.0285$ & $0.7310$ & [FORMULA] & $1.2432$ & $1.2880 \\pm 0.0247$ \\\\ $0.2714$ & $1.9720 \\..."
+    },
+    {
+      "index": 223,
+      "type": "inline",
+      "latex": "1.2880 \\pm 0.0247",
+      "tier": 1,
+      "lineNumber": 282,
+      "context": "...0 \\pm 0.0285$ & $0.7310$ & $3.7943 \\pm 0.0308$ & $1.2432$ & [FORMULA] \\\\ $0.2714$ & $1.9720 \\pm 0.0264$ & $0.4775$ & $4.7514 \\..."
+    },
+    {
+      "index": 224,
+      "type": "inline",
+      "latex": "1.9720 \\pm 0.0264",
+      "tier": 1,
+      "lineNumber": 284,
+      "context": "...m 0.0308$ & $1.2432$ & $1.2880 \\pm 0.0247$ \\\\ $0.2714$ & [FORMULA] & $0.4775$ & $4.7514 \\pm 0.0320$ & $0.7379$ & $3.7528 \\pm 0..."
+    },
+    {
+      "index": 225,
+      "type": "inline",
+      "latex": "4.7514 \\pm 0.0320",
+      "tier": 1,
+      "lineNumber": 284,
+      "context": "...m 0.0247$ \\\\ $0.2714$ & $1.9720 \\pm 0.0264$ & $0.4775$ & [FORMULA] & $0.7379$ & $3.7528 \\pm 0.0274$ & $1.2882$ & $1.1999 \\pm 0..."
+    },
+    {
+      "index": 226,
+      "type": "inline",
+      "latex": "3.7528 \\pm 0.0274",
+      "tier": 1,
+      "lineNumber": 284,
+      "context": "...0 \\pm 0.0264$ & $0.4775$ & $4.7514 \\pm 0.0320$ & $0.7379$ & [FORMULA] & $1.2882$ & $1.1999 \\pm 0.0228$ \\\\ $0.2756$ & $2.0446 \\..."
+    },
+    {
+      "index": 227,
+      "type": "inline",
+      "latex": "1.1999 \\pm 0.0228",
+      "tier": 1,
+      "lineNumber": 284,
+      "context": "...4 \\pm 0.0320$ & $0.7379$ & $3.7528 \\pm 0.0274$ & $1.2882$ & [FORMULA] \\\\ $0.2756$ & $2.0446 \\pm 0.0304$ & $0.4830$ & $4.8630 \\..."
+    },
+    {
+      "index": 228,
+      "type": "inline",
+      "latex": "2.0446 \\pm 0.0304",
+      "tier": 1,
+      "lineNumber": 286,
+      "context": "...m 0.0274$ & $1.2882$ & $1.1999 \\pm 0.0228$ \\\\ $0.2756$ & [FORMULA] & $0.4830$ & $4.8630 \\pm 0.0289$ & $0.7448$ & $3.6812 \\pm 0..."
+    },
+    {
+      "index": 229,
+      "type": "inline",
+      "latex": "4.8630 \\pm 0.0289",
+      "tier": 1,
+      "lineNumber": 286,
+      "context": "...m 0.0228$ \\\\ $0.2756$ & $2.0446 \\pm 0.0304$ & $0.4830$ & [FORMULA] & $0.7448$ & $3.6812 \\pm 0.0309$ & $1.3340$ & $1.1756 \\pm 0..."
+    },
+    {
+      "index": 230,
+      "type": "inline",
+      "latex": "3.6812 \\pm 0.0309",
+      "tier": 1,
+      "lineNumber": 286,
+      "context": "...6 \\pm 0.0304$ & $0.4830$ & $4.8630 \\pm 0.0289$ & $0.7448$ & [FORMULA] & $1.3340$ & $1.1756 \\pm 0.0247$ \\\\ $0.2798$ & $2.0663 \\..."
+    },
+    {
+      "index": 231,
+      "type": "inline",
+      "latex": "1.1756 \\pm 0.0247",
+      "tier": 1,
+      "lineNumber": 286,
+      "context": "...0 \\pm 0.0289$ & $0.7448$ & $3.6812 \\pm 0.0309$ & $1.3340$ & [FORMULA] \\\\ $0.2798$ & $2.0663 \\pm 0.0241$ & $0.4886$ & $4.9630 \\..."
+    },
+    {
+      "index": 232,
+      "type": "inline",
+      "latex": "2.0663 \\pm 0.0241",
+      "tier": 1,
+      "lineNumber": 288,
+      "context": "...m 0.0309$ & $1.3340$ & $1.1756 \\pm 0.0247$ \\\\ $0.2798$ & [FORMULA] & $0.4886$ & $4.9630 \\pm 0.0312$ & $0.7517$ & $3.5788 \\pm 0..."
+    },
+    {
+      "index": 233,
+      "type": "inline",
+      "latex": "4.9630 \\pm 0.0312",
+      "tier": 1,
+      "lineNumber": 288,
+      "context": "...m 0.0247$ \\\\ $0.2798$ & $2.0663 \\pm 0.0241$ & $0.4886$ & [FORMULA] & $0.7517$ & $3.5788 \\pm 0.0265$ & $1.3806$ & $1.0842 \\pm 0..."
+    },
+    {
+      "index": 234,
+      "type": "inline",
+      "latex": "3.5788 \\pm 0.0265",
+      "tier": 1,
+      "lineNumber": 288,
+      "context": "...3 \\pm 0.0241$ & $0.4886$ & $4.9630 \\pm 0.0312$ & $0.7517$ & [FORMULA] & $1.3806$ & $1.0842 \\pm 0.0227$ \\\\ $0.2841$ & $2.0875 \\..."
+    },
+    {
+      "index": 235,
+      "type": "inline",
+      "latex": "1.0842 \\pm 0.0227",
+      "tier": 1,
+      "lineNumber": 288,
+      "context": "...0 \\pm 0.0312$ & $0.7517$ & $3.5788 \\pm 0.0265$ & $1.3806$ & [FORMULA] \\\\ $0.2841$ & $2.0875 \\pm 0.0300$ & $0.4942$ & $5.0519 \\..."
+    },
+    {
+      "index": 236,
+      "type": "inline",
+      "latex": "2.0875 \\pm 0.0300",
+      "tier": 1,
+      "lineNumber": 290,
+      "context": "...m 0.0265$ & $1.3806$ & $1.0842 \\pm 0.0227$ \\\\ $0.2841$ & [FORMULA] & $0.4942$ & $5.0519 \\pm 0.0326$ & $0.7586$ & $3.4504 \\pm 0..."
+    },
+    {
+      "index": 237,
+      "type": "inline",
+      "latex": "5.0519 \\pm 0.0326",
+      "tier": 1,
+      "lineNumber": 290,
+      "context": "...m 0.0227$ \\\\ $0.2841$ & $2.0875 \\pm 0.0300$ & $0.4942$ & [FORMULA] & $0.7586$ & $3.4504 \\pm 0.0308$ & $1.4280$ & $1.0412 \\pm 0..."
+    },
+    {
+      "index": 238,
+      "type": "inline",
+      "latex": "3.4504 \\pm 0.0308",
+      "tier": 1,
+      "lineNumber": 290,
+      "context": "...5 \\pm 0.0300$ & $0.4942$ & $5.0519 \\pm 0.0326$ & $0.7586$ & [FORMULA] & $1.4280$ & $1.0412 \\pm 0.0242$ \\\\ $0.2884$ & $2.1566 \\..."
+    },
+    {
+      "index": 239,
+      "type": "inline",
+      "latex": "1.0412 \\pm 0.0242",
+      "tier": 1,
+      "lineNumber": 290,
+      "context": "...9 \\pm 0.0326$ & $0.7586$ & $3.4504 \\pm 0.0308$ & $1.4280$ & [FORMULA] \\\\ $0.2884$ & $2.1566 \\pm 0.0243$ & $0.4998$ & $5.2457 \\..."
+    },
+    {
+      "index": 240,
+      "type": "inline",
+      "latex": "2.1566 \\pm 0.0243",
+      "tier": 1,
+      "lineNumber": 292,
+      "context": "...m 0.0308$ & $1.4280$ & $1.0412 \\pm 0.0242$ \\\\ $0.2884$ & [FORMULA] & $0.4998$ & $5.2457 \\pm 0.0329$ & $0.7656$ & $3.3948 \\pm 0..."
+    },
+    {
+      "index": 241,
+      "type": "inline",
+      "latex": "5.2457 \\pm 0.0329",
+      "tier": 1,
+      "lineNumber": 292,
+      "context": "...m 0.0242$ \\\\ $0.2884$ & $2.1566 \\pm 0.0243$ & $0.4998$ & [FORMULA] & $0.7656$ & $3.3948 \\pm 0.0265$ & $1.4762$ & $0.9737 \\pm 0..."
+    },
+    {
+      "index": 242,
+      "type": "inline",
+      "latex": "3.3948 \\pm 0.0265",
+      "tier": 1,
+      "lineNumber": 292,
+      "context": "...6 \\pm 0.0243$ & $0.4998$ & $5.2457 \\pm 0.0329$ & $0.7656$ & [FORMULA] & $1.4762$ & $0.9737 \\pm 0.0249$ \\\\ $0.2927$ & $2.1858 \\..."
+    },
+    {
+      "index": 243,
+      "type": "inline",
+      "latex": "0.9737 \\pm 0.0249",
+      "tier": 1,
+      "lineNumber": 292,
+      "context": "...7 \\pm 0.0329$ & $0.7656$ & $3.3948 \\pm 0.0265$ & $1.4762$ & [FORMULA] \\\\ $0.2927$ & $2.1858 \\pm 0.0298$ & $0.5055$ & $5.3471 \\..."
+    },
+    {
+      "index": 244,
+      "type": "inline",
+      "latex": "2.1858 \\pm 0.0298",
+      "tier": 1,
+      "lineNumber": 294,
+      "context": "...m 0.0265$ & $1.4762$ & $0.9737 \\pm 0.0249$ \\\\ $0.2927$ & [FORMULA] & $0.5055$ & $5.3471 \\pm 0.0333$ & $0.7726$ & $3.2740 \\pm 0..."
+    },
+    {
+      "index": 245,
+      "type": "inline",
+      "latex": "5.3471 \\pm 0.0333",
+      "tier": 1,
+      "lineNumber": 294,
+      "context": "...m 0.0249$ \\\\ $0.2927$ & $2.1858 \\pm 0.0298$ & $0.5055$ & [FORMULA] & $0.7726$ & $3.2740 \\pm 0.0308$ & $1.5252$ & $0.9220 \\pm 0..."
+    },
+    {
+      "index": 246,
+      "type": "inline",
+      "latex": "3.2740 \\pm 0.0308",
+      "tier": 1,
+      "lineNumber": 294,
+      "context": "...8 \\pm 0.0298$ & $0.5055$ & $5.3471 \\pm 0.0333$ & $0.7726$ & [FORMULA] & $1.5252$ & $0.9220 \\pm 0.0231$ \\\\ $0.2970$ & $2.2061 \\..."
+    },
+    {
+      "index": 247,
+      "type": "inline",
+      "latex": "0.9220 \\pm 0.0231",
+      "tier": 1,
+      "lineNumber": 294,
+      "context": "...1 \\pm 0.0333$ & $0.7726$ & $3.2740 \\pm 0.0308$ & $1.5252$ & [FORMULA] \\\\ $0.2970$ & $2.2061 \\pm 0.0283$ & $0.5112$ & $5.4675 \\..."
+    },
+    {
+      "index": 248,
+      "type": "inline",
+      "latex": "2.2061 \\pm 0.0283",
+      "tier": 1,
+      "lineNumber": 296,
+      "context": "...m 0.0308$ & $1.5252$ & $0.9220 \\pm 0.0231$ \\\\ $0.2970$ & [FORMULA] & $0.5112$ & $5.4675 \\pm 0.0341$ & $0.7797$ & $3.2273 \\pm 0..."
+    },
+    {
+      "index": 249,
+      "type": "inline",
+      "latex": "5.4675 \\pm 0.0341",
+      "tier": 1,
+      "lineNumber": 296,
+      "context": "...m 0.0231$ \\\\ $0.2970$ & $2.2061 \\pm 0.0283$ & $0.5112$ & [FORMULA] & $0.7797$ & $3.2273 \\pm 0.0307$ & $1.5750$ & $0.8929 \\pm 0..."
+    },
+    {
+      "index": 250,
+      "type": "inline",
+      "latex": "3.2273 \\pm 0.0307",
+      "tier": 1,
+      "lineNumber": 296,
+      "context": "...1 \\pm 0.0283$ & $0.5112$ & $5.4675 \\pm 0.0341$ & $0.7797$ & [FORMULA] & $1.5750$ & $0.8929 \\pm 0.0239$ \\\\ $0.3014$ & $2.2659 \\..."
+    },
+    {
+      "index": 251,
+      "type": "inline",
+      "latex": "0.8929 \\pm 0.0239",
+      "tier": 1,
+      "lineNumber": 296,
+      "context": "...5 \\pm 0.0341$ & $0.7797$ & $3.2273 \\pm 0.0307$ & $1.5750$ & [FORMULA] \\\\ $0.3014$ & $2.2659 \\pm 0.0253$ & $0.5170$ & $5.6229 \\..."
+    },
+    {
+      "index": 252,
+      "type": "inline",
+      "latex": "2.2659 \\pm 0.0253",
+      "tier": 1,
+      "lineNumber": 298,
+      "context": "...m 0.0307$ & $1.5750$ & $0.8929 \\pm 0.0239$ \\\\ $0.3014$ & [FORMULA] & $0.5170$ & $5.6229 \\pm 0.0318$ & $0.7868$ & $3.1704 \\pm 0..."
+    },
+    {
+      "index": 253,
+      "type": "inline",
+      "latex": "5.6229 \\pm 0.0318",
+      "tier": 1,
+      "lineNumber": 298,
+      "context": "...m 0.0239$ \\\\ $0.3014$ & $2.2659 \\pm 0.0253$ & $0.5170$ & [FORMULA] & $0.7868$ & $3.1704 \\pm 0.0263$ & $1.6256$ & $0.8460 \\pm 0..."
+    },
+    {
+      "index": 254,
+      "type": "inline",
+      "latex": "3.1704 \\pm 0.0263",
+      "tier": 1,
+      "lineNumber": 298,
+      "context": "...9 \\pm 0.0253$ & $0.5170$ & $5.6229 \\pm 0.0318$ & $0.7868$ & [FORMULA] & $1.6256$ & $0.8460 \\pm 0.0255$ \\\\ $0.3058$ & $2.2700 \\..."
+    },
+    {
+      "index": 255,
+      "type": "inline",
+      "latex": "0.8460 \\pm 0.0255",
+      "tier": 1,
+      "lineNumber": 298,
+      "context": "...9 \\pm 0.0318$ & $0.7868$ & $3.1704 \\pm 0.0263$ & $1.6256$ & [FORMULA] \\\\ $0.3058$ & $2.2700 \\pm 0.0296$ & $0.5227$ & $5.7551 \\..."
+    },
+    {
+      "index": 256,
+      "type": "inline",
+      "latex": "2.2700 \\pm 0.0296",
+      "tier": 1,
+      "lineNumber": 300,
+      "context": "...m 0.0263$ & $1.6256$ & $0.8460 \\pm 0.0255$ \\\\ $0.3058$ & [FORMULA] & $0.5227$ & $5.7551 \\pm 0.0351$ & $0.7939$ & $3.0846 \\pm 0..."
+    },
+    {
+      "index": 257,
+      "type": "inline",
+      "latex": "5.7551 \\pm 0.0351",
+      "tier": 1,
+      "lineNumber": 300,
+      "context": "...m 0.0255$ \\\\ $0.3058$ & $2.2700 \\pm 0.0296$ & $0.5227$ & [FORMULA] & $0.7939$ & $3.0846 \\pm 0.0295$ & $1.6770$ & $0.7899 \\pm 0..."
+    },
+    {
+      "index": 258,
+      "type": "inline",
+      "latex": "3.0846 \\pm 0.0295",
+      "tier": 1,
+      "lineNumber": 300,
+      "context": "...0 \\pm 0.0296$ & $0.5227$ & $5.7551 \\pm 0.0351$ & $0.7939$ & [FORMULA] & $1.6770$ & $0.7899 \\pm 0.0250$ \\\\ $0.3102$ & $2.3078 \\..."
+    },
+    {
+      "index": 259,
+      "type": "inline",
+      "latex": "0.7899 \\pm 0.0250",
+      "tier": 1,
+      "lineNumber": 300,
+      "context": "...1 \\pm 0.0351$ & $0.7939$ & $3.0846 \\pm 0.0295$ & $1.6770$ & [FORMULA] \\\\ $0.3102$ & $2.3078 \\pm 0.0301$ & $0.5285$ & $5.8519 \\..."
+    },
+    {
+      "index": 260,
+      "type": "inline",
+      "latex": "2.3078 \\pm 0.0301",
+      "tier": 1,
+      "lineNumber": 302,
+      "context": "...m 0.0295$ & $1.6770$ & $0.7899 \\pm 0.0250$ \\\\ $0.3102$ & [FORMULA] & $0.5285$ & $5.8519 \\pm 0.0313$ & $0.8010$ & $2.9917 \\pm 0..."
+    },
+    {
+      "index": 261,
+      "type": "inline",
+      "latex": "5.8519 \\pm 0.0313",
+      "tier": 1,
+      "lineNumber": 302,
+      "context": "...m 0.0250$ \\\\ $0.3102$ & $2.3078 \\pm 0.0301$ & $0.5285$ & [FORMULA] & $0.8010$ & $2.9917 \\pm 0.0275$ & $1.7292$ & $0.7714 \\pm 0..."
+    },
+    {
+      "index": 262,
+      "type": "inline",
+      "latex": "2.9917 \\pm 0.0275",
+      "tier": 1,
+      "lineNumber": 302,
+      "context": "...8 \\pm 0.0301$ & $0.5285$ & $5.8519 \\pm 0.0313$ & $0.8010$ & [FORMULA] & $1.7292$ & $0.7714 \\pm 0.0249$ \\\\ $0.3147$ & $2.3458 \\..."
+    },
+    {
+      "index": 263,
+      "type": "inline",
+      "latex": "0.7714 \\pm 0.0249",
+      "tier": 1,
+      "lineNumber": 302,
+      "context": "...9 \\pm 0.0313$ & $0.8010$ & $2.9917 \\pm 0.0275$ & $1.7292$ & [FORMULA] \\\\ $0.3147$ & $2.3458 \\pm 0.0284$ & $0.5344$ & $5.9386 \\..."
+    },
+    {
+      "index": 264,
+      "type": "inline",
+      "latex": "2.3458 \\pm 0.0284",
+      "tier": 1,
+      "lineNumber": 304,
+      "context": "...m 0.0275$ & $1.7292$ & $0.7714 \\pm 0.0249$ \\\\ $0.3147$ & [FORMULA] & $0.5344$ & $5.9386 \\pm 0.0334$ & $0.8082$ & $2.9634 \\pm 0..."
+    },
+    {
+      "index": 265,
+      "type": "inline",
+      "latex": "5.9386 \\pm 0.0334",
+      "tier": 1,
+      "lineNumber": 304,
+      "context": "...m 0.0249$ \\\\ $0.3147$ & $2.3458 \\pm 0.0284$ & $0.5344$ & [FORMULA] & $0.8082$ & $2.9634 \\pm 0.0256$ & $1.7822$ & $0.7180 \\pm 0..."
+    },
+    {
+      "index": 266,
+      "type": "inline",
+      "latex": "2.9634 \\pm 0.0256",
+      "tier": 1,
+      "lineNumber": 304,
+      "context": "...8 \\pm 0.0284$ & $0.5344$ & $5.9386 \\pm 0.0334$ & $0.8082$ & [FORMULA] & $1.7822$ & $0.7180 \\pm 0.0250$ \\\\ $0.3192$ & $2.3847 \\..."
+    },
+    {
+      "index": 267,
+      "type": "inline",
+      "latex": "0.7180 \\pm 0.0250",
+      "tier": 1,
+      "lineNumber": 304,
+      "context": "...6 \\pm 0.0334$ & $0.8082$ & $2.9634 \\pm 0.0256$ & $1.7822$ & [FORMULA] \\\\ $0.3192$ & $2.3847 \\pm 0.0298$ & $0.5402$ & $6.0875 \\..."
+    },
+    {
+      "index": 268,
+      "type": "inline",
+      "latex": "2.3847 \\pm 0.0298",
+      "tier": 1,
+      "lineNumber": 306,
+      "context": "...m 0.0256$ & $1.7822$ & $0.7180 \\pm 0.0250$ \\\\ $0.3192$ & [FORMULA] & $0.5402$ & $6.0875 \\pm 0.0359$ & $0.8154$ & $2.9001 \\pm 0..."
+    },
+    {
+      "index": 269,
+      "type": "inline",
+      "latex": "6.0875 \\pm 0.0359",
+      "tier": 1,
+      "lineNumber": 306,
+      "context": "...m 0.0250$ \\\\ $0.3192$ & $2.3847 \\pm 0.0298$ & $0.5402$ & [FORMULA] & $0.8154$ & $2.9001 \\pm 0.0308$ & $1.8360$ & $0.6780 \\pm 0..."
+    },
+    {
+      "index": 270,
+      "type": "inline",
+      "latex": "2.9001 \\pm 0.0308",
+      "tier": 1,
+      "lineNumber": 306,
+      "context": "...7 \\pm 0.0298$ & $0.5402$ & $6.0875 \\pm 0.0359$ & $0.8154$ & [FORMULA] & $1.8360$ & $0.6780 \\pm 0.0248$ \\\\ $0.3238$ & $2.4373 \\..."
+    },
+    {
+      "index": 271,
+      "type": "inline",
+      "latex": "0.6780 \\pm 0.0248",
+      "tier": 1,
+      "lineNumber": 306,
+      "context": "...5 \\pm 0.0359$ & $0.8154$ & $2.9001 \\pm 0.0308$ & $1.8360$ & [FORMULA] \\\\ $0.3238$ & $2.4373 \\pm 0.0291$ & $0.5461$ & $6.2520 \\..."
+    },
+    {
+      "index": 272,
+      "type": "inline",
+      "latex": "2.4373 \\pm 0.0291",
+      "tier": 1,
+      "lineNumber": 308,
+      "context": "...m 0.0308$ & $1.8360$ & $0.6780 \\pm 0.0248$ \\\\ $0.3238$ & [FORMULA] & $0.5461$ & $6.2520 \\pm 0.0368$ & $0.8226$ & $2.7916 \\pm 0..."
+    },
+    {
+      "index": 273,
+      "type": "inline",
+      "latex": "6.2520 \\pm 0.0368",
+      "tier": 1,
+      "lineNumber": 308,
+      "context": "...m 0.0248$ \\\\ $0.3238$ & $2.4373 \\pm 0.0291$ & $0.5461$ & [FORMULA] & $0.8226$ & $2.7916 \\pm 0.0253$ & $1.8906$ & $0.6083 \\pm 0..."
+    },
+    {
+      "index": 274,
+      "type": "inline",
+      "latex": "2.7916 \\pm 0.0253",
+      "tier": 1,
+      "lineNumber": 308,
+      "context": "...3 \\pm 0.0291$ & $0.5461$ & $6.2520 \\pm 0.0368$ & $0.8226$ & [FORMULA] & $1.8906$ & $0.6083 \\pm 0.0252$ \\\\ $0.3283$ & $2.4188 \\..."
+    },
+    {
+      "index": 275,
+      "type": "inline",
+      "latex": "0.6083 \\pm 0.0252",
+      "tier": 1,
+      "lineNumber": 308,
+      "context": "...0 \\pm 0.0368$ & $0.8226$ & $2.7916 \\pm 0.0253$ & $1.8906$ & [FORMULA] \\\\ $0.3283$ & $2.4188 \\pm 0.0301$ & $0.5520$ & $6.2996 \\..."
+    },
+    {
+      "index": 276,
+      "type": "inline",
+      "latex": "2.4188 \\pm 0.0301",
+      "tier": 1,
+      "lineNumber": 310,
+      "context": "...m 0.0253$ & $1.8906$ & $0.6083 \\pm 0.0252$ \\\\ $0.3283$ & [FORMULA] & $0.5520$ & $6.2996 \\pm 0.0369$ & $0.8299$ & $2.7271 \\pm 0..."
+    },
+    {
+      "index": 277,
+      "type": "inline",
+      "latex": "6.2996 \\pm 0.0369",
+      "tier": 1,
+      "lineNumber": 310,
+      "context": "...m 0.0252$ \\\\ $0.3283$ & $2.4188 \\pm 0.0301$ & $0.5520$ & [FORMULA] & $0.8299$ & $2.7271 \\pm 0.0287$ & $1.9460$ & $0.4836 \\pm 0..."
+    },
+    {
+      "index": 278,
+      "type": "inline",
+      "latex": "2.7271 \\pm 0.0287",
+      "tier": 1,
+      "lineNumber": 310,
+      "context": "...8 \\pm 0.0301$ & $0.5520$ & $6.2996 \\pm 0.0369$ & $0.8299$ & [FORMULA] & $1.9460$ & $0.4836 \\pm 0.0242$ \\\\ $0.3329$ & $2.5142 \\..."
+    },
+    {
+      "index": 279,
+      "type": "inline",
+      "latex": "0.4836 \\pm 0.0242",
+      "tier": 1,
+      "lineNumber": 310,
+      "context": "...6 \\pm 0.0369$ & $0.8299$ & $2.7271 \\pm 0.0287$ & $1.9460$ & [FORMULA] \\\\ $0.3329$ & $2.5142 \\pm 0.0300$ & $0.5580$ & $6.3527 \\..."
+    },
+    {
+      "index": 280,
+      "type": "inline",
+      "latex": "2.5142 \\pm 0.0300",
+      "tier": 1,
+      "lineNumber": 312,
+      "context": "...m 0.0287$ & $1.9460$ & $0.4836 \\pm 0.0242$ \\\\ $0.3329$ & [FORMULA] & $0.5580$ & $6.3527 \\pm 0.0374$ & $0.8372$ & $2.6327 \\pm 0..."
+    },
+    {
+      "index": 281,
+      "type": "inline",
+      "latex": "6.3527 \\pm 0.0374",
+      "tier": 1,
+      "lineNumber": 312,
+      "context": "...m 0.0242$ \\\\ $0.3329$ & $2.5142 \\pm 0.0300$ & $0.5580$ & [FORMULA] & $0.8372$ & $2.6327 \\pm 0.0278$ & $2.1756$ & $0.2798 \\pm 0..."
+    },
+    {
+      "index": 282,
+      "type": "inline",
+      "latex": "2.6327 \\pm 0.0278",
+      "tier": 1,
+      "lineNumber": 312,
+      "context": "...2 \\pm 0.0300$ & $0.5580$ & $6.3527 \\pm 0.0374$ & $0.8372$ & [FORMULA] & $2.1756$ & $0.2798 \\pm 0.0201$ \\\\ $0.3376$ & $2.5335 \\..."
+    },
+    {
+      "index": 283,
+      "type": "inline",
+      "latex": "0.2798 \\pm 0.0201",
+      "tier": 1,
+      "lineNumber": 312,
+      "context": "...7 \\pm 0.0374$ & $0.8372$ & $2.6327 \\pm 0.0278$ & $2.1756$ & [FORMULA] \\\\ $0.3376$ & $2.5335 \\pm 0.0303$ & $0.5640$ & $6.4270 \\..."
+    },
+    {
+      "index": 284,
+      "type": "inline",
+      "latex": "2.5335 \\pm 0.0303",
+      "tier": 1,
+      "lineNumber": 314,
+      "context": "...m 0.0278$ & $2.1756$ & $0.2798 \\pm 0.0201$ \\\\ $0.3376$ & [FORMULA] & $0.5640$ & $6.4270 \\pm 0.0343$ & $0.8446$ & $2.6144 \\pm 0..."
+    },
+    {
+      "index": 285,
+      "type": "inline",
+      "latex": "6.4270 \\pm 0.0343",
+      "tier": 1,
+      "lineNumber": 314,
+      "context": "...m 0.0201$ \\\\ $0.3376$ & $2.5335 \\pm 0.0303$ & $0.5640$ & [FORMULA] & $0.8446$ & $2.6144 \\pm 0.0311$ & $2.4806$ & $0.0746 \\pm 0..."
+    },
+    {
+      "index": 286,
+      "type": "inline",
+      "latex": "2.6144 \\pm 0.0311",
+      "tier": 1,
+      "lineNumber": 314,
+      "context": "...5 \\pm 0.0303$ & $0.5640$ & $6.4270 \\pm 0.0343$ & $0.8446$ & [FORMULA] & $2.4806$ & $0.0746 \\pm 0.0504$ \\\\ $0.3422$ & $2.5808 \\..."
+    },
+    {
+      "index": 287,
+      "type": "inline",
+      "latex": "0.0746 \\pm 0.0504",
+      "tier": 1,
+      "lineNumber": 314,
+      "context": "...0 \\pm 0.0343$ & $0.8446$ & $2.6144 \\pm 0.0311$ & $2.4806$ & [FORMULA] \\\\ $0.3422$ & $2.5808 \\pm 0.0276$ & $0.5700$ & $6.4872 \\..."
+    },
+    {
+      "index": 288,
+      "type": "inline",
+      "latex": "2.5808 \\pm 0.0276",
+      "tier": 1,
+      "lineNumber": 316,
+      "context": "...m 0.0311$ & $2.4806$ & $0.0746 \\pm 0.0504$ \\\\ $0.3422$ & [FORMULA] & $0.5700$ & $6.4872 \\pm 0.0361$ & $0.8519$ & $2.5705 \\pm 0..."
+    },
+    {
+      "index": 289,
+      "type": "inline",
+      "latex": "6.4872 \\pm 0.0361",
+      "tier": 1,
+      "lineNumber": 316,
+      "context": "...m 0.0504$ \\\\ $0.3422$ & $2.5808 \\pm 0.0276$ & $0.5700$ & [FORMULA] & $0.8519$ & $2.5705 \\pm 0.0300$ & $2.8056$ & $0.2934 \\pm 0..."
+    },
+    {
+      "index": 290,
+      "type": "inline",
+      "latex": "2.5705 \\pm 0.0300",
+      "tier": 1,
+      "lineNumber": 316,
+      "context": "...8 \\pm 0.0276$ & $0.5700$ & $6.4872 \\pm 0.0361$ & $0.8519$ & [FORMULA] & $2.8056$ & $0.2934 \\pm 0.0186$ \\\\ $0.3469$ & $2.6007 \\..."
+    },
+    {
+      "index": 291,
+      "type": "inline",
+      "latex": "0.2934 \\pm 0.0186",
+      "tier": 1,
+      "lineNumber": 316,
+      "context": "...2 \\pm 0.0361$ & $0.8519$ & $2.5705 \\pm 0.0300$ & $2.8056$ & [FORMULA] \\\\ $0.3469$ & $2.6007 \\pm 0.0291$ & $0.5761$ & $6.4301 \\..."
+    },
+    {
+      "index": 292,
+      "type": "inline",
+      "latex": "2.6007 \\pm 0.0291",
+      "tier": 1,
+      "lineNumber": 318,
+      "context": "...m 0.0300$ & $2.8056$ & $0.2934 \\pm 0.0186$ \\\\ $0.3469$ & [FORMULA] & $0.5761$ & $6.4301 \\pm 0.0356$ & $0.8593$ & $2.4773 \\pm 0..."
+    },
+    {
+      "index": 293,
+      "type": "inline",
+      "latex": "6.4301 \\pm 0.0356",
+      "tier": 1,
+      "lineNumber": 318,
+      "context": "...m 0.0186$ \\\\ $0.3469$ & $2.6007 \\pm 0.0291$ & $0.5761$ & [FORMULA] & $0.8593$ & $2.4773 \\pm 0.0305$ & $3.1506$ & $0.4488 \\pm 0..."
+    },
+    {
+      "index": 294,
+      "type": "inline",
+      "latex": "2.4773 \\pm 0.0305",
+      "tier": 1,
+      "lineNumber": 318,
+      "context": "...7 \\pm 0.0291$ & $0.5761$ & $6.4301 \\pm 0.0356$ & $0.8593$ & [FORMULA] & $3.1506$ & $0.4488 \\pm 0.0172$ \\\\ $0.3516$ & $2.6623 \\..."
+    },
+    {
+      "index": 295,
+      "type": "inline",
+      "latex": "0.4488 \\pm 0.0172",
+      "tier": 1,
+      "lineNumber": 318,
+      "context": "...1 \\pm 0.0356$ & $0.8593$ & $2.4773 \\pm 0.0305$ & $3.1506$ & [FORMULA] \\\\ $0.3516$ & $2.6623 \\pm 0.0247$ & $0.5822$ & $6.4563 \\..."
+    },
+    {
+      "index": 296,
+      "type": "inline",
+      "latex": "2.6623 \\pm 0.0247",
+      "tier": 1,
+      "lineNumber": 320,
+      "context": "...m 0.0305$ & $3.1506$ & $0.4488 \\pm 0.0172$ \\\\ $0.3516$ & [FORMULA] & $0.5822$ & $6.4563 \\pm 0.0360$ & $0.8668$ & $2.4332 \\pm 0..."
+    },
+    {
+      "index": 297,
+      "type": "inline",
+      "latex": "6.4563 \\pm 0.0360",
+      "tier": 1,
+      "lineNumber": 320,
+      "context": "...m 0.0172$ \\\\ $0.3516$ & $2.6623 \\pm 0.0247$ & $0.5822$ & [FORMULA] & $0.8668$ & $2.4332 \\pm 0.0299$ & $3.5156$ & $0.4595 \\pm 0..."
+    },
+    {
+      "index": 298,
+      "type": "inline",
+      "latex": "2.4332 \\pm 0.0299",
+      "tier": 1,
+      "lineNumber": 320,
+      "context": "...3 \\pm 0.0247$ & $0.5822$ & $6.4563 \\pm 0.0360$ & $0.8668$ & [FORMULA] & $3.5156$ & $0.4595 \\pm 0.0183$ \\\\ $0.3564$ & $2.7621 \\..."
+    },
+    {
+      "index": 299,
+      "type": "inline",
+      "latex": "0.4595 \\pm 0.0183",
+      "tier": 1,
+      "lineNumber": 320,
+      "context": "...3 \\pm 0.0360$ & $0.8668$ & $2.4332 \\pm 0.0299$ & $3.5156$ & [FORMULA] \\\\ $0.3564$ & $2.7621 \\pm 0.0295$ & $0.5883$ & $6.3945 \\..."
+    },
+    {
+      "index": 300,
+      "type": "inline",
+      "latex": "2.7621 \\pm 0.0295",
+      "tier": 1,
+      "lineNumber": 322,
+      "context": "...m 0.0299$ & $3.5156$ & $0.4595 \\pm 0.0183$ \\\\ $0.3564$ & [FORMULA] & $0.5883$ & $6.3945 \\pm 0.0360$ & $0.8742$ & $2.3619 \\pm 0..."
+    },
+    {
+      "index": 301,
+      "type": "inline",
+      "latex": "6.3945 \\pm 0.0360",
+      "tier": 1,
+      "lineNumber": 322,
+      "context": "...m 0.0183$ \\\\ $0.3564$ & $2.7621 \\pm 0.0295$ & $0.5883$ & [FORMULA] & $0.8742$ & $2.3619 \\pm 0.0294$ & $3.9006$ & $0.3440 \\pm 0..."
+    },
+    {
+      "index": 302,
+      "type": "inline",
+      "latex": "2.3619 \\pm 0.0294",
+      "tier": 1,
+      "lineNumber": 322,
+      "context": "...1 \\pm 0.0295$ & $0.5883$ & $6.3945 \\pm 0.0360$ & $0.8742$ & [FORMULA] & $3.9006$ & $0.3440 \\pm 0.0191$ \\\\ $0.3612$ & $2.7882 \\..."
+    },
+    {
+      "index": 303,
+      "type": "inline",
+      "latex": "0.3440 \\pm 0.0191",
+      "tier": 1,
+      "lineNumber": 322,
+      "context": "...5 \\pm 0.0360$ & $0.8742$ & $2.3619 \\pm 0.0294$ & $3.9006$ & [FORMULA] \\\\ $0.3612$ & $2.7882 \\pm 0.0263$ & $0.5944$ & $6.3437 \\..."
+    },
+    {
+      "index": 304,
+      "type": "inline",
+      "latex": "2.7882 \\pm 0.0263",
+      "tier": 1,
+      "lineNumber": 324,
+      "context": "...m 0.0294$ & $3.9006$ & $0.3440 \\pm 0.0191$ \\\\ $0.3612$ & [FORMULA] & $0.5944$ & $6.3437 \\pm 0.0408$ & $0.8817$ & $2.3077 \\pm 0..."
+    },
+    {
+      "index": 305,
+      "type": "inline",
+      "latex": "6.3437 \\pm 0.0408",
+      "tier": 1,
+      "lineNumber": 324,
+      "context": "...m 0.0191$ \\\\ $0.3612$ & $2.7882 \\pm 0.0263$ & $0.5944$ & [FORMULA] & $0.8817$ & $2.3077 \\pm 0.0260$ & $4.3056$ & $0.2100 \\pm 0..."
+    },
+    {
+      "index": 306,
+      "type": "inline",
+      "latex": "2.3077 \\pm 0.0260",
+      "tier": 1,
+      "lineNumber": 324,
+      "context": "...2 \\pm 0.0263$ & $0.5944$ & $6.3437 \\pm 0.0408$ & $0.8817$ & [FORMULA] & $4.3056$ & $0.2100 \\pm 0.0220$ \\\\ $0.3660$ & $2.8463 \\..."
+    },
+    {
+      "index": 307,
+      "type": "inline",
+      "latex": "0.2100 \\pm 0.0220",
+      "tier": 1,
+      "lineNumber": 324,
+      "context": "...7 \\pm 0.0408$ & $0.8817$ & $2.3077 \\pm 0.0260$ & $4.3056$ & [FORMULA] \\\\ $0.3660$ & $2.8463 \\pm 0.0252$ & $0.6006$ & $6.2978 \\..."
+    },
+    {
+      "index": 308,
+      "type": "inline",
+      "latex": "2.8463 \\pm 0.0252",
+      "tier": 1,
+      "lineNumber": 326,
+      "context": "...m 0.0260$ & $4.3056$ & $0.2100 \\pm 0.0220$ \\\\ $0.3660$ & [FORMULA] & $0.6006$ & $6.2978 \\pm 0.0423$ & $0.8892$ & $2.2963 \\pm 0..."
+    },
+    {
+      "index": 309,
+      "type": "inline",
+      "latex": "6.2978 \\pm 0.0423",
+      "tier": 1,
+      "lineNumber": 326,
+      "context": "...m 0.0220$ \\\\ $0.3660$ & $2.8463 \\pm 0.0252$ & $0.6006$ & [FORMULA] & $0.8892$ & $2.2963 \\pm 0.0283$ & $4.7306$ & $0.1433 \\pm 0..."
+    },
+    {
+      "index": 310,
+      "type": "inline",
+      "latex": "2.2963 \\pm 0.0283",
+      "tier": 1,
+      "lineNumber": 326,
+      "context": "...3 \\pm 0.0252$ & $0.6006$ & $6.2978 \\pm 0.0423$ & $0.8892$ & [FORMULA] & $4.7306$ & $0.1433 \\pm 0.0305$ \\\\ $0.3709$ & $2.8903 \\..."
+    },
+    {
+      "index": 311,
+      "type": "inline",
+      "latex": "0.1433 \\pm 0.0305",
+      "tier": 1,
+      "lineNumber": 326,
+      "context": "...8 \\pm 0.0423$ & $0.8892$ & $2.2963 \\pm 0.0283$ & $4.7306$ & [FORMULA] \\\\ $0.3709$ & $2.8903 \\pm 0.0285$ & $0.6068$ & $6.1805 \\..."
+    },
+    {
+      "index": 312,
+      "type": "inline",
+      "latex": "2.8903 \\pm 0.0285",
+      "tier": 1,
+      "lineNumber": 328,
+      "context": "...m 0.0283$ & $4.7306$ & $0.1433 \\pm 0.0305$ \\\\ $0.3709$ & [FORMULA] & $0.6068$ & $6.1805 \\pm 0.0393$ & $0.8968$ & $2.2847 \\pm 0..."
+    },
+    {
+      "index": 313,
+      "type": "inline",
+      "latex": "6.1805 \\pm 0.0393",
+      "tier": 1,
+      "lineNumber": 328,
+      "context": "...m 0.0305$ \\\\ $0.3709$ & $2.8903 \\pm 0.0285$ & $0.6068$ & [FORMULA] & $0.8968$ & $2.2847 \\pm 0.0275$ & $5.1756$ & $0.2265 \\pm 0..."
+    },
+    {
+      "index": 314,
+      "type": "inline",
+      "latex": "2.2847 \\pm 0.0275",
+      "tier": 1,
+      "lineNumber": 328,
+      "context": "...3 \\pm 0.0285$ & $0.6068$ & $6.1805 \\pm 0.0393$ & $0.8968$ & [FORMULA] & $5.1756$ & $0.2265 \\pm 0.0246$ \\\\ $0.3758$ & $2.9375 \\..."
+    },
+    {
+      "index": 315,
+      "type": "inline",
+      "latex": "0.2265 \\pm 0.0246",
+      "tier": 1,
+      "lineNumber": 328,
+      "context": "...5 \\pm 0.0393$ & $0.8968$ & $2.2847 \\pm 0.0275$ & $5.1756$ & [FORMULA] \\\\ $0.3758$ & $2.9375 \\pm 0.0224$ & $0.6131$ & $5.9525 \\..."
+    },
+    {
+      "index": 316,
+      "type": "inline",
+      "latex": "2.9375 \\pm 0.0224",
+      "tier": 1,
+      "lineNumber": 330,
+      "context": "...m 0.0275$ & $5.1756$ & $0.2265 \\pm 0.0246$ \\\\ $0.3758$ & [FORMULA] & $0.6131$ & $5.9525 \\pm 0.0367$ & $0.9044$ & $2.2257 \\pm 0..."
+    },
+    {
+      "index": 317,
+      "type": "inline",
+      "latex": "5.9525 \\pm 0.0367",
+      "tier": 1,
+      "lineNumber": 330,
+      "context": "...m 0.0246$ \\\\ $0.3758$ & $2.9375 \\pm 0.0224$ & $0.6131$ & [FORMULA] & $0.9044$ & $2.2257 \\pm 0.0297$ & $5.6406$ & $0.1880 \\pm 0..."
+    },
+    {
+      "index": 318,
+      "type": "inline",
+      "latex": "2.2257 \\pm 0.0297",
+      "tier": 1,
+      "lineNumber": 330,
+      "context": "...5 \\pm 0.0224$ & $0.6131$ & $5.9525 \\pm 0.0367$ & $0.9044$ & [FORMULA] & $5.6406$ & $0.1880 \\pm 0.0261$ \\\\ $0.3807$ & $3.0037 \\..."
+    },
+    {
+      "index": 319,
+      "type": "inline",
+      "latex": "0.1880 \\pm 0.0261",
+      "tier": 1,
+      "lineNumber": 330,
+      "context": "...5 \\pm 0.0367$ & $0.9044$ & $2.2257 \\pm 0.0297$ & $5.6406$ & [FORMULA] \\\\ $0.3807$ & $3.0037 \\pm 0.0296$ & $0.6194$ & $6.0538 \\..."
+    },
+    {
+      "index": 320,
+      "type": "inline",
+      "latex": "3.0037 \\pm 0.0296",
+      "tier": 1,
+      "lineNumber": 332,
+      "context": "...m 0.0297$ & $5.6406$ & $0.1880 \\pm 0.0261$ \\\\ $0.3807$ & [FORMULA] & $0.6194$ & $6.0538 \\pm 0.0391$ & $0.9120$ & $2.1731 \\pm 0..."
+    },
+    {
+      "index": 321,
+      "type": "inline",
+      "latex": "6.0538 \\pm 0.0391",
+      "tier": 1,
+      "lineNumber": 332,
+      "context": "...m 0.0261$ \\\\ $0.3807$ & $3.0037 \\pm 0.0296$ & $0.6194$ & [FORMULA] & $0.9120$ & $2.1731 \\pm 0.0295$ & $6.1256$ & $0.1135 \\pm 0..."
+    },
+    {
+      "index": 322,
+      "type": "inline",
+      "latex": "2.1731 \\pm 0.0295",
+      "tier": 1,
+      "lineNumber": 332,
+      "context": "...7 \\pm 0.0296$ & $0.6194$ & $6.0538 \\pm 0.0391$ & $0.9120$ & [FORMULA] & $6.1256$ & $0.1135 \\pm 0.0424$ \\\\ $0.3856$ & $3.0602 \\..."
+    },
+    {
+      "index": 323,
+      "type": "inline",
+      "latex": "0.1135 \\pm 0.0424",
+      "tier": 1,
+      "lineNumber": 332,
+      "context": "...8 \\pm 0.0391$ & $0.9120$ & $2.1731 \\pm 0.0295$ & $6.1256$ & [FORMULA] \\\\ $0.3856$ & $3.0602 \\pm 0.0277$ & $0.6257$ & $5.9463 \\..."
+    },
+    {
+      "index": 324,
+      "type": "inline",
+      "latex": "3.0602 \\pm 0.0277",
+      "tier": 1,
+      "lineNumber": 334,
+      "context": "...m 0.0295$ & $6.1256$ & $0.1135 \\pm 0.0424$ \\\\ $0.3856$ & [FORMULA] & $0.6257$ & $5.9463 \\pm 0.0339$ & $0.9197$ & $2.1173 \\pm 0..."
+    },
+    {
+      "index": 325,
+      "type": "inline",
+      "latex": "5.9463 \\pm 0.0339",
+      "tier": 1,
+      "lineNumber": 334,
+      "context": "...m 0.0424$ \\\\ $0.3856$ & $3.0602 \\pm 0.0277$ & $0.6257$ & [FORMULA] & $0.9197$ & $2.1173 \\pm 0.0257$ & $7.0225$ & $0.0908 \\pm 0..."
+    },
+    {
+      "index": 326,
+      "type": "inline",
+      "latex": "2.1173 \\pm 0.0257",
+      "tier": 1,
+      "lineNumber": 334,
+      "context": "...2 \\pm 0.0277$ & $0.6257$ & $5.9463 \\pm 0.0339$ & $0.9197$ & [FORMULA] & $7.0225$ & $0.0908 \\pm 0.0254$ \\\\ $0.3906$ & $3.1212 \\..."
+    },
+    {
+      "index": 327,
+      "type": "inline",
+      "latex": "0.0908 \\pm 0.0254",
+      "tier": 1,
+      "lineNumber": 334,
+      "context": "...3 \\pm 0.0339$ & $0.9197$ & $2.1173 \\pm 0.0257$ & $7.0225$ & [FORMULA] \\\\ $0.3906$ & $3.1212 \\pm 0.0273$ & $0.6320$ & $5.8797 \\..."
+    },
+    {
+      "index": 328,
+      "type": "inline",
+      "latex": "3.1212 \\pm 0.0273",
+      "tier": 1,
+      "lineNumber": 336,
+      "context": "...m 0.0257$ & $7.0225$ & $0.0908 \\pm 0.0254$ \\\\ $0.3906$ & [FORMULA] & $0.6320$ & $5.8797 \\pm 0.0374$ & $0.9274$ & $2.0884 \\pm 0..."
+    },
+    {
+      "index": 329,
+      "type": "inline",
+      "latex": "5.8797 \\pm 0.0374",
+      "tier": 1,
+      "lineNumber": 336,
+      "context": "...m 0.0254$ \\\\ $0.3906$ & $3.1212 \\pm 0.0273$ & $0.6320$ & [FORMULA] & $0.9274$ & $2.0884 \\pm 0.0241$ & $8.1225$ & $0.0602 \\pm 0..."
+    },
+    {
+      "index": 330,
+      "type": "inline",
+      "latex": "2.0884 \\pm 0.0241",
+      "tier": 1,
+      "lineNumber": 336,
+      "context": "...2 \\pm 0.0273$ & $0.6320$ & $5.8797 \\pm 0.0374$ & $0.9274$ & [FORMULA] & $8.1225$ & $0.0602 \\pm 0.0433$ \\\\ $0.3956$ & $3.2098 \\..."
+    },
+    {
+      "index": 331,
+      "type": "inline",
+      "latex": "0.0602 \\pm 0.0433",
+      "tier": 1,
+      "lineNumber": 336,
+      "context": "...7 \\pm 0.0374$ & $0.9274$ & $2.0884 \\pm 0.0241$ & $8.1225$ & [FORMULA] \\\\ $0.3956$ & $3.2098 \\pm 0.0265$ & --- & --- & --- & --..."
+    },
+    {
+      "index": 332,
+      "type": "inline",
+      "latex": "3.2098 \\pm 0.0265",
+      "tier": 1,
+      "lineNumber": 338,
+      "context": "...m 0.0241$ & $8.1225$ & $0.0602 \\pm 0.0433$ \\\\ $0.3956$ & [FORMULA] & --- & --- & --- & --- & --- & --- \\\\ \\hline \\end{longta..."
+    },
+    {
+      "index": 333,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 341,
+      "context": "...& --- & --- & --- & --- & --- \\\\ \\hline \\end{longtable} [FORMULA] as measured in~\\cite{Xiao} the data on the absolute value $..."
+    },
+    {
+      "index": 334,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 341,
+      "context": "...$ as measured in~\\cite{Xiao} the data on the absolute value [FORMULA] of the pure isovector EM FF of the charged pion with errors..."
+    },
+    {
+      "index": 335,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 341,
+      "context": "...ed pion with errors are evaluated in Table~\\ref{tab:3}, and [FORMULA] as measured in~\\cite{Ablikim7} the data on the absolute val..."
+    },
+    {
+      "index": 336,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 341,
+      "context": "...measured in~\\cite{Ablikim7} the data on the absolute value [FORMULA] of the pure isovector EM FF of the charged pion with errors..."
+    },
+    {
+      "index": 337,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 343,
+      "context": "...:4}. \\begin{longtable}{ccccccccc} \\caption{The values of [FORMULA] with errors from measurements of T.~Xiao~et~al.~\\cite{Xiao}..."
+    },
+    {
+      "index": 338,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...s of T.~Xiao~et~al.~\\cite{Xiao}. \\label{tab:3}}\\\\ \\hline [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 339,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...Xiao~et~al.~\\cite{Xiao}. \\label{tab:3}}\\\\ \\hline $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 340,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "....~\\cite{Xiao}. \\label{tab:3}}\\\\ \\hline $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] &..."
+    },
+    {
+      "index": 341,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...{tab:3}}\\\\ \\hline $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 342,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...\\\\ \\hline $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 343,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...e $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] &..."
+    },
+    {
+      "index": 344,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...$|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 345,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 346,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...& $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirs..."
+    },
+    {
+      "index": 347,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...$|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirsthead..."
+    },
+    {
+      "index": 348,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirsthead \\caption{c..."
+    },
+    {
+      "index": 349,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 345,
+      "context": "...& $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] \\\\ \\hline \\endfirsthead \\caption{continued from previous..."
+    },
+    {
+      "index": 350,
+      "type": "inline",
+      "latex": "1.2579 \\pm 0.1274",
+      "tier": 1,
+      "lineNumber": 350,
+      "context": "...tion{continued from previous page} \\\\ \\endhead $0.0961$ & [FORMULA] & $0.2401$ & $1.8320 \\pm 0.0678$ & $0.4489$ & $4.0967 \\pm 0..."
+    },
+    {
+      "index": 351,
+      "type": "inline",
+      "latex": "1.8320 \\pm 0.0678",
+      "tier": 1,
+      "lineNumber": 350,
+      "context": "...} \\\\ \\endhead $0.0961$ & $1.2579 \\pm 0.1274$ & $0.2401$ & [FORMULA] & $0.4489$ & $4.0967 \\pm 0.0645$ & $0.7225$ & $3.9831 \\pm 0..."
+    },
+    {
+      "index": 352,
+      "type": "inline",
+      "latex": "4.0967 \\pm 0.0645",
+      "tier": 1,
+      "lineNumber": 350,
+      "context": "...9 \\pm 0.1274$ & $0.2401$ & $1.8320 \\pm 0.0678$ & $0.4489$ & [FORMULA] & $0.7225$ & $3.9831 \\pm 0.0712$ \\\\ $0.1089$ & $1.3352 \\p..."
+    },
+    {
+      "index": 353,
+      "type": "inline",
+      "latex": "3.9831 \\pm 0.0712",
+      "tier": 1,
+      "lineNumber": 350,
+      "context": "...0 \\pm 0.0678$ & $0.4489$ & $4.0967 \\pm 0.0645$ & $0.7225$ & [FORMULA] \\\\ $0.1089$ & $1.3352 \\pm 0.0964$ & $0.2601$ & $1.8998 \\p..."
+    },
+    {
+      "index": 354,
+      "type": "inline",
+      "latex": "1.3352 \\pm 0.0964",
+      "tier": 1,
+      "lineNumber": 351,
+      "context": "...pm 0.0645$ & $0.7225$ & $3.9831 \\pm 0.0712$ \\\\ $0.1089$ & [FORMULA] & $0.2601$ & $1.8998 \\pm 0.0676$ & $0.4761$ & $4.6435 \\pm 0..."
+    },
+    {
+      "index": 355,
+      "type": "inline",
+      "latex": "1.8998 \\pm 0.0676",
+      "tier": 1,
+      "lineNumber": 351,
+      "context": "...pm 0.0712$ \\\\ $0.1089$ & $1.3352 \\pm 0.0964$ & $0.2601$ & [FORMULA] & $0.4761$ & $4.6435 \\pm 0.0666$ & $0.7569$ & $3.5322 \\pm 0..."
+    },
+    {
+      "index": 356,
+      "type": "inline",
+      "latex": "4.6435 \\pm 0.0666",
+      "tier": 1,
+      "lineNumber": 351,
+      "context": "...2 \\pm 0.0964$ & $0.2601$ & $1.8998 \\pm 0.0676$ & $0.4761$ & [FORMULA] & $0.7569$ & $3.5322 \\pm 0.0712$ \\\\ $0.1225$ & $1.3827 \\p..."
+    },
+    {
+      "index": 357,
+      "type": "inline",
+      "latex": "3.5322 \\pm 0.0712",
+      "tier": 1,
+      "lineNumber": 351,
+      "context": "...8 \\pm 0.0676$ & $0.4761$ & $4.6435 \\pm 0.0666$ & $0.7569$ & [FORMULA] \\\\ $0.1225$ & $1.3827 \\pm 0.0809$ & $0.2809$ & $2.1465 \\p..."
+    },
+    {
+      "index": 358,
+      "type": "inline",
+      "latex": "1.3827 \\pm 0.0809",
+      "tier": 1,
+      "lineNumber": 352,
+      "context": "...pm 0.0666$ & $0.7569$ & $3.5322 \\pm 0.0712$ \\\\ $0.1225$ & [FORMULA] & $0.2809$ & $2.1465 \\pm 0.0695$ & $0.5041$ & $5.2939 \\pm 0..."
+    },
+    {
+      "index": 359,
+      "type": "inline",
+      "latex": "2.1465 \\pm 0.0695",
+      "tier": 1,
+      "lineNumber": 352,
+      "context": "...pm 0.0712$ \\\\ $0.1225$ & $1.3827 \\pm 0.0809$ & $0.2809$ & [FORMULA] & $0.5041$ & $5.2939 \\pm 0.0657$ & $0.7921$ & $3.0313 \\pm 0..."
+    },
+    {
+      "index": 360,
+      "type": "inline",
+      "latex": "5.2939 \\pm 0.0657",
+      "tier": 1,
+      "lineNumber": 352,
+      "context": "...7 \\pm 0.0809$ & $0.2809$ & $2.1465 \\pm 0.0695$ & $0.5041$ & [FORMULA] & $0.7921$ & $3.0313 \\pm 0.0717$ \\\\ $0.1369$ & $1.3011 \\p..."
+    },
+    {
+      "index": 361,
+      "type": "inline",
+      "latex": "3.0313 \\pm 0.0717",
+      "tier": 1,
+      "lineNumber": 352,
+      "context": "...5 \\pm 0.0695$ & $0.5041$ & $5.2939 \\pm 0.0657$ & $0.7921$ & [FORMULA] \\\\ $0.1369$ & $1.3011 \\pm 0.0739$ & $0.3025$ & $2.2129 \\p..."
+    },
+    {
+      "index": 362,
+      "type": "inline",
+      "latex": "1.3011 \\pm 0.0739",
+      "tier": 1,
+      "lineNumber": 353,
+      "context": "...pm 0.0657$ & $0.7921$ & $3.0313 \\pm 0.0717$ \\\\ $0.1369$ & [FORMULA] & $0.3025$ & $2.2129 \\pm 0.0638$ & $0.5329$ & $5.9774 \\pm 0..."
+    },
+    {
+      "index": 363,
+      "type": "inline",
+      "latex": "2.2129 \\pm 0.0638",
+      "tier": 1,
+      "lineNumber": 353,
+      "context": "...pm 0.0717$ \\\\ $0.1369$ & $1.3011 \\pm 0.0739$ & $0.3025$ & [FORMULA] & $0.5329$ & $5.9774 \\pm 0.0666$ & $0.8281$ & $2.8224 \\pm 0..."
+    },
+    {
+      "index": 364,
+      "type": "inline",
+      "latex": "5.9774 \\pm 0.0666",
+      "tier": 1,
+      "lineNumber": 353,
+      "context": "...1 \\pm 0.0739$ & $0.3025$ & $2.2129 \\pm 0.0638$ & $0.5329$ & [FORMULA] & $0.8281$ & $2.8224 \\pm 0.0731$ \\\\ $0.1521$ & $1.4347 \\p..."
+    },
+    {
+      "index": 365,
+      "type": "inline",
+      "latex": "2.8224 \\pm 0.0731",
+      "tier": 1,
+      "lineNumber": 353,
+      "context": "...9 \\pm 0.0638$ & $0.5329$ & $5.9774 \\pm 0.0666$ & $0.8281$ & [FORMULA] \\\\ $0.1521$ & $1.4347 \\pm 0.0712$ & $0.3249$ & $2.3250 \\p..."
+    },
+    {
+      "index": 366,
+      "type": "inline",
+      "latex": "1.4347 \\pm 0.0712",
+      "tier": 1,
+      "lineNumber": 354,
+      "context": "...pm 0.0666$ & $0.8281$ & $2.8224 \\pm 0.0731$ \\\\ $0.1521$ & [FORMULA] & $0.3249$ & $2.3250 \\pm 0.0614$ & $0.5625$ & $6.3216 \\pm 0..."
+    },
+    {
+      "index": 367,
+      "type": "inline",
+      "latex": "2.3250 \\pm 0.0614",
+      "tier": 1,
+      "lineNumber": 354,
+      "context": "...pm 0.0731$ \\\\ $0.1521$ & $1.4347 \\pm 0.0712$ & $0.3249$ & [FORMULA] & $0.5625$ & $6.3216 \\pm 0.0681$ & $0.8649$ & $2.3964 \\pm 0..."
+    },
+    {
+      "index": 368,
+      "type": "inline",
+      "latex": "6.3216 \\pm 0.0681",
+      "tier": 1,
+      "lineNumber": 354,
+      "context": "...7 \\pm 0.0712$ & $0.3249$ & $2.3250 \\pm 0.0614$ & $0.5625$ & [FORMULA] & $0.8649$ & $2.3964 \\pm 0.0730$ \\\\ $0.1681$ & $1.4848 \\p..."
+    },
+    {
+      "index": 369,
+      "type": "inline",
+      "latex": "2.3964 \\pm 0.0730",
+      "tier": 1,
+      "lineNumber": 354,
+      "context": "...0 \\pm 0.0614$ & $0.5625$ & $6.3216 \\pm 0.0681$ & $0.8649$ & [FORMULA] \\\\ $0.1681$ & $1.4848 \\pm 0.0713$ & $0.3481$ & $2.6404 \\p..."
+    },
+    {
+      "index": 370,
+      "type": "inline",
+      "latex": "1.4848 \\pm 0.0713",
+      "tier": 1,
+      "lineNumber": 355,
+      "context": "...pm 0.0681$ & $0.8649$ & $2.3964 \\pm 0.0730$ \\\\ $0.1681$ & [FORMULA] & $0.3481$ & $2.6404 \\pm 0.0637$ & $0.5929$ & $6.4618 \\pm 0..."
+    },
+    {
+      "index": 371,
+      "type": "inline",
+      "latex": "2.6404 \\pm 0.0637",
+      "tier": 1,
+      "lineNumber": 355,
+      "context": "...pm 0.0730$ \\\\ $0.1681$ & $1.4848 \\pm 0.0713$ & $0.3481$ & [FORMULA] & $0.5929$ & $6.4618 \\pm 0.0715$ & $0.9025$ & $2.1373 \\pm 0..."
+    },
+    {
+      "index": 372,
+      "type": "inline",
+      "latex": "6.4618 \\pm 0.0715",
+      "tier": 1,
+      "lineNumber": 355,
+      "context": "...8 \\pm 0.0713$ & $0.3481$ & $2.6404 \\pm 0.0637$ & $0.5929$ & [FORMULA] & $0.9025$ & $2.1373 \\pm 0.0742$ \\\\ $0.1849$ & $1.5489 \\p..."
+    },
+    {
+      "index": 373,
+      "type": "inline",
+      "latex": "2.1373 \\pm 0.0742",
+      "tier": 1,
+      "lineNumber": 355,
+      "context": "...4 \\pm 0.0637$ & $0.5929$ & $6.4618 \\pm 0.0715$ & $0.9025$ & [FORMULA] \\\\ $0.1849$ & $1.5489 \\pm 0.0772$ & $0.3721$ & $2.8870 \\p..."
+    },
+    {
+      "index": 374,
+      "type": "inline",
+      "latex": "1.5489 \\pm 0.0772",
+      "tier": 1,
+      "lineNumber": 356,
+      "context": "...pm 0.0715$ & $0.9025$ & $2.1373 \\pm 0.0742$ \\\\ $0.1849$ & [FORMULA] & $0.3721$ & $2.8870 \\pm 0.0631$ & $0.6241$ & $6.1518 \\pm 0..."
+    },
+    {
+      "index": 375,
+      "type": "inline",
+      "latex": "2.8870 \\pm 0.0631",
+      "tier": 1,
+      "lineNumber": 356,
+      "context": "...pm 0.0742$ \\\\ $0.1849$ & $1.5489 \\pm 0.0772$ & $0.3721$ & [FORMULA] & $0.6241$ & $6.1518 \\pm 0.0733$ & $0.9409$ & $1.9482 \\pm 0..."
+    },
+    {
+      "index": 376,
+      "type": "inline",
+      "latex": "6.1518 \\pm 0.0733",
+      "tier": 1,
+      "lineNumber": 356,
+      "context": "...9 \\pm 0.0772$ & $0.3721$ & $2.8870 \\pm 0.0631$ & $0.6241$ & [FORMULA] & $0.9409$ & $1.9482 \\pm 0.0749$ \\\\ $0.2025$ & $1.6065 \\p..."
+    },
+    {
+      "index": 377,
+      "type": "inline",
+      "latex": "1.9482 \\pm 0.0749",
+      "tier": 1,
+      "lineNumber": 356,
+      "context": "...0 \\pm 0.0631$ & $0.6241$ & $6.1518 \\pm 0.0733$ & $0.9409$ & [FORMULA] \\\\ $0.2025$ & $1.6065 \\pm 0.0683$ & $0.3969$ & $3.2578 \\p..."
+    },
+    {
+      "index": 378,
+      "type": "inline",
+      "latex": "1.6065 \\pm 0.0683",
+      "tier": 1,
+      "lineNumber": 357,
+      "context": "...pm 0.0733$ & $0.9409$ & $1.9482 \\pm 0.0749$ \\\\ $0.2025$ & [FORMULA] & $0.3969$ & $3.2578 \\pm 0.0644$ & $0.6561$ & $5.2718 \\pm 0..."
+    },
+    {
+      "index": 379,
+      "type": "inline",
+      "latex": "3.2578 \\pm 0.0644",
+      "tier": 1,
+      "lineNumber": 357,
+      "context": "...pm 0.0749$ \\\\ $0.2025$ & $1.6065 \\pm 0.0683$ & $0.3969$ & [FORMULA] & $0.6561$ & $5.2718 \\pm 0.0702$ & $0.9801$ & $1.6492 \\pm 0..."
+    },
+    {
+      "index": 380,
+      "type": "inline",
+      "latex": "5.2718 \\pm 0.0702",
+      "tier": 1,
+      "lineNumber": 357,
+      "context": "...5 \\pm 0.0683$ & $0.3969$ & $3.2578 \\pm 0.0644$ & $0.6561$ & [FORMULA] & $0.9801$ & $1.6492 \\pm 0.0752$ \\\\ $0.2209$ & $1.7209 \\p..."
+    },
+    {
+      "index": 381,
+      "type": "inline",
+      "latex": "1.6492 \\pm 0.0752",
+      "tier": 1,
+      "lineNumber": 357,
+      "context": "...8 \\pm 0.0644$ & $0.6561$ & $5.2718 \\pm 0.0702$ & $0.9801$ & [FORMULA] \\\\ $0.2209$ & $1.7209 \\pm 0.0685$ & $0.4225$ & $3.6715 \\p..."
+    },
+    {
+      "index": 382,
+      "type": "inline",
+      "latex": "1.7209 \\pm 0.0685",
+      "tier": 1,
+      "lineNumber": 358,
+      "context": "...pm 0.0702$ & $0.9801$ & $1.6492 \\pm 0.0752$ \\\\ $0.2209$ & [FORMULA] & $0.4225$ & $3.6715 \\pm 0.0648$ & $0.6889$ & $4.6328 \\pm 0..."
+    },
+    {
+      "index": 383,
+      "type": "inline",
+      "latex": "3.6715 \\pm 0.0648",
+      "tier": 1,
+      "lineNumber": 358,
+      "context": "...pm 0.0752$ \\\\ $0.2209$ & $1.7209 \\pm 0.0685$ & $0.4225$ & [FORMULA] & $0.6889$ & $4.6328 \\pm 0.0705$ & --- & --- \\\\ \\hline \\e..."
+    },
+    {
+      "index": 384,
+      "type": "inline",
+      "latex": "4.6328 \\pm 0.0705",
+      "tier": 1,
+      "lineNumber": 358,
+      "context": "...9 \\pm 0.0685$ & $0.4225$ & $3.6715 \\pm 0.0648$ & $0.6889$ & [FORMULA] & --- & --- \\\\ \\hline \\end{longtable} \\begin{longtable..."
+    },
+    {
+      "index": 385,
+      "type": "inline",
+      "latex": "|F^c_\\pi(s)|",
+      "tier": 1,
+      "lineNumber": 363,
+      "context": "...e} \\begin{longtable}{ccccccccc} \\caption{The values of [FORMULA] with errors from measurements of M.~Ablikim~et~al.~\\cite{Ab..."
+    },
+    {
+      "index": 386,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "....~Ablikim~et~al.~\\cite{Ablikim7}.\\label{tab:4}}\\\\ \\hline [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 387,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...m~et~al.~\\cite{Ablikim7}.\\label{tab:4}}\\\\ \\hline $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 388,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...cite{Ablikim7}.\\label{tab:4}}\\\\ \\hline $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] &..."
+    },
+    {
+      "index": 389,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...{tab:4}}\\\\ \\hline $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 390,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...\\\\ \\hline $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 391,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...e $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] &..."
+    },
+    {
+      "index": 392,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...$|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\..."
+    },
+    {
+      "index": 393,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|..."
+    },
+    {
+      "index": 394,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...& $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirs..."
+    },
+    {
+      "index": 395,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...$|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & [FORMULA] [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirsthead..."
+    },
+    {
+      "index": 396,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...}^{c}(s)|$ & $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV [FORMULA] ] & $|F_{\\pi}^{c}(s)|$ \\\\ \\hline \\endfirsthead \\caption{c..."
+    },
+    {
+      "index": 397,
+      "type": "inline",
+      "latex": "|F_{\\pi}^{c}(s)|",
+      "tier": 1,
+      "lineNumber": 365,
+      "context": "...& $s$ [GeV$^{2}$] & $|F_{\\pi}^{c}(s)|$ & $s$ [GeV$^{2}$] & [FORMULA] \\\\ \\hline \\endfirsthead \\caption{continued from previous..."
+    },
+    {
+      "index": 398,
+      "type": "inline",
+      "latex": "2.6228 \\pm 0.0571",
+      "tier": 1,
+      "lineNumber": 370,
+      "context": "...ion{continued from previous page} \\\\ \\endhead $0.3630$ & [FORMULA] & $0.4590$ & $4.2006 \\pm 0.0593$ & $0.5663$ & $6.3316 \\pm..."
+    },
+    {
+      "index": 399,
+      "type": "inline",
+      "latex": "4.2006 \\pm 0.0593",
+      "tier": 1,
+      "lineNumber": 370,
+      "context": "...\\\\ \\endhead $0.3630$ & $2.6228 \\pm 0.0571$ & $0.4590$ & [FORMULA] & $0.5663$ & $6.3316 \\pm 0.0773$ & $0.6848$ & $4.7102 \\pm..."
+    },
+    {
+      "index": 400,
+      "type": "inline",
+      "latex": "6.3316 \\pm 0.0773",
+      "tier": 1,
+      "lineNumber": 370,
+      "context": "...\\pm 0.0571$ & $0.4590$ & $4.2006 \\pm 0.0593$ & $0.5663$ & [FORMULA] & $0.6848$ & $4.7102 \\pm 0.0649$ \\\\ $0.3691$ & $2.7159 \\..."
+    },
+    {
+      "index": 401,
+      "type": "inline",
+      "latex": "4.7102 \\pm 0.0649",
+      "tier": 1,
+      "lineNumber": 370,
+      "context": "...\\pm 0.0593$ & $0.5663$ & $6.3316 \\pm 0.0773$ & $0.6848$ & [FORMULA] \\\\ $0.3691$ & $2.7159 \\pm 0.0551$ & $0.4658$ & $4.3154 \\..."
+    },
+    {
+      "index": 402,
+      "type": "inline",
+      "latex": "2.7159 \\pm 0.0551",
+      "tier": 1,
+      "lineNumber": 371,
+      "context": "...m 0.0773$ & $0.6848$ & $4.7102 \\pm 0.0649$ \\\\ $0.3691$ & [FORMULA] & $0.4658$ & $4.3154 \\pm 0.0577$ & $0.5738$ & $6.4403 \\pm..."
+    },
+    {
+      "index": 403,
+      "type": "inline",
+      "latex": "4.3154 \\pm 0.0577",
+      "tier": 1,
+      "lineNumber": 371,
+      "context": "...m 0.0649$ \\\\ $0.3691$ & $2.7159 \\pm 0.0551$ & $0.4658$ & [FORMULA] & $0.5738$ & $6.4403 \\pm 0.0757$ & $0.6931$ & $4.5238 \\pm..."
+    },
+    {
+      "index": 404,
+      "type": "inline",
+      "latex": "6.4403 \\pm 0.0757",
+      "tier": 1,
+      "lineNumber": 371,
+      "context": "...\\pm 0.0551$ & $0.4658$ & $4.3154 \\pm 0.0577$ & $0.5738$ & [FORMULA] & $0.6931$ & $4.5238 \\pm 0.0674$ \\\\ $0.3752$ & $2.8587 \\..."
+    },
+    {
+      "index": 405,
+      "type": "inline",
+      "latex": "4.5238 \\pm 0.0674",
+      "tier": 1,
+      "lineNumber": 371,
+      "context": "...\\pm 0.0577$ & $0.5738$ & $6.4403 \\pm 0.0757$ & $0.6931$ & [FORMULA] \\\\ $0.3752$ & $2.8587 \\pm 0.0524$ & $0.4727$ & $4.5158 \\..."
+    },
+    {
+      "index": 406,
+      "type": "inline",
+      "latex": "2.8587 \\pm 0.0524",
+      "tier": 1,
+      "lineNumber": 372,
+      "context": "...m 0.0757$ & $0.6931$ & $4.5238 \\pm 0.0674$ \\\\ $0.3752$ & [FORMULA] & $0.4727$ & $4.5158 \\pm 0.0551$ & $0.5814$ & $6.4891 \\pm..."
+    },
+    {
+      "index": 407,
+      "type": "inline",
+      "latex": "4.5158 \\pm 0.0551",
+      "tier": 1,
+      "lineNumber": 372,
+      "context": "...m 0.0674$ \\\\ $0.3752$ & $2.8587 \\pm 0.0524$ & $0.4727$ & [FORMULA] & $0.5814$ & $6.4891 \\pm 0.0747$ & $0.7014$ & $4.3203 \\pm..."
+    },
+    {
+      "index": 408,
+      "type": "inline",
+      "latex": "6.4891 \\pm 0.0747",
+      "tier": 1,
+      "lineNumber": 372,
+      "context": "...\\pm 0.0524$ & $0.4727$ & $4.5158 \\pm 0.0551$ & $0.5814$ & [FORMULA] & $0.7014$ & $4.3203 \\pm 0.0588$ \\\\ $0.3813$ & $2.9442 \\..."
+    },
+    {
+      "index": 409,
+      "type": "inline",
+      "latex": "4.3203 \\pm 0.0588",
+      "tier": 1,
+      "lineNumber": 372,
+      "context": "...\\pm 0.0551$ & $0.5814$ & $6.4891 \\pm 0.0747$ & $0.7014$ & [FORMULA] \\\\ $0.3813$ & $2.9442 \\pm 0.0509$ & $0.4796$ & $4.7177 \\..."
+    },
+    {
+      "index": 410,
+      "type": "inline",
+      "latex": "2.9442 \\pm 0.0509",
+      "tier": 1,
+      "lineNumber": 373,
+      "context": "...m 0.0747$ & $0.7014$ & $4.3203 \\pm 0.0588$ \\\\ $0.3813$ & [FORMULA] & $0.4796$ & $4.7177 \\pm 0.0527$ & $0.5891$ & $6.4405 \\pm..."
+    },
+    {
+      "index": 411,
+      "type": "inline",
+      "latex": "4.7177 \\pm 0.0527",
+      "tier": 1,
+      "lineNumber": 373,
+      "context": "...m 0.0588$ \\\\ $0.3813$ & $2.9442 \\pm 0.0509$ & $0.4796$ & [FORMULA] & $0.5891$ & $6.4405 \\pm 0.0746$ & $0.7098$ & $4.1088 \\pm..."
+    },
+    {
+      "index": 412,
+      "type": "inline",
+      "latex": "6.4405 \\pm 0.0746",
+      "tier": 1,
+      "lineNumber": 373,
+      "context": "...\\pm 0.0509$ & $0.4796$ & $4.7177 \\pm 0.0527$ & $0.5891$ & [FORMULA] & $0.7098$ & $4.1088 \\pm 0.0617$ \\\\ $0.3875$ & $3.0272 \\..."
+    },
+    {
+      "index": 413,
+      "type": "inline",
+      "latex": "4.1088 \\pm 0.0617",
+      "tier": 1,
+      "lineNumber": 373,
+      "context": "...\\pm 0.0527$ & $0.5891$ & $6.4405 \\pm 0.0746$ & $0.7098$ & [FORMULA] \\\\ $0.3875$ & $3.0272 \\pm 0.0495$ & $0.4865$ & $4.9612 \\..."
+    },
+    {
+      "index": 414,
+      "type": "inline",
+      "latex": "3.0272 \\pm 0.0495",
+      "tier": 1,
+      "lineNumber": 374,
+      "context": "...m 0.0746$ & $0.7098$ & $4.1088 \\pm 0.0617$ \\\\ $0.3875$ & [FORMULA] & $0.4865$ & $4.9612 \\pm 0.0601$ & $0.5968$ & $6.3509 \\pm..."
+    },
+    {
+      "index": 415,
+      "type": "inline",
+      "latex": "4.9612 \\pm 0.0601",
+      "tier": 1,
+      "lineNumber": 374,
+      "context": "...m 0.0617$ \\\\ $0.3875$ & $3.0272 \\pm 0.0495$ & $0.4865$ & [FORMULA] & $0.5968$ & $6.3509 \\pm 0.0744$ & $0.7183$ & $4.0533 \\pm..."
+    },
+    {
+      "index": 416,
+      "type": "inline",
+      "latex": "6.3509 \\pm 0.0744",
+      "tier": 1,
+      "lineNumber": 374,
+      "context": "...\\pm 0.0495$ & $0.4865$ & $4.9612 \\pm 0.0601$ & $0.5968$ & [FORMULA] & $0.7183$ & $4.0533 \\pm 0.0625$ \\\\ $0.3938$ & $3.1239 \\..."
+    },
+    {
+      "index": 417,
+      "type": "inline",
+      "latex": "4.0533 \\pm 0.0625",
+      "tier": 1,
+      "lineNumber": 374,
+      "context": "...\\pm 0.0601$ & $0.5968$ & $6.3509 \\pm 0.0744$ & $0.7183$ & [FORMULA] \\\\ $0.3938$ & $3.1239 \\pm 0.0479$ & $0.4935$ & $5.0862 \\..."
+    },
+    {
+      "index": 418,
+      "type": "inline",
+      "latex": "3.1239 \\pm 0.0479",
+      "tier": 1,
+      "lineNumber": 375,
+      "context": "...m 0.0744$ & $0.7183$ & $4.0533 \\pm 0.0625$ \\\\ $0.3938$ & [FORMULA] & $0.4935$ & $5.0862 \\pm 0.0586$ & $0.6045$ & $6.0821 \\pm..."
+    },
+    {
+      "index": 419,
+      "type": "inline",
+      "latex": "5.0862 \\pm 0.0586",
+      "tier": 1,
+      "lineNumber": 375,
+      "context": "...m 0.0625$ \\\\ $0.3938$ & $3.1239 \\pm 0.0479$ & $0.4935$ & [FORMULA] & $0.6045$ & $6.0821 \\pm 0.0758$ & $0.7268$ & $3.9213 \\pm..."
+    },
+    {
+      "index": 420,
+      "type": "inline",
+      "latex": "6.0821 \\pm 0.0758",
+      "tier": 1,
+      "lineNumber": 375,
+      "context": "...\\pm 0.0479$ & $0.4935$ & $5.0862 \\pm 0.0586$ & $0.6045$ & [FORMULA] & $0.7268$ & $3.9213 \\pm 0.0646$ \\\\ $0.4001$ & $3.2176 \\..."
+    },
+    {
+      "index": 421,
+      "type": "inline",
+      "latex": "3.9213 \\pm 0.0646",
+      "tier": 1,
+      "lineNumber": 375,
+      "context": "...\\pm 0.0586$ & $0.6045$ & $6.0821 \\pm 0.0758$ & $0.7268$ & [FORMULA] \\\\ $0.4001$ & $3.2176 \\pm 0.0465$ & $0.5006$ & $5.1210 \\..."
+    },
+    {
+      "index": 422,
+      "type": "inline",
+      "latex": "3.2176 \\pm 0.0465",
+      "tier": 1,
+      "lineNumber": 376,
+      "context": "...m 0.0758$ & $0.7268$ & $3.9213 \\pm 0.0646$ \\\\ $0.4001$ & [FORMULA] & $0.5006$ & $5.1210 \\pm 0.0582$ & $0.6123$ & $5.9440 \\pm..."
+    },
+    {
+      "index": 423,
+      "type": "inline",
+      "latex": "5.1210 \\pm 0.0582",
+      "tier": 1,
+      "lineNumber": 376,
+      "context": "...m 0.0646$ \\\\ $0.4001$ & $3.2176 \\pm 0.0465$ & $0.5006$ & [FORMULA] & $0.6123$ & $5.9440 \\pm 0.0834$ & $0.7353$ & $3.8124 \\pm..."
+    },
+    {
+      "index": 424,
+      "type": "inline",
+      "latex": "5.9440 \\pm 0.0834",
+      "tier": 1,
+      "lineNumber": 376,
+      "context": "...\\pm 0.0465$ & $0.5006$ & $5.1210 \\pm 0.0582$ & $0.6123$ & [FORMULA] & $0.7353$ & $3.8124 \\pm 0.0663$ \\\\ $0.4064$ & $3.3085 \\..."
+    },
+    {
+      "index": 425,
+      "type": "inline",
+      "latex": "3.8124 \\pm 0.0663",
+      "tier": 1,
+      "lineNumber": 376,
+      "context": "...\\pm 0.0582$ & $0.6123$ & $5.9440 \\pm 0.0834$ & $0.7353$ & [FORMULA] \\\\ $0.4064$ & $3.3085 \\pm 0.0452$ & $0.5077$ & $5.3716 \\..."
+    },
+    {
+      "index": 426,
+      "type": "inline",
+      "latex": "3.3085 \\pm 0.0452",
+      "tier": 1,
+      "lineNumber": 377,
+      "context": "...m 0.0834$ & $0.7353$ & $3.8124 \\pm 0.0663$ \\\\ $0.4064$ & [FORMULA] & $0.5077$ & $5.3716 \\pm 0.0647$ & $0.6202$ & $5.9887 \\pm..."
+    },
+    {
+      "index": 427,
+      "type": "inline",
+      "latex": "5.3716 \\pm 0.0647",
+      "tier": 1,
+      "lineNumber": 377,
+      "context": "...m 0.0663$ \\\\ $0.4064$ & $3.3085 \\pm 0.0452$ & $0.5077$ & [FORMULA] & $0.6202$ & $5.9887 \\pm 0.0821$ & $0.7439$ & $3.6460 \\pm..."
+    },
+    {
+      "index": 428,
+      "type": "inline",
+      "latex": "5.9887 \\pm 0.0821",
+      "tier": 1,
+      "lineNumber": 377,
+      "context": "...\\pm 0.0452$ & $0.5077$ & $5.3716 \\pm 0.0647$ & $0.6202$ & [FORMULA] & $0.7439$ & $3.6460 \\pm 0.0693$ \\\\ $0.4128$ & $3.4262 \\..."
+    },
+    {
+      "index": 429,
+      "type": "inline",
+      "latex": "3.6460 \\pm 0.0693",
+      "tier": 1,
+      "lineNumber": 377,
+      "context": "...\\pm 0.0647$ & $0.6202$ & $5.9887 \\pm 0.0821$ & $0.7439$ & [FORMULA] \\\\ $0.4128$ & $3.4262 \\pm 0.0582$ & $0.5148$ & $5.6100 \\..."
+    },
+    {
+      "index": 430,
+      "type": "inline",
+      "latex": "3.4262 \\pm 0.0582",
+      "tier": 1,
+      "lineNumber": 378,
+      "context": "...m 0.0821$ & $0.7439$ & $3.6460 \\pm 0.0693$ \\\\ $0.4128$ & [FORMULA] & $0.5148$ & $5.6100 \\pm 0.0619$ & $0.6281$ & $5.8975 \\pm..."
+    },
+    {
+      "index": 431,
+      "type": "inline",
+      "latex": "5.6100 \\pm 0.0619",
+      "tier": 1,
+      "lineNumber": 378,
+      "context": "...m 0.0693$ \\\\ $0.4128$ & $3.4262 \\pm 0.0582$ & $0.5148$ & [FORMULA] & $0.6281$ & $5.8975 \\pm 0.0724$ & $0.7526$ & $3.5157 \\pm..."
+    },
+    {
+      "index": 432,
+      "type": "inline",
+      "latex": "5.8975 \\pm 0.0724",
+      "tier": 1,
+      "lineNumber": 378,
+      "context": "...\\pm 0.0582$ & $0.5148$ & $5.6100 \\pm 0.0619$ & $0.6281$ & [FORMULA] & $0.7526$ & $3.5157 \\pm 0.0575$ \\\\ $0.4193$ & $3.5256 \\..."
+    },
+    {
+      "index": 433,
+      "type": "inline",
+      "latex": "3.5157 \\pm 0.0575",
+      "tier": 1,
+      "lineNumber": 378,
+      "context": "...\\pm 0.0619$ & $0.6281$ & $5.8975 \\pm 0.0724$ & $0.7526$ & [FORMULA] \\\\ $0.4193$ & $3.5256 \\pm 0.0566$ & $0.5220$ & $5.7086 \\..."
+    },
+    {
+      "index": 434,
+      "type": "inline",
+      "latex": "3.5256 \\pm 0.0566",
+      "tier": 1,
+      "lineNumber": 379,
+      "context": "...m 0.0724$ & $0.7526$ & $3.5157 \\pm 0.0575$ \\\\ $0.4193$ & [FORMULA] & $0.5220$ & $5.7086 \\pm 0.0694$ & $0.6360$ & $5.7515 \\pm..."
+    },
+    {
+      "index": 435,
+      "type": "inline",
+      "latex": "5.7086 \\pm 0.0694",
+      "tier": 1,
+      "lineNumber": 379,
+      "context": "...m 0.0575$ \\\\ $0.4193$ & $3.5256 \\pm 0.0566$ & $0.5220$ & [FORMULA] & $0.6360$ & $5.7515 \\pm 0.0729$ & $0.7613$ & $3.3510 \\pm..."
+    },
+    {
+      "index": 436,
+      "type": "inline",
+      "latex": "5.7515 \\pm 0.0729",
+      "tier": 1,
+      "lineNumber": 379,
+      "context": "...\\pm 0.0566$ & $0.5220$ & $5.7086 \\pm 0.0694$ & $0.6360$ & [FORMULA] & $0.7613$ & $3.3510 \\pm 0.0603$ \\\\ $0.4258$ & $3.6222 \\..."
+    },
+    {
+      "index": 437,
+      "type": "inline",
+      "latex": "3.3510 \\pm 0.0603",
+      "tier": 1,
+      "lineNumber": 379,
+      "context": "...\\pm 0.0694$ & $0.6360$ & $5.7515 \\pm 0.0729$ & $0.7613$ & [FORMULA] \\\\ $0.4258$ & $3.6222 \\pm 0.0551$ & $0.5293$ & $5.7354 \\..."
+    },
+    {
+      "index": 438,
+      "type": "inline",
+      "latex": "3.6222 \\pm 0.0551",
+      "tier": 1,
+      "lineNumber": 380,
+      "context": "...m 0.0729$ & $0.7613$ & $3.3510 \\pm 0.0603$ \\\\ $0.4258$ & [FORMULA] & $0.5293$ & $5.7354 \\pm 0.0690$ & $0.6440$ & $5.4657 \\p..."
+    },
+    {
+      "index": 439,
+      "type": "inline",
+      "latex": "5.7354 \\pm 0.0690",
+      "tier": 1,
+      "lineNumber": 380,
+      "context": "...m 0.0603$ \\\\ $0.4258$ & $3.6222 \\pm 0.0551$ & $0.5293$ & [FORMULA] & $0.6440$ & $5.4657 \\pm 0.0760$ & $0.7700$ & $3.2412 \\p..."
+    },
+    {
+      "index": 440,
+      "type": "inline",
+      "latex": "5.4657 \\pm 0.0760",
+      "tier": 1,
+      "lineNumber": 380,
+      "context": "...pm 0.0551$ & $0.5293$ & $5.7354 \\pm 0.0690$ & $0.6440$ & [FORMULA] & $0.7700$ & $3.2412 \\pm 0.0623$ \\\\ $0.4323$ & $3.6757 \\..."
+    },
+    {
+      "index": 441,
+      "type": "inline",
+      "latex": "3.2412 \\pm 0.0623",
+      "tier": 1,
+      "lineNumber": 380,
+      "context": "...pm 0.0690$ & $0.6440$ & $5.4657 \\pm 0.0760$ & $0.7700$ & [FORMULA] \\\\ $0.4323$ & $3.6757 \\pm 0.0542$ & $0.5366$ & $5.9464 \\..."
+    },
+    {
+      "index": 442,
+      "type": "inline",
+      "latex": "3.6757 \\pm 0.0542",
+      "tier": 1,
+      "lineNumber": 381,
+      "context": "...m 0.0760$ & $0.7700$ & $3.2412 \\pm 0.0623$ \\\\ $0.4323$ & [FORMULA] & $0.5366$ & $5.9464 \\pm 0.0582$ & $0.6521$ & $5.2508 \\p..."
+    },
+    {
+      "index": 443,
+      "type": "inline",
+      "latex": "5.9464 \\pm 0.0582",
+      "tier": 1,
+      "lineNumber": 381,
+      "context": "...m 0.0623$ \\\\ $0.4323$ & $3.6757 \\pm 0.0542$ & $0.5366$ & [FORMULA] & $0.6521$ & $5.2508 \\pm 0.0688$ & $0.7788$ & $3.1919 \\p..."
+    },
+    {
+      "index": 444,
+      "type": "inline",
+      "latex": "5.2508 \\pm 0.0688",
+      "tier": 1,
+      "lineNumber": 381,
+      "context": "...pm 0.0542$ & $0.5366$ & $5.9464 \\pm 0.0582$ & $0.6521$ & [FORMULA] & $0.7788$ & $3.1919 \\pm 0.0632$ \\\\ $0.4389$ & $3.8206 \\..."
+    },
+    {
+      "index": 445,
+      "type": "inline",
+      "latex": "3.1919 \\pm 0.0632",
+      "tier": 1,
+      "lineNumber": 381,
+      "context": "...pm 0.0582$ & $0.6521$ & $5.2508 \\pm 0.0688$ & $0.7788$ & [FORMULA] \\\\ $0.4389$ & $3.8206 \\pm 0.0522$ & $0.5439$ & $6.0994 \\..."
+    },
+    {
+      "index": 446,
+      "type": "inline",
+      "latex": "3.8206 \\pm 0.0522",
+      "tier": 1,
+      "lineNumber": 382,
+      "context": "...m 0.0688$ & $0.7788$ & $3.1919 \\pm 0.0632$ \\\\ $0.4389$ & [FORMULA] & $0.5439$ & $6.0994 \\pm 0.0647$ & $0.6602$ & $5.1830 \\p..."
+    },
+    {
+      "index": 447,
+      "type": "inline",
+      "latex": "6.0994 \\pm 0.0647",
+      "tier": 1,
+      "lineNumber": 382,
+      "context": "...m 0.0632$ \\\\ $0.4389$ & $3.8206 \\pm 0.0522$ & $0.5439$ & [FORMULA] & $0.6602$ & $5.1830 \\pm 0.0693$ & $0.7877$ & $3.1741 \\p..."
+    },
+    {
+      "index": 448,
+      "type": "inline",
+      "latex": "5.1830 \\pm 0.0693",
+      "tier": 1,
+      "lineNumber": 382,
+      "context": "...pm 0.0522$ & $0.5439$ & $6.0994 \\pm 0.0647$ & $0.6602$ & [FORMULA] & $0.7877$ & $3.1741 \\pm 0.0636$ \\\\ $0.4456$ & $3.9851 \\..."
+    },
+    {
+      "index": 449,
+      "type": "inline",
+      "latex": "3.1741 \\pm 0.0636",
+      "tier": 1,
+      "lineNumber": 382,
+      "context": "...pm 0.0647$ & $0.6602$ & $5.1830 \\pm 0.0693$ & $0.7877$ & [FORMULA] \\\\ $0.4456$ & $3.9851 \\pm 0.0500$ & $0.5513$ & $6.1742 \\..."
+    },
+    {
+      "index": 450,
+      "type": "inline",
+      "latex": "3.9851 \\pm 0.0500",
+      "tier": 1,
+      "lineNumber": 383,
+      "context": "...m 0.0693$ & $0.7877$ & $3.1741 \\pm 0.0636$ \\\\ $0.4456$ & [FORMULA] & $0.5513$ & $6.1742 \\pm 0.0638$ & $0.6683$ & $5.0217 \\p..."
+    },
+    {
+      "index": 451,
+      "type": "inline",
+      "latex": "6.1742 \\pm 0.0638",
+      "tier": 1,
+      "lineNumber": 383,
+      "context": "...m 0.0636$ \\\\ $0.4456$ & $3.9851 \\pm 0.0500$ & $0.5513$ & [FORMULA] & $0.6683$ & $5.0217 \\pm 0.0713$ & $0.7966$ & $2.9754 \\p..."
+    },
+    {
+      "index": 452,
+      "type": "inline",
+      "latex": "5.0217 \\pm 0.0713",
+      "tier": 1,
+      "lineNumber": 383,
+      "context": "...pm 0.0500$ & $0.5513$ & $6.1742 \\pm 0.0638$ & $0.6683$ & [FORMULA] & $0.7966$ & $2.9754 \\pm 0.0678$ \\\\ $0.4523$ & $4.1906 \\..."
+    },
+    {
+      "index": 453,
+      "type": "inline",
+      "latex": "2.9754 \\pm 0.0678",
+      "tier": 1,
+      "lineNumber": 383,
+      "context": "...pm 0.0638$ & $0.6683$ & $5.0217 \\pm 0.0713$ & $0.7966$ & [FORMULA] \\\\ $0.4523$ & $4.1906 \\pm 0.0594$ & $0.5588$ & $6.2835 \\..."
+    },
+    {
+      "index": 454,
+      "type": "inline",
+      "latex": "4.1906 \\pm 0.0594",
+      "tier": 1,
+      "lineNumber": 384,
+      "context": "...m 0.0713$ & $0.7966$ & $2.9754 \\pm 0.0678$ \\\\ $0.4523$ & [FORMULA] & $0.5588$ & $6.2835 \\pm 0.0704$ & $0.6765$ & $4.8821 \\p..."
+    },
+    {
+      "index": 455,
+      "type": "inline",
+      "latex": "6.2835 \\pm 0.0704",
+      "tier": 1,
+      "lineNumber": 384,
+      "context": "...m 0.0678$ \\\\ $0.4523$ & $4.1906 \\pm 0.0594$ & $0.5588$ & [FORMULA] & $0.6765$ & $4.8821 \\pm 0.0627$ & $0.8055$ & $2.8349 \\p..."
+    },
+    {
+      "index": 456,
+      "type": "inline",
+      "latex": "4.8821 \\pm 0.0627",
+      "tier": 1,
+      "lineNumber": 384,
+      "context": "...pm 0.0594$ & $0.5588$ & $6.2835 \\pm 0.0704$ & $0.6765$ & [FORMULA] & $0.8055$ & $2.8349 \\pm 0.0534$ \\\\ \\hline \\end{longtabl..."
+    },
+    {
+      "index": 457,
+      "type": "inline",
+      "latex": "2.8349 \\pm 0.0534",
+      "tier": 1,
+      "lineNumber": 384,
+      "context": "...pm 0.0704$ & $0.6765$ & $4.8821 \\pm 0.0627$ & $0.8055$ & [FORMULA] \\\\ \\hline \\end{longtable} All three sets of data on th..."
+    },
+    {
+      "index": 458,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 388,
+      "context": "...{longtable} All three sets of data on the absolute value [FORMULA] of the pure isovector EM FF of the charged pion as a functi..."
+    },
+    {
+      "index": 459,
+      "type": "inline",
+      "latex": "s",
+      "tier": 1,
+      "lineNumber": 388,
+      "context": "...e pure isovector EM FF of the charged pion as a function of [FORMULA] of threshold up to 9 GeV$^2$ as given in Tables~\\ref{tab:2}..."
+    },
+    {
+      "index": 460,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 388,
+      "context": "...e charged pion as a function of $s$ of threshold up to 9 GeV [FORMULA] as given in Tables~\\ref{tab:2}--\\ref{tab:4} are graphically..."
+    },
+    {
+      "index": 461,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 392,
+      "context": "...5\\textwidth]{piffdat.eps}\\\\ \\caption{Calculated values of [FORMULA] with errors from measured $\\sigma^{bare}_{tot}(e^+e^- \\to \\..."
+    },
+    {
+      "index": 462,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^- \\to \\pi^+ \\pi^-)",
+      "tier": 1,
+      "lineNumber": 392,
+      "context": "...ulated values of $|F^c_{\\pi}(s)|$ with errors from measured [FORMULA] in~\\cite{Lees3,Xiao,Ablikim7} by the Expression (\\ref{genso..."
+    },
+    {
+      "index": 463,
+      "type": "inline",
+      "latex": "A_3",
+      "tier": 1,
+      "lineNumber": 395,
+      "context": "...ic'' number 0.71 is substituted by the third free parameter [FORMULA] , because~one can not expect to be suitable nucleon ``magic'..."
+    },
+    {
+      "index": 464,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 395,
+      "context": "...agic'' number for optimal description of the absolute value [FORMULA] data and one has to look for the charged pion ``magic'' num..."
+    },
+    {
+      "index": 465,
+      "type": "inline",
+      "latex": "{A=3.9888\\pm0.0061}",
+      "tier": 1,
+      "lineNumber": 397,
+      "context": "...Figure~\\ref{fig:5} has been achieved with parameter values [FORMULA] , ${m^2_a=5.5647\\pm0.1915 }$ GeV$^{2}$ and the charged pion..."
+    },
+    {
+      "index": 466,
+      "type": "inline",
+      "latex": "{m^2_a=5.5647\\pm0.1915 }",
+      "tier": 1,
+      "lineNumber": 397,
+      "context": "...been achieved with parameter values ${A=3.9888\\pm0.0061}$, [FORMULA] GeV$^{2}$ and the charged pion ``magic'' number $A_3=$ $-5..."
+    },
+    {
+      "index": 467,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 397,
+      "context": "...alues ${A=3.9888\\pm0.0061}$, ${m^2_a=5.5647\\pm0.1915 }$ GeV [FORMULA] and the charged pion ``magic'' number $A_3=$ $-5.5647\\pm0.1..."
+    },
+    {
+      "index": 468,
+      "type": "inline",
+      "latex": "A_3=",
+      "tier": 1,
+      "lineNumber": 397,
+      "context": "...m0.1915 }$ GeV$^{2}$ and the charged pion ``magic'' number [FORMULA] $-5.5647\\pm0.1037$ GeV$^{2}$. The~result of the fit is grap..."
+    },
+    {
+      "index": 469,
+      "type": "inline",
+      "latex": "-5.5647\\pm0.1037",
+      "tier": 1,
+      "lineNumber": 397,
+      "context": "...}$ GeV$^{2}$ and the charged pion ``magic'' number $A_3=$ [FORMULA] GeV$^{2}$. The~result of the fit is graphically presented i..."
+    },
+    {
+      "index": 470,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 397,
+      "context": "...charged pion ``magic'' number $A_3=$ $-5.5647\\pm0.1037$ GeV [FORMULA] . The~result of the fit is graphically presented in Figure~\\..."
+    },
+    {
+      "index": 471,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 402,
+      "context": "...\\textwidth]{piftnaiv.eps} \\caption{Optimal description of [FORMULA] data with dashed line given by a similar formula \\mbox{to E..."
+    },
+    {
+      "index": 472,
+      "type": "inline",
+      "latex": "A_3=-5.5647\\pm0.1037",
+      "tier": 1,
+      "lineNumber": 402,
+      "context": "...ef{fortfunct})}, however now with the third parameter to be [FORMULA] GeV$^{2}$. \\label{fig:6}} \\end{figure} If dashed line v..."
+    },
+    {
+      "index": 473,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 402,
+      "context": "...w with the third parameter to be $A_3=-5.5647\\pm0.1037 $ GeV [FORMULA] . \\label{fig:6}} \\end{figure} If dashed line values are..."
+    },
+    {
+      "index": 474,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 405,
+      "context": "...line values are subtracted from the experimental values of [FORMULA] with errors in Tables~\\ref{fig:2}--\\ref{fig:4}, damped osci..."
+    },
+    {
+      "index": 475,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 409,
+      "context": "...of dashed line data in Figure~\\ref{fig:6} from exp. data on [FORMULA] in Tables~\\ref{fig:2}--\\ref{fig:4}. \\label{fig:7}} \\end{fi..."
+    },
+    {
+      "index": 476,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 412,
+      "context": "...fig:4}. \\label{fig:7}} \\end{figure} If only the data on [FORMULA] from Figure~\\ref{fig:5} just behind the distinct $\\rho$-mes..."
+    },
+    {
+      "index": 477,
+      "type": "inline",
+      "latex": "\\rho",
+      "tier": 1,
+      "lineNumber": 412,
+      "context": "...{\\pi}(s)|$ from Figure~\\ref{fig:5} just behind the distinct [FORMULA] -meson peak, starting from \\mbox{1 GeV$^2$} up to 9 GeV$^2$,..."
+    },
+    {
+      "index": 478,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 412,
+      "context": "...nd the distinct $\\rho$-meson peak, starting from \\mbox{1 GeV [FORMULA] } up to 9 GeV$^2$, are optimally described by a similar for..."
+    },
+    {
+      "index": 479,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 412,
+      "context": "...\\rho$-meson peak, starting from \\mbox{1 GeV$^2$} up to 9 GeV [FORMULA] , are optimally described by a similar formula to Equation..."
+    },
+    {
+      "index": 480,
+      "type": "inline",
+      "latex": "{A=3.7485\\pm0.4463}",
+      "tier": 1,
+      "lineNumber": 413,
+      "context": "...\\ref{fortfunct}) with all three free parameters with values [FORMULA] , ${m^2_a=3.9681\\pm0.6064}$ GeV$^{2}$, \\mbox{${A_3=-2.0369\\p..."
+    },
+    {
+      "index": 481,
+      "type": "inline",
+      "latex": "{m^2_a=3.9681\\pm0.6064}",
+      "tier": 1,
+      "lineNumber": 413,
+      "context": "...ll three free parameters with values ${A=3.7485\\pm0.4463}$, [FORMULA] GeV$^{2}$, \\mbox{${A_3=-2.0369\\pm0.2613}$ GeV$^{2}$}, one o..."
+    },
+    {
+      "index": 482,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 413,
+      "context": "...values ${A=3.7485\\pm0.4463}$, ${m^2_a=3.9681\\pm0.6064}$ GeV [FORMULA] , \\mbox{${A_3=-2.0369\\pm0.2613}$ GeV$^{2}$}, one obtains the..."
+    },
+    {
+      "index": 483,
+      "type": "inline",
+      "latex": "{A_3=-2.0369\\pm0.2613}",
+      "tier": 1,
+      "lineNumber": 413,
+      "context": "...7485\\pm0.4463}$, ${m^2_a=3.9681\\pm0.6064}$ GeV$^{2}$, \\mbox{ [FORMULA] GeV$^{2}$}, one obtains the result graphically presented by..."
+    },
+    {
+      "index": 484,
+      "type": "inline",
+      "latex": "^{2}",
+      "tier": 1,
+      "lineNumber": 413,
+      "context": "...681\\pm0.6064}$ GeV$^{2}$, \\mbox{${A_3=-2.0369\\pm0.2613}$ GeV [FORMULA] }, one obtains the result graphically presented by dashed li..."
+    },
+    {
+      "index": 485,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 419,
+      "context": "...columnwidth]{pinaiv2.eps} \\caption{Optimal description of [FORMULA] data with dashed line given by a similar formula \\mbox{to E..."
+    },
+    {
+      "index": 486,
+      "type": "inline",
+      "latex": "A_3=-2.0369\\pm0.2613",
+      "tier": 1,
+      "lineNumber": 419,
+      "context": "...ef{fortfunct})}, however now with the third parameter to be [FORMULA] GeV$^2$. \\label{fig:8}} \\end{figure} \\unskip \\begin{figu..."
+    },
+    {
+      "index": 487,
+      "type": "inline",
+      "latex": "^2",
+      "tier": 1,
+      "lineNumber": 419,
+      "context": "...ow with the third parameter to be $A_3=-2.0369\\pm0.2613$ GeV [FORMULA] . \\label{fig:8}} \\end{figure} \\unskip \\begin{figure}[ht]..."
+    },
+    {
+      "index": 488,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 425,
+      "context": "...of dashed line data in Figure~\\ref{fig:8} from exp. data on [FORMULA] in Tables~\\ref{fig:2}--\\ref{fig:4}. \\label{fig:9}} \\end{fi..."
+    },
+    {
+      "index": 489,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 428,
+      "context": "...g:9}} \\end{figure} A perfect description of the data on [FORMULA] accumulated in Tables~\\ref{fig:2}--\\ref{fig:4} \\mbox{by Equ..."
+    },
+    {
+      "index": 490,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 434,
+      "context": "...olumnwidth]{piftuamd.eps} \\caption{Optimal description of [FORMULA] data with full line given by Equations (\\ref{pioFF})--(\\ref..."
+    },
+    {
+      "index": 491,
+      "type": "inline",
+      "latex": "|F^c_{\\pi}(s)|",
+      "tier": 1,
+      "lineNumber": 440,
+      "context": "...ne data in Figure~\\ref{fig:10} from the pure EM form factor [FORMULA] data as given in Tables~\\ref{fig:2}--\\ref{fig:4} reveal no..."
+    },
+    {
+      "index": 492,
+      "type": "inline",
+      "latex": "\\gamma\\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...d. Since oscillation structures have to be concerned of the [FORMULA] vertex generated by the strong interactions only and the me..."
+    },
+    {
+      "index": 493,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to \\pi^+\\pi^-)",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...generated by the strong interactions only and the measured [FORMULA] contains some part of $\\pi^+\\pi^-$ pairs due to electromagn..."
+    },
+    {
+      "index": 494,
+      "type": "inline",
+      "latex": "\\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...a^{bare}_{tot}(e^+e^-\\to \\pi^+\\pi^-)$ contains some part of [FORMULA] pairs due to electromagnetic isospin violating decay of $\\o..."
+    },
+    {
+      "index": 495,
+      "type": "inline",
+      "latex": "\\omega(782)\\to\\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...^-$ pairs due to electromagnetic isospin violating decay of [FORMULA] , first an elimination of a contribution of the latter into..."
+    },
+    {
+      "index": 496,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to \\pi^+\\pi^- (\\gamma))",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...the most precise measurements~\\cite{Lees3,Xiao,Ablikim7} of [FORMULA] with the ISR method has been carried out. With~this aim, fi..."
+    },
+    {
+      "index": 497,
+      "type": "inline",
+      "latex": "\\sigma^{bare}_{tot}(e^+e^-\\to \\pi^+\\pi^- (\\gamma))",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...h the ISR method has been carried out. With~this aim, first [FORMULA] was expressed as the absolute value squared of the sum of t..."
+    },
+    {
+      "index": 498,
+      "type": "inline",
+      "latex": "\\omega(782)\\to\\pi^+\\pi^-",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...f the pure charged pion electromagnetic form factor and the [FORMULA] contribution expressed by the Breit-Wigner formula (see Equ..."
+    },
+    {
+      "index": 499,
+      "type": "inline",
+      "latex": "\\pi\\pi",
+      "tier": 1,
+      "lineNumber": 450,
+      "context": "...ion electromagnetic form factor phase with P-wave isovector [FORMULA] -scattering phase shift and the most accurate up-to-now data..."
+    },
+    {
+      "index": 500,
+      "type": "inline",
+      "latex": "e^+e^-\\to p\\bar p",
+      "tier": 1,
+      "lineNumber": 485,
+      "context": "....; et al. \\newblock {Measurement of the cross section for [FORMULA] at center-of-mass energies from 2.0 to 3.07 GeV}. \\new..."
+    },
+    {
+      "index": 501,
+      "type": "inline",
+      "latex": "e^{+} e^{-} \\to \\pi^{+} \\pi^{-}",
+      "tier": 1,
+      "lineNumber": 493,
+      "context": "...; An, Q.; Bai, J.Z.; et al. \\newblock {Measurement of the [FORMULA] cross section between 600 and 900 MeV using initial stat..."
+    },
+    {
+      "index": 502,
+      "type": "inline",
+      "latex": "e^+e^-\\to p\\bar p",
+      "tier": 1,
+      "lineNumber": 501,
+      "context": "...V.; Eidelman, S.I.; et al. \\newblock Study of the process [FORMULA] in the c.m. energy range from threshold to 2 GeV with the..."
+    },
+    {
+      "index": 503,
+      "type": "inline",
+      "latex": "e^+e^- \\to hadrons",
+      "tier": 1,
+      "lineNumber": 509,
+      "context": "...S.I.; et al. \\newblock Observation of a fine structure in [FORMULA] production at the nucleon-antinucleon threshold. \\newbl..."
+    },
+    {
+      "index": 504,
+      "type": "inline",
+      "latex": "e^+e^-\\to p\\bar p",
+      "latexOriginal": "e^+e^-\\to\r\n\tp\\bar p",
+      "tier": 1,
+      "lineNumber": 517,
+      "context": "...block Measurement of Proton Electromagnetic Form Factors in [FORMULA] in the Energy Region 2.00--3.08 GeV. \\newblock {\\em Phys...."
+    },
+    {
+      "index": 505,
+      "type": "inline",
+      "latex": "e^+e^-\\to p\\bar p",
+      "tier": 1,
+      "lineNumber": 525,
+      "context": "..., V.; Zghiche, A.; Grauges, E.; et al. \\newblock Study of [FORMULA] using initial state radiation with BABAR. \\newblock {\\e..."
+    },
+    {
+      "index": 506,
+      "type": "inline",
+      "latex": "e^+e^-\\to p\\bar p",
+      "tier": 1,
+      "lineNumber": 533,
+      "context": "...own, D.N.; Kerth, L.T.; Yu, G.; et al. \\newblock Study of [FORMULA] via initial-state radiation at BABAR. \\newblock {\\em Phys..."
+    },
+    {
+      "index": 507,
+      "type": "inline",
+      "latex": "e^+e^-",
+      "tier": 1,
+      "lineNumber": 540,
+      "context": "...ewblock {Production of charged pions, kaons, and protons in [FORMULA] annihilations into hadrons at $\\sqrt{s}=10.54$ GeV}. \\..."
+    },
+    {
+      "index": 508,
+      "type": "inline",
+      "latex": "\\sqrt{s}=10.54",
+      "tier": 1,
+      "lineNumber": 541,
+      "context": "...s, and protons in $e^+e^-$ annihilations into hadrons at [FORMULA] GeV}. \\newblock {\\em Phys. Rev. D} {\\bf 2013}, {\\em 88},~..."
+    },
+    {
+      "index": 509,
+      "type": "inline",
+      "latex": "e^+e^-\\to p\\bar p",
+      "tier": 1,
+      "lineNumber": 548,
+      "context": "....; An, Q.; Bai, Y.; et al. \\newblock Study of the process [FORMULA] via initial state radiation at BESIII. \\newblock {\\em P..."
+    },
+    {
+      "index": 510,
+      "type": "inline",
+      "latex": "e^+e^- \\to p \\bar{p}",
+      "tier": 1,
+      "lineNumber": 566,
+      "context": "...Zallo, A. \\newblock {No Sommerfeld resummation factor in [FORMULA] ?} \\newblock {\\em Eur. Phys. J. A} {\\bf 2012}, {\\em 48},~3..."
+    },
+    {
+      "index": 511,
+      "type": "inline",
+      "latex": "{G}_{{E}_{p}}/{G}_{{M}_{p}}",
+      "tier": 1,
+      "lineNumber": 603,
+      "context": "...Bimbot, L.; Boeglin, W.U.; Brash, E.J.; et al. \\newblock { [FORMULA] Ratio by Polarization Transfer in $\\stackrel{\\ensuremath..."
+    },
+    {
+      "index": 512,
+      "type": "inline",
+      "latex": "\\stackrel{\\ensuremath{\\rightarrow}}{e}\\mathit{p}\\phantom{\\rule{0ex}{0ex}}\\ensuremath{\\rightarrow}\\phantom{\\rule{0ex}{0ex}}\\mathit{e}\\stackrel{\\ensuremath{\\rightarrow}}{p}",
+      "tier": 2,
+      "lineNumber": 604,
+      "context": "...E}_{p}}/{G}_{{M}_{p}}$ Ratio by Polarization Transfer in [FORMULA] }. \\newblock {\\em Phys. Rev. Lett.} {\\bf 2000}, {\\em 84},~..."
+    },
+    {
+      "index": 513,
+      "type": "inline",
+      "latex": "{G}_{{E}_{p}}/{G}_{{M}_{p}}",
+      "tier": 1,
+      "lineNumber": 611,
+      "context": "....; Cavata, C.; Chai, Z.; et al. \\newblock {Measurement of [FORMULA] in $\\stackrel{\\ensuremath{\\rightarrow}}{e}\\mathit{p}\\ens..."
+    },
+    {
+      "index": 514,
+      "type": "inline",
+      "latex": "\\stackrel{\\ensuremath{\\rightarrow}}{e}\\mathit{p}\\ensuremath{\\rightarrow}\\mathit{e}\\stackrel{\\ensuremath{\\rightarrow}}{p}",
+      "tier": 2,
+      "lineNumber": 612,
+      "context": "...ewblock {Measurement of ${G}_{{E}_{p}}/{G}_{{M}_{p}}$ in [FORMULA] to ${\\mathit{Q}}^{2}\\phantom{\\rule{0ex}{0ex}}=\\phanto..."
+    },
+    {
+      "index": 515,
+      "type": "inline",
+      "latex": "{\\mathit{Q}}^{2}\\phantom{\\rule{0ex}{0ex}}=\\phantom{\\rule{0ex}{0ex}}5.6{\\mathrm{GeV}}^{2}",
+      "tier": 2,
+      "lineNumber": 614,
+      "context": "...}\\mathit{e}\\stackrel{\\ensuremath{\\rightarrow}}{p}$ to [FORMULA] }. \\newblock {\\em Phys. Rev. Lett.} {\\bf 2002}, {\\em 88},~..."
+    },
+    {
+      "index": 516,
+      "type": "inline",
+      "latex": "{Q}^{2}=3.5\\phantom{\\rule{0.3em}{0ex}}\\text{GeV}{}^{2}",
+      "tier": 2,
+      "lineNumber": 622,
+      "context": "...et al. \\newblock {Proton elastic form factor ratios to [FORMULA] by polarization transfer}. \\newblock {\\em Phys. Rev. C..."
+    },
+    {
+      "index": 517,
+      "type": "inline",
+      "latex": "\\mu_{p}G_{E}/G_{M}",
+      "tier": 1,
+      "lineNumber": 631,
+      "context": "...sion measurement of the proton elastic form factor ratio [FORMULA] at low $Q^2$}. \\newblock {\\em Phys. Lett. B} {\\bf 2011},..."
+    },
+    {
+      "index": 518,
+      "type": "inline",
+      "latex": "Q^2",
+      "tier": 1,
+      "lineNumber": 631,
+      "context": "...on elastic form factor ratio $\\mu_{p}G_{E}/G_{M}$ at low [FORMULA] }. \\newblock {\\em Phys. Lett. B} {\\bf 2011}, {\\em 705},~59..."
+    },
+    {
+      "index": 519,
+      "type": "inline",
+      "latex": "{Q}^{2}=2.5",
+      "tier": 1,
+      "lineNumber": 640,
+      "context": "...fer observables in elastic electron-proton scattering at [FORMULA] , 5.2, 6.8, and $8.5 {\\mathrm{GeV}}^{2}$}. \\newblock {\\em..."
+    },
+    {
+      "index": 520,
+      "type": "inline",
+      "latex": "8.5 {\\mathrm{GeV}}^{2}",
+      "tier": 1,
+      "lineNumber": 640,
+      "context": "...ectron-proton scattering at ${Q}^{2}=2.5$, 5.2, 6.8, and [FORMULA] }. \\newblock {\\em Phys. Rev. C} {\\bf 2017}, {\\em 96},~0552..."
+    },
+    {
+      "index": 521,
+      "type": "inline",
+      "latex": "e^+ e^- \\to \\pi^+\\pi^- (\\gamma)",
+      "tier": 1,
+      "lineNumber": 686,
+      "context": "...Kerth, L.T.; et al. \\newblock {Precise Measurement of the [FORMULA] Cross Section with the Initial-State Radiation Method at..."
+    },
+    {
+      "index": 522,
+      "type": "inline",
+      "latex": "e^+e^-\\to \\pi^+ \\pi^-",
+      "tier": 1,
+      "lineNumber": 703,
+      "context": "...Y.; et al. \\newblock Corrigendum to ``Measurement of the [FORMULA] cross section between 600 and 900 MeV using initial state..."
+    },
+    {
+      "index": 523,
+      "type": "inline",
+      "latex": "\\rho^0",
+      "tier": 1,
+      "lineNumber": 746,
+      "context": "...čková, A.Z.; Kamiński, R. \\newblock {What are the correct [FORMULA] (770) meson mass and width values?} \\newblock {\\em Phys. R..."
+    }
+  ],
+  "customMacros": {},
+  "tierCounts": {
+    "1": 496,
+    "2": 13,
+    "3": 15,
+    "4": 0
+  },
+  "extractedAt": "2026-02-27T11:16:54.713Z"
+}

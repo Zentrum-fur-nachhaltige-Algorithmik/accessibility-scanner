@@ -148,7 +148,13 @@ function discoverPapersWithGt() {
 
   return fs.readdirSync(papersDir).filter(dir => {
     const gtPath = path.join(papersDir, dir, 'ground_truth.json');
-    return fs.existsSync(gtPath);
+    if (fs.existsSync(gtPath)) return true;
+    // Fall back to .tex source
+    const sourceDir = path.join(papersDir, dir, 'source');
+    if (fs.existsSync(sourceDir)) {
+      return fs.readdirSync(sourceDir).some(f => f.endsWith('.tex'));
+    }
+    return false;
   });
 }
 

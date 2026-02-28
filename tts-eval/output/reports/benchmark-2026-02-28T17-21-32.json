@@ -1,0 +1,972 @@
+{
+  "type": "multi-extractor-benchmark",
+  "generatedAt": "2026-02-28T17:21:32.575Z",
+  "comparison": {
+    "ranked": [
+      {
+        "rank": 1,
+        "name": "mistral",
+        "metrics": {
+          "name": "mistral",
+          "extractor": "mistral",
+          "paperCount": 3,
+          "weighted": {
+            "recall": 0.7678571428571429,
+            "precision": 0.9136394790952708,
+            "f1": 0.8344287949921754,
+            "conversionRate": 0.9938313913639479,
+            "charAccuracy": 0.8295235176899414,
+            "exactMatchRate": 0.48237059264816207
+          },
+          "macro": {
+            "recall": 0.730694777803707,
+            "precision": 0.8860466836346234,
+            "f1": 0.7630070756660405
+          },
+          "perTier": {
+            "1": {
+              "gtCount": 1533,
+              "matchedCount": 1158,
+              "recall": 0.7553816046966731,
+              "avgSimilarity": 0.8553169303352558,
+              "exactMatchRate": 0.540587219343696
+            },
+            "2": {
+              "gtCount": 139,
+              "matchedCount": 128,
+              "recall": 0.920863309352518,
+              "avgSimilarity": 0.6736366772796489,
+              "exactMatchRate": 0.125
+            },
+            "3": {
+              "gtCount": 60,
+              "matchedCount": 47,
+              "recall": 0.7833333333333333,
+              "avgSimilarity": 0.6185606183121429,
+              "exactMatchRate": 0.02127659574468085
+            },
+            "4": {
+              "gtCount": 4,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            }
+          },
+          "perType": {
+            "inline": {
+              "gtCount": 1554,
+              "matchedCount": 1169,
+              "recall": 0.7522522522522522
+            },
+            "display": {
+              "gtCount": 182,
+              "matchedCount": 164,
+              "recall": 0.9010989010989011
+            }
+          },
+          "editDistHistogram": {
+            "exact": 643,
+            "1-5": 296,
+            "6-20": 241,
+            "21-50": 72,
+            "50+": 81
+          },
+          "operational": {
+            "totalLatencyMs": 0,
+            "avgLatencyMs": 0,
+            "totalCostUsd": 0,
+            "avgCostUsd": 0
+          },
+          "counts": {
+            "totalGt": 1736,
+            "totalOcr": 1459,
+            "totalMatched": 1333,
+            "totalConverted": 1450
+          }
+        }
+      },
+      {
+        "rank": 2,
+        "name": "pymupdf-hybrid",
+        "metrics": {
+          "name": "pymupdf-hybrid",
+          "extractor": "pymupdf-hybrid",
+          "paperCount": 3,
+          "weighted": {
+            "recall": 0.35599078341013823,
+            "precision": 0.08293075684380032,
+            "f1": 0.1345232912494558,
+            "conversionRate": 0.9971819645732689,
+            "charAccuracy": 0.6026318377287596,
+            "exactMatchRate": 0.343042071197411
+          },
+          "macro": {
+            "recall": 0.27138021686769315,
+            "precision": 0.08634495916611583,
+            "f1": 0.1283674758084139
+          },
+          "perTier": {
+            "1": {
+              "gtCount": 1533,
+              "matchedCount": 615,
+              "recall": 0.40117416829745595,
+              "avgSimilarity": 0.6039349376346914,
+              "exactMatchRate": 0.34471544715447155
+            },
+            "2": {
+              "gtCount": 139,
+              "matchedCount": 3,
+              "recall": 0.02158273381294964,
+              "avgSimilarity": 0.3354963570127505,
+              "exactMatchRate": 0
+            },
+            "3": {
+              "gtCount": 60,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            },
+            "4": {
+              "gtCount": 4,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            }
+          },
+          "perType": {
+            "inline": {
+              "gtCount": 1554,
+              "matchedCount": 615,
+              "recall": 0.39575289575289574
+            },
+            "display": {
+              "gtCount": 182,
+              "matchedCount": 3,
+              "recall": 0.016483516483516484
+            }
+          },
+          "editDistHistogram": {
+            "exact": 212,
+            "1-5": 283,
+            "6-20": 122,
+            "21-50": 1,
+            "50+": 0
+          },
+          "operational": {
+            "totalLatencyMs": 5727,
+            "avgLatencyMs": 1909,
+            "totalCostUsd": 0,
+            "avgCostUsd": 0
+          },
+          "counts": {
+            "totalGt": 1736,
+            "totalOcr": 7452,
+            "totalMatched": 618,
+            "totalConverted": 7431
+          }
+        }
+      },
+      {
+        "rank": 3,
+        "name": "pymupdf",
+        "metrics": {
+          "name": "pymupdf",
+          "extractor": "pymupdf",
+          "paperCount": 3,
+          "weighted": {
+            "recall": 0,
+            "precision": 0,
+            "f1": 0,
+            "conversionRate": 0,
+            "charAccuracy": 0,
+            "exactMatchRate": 0
+          },
+          "macro": {
+            "recall": 0,
+            "precision": 0,
+            "f1": 0
+          },
+          "perTier": {
+            "1": {
+              "gtCount": 1533,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            },
+            "2": {
+              "gtCount": 139,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            },
+            "3": {
+              "gtCount": 60,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            },
+            "4": {
+              "gtCount": 4,
+              "matchedCount": 0,
+              "recall": 0,
+              "avgSimilarity": 0,
+              "exactMatchRate": 0
+            }
+          },
+          "perType": {
+            "inline": {
+              "gtCount": 1554,
+              "matchedCount": 0,
+              "recall": 0
+            },
+            "display": {
+              "gtCount": 182,
+              "matchedCount": 0,
+              "recall": 0
+            }
+          },
+          "editDistHistogram": {
+            "exact": 0,
+            "1-5": 0,
+            "6-20": 0,
+            "21-50": 0,
+            "50+": 0
+          },
+          "operational": {
+            "totalLatencyMs": 3623,
+            "avgLatencyMs": 1207.6666666666667,
+            "totalCostUsd": 0,
+            "avgCostUsd": 0
+          },
+          "counts": {
+            "totalGt": 1736,
+            "totalOcr": 0,
+            "totalMatched": 0,
+            "totalConverted": 0
+          }
+        }
+      }
+    ],
+    "recommendations": [
+      "Best overall F1: mistral (83.4%)",
+      "Best free extractor: mistral (F1: 83.4%)"
+    ],
+    "timestamp": "2026-02-28T17:21:32.575Z"
+  },
+  "perPaper": {
+    "mistral": {
+      "2012.13450": {
+        "extractor": "mistral",
+        "core": {
+          "recall": 0.9785067873303167,
+          "precision": 0.9885714285714285,
+          "f1": 0.9835133598635588,
+          "conversionRate": 0.9954285714285714,
+          "lossRate": 0.021493212669683258
+        },
+        "character": {
+          "charAccuracy": 0.9117669316195985,
+          "exactMatchRate": 0.6439306358381502,
+          "exactMatchCount": 557,
+          "editDistHistogram": {
+            "exact": 557,
+            "1-5": 202,
+            "6-20": 92,
+            "21-50": 13,
+            "50+": 1
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 819,
+            "matchedCount": 811,
+            "recall": 0.9902319902319903,
+            "avgSimilarity": 0.9165114147019615,
+            "exactMatchRate": 0.6695437731196054
+          },
+          "2": {
+            "gtCount": 46,
+            "matchedCount": 46,
+            "recall": 1,
+            "avgSimilarity": 0.8550897261074665,
+            "exactMatchRate": 0.30434782608695654
+          },
+          "3": {
+            "gtCount": 15,
+            "matchedCount": 8,
+            "recall": 0.5333333333333333,
+            "avgSimilarity": 0.7566888908398022,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 4,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 805,
+            "matchedCount": 794,
+            "recall": 0.986335403726708
+          },
+          "display": {
+            "gtCount": 79,
+            "matchedCount": 71,
+            "recall": 0.8987341772151899
+          }
+        },
+        "operational": {
+          "latencyMs": 0,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 884,
+          "ocrTotal": 875,
+          "matched": 865,
+          "unmatchedGt": 19,
+          "unmatchedOcr": 10,
+          "converted": 871,
+          "conversionFailed": 4
+        },
+        "matchStrategy": "greedy"
+      },
+      "2303.09244": {
+        "extractor": "mistral",
+        "core": {
+          "recall": 0.8567073170731707,
+          "precision": 0.7298701298701299,
+          "f1": 0.788218793828892,
+          "conversionRate": 0.987012987012987,
+          "lossRate": 0.14329268292682926
+        },
+        "character": {
+          "charAccuracy": 0.6398301033234329,
+          "exactMatchRate": 0.1601423487544484,
+          "exactMatchCount": 45,
+          "editDistHistogram": {
+            "exact": 45,
+            "1-5": 43,
+            "6-20": 74,
+            "21-50": 46,
+            "50+": 73
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 218,
+            "matchedCount": 184,
+            "recall": 0.8440366972477065,
+            "avgSimilarity": 0.6987202975381047,
+            "exactMatchRate": 0.2391304347826087
+          },
+          "2": {
+            "gtCount": 80,
+            "matchedCount": 73,
+            "recall": 0.9125,
+            "avgSimilarity": 0.5449180397903421,
+            "exactMatchRate": 0.0136986301369863
+          },
+          "3": {
+            "gtCount": 30,
+            "matchedCount": 24,
+            "recall": 0.8,
+            "avgSimilarity": 0.4770294742574357,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 0,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 242,
+            "matchedCount": 205,
+            "recall": 0.8471074380165289
+          },
+          "display": {
+            "gtCount": 86,
+            "matchedCount": 76,
+            "recall": 0.8837209302325582
+          }
+        },
+        "operational": {
+          "latencyMs": 0,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 328,
+          "ocrTotal": 385,
+          "matched": 281,
+          "unmatchedGt": 47,
+          "unmatchedOcr": 104,
+          "converted": 380,
+          "conversionFailed": 5
+        },
+        "matchStrategy": "hungarian"
+      },
+      "2303.16681": {
+        "extractor": "mistral",
+        "core": {
+          "recall": 0.3568702290076336,
+          "precision": 0.9396984924623115,
+          "f1": 0.5172890733056709,
+          "conversionRate": 1,
+          "lossRate": 0.6431297709923665
+        },
+        "character": {
+          "charAccuracy": 0.7341400759136606,
+          "exactMatchRate": 0.2192513368983957,
+          "exactMatchCount": 41,
+          "editDistHistogram": {
+            "exact": 41,
+            "1-5": 51,
+            "6-20": 75,
+            "21-50": 13,
+            "50+": 7
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 496,
+            "matchedCount": 163,
+            "recall": 0.3286290322580645,
+            "avgSimilarity": 0.7276178727480006,
+            "exactMatchRate": 0.2392638036809816
+          },
+          "2": {
+            "gtCount": 13,
+            "matchedCount": 9,
+            "recall": 0.6923076923076923,
+            "avgSimilarity": 0.7902611540174042,
+            "exactMatchRate": 0.1111111111111111
+          },
+          "3": {
+            "gtCount": 15,
+            "matchedCount": 15,
+            "recall": 1,
+            "avgSimilarity": 0.7713420367849229,
+            "exactMatchRate": 0.06666666666666667
+          },
+          "4": {
+            "gtCount": 0,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 507,
+            "matchedCount": 170,
+            "recall": 0.33530571992110453
+          },
+          "display": {
+            "gtCount": 17,
+            "matchedCount": 17,
+            "recall": 1
+          }
+        },
+        "operational": {
+          "latencyMs": 0,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 524,
+          "ocrTotal": 199,
+          "matched": 187,
+          "unmatchedGt": 337,
+          "unmatchedOcr": 12,
+          "converted": 199,
+          "conversionFailed": 0
+        },
+        "matchStrategy": "hungarian"
+      }
+    },
+    "pymupdf-hybrid": {
+      "2012.13450": {
+        "extractor": "pymupdf-hybrid",
+        "core": {
+          "recall": 0.6063348416289592,
+          "precision": 0.2266384778012685,
+          "f1": 0.329947676208064,
+          "conversionRate": 0.9928118393234673,
+          "lossRate": 0.3936651583710407
+        },
+        "character": {
+          "charAccuracy": 0.6008667368553521,
+          "exactMatchRate": 0.3358208955223881,
+          "exactMatchCount": 180,
+          "editDistHistogram": {
+            "exact": 180,
+            "1-5": 251,
+            "6-20": 104,
+            "21-50": 1,
+            "50+": 0
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 819,
+            "matchedCount": 534,
+            "recall": 0.652014652014652,
+            "avgSimilarity": 0.6018175690700945,
+            "exactMatchRate": 0.33707865168539325
+          },
+          "2": {
+            "gtCount": 46,
+            "matchedCount": 2,
+            "recall": 0.043478260869565216,
+            "avgSimilarity": 0.3469945355191257,
+            "exactMatchRate": 0
+          },
+          "3": {
+            "gtCount": 15,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 4,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 805,
+            "matchedCount": 533,
+            "recall": 0.662111801242236
+          },
+          "display": {
+            "gtCount": 79,
+            "matchedCount": 3,
+            "recall": 0.0379746835443038
+          }
+        },
+        "operational": {
+          "latencyMs": 1018,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 884,
+          "ocrTotal": 2365,
+          "matched": 536,
+          "unmatchedGt": 348,
+          "unmatchedOcr": 1829,
+          "converted": 2348,
+          "conversionFailed": 17
+        },
+        "matchStrategy": "greedy"
+      },
+      "2303.09244": {
+        "extractor": "pymupdf-hybrid",
+        "core": {
+          "recall": 0.13719512195121952,
+          "precision": 0.015608740894901144,
+          "f1": 0.028028651510432885,
+          "conversionRate": 1,
+          "lossRate": 0.8628048780487805
+        },
+        "character": {
+          "charAccuracy": 0.5354497354497355,
+          "exactMatchRate": 0.26666666666666666,
+          "exactMatchCount": 12,
+          "editDistHistogram": {
+            "exact": 12,
+            "1-5": 19,
+            "6-20": 14,
+            "21-50": 0,
+            "50+": 0
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 218,
+            "matchedCount": 44,
+            "recall": 0.2018348623853211,
+            "avgSimilarity": 0.540516774891775,
+            "exactMatchRate": 0.2727272727272727
+          },
+          "2": {
+            "gtCount": 80,
+            "matchedCount": 1,
+            "recall": 0.0125,
+            "avgSimilarity": 0.3125,
+            "exactMatchRate": 0
+          },
+          "3": {
+            "gtCount": 30,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 0,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 242,
+            "matchedCount": 45,
+            "recall": 0.1859504132231405
+          },
+          "display": {
+            "gtCount": 86,
+            "matchedCount": 0,
+            "recall": 0
+          }
+        },
+        "operational": {
+          "latencyMs": 3759,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 328,
+          "ocrTotal": 2883,
+          "matched": 45,
+          "unmatchedGt": 283,
+          "unmatchedOcr": 2838,
+          "converted": 2883,
+          "conversionFailed": 0
+        },
+        "matchStrategy": "greedy"
+      },
+      "2303.16681": {
+        "extractor": "pymupdf-hybrid",
+        "core": {
+          "recall": 0.07061068702290077,
+          "precision": 0.01678765880217786,
+          "f1": 0.027126099706744868,
+          "conversionRate": 0.9981851179673321,
+          "lossRate": 0.9293893129770993
+        },
+        "character": {
+          "charAccuracy": 0.7099099099099097,
+          "exactMatchRate": 0.5405405405405406,
+          "exactMatchCount": 20,
+          "editDistHistogram": {
+            "exact": 20,
+            "1-5": 13,
+            "6-20": 4,
+            "21-50": 0,
+            "50+": 0
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 496,
+            "matchedCount": 37,
+            "recall": 0.07459677419354839,
+            "avgSimilarity": 0.7099099099099097,
+            "exactMatchRate": 0.5405405405405406
+          },
+          "2": {
+            "gtCount": 13,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "3": {
+            "gtCount": 15,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 0,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 507,
+            "matchedCount": 37,
+            "recall": 0.07297830374753451
+          },
+          "display": {
+            "gtCount": 17,
+            "matchedCount": 0,
+            "recall": 0
+          }
+        },
+        "operational": {
+          "latencyMs": 950,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 524,
+          "ocrTotal": 2204,
+          "matched": 37,
+          "unmatchedGt": 487,
+          "unmatchedOcr": 2167,
+          "converted": 2200,
+          "conversionFailed": 4
+        },
+        "matchStrategy": "greedy"
+      }
+    },
+    "pymupdf": {
+      "2012.13450": {
+        "extractor": "pymupdf",
+        "core": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "conversionRate": 0,
+          "lossRate": 1
+        },
+        "character": {
+          "charAccuracy": 0,
+          "exactMatchRate": 0,
+          "exactMatchCount": 0,
+          "editDistHistogram": {
+            "exact": 0,
+            "1-5": 0,
+            "6-20": 0,
+            "21-50": 0,
+            "50+": 0
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 819,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "2": {
+            "gtCount": 46,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "3": {
+            "gtCount": 15,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 4,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 805,
+            "matchedCount": 0,
+            "recall": 0
+          },
+          "display": {
+            "gtCount": 79,
+            "matchedCount": 0,
+            "recall": 0
+          }
+        },
+        "operational": {
+          "latencyMs": 1096,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 884,
+          "ocrTotal": 0,
+          "matched": 0,
+          "unmatchedGt": 884,
+          "unmatchedOcr": 0,
+          "converted": 0,
+          "conversionFailed": 0
+        },
+        "matchStrategy": "hungarian"
+      },
+      "2303.09244": {
+        "extractor": "pymupdf",
+        "core": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "conversionRate": 0,
+          "lossRate": 1
+        },
+        "character": {
+          "charAccuracy": 0,
+          "exactMatchRate": 0,
+          "exactMatchCount": 0,
+          "editDistHistogram": {
+            "exact": 0,
+            "1-5": 0,
+            "6-20": 0,
+            "21-50": 0,
+            "50+": 0
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 218,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "2": {
+            "gtCount": 80,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "3": {
+            "gtCount": 30,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 0,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 242,
+            "matchedCount": 0,
+            "recall": 0
+          },
+          "display": {
+            "gtCount": 86,
+            "matchedCount": 0,
+            "recall": 0
+          }
+        },
+        "operational": {
+          "latencyMs": 1261,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 328,
+          "ocrTotal": 0,
+          "matched": 0,
+          "unmatchedGt": 328,
+          "unmatchedOcr": 0,
+          "converted": 0,
+          "conversionFailed": 0
+        },
+        "matchStrategy": "hungarian"
+      },
+      "2303.16681": {
+        "extractor": "pymupdf",
+        "core": {
+          "recall": 0,
+          "precision": 0,
+          "f1": 0,
+          "conversionRate": 0,
+          "lossRate": 1
+        },
+        "character": {
+          "charAccuracy": 0,
+          "exactMatchRate": 0,
+          "exactMatchCount": 0,
+          "editDistHistogram": {
+            "exact": 0,
+            "1-5": 0,
+            "6-20": 0,
+            "21-50": 0,
+            "50+": 0
+          }
+        },
+        "perTier": {
+          "1": {
+            "gtCount": 496,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "2": {
+            "gtCount": 13,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "3": {
+            "gtCount": 15,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          },
+          "4": {
+            "gtCount": 0,
+            "matchedCount": 0,
+            "recall": 0,
+            "avgSimilarity": 0,
+            "exactMatchRate": 0
+          }
+        },
+        "perType": {
+          "inline": {
+            "gtCount": 507,
+            "matchedCount": 0,
+            "recall": 0
+          },
+          "display": {
+            "gtCount": 17,
+            "matchedCount": 0,
+            "recall": 0
+          }
+        },
+        "operational": {
+          "latencyMs": 1266,
+          "costUsd": 0
+        },
+        "counts": {
+          "gtTotal": 524,
+          "ocrTotal": 0,
+          "matched": 0,
+          "unmatchedGt": 524,
+          "unmatchedOcr": 0,
+          "converted": 0,
+          "conversionFailed": 0
+        },
+        "matchStrategy": "hungarian"
+      }
+    }
+  }
+}

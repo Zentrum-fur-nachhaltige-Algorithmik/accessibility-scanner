@@ -12,15 +12,20 @@
     "run-pipeline": "node scripts/run-pipeline.js",
     "generate-report": "node scripts/generate-report.js",
     "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:eval": "vitest run --project eval",
+    "test:baseline": "BASELINE_UPDATE=1 vitest run --project eval",
     "test:watch": "vitest"
   },
   "dependencies": {
-    "temml": "^0.10.0",
-    "speech-rule-engine": "^4.0.0",
+    "fast-levenshtein": "^3.0.0",
     "fast-xml-parser": "^4.3.0",
-    "fast-levenshtein": "^3.0.0"
+    "speech-rule-engine": "^4.0.0",
+    "temml": "^0.10.0"
   },
   "devDependencies": {
+    "linkedom": "^0.16.11",
     "vitest": "^1.6.0"
   }
 }

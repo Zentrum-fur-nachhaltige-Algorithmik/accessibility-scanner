@@ -6,3 +6,4 @@ data/arxiv_papers/*/source/
 data/cache/
 output/html/
 .env
+tests/eval/__snapshots__/

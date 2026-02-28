@@ -54,6 +54,30 @@ const config = {
     complexPatterns: ['\\begin{pmatrix}', '\\begin{bmatrix}', '\\begin{cases}', '\\begin{vmatrix}'],
     difficultPatterns: ['\\begin{align}', '\\begin{gather}', '\\begin{multline}', '\\DeclareMathOperator', '\\tikzcd'],
   },
+
+  // Multi-extractor configuration
+  extractors: {
+    available: ['mistral', 'pymupdf', 'pymupdf-hybrid', 'nougat', 'marker', 'mathpix'],
+    default: 'mistral',
+    modal: {
+      nougat: { gpu: 'T4', timeout: 600 },
+      marker: { gpu: 'T4', timeout: 600 },
+    },
+    mathpix: {
+      appId: process.env.MATHPIX_APP_ID,
+      appKey: process.env.MATHPIX_APP_KEY,
+    },
+  },
+
+  // Corpus expansion configuration
+  corpus: {
+    densityTiers: {
+      low: { min: 10, max: 50 },
+      medium: { min: 100, max: 300 },
+      high: { min: 500 },
+    },
+    targetPerTier: 3,
+  },
 };
 
 // Validate required env vars at import time

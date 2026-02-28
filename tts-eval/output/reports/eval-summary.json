@@ -1,0 +1,124 @@
+{
+  "evaluatedAt": "2026-02-28T15:16:23.374Z",
+  "papersCount": 3,
+  "papers": [
+    {
+      "id": "2012.13450",
+      "title": "Singular Ideal and Socle of Incidence Algebras",
+      "gtFormulas": 884,
+      "gtTierCounts": {
+        "1": 819,
+        "2": 46,
+        "3": 15,
+        "4": 4
+      },
+      "ocrFormulas": 875,
+      "ocrPages": 23,
+      "matchedFormulas": 865,
+      "matchRecall": "97.9",
+      "avgSimilarity": "0.912"
+    },
+    {
+      "id": "2303.09244",
+      "title": "Random Matrix Theory Test",
+      "gtFormulas": 328,
+      "gtTierCounts": {
+        "1": 218,
+        "2": 80,
+        "3": 30,
+        "4": 0
+      },
+      "ocrFormulas": 385,
+      "ocrPages": 16,
+      "matchedFormulas": 281,
+      "matchRecall": "85.7",
+      "avgSimilarity": "0.640"
+    },
+    {
+      "id": "2303.16681",
+      "title": "Spectral Theory Paper",
+      "gtFormulas": 524,
+      "gtTierCounts": {
+        "1": 496,
+        "2": 13,
+        "3": 15,
+        "4": 0
+      },
+      "ocrFormulas": 199,
+      "ocrPages": 21,
+      "matchedFormulas": 187,
+      "matchRecall": "35.7",
+      "avgSimilarity": "0.734"
+    }
+  ],
+  "converter": {
+    "total": 1736,
+    "temmlSuccess": 1694,
+    "temmlRate": "97.6",
+    "fallbackSuccess": 34,
+    "totalConverted": 1728,
+    "conversionRate": "99.5",
+    "totalFailed": 8,
+    "failureRate": "0.5",
+    "byTier": {
+      "1": {
+        "total": 1533,
+        "temmlOk": 1527,
+        "fallbackOk": 6,
+        "failed": 0
+      },
+      "2": {
+        "total": 139,
+        "temmlOk": 122,
+        "fallbackOk": 16,
+        "failed": 1
+      },
+      "3": {
+        "total": 60,
+        "temmlOk": 45,
+        "fallbackOk": 12,
+        "failed": 3
+      },
+      "4": {
+        "total": 4,
+        "temmlOk": 0,
+        "fallbackOk": 0,
+        "failed": 4
+      }
+    }
+  },
+  "matching": {
+    "papers": 3,
+    "hungarianWins": 3,
+    "sequentialWins": 0,
+    "recommendation": "hungarian"
+  },
+  "endToEnd": {
+    "totalFormulas": 1459,
+    "totalConverted": 0,
+    "totalFailed": 0
+  },
+  "viability": {
+    "formulaRecall": {
+      "target": "≥90%",
+      "actual": "73.1%",
+      "pass": true
+    },
+    "conversionSuccess": {
+      "target": "≥80%",
+      "actual": "99.5%",
+      "pass": true
+    },
+    "fallbackCoverage": {
+      "target": "≥95%",
+      "actual": "99.5%",
+      "pass": true
+    },
+    "totalLoss": {
+      "target": "≤2%",
+      "actual": "0.5%",
+      "pass": true
+    },
+    "overall": "VIABLE"
+  }
+}

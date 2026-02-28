@@ -1,0 +1,80 @@
+[
+  {
+    "paperId": "2012.13450",
+    "gtCount": 884,
+    "ocrCount": 875,
+    "sequential": {
+      "matched": 207,
+      "avgSimilarity": 0.6033097121361224,
+      "unmatchedGt": 677,
+      "unmatchedOcr": 668,
+      "timeMs": 54
+    },
+    "hungarian": {
+      "matched": 865,
+      "avgSimilarity": 0.9117380298854943,
+      "unmatchedGt": 19,
+      "unmatchedOcr": 10,
+      "timeMs": 3546,
+      "simDistribution": {
+        "exact": 575,
+        "high": 151,
+        "medium": 109,
+        "low": 30
+      }
+    },
+    "winner": "hungarian"
+  },
+  {
+    "paperId": "2303.09244",
+    "gtCount": 328,
+    "ocrCount": 385,
+    "sequential": {
+      "matched": 24,
+      "avgSimilarity": 0.41945388891505847,
+      "unmatchedGt": 304,
+      "unmatchedOcr": 361,
+      "timeMs": 177
+    },
+    "hungarian": {
+      "matched": 281,
+      "avgSimilarity": 0.6398301033234326,
+      "unmatchedGt": 47,
+      "unmatchedOcr": 104,
+      "timeMs": 13267,
+      "simDistribution": {
+        "exact": 46,
+        "high": 41,
+        "medium": 95,
+        "low": 99
+      }
+    },
+    "winner": "hungarian"
+  },
+  {
+    "paperId": "2303.16681",
+    "gtCount": 524,
+    "ocrCount": 199,
+    "sequential": {
+      "matched": 25,
+      "avgSimilarity": 0.576768865376979,
+      "unmatchedGt": 499,
+      "unmatchedOcr": 174,
+      "timeMs": 14
+    },
+    "hungarian": {
+      "matched": 187,
+      "avgSimilarity": 0.7341400759136606,
+      "unmatchedGt": 337,
+      "unmatchedOcr": 12,
+      "timeMs": 2480,
+      "simDistribution": {
+        "exact": 41,
+        "high": 36,
+        "medium": 94,
+        "low": 16
+      }
+    },
+    "winner": "hungarian"
+  }
+]

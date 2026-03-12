@@ -1,0 +1,266 @@
+<!-- WCAG-TEST
+criterion: 3.3.7
+level: A
+title: Redundant Entry
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: forms
+description: Multi-step form auto-populates and avoids redundant data entry
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Redundant Entry - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .compliant-note {
+            border: 2px solid #2e7d32;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5e9;
+        }
+        .compliant-label {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .step {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .step-header {
+            background: #1b5e20;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+        }
+        .step-body {
+            padding: 20px;
+        }
+        .step-body label {
+            display: block;
+            font-weight: bold;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .step-body input,
+        .step-body select {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .step-body .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .step-body .form-row > div {
+            flex: 1;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .auto-filled {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .auto-note {
+            color: #2e7d32;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .same-as-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+        }
+        .same-as-checkbox input {
+            width: 20px;
+            height: 20px;
+        }
+        .same-as-checkbox label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .summary-display {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .summary-display dt {
+            font-weight: bold;
+            margin-top: 6px;
+        }
+        .summary-display dd {
+            margin: 0 0 4px 0;
+            color: #424242;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Checkout Process</h1>
+    <p>Complete all steps to place your order.</p>
+
+    <!-- PATTERN 1: Step 1 collects information once -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 1: Data Collected Once, Reused Across Steps</div>
+        <p>Name, email, and phone are collected in Step 1 and automatically populated in subsequent steps where needed.</p>
+    </div>
+
+    <div class="step">
+        <div class="step-header">Step 1: Account Information</div>
+        <div class="step-body">
+            <label for="s1-first">First Name</label>
+            <input type="text" id="s1-first" name="first_name" value="Jane" autocomplete="given-name">
+
+            <label for="s1-last">Last Name</label>
+            <input type="text" id="s1-last" name="last_name" value="Doe" autocomplete="family-name">
+
+            <label for="s1-email">Email Address</label>
+            <input type="email" id="s1-email" name="email" value="jane.doe@example.com" autocomplete="email">
+
+            <label for="s1-phone">Phone Number</label>
+            <input type="tel" id="s1-phone" name="phone" value="555-0123" autocomplete="tel">
+
+            <button class="btn" type="button">Continue to Shipping</button>
+        </div>
+    </div>
+
+    <!-- Step 2: Only asks for NEW data (shipping address), name auto-populated -->
+    <div class="step">
+        <div class="step-header">Step 2: Shipping Information</div>
+        <div class="step-body">
+            <p>Shipping to: <strong>Jane Doe</strong> (jane.doe@example.com)</p>
+            <div class="auto-note">Name and email carried from Step 1 — <a href="#s1-first">edit in Step 1</a></div>
+
+            <label for="s2-address">Street Address</label>
+            <input type="text" id="s2-address" name="ship_address" value="123 Main St" autocomplete="shipping street-address">
+
+            <div class="form-row">
+                <div>
+                    <label for="s2-city">City</label>
+                    <input type="text" id="s2-city" name="ship_city" value="Springfield" autocomplete="shipping address-level2">
+                </div>
+                <div>
+                    <label for="s2-state">State</label>
+                    <input type="text" id="s2-state" name="ship_state" value="IL" autocomplete="shipping address-level1">
+                </div>
+                <div>
+                    <label for="s2-zip">ZIP Code</label>
+                    <input type="text" id="s2-zip" name="ship_zip" value="62704" autocomplete="shipping postal-code">
+                </div>
+            </div>
+
+            <button class="btn" type="button">Continue to Billing</button>
+        </div>
+    </div>
+
+    <!-- PATTERN 2: "Same as shipping" checkbox -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 2: "Same as Shipping" Checkbox</div>
+        <p>A checkbox allows users to copy the shipping address to billing, avoiding redundant entry of address fields.</p>
+    </div>
+
+    <div class="step">
+        <div class="step-header">Step 3: Billing Information</div>
+        <div class="step-body">
+            <div class="same-as-checkbox">
+                <input type="checkbox" id="same-as-ship" name="same_address" checked>
+                <label for="same-as-ship">Billing address is the same as shipping address</label>
+            </div>
+
+            <!-- Auto-filled from shipping, editable if unchecked -->
+            <label for="s3-address">Street Address</label>
+            <input type="text" id="s3-address" name="bill_address" value="123 Main St" class="auto-filled" autocomplete="billing street-address">
+            <div class="auto-note">Auto-filled from shipping address</div>
+
+            <div class="form-row">
+                <div>
+                    <label for="s3-city">City</label>
+                    <input type="text" id="s3-city" name="bill_city" value="Springfield" class="auto-filled" autocomplete="billing address-level2">
+                </div>
+                <div>
+                    <label for="s3-state">State</label>
+                    <input type="text" id="s3-state" name="bill_state" value="IL" class="auto-filled" autocomplete="billing address-level1">
+                </div>
+                <div>
+                    <label for="s3-zip">ZIP Code</label>
+                    <input type="text" id="s3-zip" name="bill_zip" value="62704" class="auto-filled" autocomplete="billing postal-code">
+                </div>
+            </div>
+
+            <label for="s3-card">Card Number</label>
+            <input type="text" id="s3-card" name="card_number" autocomplete="cc-number">
+
+            <div class="form-row">
+                <div>
+                    <label for="s3-exp">Expiry</label>
+                    <input type="text" id="s3-exp" name="card_exp" placeholder="MM/YY" autocomplete="cc-exp">
+                </div>
+                <div>
+                    <label for="s3-cvv">CVV</label>
+                    <input type="text" id="s3-cvv" name="card_cvv" autocomplete="cc-csc">
+                </div>
+            </div>
+
+            <button class="btn" type="button">Continue to Review</button>
+        </div>
+    </div>
+
+    <!-- Step 4: Displays previously entered data, does not re-ask -->
+    <div class="step">
+        <div class="step-header">Step 4: Order Review</div>
+        <div class="step-body">
+            <p><strong>Order Summary:</strong> 3 items - $149.97 | Shipping: $5.99</p>
+
+            <div class="summary-display">
+                <dl>
+                    <dt>Name</dt><dd>Jane Doe</dd>
+                    <dt>Email</dt><dd>jane.doe@example.com</dd>
+                    <dt>Phone</dt><dd>555-0123</dd>
+                    <dt>Shipping Address</dt><dd>123 Main St, Springfield, IL 62704</dd>
+                    <dt>Billing Address</dt><dd>Same as shipping</dd>
+                </dl>
+            </div>
+            <p><a href="#s1-first">Edit account info</a> | <a href="#s2-address">Edit shipping</a> | <a href="#s3-address">Edit billing</a></p>
+
+            <button class="btn" type="button">Place Order</button>
+        </div>
+    </div>
+
+</body>
+</html>

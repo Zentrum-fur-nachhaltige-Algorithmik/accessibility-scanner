@@ -1,0 +1,307 @@
+<!-- WCAG-TEST
+criterion: 2.4.11
+level: AA
+title: Focus Not Obscured (Minimum)
+test_type: bad
+expected_violations: 5
+testable_by: dom
+scanners: focus-management
+description: Fixed/sticky elements obscure focused interactive elements
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Focus Not Obscured - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* VIOLATION 1: Fixed header that obscures focused elements behind it */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #1a237e;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+        .fixed-header nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+
+        /* VIOLATION 2: Fixed footer that covers bottom-of-page focusable content */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #263238;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .fixed-footer a {
+            color: #80cbc4;
+            margin: 0 10px;
+        }
+
+        /* VIOLATION 3: Cookie banner that overlaps form fields */
+        .cookie-banner {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            background: #37474f;
+            color: white;
+            padding: 20px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cookie-banner button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        /* No scroll-padding to compensate for fixed elements */
+        .page-content {
+            padding-top: 80px; /* Only minimal offset, not enough with scrolling */
+            padding-bottom: 200px;
+        }
+
+        .form-section {
+            margin: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .form-section input,
+        .form-section select,
+        .form-section textarea {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            padding: 8px;
+            margin: 8px 0 16px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-section label {
+            font-weight: bold;
+        }
+        .form-section button {
+            padding: 10px 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* VIOLATION 4: Sticky sidebar that overlaps content on narrow viewports */
+        .sticky-sidebar {
+            position: sticky;
+            top: 80px;
+            float: right;
+            width: 250px;
+            background: #e8eaf6;
+            padding: 15px;
+            margin-left: 20px;
+            z-index: 500;
+            max-height: 300px;
+            overflow: hidden;
+        }
+        .sticky-sidebar a {
+            display: block;
+            padding: 5px 0;
+            color: #283593;
+        }
+
+        /* VIOLATION 5: Notification toast that covers interactive elements */
+        .notification-toast {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            width: 350px;
+            background: #ff5722;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .notification-toast a {
+            color: #ffccbc;
+        }
+        .notification-toast button {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .content-block {
+            margin: 20px;
+            padding: 15px;
+        }
+        .content-block a {
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VIOLATION 1: Fixed header obscures elements when they receive focus via Tab -->
+    <header class="fixed-header">
+        <strong>SiteName</strong>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#products">Products</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <!-- VIOLATION 5: Persistent notification covering right-side content -->
+    <div class="notification-toast" aria-live="assertive">
+        <p>Special offer! <a href="#offer">Click here for 50% off</a></p>
+        <button>Dismiss</button>
+    </div>
+
+    <div class="page-content">
+        <div class="violation-section">
+            <div class="violation-label">VIOLATION 1: Fixed Header Obscures Focus</div>
+            <p>The fixed header at the top has no scroll-padding-top on the html/body. When tabbing through links near the top of scrolled content, focused elements get hidden behind the 80px fixed header.</p>
+        </div>
+
+        <!-- Content near top that gets obscured by fixed header when scrolling -->
+        <div class="content-block">
+            <h2>Welcome to Our Site</h2>
+            <p>Browse our <a href="#catalog">product catalog</a> or <a href="#support">get support</a>.</p>
+            <p>Read our <a href="#blog">latest blog posts</a> and <a href="#news">company news</a>.</p>
+        </div>
+
+        <div class="violation-section">
+            <div class="violation-label">VIOLATION 3: Cookie Banner Overlaps Form</div>
+            <p>The cookie consent banner at the bottom overlaps with the form fields below, making them impossible to see when focused.</p>
+        </div>
+
+        <!-- VIOLATION 4: Sticky sidebar overlapping main content -->
+        <div style="overflow: hidden;">
+            <aside class="sticky-sidebar">
+                <h3>Quick Links</h3>
+                <a href="#link1">Documentation</a>
+                <a href="#link2">API Reference</a>
+                <a href="#link3">Tutorials</a>
+                <a href="#link4">Community</a>
+                <a href="#link5">Support</a>
+            </aside>
+
+            <div class="violation-section" style="margin-right: 290px;">
+                <div class="violation-label">VIOLATION 4: Sticky Sidebar Overlaps Content</div>
+                <p>The sticky sidebar floats over main content on narrow screens. Focusable elements beneath it become obscured.</p>
+            </div>
+
+            <div class="content-block" style="margin-right: 290px;">
+                <h2>Main Content Area</h2>
+                <p>Fill out the form below to register:</p>
+                <!-- These elements can be overlapped by the sticky sidebar on narrow viewports -->
+                <a href="#terms">Terms of Service</a> |
+                <a href="#privacy">Privacy Policy</a> |
+                <a href="#accessibility">Accessibility Statement</a>
+            </div>
+        </div>
+
+        <!-- Form section near bottom - covered by fixed footer and cookie banner -->
+        <div class="form-section">
+            <h2>Contact Form</h2>
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name">
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email">
+
+            <label for="subject">Subject</label>
+            <select id="subject" name="subject">
+                <option value="">Select a topic...</option>
+                <option value="general">General Inquiry</option>
+                <option value="support">Technical Support</option>
+                <option value="billing">Billing</option>
+            </select>
+
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="4"></textarea>
+
+            <!-- These buttons near the bottom are covered by the fixed footer + cookie banner -->
+            <button type="submit">Send Message</button>
+            <button type="reset">Clear Form</button>
+        </div>
+
+        <div class="violation-section">
+            <div class="violation-label">VIOLATION 2: Fixed Footer Obscures Bottom Content</div>
+            <p>The fixed footer covers the submit/reset buttons and bottom links. Users tabbing to these elements cannot see them.</p>
+        </div>
+
+        <div class="violation-section">
+            <div class="violation-label">VIOLATION 5: Notification Toast Covers Content</div>
+            <p>A persistent notification toast in the top-right corner covers focusable elements behind it with a high z-index.</p>
+        </div>
+
+        <!-- Bottom links that are obscured by footer -->
+        <div class="content-block">
+            <p><a href="#sitemap">Sitemap</a> | <a href="#careers">Careers</a> | <a href="#legal">Legal</a></p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 3: Cookie banner covering form fields -->
+    <div class="cookie-banner">
+        <p>We use cookies to enhance your experience. By continuing, you agree to our cookie policy.</p>
+        <div>
+            <button>Accept All</button>
+            <button>Manage Preferences</button>
+        </div>
+    </div>
+
+    <!-- VIOLATION 2: Fixed footer obscuring bottom-of-page elements -->
+    <footer class="fixed-footer">
+        <a href="#about">About</a>
+        <a href="#terms">Terms</a>
+        <a href="#contact-footer">Contact</a>
+    </footer>
+
+</body>
+</html>

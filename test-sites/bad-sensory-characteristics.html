@@ -1,0 +1,168 @@
+<!-- WCAG-TEST
+criterion: 1.3.3
+level: A
+title: Sensory Characteristics
+test_type: bad
+expected_violations: 4
+testable_by: manual
+scanners: structure
+description: Instructions rely solely on shape, color, size, or visual location without text alternatives
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Sensory-Only Instructions (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .violation-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+        .form-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .round-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .square-btn {
+            width: 50px;
+            height: 50px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .triangle-icon {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 26px solid #ffc107;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .error-text { color: #dc3545; }
+        .success-text { color: #28a745; }
+        .sidebar {
+            float: right;
+            width: 200px;
+            background: #e9ecef;
+            padding: 15px;
+            margin-left: 20px;
+            border-radius: 4px;
+        }
+        .large-text { font-size: 1.5em; }
+        .small-text { font-size: 0.75em; }
+        .layout-container {
+            display: flex;
+            gap: 20px;
+        }
+        .layout-container .left-panel {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .layout-container .right-panel {
+            flex: 1;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sensory-Only Instructions (BAD)</h1>
+    <p>This page demonstrates violations of WCAG 1.3.3: instructions that rely solely on sensory characteristics.</p>
+
+    <!-- Violation 1: Shape-only references -->
+    <h2>Violation 1: Shape-Only References</h2>
+    <div class="violation-note">Instructions reference buttons only by their shape. Users who cannot see the shapes have no way to identify the correct control.</div>
+    <div class="form-section">
+        <p>To submit your application, <strong>click the round button</strong>. To cancel, <strong>press the square button</strong>.</p>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 10px;">
+            <button class="round-btn" aria-label="Submit">&#10003;</button>
+            <button class="square-btn" aria-label="Cancel">&#10005;</button>
+        </div>
+        <p style="margin-top: 15px;">If you see a <span class="triangle-icon"></span> <strong>triangle icon</strong>, it means there is a warning. Review the section marked with the triangle before proceeding.</p>
+    </div>
+
+    <!-- Violation 2: Color-only references -->
+    <h2>Violation 2: Color-Only References</h2>
+    <div class="violation-note">Error and success states are communicated only through text color. Users who cannot perceive color differences will miss these instructions.</div>
+    <div class="form-section">
+        <p>Please review the form below. <strong>The red text indicates required fields that have errors.</strong> <strong>Green text means the field is valid.</strong></p>
+        <form>
+            <div style="margin-bottom: 10px;">
+                <label>Full Name:</label><br>
+                <input type="text" value="">
+                <span class="error-text">This field is required</span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Email Address:</label><br>
+                <input type="text" value="user@example.com">
+                <span class="success-text">Looks good</span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Phone Number:</label><br>
+                <input type="text" value="abc">
+                <span class="error-text">Invalid phone number format</span>
+            </div>
+        </form>
+    </div>
+
+    <!-- Violation 3: Location-only references -->
+    <h2>Violation 3: Location-Only References</h2>
+    <div class="violation-note">Instructions direct users to page locations ("on the left", "in the sidebar", "at the top") without identifying elements by name or role.</div>
+    <div class="layout-container">
+        <div class="left-panel">
+            <h3>Navigation</h3>
+            <ul>
+                <li><a href="#">Account Settings</a></li>
+                <li><a href="#">Billing</a></li>
+                <li><a href="#">Notifications</a></li>
+            </ul>
+        </div>
+        <div class="right-panel">
+            <h3>Getting Started</h3>
+            <p>To manage your account, <strong>use the menu on the left</strong>.</p>
+            <p>For quick actions, <strong>check the sidebar on the right side of the page</strong>.</p>
+            <p>Your profile summary is <strong>located at the top of the page above</strong>.</p>
+            <p>Additional options can be found <strong>below the main content area</strong>.</p>
+        </div>
+    </div>
+
+    <!-- Violation 4: Size-only references -->
+    <h2>Violation 4: Size-Only References</h2>
+    <div class="violation-note">Instructions reference elements only by their visual size. This is meaningless to screen reader users.</div>
+    <div class="form-section">
+        <p><strong>Click the larger button</strong> to proceed to checkout. <strong>The smaller button</strong> saves your cart for later.</p>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 10px;">
+            <button style="padding: 15px 30px; font-size: 1.3em;">Proceed</button>
+            <button style="padding: 5px 10px; font-size: 0.8em;">Save</button>
+        </div>
+        <p style="margin-top: 15px;">Important notices are shown in <span class="large-text">large text</span>. Optional details appear in <span class="small-text">smaller text</span>. <strong>Read the large text first.</strong></p>
+    </div>
+
+</body>
+</html>

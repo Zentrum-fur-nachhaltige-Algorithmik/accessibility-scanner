@@ -1,0 +1,181 @@
+<!-- WCAG-TEST
+criterion: 2.1.4
+level: A
+title: Character Key Shortcuts
+test_type: good
+expected_violations: 0
+testable_by: manual
+scanners: keyboard
+description: Keyboard shortcuts use modifier keys and can be remapped or disabled by the user
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Proper Keyboard Shortcuts (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .shortcut-badge {
+            display: inline-block;
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            padding: 2px 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .toolbar {
+            background: #343a40;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: flex;
+            gap: 15px;
+        }
+        .toolbar button {
+            background: #495057;
+            color: #fff;
+            border: 1px solid #6c757d;
+            padding: 4px 12px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .settings-panel {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .settings-panel table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .settings-panel td, .settings-panel th {
+            padding: 6px 10px;
+            border-bottom: 1px solid #dee2e6;
+            text-align: left;
+        }
+        .feed-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Proper Keyboard Shortcuts (GOOD)</h1>
+    <p>This page demonstrates WCAG 2.1.4 compliance: shortcuts use modifier keys and/or can be disabled and remapped.</p>
+
+    <!-- Pattern 1: Modifier key shortcuts -->
+    <h2>Pattern 1: Shortcuts with Modifier Keys</h2>
+    <div class="section">
+        <div class="toolbar" role="toolbar" aria-label="Email actions">
+            <button>Search (<span class="shortcut-badge">Ctrl+K</span>)</button>
+            <button>Delete (<span class="shortcut-badge">Ctrl+D</span>)</button>
+            <button>Reply (<span class="shortcut-badge">Ctrl+R</span>)</button>
+            <button>Forward (<span class="shortcut-badge">Ctrl+Shift+F</span>)</button>
+        </div>
+        <p style="margin-top: 10px;">All shortcuts require a modifier key (Ctrl or Ctrl+Shift), preventing accidental activation by speech input or screen reader users.</p>
+    </div>
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (!e.ctrlKey && !e.metaKey) return; // Require modifier
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            switch(e.key) {
+                case 'k': e.preventDefault(); console.log('Open search'); break;
+                case 'd': e.preventDefault(); console.log('Delete selected'); break;
+                case 'r': e.preventDefault(); console.log('Reply'); break;
+            }
+            if (e.shiftKey && e.key === 'F') {
+                e.preventDefault(); console.log('Forward');
+            }
+        });
+    </script>
+
+    <!-- Pattern 2: Remappable and disableable shortcuts -->
+    <h2>Pattern 2: Disableable and Remappable Shortcuts</h2>
+    <div class="section">
+        <p>Navigate the feed using keyboard shortcuts. You can disable or remap all shortcuts in settings.</p>
+        <div style="margin-bottom: 10px;">
+            <label>
+                <input type="checkbox" id="shortcuts-enabled" checked>
+                Enable keyboard shortcuts
+            </label>
+        </div>
+        <div class="settings-panel">
+            <h3>Shortcut Settings</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Current Shortcut</th>
+                        <th>Remap</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Next item</td>
+                        <td><span class="shortcut-badge">Alt+J</span></td>
+                        <td><input type="text" value="Alt+J" size="10" aria-label="Remap next item shortcut"></td>
+                    </tr>
+                    <tr>
+                        <td>Previous item</td>
+                        <td><span class="shortcut-badge">Alt+K</span></td>
+                        <td><input type="text" value="Alt+K" size="10" aria-label="Remap previous item shortcut"></td>
+                    </tr>
+                    <tr>
+                        <td>Open item</td>
+                        <td><span class="shortcut-badge">Alt+O</span></td>
+                        <td><input type="text" value="Alt+O" size="10" aria-label="Remap open item shortcut"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="feed-2" style="margin-top: 15px;">
+            <div class="feed-item"><strong>Post 1:</strong> New release announced for version 4.0</div>
+            <div class="feed-item"><strong>Post 2:</strong> Community meetup scheduled for April</div>
+            <div class="feed-item"><strong>Post 3:</strong> Bug bounty program now open</div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('keydown', function(e) {
+            var enabled = document.getElementById('shortcuts-enabled');
+            if (!enabled || !enabled.checked) return;
+            if (!e.altKey) return; // Require Alt modifier
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            switch(e.key) {
+                case 'j': e.preventDefault(); console.log('Next item'); break;
+                case 'k': e.preventDefault(); console.log('Previous item'); break;
+                case 'o': e.preventDefault(); console.log('Open item'); break;
+            }
+        });
+    </script>
+
+    <!-- Pattern 3: Focus-only shortcuts -->
+    <h2>Pattern 3: Shortcuts Active Only When Component Has Focus</h2>
+    <div class="section">
+        <p>The widget below accepts single character shortcuts only when it has focus. This satisfies 2.1.4 because the shortcut is only active on the focused component.</p>
+        <div tabindex="0" role="listbox" aria-label="Color picker" style="border: 2px solid #007bff; padding: 15px; border-radius: 4px; max-width: 300px;">
+            <p style="margin: 0 0 8px;">Focus this panel, then press <span class="shortcut-badge">r</span> <span class="shortcut-badge">g</span> <span class="shortcut-badge">b</span> to select a color.</p>
+            <div role="option" aria-selected="false">Red</div>
+            <div role="option" aria-selected="false">Green</div>
+            <div role="option" aria-selected="false">Blue</div>
+        </div>
+        <p style="margin-top: 8px; font-size: 0.9em; color: #666;">Single-character shortcuts here are compliant because they only activate when the component has focus.</p>
+    </div>
+
+</body>
+</html>

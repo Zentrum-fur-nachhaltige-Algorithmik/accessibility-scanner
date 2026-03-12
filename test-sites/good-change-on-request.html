@@ -24,11 +24,12 @@ description: All context changes user-initiated, update buttons for feeds, no au
     </style>
 </head>
 <body>
+<main>
     <h1>Good Change on Request (3.2.5 AAA)</h1>
 
     <!-- Compliant 1: User-initiated page change with link instead of auto-redirect -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Page change requires user action</div>
+        <h2 class="compliant-title">Compliant: Page change requires user action</div>
         <p>This page has moved to a new location. Please follow the link below when you are ready:</p>
         <p><a href="https://example.com/new-page" style="color:#005fcc;">Go to the new page</a></p>
         <p style="font-size:0.85em; color:#555;">No auto-redirect is used. The user decides when to navigate.</p>
@@ -36,7 +37,7 @@ description: All context changes user-initiated, update buttons for feeds, no au
 
     <!-- Compliant 2: Promotional content controlled by user -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Promotional content with manual navigation</div>
+        <h2 class="compliant-title">Compliant: Promotional content with manual navigation</div>
         <div style="background:#333; color:#fff; padding:20px; text-align:center; margin:10px 0;">
             <p id="promoText" style="font-size:1.2em;">Featured Deal: 30% off Electronics</p>
         </div>
@@ -55,7 +56,7 @@ description: All context changes user-initiated, update buttons for feeds, no au
 
     <!-- Compliant 3: News feed with manual refresh -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: News feed updates only on user request</div>
+        <h2 class="compliant-title">Compliant: News feed updates only on user request</div>
         <button type="button" id="refreshBtn" onclick="refreshFeed()">Refresh Feed</button>
         <span id="feedStatus" role="status" aria-live="polite" style="margin-left:10px; color:#555;"></span>
         <div id="newsFeed" style="margin-top:10px;">
@@ -76,7 +77,7 @@ description: All context changes user-initiated, update buttons for feeds, no au
 
     <!-- Compliant 4: Select with explicit Go button -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Select dropdown with explicit submit button</div>
+        <h2 class="compliant-title">Compliant: Select dropdown with explicit submit button</div>
         <form action="#" method="get" style="display:flex; align-items:center; gap:10px;">
             <label for="dept">Select a department:</label>
             <select id="dept" name="dept" style="padding:8px;">
@@ -89,5 +90,6 @@ description: All context changes user-initiated, update buttons for feeds, no au
         </form>
         <p style="font-size:0.85em; color:#555;">The dropdown does not navigate on change. The user must click "Go" to navigate.</p>
     </div>
+</main>
 </body>
 </html>

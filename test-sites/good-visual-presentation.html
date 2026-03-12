@@ -33,17 +33,18 @@ description: Controlled line width, user color preferences, left-aligned text, 1
     </style>
 </head>
 <body>
+<main>
     <h1>Good Visual Presentation (1.4.8 AAA)</h1>
 
     <!-- Compliant 1: Line width limited to ~70 characters -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Line width limited with max-width: 70ch</div>
+        <h2 class="compliant-title">Compliant: Line width limited with max-width: 70ch</div>
         <p>This paragraph is constrained to approximately 70 characters per line using the <code>ch</code> unit. This ensures readability regardless of viewport width. Users can follow from the end of one line to the beginning of the next without losing their place.</p>
     </div>
 
     <!-- Compliant 2: User can adjust colors -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: User-selectable foreground and background colors</div>
+        <h2 class="compliant-title">Compliant: User-selectable foreground and background colors</div>
         <div class="color-controls">
             <label for="fgColor">Text color:</label>
             <input type="color" id="fgColor" value="#222222"
@@ -57,17 +58,18 @@ description: Controlled line width, user color preferences, left-aligned text, 1
 
     <!-- Compliant 3: Left-aligned text with proper spacing -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Left-aligned text with 1.8 line spacing</div>
+        <h2 class="compliant-title">Compliant: Left-aligned text with 1.8 line spacing</div>
         <p>All text on this page is left-aligned (not justified), providing consistent word spacing. The line-height is set to 1.8, exceeding the 1.5 AAA minimum. Paragraph spacing is at least 1.5 times the line spacing, creating clear visual separation between blocks of text.</p>
         <p>This second paragraph demonstrates the paragraph spacing. The gap between paragraphs is clearly larger than the gap between lines within a paragraph, making it easy to identify paragraph boundaries.</p>
     </div>
 
     <!-- Compliant 4: Text resizable without content loss -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Text resizable to 200% without content loss</div>
+        <h2 class="compliant-title">Compliant: Text resizable to 200% without content loss</div>
         <div style="overflow: auto; min-height: auto; padding: 1em; border: 1px solid #999;">
             <p style="margin:0;">This text container uses relative units (em/rem), auto overflow, and flexible height. When zoomed to 200%, the container expands to fit all content. No text is clipped or hidden. The layout remains usable at any zoom level.</p>
         </div>
     </div>
+</main>
 </body>
 </html>

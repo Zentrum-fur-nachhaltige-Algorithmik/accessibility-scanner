@@ -33,6 +33,13 @@ class LLMBaseScanner extends BaseScanner {
     const fullPrompt = `Analyze the following HTML for accessibility issues.\n\nHTML:\n\`\`\`html\n${htmlSnippet}\n\`\`\`\n\n${prompt}`;
 
     const defaultSystem = `You are an accessibility auditor. Analyze HTML for WCAG 2.2 compliance issues.
+
+CRITICAL RULES:
+1. ONLY report violations for the SPECIFIC criteria mentioned in the user prompt. Do NOT report violations for any other WCAG criteria.
+2. If the HTML is compliant for the requested criteria, return an EMPTY violations array.
+3. Err on the side of NOT flagging. Only report clear, unambiguous violations.
+4. Do NOT flag issues related to criteria not listed in the prompt (e.g., do not flag 1.3.1, 1.4.3, or 2.4.4 unless explicitly asked).
+
 Respond ONLY with valid JSON. Do not include markdown code fences or explanations.
 Format: { "violations": [{ "criterion": "X.Y.Z", "description": "...", "impact": "critical|serious|moderate|minor", "selector": "..." }], "summary": "..." }`;
 

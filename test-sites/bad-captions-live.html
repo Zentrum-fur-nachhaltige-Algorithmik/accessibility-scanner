@@ -1,0 +1,80 @@
+<!-- WCAG-TEST
+criterion: 1.2.4
+level: AA
+title: Captions (Live)
+test_type: bad
+expected_violations: 3
+testable_by: regex
+scanners: media-alternatives
+description: Live video content without captions or real-time captioning support
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad: Captions (Live) - WCAG 1.2.4</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; }
+        h1 { color: #1a1a1a; }
+        .stream-container { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; max-width: 800px; }
+        .stream-container h2 { margin-top: 0; }
+        .video-placeholder { background: #000; color: #fff; height: 300px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border-radius: 4px; }
+        .live-badge { background: #e00; color: #fff; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-left: 0.5rem; }
+        .controls { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+        .controls button { padding: 0.4rem 1rem; border: 1px solid #999; background: #eee; border-radius: 4px; cursor: pointer; }
+        iframe { border: none; width: 100%; height: 350px; }
+    </style>
+</head>
+<body>
+    <h1>Live Streaming Platform</h1>
+    <p>Watch our live events happening right now.</p>
+
+    <!-- Violation 1: Live video element with no captions track -->
+    <div class="stream-container">
+        <h2>Morning News Broadcast <span class="live-badge">LIVE</span></h2>
+        <video autoplay muted width="100%" height="300">
+            <source src="live-stream-news.m3u8" type="application/x-mpegURL">
+            <!-- No <track kind="captions"> element for live content -->
+            Your browser does not support the video tag.
+        </video>
+        <div class="controls">
+            <button>Unmute</button>
+            <button>Full Screen</button>
+            <!-- No caption toggle button -->
+        </div>
+    </div>
+
+    <!-- Violation 2: Live webinar player with no caption track or captioning service -->
+    <div class="stream-container">
+        <h2>Webinar: Q1 Financial Results <span class="live-badge">LIVE</span></h2>
+        <div class="video-placeholder">
+            <div>
+                <p>Live Webinar Stream</p>
+                <p style="font-size: 0.8rem;">Speaker: Jane Thompson, CFO</p>
+            </div>
+        </div>
+        <video width="100%" height="0" style="display:none" data-live="true">
+            <source src="webinar-stream.webm" type="video/webm">
+            <!-- No caption track, no captioning integration, no transcript -->
+        </video>
+        <div class="controls">
+            <button>Ask a Question</button>
+            <button>Raise Hand</button>
+            <!-- No CC button, no live transcript panel -->
+        </div>
+    </div>
+
+    <!-- Violation 3: Conference call embed with no real-time captioning support -->
+    <div class="stream-container">
+        <h2>All-Hands Company Meeting <span class="live-badge">LIVE</span></h2>
+        <!-- Embedded conference call player with zero captioning infrastructure -->
+        <iframe src="https://conference.example.com/room/12345?embed=true" title="Conference call - no captions available"></iframe>
+        <p>Join the live discussion with the leadership team. Audio and video only — no captioning is provided for this stream.</p>
+        <div class="controls">
+            <button>Join Audio</button>
+            <button>Share Screen</button>
+        </div>
+    </div>
+</body>
+</html>

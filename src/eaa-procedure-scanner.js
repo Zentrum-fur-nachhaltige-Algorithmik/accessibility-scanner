@@ -331,7 +331,7 @@ class EAAProcedureScanner extends BaseScanner {
                     issue: 'statement-missing-wcag-reference',
                     description: 'Accessibility statement lacks WCAG compliance reference',
                     severity: 'warning',
-                    suggestion: 'Include WCAG 2.1 AA compliance level and reference in statement'
+                    suggestion: 'Include WCAG 2.2 AA compliance level and reference in statement'
                   });
                 }
 

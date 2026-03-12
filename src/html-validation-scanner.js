@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Enhanced HTML Validation Scanner for WCAG 2.1 compliance testing
+ * Enhanced HTML Validation Scanner for WCAG 2.2 compliance testing
  * PHASE 1: CSP-Independent Implementation
  *
  * Implements EN 301 549 criteria 9.4.1.1, 9.4.1.3 + 40+ additional axe rules

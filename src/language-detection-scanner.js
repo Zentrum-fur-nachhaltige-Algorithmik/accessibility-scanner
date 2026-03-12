@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Language Detection Scanner for WCAG 2.1 compliance testing
+ * Language Detection Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.3.1.1, 9.3.1.2 (Language of Page, Language of Parts)
  * Detects page language declarations and multilingual content marking
  */

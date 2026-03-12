@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Timing Controls Scanner for WCAG 2.1 compliance testing
+ * Timing Controls Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.2.2.1, 9.2.2.2, 9.2.2.6
  * Tests timing adjustability, auto-play controls, and timeout handling
  */

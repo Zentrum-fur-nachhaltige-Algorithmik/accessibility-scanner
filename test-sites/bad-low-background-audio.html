@@ -1,0 +1,81 @@
+<!-- WCAG-TEST
+criterion: 1.4.7
+level: AAA
+title: Low or No Background Audio
+test_type: bad
+expected_violations: 4
+testable_by: llm
+scanners: llm-visual-presentation-scanner
+description: Audio content with loud background sounds, no option to disable background audio
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Low Background Audio - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
+        .audio-placeholder { background: #333; color: #fff; padding: 25px; border-radius: 8px; margin: 10px 0; }
+        .level-bar { height: 20px; border-radius: 4px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Bad Low or No Background Audio (1.4.7 AAA)</h1>
+
+    <!-- Violation 1: Background music louder than -20dB below foreground -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 1: Background music too loud relative to speech</div>
+        <div class="audio-placeholder">
+            <p>[Audio Player: Product Tutorial Narration]</p>
+            <p>Audio levels:</p>
+            <p>Speech (foreground):</p>
+            <div class="level-bar" style="width:60%; background:#4CAF50;">-12 dB</div>
+            <p>Background music:</p>
+            <div class="level-bar" style="width:50%; background:#f44336;">-18 dB</div>
+            <p>Difference: only 6 dB (must be at least 20 dB lower)</p>
+        </div>
+        <p>The background music is only 6 dB below the speech, making it difficult for users with hearing impairments to distinguish the spoken content from the music.</p>
+    </div>
+
+    <!-- Violation 2: No option to turn off background audio -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 2: No control to disable background audio</div>
+        <div class="audio-placeholder">
+            <p>[Audio Player: E-Learning Module — Workplace Safety]</p>
+            <p>This audio module plays narration over continuous ambient office sounds (typing, phones ringing, chatter). There is no separate volume control or toggle for the background audio. Users must listen to both tracks together.</p>
+            <p>Controls available: Play | Pause | Volume (master only)</p>
+            <p style="color:#f44336;">Missing: Separate background audio toggle or volume control</p>
+        </div>
+    </div>
+
+    <!-- Violation 3: Speech mixed with loud ambient sounds -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 3: Interview audio with loud ambient noise</div>
+        <div class="audio-placeholder">
+            <p>[Audio Player: Street Interview — City Noise Survey]</p>
+            <p>Audio levels:</p>
+            <p>Interviewee speech:</p>
+            <div class="level-bar" style="width:45%; background:#4CAF50;">-15 dB</div>
+            <p>Traffic and street noise:</p>
+            <div class="level-bar" style="width:40%; background:#f44336;">-20 dB</div>
+            <p>Difference: only 5 dB — speech barely rises above background</p>
+        </div>
+        <p>The recording was made outdoors without noise isolation. No post-processed clean version is available.</p>
+    </div>
+
+    <!-- Violation 4: Podcast with background soundscape -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 4: Podcast with continuous background soundscape</div>
+        <div class="audio-placeholder">
+            <p>[Audio Player: True Crime Podcast — Episode 12 — 40 minutes]</p>
+            <p>This podcast uses dramatic background music and sound effects throughout the entire episode. The background audio varies in volume and sometimes nearly matches the speech volume during dramatic moments. No speech-only version is available.</p>
+            <p>Peak background level: -8 dB (during dramatic moments)</p>
+            <p>Average speech level: -10 dB</p>
+            <p style="color:#f44336;">Background audio exceeds speech at multiple points in the episode.</p>
+        </div>
+    </div>
+</body>
+</html>

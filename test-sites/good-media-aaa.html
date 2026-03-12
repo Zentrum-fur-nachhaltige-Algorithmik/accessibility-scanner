@@ -1,0 +1,81 @@
+<!-- WCAG-TEST
+criterion: 1.2.6, 1.2.7, 1.2.8, 1.2.9
+level: AAA
+title: Media AAA (Sign Language, Extended Audio Description, Media Alternative, Live Audio-only)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-media-alternatives-scanner
+description: Complete media accessibility with sign language, extended descriptions, transcripts, and live captioning
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Media AAA - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        .media-placeholder { background: #1a3a1a; color: #fff; padding: 30px; text-align: center; margin: 10px 0; border-radius: 4px; }
+        .transcript { background: #fff; border: 1px solid #ccc; padding: 15px; margin: 10px 0; max-height: 150px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Good Media AAA (1.2.6, 1.2.7, 1.2.8, 1.2.9)</h1>
+
+    <!-- Compliant 1: Video with sign language interpreter (1.2.6) -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant (1.2.6): Video with sign language interpreter window</div>
+        <div class="media-placeholder">
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <div style="flex:3; background:#333; padding:40px;">Main Video Content</div>
+                <div style="flex:1; background:#444; padding:20px; border:2px solid #4CAF50;">Sign Language Interpreter</div>
+            </div>
+            <p style="margin-top:10px;">Captions: Yes | Audio Description: Yes | Sign Language: Yes</p>
+        </div>
+    </div>
+
+    <!-- Compliant 2: Extended audio description (1.2.7) -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant (1.2.7): Extended audio description with video pausing</div>
+        <div class="media-placeholder">
+            <p>[Video Player: Science Documentary — Extended Description Version]</p>
+            <p>When visual content cannot be described during natural pauses, the video automatically pauses to allow the full audio description to play before resuming.</p>
+            <p>Mode: <button style="background:#4CAF50; color:#fff; border:none; padding:5px 15px; cursor:pointer;">Extended AD: ON</button></p>
+        </div>
+    </div>
+
+    <!-- Compliant 3: Full text alternative for video (1.2.8) -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant (1.2.8): Complete media alternative (text transcript)</div>
+        <div class="media-placeholder">
+            <p>[Video Player: Cooking Tutorial — Sourdough Bread]</p>
+        </div>
+        <details>
+            <summary style="cursor:pointer; font-weight:bold; padding:8px;">Full Text Alternative (describes all audio and visual content)</summary>
+            <div class="transcript">
+                <p><strong>[0:00]</strong> The instructor stands at a wooden countertop with a glass bowl, bread flour, water, and a jar of sourdough starter visible.</p>
+                <p><strong>[0:15]</strong> (Instructor speaking) "Today we are making sourdough bread from scratch." The instructor picks up the jar of bubbly starter, tilting it toward the camera to show its active, foamy texture.</p>
+                <p><strong>[0:30]</strong> Flour is measured into the bowl. The instructor uses a digital scale reading 500 grams. The flour is white and fine-textured.</p>
+                <p><em>... full transcript continues for all 20 minutes, describing every visual action, ingredient appearance, and spoken instruction ...</em></p>
+            </div>
+        </details>
+    </div>
+
+    <!-- Compliant 4: Live audio with real-time text (1.2.9) -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant (1.2.9): Live audio with real-time text captioning</div>
+        <div class="media-placeholder">
+            <p>[Live Audio Stream: Weekly Town Hall Meeting]</p>
+            <p>Live captioning: <strong style="color:#4CAF50;">ACTIVE</strong></p>
+        </div>
+        <div class="transcript" aria-live="polite" aria-label="Live transcript">
+            <p><strong>[14:02:15]</strong> Speaker: "Thank you for joining today's town hall."</p>
+            <p><strong>[14:02:22]</strong> Speaker: "Our first topic is the quarterly results."</p>
+            <p><em>Live transcript updates in real-time...</em></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!-- WCAG-TEST
+criterion: 2.4.12
+level: AAA
+title: Focus Not Obscured (Enhanced)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-focus-appearance-scanner
+description: Focused elements are never obscured by overlays or sticky elements
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Focus Not Obscured (Enhanced) - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+
+        /* Compliant: Sticky header with proper scroll-margin */
+        .sticky-header {
+            position: sticky; top: 0; height: 60px; background: #333; color: #fff;
+            z-index: 100; padding: 15px 20px; display: flex; align-items: center;
+        }
+        /* All focusable elements have scroll-margin-top to clear the header */
+        input:focus, button:focus, a:focus, textarea:focus, select:focus {
+            scroll-margin-top: 100px;
+            outline: 3px solid #005fcc;
+            outline-offset: 2px;
+        }
+        .main-content { padding: 20px; margin-top: 10px; }
+
+        /* Compliant: Cookie banner dismisses and reserves space */
+        .cookie-banner-compliant {
+            background: #1a1a2e; color: #fff; padding: 15px 20px;
+            margin: 20px 0; border-radius: 8px;
+        }
+        .cookie-banner-compliant.dismissed { display: none; }
+
+        /* Compliant: Sidebar does not overlap content */
+        .layout { display: flex; gap: 20px; }
+        .sidebar { width: 250px; background: #f5f5f5; padding: 15px; flex-shrink: 0; }
+        .main-form { flex: 1; min-width: 0; }
+    </style>
+</head>
+<body>
+    <div class="sticky-header">
+        <nav><a href="#main" style="color:#fff;">Skip to Content</a> | Site Navigation</nav>
+    </div>
+
+    <main id="main" class="main-content">
+        <!-- Compliant 1: Scroll-margin ensures focused elements clear the sticky header -->
+        <div class="compliant-section">
+            <div class="compliant-title">Compliant: Scroll-margin clears sticky header</div>
+            <p>All focusable elements use scroll-margin-top so the sticky header never covers them.</p>
+            <label for="name">Name:</label>
+            <input type="text" id="name" style="display:block; margin: 5px 0; width: 300px;">
+            <label for="email">Email:</label>
+            <input type="email" id="email" style="display:block; margin: 5px 0; width: 300px;">
+        </div>
+
+        <!-- Compliant 2: Dismissible cookie banner in document flow -->
+        <div class="compliant-section">
+            <div class="compliant-title">Compliant: Cookie banner is dismissible and in-flow</div>
+            <div class="cookie-banner-compliant" id="cookieBanner">
+                <p style="margin:0;">We use cookies for essential functionality.
+                    <button onclick="document.getElementById('cookieBanner').classList.add('dismissed')"
+                            style="margin-left:15px; padding:5px 15px; cursor:pointer;">
+                        Accept &amp; Dismiss
+                    </button>
+                </p>
+            </div>
+            <label for="feedback">Feedback:</label>
+            <textarea id="feedback" rows="3" style="display:block; width:100%; max-width:500px;"></textarea>
+            <button type="submit" style="margin-top:10px; padding:8px 20px;">Submit</button>
+        </div>
+
+        <!-- Compliant 3: Sidebar layout with no overlap -->
+        <div class="compliant-section">
+            <div class="compliant-title">Compliant: Sidebar and form with no overlap</div>
+            <div class="layout">
+                <div class="main-form">
+                    <label for="address">Street Address:</label>
+                    <input type="text" id="address" style="display:block; width:100%; margin:5px 0;">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" style="display:block; width:100%; margin:5px 0;">
+                </div>
+                <aside class="sidebar">
+                    <h3>Related Links</h3>
+                    <ul>
+                        <li><a href="#main">Help Center</a></li>
+                        <li><a href="#main">Contact Us</a></li>
+                    </ul>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Compliant 4: Popover auto-dismisses on focus change -->
+        <div class="compliant-section">
+            <div class="compliant-title">Compliant: Popover closes when focus moves away</div>
+            <div style="position:relative; display:inline-block;">
+                <button id="popBtn" onclick="document.getElementById('popMenu').style.display='block'"
+                        onblur="setTimeout(function(){document.getElementById('popMenu').style.display='none'},200)">
+                    Options Menu
+                </button>
+                <div id="popMenu" style="display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ccc; padding:10px; z-index:10;">
+                    <a href="#main" style="display:block; padding:4px 0;">Option A</a>
+                    <a href="#main" style="display:block; padding:4px 0;">Option B</a>
+                </div>
+            </div>
+            <div style="margin-top:15px;">
+                <label for="after-pop">Input after popover:</label>
+                <input type="text" id="after-pop" style="display:block; margin:5px 0; width:300px;">
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -53,7 +53,7 @@ description: Focused elements are never obscured by overlays or sticky elements
     <main id="main" class="main-content">
         <!-- Compliant 1: Scroll-margin ensures focused elements clear the sticky header -->
         <div class="compliant-section">
-            <div class="compliant-title">Compliant: Scroll-margin clears sticky header</div>
+            <h2 class="compliant-title">Compliant: Scroll-margin clears sticky header</h2>
             <p>All focusable elements use scroll-margin-top so the sticky header never covers them.</p>
             <label for="name">Name:</label>
             <input type="text" id="name" style="display:block; margin: 5px 0; width: 300px;">
@@ -63,7 +63,7 @@ description: Focused elements are never obscured by overlays or sticky elements
 
         <!-- Compliant 2: Dismissible cookie banner in document flow -->
         <div class="compliant-section">
-            <div class="compliant-title">Compliant: Cookie banner is dismissible and in-flow</div>
+            <h2 class="compliant-title">Compliant: Cookie banner is dismissible and in-flow</h2>
             <div class="cookie-banner-compliant" id="cookieBanner">
                 <p style="margin:0;">We use cookies for essential functionality.
                     <button onclick="document.getElementById('cookieBanner').classList.add('dismissed')"
@@ -79,7 +79,7 @@ description: Focused elements are never obscured by overlays or sticky elements
 
         <!-- Compliant 3: Sidebar layout with no overlap -->
         <div class="compliant-section">
-            <div class="compliant-title">Compliant: Sidebar and form with no overlap</div>
+            <h2 class="compliant-title">Compliant: Sidebar and form with no overlap</h2>
             <div class="layout">
                 <div class="main-form">
                     <label for="address">Street Address:</label>
@@ -99,7 +99,7 @@ description: Focused elements are never obscured by overlays or sticky elements
 
         <!-- Compliant 4: Popover auto-dismisses on focus change -->
         <div class="compliant-section">
-            <div class="compliant-title">Compliant: Popover closes when focus moves away</div>
+            <h2 class="compliant-title">Compliant: Popover closes when focus moves away</h2>
             <div style="position:relative; display:inline-block;">
                 <button id="popBtn" onclick="document.getElementById('popMenu').style.display='block'"
                         onblur="setTimeout(function(){document.getElementById('popMenu').style.display='none'},200)">

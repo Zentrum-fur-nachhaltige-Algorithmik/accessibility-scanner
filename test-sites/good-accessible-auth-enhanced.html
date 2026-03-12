@@ -26,11 +26,12 @@ description: Authentication without any cognitive function tests
     </style>
 </head>
 <body>
+<main>
     <h1>Good Accessible Authentication Enhanced (3.3.9 AAA)</h1>
 
     <!-- Compliant 1: Standard password login with paste allowed -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Password login with copy-paste enabled</div>
+        <h2 class="compliant-title">Compliant: Password login with copy-paste enabled</h2>
         <div class="auth-form">
             <label for="email1">Email:</label>
             <input type="email" id="email1" autocomplete="email">
@@ -43,7 +44,7 @@ description: Authentication without any cognitive function tests
 
     <!-- Compliant 2: Passkey / biometric authentication -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Passkey and biometric authentication</div>
+        <h2 class="compliant-title">Compliant: Passkey and biometric authentication</h2>
         <div class="auth-form">
             <p>Sign in with your device's built-in security:</p>
             <button type="button" style="font-size:1.1em; padding:12px 30px;">Sign in with Passkey</button>
@@ -53,7 +54,7 @@ description: Authentication without any cognitive function tests
 
     <!-- Compliant 3: Magic link (no cognitive test) -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Magic link login (no memorization needed)</div>
+        <h2 class="compliant-title">Compliant: Magic link login (no memorization needed)</h2>
         <div class="auth-form">
             <label for="email3">Email address:</label>
             <input type="email" id="email3" autocomplete="email">
@@ -61,5 +62,6 @@ description: Authentication without any cognitive function tests
             <p style="font-size:0.85em;color:#555;">We will email you a link. Click it to sign in — no codes to remember or type.</p>
         </div>
     </div>
+</main>
 </body>
 </html>

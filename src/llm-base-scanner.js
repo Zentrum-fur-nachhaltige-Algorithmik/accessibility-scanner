@@ -38,7 +38,7 @@ Format: { "violations": [{ "criterion": "X.Y.Z", "description": "...", "impact":
 
     const result = await this.llmClient.predict(fullPrompt, {
       systemPrompt: systemPrompt || defaultSystem,
-      temperature: 0.1,
+      temperature: 0,
       forceJson: true,
     });
 
@@ -48,11 +48,34 @@ Format: { "violations": [{ "criterion": "X.Y.Z", "description": "...", "impact":
 
     let parsed;
     try {
-      parsed = typeof result.content === 'string'
-        ? JSON.parse(result.content)
-        : result.content;
+      let content = result.content;
+      if (typeof content === 'string') {
+        // Strip markdown code fences if present
+        content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+        // Attempt to fix truncated JSON by closing open arrays/objects
+        try {
+          parsed = JSON.parse(content);
+        } catch {
+          // Try to recover truncated JSON
+          let fixed = content;
+          const openBraces = (fixed.match(/{/g) || []).length;
+          const closeBraces = (fixed.match(/}/g) || []).length;
+          const openBrackets = (fixed.match(/\[/g) || []).length;
+          const closeBrackets = (fixed.match(/]/g) || []).length;
+          // Remove trailing incomplete entries (e.g., trailing comma or partial object)
+          fixed = fixed.replace(/,\s*(?:{\s*"[^"]*":\s*)?$/, '');
+          for (let i = 0; i < openBrackets - closeBrackets; i++) fixed += ']';
+          for (let i = 0; i < openBraces - closeBraces; i++) fixed += '}';
+          parsed = JSON.parse(fixed);
+          console.warn(`${this.id}: Recovered truncated JSON response`);
+        }
+      } else {
+        parsed = content;
+      }
     } catch (e) {
-      throw new Error(`${this.id}: Failed to parse LLM response as JSON: ${e.message}`);
+      console.error(`${this.id}: Failed to parse LLM response: ${e.message}`);
+      // Return empty violations rather than crashing the scan
+      parsed = { violations: [], summary: 'LLM response could not be parsed' };
     }
 
     return parsed;

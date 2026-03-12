@@ -10,6 +10,7 @@
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
+const { parseWcagMetadata } = require('./wcag-metadata-parser');
 
 // Load .env if present
 const envPath = path.join(__dirname, '..', '.env');
@@ -175,18 +176,36 @@ async function main() {
       try {
         await page.goto(`http://localhost:8099/${file}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
         const result = await scanner.scan(page);
-        const clean = result.violations.length === 0;
+
+        // Filter violations to only count those matching the file's target criteria
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        const metadata = parseWcagMetadata(fileContent);
+        const targetCriteria = metadata && Array.isArray(metadata.criterion) ? metadata.criterion : [];
+
+        let relevantViolations = result.violations;
+        if (targetCriteria.length > 0) {
+          relevantViolations = result.violations.filter(v => {
+            const criterion = v.ruleId || '';
+            return targetCriteria.some(tc => criterion.includes(tc));
+          });
+          const filtered = result.violations.length - relevantViolations.length;
+          if (filtered > 0) {
+            console.log(`         (filtered ${filtered} out-of-scope violations)`);
+          }
+        }
+
+        const clean = relevantViolations.length === 0;
         const status = clean ? 'PASS' : 'FAIL';
         if (clean) totalPassed++;
 
-        console.log(`  [GOOD] ${file}: ${status} (${result.violations.length} violations)`);
-        if (result.violations.length > 0) {
-          result.violations.slice(0, 2).forEach(v => {
+        console.log(`  [GOOD] ${file}: ${status} (${relevantViolations.length} relevant / ${result.violations.length} total violations)`);
+        if (relevantViolations.length > 0) {
+          relevantViolations.slice(0, 2).forEach(v => {
             console.log(`         - FALSE POS: ${v.ruleId}: ${v.description.slice(0, 80)}`);
           });
         }
 
-        results[scannerId].good.push({ file, clean, violations: result.violations.length });
+        results[scannerId].good.push({ file, clean, violations: relevantViolations.length });
       } catch (err) {
         console.log(`  [GOOD] ${file}: ERROR - ${err.message}`);
         results[scannerId].good.push({ file, clean: false, error: err.message });

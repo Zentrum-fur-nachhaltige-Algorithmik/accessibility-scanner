@@ -22,7 +22,7 @@ class LLMClient {
       throw new Error('OPENROUTER_API_KEY is required (pass apiKey option or set env var)');
     }
 
-    this.model = options.model || 'google/gemini-2.5-flash';
+    this.model = options.model || 'google/gemini-3-flash-preview';
     this.fallbackModels = options.fallbackModels || [];
     this.siteUrl = options.siteUrl || null;
     this.appName = options.appName || 'AccessibilityScanner';

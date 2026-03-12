@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Responsive Design Scanner for WCAG 2.1 compliance testing
+ * Responsive Design Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.1.4.4, 9.1.4.10, 9.1.4.12 (Resize Text, Reflow, Text Spacing)
  * Uses visual screenshot analysis for thorough responsive design testing
  */

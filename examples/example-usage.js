@@ -215,8 +215,8 @@ async function example5_RealTimeMonitoring(runner) {
 
 async function createCustomTestSuite() {
     return {
-        name: 'WCAG 2.1 AA Compliance Suite',
-        description: 'Comprehensive WCAG 2.1 AA compliance testing',
+        name: 'WCAG 2.2 AA Compliance Suite',
+        description: 'Comprehensive WCAG 2.2 AA compliance testing',
         version: '1.0.0',
         tests: [
             {

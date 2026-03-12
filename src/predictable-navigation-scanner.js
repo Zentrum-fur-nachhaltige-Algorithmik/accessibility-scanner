@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Predictable Navigation Scanner for WCAG 2.1 compliance testing
+ * Predictable Navigation Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.3.2.1, 9.3.2.2, 9.3.2.3, 9.3.2.4
  * Tests navigation consistency, predictable behavior, and user control
  */

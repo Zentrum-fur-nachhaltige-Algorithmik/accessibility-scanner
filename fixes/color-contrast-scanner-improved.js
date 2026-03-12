@@ -324,7 +324,7 @@ class ImprovedColorContrastScanner {
         // Convert font-weight to numeric if needed
         const numericWeight = this.normalizeFontWeight(fontWeight);
         
-        // WCAG 2.1 large text criteria:
+        // WCAG 2.2 large text criteria:
         // - 18pt (24px) or larger
         // - 14pt (18.66px) or larger AND bold (700+)
         if (fontSize >= 24) {
@@ -378,7 +378,7 @@ class ImprovedColorContrastScanner {
     }
 
     /**
-     * ACCURATE: WCAG 2.1 relative luminance calculation
+     * ACCURATE: WCAG 2.2 relative luminance calculation
      */
     getRelativeLuminance(color) {
         const rsRGB = color.r / 255;

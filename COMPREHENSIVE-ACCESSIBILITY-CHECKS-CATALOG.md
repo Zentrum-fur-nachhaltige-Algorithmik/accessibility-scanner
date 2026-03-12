@@ -6,7 +6,7 @@
 
 **Total Detection Capabilities:**
 - **400+ distinct accessibility violations** across all WCAG criteria
-- **Complete WCAG 2.1 AA compliance coverage**
+- **Complete WCAG 2.2 AA compliance coverage**
 - **40+ CSP-immune custom implementations**
 - **3-tier fallback strategy** for maximum compatibility
 - **29 positive test patterns** + **31 negative test patterns**
@@ -18,7 +18,7 @@
 ### 🔄 WCAG Compliance Detection via Axe Core
 
 **Coverage Scope:**
-- **WCAG 2.1 A/AA/AAA**: Complete coverage including `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22a`, `wcag22aa`
+- **WCAG 2.2 A/AA/AAA**: Complete coverage including `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22a`, `wcag22aa`
 - **Best Practices**: Additional non-WCAG accessibility recommendations
 
 **Core Axe Rules (40+ explicitly enabled):**
@@ -239,7 +239,7 @@
 
 ## 🚀 Tier 3: Advanced Phase 6 Scanners
 
-### Phase 6A: Critical Missing WCAG 2.1 AA Criteria
+### Phase 6A: Critical Missing WCAG 2.2 AA Criteria
 
 #### 🎤 Label in Name Scanner (`phase6a-label-in-name-scanner.js`)
 
@@ -394,7 +394,7 @@
 
 ### 🎯 Coverage Statistics
 - **Total Violation Types**: **400+ distinct accessibility violations**
-- **WCAG Coverage**: **Complete WCAG 2.1 AA compliance patterns**
+- **WCAG Coverage**: **Complete WCAG 2.2 AA compliance patterns**
 - **CSP-Immune Rules**: **40+ custom implementations** bypassing Content Security Policy
 - **Test Coverage**: **60 test files** (31 negative + 29 positive)
 - **Safety Critical**: **Seizure prevention** and motion controls

@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Input Modalities Scanner for WCAG 2.1 compliance testing
+ * Input Modalities Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.2.5.1, 9.2.5.2, 9.2.5.3, 9.2.5.4
  * Tests pointer gestures, cancellation, label matching, and motion actuation
  */

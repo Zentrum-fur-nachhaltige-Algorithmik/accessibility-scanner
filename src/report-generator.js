@@ -287,6 +287,9 @@ class ReportGenerator {
 
   /* --- Severity: monochrome labels, row tint for emphasis --- */
   .sev { font-weight: 600; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.03em; color: #2b2b2b; }
+  .method-badge { font-size: 7pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 5px; border: 1px solid #999; border-radius: 2px; }
+  .method-llm { background: #f0f0f0; color: #444; }
+  .method-auto { background: transparent; color: #666; border-color: #ccc; }
   tr.row-critical td { border-left: 3px solid #7a2e2e; }
   tr.row-serious td  { border-left: 3px solid #6b4a1a; }
   tr.row-moderate td { border-left: 3px solid #8a8a5a; }
@@ -376,7 +379,7 @@ class ReportGenerator {
     {{orgLogoHtml}}
     <div class="org-name">{{orgName}}</div>
     <h1>Accessibility Audit Report</h1>
-    <div class="doc-subtitle">Automated WCAG 2.1 Level AA Conformance Assessment</div>
+    <div class="doc-subtitle">Automated {{conformanceTarget}} Conformance Assessment</div>
   </div>
   <div class="doc-header-right">
     <p class="doc-meta-line doc-id">{{docNumber}}</p>
@@ -398,7 +401,7 @@ class ReportGenerator {
 <tbody>
 <tr><th scope="row" style="width:160px;text-align:left">Target URL</th><td>{{url}}</td></tr>
 <tr><th scope="row" style="text-align:left">Assessment Date</th><td>{{reportDate}}</td></tr>
-<tr><th scope="row" style="text-align:left">Conformance Target</th><td>WCAG 2.1 Level AA</td></tr>
+<tr><th scope="row" style="text-align:left">Conformance Target</th><td>{{conformanceTarget}}</td></tr>
 <tr><th scope="row" style="text-align:left">Overall Score</th><td>{{accessibilityScore}} of 100</td></tr>
 <tr><th scope="row" style="text-align:left">Violations Identified</th><td>{{violationsCount}}</td></tr>
 {{passesRow}}
@@ -458,6 +461,11 @@ class ReportGenerator {
     html = html.replace(/{{id}}/g, data.id || 'unknown');
     html = html.replace(/{{docNumber}}/g, this.esc(data.docNumber || ''));
     html = html.replace(/{{violationsCount}}/g, violationsCount);
+
+    // Determine conformance target based on whether LLM scanners were used
+    const hasLlmScanners = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
+    const conformanceTarget = hasLlmScanners ? 'WCAG 2.2 Level AAA' : 'WCAG 2.2 Level AA';
+    html = html.replace(/{{conformanceTarget}}/g, conformanceTarget);
     html = html.replace(/{{orgName}}/g, this.esc(data.orgName || DEFAULT_ORG_NAME));
     html = html.replace(/{{generatedBy}}/g, this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0'));
 
@@ -541,7 +549,7 @@ class ReportGenerator {
     }
     html += `<tr><td><strong>Total</strong></td><td><strong>${total}</strong></td><td></td></tr>`;
     html += '</tbody></table>';
-    html += '<p class="table-note">Severity classification per WCAG 2.1 impact assessment. Critical: barriers preventing access. Serious: significant obstacles. Moderate: degraded experience. Minor: best-practice deviations.</p>';
+    html += '<p class="table-note">Severity classification per WCAG 2.2 impact assessment. Critical: barriers preventing access. Serious: significant obstacles. Moderate: degraded experience. Minor: best-practice deviations.</p>';
 
     return html;
   }
@@ -571,7 +579,12 @@ class ReportGenerator {
   }
 
   generateMethodologySection(data) {
-    let html = '<p>Assessment conducted via automated scanning against WCAG 2.1 Level AA success criteria per EN 301 549.</p>';
+    const hasLlm = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
+    const levelLabel = hasLlm ? 'Level AAA' : 'Level AA';
+    let html = `<p>Assessment conducted via automated scanning against WCAG 2.2 ${levelLabel} success criteria per EN 301 549.</p>`;
+    if (hasLlm) {
+      html += '<p>This audit includes LLM-powered semantic analysis for AAA-level criteria. Findings marked <span class="method-badge method-llm">LLM</span> were identified using large language model analysis and should be verified by manual review.</p>';
+    }
     html += '<div class="scope-note">This report documents machine-detectable violations only. Automated testing covers approximately 30\u201340% of WCAG success criteria. A full conformance evaluation requires additional manual expert review, assistive technology testing, and user testing. Findings should be interpreted as a lower bound of existing barriers.</div>';
 
     if (data.scanners && Object.keys(data.scanners).length > 0) {
@@ -610,7 +623,7 @@ class ReportGenerator {
     const groups = this.groupViolationsByPrinciple(data.violations);
     const totalViolations = data.violations.length;
     let html = '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>';
-    html += `<p>The following ${totalViolations} findings are grouped by WCAG 2.1 principle. Each sub-section lists violations ordered by severity.</p>`;
+    html += `<p>The following ${totalViolations} findings are grouped by WCAG 2.2 principle. Each sub-section lists violations ordered by severity.</p>`;
 
     const sections = [
       ['perceivable', 'Perceivable', '4.1'],
@@ -648,7 +661,8 @@ class ReportGenerator {
   renderViolationTable(violations, tableNum, captionText) {
     let html = `<table>\n`;
     if (tableNum && captionText) html += `<caption>Table ${tableNum}: ${captionText}</caption>\n`;
-    html += `<thead><tr><th scope="col" style="width:28px">#</th><th scope="col" style="width:62px">Severity</th><th scope="col" style="width:60px">Criterion</th><th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
+    const hasLlm = violations.some(v => (v.scannerId || '').startsWith('llm-'));
+    html += `<thead><tr><th scope="col" style="width:28px">#</th><th scope="col" style="width:62px">Severity</th><th scope="col" style="width:60px">Criterion</th>${hasLlm ? '<th scope="col" style="width:48px">Method</th>' : ''}<th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
 <tbody>`;
 
     violations.forEach((v, i) => {
@@ -657,7 +671,9 @@ class ReportGenerator {
       const desc = this.esc(v.description || v.type || v.issue || '');
       const el = v.element ? `<code>${this.esc(v.element)}</code>` : '\u2014';
       const rec = this.esc(v.recommendation || v.suggestion || '\u2014');
-      html += `<tr class="row-${sev}"><td>${i + 1}</td><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${desc}</td><td>${el}</td><td>${rec}</td></tr>`;
+      const isLlm = (v.scannerId || '').startsWith('llm-');
+      const methodCol = hasLlm ? `<td><span class="method-badge method-${isLlm ? 'llm' : 'auto'}">${isLlm ? 'LLM' : 'Auto'}</span></td>` : '';
+      html += `<tr class="row-${sev}"><td>${i + 1}</td><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(String(criterion)) || '\u2014'}</td>${methodCol}<td>${desc}</td><td>${el}</td><td>${rec}</td></tr>`;
     });
 
     html += '</tbody></table>';
@@ -754,7 +770,8 @@ class ReportGenerator {
     html += `<tr><th scope="row" style="text-align:left">Generated</th><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
     html += `<tr><th scope="row" style="text-align:left">Generator</th><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
     html += `<tr><th scope="row" style="text-align:left">Target</th><td>${this.esc(data.url || '')}</td></tr>`;
-    html += `<tr><th scope="row" style="text-align:left">Standard</th><td>WCAG 2.1 Level AA / EN 301 549</td></tr>`;
+    const appLlm = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
+    html += `<tr><th scope="row" style="text-align:left">Standard</th><td>WCAG 2.2 ${appLlm ? 'Level AAA' : 'Level AA'} / EN 301 549</td></tr>`;
     if (data.scanners) html += `<tr><th scope="row" style="text-align:left">Modules Executed</th><td>${Object.keys(data.scanners).length}</td></tr>`;
     html += '</tbody></table>';
     tNum++;

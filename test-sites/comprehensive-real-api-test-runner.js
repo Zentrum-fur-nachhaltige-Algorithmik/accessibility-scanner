@@ -224,14 +224,14 @@ const COMPREHENSIVE_TEST_SITES = {
             file: 'bad-keyboard-access.html',
             expectedPhase6aFail: true,
             expectedPrimaryPattern: 'keyboardAccess',
-            description: 'WCAG 2.1.1 & 2.1.3 - Keyboard accessibility failures preventing operation'
+            description: 'WCAG 2.2.1 & 2.1.3 - Keyboard accessibility failures preventing operation'
         },
         {
             name: 'Keyboard Trap Violations',
             file: 'bad-keyboard-trap.html',
             expectedPhase6aFail: true,
             expectedPrimaryPattern: 'keyboardTraps',
-            description: 'WCAG 2.1.2 - Keyboard trap failures preventing navigation escape'
+            description: 'WCAG 2.2.2 - Keyboard trap failures preventing navigation escape'
         },
         {
             name: 'Focus Order Violations',
@@ -312,7 +312,7 @@ const COMPREHENSIVE_TEST_SITES = {
             file: 'bad-keyboard-native-override.html',
             expectedPhase6aFail: true,
             expectedPrimaryPattern: 'keyboardNativeOverride',
-            description: 'WCAG 2.1.1 & 2.1.2 - Custom controls that override expected keyboard behavior'
+            description: 'WCAG 2.2.1 & 2.1.2 - Custom controls that override expected keyboard behavior'
         },
         {
             name: 'Concurrent Input Mechanisms Violations',
@@ -356,7 +356,7 @@ const COMPREHENSIVE_TEST_SITES = {
             file: 'bad-scrollable-content.html',
             expectedPhase6aFail: true,
             expectedPrimaryPattern: 'scrollableContentViolations',
-            description: 'WCAG 2.1.1 - Scrollable content regions not accessible via keyboard navigation'
+            description: 'WCAG 2.2.1 - Scrollable content regions not accessible via keyboard navigation'
         },
         {
             name: 'Text Spacing Violations',
@@ -388,7 +388,7 @@ const COMPREHENSIVE_TEST_SITES = {
             file: 'good-accessibility.html',
             expectedPhase6aFail: false,
             expectedViolations: { colorContrast: false, useOfColor: false, imagesOfText: false },
-            description: 'Proper implementation of WCAG 2.1 Level AA standards'
+            description: 'Proper implementation of WCAG 2.2 Level AA standards'
         },
         {
             name: 'Good Seizure Safe Content',
@@ -484,7 +484,7 @@ const COMPREHENSIVE_TEST_SITES = {
             name: 'Good Keyboard Native Override',
             file: 'good-keyboard-native-override.html',
             expectedPhase6aFail: false,
-            description: 'WCAG 2.1.1 & 2.1.2 compliant - Custom controls that preserve expected keyboard behavior'
+            description: 'WCAG 2.2.1 & 2.1.2 compliant - Custom controls that preserve expected keyboard behavior'
         },
         {
             name: 'Good Concurrent Input Mechanisms',
@@ -520,7 +520,7 @@ const COMPREHENSIVE_TEST_SITES = {
             name: 'Good Scrollable Content',
             file: 'good-scrollable-content.html',
             expectedPhase6aFail: false,
-            description: 'WCAG 2.1.1 compliant - Scrollable content regions accessible via keyboard navigation'
+            description: 'WCAG 2.2.1 compliant - Scrollable content regions accessible via keyboard navigation'
         },
         {
             name: 'Good Text Spacing',

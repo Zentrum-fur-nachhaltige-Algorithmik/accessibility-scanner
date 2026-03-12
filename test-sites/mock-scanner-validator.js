@@ -451,7 +451,7 @@ const TEST_SITES = {
                 'drag_drop_no_keyboard_alternative'
             ],
             expectedConfidence: 'high',
-            description: 'WCAG 2.1.1 & 2.1.3 - Keyboard accessibility failures preventing operation'
+            description: 'WCAG 2.2.1 & 2.1.3 - Keyboard accessibility failures preventing operation'
         },
         {
             name: 'Keyboard Trap Violations',
@@ -467,7 +467,7 @@ const TEST_SITES = {
                 'no_focus_restoration'
             ],
             expectedConfidence: 'high',
-            description: 'WCAG 2.1.2 - Keyboard trap failures preventing navigation escape'
+            description: 'WCAG 2.2.2 - Keyboard trap failures preventing navigation escape'
         },
         {
             name: 'Focus Order Violations',
@@ -655,7 +655,7 @@ const TEST_SITES = {
                 'modal_traps_escape_key'
             ],
             expectedConfidence: 'high',
-            description: 'WCAG 2.1.1 & 2.1.2 - Custom controls that override expected keyboard behavior'
+            description: 'WCAG 2.2.1 & 2.1.2 - Custom controls that override expected keyboard behavior'
         },
         
         // === NEW PHASE 4C: OPERABLE ADVANCED ===
@@ -769,7 +769,7 @@ const TEST_SITES = {
                 'log_viewers_keyboard_inaccessible'
             ],
             expectedConfidence: 'high',
-            description: 'WCAG 2.1.1 - Scrollable content regions not accessible via keyboard navigation'
+            description: 'WCAG 2.2.1 - Scrollable content regions not accessible via keyboard navigation'
         },
         {
             name: 'Text Spacing Violations',
@@ -836,7 +836,7 @@ const TEST_SITES = {
             file: 'good-accessibility.html',
             expectedViolations: [], // Keine Verletzungen erwartet
             expectedConfidence: 'high',
-            description: 'Proper implementation of WCAG 2.1 Level AA standards'
+            description: 'Proper implementation of WCAG 2.2 Level AA standards'
         },
         {
             name: 'Good Seizure Safe Content',
@@ -982,7 +982,7 @@ const TEST_SITES = {
             file: 'good-keyboard-native-override.html',
             expectedViolations: [],
             expectedConfidence: 'high',
-            description: 'WCAG 2.1.1 & 2.1.2 compliant - Custom controls that preserve expected keyboard behavior'
+            description: 'WCAG 2.2.1 & 2.1.2 compliant - Custom controls that preserve expected keyboard behavior'
         },
         {
             name: 'Good Concurrent Input Mechanisms',
@@ -1026,7 +1026,7 @@ const TEST_SITES = {
             file: 'good-scrollable-content.html',
             expectedViolations: [],
             expectedConfidence: 'high',
-            description: 'WCAG 2.1.1 compliant - Scrollable content regions accessible via keyboard navigation'
+            description: 'WCAG 2.2.1 compliant - Scrollable content regions accessible via keyboard navigation'
         },
         {
             name: 'Good Text Spacing',

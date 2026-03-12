@@ -1,6 +1,6 @@
 {
   "name": "Comprehensive Website Accessibility Test Suite",
-  "description": "Complete WCAG 2.1 AA compliance testing with failed test isolation",
+  "description": "Complete WCAG 2.2 AA compliance testing with failed test isolation",
   "version": "1.0.0",
   "author": "Enhanced E2E Testing System",
   "created": "2024-01-01T00:00:00.000Z",

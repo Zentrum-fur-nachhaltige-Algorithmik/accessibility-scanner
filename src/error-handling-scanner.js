@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Error Handling Scanner for WCAG 2.1 compliance testing
+ * Error Handling Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.3.3.1, 9.3.3.2, 9.3.3.3, 9.3.3.4
  * Tests error identification, labels/instructions, suggestions, and error prevention
  */

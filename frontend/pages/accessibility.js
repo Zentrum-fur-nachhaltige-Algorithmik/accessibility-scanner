@@ -51,17 +51,21 @@ export default function Accessibility() {
   return (
     <>
       <Head>
-        <title>Accessibility Statement — Abraham Nemeth Society for Accessible Algorithmics e.V.</title>
+        <title>Accessibility Statement — Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.</title>
         <meta name="description" content="Accessibility statement, feedback process, and compliance monitoring" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="page">
+      <div className="page" lang="en">
         <a href="#main-content" className="skip-link">Skip to main content</a>
 
         <header className="letterhead">
           <nav className="letterhead-inner" aria-label="Service">
-            <h1 className="org-name">Abraham Nemeth Society for Accessible Algorithmics e.V.</h1>
+            <h1 className="org-name">
+              <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+                Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.
+              </a>
+            </h1>
             <div className="service-title">Web Accessibility Audit Service</div>
           </nav>
         </header>
@@ -73,14 +77,14 @@ export default function Accessibility() {
             <section aria-labelledby="statement-heading">
               <h2 id="statement-heading">Commitment to Accessibility</h2>
               <p>
-                Abraham Nemeth Society for Accessible Algorithmics e.V. is
+                Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V. is
                 committed to ensuring digital accessibility for people with disabilities. This website strives
-                to be <strong>WCAG 2.1 AA</strong> compliant in accordance with the European Accessibility Act
+                to be <strong>WCAG 2.2 AA</strong> compliant in accordance with the European Accessibility Act
                 (EAA) and EN 301 549.
               </p>
               <p>
                 <strong>Compliance level:</strong> This website is <strong>partially compliant</strong> with
-                WCAG 2.1 Level AA. Partial compliance means that some parts of the content do not yet fully
+                WCAG 2.2 Level AA. Partial compliance means that some parts of the content do not yet fully
                 conform to the accessibility standard.
               </p>
               <p>
@@ -156,14 +160,14 @@ export default function Accessibility() {
                       id="feedback-email"
                       name="email"
                       aria-required="true"
-                      aria-invalid={formErrors.email ? 'true' : undefined}
-                      aria-describedby={formErrors.email ? 'feedback-email-error' : undefined}
+                      aria-invalid={formErrors.email ? 'true' : 'false'}
+                      aria-describedby="feedback-email-error"
                       autoComplete="email"
                       onChange={() => clearError('email')}
                     />
-                    {formErrors.email && (
-                      <p className="error-text" id="feedback-email-error">{formErrors.email}</p>
-                    )}
+                    <p className="error-text" id="feedback-email-error" aria-live="assertive">
+                      {formErrors.email || ''}
+                    </p>
                   </div>
 
                   <div className="acc-field">
@@ -182,14 +186,14 @@ export default function Accessibility() {
                       name="description"
                       rows="5"
                       aria-required="true"
-                      aria-invalid={formErrors.description ? 'true' : undefined}
-                      aria-describedby={formErrors.description ? 'feedback-desc-error' : undefined}
+                      aria-invalid={formErrors.description ? 'true' : 'false'}
+                      aria-describedby="feedback-desc-error"
                       placeholder="Please describe the accessibility barrier you encountered"
                       onChange={() => clearError('description')}
                     />
-                    {formErrors.description && (
-                      <p className="error-text" id="feedback-desc-error">{formErrors.description}</p>
-                    )}
+                    <p className="error-text" id="feedback-desc-error" aria-live="assertive">
+                      {formErrors.description || ''}
+                    </p>
                   </div>
 
                   <button type="submit" className="submit-btn">Submit Feedback</button>
@@ -205,7 +209,7 @@ export default function Accessibility() {
               </p>
               <p>
                 <strong>Regular audits:</strong> Quarterly audit of automated scan results ensures ongoing
-                compliance with WCAG 2.1 Level AA and EN 301 549 requirements.
+                compliance with WCAG 2.2 Level AA and EN 301 549 requirements.
               </p>
               <p>
                 <strong>Issue tracking:</strong> Accessibility issues are tracked via GitHub Issues with
@@ -226,14 +230,14 @@ export default function Accessibility() {
             </section>
 
             <p className="acc-back">
-              <a href="/">Back to audit service</a>
+              <a href="/">Back to homepage</a> · <a href="/audit">Audit service</a>
             </p>
           </div>
         </main>
 
         <footer className="footer">
-          <p>Abraham Nemeth Society for Accessible Algorithmics e.V. — {new Date().getFullYear()}</p>
-          <p><a href="/accessibility">Accessibility</a></p>
+          <p>Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V. — {new Date().getFullYear()}</p>
+          <p><a href="/">Startseite</a> · <a href="/audit">Audit Service</a> · <a href="/accessibility">Accessibility</a></p>
         </footer>
       </div>
     </>

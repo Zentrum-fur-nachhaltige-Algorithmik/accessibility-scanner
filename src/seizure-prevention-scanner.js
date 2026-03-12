@@ -3,7 +3,7 @@ const path = require('path');
 const BaseScanner = require('./base-scanner');
 
 /**
- * Seizure Prevention Scanner for WCAG 2.1 compliance testing
+ * Seizure Prevention Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.2.3.1, 9.2.3.3 (Three Flashes, Animation from Interactions)
  * CRITICAL SAFETY REQUIREMENT - Tests for seizure-inducing content
  */

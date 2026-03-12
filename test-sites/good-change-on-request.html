@@ -1,0 +1,93 @@
+<!-- WCAG-TEST
+criterion: 3.2.5
+level: AAA
+title: Change on Request
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-behavioral-scanner
+description: All context changes user-initiated, update buttons for feeds, no auto-redirects
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Change on Request - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        .feed-item { background: #fff; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 8px 16px; cursor: pointer; margin: 4px; }
+        button:focus, select:focus { outline: 3px solid #005fcc; outline-offset: 2px; }
+    </style>
+</head>
+<body>
+    <h1>Good Change on Request (3.2.5 AAA)</h1>
+
+    <!-- Compliant 1: User-initiated page change with link instead of auto-redirect -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant: Page change requires user action</div>
+        <p>This page has moved to a new location. Please follow the link below when you are ready:</p>
+        <p><a href="https://example.com/new-page" style="color:#005fcc;">Go to the new page</a></p>
+        <p style="font-size:0.85em; color:#555;">No auto-redirect is used. The user decides when to navigate.</p>
+    </div>
+
+    <!-- Compliant 2: Promotional content controlled by user -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant: Promotional content with manual navigation</div>
+        <div style="background:#333; color:#fff; padding:20px; text-align:center; margin:10px 0;">
+            <p id="promoText" style="font-size:1.2em;">Featured Deal: 30% off Electronics</p>
+        </div>
+        <div style="text-align:center;">
+            <button type="button" aria-label="Previous deal" onclick="showPrevDeal()">Previous</button>
+            <button type="button" aria-label="Next deal" onclick="showNextDeal()">Next</button>
+        </div>
+        <script>
+            var deals = ['Featured Deal: 30% off Electronics', 'Limited Time: Free Shipping on Orders Over $50', 'New Arrival: Smart Home Collection'];
+            var dIdx = 0;
+            function showNextDeal(){ dIdx = (dIdx+1) % deals.length; document.getElementById('promoText').textContent = deals[dIdx]; }
+            function showPrevDeal(){ dIdx = (dIdx-1+deals.length) % deals.length; document.getElementById('promoText').textContent = deals[dIdx]; }
+        </script>
+        <p style="font-size:0.85em; color:#555;">Content only changes when the user clicks Previous or Next. No auto-rotation.</p>
+    </div>
+
+    <!-- Compliant 3: News feed with manual refresh -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant: News feed updates only on user request</div>
+        <button type="button" id="refreshBtn" onclick="refreshFeed()">Refresh Feed</button>
+        <span id="feedStatus" role="status" aria-live="polite" style="margin-left:10px; color:#555;"></span>
+        <div id="newsFeed" style="margin-top:10px;">
+            <div class="feed-item"><strong>12:05</strong> — Market reaches all-time high</div>
+            <div class="feed-item"><strong>12:03</strong> — New trade agreement announced</div>
+            <div class="feed-item"><strong>12:01</strong> — Tech company reports earnings</div>
+        </div>
+        <script>
+            function refreshFeed(){
+                var item = document.createElement('div');
+                item.className = 'feed-item';
+                item.innerHTML = '<strong>12:07</strong> — Updated: New headline loaded on user request';
+                document.getElementById('newsFeed').insertBefore(item, document.getElementById('newsFeed').firstChild);
+                document.getElementById('feedStatus').textContent = 'Feed updated.';
+            }
+        </script>
+    </div>
+
+    <!-- Compliant 4: Select with explicit Go button -->
+    <div class="compliant-section">
+        <div class="compliant-title">Compliant: Select dropdown with explicit submit button</div>
+        <form action="#" method="get" style="display:flex; align-items:center; gap:10px;">
+            <label for="dept">Select a department:</label>
+            <select id="dept" name="dept" style="padding:8px;">
+                <option value="">Choose department...</option>
+                <option value="/sales">Sales</option>
+                <option value="/engineering">Engineering</option>
+                <option value="/marketing">Marketing</option>
+            </select>
+            <button type="submit">Go</button>
+        </form>
+        <p style="font-size:0.85em; color:#555;">The dropdown does not navigate on change. The user must click "Go" to navigate.</p>
+    </div>
+</body>
+</html>

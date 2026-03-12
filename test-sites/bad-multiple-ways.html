@@ -1,0 +1,81 @@
+<!-- WCAG-TEST
+criterion: 2.4.5
+level: AA
+title: Multiple Ways
+test_type: bad
+expected_violations: 3
+testable_by: regex
+scanners: page-structure
+description: Pages reachable only through a single specific navigation path with no alternative ways to find content
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad: Multiple Ways - WCAG 2.4.5</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+        .page-content { padding: 2rem; max-width: 800px; }
+        h1 { color: #1a1a1a; }
+        .breadcrumb { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
+        .breadcrumb a { color: #0066cc; }
+        .content-block { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; }
+        .content-block h2 { margin-top: 0; }
+        .note { background: #fff3cd; padding: 1rem; border-radius: 4px; border-left: 4px solid #ffc107; margin: 1rem 0; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <!-- Violation 1: No site-wide navigation menu -->
+    <!-- No <nav> element, no header navigation, no main menu -->
+
+    <div class="page-content">
+        <h1>Return Policy - Electronics Category - Laptops</h1>
+
+        <!-- Violation 2: No search functionality anywhere on the page -->
+        <!-- No search form, no search link, no way to search for this content -->
+
+        <!-- Violation 3: No sitemap link, no table of contents, no related links -->
+        <!-- The only way to reach this page is: Home > Help > Policies > Return Policy > Electronics > Laptops -->
+        <!-- That specific link chain is the sole navigation path -->
+
+        <p class="breadcrumb">
+            You arrived here via: <a href="#">Home</a> &gt; <a href="#">Help Center</a> &gt; <a href="#">Policies</a> &gt; <a href="#">Return Policy</a> &gt; <a href="#">Electronics</a> &gt; Laptops
+        </p>
+
+        <div class="content-block">
+            <h2>Laptop Return Policy</h2>
+            <p>Laptops purchased from our store may be returned within 15 days of the original purchase date, subject to the following conditions:</p>
+            <ul>
+                <li>The laptop must be in its original packaging with all accessories included.</li>
+                <li>Software must not have been activated or registered.</li>
+                <li>A restocking fee of 15% applies to opened items.</li>
+                <li>Custom-configured laptops are not eligible for return.</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h2>Exceptions</h2>
+            <p>Defective laptops may be returned within 30 days regardless of the above conditions. Contact support for a return authorization number.</p>
+        </div>
+
+        <div class="content-block">
+            <h2>How to Initiate a Return</h2>
+            <ol>
+                <li>Log in to your account and navigate to Order History.</li>
+                <li>Select the laptop order you wish to return.</li>
+                <li>Click "Request Return" and follow the prompts.</li>
+                <li>Print the prepaid shipping label provided.</li>
+                <li>Ship the item within 5 business days.</li>
+            </ol>
+        </div>
+
+        <div class="note">
+            <strong>Note:</strong> This page can only be found by navigating through the exact path: Home &gt; Help Center &gt; Policies &gt; Return Policy &gt; Electronics &gt; Laptops. There is no search, sitemap, index, or alternative navigation to reach this content.
+        </div>
+
+        <p><a href="#">&larr; Back to Electronics Return Policy</a></p>
+    </div>
+    <!-- No footer navigation, no sitemap link, no site search -->
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!-- WCAG-TEST
+criterion: 1.4.6
+level: AAA
+title: Contrast (Enhanced)
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: color-contrast
+description: All text meets enhanced 7:1 contrast ratio
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Contrast Enhanced</title>
+    <style>
+        /* All color combinations verified to exceed 7:1 contrast ratio */
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; background: #ffffff; color: #111111; }
+        /* #111111 on #ffffff = 18.1:1 */
+        h1 { color: #000000; font-size: 2rem; }
+        h2 { color: #111111; font-size: 1.5rem; }
+        /* #333333 on #ffffff = 12.6:1 */
+        .muted { color: #333333; }
+        /* Links: #003580 on #ffffff = 10.3:1 */
+        a { color: #003580; text-decoration: underline; }
+        a:hover { color: #001d47; }
+        a:focus { outline: 3px solid #003580; outline-offset: 2px; }
+        /* Button: #ffffff on #1a1a1a = 17.4:1 */
+        .btn-primary { background: #1a1a1a; color: #ffffff; border: none; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 4px; cursor: pointer; }
+        .btn-primary:focus { outline: 3px solid #003580; outline-offset: 2px; }
+        /* Secondary button: #111111 on #e0e0e0 = 14.8:1 */
+        .btn-secondary { background: #e0e0e0; color: #111111; border: 2px solid #333333; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 4px; cursor: pointer; }
+        /* Card: #111111 on #f5f5f5 = 17.1:1 */
+        .card { background: #f5f5f5; color: #111111; padding: 1.5rem; border: 2px solid #333333; border-radius: 4px; margin: 1.5rem 0; }
+        /* Alert: #1a1a1a on #d4edda = 13.6:1 */
+        .alert-success { background: #d4edda; color: #1a1a1a; padding: 1rem; border: 2px solid #155724; border-radius: 4px; margin: 1rem 0; }
+        /* Error: #1a1a1a on #f8d7da = 12.7:1 */
+        .alert-error { background: #f8d7da; color: #1a1a1a; padding: 1rem; border: 2px solid #721c24; border-radius: 4px; margin: 1rem 0; }
+        label { display: block; margin-top: 1rem; font-weight: bold; color: #111111; }
+        input { border: 2px solid #333333; padding: 0.5rem; font-size: 1rem; border-radius: 4px; color: #111111; background: #ffffff; }
+        input:focus { outline: 3px solid #003580; outline-offset: 2px; }
+        .footer { color: #333333; margin-top: 3rem; padding-top: 1rem; border-top: 2px solid #333333; }
+        /* Large text (18pt+): #444444 on #ffffff = 9.7:1, still exceeds 4.5:1 required for large */
+        .large-heading { font-size: 2.5rem; color: #222222; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Enhanced Contrast - Compliant Examples</h1>
+        <p class="muted">All text on this page meets the enhanced 7:1 contrast ratio requirement for WCAG AAA.</p>
+
+        <!-- Pattern 1: High contrast body text and headings -->
+        <section>
+            <h2 class="large-heading">High Contrast Design</h2>
+            <p>Body text uses #111111 on #ffffff, achieving an 18.1:1 ratio. Even secondary text at #333333 achieves 12.6:1.</p>
+            <p>Visit <a href="/guidelines">our accessibility guidelines</a> for implementation details.</p>
+        </section>
+
+        <!-- Pattern 2: Buttons and interactive elements -->
+        <section>
+            <h2>Interactive Elements</h2>
+            <button class="btn-primary">Submit Form</button>
+            <button class="btn-secondary">Cancel</button>
+        </section>
+
+        <!-- Pattern 3: Cards and alerts -->
+        <div class="card">
+            <h2>Information Card</h2>
+            <p>Content within cards maintains the 7:1 ratio against the slightly tinted background.</p>
+        </div>
+        <div class="alert-success" role="status">Your changes have been saved successfully.</div>
+        <div class="alert-error" role="alert">Please correct the errors below before continuing.</div>
+
+        <!-- Pattern 4: Form elements -->
+        <section>
+            <h2>Form Fields</h2>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter username">
+        </section>
+
+        <footer class="footer">
+            <p>Footer text also meets the 7:1 enhanced contrast requirement.</p>
+        </footer>
+    </main>
+</body>
+</html>

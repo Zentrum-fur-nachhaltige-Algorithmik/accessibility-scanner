@@ -1,0 +1,240 @@
+<!-- WCAG-TEST
+criterion: 3.3.8
+level: AA
+title: Accessible Authentication (Minimum)
+test_type: bad
+expected_violations: 4
+testable_by: dom
+scanners: forms, authentication
+description: Authentication requires cognitive function tests and blocks assistive input
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Accessible Authentication - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .login-card h2 {
+            margin-top: 0;
+            color: #1a237e;
+        }
+        .login-card label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .login-card input[type="text"],
+        .login-card input[type="password"],
+        .login-card input[type="email"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* VIOLATION 2: CAPTCHA styling */
+        .captcha-box {
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fafafa;
+            text-align: center;
+        }
+        .captcha-image {
+            display: inline-block;
+            background: #263238;
+            color: #a5d6a7;
+            font-family: 'Courier New', monospace;
+            font-size: 28px;
+            letter-spacing: 8px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: line-through;
+            font-style: italic;
+            user-select: none;
+        }
+        .captcha-input {
+            margin-top: 10px;
+        }
+
+        /* VIOLATION 3: Cognitive test */
+        .security-question {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ffb74d;
+            background: #fff8e1;
+            border-radius: 4px;
+        }
+        .math-problem {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e65100;
+            margin: 10px 0;
+        }
+
+        /* VIOLATION 4: Pattern recall */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 8px;
+            margin: 15px auto;
+            width: fit-content;
+        }
+        .pattern-cell {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #bdbdbd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .pattern-cell.active {
+            background: #1976d2;
+            border-color: #0d47a1;
+            color: white;
+        }
+
+        .warning-text {
+            color: #d32f2f;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Account Login</h1>
+
+    <!-- VIOLATION 1: Paste blocking and autocomplete disabled -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 1: Paste Blocked and Autocomplete Disabled</div>
+        <p>Password fields block paste via onpaste="return false" and use autocomplete="off", preventing password managers from functioning.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Sign In</h2>
+
+        <label for="login-email">Email Address</label>
+        <!-- autocomplete="off" prevents browser/password-manager autofill -->
+        <input type="email" id="login-email" name="email" autocomplete="off" placeholder="Enter your email">
+
+        <label for="login-password">Password</label>
+        <!-- onpaste="return false" blocks pasting from password managers -->
+        <input type="password" id="login-password" name="password"
+               autocomplete="off"
+               onpaste="return false"
+               oncopy="return false"
+               oncut="return false"
+               placeholder="Type your password (no paste allowed)">
+        <p class="warning-text">For security, pasting is disabled on this field.</p>
+
+        <!-- VIOLATION 2: Visual CAPTCHA with no accessible alternative -->
+        <div class="violation-section">
+            <div class="violation-label">VIOLATION 2: Inaccessible Visual CAPTCHA</div>
+            <p>A distorted text CAPTCHA with no audio alternative, no object recognition option, and no way for screen reader users to complete it.</p>
+        </div>
+
+        <div class="captcha-box">
+            <p>Type the characters shown below:</p>
+            <div class="captcha-image" aria-hidden="true">Xk9mP2</div>
+            <!-- No alt text, no audio alternative, no accessible mechanism -->
+            <div class="captcha-input">
+                <label for="captcha-text">Enter CAPTCHA text</label>
+                <input type="text" id="captcha-text" name="captcha" autocomplete="off" placeholder="Type distorted text above">
+            </div>
+        </div>
+
+        <button class="login-btn" type="button">Sign In</button>
+    </div>
+
+    <!-- VIOLATION 3: Cognitive function test (math problem) -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 3: Math Problem as Security Check</div>
+        <p>Users must solve a math problem to verify they are human. This is a cognitive function test that excludes users with dyscalculia or cognitive disabilities.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Additional Verification</h2>
+        <div class="security-question">
+            <p>Please solve the following to continue:</p>
+            <div class="math-problem">What is 47 + 28 = ?</div>
+            <label for="math-answer">Your answer:</label>
+            <input type="text" id="math-answer" name="math_verify" placeholder="Enter the sum">
+        </div>
+    </div>
+
+    <!-- VIOLATION 4: Pattern recall authentication -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 4: Pattern Recall Required</div>
+        <p>Users must remember and reproduce a specific pattern on a grid. This requires memorization and spatial recall, which are cognitive function tests prohibited under 3.3.8.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Draw Your Security Pattern</h2>
+        <p>Reproduce the pattern you set up during registration:</p>
+        <div class="pattern-grid">
+            <div class="pattern-cell" data-pos="1">1</div>
+            <div class="pattern-cell active" data-pos="2">2</div>
+            <div class="pattern-cell" data-pos="3">3</div>
+            <div class="pattern-cell active" data-pos="4">4</div>
+            <div class="pattern-cell" data-pos="5">5</div>
+            <div class="pattern-cell active" data-pos="6">6</div>
+            <div class="pattern-cell" data-pos="7">7</div>
+            <div class="pattern-cell" data-pos="8">8</div>
+            <div class="pattern-cell active" data-pos="9">9</div>
+        </div>
+        <p style="font-size: 13px; color: #757575;">Tap the cells in the correct order to unlock your account.</p>
+        <!-- No alternative method provided (e.g., password, passkey, biometric) -->
+    </div>
+
+</body>
+</html>

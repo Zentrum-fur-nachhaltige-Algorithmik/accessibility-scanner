@@ -1,0 +1,212 @@
+<!-- WCAG-TEST
+criterion: 3.3.8
+level: AA
+title: Accessible Authentication (Minimum)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: forms, authentication
+description: Authentication supports password managers, paste, and avoids cognitive function tests
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Accessible Authentication - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+        .compliant-note {
+            border: 2px solid #2e7d32;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5e9;
+        }
+        .compliant-label {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .login-card h2 {
+            margin-top: 0;
+            color: #1b5e20;
+        }
+        .login-card label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .login-card input[type="text"],
+        .login-card input[type="password"],
+        .login-card input[type="email"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .login-card input:focus-visible {
+            outline: 3px solid #1b5e20;
+            outline-offset: 2px;
+        }
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            min-height: 44px;
+        }
+        .login-btn:focus-visible {
+            outline: 3px solid #1b5e20;
+            outline-offset: 2px;
+        }
+
+        .alt-login {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .alt-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 8px 0;
+            min-height: 44px;
+        }
+        .alt-login-btn:hover {
+            border-color: #1976d2;
+            background: #e3f2fd;
+        }
+        .alt-login-btn:focus-visible {
+            outline: 3px solid #1b5e20;
+            outline-offset: 2px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            color: #757575;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .help-text {
+            color: #2e7d32;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Account Login</h1>
+
+    <!-- PATTERN 1: Proper autocomplete and paste support -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 1: Password Manager and Paste Support</div>
+        <p>Login fields use correct <code>autocomplete</code> attributes and do not block paste, copy, or cut. Password managers can fill credentials automatically.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Sign In</h2>
+
+        <label for="login-email">Email Address</label>
+        <!-- Proper autocomplete enables password manager autofill -->
+        <input type="email" id="login-email" name="email" autocomplete="username" placeholder="Enter your email">
+        <p class="help-text">Your email will be auto-filled if saved in your browser or password manager.</p>
+
+        <label for="login-password">Password</label>
+        <!-- No paste blocking, proper autocomplete for current password -->
+        <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Enter your password">
+        <p class="help-text">Paste from your password manager is fully supported.</p>
+
+        <button class="login-btn" type="button">Sign In</button>
+
+        <!-- PATTERN 2: Alternative authentication methods that avoid cognitive tests -->
+        <div class="divider">or</div>
+
+        <div class="compliant-note" style="margin: 10px 0;">
+            <div class="compliant-label">PATTERN 2: Cognitive-Test-Free Alternatives</div>
+            <p>Multiple sign-in methods are offered that do not require memorization, transcription, or cognitive function tests.</p>
+        </div>
+
+        <div class="alt-login">
+            <button class="alt-login-btn" type="button">
+                <span aria-hidden="true">&#128273;</span> Sign in with Passkey
+            </button>
+            <button class="alt-login-btn" type="button">
+                <span aria-hidden="true">&#128231;</span> Email Magic Link
+            </button>
+            <button class="alt-login-btn" type="button">
+                <span aria-hidden="true">&#128241;</span> SMS One-Time Code
+            </button>
+        </div>
+
+        <p style="font-size: 13px; color: #757575; text-align: center; margin-top: 15px;">
+            <a href="#forgot">Forgot password?</a> |
+            <a href="#register">Create account</a>
+        </p>
+    </div>
+
+    <!-- PATTERN 3: If verification is needed, it uses accessible methods -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 3: Accessible Bot Prevention</div>
+        <p>If additional verification is required, it uses methods that do not depend on cognitive abilities: email/SMS confirmation codes (copy-paste supported), or invisible bot detection.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Verification Code</h2>
+        <p>We sent a 6-digit code to your email. Paste it below:</p>
+
+        <label for="verify-code">Verification Code</label>
+        <!-- Paste is allowed, autocomplete supports one-time codes -->
+        <input type="text" id="verify-code" name="otp" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="Enter 6-digit code">
+        <p class="help-text">You can paste the code from your email. Auto-fill from SMS is also supported on mobile devices.</p>
+
+        <button class="login-btn" type="button">Verify</button>
+
+        <p style="font-size: 13px; color: #757575; margin-top: 10px;">
+            Didn't receive the code? <a href="#resend">Resend code</a>
+        </p>
+    </div>
+
+</body>
+</html>

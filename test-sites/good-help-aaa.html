@@ -27,11 +27,12 @@ description: Context-sensitive help for every field, tooltips, documentation lin
     </style>
 </head>
 <body>
+<main>
     <h1>Good Help (3.3.5 AAA)</h1>
 
     <!-- Compliant 1: Form fields with contextual help -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Tax form with help text for every field</div>
+        <h2 class="compliant-title">Compliant: Tax form with help text for every field</h2>
         <div class="help-bar">
             Need help? <a href="#help-docs">View full documentation</a> |
             <a href="#faq">FAQ</a> |
@@ -61,7 +62,7 @@ description: Context-sensitive help for every field, tooltips, documentation lin
 
     <!-- Compliant 2: Error messages with corrective guidance -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Error messages with specific corrective guidance</div>
+        <h2 class="compliant-title">Compliant: Error messages with specific corrective guidance</h2>
         <form>
             <label for="acct2">Account Number:</label>
             <input type="text" id="acct2" value="12345" aria-describedby="acct2-error" aria-invalid="true" style="border-color:#d32f2f;">
@@ -75,7 +76,7 @@ description: Context-sensitive help for every field, tooltips, documentation lin
 
     <!-- Compliant 3: Tooltip and inline help for specialized fields -->
     <div class="compliant-section">
-        <div class="compliant-title">Compliant: Specialized fields with inline help and lookup tools</div>
+        <h2 class="compliant-title">Compliant: Specialized fields with inline help and lookup tools</h2>
         <form>
             <label for="icd2">ICD-10 Diagnosis Code:</label>
             <input type="text" id="icd2" aria-describedby="icd2-help" placeholder="e.g., J06.9">
@@ -85,7 +86,7 @@ description: Context-sensitive help for every field, tooltips, documentation lin
 
     <!-- Help documentation section -->
     <div class="compliant-section" id="help-docs">
-        <div class="compliant-title">Compliant: Help documentation always accessible</div>
+        <h2 class="compliant-title">Compliant: Help documentation always accessible</h2>
         <p>Comprehensive help is available at every step:</p>
         <ul>
             <li><a href="#full-guide">Complete form filing guide (PDF)</a></li>
@@ -95,5 +96,6 @@ description: Context-sensitive help for every field, tooltips, documentation lin
             <li>Email: <a href="mailto:help@example.com">help@example.com</a></li>
         </ul>
     </div>
+</main>
 </body>
 </html>

@@ -1,5 +1,7 @@
 /**
  * Scanner Registry — instantiates and registers all scanners with a ScanPipeline.
+ *
+ * LLM-powered scanners are conditionally registered when OPENROUTER_API_KEY is set.
  */
 
 const ColorContrastScanner = require('./color-contrast-scanner');
@@ -32,11 +34,43 @@ const MobileSpecificScanner = require('./phase6d-mobile-specific-scanner');
 const DynamicSPAScanner = require('./phase6e-dynamic-spa-scanner');
 
 /**
+ * Create LLM scanner instances if OPENROUTER_API_KEY is available.
+ * @returns {import('./base-scanner')[]}
+ */
+function createLLMScanners() {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    return [];
+  }
+
+  const { LLMClient } = require('./llm-client');
+  const LLMSemanticTextScanner = require('./llm-semantic-text-scanner');
+  const LLMAuthScanner = require('./llm-auth-scanner');
+  const LLMMediaAlternativesScanner = require('./llm-media-alternatives-scanner');
+  const LLMVisualPresentationScanner = require('./llm-visual-presentation-scanner');
+  const LLMBehavioralScanner = require('./llm-behavioral-scanner');
+  const LLMFocusAppearanceScanner = require('./llm-focus-appearance-scanner');
+
+  const client = new LLMClient({ apiKey });
+
+  console.log('LLM scanners enabled (OPENROUTER_API_KEY detected)');
+
+  return [
+    new LLMSemanticTextScanner(client),
+    new LLMAuthScanner(client),
+    new LLMMediaAlternativesScanner(client),
+    new LLMVisualPresentationScanner(client),
+    new LLMBehavioralScanner(client),
+    new LLMFocusAppearanceScanner(client),
+  ];
+}
+
+/**
  * Create all scanner instances.
  * @returns {import('./base-scanner')[]}
  */
 function createAllScanners() {
-  return [
+  const scanners = [
     // Concurrent scanners (perceivable)
     new ColorContrastScanner(),
     new UseOfColorScanner(),
@@ -79,6 +113,12 @@ function createAllScanners() {
     new ComplianceMonitoringScanner(),
     new EAAProcedureScanner(),
   ];
+
+  // Conditionally add LLM-powered scanners
+  const llmScanners = createLLMScanners();
+  scanners.push(...llmScanners);
+
+  return scanners;
 }
 
 /**
@@ -143,4 +183,4 @@ function registerAllScanners(pipeline) {
   return scanners;
 }
 
-module.exports = { createAllScanners, registerAllScanners, getProfile, PROFILES, PROFILE_OPTIONS };
+module.exports = { createAllScanners, createLLMScanners, registerAllScanners, getProfile, PROFILES, PROFILE_OPTIONS };

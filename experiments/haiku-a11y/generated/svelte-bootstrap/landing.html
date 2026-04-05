@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CloudSync - Real-time data synchronization platform for modern teams.">
+  <title>CloudSync - Real-time Data Sync for Teams</title>
+
+  <!-- Bootstrap 5 CSS via CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+  <style>
+    /* Accessibility: Screen reader only class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Skip link - first focusable element */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #1b2a4a;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Root styles */
+    :root {
+      --primary: #1b2a4a;
+      --accent: #0d5dff;
+      --accent-hover: #0047cc;
+      --text: #1a1a1a;
+      --text-light: #666;
+      --border: #e0e0e0;
+      --bg-light: #f8f9fa;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: #ffffff;
+    }
+
+    /* Focus styles - minimum 3px solid outline with good contrast */
+    *:focus-visible {
+      outline: 3px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* Motion respect */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Navigation */
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1.5rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 0;
+      border-bottom: 2px solid transparent;
+      transition-duration: 0.01ms;
+    }
+
+    nav a:hover, nav a:focus {
+      border-bottom-color: white;
+    }
+
+    nav a[aria-current="page"] {
+      border-bottom-color: white;
+      font-weight: 600;
+    }
+
+    /* Hero section */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #2d4a7b 100%);
+      color: white;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    /* Button styles */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition-duration: 0.01ms;
+      text-decoration: none;
+      display: inline-block;
+      border: 2px solid transparent;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover, .btn-primary:focus {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: white;
+      border-color: white;
+    }
+
+    .btn-secondary:hover, .btn-secondary:focus {
+      background-color: white;
+      color: var(--primary);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Features section */
+    .features {
+      padding: 4rem 2rem;
+      background-color: var(--bg-light);
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 3rem;
+      color: var(--primary);
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition-duration: 0.01ms;
+    }
+
+    .feature-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .feature-card p {
+      color: var(--text-light);
+      margin: 0;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background-color: var(--primary);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 4rem 2rem;
+      background-color: white;
+    }
+
+    .testimonials h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 3rem;
+      color: var(--primary);
+    }
+
+    .testimonial-card {
+      background-color: var(--bg-light);
+      padding: 2rem;
+      border-radius: 0.5rem;
+      border-left: 4px solid var(--accent);
+      margin-bottom: 2rem;
+    }
+
+    .testimonial-text {
+      font-style: italic;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-author {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .testimonial-role {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.hidden {
+      display: none;
+    }
+
+    .modal-dialog {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--primary);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn:hover, .close-btn:focus {
+      color: var(--primary);
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    input[type="email"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+
+    input[type="email"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 4rem;
+    }
+
+    .form-hint {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-top: 0.25rem;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--primary);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    footer p {
+      margin-bottom: 0.5rem;
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+    }
+
+    footer a:hover, footer a:focus {
+      opacity: 0.8;
+    }
+
+    /* Status region */
+    .status-region {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background-color: #28a745;
+      color: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      max-width: 300px;
+      display: none;
+      z-index: 1001;
+    }
+
+    .status-region.visible {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      nav ul {
+        gap: 1rem;
+      }
+
+      .features h2, .testimonials h2 {
+        font-size: 1.5rem;
+      }
+
+      .cta-section h2 {
+        font-size: 1.5rem;
+      }
+
+      .modal-dialog {
+        margin: 0 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 3rem 1rem;
+      }
+
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+
+      header {
+        padding: 1rem;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Skip link - first focusable element for keyboard users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Status region for announcements -->
+  <div id="status-region" role="status" aria-live="polite" class="status-region"></div>
+
+  <!-- Header & Navigation -->
+  <header>
+    <div class="container-lg">
+      <nav aria-label="Main navigation">
+        <ul>
+          <li><a href="#" aria-current="page">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#testimonials">Testimonials</a></li>
+          <li><button type="button" class="btn btn-primary" id="signup-trigger" aria-haspopup="dialog">Sign Up</button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main id="main-content">
+    <!-- Hero section -->
+    <section class="hero" aria-label="Welcome to CloudSync">
+      <div class="container-lg">
+        <h1>Sync Your Data in Real Time</h1>
+        <p>CloudSync makes team collaboration seamless. Keep your data synchronized across devices, workspaces, and continents with enterprise-grade security.</p>
+        <div>
+          <button type="button" class="btn btn-primary" id="cta-button" aria-label="Get started with CloudSync free trial">
+            Start Free Trial
+          </button>
+          <button type="button" class="btn btn-secondary" id="demo-button" aria-label="Watch a product demo">
+            Watch Demo
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features section -->
+    <section id="features" class="features" aria-labelledby="features-heading">
+      <div class="container-lg">
+        <h2 id="features-heading">Why Teams Choose CloudSync</h2>
+        <div class="row g-4">
+          <!-- Feature 1 -->
+          <div class="col-md-4">
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">⚡</div>
+              <h3>Lightning Fast</h3>
+              <p>Sync happens in milliseconds, not minutes. Real-time updates keep your team in perfect sync, no matter where they work.</p>
+            </article>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="col-md-4">
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">🔐</div>
+              <h3>Enterprise Security</h3>
+              <p>Bank-grade encryption, SOC 2 compliance, and HIPAA ready. Your data is protected with industry-leading security standards.</p>
+            </article>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="col-md-4">
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">🌍</div>
+              <h3>Global Scale</h3>
+              <p>Server presence in 6 continents ensures low latency everywhere. Scale from a team of 5 to an enterprise of 50,000.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials section -->
+    <section id="testimonials" class="testimonials" aria-labelledby="testimonials-heading">
+      <div class="container-lg">
+        <h2 id="testimonials-heading">What Our Users Say</h2>
+
+        <!-- Testimonial 1 -->
+        <article class="testimonial-card">
+          <p class="testimonial-text">"CloudSync transformed how our remote team collaborates. We've cut sync errors by 95% and our developers love the real-time updates."</p>
+          <p class="testimonial-author">Sarah Chen</p>
+          <p class="testimonial-role">Engineering Lead, TechCorp</p>
+        </article>
+
+        <!-- Testimonial 2 -->
+        <article class="testimonial-card">
+          <p class="testimonial-text">"The performance is outstanding. We moved from a legacy system that took 20 minutes to sync to CloudSync doing it in seconds. It's a game changer."</p>
+          <p class="testimonial-author">Marcus Johnson</p>
+          <p class="testimonial-role">CTO, FinanceFlow</p>
+        </article>
+
+        <!-- Testimonial 3 -->
+        <article class="testimonial-card">
+          <p class="testimonial-text">"Support is incredible. We had one complex migration question and the team guided us through it personally. This is why we recommend CloudSync to everyone."</p>
+          <p class="testimonial-author">Elena Rodriguez</p>
+          <p class="testimonial-role">Product Manager, DesignStudio</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Call-to-action section -->
+    <section class="cta-section" aria-label="Ready to get started with CloudSync">
+      <div class="container-lg">
+        <h2>Ready to Sync Better?</h2>
+        <p style="margin-bottom: 1.5rem; font-size: 1.1rem;">Join 10,000+ teams using CloudSync to stay connected.</p>
+        <button type="button" class="btn btn-primary" id="final-cta-button" aria-label="Sign up for CloudSync today">
+          Sign Up Today
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sign-up Modal -->
+  <div id="signup-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <button type="button" class="close-btn" id="modal-close" aria-label="Close sign-up modal">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="modal-header">
+        <h2 id="modal-title">Join CloudSync</h2>
+      </div>
+
+      <form id="signup-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            aria-required="true"
+            aria-invalid="false"
+            aria-describedby="email-hint email-error"
+            autocomplete="email"
+            placeholder="you@company.com">
+          <p id="email-hint" class="form-hint">We'll never share your email with third parties.</p>
+          <p id="email-error" role="alert" hidden></p>
+        </div>
+
+        <div class="form-group">
+          <label for="company">Company Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input
+            type="text"
+            id="company"
+            name="company"
+            required
+            aria-required="true"
+            aria-invalid="false"
+            aria-describedby="company-error"
+            autocomplete="organization"
+            placeholder="Your Company">
+          <p id="company-error" role="alert" hidden></p>
+        </div>
+
+        <div class="form-group">
+          <label for="team-size">Team Size <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <select id="team-size" name="team-size" required aria-required="true" class="form-control">
+            <option value="">Select your team size</option>
+            <option value="1-10">1-10 people</option>
+            <option value="11-50">11-50 people</option>
+            <option value="51-200">51-200 people</option>
+            <option value="200+">200+ people</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Tell us about your sync needs</label>
+          <textarea
+            id="message"
+            name="message"
+            aria-describedby="message-hint"
+            placeholder="What are your main data synchronization challenges?"></textarea>
+          <p id="message-hint" class="form-hint">Optional — helps us tailor your experience.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Create Free Account
+        </button>
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.875rem; color: var(--text-light);">
+          By signing up, you agree to our <a href="#" style="color: var(--accent); text-decoration: underline;">Terms of Service</a> and <a href="#" style="color: var(--accent); text-decoration: underline;">Privacy Policy</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container-lg">
+      <p>&copy; 2026 CloudSync. All rights reserved.</p>
+      <nav aria-label="Footer navigation">
+        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Contact Us</a> | <a href="#">Blog</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Modal management with focus trap and accessibility
+    const modal = document.getElementById('signup-modal');
+    const modalTriggers = document.querySelectorAll('[id$="signup-trigger"], [id$="cta-button"], [id$="final-cta-button"]');
+    const modalClose = document.getElementById('modal-close');
+    const signupForm = document.getElementById('signup-form');
+    const statusRegion = document.getElementById('status-region');
+    let modalTriggerElement = null;
+
+    // Helper: get all focusable elements in modal
+    function getFocusableElements(container) {
+      return Array.from(container.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ));
+    }
+
+    // Open modal with focus management
+    function openModal(trigger) {
+      modalTriggerElement = trigger;
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+
+      // Focus first input
+      const focusable = getFocusableElements(modal);
+      if (focusable.length) focusable[0].focus();
+
+      // Add focus trap
+      modal.addEventListener('keydown', trapFocus);
+
+      // Announce to screen readers
+      announceStatus('Sign-up form opened. Use Tab to navigate, Escape to close.');
+    }
+
+    // Close modal with focus return
+    function closeModal() {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      modal.removeEventListener('keydown', trapFocus);
+
+      // Return focus to trigger
+      if (modalTriggerElement) {
+        modalTriggerElement.focus();
+      }
+
+      // Announce to screen readers
+      announceStatus('Sign-up form closed.');
+    }
+
+    // Focus trap within modal
+    function trapFocus(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const focusable = getFocusableElements(modal);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    // Status announcements for screen readers
+    function announceStatus(message) {
+      statusRegion.textContent = message;
+      statusRegion.classList.add('visible');
+      setTimeout(() => statusRegion.classList.remove('visible'), 5000);
+    }
+
+    // Attach open modal listeners to all triggers
+    modalTriggers.forEach(trigger => {
+      trigger.addEventListener('click', () => openModal(trigger));
+    });
+
+    // Close button listener
+    modalClose.addEventListener('click', closeModal);
+
+    // Form validation
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const emailInput = document.getElementById('email');
+      const emailError = document.getElementById('email-error');
+      const companyInput = document.getElementById('company');
+      const companyError = document.getElementById('company-error');
+      const teamSizeSelect = document.getElementById('team-size');
+
+      let isValid = true;
+
+      // Validate email
+      if (!emailInput.value || !emailInput.value.includes('@')) {
+        emailError.textContent = 'Please enter a valid email address.';
+        emailError.hidden = false;
+        emailInput.setAttribute('aria-invalid', 'true');
+        isValid = false;
+      } else {
+        emailError.hidden = true;
+        emailInput.setAttribute('aria-invalid', 'false');
+      }
+
+      // Validate company
+      if (!companyInput.value.trim()) {
+        companyError.textContent = 'Please enter your company name.';
+        companyError.hidden = false;
+        companyInput.setAttribute('aria-invalid', 'true');
+        isValid = false;
+      } else {
+        companyError.hidden = true;
+        companyInput.setAttribute('aria-invalid', 'false');
+      }
+
+      // Validate team size
+      if (!teamSizeSelect.value) {
+        isValid = false;
+      }
+
+      if (isValid) {
+        announceStatus(`Sign-up successful! Welcome, ${companyInput.value}. Check your email for next steps.`);
+        signupForm.reset();
+        closeModal();
+      }
+    });
+
+    // Demo button interaction
+    document.getElementById('demo-button').addEventListener('click', () => {
+      announceStatus('Loading demo video. Please wait.');
+      setTimeout(() => {
+        announceStatus('Demo would open in a new window: "CloudSync Real-time Sync Demo"');
+      }, 1000);
+    });
+
+    // CTA button in hero
+    document.getElementById('cta-button').addEventListener('click', () => {
+      announceStatus('Free trial signup form opened.');
+      openModal(document.getElementById('cta-button'));
+    });
+  </script>
+</body>
+</html>

@@ -66,18 +66,33 @@ class HoverFocusContentScanner extends BaseScanner {
               (style.left && !style.left.startsWith('-')) ||
               (style.right && style.right !== '-300px');
 
-            if (showsContent) {
+            if (!showsContent) continue;
+
+            // Handle comma-separated selectors: ".a:hover .b, .a:focus .b"
+            // If the same rule contains both :hover and :focus selectors, mark as having equivalent
+            const selectorParts = sel.split(',').map(s => s.trim());
+            const hasHoverPart = selectorParts.some(s => /:hover/i.test(s));
+            const hasFocusPart = selectorParts.some(s => /:focus/i.test(s));
+
+            if (hasHoverPart) {
               hoverContentSelectors.push({
                 selector: sel,
-                type: isHoverRule ? 'hover' : 'focus',
+                type: 'hover',
+                hasFocusEquivalent: hasFocusPart, // true if same rule also has :focus
+              });
+            }
+            if (hasFocusPart && !hasHoverPart) {
+              hoverContentSelectors.push({
+                selector: sel,
+                type: 'focus',
                 hasFocusEquivalent: false,
               });
             }
           }
 
-          // Check if hover rules have focus equivalents
+          // Check if hover-only rules have focus equivalents in OTHER rules
           for (const entry of hoverContentSelectors) {
-            if (entry.type === 'hover') {
+            if (entry.type === 'hover' && !entry.hasFocusEquivalent) {
               const focusEquivalent = entry.selector.replace(/:hover/g, ':focus');
               const focusWithinEquivalent = entry.selector.replace(/:hover/g, ':focus-within');
               entry.hasFocusEquivalent = hoverContentSelectors.some(

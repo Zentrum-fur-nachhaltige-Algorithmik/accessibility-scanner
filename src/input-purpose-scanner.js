@@ -184,6 +184,13 @@ class InputPurposeScanner extends BaseScanner {
           if (detectedPurpose && lastToken !== 'on' && lastToken !== 'off') {
             const matches = detectedPurpose.some(expected => tokens.includes(expected));
             if (!matches) {
+              // If the current value is a valid spec purpose, run detectPurpose
+              // in reverse: check if any pattern expects this autocomplete value.
+              // This prevents flagging e.g. autocomplete="photo" on type="url"
+              // when "photo" is a valid, more-specific purpose for the field.
+              const reverseMatch = VALID_AUTOCOMPLETE_VALUES.has(lastToken) &&
+                INPUT_PURPOSE_MAP.some(m => m.expected.includes(lastToken));
+              if (reverseMatch) return; // valid specific purpose, skip
               violations.push({
                 criterion: '9.1.3.5',
                 element: getSelector(el),

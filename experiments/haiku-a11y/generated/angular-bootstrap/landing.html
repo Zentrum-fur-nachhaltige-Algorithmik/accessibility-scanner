@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataFlow - Real-time Analytics Platform</title>
+  <meta name="description" content="DataFlow: Professional analytics platform for enterprise teams. Real-time insights, automated reporting, and seamless integrations.">
+
+  <!-- Bootstrap 5 via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* Accessibility: Screen reader only content */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Accessibility: Focus styles (3px outline, 3:1 contrast minimum) */
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+
+    /* Respect user motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Base styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
+      color: #333333;
+      background-color: #ffffff;
+    }
+
+    /* Heading hierarchy */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      color: #1b2a4a;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 1.5rem;
+      color: #1b2a4a;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+
+    /* Skip link - first focusable element */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background-color: #1b2a4a;
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 100;
+      border-radius: 0 0 4px 0;
+    }
+
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #ffc107;
+      outline-offset: 2px;
+    }
+
+    /* Navigation */
+    header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e9ecef;
+      padding: 1rem 0;
+    }
+
+    nav[aria-label="Main navigation"] {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    nav[aria-label="Main navigation"] a {
+      text-decoration: none;
+      color: #495057;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    nav[aria-label="Main navigation"] a:hover,
+    nav[aria-label="Main navigation"] a:focus-visible {
+      color: #1b2a4a;
+      border-bottom-color: #0d6efd;
+    }
+
+    nav[aria-label="Main navigation"] a[aria-current="page"] {
+      color: #0d6efd;
+      border-bottom-color: #0d6efd;
+    }
+
+    /* Hero section */
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      color: white;
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      max-width: 80ch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Button styles - ensuring 3:1 contrast */
+    .btn-primary {
+      background-color: #0d6efd;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 2px solid #0d6efd;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0b5ed7;
+      border-color: #0b5ed7;
+    }
+
+    .btn-primary:focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 2px solid #6c757d;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5c636a;
+    }
+
+    /* Cards */
+    .feature-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      min-height: 100%;
+    }
+
+    .feature-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .feature-card:focus-within {
+      outline: 3px solid #0d6efd;
+      outline-offset: 2px;
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      aria-hidden: true;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+
+    .feature-card p {
+      color: #6c757d;
+      line-height: 1.6;
+    }
+
+    /* Features grid section */
+    .features {
+      padding: 5rem 2rem;
+      background-color: #f8f9fa;
+    }
+
+    .features h2 {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    /* Testimonials section */
+    .testimonials {
+      padding: 5rem 2rem;
+      background-color: white;
+    }
+
+    .testimonials h2 {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .testimonial-card {
+      background-color: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 2rem;
+      border-radius: 4px;
+      margin-bottom: 2rem;
+    }
+
+    .testimonial-author {
+      font-weight: 600;
+      color: #1b2a4a;
+      margin-top: 1rem;
+    }
+
+    .testimonial-role {
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+
+    /* Modal - sign-up form */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background-color: white;
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6c757d;
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .modal-close:hover,
+    .modal-close:focus-visible {
+      color: #1b2a4a;
+    }
+
+    /* Form styling */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1b2a4a;
+    }
+
+    input[type="email"],
+    input[type="text"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #dee2e6;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    input[type="email"]:focus-visible,
+    input[type="text"]:focus-visible,
+    input[type="password"]:focus-visible,
+    select:focus-visible {
+      border-color: #0d6efd;
+      outline: none;
+    }
+
+    input[type="email"]:invalid {
+      border-color: #dc3545;
+    }
+
+    .form-hint {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+
+    .form-error {
+      color: #dc3545;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .form-error.show {
+      display: block;
+    }
+
+    .required-indicator {
+      color: #dc3545;
+      aria-hidden: true;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #1b2a4a;
+      color: white;
+      padding: 3rem 2rem;
+      margin-top: 5rem;
+    }
+
+    footer a {
+      color: #e9ecef;
+      text-decoration: underline;
+      transition: color 0.2s ease;
+    }
+
+    footer a:hover,
+    footer a:focus-visible {
+      color: white;
+    }
+
+    footer nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .footer-section h3 {
+      color: white;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-section li {
+      margin-bottom: 0.75rem;
+    }
+
+    .copyright {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 2rem;
+      text-align: center;
+      color: #adb5bd;
+    }
+
+    /* Toast notification */
+    .toast-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 999;
+    }
+
+    .toast {
+      background-color: #198754;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.error {
+      background-color: #dc3545;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .hero {
+        padding: 3rem 1.5rem;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .features {
+        padding: 3rem 1.5rem;
+      }
+
+      nav[aria-label="Main navigation"] {
+        gap: 1rem;
+      }
+
+      nav[aria-label="Main navigation"] a {
+        font-size: 0.9rem;
+      }
+
+      footer nav {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip link - first focusable element for keyboard users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header with main navigation -->
+  <header role="banner">
+    <div class="container">
+      <nav aria-label="Main navigation" class="d-flex justify-content-between align-items-center">
+        <h1 style="margin: 0; font-size: 1.5rem;">
+          <a href="/" style="text-decoration: none; color: #1b2a4a;">DataFlow</a>
+        </h1>
+        <div class="d-flex gap-3" style="align-items: center;">
+          <a href="/" aria-current="page">Home</a>
+          <a href="#features">Features</a>
+          <a href="#testimonials">Testimonials</a>
+          <a href="#pricing">Pricing</a>
+          <button type="button" class="btn-primary" id="open-modal">Get Started</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main id="main-content">
+    <!-- Hero section -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <h1 id="hero-heading">Real-Time Analytics for Modern Teams</h1>
+        <p>Transform raw data into actionable insights with DataFlow's intelligent analytics platform. Monitor performance, identify trends, and make decisions faster.</p>
+        <button type="button" class="btn-primary" id="hero-cta">Start Free Trial</button>
+      </div>
+    </section>
+
+    <!-- Features section -->
+    <section id="features" class="features" aria-labelledby="features-heading">
+      <div class="container">
+        <h2 id="features-heading">Powerful Features for Every Team</h2>
+        <div class="row g-4">
+          <!-- Feature 1 -->
+          <div class="col-md-4">
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">📊</div>
+              <h3>Real-Time Dashboards</h3>
+              <p>Monitor key metrics across all your data sources with live-updating visualizations. Get instant visibility into performance, user behavior, and business KPIs.</p>
+            </article>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="col-md-4">
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">🔄</div>
+              <h3>Seamless Integrations</h3>
+              <p>Connect with 200+ data sources including Salesforce, Google Analytics, Stripe, and more. Build custom workflows without manual data entry.</p>
+            </article>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="col-md-4">
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">🤖</div>
+              <h3>AI-Powered Insights</h3>
+              <p>Leverage machine learning to detect anomalies, forecast trends, and receive intelligent recommendations tailored to your business goals.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials section -->
+    <section id="testimonials" class="testimonials" aria-labelledby="testimonials-heading">
+      <div class="container">
+        <h2 id="testimonials-heading">Loved by Teams Worldwide</h2>
+
+        <!-- Testimonial 1 -->
+        <article class="testimonial-card">
+          <p>"DataFlow cut our reporting time from 8 hours to 30 minutes. The team can now focus on strategy instead of data compilation."</p>
+          <div class="testimonial-author">Sarah Chen</div>
+          <div class="testimonial-role">Director of Analytics, TechCorp</div>
+        </article>
+
+        <!-- Testimonial 2 -->
+        <article class="testimonial-card">
+          <p>"We tried three analytics platforms before DataFlow. The combination of ease-of-use and powerful features is unmatched."</p>
+          <div class="testimonial-author">Marcus Thompson</div>
+          <div class="testimonial-role">VP Product, FinanceFlow</div>
+        </article>
+
+        <!-- Testimonial 3 -->
+        <article class="testimonial-card">
+          <p>"The customer support is exceptional. They helped us migrate from our legacy system in a week with zero downtime."</p>
+          <div class="testimonial-author">Elena Rodriguez</div>
+          <div class="testimonial-role">CTO, RetailHub</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Pricing section (CTA) -->
+    <section id="pricing" class="features" aria-labelledby="pricing-heading" style="text-align: center;">
+      <div class="container">
+        <h2 id="pricing-heading">Simple, Transparent Pricing</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 2rem; color: #6c757d;">Plans starting at $99/month. All plans include free onboarding and 24/7 support.</p>
+        <button type="button" class="btn-primary btn-lg" id="pricing-cta" style="padding: 0.875rem 2rem; font-size: 1.1rem;">View Full Pricing</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Sign-up form -->
+  <div class="modal-overlay" id="signup-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-dialog">
+      <button type="button" class="modal-close" id="close-modal" aria-label="Close sign-up form">
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      <h2 id="modal-title">Start Your Free Trial</h2>
+      <p style="color: #6c757d; margin-bottom: 2rem;">Get instant access to real-time analytics. No credit card required.</p>
+
+      <form id="signup-form" novalidate>
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="fullname">
+            Full Name
+            <span class="required-indicator" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input
+            type="text"
+            id="fullname"
+            name="fullname"
+            required
+            aria-required="true"
+            aria-describedby="fullname-error"
+            placeholder="John Doe">
+          <p id="fullname-error" class="form-error" role="alert"></p>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">
+            Email Address
+            <span class="required-indicator" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            aria-required="true"
+            aria-describedby="email-hint email-error"
+            autocomplete="email"
+            placeholder="your@company.com">
+          <p id="email-hint" class="form-hint">We'll never share your email.</p>
+          <p id="email-error" class="form-error" role="alert"></p>
+        </div>
+
+        <!-- Company Size -->
+        <div class="form-group">
+          <label for="company-size">
+            Company Size
+            <span class="required-indicator" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <select
+            id="company-size"
+            name="company-size"
+            required
+            aria-required="true"
+            aria-describedby="company-size-error">
+            <option value="">Select company size...</option>
+            <option value="startup">Startup (1-10)</option>
+            <option value="small">Small (11-50)</option>
+            <option value="medium">Medium (51-200)</option>
+            <option value="large">Large (200+)</option>
+          </select>
+          <p id="company-size-error" class="form-error" role="alert"></p>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">
+            Password
+            <span class="required-indicator" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            aria-required="true"
+            aria-describedby="pwd-requirements pwd-error"
+            autocomplete="new-password"
+            placeholder="Minimum 8 characters">
+          <p id="pwd-requirements" class="form-hint">Minimum 8 characters, including a number and special character.</p>
+          <p id="pwd-error" class="form-error" role="alert"></p>
+        </div>
+
+        <!-- Consent checkbox -->
+        <div class="form-group" style="margin-bottom: 2rem;">
+          <div style="display: flex; gap: 0.75rem;">
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              required
+              aria-required="true"
+              aria-describedby="terms-error"
+              style="width: auto; margin: 0.25rem 0 0 0;">
+            <label for="terms" style="margin-bottom: 0;">
+              I agree to the <a href="#" style="color: #0d6efd;">Terms of Service</a> and <a href="#" style="color: #0d6efd;">Privacy Policy</a>
+              <span class="sr-only">(required)</span>
+            </label>
+          </div>
+          <p id="terms-error" class="form-error" role="alert"></p>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 0.875rem;">
+          Create Free Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast notification container (must exist before content is injected) -->
+  <div id="toast-region" role="status" aria-live="polite" aria-atomic="true" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer role="contentinfo">
+    <div class="container">
+      <nav aria-label="Footer navigation">
+        <div class="footer-section">
+          <h3>Product</h3>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Support</h3>
+          <ul>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">API Docs</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Status</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Accessibility</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="copyright">
+        <p>&copy; 2026 DataFlow Inc. All rights reserved. <a href="#">Accessibility Statement</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Modal management with accessibility features
+    const signupModal = document.getElementById('signup-modal');
+    const openButtons = document.querySelectorAll('#open-modal, #hero-cta, #pricing-cta');
+    const closeButton = document.getElementById('close-modal');
+    const signupForm = document.getElementById('signup-form');
+    const toastRegion = document.getElementById('toast-region');
+
+    let focusTrigger = null;
+
+    // Helper: Get all focusable elements
+    function getFocusableElements(container) {
+      return container.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+    }
+
+    // Helper: Show toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+      toast.textContent = message;
+      toast.setAttribute('role', 'alert');
+
+      toastRegion.appendChild(toast);
+
+      // Auto-dismiss after 8 seconds (gives screen readers time to announce)
+      setTimeout(() => {
+        toast.remove();
+      }, 8000);
+    }
+
+    // Open modal
+    function openModal(trigger) {
+      focusTrigger = trigger;
+      signupModal.classList.add('active');
+      signupModal.removeAttribute('hidden');
+
+      // Focus first input
+      const focusable = getFocusableElements(signupModal);
+      if (focusable.length > 0) {
+        focusable[1]?.focus(); // Skip close button
+      }
+
+      // Add event listener for focus trap
+      signupModal.addEventListener('keydown', trapFocus);
+    }
+
+    // Close modal
+    function closeModal() {
+      signupModal.classList.remove('active');
+      signupModal.setAttribute('hidden', 'true');
+      signupModal.removeEventListener('keydown', trapFocus);
+
+      // Return focus to trigger
+      if (focusTrigger) {
+        focusTrigger.focus();
+      }
+
+      // Reset form
+      signupForm.reset();
+    }
+
+    // Focus trap: keep focus within modal
+    function trapFocus(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const focusable = [...getFocusableElements(signupModal)];
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    // Event listeners for modal triggers
+    openButtons.forEach(btn => {
+      btn.addEventListener('click', () => openModal(btn));
+    });
+
+    closeButton.addEventListener('click', closeModal);
+
+    // Close modal on backdrop click
+    signupModal.addEventListener('click', (e) => {
+      if (e.target === signupModal) {
+        closeModal();
+      }
+    });
+
+    // Form validation
+    function validateForm() {
+      const errors = {};
+      const fullname = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const companySize = document.getElementById('company-size').value;
+      const password = document.getElementById('password').value;
+      const terms = document.getElementById('terms').checked;
+
+      // Full name validation
+      if (!fullname) {
+        errors.fullname = 'Please enter your full name.';
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        errors.email = 'Please enter a valid email address.';
+      }
+
+      // Company size validation
+      if (!companySize) {
+        errors.company_size = 'Please select your company size.';
+      }
+
+      // Password validation (8+ chars, number, special char)
+      const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+      if (!password || !passwordRegex.test(password)) {
+        errors.password = 'Password must be at least 8 characters with a number and special character.';
+      }
+
+      // Terms validation
+      if (!terms) {
+        errors.terms = 'You must agree to the terms and privacy policy.';
+      }
+
+      return errors;
+    }
+
+    // Display validation errors
+    function displayErrors(errors) {
+      // Clear previous errors
+      document.querySelectorAll('.form-error').forEach(el => {
+        el.classList.remove('show');
+        el.textContent = '';
+      });
+
+      // Display new errors
+      Object.keys(errors).forEach(field => {
+        const errorEl = document.getElementById(`${field}-error`);
+        if (errorEl) {
+          errorEl.textContent = errors[field];
+          errorEl.classList.add('show');
+
+          // Update aria-invalid
+          const input = document.getElementById(field);
+          if (input) {
+            input.setAttribute('aria-invalid', 'true');
+          }
+        }
+      });
+    }
+
+    // Clear error on input
+    signupForm.querySelectorAll('input, select').forEach(field => {
+      field.addEventListener('change', () => {
+        const errorEl = document.getElementById(`${field.id}-error`);
+        if (errorEl && errorEl.classList.contains('show')) {
+          field.setAttribute('aria-invalid', 'false');
+          errorEl.classList.remove('show');
+          errorEl.textContent = '';
+        }
+      });
+    });
+
+    // Form submission
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const errors = validateForm();
+
+      if (Object.keys(errors).length > 0) {
+        displayErrors(errors);
+        showToast('Please fix the errors in the form.', 'error');
+        return;
+      }
+
+      // Simulate form submission
+      const email = document.getElementById('email').value;
+      showToast(`Welcome! Check your email at ${email} to confirm your account.`, 'success');
+
+      setTimeout(() => {
+        closeModal();
+      }, 1500);
+    });
+
+    // Announce navigation to screen readers
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (link.getAttribute('href') !== '#') {
+          const targetId = link.getAttribute('href').substring(1);
+          const target = document.getElementById(targetId);
+          if (target) {
+            setTimeout(() => {
+              const announcement = document.createElement('div');
+              announcement.setAttribute('role', 'status');
+              announcement.setAttribute('aria-live', 'polite');
+              announcement.className = 'sr-only';
+              announcement.textContent = `Navigated to ${target.tagName === 'SECTION' ? 'section' : 'element'}`;
+              document.body.appendChild(announcement);
+              setTimeout(() => announcement.remove(), 1000);
+            }, 100);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

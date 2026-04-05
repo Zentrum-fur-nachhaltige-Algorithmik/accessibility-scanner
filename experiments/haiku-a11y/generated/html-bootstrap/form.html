@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contact Us - Accessible Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Screen reader only utility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles */
+        :focus-visible {
+            outline: 3px solid #1b2a4a;
+            outline-offset: 2px;
+        }
+
+        /* Skip link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 8px 16px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Form customizations */
+        body {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .required-indicator {
+            color: #dc3545;
+        }
+
+        .form-hint {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .form-control:invalid {
+            border-color: #dc3545;
+        }
+
+        .form-control:invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        /* Success state */
+        .form-control.is-valid {
+            border-color: #198754;
+        }
+
+        .form-control.is-valid:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+
+        /* Button styles */
+        .btn {
+            min-height: 44px;
+            font-size: 1rem;
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid #1b2a4a;
+            outline-offset: 2px;
+        }
+
+        /* Live region for form status */
+        #form-status {
+            min-height: 1.5rem;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* Ensure text reflow at 320px */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="bg-light border-bottom py-3">
+        <div class="container">
+            <h1 class="h3 mb-0">Contact Support</h1>
+        </div>
+    </header>
+
+    <main id="main-content" class="py-5">
+        <div class="container" style="max-width: 600px;">
+            <section>
+                <h2 class="h4 mb-3">Send us a message</h2>
+                <p>We're here to help. Fill out the form below and we'll get back to you within 24 hours.</p>
+
+                <div id="form-status" role="alert" aria-live="assertive" class="visually-hidden"></div>
+
+                <form id="contact-form" novalidate>
+                    <!-- Name field -->
+                    <div class="mb-3">
+                        <label for="full-name" class="form-label">
+                            Full Name
+                            <span class="required-indicator" aria-hidden="true">*</span>
+                            <span class="sr-only">(required)</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="full-name"
+                            name="fullName"
+                            required
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-describedby="fullName-error"
+                            autocomplete="name">
+                        <div id="fullName-error" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <!-- Email field -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            Email Address
+                            <span class="required-indicator" aria-hidden="true">*</span>
+                            <span class="sr-only">(required)</span>
+                        </label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            required
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-describedby="email-hint email-error"
+                            autocomplete="email">
+                        <p id="email-hint" class="form-hint">We'll never share your email address.</p>
+                        <div id="email-error" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <!-- Phone field -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">
+                            Phone Number
+                            <span class="sr-only">(optional)</span>
+                        </label>
+                        <input
+                            type="tel"
+                            class="form-control"
+                            id="phone"
+                            name="phone"
+                            aria-invalid="false"
+                            aria-describedby="phone-hint phone-error"
+                            autocomplete="tel"
+                            placeholder="(555) 123-4567">
+                        <p id="phone-hint" class="form-hint">Include country code if calling from outside the US.</p>
+                        <div id="phone-error" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <!-- Subject dropdown -->
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">
+                            Subject
+                            <span class="required-indicator" aria-hidden="true">*</span>
+                            <span class="sr-only">(required)</span>
+                        </label>
+                        <select
+                            class="form-select"
+                            id="subject"
+                            name="subject"
+                            required
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-describedby="subject-error">
+                            <option value="">— Please select a subject —</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="billing">Billing Question</option>
+                            <option value="feedback">Feedback</option>
+                            <option value="accessibility">Accessibility Issue</option>
+                        </select>
+                        <div id="subject-error" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <!-- Message field -->
+                    <div class="mb-3">
+                        <label for="message" class="form-label">
+                            Message
+                            <span class="required-indicator" aria-hidden="true">*</span>
+                            <span class="sr-only">(required)</span>
+                        </label>
+                        <textarea
+                            class="form-control"
+                            id="message"
+                            name="message"
+                            rows="5"
+                            required
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-describedby="message-hint message-error"
+                            placeholder="Tell us how we can help..."></textarea>
+                        <p id="message-hint" class="form-hint">Please provide detailed information about your inquiry (minimum 10 characters).</p>
+                        <div id="message-error" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <!-- Checkbox for opt-in -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="newsletter"
+                                name="newsletter"
+                                value="yes">
+                            <label class="form-check-label" for="newsletter">
+                                Keep me updated with news and product updates
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit and Reset buttons -->
+                    <div class="d-flex gap-2">
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            id="submit-btn">
+                            Send Message
+                        </button>
+                        <button
+                            type="reset"
+                            class="btn btn-outline-secondary"
+                            id="reset-btn">
+                            Clear Form
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success message container -->
+                <div id="success-message" role="status" aria-live="polite" class="alert alert-success mt-4" hidden>
+                    <strong>Success!</strong> Your message has been sent. We'll be in touch soon.
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-light border-top py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-0">&copy; 2024 Support Team. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const form = document.getElementById('contact-form');
+        const formStatus = document.getElementById('form-status');
+        const successMessage = document.getElementById('success-message');
+
+        const fields = {
+            fullName: {
+                element: document.getElementById('full-name'),
+                errorContainer: document.getElementById('fullName-error'),
+                validate: (value) => {
+                    if (!value.trim()) return 'Full name is required.';
+                    if (value.trim().length < 2) return 'Full name must be at least 2 characters.';
+                    return null;
+                }
+            },
+            email: {
+                element: document.getElementById('email'),
+                errorContainer: document.getElementById('email-error'),
+                validate: (value) => {
+                    if (!value.trim()) return 'Email address is required.';
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) return 'Please enter a valid email address.';
+                    return null;
+                }
+            },
+            phone: {
+                element: document.getElementById('phone'),
+                errorContainer: document.getElementById('phone-error'),
+                validate: (value) => {
+                    if (value.trim() && value.trim().length < 10) {
+                        return 'Please enter a valid phone number.';
+                    }
+                    return null;
+                }
+            },
+            subject: {
+                element: document.getElementById('subject'),
+                errorContainer: document.getElementById('subject-error'),
+                validate: (value) => {
+                    if (!value) return 'Please select a subject.';
+                    return null;
+                }
+            },
+            message: {
+                element: document.getElementById('message'),
+                errorContainer: document.getElementById('message-error'),
+                validate: (value) => {
+                    if (!value.trim()) return 'Message is required.';
+                    if (value.trim().length < 10) return 'Message must be at least 10 characters.';
+                    return null;
+                }
+            }
+        };
+
+        // Validate individual field
+        function validateField(fieldName) {
+            const field = fields[fieldName];
+            const value = field.element.value;
+            const error = field.validate(value);
+
+            if (error) {
+                field.element.setAttribute('aria-invalid', 'true');
+                field.errorContainer.textContent = error;
+                field.errorContainer.hidden = false;
+                return false;
+            } else {
+                field.element.setAttribute('aria-invalid', 'false');
+                field.errorContainer.textContent = '';
+                field.errorContainer.hidden = true;
+                return true;
+            }
+        }
+
+        // Validate all fields
+        function validateForm() {
+            let isValid = true;
+            for (const fieldName in fields) {
+                if (!validateField(fieldName)) {
+                    isValid = false;
+                }
+            }
+            return isValid;
+        }
+
+        // Clear success and error messages
+        function clearMessages() {
+            successMessage.hidden = true;
+            formStatus.textContent = '';
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            clearMessages();
+
+            if (validateForm()) {
+                // Simulate form submission
+                formStatus.textContent = 'Your message has been sent successfully.';
+                successMessage.hidden = false;
+
+                // Log form data
+                const formData = new FormData(form);
+                console.log('Form data:', Object.fromEntries(formData));
+
+                // Reset form after successful submission
+                setTimeout(() => {
+                    form.reset();
+                    for (const fieldName in fields) {
+                        fields[fieldName].element.setAttribute('aria-invalid', 'false');
+                    }
+                }, 1000);
+            } else {
+                formStatus.textContent = 'Please correct the errors below.';
+                // Focus on first invalid field
+                for (const fieldName in fields) {
+                    if (fields[fieldName].element.getAttribute('aria-invalid') === 'true') {
+                        fields[fieldName].element.focus();
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Clear error message on input change
+        for (const fieldName in fields) {
+            fields[fieldName].element.addEventListener('change', function () {
+                validateField(fieldName);
+            });
+
+            // Real-time validation for email and phone
+            if (fieldName === 'email' || fieldName === 'phone') {
+                fields[fieldName].element.addEventListener('blur', function () {
+                    validateField(fieldName);
+                });
+            }
+        }
+
+        // Prevent default form reset styling issues
+        document.getElementById('reset-btn').addEventListener('click', function () {
+            clearMessages();
+            setTimeout(() => {
+                for (const fieldName in fields) {
+                    fields[fieldName].element.setAttribute('aria-invalid', 'false');
+                    fields[fieldName].errorContainer.hidden = true;
+                    fields[fieldName].errorContainer.textContent = '';
+                }
+            }, 0);
+        });
+    </script>
+</body>
+</html>

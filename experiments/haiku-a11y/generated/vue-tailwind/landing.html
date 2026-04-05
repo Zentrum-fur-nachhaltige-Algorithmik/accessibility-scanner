@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskFlow - Intelligent Project Management for Teams</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Screen reader only text */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Focus visible styles */
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+
+    /* Remove default outline on buttons and links with focus-visible */
+    button:focus:not(:focus-visible),
+    a:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    /* Reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Motion enabled animations */
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-in {
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      .slide-up {
+        animation: slideUp 0.6s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+
+    /* Text sizes use rem for scaling */
+    body {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* Ensure sufficient text contrast */
+    a {
+      text-decoration: underline;
+    }
+
+    /* Link underlines in body text */
+    main a {
+      color: #0066cc;
+      text-decoration: underline;
+    }
+
+    main a:visited {
+      color: #663399;
+    }
+
+    /* Modal backdrop */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-overlay[hidden] {
+      display: none;
+    }
+
+    /* Modal dialog */
+    .modal-dialog {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      max-width: 28rem;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form validation */
+    input:invalid {
+      border-color: #dc2626;
+    }
+
+    input:valid {
+      border-color: #16a34a;
+    }
+
+    .form-error {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Placeholder text contrast */
+    input::placeholder {
+      color: #767676;
+    }
+
+    /* Testimonial cards */
+    .testimonial-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .testimonial-quote {
+      font-style: italic;
+      margin-bottom: 1rem;
+      line-height: 1.8;
+    }
+
+    .testimonial-author {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+    }
+
+    .testimonial-role {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    /* Feature cards */
+    .feature-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .feature-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .feature-card:focus-within {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+    }
+
+    .feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      height: 3rem;
+      background: #eff6ff;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    /* Button styles */
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: #0066cc;
+      color: white;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+      background: #0052a3;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus {
+      background: #d1d5db;
+    }
+
+    /* Responsive text sizing */
+    h1 {
+      font-size: 2.25rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 1.875rem;
+      line-height: 1.3;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 1.875rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #0066cc;
+      color: white;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Navigation underline for current page */
+    nav a[aria-current="page"] {
+      border-bottom: 2px solid #0066cc;
+    }
+
+    /* Live region for announcements */
+    [role="status"],
+    [role="alert"] {
+      position: relative;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900">
+  <!-- Skip link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Vue app container -->
+  <div id="app">
+    <!-- Header with Navigation -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <nav aria-label="Main navigation" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div class="text-2xl font-bold text-blue-600">TaskFlow</div>
+        <ul class="flex gap-8 list-none">
+          <li><a href="#features" class="text-gray-700 hover:text-blue-600 transition-colors">Features</a></li>
+          <li><a href="#testimonials" class="text-gray-700 hover:text-blue-600 transition-colors">Testimonials</a></li>
+          <li><a href="#pricing" class="text-gray-700 hover:text-blue-600 transition-colors">Pricing</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Main content -->
+    <main id="main-content">
+      <!-- Hero section -->
+      <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
+        <div class="text-center">
+          <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+            Intelligent Project Management for Modern Teams
+          </h1>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+            TaskFlow brings clarity to chaos. Collaborate seamlessly, track progress in real-time, and deliver projects on time—every time.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              @click="openSignUpModal"
+              type="button"
+              class="btn btn-primary text-lg py-3 px-8"
+              aria-label="Open sign-up form to start free trial"
+            >
+              Start Free Trial
+            </button>
+            <a
+              href="#features"
+              class="btn btn-secondary text-lg py-3 px-8 text-center"
+              aria-label="Learn more about our features"
+            >
+              Learn More
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features section -->
+      <section id="features" aria-labelledby="features-heading" class="bg-gray-50 py-20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 id="features-heading" class="text-3xl font-bold text-center mb-12">
+            Why Teams Choose TaskFlow
+          </h2>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">📋</div>
+              <h3>Intuitive Task Management</h3>
+              <p class="text-gray-600 mt-4">
+                Create, organize, and prioritize tasks with drag-and-drop simplicity. Perfect for sprints, to-do lists, and complex workflows.
+              </p>
+            </article>
+
+            <!-- Feature 2 -->
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">👥</div>
+              <h3>Real-Time Collaboration</h3>
+              <p class="text-gray-600 mt-4">
+                Work together seamlessly. See live updates, @mention teammates, and never miss a deadline with intelligent notifications.
+              </p>
+            </article>
+
+            <!-- Feature 3 -->
+            <article class="feature-card">
+              <div class="feature-icon" aria-hidden="true">📊</div>
+              <h3>Advanced Analytics</h3>
+              <p class="text-gray-600 mt-4">
+                Gain insights with built-in dashboards, burndown charts, and team velocity metrics. Data-driven decisions made easy.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials section -->
+      <section id="testimonials" aria-labelledby="testimonials-heading" class="py-20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 id="testimonials-heading" class="text-3xl font-bold text-center mb-12">
+            Loved by Teams Everywhere
+          </h2>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <article class="testimonial-card">
+              <p class="testimonial-quote">
+                "TaskFlow transformed how our team ships software. We reduced project delays by 40% and our team is happier."
+              </p>
+              <span class="testimonial-author">Sarah Chen</span>
+              <span class="testimonial-role">Engineering Lead, TechStart Inc</span>
+            </article>
+
+            <!-- Testimonial 2 -->
+            <article class="testimonial-card">
+              <p class="testimonial-quote">
+                "The analytics dashboard alone is worth the price. We finally understand where our team spends time."
+              </p>
+              <span class="testimonial-author">Marcus Johnson</span>
+              <span class="testimonial-role">Product Manager, CreativeWorks</span>
+            </article>
+
+            <!-- Testimonial 3 -->
+            <article class="testimonial-card">
+              <p class="testimonial-quote">
+                "Switching from spreadsheets to TaskFlow was a game-changer. Integration with Slack saved us hours every week."
+              </p>
+              <span class="testimonial-author">Priya Sharma</span>
+              <span class="testimonial-role">Operations Director, Global Solutions</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing section -->
+      <section id="pricing" aria-labelledby="pricing-heading" class="bg-gray-50 py-20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 id="pricing-heading" class="text-3xl font-bold text-center mb-12">
+            Simple, Transparent Pricing
+          </h2>
+
+          <div class="max-w-2xl mx-auto">
+            <p class="text-center text-gray-600 mb-8 leading-relaxed">
+              Choose the plan that fits your team. All plans include a 14-day free trial with full access.
+            </p>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-8">
+              <h3 class="text-2xl font-bold mb-4">Professional Plan</h3>
+              <p class="text-4xl font-bold text-blue-600 mb-2">
+                $29
+                <span class="text-lg font-normal text-gray-600">/month</span>
+              </p>
+              <p class="text-gray-600 mb-6">Per user, billed annually</p>
+
+              <ul class="space-y-3 mb-8 text-gray-700">
+                <li class="flex items-start">
+                  <span aria-hidden="true" class="mr-2">✓</span>
+                  <span>Unlimited tasks and projects</span>
+                </li>
+                <li class="flex items-start">
+                  <span aria-hidden="true" class="mr-2">✓</span>
+                  <span>Team collaboration tools</span>
+                </li>
+                <li class="flex items-start">
+                  <span aria-hidden="true" class="mr-2">✓</span>
+                  <span>Advanced reporting and analytics</span>
+                </li>
+                <li class="flex items-start">
+                  <span aria-hidden="true" class="mr-2">✓</span>
+                  <span>Priority email support</span>
+                </li>
+                <li class="flex items-start">
+                  <span aria-hidden="true" class="mr-2">✓</span>
+                  <span>API access for integrations</span>
+                </li>
+              </ul>
+
+              <button
+                @click="openSignUpModal"
+                type="button"
+                class="w-full btn btn-primary py-3"
+                aria-label="Get started with Professional Plan"
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA section -->
+      <section class="bg-blue-600 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 class="text-3xl font-bold mb-4">Ready to Transform Your Workflow?</h2>
+          <p class="text-xl mb-8 opacity-95 leading-relaxed">
+            Join thousands of teams already using TaskFlow to work smarter and ship faster.
+          </p>
+          <button
+            @click="openSignUpModal"
+            type="button"
+            class="inline-block bg-white text-blue-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Start your free trial now"
+          >
+            Start Your Free Trial Today
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Sign-up Modal -->
+    <div
+      v-show="isModalOpen"
+      :hidden="!isModalOpen"
+      class="modal-overlay"
+      role="presentation"
+      @click.self="closeSignUpModal"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        class="modal-dialog"
+      >
+        <h2 id="modal-title" class="text-2xl font-bold mb-6">Start Your Free Trial</h2>
+
+        <form @submit.prevent="handleSignUp" novalidate>
+          <!-- Full Name -->
+          <div class="mb-4">
+            <label for="fullname" class="block text-sm font-medium mb-2">
+              Full Name
+              <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              id="fullname"
+              v-model="signUpForm.fullname"
+              required
+              aria-required="true"
+              :aria-invalid="!!signUpErrors.fullname"
+              :aria-describedby="signUpErrors.fullname ? 'fullname-error' : undefined"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Jane Doe"
+            />
+            <p v-if="signUpErrors.fullname" id="fullname-error" class="form-error" role="alert">
+              {{ signUpErrors.fullname }}
+            </p>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-4">
+            <label for="email" class="block text-sm font-medium mb-2">
+              Email Address
+              <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              v-model="signUpForm.email"
+              required
+              aria-required="true"
+              :aria-invalid="!!signUpErrors.email"
+              :aria-describedby="signUpErrors.email ? 'email-error' : 'email-hint'"
+              autocomplete="email"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="jane@company.com"
+            />
+            <p id="email-hint" class="text-sm text-gray-500 mt-1">We'll never share your email.</p>
+            <p v-if="signUpErrors.email" id="email-error" class="form-error" role="alert">
+              {{ signUpErrors.email }}
+            </p>
+          </div>
+
+          <!-- Company -->
+          <div class="mb-4">
+            <label for="company" class="block text-sm font-medium mb-2">
+              Company Name
+              <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              id="company"
+              v-model="signUpForm.company"
+              required
+              aria-required="true"
+              :aria-invalid="!!signUpErrors.company"
+              :aria-describedby="signUpErrors.company ? 'company-error' : undefined"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Acme Corp"
+            />
+            <p v-if="signUpErrors.company" id="company-error" class="form-error" role="alert">
+              {{ signUpErrors.company }}
+            </p>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-6">
+            <label for="password" class="block text-sm font-medium mb-2">
+              Password
+              <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <div class="relative">
+              <input
+                :type="showPassword ? 'text' : 'password'"
+                id="password"
+                v-model="signUpForm.password"
+                required
+                aria-required="true"
+                :aria-invalid="!!signUpErrors.password"
+                :aria-describedby="signUpErrors.password ? 'password-error' : 'password-requirements'"
+                autocomplete="new-password"
+                class="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                @click="showPassword = !showPassword"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
+              >
+                {{ showPassword ? '🙈' : '👁' }}
+              </button>
+            </div>
+            <p id="password-requirements" class="text-sm text-gray-500 mt-1">
+              Minimum 8 characters with one number
+            </p>
+            <p v-if="signUpErrors.password" id="password-error" class="form-error" role="alert">
+              {{ signUpErrors.password }}
+            </p>
+          </div>
+
+          <!-- Success message -->
+          <p
+            v-if="signUpSuccess"
+            role="status"
+            aria-live="polite"
+            class="text-green-600 font-semibold mb-4"
+          >
+            ✓ Welcome! Check your email to confirm.
+          </p>
+
+          <!-- Form actions -->
+          <div class="flex gap-3">
+            <button
+              type="submit"
+              class="flex-1 btn btn-primary py-2"
+              :disabled="signUpSuccess"
+              :aria-busy="isSubmitting"
+            >
+              {{ isSubmitting ? 'Creating account...' : 'Create Account' }}
+            </button>
+            <button
+              type="button"
+              @click="closeSignUpModal"
+              class="flex-1 btn btn-secondary py-2"
+              aria-label="Cancel and close sign-up form"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+
+        <!-- Close button -->
+        <button
+          type="button"
+          @click="closeSignUpModal"
+          aria-label="Close sign-up modal"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl leading-none"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          <div>
+            <h3 class="text-white font-semibold mb-4">Product</h3>
+            <ul class="space-y-2">
+              <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+              <li><a href="#pricing" class="hover:text-white transition-colors">Pricing</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Security</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold mb-4">Company</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-white transition-colors">About</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold mb-4">Legal</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold mb-4">Follow Us</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="hover:text-white transition-colors">Twitter</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">LinkedIn</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">GitHub</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 pt-8 text-center text-sm">
+          <p>&copy; 2024 TaskFlow. All rights reserved. Built with accessibility first.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Vue 3 from CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+
+    createApp({
+      setup() {
+        // Modal state
+        const isModalOpen = ref(false);
+        const isSubmitting = ref(false);
+        const signUpSuccess = ref(false);
+        const showPassword = ref(false);
+
+        // Form data
+        const signUpForm = ref({
+          fullname: '',
+          email: '',
+          company: '',
+          password: '',
+        });
+
+        // Form validation errors
+        const signUpErrors = ref({});
+
+        // Modal functions
+        function openSignUpModal() {
+          isModalOpen.value = true;
+          // Focus first form field after modal opens
+          setTimeout(() => {
+            const fullnameInput = document.getElementById('fullname');
+            if (fullnameInput) fullnameInput.focus();
+          }, 0);
+        }
+
+        function closeSignUpModal() {
+          isModalOpen.value = false;
+          // Reset form
+          signUpForm.value = {
+            fullname: '',
+            email: '',
+            company: '',
+            password: '',
+          };
+          signUpErrors.value = {};
+          signUpSuccess.value = false;
+          showPassword.value = false;
+        }
+
+        // Form validation
+        function validateForm() {
+          const errors = {};
+
+          if (!signUpForm.value.fullname.trim()) {
+            errors.fullname = 'Full name is required';
+          }
+
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!signUpForm.value.email.trim()) {
+            errors.email = 'Email is required';
+          } else if (!emailRegex.test(signUpForm.value.email)) {
+            errors.email = 'Please enter a valid email address';
+          }
+
+          if (!signUpForm.value.company.trim()) {
+            errors.company = 'Company name is required';
+          }
+
+          if (!signUpForm.value.password) {
+            errors.password = 'Password is required';
+          } else if (signUpForm.value.password.length < 8) {
+            errors.password = 'Password must be at least 8 characters';
+          } else if (!/\d/.test(signUpForm.value.password)) {
+            errors.password = 'Password must contain at least one number';
+          }
+
+          return errors;
+        }
+
+        // Form submission
+        async function handleSignUp() {
+          signUpErrors.value = {};
+          const errors = validateForm();
+
+          if (Object.keys(errors).length > 0) {
+            signUpErrors.value = errors;
+            // Focus error summary
+            setTimeout(() => {
+              const firstErrorField = Object.keys(errors)[0];
+              const errorElement = document.getElementById(firstErrorField);
+              if (errorElement) errorElement.focus();
+            }, 0);
+            return;
+          }
+
+          isSubmitting.value = true;
+          // Simulate API call
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          isSubmitting.value = false;
+          signUpSuccess.value = true;
+
+          // Auto-close after success
+          setTimeout(() => {
+            closeSignUpModal();
+          }, 2000);
+        }
+
+        // Keyboard handling for modal
+        function handleModalKeydown(e) {
+          if (e.key === 'Escape') {
+            closeSignUpModal();
+          }
+        }
+
+        // Add event listener to document for Escape key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && isModalOpen.value) {
+            closeSignUpModal();
+          }
+        });
+
+        return {
+          isModalOpen,
+          isSubmitting,
+          signUpSuccess,
+          showPassword,
+          signUpForm,
+          signUpErrors,
+          openSignUpModal,
+          closeSignUpModal,
+          handleSignUp,
+          handleModalKeydown,
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

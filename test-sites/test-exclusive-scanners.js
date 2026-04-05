@@ -1,0 +1,254 @@
+#!/usr/bin/env node
+
+/**
+ * Exclusive Scanner True/False Positive Test
+ *
+ * Tests all exclusive (non-LLM) scanners against their specific good + bad test files.
+ *  - Bad files: must produce >0 violations for the target criterion (true positive)
+ *  - Good files: must produce 0 violations for the target criterion (no false positives)
+ *
+ * Each scanner gets its own fresh page (exclusive access).
+ */
+
+const path = require('path');
+const http = require('http');
+const fs = require('fs');
+const { parseWcagMetadata } = require('./wcag-metadata-parser');
+
+async function loadPuppeteer() {
+  try {
+    return require('puppeteer');
+  } catch {
+    const mod = await import('puppeteer');
+    return mod.default || mod;
+  }
+}
+
+/**
+ * Scanner definitions: id → { module, criteria, scanOpts }
+ * Each entry defines which WCAG criteria to filter violations by.
+ */
+const EXCLUSIVE_SCANNERS = {
+  'keyboard-navigation': {
+    module: '../src/keyboard-navigation-scanner',
+    criteria: ['2.1.1', '2.1.2', '2.1.4'],
+  },
+  'focus-management': {
+    module: '../src/focus-management-scanner',
+    criteria: ['2.4.3', '2.4.7', '2.4.11'],
+  },
+  'input-modalities': {
+    module: '../src/input-modalities-scanner',
+    criteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.7', '2.5.8'],
+  },
+  'responsive-design': {
+    module: '../src/responsive-design-scanner',
+    criteria: ['1.4.4', '1.4.10', '1.4.12'],
+    scanOpts: { heuristicOnly: true }, // use heuristic mode for speed
+  },
+  'hover-focus-content': {
+    module: '../src/hover-focus-content-scanner',
+    criteria: ['1.4.13'],
+    scanOpts: { heuristicOnly: true },
+  },
+  'seizure-prevention': {
+    module: '../src/seizure-prevention-scanner',
+    criteria: ['2.3.1'],
+  },
+  'multiple-ways': {
+    module: '../src/multiple-ways-scanner',
+    criteria: ['2.4.5'],
+  },
+};
+
+/**
+ * Criterion → scanner mapping for test file routing.
+ */
+const CRITERION_TO_SCANNER = {};
+for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
+  for (const c of def.criteria) {
+    CRITERION_TO_SCANNER[c] = id;
+  }
+}
+
+/**
+ * Check if a violation matches any of the target criteria.
+ */
+function matchesCriteria(violation, criteria) {
+  const c = violation.criterion || violation.ruleId || '';
+  return criteria.some(target => {
+    // Match "9.2.4.11" against "2.4.11", "1.4.12" against "9.1.4.12", etc.
+    return c.includes(target) || c === `9.${target}`;
+  });
+}
+
+async function main() {
+  const puppeteer = await loadPuppeteer();
+  const testDir = __dirname;
+
+  // Parse all test files and route to scanners
+  const allFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.html'));
+  const testPlan = []; // { file, scanner, criteria, expectViolations }
+
+  for (const file of allFiles) {
+    const content = fs.readFileSync(path.join(testDir, file), 'utf-8');
+    let metadata;
+    try {
+      metadata = parseWcagMetadata(content);
+    } catch (e) {
+      continue;
+    }
+    if (!metadata) continue;
+
+    const isGood = metadata.testType === 'good';
+    const isBad = metadata.testType === 'bad';
+    if (!isGood && !isBad) continue;
+
+    // Find which exclusive scanner(s) cover this file's criteria
+    const scannerIds = new Set();
+    for (const c of metadata.criterion) {
+      const sid = CRITERION_TO_SCANNER[c];
+      if (sid) scannerIds.add(sid);
+    }
+
+    for (const sid of scannerIds) {
+      testPlan.push({
+        file,
+        scanner: sid,
+        criteria: metadata.criterion,
+        expectViolations: isBad,
+        title: metadata.title,
+      });
+    }
+  }
+
+  console.log(`Test plan: ${testPlan.length} tests across ${new Set(testPlan.map(t => t.scanner)).size} scanners\n`);
+
+  // Start static server
+  const server = http.createServer((req, res) => {
+    const filePath = path.join(testDir, req.url.replace(/^\//, ''));
+    if (!fs.existsSync(filePath)) {
+      res.writeHead(404);
+      res.end('Not found');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(fs.readFileSync(filePath));
+  });
+  const port = await new Promise(resolve => {
+    server.listen(0, () => resolve(server.address().port));
+  });
+
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  // Instantiate scanners
+  const scannerInstances = {};
+  for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
+    try {
+      const ScannerClass = require(def.module);
+      scannerInstances[id] = new ScannerClass();
+    } catch (err) {
+      console.warn(`WARN: Could not load scanner ${id}: ${err.message}`);
+    }
+  }
+
+  // Suppress verbose scanner output
+  const origLog = console.log;
+  const origWarn = console.warn;
+  function silence() { console.log = () => {}; console.warn = () => {}; }
+  function restore() { console.log = origLog; console.warn = origWarn; }
+
+  let passed = 0;
+  let failed = 0;
+  const failures = [];
+
+  // Group tests by scanner for efficient execution
+  const byScanner = {};
+  for (const t of testPlan) {
+    if (!byScanner[t.scanner]) byScanner[t.scanner] = [];
+    byScanner[t.scanner].push(t);
+  }
+
+  for (const [scannerId, tests] of Object.entries(byScanner)) {
+    const scanner = scannerInstances[scannerId];
+    if (!scanner) {
+      origLog(`SKIP ${scannerId}: scanner not loaded`);
+      continue;
+    }
+
+    const scannerDef = EXCLUSIVE_SCANNERS[scannerId];
+    origLog(`\n--- ${scannerId} (${tests.length} tests) ---`);
+
+    for (const t of tests) {
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1920, height: 1080 });
+
+      try {
+        await page.goto(`http://localhost:${port}/${t.file}`, {
+          waitUntil: 'networkidle0',
+          timeout: 30000,
+        });
+
+        silence();
+        const result = await Promise.race([
+          scanner.scan(page, { observationTime: 0, ...(scannerDef.scanOpts || {}) }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 60000)),
+        ]);
+        restore();
+
+        // Filter violations to the criteria this test file covers
+        const allViolations = result.violations || [];
+        const relevant = allViolations.filter(v => matchesCriteria(v, t.criteria));
+
+        const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
+        const label = t.expectViolations ? 'TRUE-POS' : 'FALSE-POS';
+        const detail = t.expectViolations
+          ? `${relevant.length} violations`
+          : `${relevant.length} false positives`;
+
+        if (ok) {
+          origLog(`  PASS [${label}] ${t.file}: ${detail}`);
+          passed++;
+        } else {
+          origLog(`  FAIL [${label}] ${t.file}: ${detail}`);
+          if (relevant.length > 0) {
+            relevant.slice(0, 3).forEach(v =>
+              origLog(`    - [${v.criterion}] ${v.issue}: ${(v.description || '').substring(0, 100)}`)
+            );
+          }
+          failed++;
+          failures.push({ file: t.file, scanner: scannerId, label, detail, relevant: relevant.slice(0, 3) });
+        }
+      } catch (err) {
+        restore();
+        origLog(`  ERROR ${t.file}: ${err.message}`);
+        failed++;
+        failures.push({ file: t.file, scanner: scannerId, label: 'ERROR', detail: err.message });
+      } finally {
+        await page.close().catch(() => {});
+      }
+    }
+  }
+
+  await browser.close();
+  server.close();
+
+  origLog(`\n=== SUMMARY ===`);
+  origLog(`Total: ${passed + failed} | Passed: ${passed} | Failed: ${failed}`);
+
+  if (failures.length > 0) {
+    origLog(`\nFailures:`);
+    for (const f of failures) {
+      origLog(`  ${f.scanner} / ${f.file} [${f.label}]: ${f.detail}`);
+    }
+    process.exit(1);
+  }
+}
+
+main().catch(err => {
+  console.error('Fatal:', err);
+  process.exit(1);
+});

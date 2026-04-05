@@ -66,6 +66,16 @@ const SCANNER_TESTS = {
     good: ['good-focus-appearance.html', 'good-focus-not-obscured-enhanced.html'],
     criteria: ['2.4.12', '2.4.13'],
   },
+  'llm-sensory-characteristics': {
+    bad: ['bad-sensory-characteristics.html'],
+    good: ['good-sensory-characteristics.html'],
+    criteria: ['1.3.3'],
+  },
+  'llm-reading-level': {
+    bad: ['bad-reading-level.html'],
+    good: ['good-reading-level.html'],
+    criteria: ['3.1.5'],
+  },
 };
 
 async function main() {
@@ -82,6 +92,8 @@ async function main() {
   const LLMVisualPresentationScanner = require('../src/llm-visual-presentation-scanner');
   const LLMBehavioralScanner = require('../src/llm-behavioral-scanner');
   const LLMFocusAppearanceScanner = require('../src/llm-focus-appearance-scanner');
+  const LLMSensoryCharacteristicsScanner = require('../src/llm-sensory-characteristics-scanner');
+  const LLMReadingLevelScanner = require('../src/llm-reading-level-scanner');
 
   const client = new LLMClient({
     apiKey: process.env.OPENROUTER_API_KEY,
@@ -96,6 +108,8 @@ async function main() {
     'llm-visual-presentation': new LLMVisualPresentationScanner(client),
     'llm-behavioral': new LLMBehavioralScanner(client),
     'llm-focus-appearance': new LLMFocusAppearanceScanner(client),
+    'llm-sensory-characteristics': new LLMSensoryCharacteristicsScanner(client),
+    'llm-reading-level': new LLMReadingLevelScanner(client),
   };
 
   // Start static file server

@@ -1,9 +1,0 @@
-node_modules/
-__pycache__/
-*.pyc
-data/arxiv_papers/*/paper.pdf
-data/arxiv_papers/*/source/
-data/cache/
-output/html/
-.env
-tests/eval/__snapshots__/

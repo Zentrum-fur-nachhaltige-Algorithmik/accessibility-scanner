@@ -1,9 +1,0 @@
-{
-  "testCase": "bad-use-of-color",
-  "timestamp": "2025-07-11T08:22:22.931Z",
-  "imageResults": [],
-  "summary": {
-    "suspectedTextImages": 0,
-    "backgroundTextImages": 0
-  }
-}

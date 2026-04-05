@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact Us — Accessible Form Example</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f5f5f5;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    /* Skip link — always first focusable element */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #000;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Page structure */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      margin: 0;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    footer {
+      text-align: center;
+      color: #666;
+      padding: 2rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    /* Form container */
+    .form-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-intro {
+      color: #555;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    /* Form groups */
+    .form-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1a1a1a;
+      font-size: 0.95rem;
+    }
+
+    /* Required field indicator */
+    .required-indicator {
+      color: #d32f2f;
+      margin-left: 0.25rem;
+      font-weight: bold;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Input fields */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1rem;
+      background-color: #fff;
+      color: #1a1a1a;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #1b2a4a;
+      box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.2);
+    }
+
+    input[type="text"]:focus-visible,
+    input[type="email"]:focus-visible,
+    input[type="tel"]:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+
+    /* Invalid state */
+    input[aria-invalid="true"],
+    select[aria-invalid="true"],
+    textarea[aria-invalid="true"] {
+      border-color: #d32f2f;
+      background-color: #fff;
+    }
+
+    input[aria-invalid="true"]:focus,
+    select[aria-invalid="true"]:focus,
+    textarea[aria-invalid="true"]:focus {
+      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Placeholder text contrast */
+    input::placeholder,
+    textarea::placeholder {
+      color: #767676;
+    }
+
+    /* Error messages */
+    .error-message {
+      color: #d32f2f;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error-message[hidden="false"] {
+      display: block;
+    }
+
+    /* Hint text */
+    .hint-text {
+      color: #666;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Error summary */
+    .error-summary {
+      background-color: #ffebee;
+      border: 2px solid #d32f2f;
+      border-radius: 4px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    .error-summary[hidden="false"] {
+      display: block;
+    }
+
+    .error-summary h2 {
+      color: #d32f2f;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .error-summary ul {
+      list-style-position: inside;
+      margin: 0;
+      padding: 0;
+    }
+
+    .error-summary li {
+      margin-bottom: 0.5rem;
+    }
+
+    .error-summary a {
+      color: #d32f2f;
+      text-decoration: underline;
+    }
+
+    .error-summary a:hover,
+    .error-summary a:focus {
+      text-decoration: underline;
+    }
+
+    /* Buttons */
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border: 2px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    button:focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+
+    /* Primary button */
+    .btn-primary {
+      background-color: #1b2a4a;
+      color: #fff;
+      border-color: #1b2a4a;
+    }
+
+    .btn-primary:hover {
+      background-color: #0f1829;
+      border-color: #0f1829;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary:disabled {
+      background-color: #ccc;
+      color: #666;
+      border-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Secondary button */
+    .btn-secondary {
+      background-color: #f5f5f5;
+      color: #1a1a1a;
+      border-color: #ccc;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e8e8e8;
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px);
+    }
+
+    /* Form actions */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    /* Success message */
+    .success-message {
+      background-color: #e8f5e9;
+      border: 2px solid #4caf50;
+      border-radius: 4px;
+      padding: 1rem;
+      color: #2e7d32;
+      display: none;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .success-message[hidden="false"] {
+      display: block;
+    }
+
+    /* Loading state */
+    button[disabled] {
+      opacity: 0.7;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .form-container {
+        padding: 1.5rem;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .form-actions {
+        justify-content: stretch;
+      }
+
+      .form-actions button {
+        flex: 1;
+      }
+    }
+
+    /* Reflow support */
+    @media (max-width: 320px) {
+      body {
+        font-size: 14px;
+      }
+
+      .form-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header>
+    <h1>Get in Touch</h1>
+  </header>
+
+  <main id="main-content">
+    <div id="root"></div>
+  </main>
+
+  <footer>
+    <p>© 2024 Accessible Contact Form Example. All rights reserved.</p>
+  </footer>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- React Component -->
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    function ContactForm() {
+      const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: ''
+      });
+
+      const [errors, setErrors] = useState({});
+      const [submitted, setSubmitted] = useState(false);
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const errorSummaryRef = useRef(null);
+      const nameInputRef = useRef(null);
+
+      // Validation logic
+      const validate = () => {
+        const newErrors = {};
+
+        if (!formData.name.trim()) {
+          newErrors.name = 'Please enter your full name.';
+        }
+
+        if (!formData.email.trim()) {
+          newErrors.email = 'Please enter a valid email address.';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+          newErrors.email = 'Email must be in format: user@example.com';
+        }
+
+        if (formData.phone && !/^[0-9\-\(\)\s\+]+$/.test(formData.phone)) {
+          newErrors.phone = 'Phone number contains invalid characters.';
+        }
+
+        if (!formData.subject.trim()) {
+          newErrors.subject = 'Please select a subject.';
+        }
+
+        if (!formData.message.trim()) {
+          newErrors.message = 'Please enter your message.';
+        } else if (formData.message.trim().length < 10) {
+          newErrors.message = 'Message must be at least 10 characters long.';
+        }
+
+        return newErrors;
+      };
+
+      // Handle input changes
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+
+        // Clear error for this field when user starts typing
+        if (errors[name]) {
+          setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+      };
+
+      // Handle form submission
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const newErrors = validate();
+
+        if (Object.keys(newErrors).length > 0) {
+          setErrors(newErrors);
+          // Focus error summary for keyboard and screen reader users
+          requestAnimationFrame(() => {
+            if (errorSummaryRef.current) {
+              errorSummaryRef.current.focus();
+              errorSummaryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+          return;
+        }
+
+        // Simulate submission
+        setIsSubmitting(true);
+        setTimeout(() => {
+          setIsSubmitting(false);
+          setSubmitted(true);
+          setErrors({});
+          setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+
+          // Auto-dismiss success after 5 seconds
+          setTimeout(() => {
+            setSubmitted(false);
+          }, 5000);
+
+          // Focus back to form after submission
+          requestAnimationFrame(() => {
+            if (nameInputRef.current) {
+              nameInputRef.current.focus();
+            }
+          });
+        }, 1200);
+      };
+
+      // Handle reset
+      const handleReset = () => {
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+        setErrors({});
+        setSubmitted(false);
+        requestAnimationFrame(() => {
+          if (nameInputRef.current) {
+            nameInputRef.current.focus();
+          }
+        });
+      };
+
+      return (
+        <div className="form-container">
+          <p className="form-intro">
+            We'd love to hear from you. Please fill out the form below and we'll get back to you as soon as possible.
+          </p>
+
+          {/* Error Summary */}
+          {Object.keys(errors).length > 0 && (
+            <div
+              ref={errorSummaryRef}
+              className="error-summary"
+              hidden="false"
+              role="alert"
+              aria-live="assertive"
+              tabIndex="-1"
+            >
+              <h2>Please fix {Object.keys(errors).length} error{Object.keys(errors).length !== 1 ? 's' : ''}:</h2>
+              <ul>
+                {Object.entries(errors).map(([field, msg]) => (
+                  <li key={field}>
+                    <a href={`#${field}-input`}>{msg}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {submitted && (
+            <div
+              className="success-message"
+              hidden="false"
+              role="status"
+              aria-live="polite"
+            >
+              Thank you! Your message has been sent successfully. We'll be in touch soon.
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate>
+            {/* Name Field */}
+            <div className="form-group">
+              <label htmlFor="name-input">
+                Name
+                <span className="required-indicator" aria-hidden="true">*</span>
+                <span className="sr-only">(required)</span>
+              </label>
+              <input
+                ref={nameInputRef}
+                type="text"
+                id="name-input"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                aria-required="true"
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'name-error' : undefined}
+                placeholder="John Doe"
+                autoComplete="name"
+              />
+              {errors.name && (
+                <p id="name-error" className="error-message" hidden="false" role="alert">
+                  {errors.name}
+                </p>
+              )}
+            </div>
+
+            {/* Email Field */}
+            <div className="form-group">
+              <label htmlFor="email-input">
+                Email
+                <span className="required-indicator" aria-hidden="true">*</span>
+                <span className="sr-only">(required)</span>
+              </label>
+              <input
+                type="email"
+                id="email-input"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                aria-required="true"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : 'email-hint'}
+                placeholder="john@example.com"
+                autoComplete="email"
+              />
+              {!errors.email && (
+                <p id="email-hint" className="hint-text">
+                  We'll never share your email address.
+                </p>
+              )}
+              {errors.email && (
+                <p id="email-error" className="error-message" hidden="false" role="alert">
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Phone Field */}
+            <div className="form-group">
+              <label htmlFor="phone-input">
+                Phone
+                <span className="sr-only">(optional)</span>
+              </label>
+              <input
+                type="tel"
+                id="phone-input"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                aria-invalid={!!errors.phone}
+                aria-describedby={errors.phone ? 'phone-error' : 'phone-hint'}
+                placeholder="+1 (555) 123-4567"
+                autoComplete="tel"
+              />
+              {!errors.phone && (
+                <p id="phone-hint" className="hint-text">
+                  Include country code for international numbers.
+                </p>
+              )}
+              {errors.phone && (
+                <p id="phone-error" className="error-message" hidden="false" role="alert">
+                  {errors.phone}
+                </p>
+              )}
+            </div>
+
+            {/* Subject Dropdown */}
+            <div className="form-group">
+              <label htmlFor="subject-input">
+                Subject
+                <span className="required-indicator" aria-hidden="true">*</span>
+                <span className="sr-only">(required)</span>
+              </label>
+              <select
+                id="subject-input"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                aria-required="true"
+                aria-invalid={!!errors.subject}
+                aria-describedby={errors.subject ? 'subject-error' : undefined}
+              >
+                <option value="">Select a subject...</option>
+                <option value="general">General Inquiry</option>
+                <option value="support">Technical Support</option>
+                <option value="billing">Billing Question</option>
+                <option value="feedback">Product Feedback</option>
+                <option value="partnership">Partnership Opportunity</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.subject && (
+                <p id="subject-error" className="error-message" hidden="false" role="alert">
+                  {errors.subject}
+                </p>
+              )}
+            </div>
+
+            {/* Message Field */}
+            <div className="form-group">
+              <label htmlFor="message-input">
+                Message
+                <span className="required-indicator" aria-hidden="true">*</span>
+                <span className="sr-only">(required, minimum 10 characters)</span>
+              </label>
+              <textarea
+                id="message-input"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                aria-required="true"
+                aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? 'message-error' : 'message-hint'}
+                placeholder="Tell us how we can help..."
+              ></textarea>
+              {!errors.message && (
+                <p id="message-hint" className="hint-text">
+                  Minimum 10 characters. Please be descriptive.
+                </p>
+              )}
+              {errors.message && (
+                <p id="message-error" className="error-message" hidden="false" role="alert">
+                  {errors.message}
+                </p>
+              )}
+            </div>
+
+            {/* Form Actions */}
+            <div className="form-actions">
+              <button
+                type="reset"
+                onClick={handleReset}
+                className="btn-secondary"
+                aria-label="Clear all form fields"
+              >
+                Clear
+              </button>
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={isSubmitting}
+                aria-busy={isSubmitting}
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+              </button>
+            </div>
+          </form>
+        </div>
+      );
+    }
+
+    // Mount React component
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<ContactForm />);
+  </script>
+</body>
+</html>

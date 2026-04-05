@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Acme Support</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    /* Reset & Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background-color: #f9f9f9;
+    }
+
+    /* Screen reader only content */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #1b2a4a;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #4a90e2;
+      outline-offset: 2px;
+    }
+
+    /* Layout */
+    header {
+      background: linear-gradient(135deg, #1b2a4a 0%, #2d4a7a 100%);
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    footer {
+      background: #f0f0f0;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    /* Form structure */
+    .form-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-intro {
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    /* Form groups */
+    .form-group {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      color: #1a1a1a;
+      font-size: 1rem;
+    }
+
+    .required-indicator {
+      color: #c41e3a;
+      font-weight: 700;
+      aria-hidden: "true";
+    }
+
+    /* Input & Select styling */
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea,
+    select {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 0.75rem;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #1a1a1a;
+      transition: border-color 0.2ms, box-shadow 0.2ms;
+      min-height: 2.5rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      textarea,
+      select {
+        transition-duration: 0.01ms;
+      }
+    }
+
+    input[type="text"]:focus-visible,
+    input[type="email"]:focus-visible,
+    input[type="tel"]:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 3px solid #4a90e2;
+      outline-offset: 2px;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    input[type="text"]:disabled,
+    input[type="email"]:disabled,
+    input[type="tel"]:disabled,
+    textarea:disabled,
+    select:disabled {
+      background-color: #f5f5f5;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.5;
+    }
+
+    /* Invalid state */
+    input[aria-invalid="true"],
+    textarea[aria-invalid="true"],
+    select[aria-invalid="true"] {
+      border-color: #c41e3a;
+      background-color: #fff8f8;
+    }
+
+    /* Field hints */
+    .field-hint {
+      font-size: 0.875rem;
+      color: #666;
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+
+    /* Error messages */
+    .error-message {
+      font-size: 0.875rem;
+      color: #c41e3a;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .error-message::before {
+      content: "⚠";
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+    }
+
+    /* Error summary */
+    .error-summary {
+      background-color: #fff8f8;
+      border-left: 4px solid #c41e3a;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 4px;
+    }
+
+    .error-summary h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #c41e3a;
+      margin-bottom: 0.5rem;
+    }
+
+    .error-summary ul {
+      list-style: none;
+      margin-left: 0;
+    }
+
+    .error-summary li {
+      margin-bottom: 0.5rem;
+    }
+
+    .error-summary a {
+      color: #c41e3a;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+
+    .error-summary a:focus-visible {
+      outline: 3px solid #4a90e2;
+      outline-offset: 2px;
+    }
+
+    /* Success message */
+    .success-message {
+      background-color: #f0f8f0;
+      border-left: 4px solid #2d7a4a;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 4px;
+      color: #1a5a3a;
+    }
+
+    .success-message h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2d7a4a;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Buttons */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2ms, transform 0.2ms;
+      min-height: 2.5rem;
+      min-width: 120px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      button {
+        transition-duration: 0.01ms;
+      }
+    }
+
+    .btn-primary {
+      background-color: #1b2a4a;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: #0f1a2e;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 3px solid #4a90e2;
+      outline-offset: 2px;
+    }
+
+    .btn-primary:disabled {
+      background-color: #ccc;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: #ddd;
+      color: #1a1a1a;
+    }
+
+    .btn-secondary:hover {
+      background-color: #ccc;
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px);
+    }
+
+    .btn-secondary:focus-visible {
+      outline: 3px solid #4a90e2;
+      outline-offset: 2px;
+    }
+
+    /* Fieldset (for grouping) */
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Character counter */
+    .char-counter {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .form-container {
+        padding: 1.5rem 1rem;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner">
+    <h1>Contact Us</h1>
+    <p>We're here to help. Send us a message and we'll respond within 24 hours.</p>
+  </header>
+
+  <main id="main-content" tabindex="-1">
+    <div id="app">
+      <div class="form-container">
+        <p class="form-intro">All fields marked with <span class="required-indicator">*</span> <span class="sr-only">(asterisk)</span> are required.</p>
+
+        <!-- Error summary -->
+        <div v-if="errors && Object.keys(errors).length > 0"
+             ref="errorSummary"
+             tabindex="-1"
+             role="alert"
+             aria-live="assertive"
+             class="error-summary">
+          <h2>{{ Object.keys(errors).length }} {{ Object.keys(errors).length === 1 ? 'error' : 'errors' }} found</h2>
+          <ul>
+            <li v-for="(message, field) in errors" :key="field">
+              <a :href="`#${field}`">{{ message }}</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Success message -->
+        <div v-if="successMessage"
+             role="status"
+             aria-live="polite"
+             class="success-message">
+          <h2>Thank you!</h2>
+          <p>{{ successMessage }}</p>
+        </div>
+
+        <form @submit.prevent="handleSubmit" novalidate>
+          <!-- Name field -->
+          <div class="form-group">
+            <label for="full-name">
+              Full Name
+              <span class="required-indicator">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              id="full-name"
+              v-model="form.name"
+              placeholder="Jane Doe"
+              aria-required="true"
+              :aria-invalid="!!errors.name"
+              :aria-describedby="errors.name ? 'name-error' : 'name-hint'"
+              autocomplete="name"
+              @blur="validateField('name')">
+            <p id="name-hint" class="field-hint">Please enter your full name.</p>
+            <div v-if="errors.name" id="name-error" class="error-message" role="alert">
+              {{ errors.name }}
+            </div>
+          </div>
+
+          <!-- Email field -->
+          <div class="form-group">
+            <label for="email">
+              Email Address
+              <span class="required-indicator">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              v-model="form.email"
+              placeholder="jane@example.com"
+              aria-required="true"
+              :aria-invalid="!!errors.email"
+              :aria-describedby="errors.email ? 'email-error' : 'email-hint'"
+              autocomplete="email"
+              @blur="validateField('email')">
+            <p id="email-hint" class="field-hint">We'll use this to reply to your message.</p>
+            <div v-if="errors.email" id="email-error" class="error-message" role="alert">
+              {{ errors.email }}
+            </div>
+          </div>
+
+          <!-- Phone field -->
+          <div class="form-group">
+            <label for="phone">
+              Phone Number
+              <span class="required-indicator">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              v-model="form.phone"
+              placeholder="+1 (555) 123-4567"
+              aria-required="true"
+              :aria-invalid="!!errors.phone"
+              :aria-describedby="errors.phone ? 'phone-error' : 'phone-hint'"
+              autocomplete="tel"
+              @blur="validateField('phone')">
+            <p id="phone-hint" class="field-hint">Include your country code for international calls.</p>
+            <div v-if="errors.phone" id="phone-error" class="error-message" role="alert">
+              {{ errors.phone }}
+            </div>
+          </div>
+
+          <!-- Subject dropdown -->
+          <div class="form-group">
+            <label for="subject">
+              Subject
+              <span class="required-indicator">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <select
+              id="subject"
+              v-model="form.subject"
+              aria-required="true"
+              :aria-invalid="!!errors.subject"
+              :aria-describedby="errors.subject ? 'subject-error' : undefined"
+              @change="validateField('subject')">
+              <option value="">— Select a subject —</option>
+              <option value="billing">Billing & Payments</option>
+              <option value="support">Technical Support</option>
+              <option value="feature">Feature Request</option>
+              <option value="feedback">General Feedback</option>
+            </select>
+            <div v-if="errors.subject" id="subject-error" class="error-message" role="alert">
+              {{ errors.subject }}
+            </div>
+          </div>
+
+          <!-- Message field -->
+          <div class="form-group">
+            <label for="message">
+              Message
+              <span class="required-indicator">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <textarea
+              id="message"
+              v-model="form.message"
+              placeholder="Tell us more about your issue or question..."
+              aria-required="true"
+              :aria-invalid="!!errors.message"
+              :aria-describedby="errors.message ? 'message-error' : 'message-hint'"
+              @blur="validateField('message')"></textarea>
+            <p id="message-hint" class="field-hint">Provide as much detail as possible to help us assist you faster.</p>
+            <p class="char-counter" aria-live="polite">
+              {{ form.message.length }} / 1000 characters
+            </p>
+            <div v-if="errors.message" id="message-error" class="error-message" role="alert">
+              {{ errors.message }}
+            </div>
+          </div>
+
+          <!-- Preferences checkbox -->
+          <div class="form-group">
+            <label for="subscribe" class="checkbox-label">
+              <input
+                type="checkbox"
+                id="subscribe"
+                v-model="form.subscribe"
+                aria-describedby="subscribe-hint">
+              <span>Email me with updates and special offers</span>
+            </label>
+            <p id="subscribe-hint" class="field-hint">Optional. You can unsubscribe anytime.</p>
+          </div>
+
+          <!-- Form actions -->
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" :disabled="isSubmitting">
+              {{ isSubmitting ? 'Sending...' : 'Send Message' }}
+            </button>
+            <button type="reset" class="btn-secondary" @click="resetForm">
+              Clear Form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2024 Acme Support. All rights reserved. <a href="#" style="color: #4a90e2; text-decoration: underline;">Privacy Policy</a></p>
+  </footer>
+
+  <script>
+    const { createApp, ref, reactive } = Vue;
+
+    createApp({
+      setup() {
+        const form = reactive({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+          subscribe: false
+        });
+
+        const errors = ref({});
+        const successMessage = ref('');
+        const isSubmitting = ref(false);
+        const errorSummary = ref(null);
+
+        const validateField = (field) => {
+          if (!errors.value[field]) return;
+
+          const newErrors = { ...errors.value };
+          delete newErrors[field];
+          errors.value = newErrors;
+        };
+
+        const validateForm = () => {
+          const newErrors = {};
+
+          if (!form.name.trim()) {
+            newErrors.name = 'Full name is required.';
+          }
+
+          if (!form.email.trim()) {
+            newErrors.email = 'Email address is required.';
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+            newErrors.email = 'Please enter a valid email address.';
+          }
+
+          if (!form.phone.trim()) {
+            newErrors.phone = 'Phone number is required.';
+          } else if (!/^\+?[\d\s\-()]{10,}$/.test(form.phone)) {
+            newErrors.phone = 'Please enter a valid phone number.';
+          }
+
+          if (!form.subject) {
+            newErrors.subject = 'Please select a subject.';
+          }
+
+          if (!form.message.trim()) {
+            newErrors.message = 'Message is required.';
+          } else if (form.message.length < 10) {
+            newErrors.message = 'Message must be at least 10 characters long.';
+          } else if (form.message.length > 1000) {
+            newErrors.message = 'Message cannot exceed 1000 characters.';
+          }
+
+          return newErrors;
+        };
+
+        const handleSubmit = async () => {
+          errors.value = validateForm();
+
+          if (Object.keys(errors.value).length > 0) {
+            await Vue.nextTick();
+            errorSummary.value?.focus();
+            return;
+          }
+
+          isSubmitting.value = true;
+
+          try {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            successMessage.value = `Thank you for contacting us, ${form.name.split(' ')[0]}! We've received your message and will be in touch soon.`;
+            form.name = '';
+            form.email = '';
+            form.phone = '';
+            form.subject = '';
+            form.message = '';
+            form.subscribe = false;
+
+            setTimeout(() => {
+              successMessage.value = '';
+            }, 6000);
+          } finally {
+            isSubmitting.value = false;
+          }
+        };
+
+        const resetForm = () => {
+          form.name = '';
+          form.email = '';
+          form.phone = '';
+          form.subject = '';
+          form.message = '';
+          form.subscribe = false;
+          errors.value = {};
+          successMessage.value = '';
+        };
+
+        return {
+          form,
+          errors,
+          successMessage,
+          isSubmitting,
+          errorSummary,
+          handleSubmit,
+          resetForm,
+          validateField
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

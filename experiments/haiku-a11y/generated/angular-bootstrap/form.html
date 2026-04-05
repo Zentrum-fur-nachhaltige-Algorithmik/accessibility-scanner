@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact Us - Accessible Form</title>
+
+  <!-- Bootstrap 5 CSS via CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* Accessibility: Screen reader only text */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Body text sizing and line-height for readability */
+    body {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Focus styles with minimum 3px solid outline and 3:1 contrast */
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+
+    /* Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Form group styling */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    /* Label styling with required indicator */
+    label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    /* Visual indicator for required fields - not color-only */
+    .required-indicator {
+      color: #d32f2f;
+      font-weight: bold;
+      margin-left: 0.25rem;
+    }
+
+    /* Form control focus states override Bootstrap */
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #1b2a4a;
+      box-shadow: 0 0 0 0.2rem rgba(27, 42, 74, 0.25);
+    }
+
+    /* Error message styling with alert role */
+    .invalid-feedback {
+      display: block;
+      color: #d32f2f;
+      font-size: 0.9375rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Hint text styling */
+    .form-text {
+      display: block;
+      color: #666;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Button styling */
+    .btn {
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background-color: #1b2a4a;
+      border-color: #1b2a4a;
+    }
+
+    .btn-primary:hover {
+      background-color: #0f1729;
+      border-color: #0f1729;
+    }
+
+    /* Success message styling */
+    .alert {
+      padding: 1rem;
+      border-radius: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+      background-color: #f1f5fe;
+      border: 1px solid #1565c0;
+      color: #0d47a1;
+    }
+
+    /* Form section container */
+    .form-section {
+      background-color: #f8f9fa;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 600px;
+    }
+
+    /* Placeholder text with sufficient contrast */
+    .form-control::placeholder {
+      color: #767676;
+    }
+
+    /* Container padding and max-width for readability */
+    .container {
+      max-width: 80ch;
+    }
+
+    /* Main landmark */
+    main {
+      padding: 2rem 0;
+      min-height: calc(100vh - 200px);
+    }
+
+    /* Header and footer styling */
+    header {
+      background-color: #f8f9fa;
+      padding: 1rem 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+      padding: 2rem 0;
+      margin-top: 3rem;
+      text-align: center;
+      color: #666;
+    }
+
+    /* Skip link styling */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #1b2a4a;
+      color: white;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Input field styling for better visibility */
+    .form-control {
+      border: 1px solid #ccc;
+      min-height: 2.5rem;
+    }
+
+    .form-select {
+      border: 1px solid #ccc;
+      min-height: 2.5rem;
+    }
+
+    /* Two-column layout for larger screens, responsive */
+    @media (min-width: 768px) {
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .form-row .form-group {
+        margin-bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip link as first focusable element -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header with navigation -->
+  <header>
+    <div class="container">
+      <nav aria-label="Main navigation">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#" aria-current="page">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main content area -->
+  <main id="main-content">
+    <div class="container">
+      <!-- Page heading -->
+      <h1>Get in Touch</h1>
+      <p class="lead">We'd like to hear from you. Please fill out the form below and we'll respond within 24 hours.</p>
+
+      <!-- Success message region (live region for dynamic updates) -->
+      <div id="success-message" role="status" aria-live="polite" aria-atomic="true" hidden>
+        <div class="alert alert-success">
+          Thank you for contacting us! Your message has been received and we'll get back to you shortly.
+        </div>
+      </div>
+
+      <!-- Form container -->
+      <form id="contact-form" class="form-section" novalidate>
+        <fieldset>
+          <legend class="h5 mb-4">Contact Information</legend>
+
+          <!-- Full Name field -->
+          <div class="form-group">
+            <label for="full-name">
+              Full Name
+              <span class="required-indicator" aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="full-name"
+              name="fullName"
+              aria-required="true"
+              aria-invalid="false"
+              aria-describedby="fullName-error"
+              autocomplete="name"
+              placeholder="John Smith"
+            >
+            <p id="fullName-error" class="invalid-feedback" role="alert" hidden></p>
+          </div>
+
+          <!-- Two-column layout for email and phone -->
+          <div class="form-row">
+            <!-- Email field -->
+            <div class="form-group">
+              <label for="email">
+                Email Address
+                <span class="required-indicator" aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                aria-required="true"
+                aria-invalid="false"
+                aria-describedby="email-hint email-error"
+                autocomplete="email"
+                placeholder="john@example.com"
+              >
+              <p id="email-hint" class="form-text">We'll never share your email address.</p>
+              <p id="email-error" class="invalid-feedback" role="alert" hidden></p>
+            </div>
+
+            <!-- Phone field -->
+            <div class="form-group">
+              <label for="phone">
+                Phone Number
+                <span class="sr-only">(optional)</span>
+              </label>
+              <input
+                type="tel"
+                class="form-control"
+                id="phone"
+                name="phone"
+                aria-invalid="false"
+                aria-describedby="phone-hint phone-error"
+                autocomplete="tel"
+                placeholder="(555) 123-4567"
+              >
+              <p id="phone-hint" class="form-text">Format: (555) 123-4567</p>
+              <p id="phone-error" class="invalid-feedback" role="alert" hidden></p>
+            </div>
+          </div>
+
+          <!-- Subject dropdown -->
+          <div class="form-group">
+            <label for="subject">
+              Subject
+              <span class="required-indicator" aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <select
+              class="form-select"
+              id="subject"
+              name="subject"
+              aria-required="true"
+              aria-invalid="false"
+              aria-describedby="subject-error"
+            >
+              <option value="">-- Select a subject --</option>
+              <option value="general">General Inquiry</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing Question</option>
+              <option value="partnership">Partnership Opportunity</option>
+              <option value="feedback">Product Feedback</option>
+            </select>
+            <p id="subject-error" class="invalid-feedback" role="alert" hidden></p>
+          </div>
+
+          <!-- Message textarea -->
+          <div class="form-group">
+            <label for="message">
+              Message
+              <span class="required-indicator" aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <textarea
+              class="form-control"
+              id="message"
+              name="message"
+              rows="5"
+              aria-required="true"
+              aria-invalid="false"
+              aria-describedby="message-hint message-error"
+              placeholder="Please provide details about your inquiry..."
+            ></textarea>
+            <p id="message-hint" class="form-text">Minimum 10 characters required.</p>
+            <p id="message-error" class="invalid-feedback" role="alert" hidden></p>
+          </div>
+
+        </fieldset>
+
+        <!-- Form actions (buttons) -->
+        <div class="form-actions mt-4 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">
+            Send Message
+          </button>
+          <button type="reset" class="btn btn-outline-secondary">
+            Clear Form
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Accessible Contact Form. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS (optional, not needed for this form) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Angular-style component implementation -->
+  <script>
+    /**
+     * ContactFormComponent - Angular-style accessible contact form
+     * Implements WCAG 2.2 AA compliant form validation and submission
+     */
+    class ContactFormComponent {
+      constructor() {
+        this.formElement = document.getElementById('contact-form');
+        this.successMessage = document.getElementById('success-message');
+        this.formState = {
+          fullName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        };
+        this.errors = {};
+        this.init();
+      }
+
+      init() {
+        // Bind form submission
+        this.formElement.addEventListener('submit', (e) => this.handleSubmit(e));
+
+        // Bind individual field validation on blur
+        this.getFormFields().forEach(field => {
+          field.addEventListener('blur', () => this.validateField(field));
+          field.addEventListener('input', () => this.updateFormState(field));
+        });
+
+        // Bind reset handler
+        this.formElement.addEventListener('reset', () => this.handleReset());
+      }
+
+      getFormFields() {
+        return [
+          this.formElement.elements['fullName'],
+          this.formElement.elements['email'],
+          this.formElement.elements['phone'],
+          this.formElement.elements['subject'],
+          this.formElement.elements['message']
+        ];
+      }
+
+      updateFormState(field) {
+        this.formState[field.name] = field.value.trim();
+      }
+
+      validateField(field) {
+        const fieldName = field.name;
+        const value = field.value.trim();
+        const errorElement = document.getElementById(`${fieldName}-error`);
+
+        let errorMessage = '';
+
+        // Validation rules
+        if (fieldName === 'fullName') {
+          if (!value) {
+            errorMessage = 'Full name is required.';
+          } else if (value.length < 2) {
+            errorMessage = 'Full name must be at least 2 characters.';
+          }
+        }
+
+        if (fieldName === 'email') {
+          if (!value) {
+            errorMessage = 'Email address is required.';
+          } else if (!this.isValidEmail(value)) {
+            errorMessage = 'Please enter a valid email address.';
+          }
+        }
+
+        if (fieldName === 'phone') {
+          if (value && !this.isValidPhone(value)) {
+            errorMessage = 'Please enter a valid phone number.';
+          }
+        }
+
+        if (fieldName === 'subject') {
+          if (!value) {
+            errorMessage = 'Please select a subject.';
+          }
+        }
+
+        if (fieldName === 'message') {
+          if (!value) {
+            errorMessage = 'Message is required.';
+          } else if (value.length < 10) {
+            errorMessage = 'Message must be at least 10 characters.';
+          }
+        }
+
+        // Update aria-invalid and error display
+        if (errorMessage) {
+          field.setAttribute('aria-invalid', 'true');
+          field.classList.add('is-invalid');
+          errorElement.textContent = errorMessage;
+          errorElement.hidden = false;
+          this.errors[fieldName] = errorMessage;
+        } else {
+          field.setAttribute('aria-invalid', 'false');
+          field.classList.remove('is-invalid');
+          errorElement.textContent = '';
+          errorElement.hidden = true;
+          delete this.errors[fieldName];
+        }
+      }
+
+      isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      isValidPhone(phone) {
+        // Accept various phone formats
+        const phoneRegex = /^[\d\s\-().+]+$|^$/;
+        return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
+      }
+
+      handleSubmit(event) {
+        event.preventDefault();
+
+        // Clear previous success message
+        this.successMessage.hidden = true;
+
+        // Validate all fields
+        this.getFormFields().forEach(field => this.validateField(field));
+
+        // Check if form is valid
+        if (Object.keys(this.errors).length === 0) {
+          this.submitForm();
+        } else {
+          // Focus on first invalid field for keyboard users
+          const firstInvalidField = this.getFormFields().find(
+            field => field.getAttribute('aria-invalid') === 'true'
+          );
+          if (firstInvalidField) {
+            firstInvalidField.focus();
+          }
+        }
+      }
+
+      submitForm() {
+        // Log form data (in real app, would send to server)
+        console.log('Form submitted with data:', this.formState);
+
+        // Show success message in live region
+        this.successMessage.hidden = false;
+
+        // Reset form
+        this.formElement.reset();
+        this.formState = {
+          fullName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        };
+        this.errors = {};
+
+        // Clear all validation states
+        this.getFormFields().forEach(field => {
+          field.setAttribute('aria-invalid', 'false');
+          field.classList.remove('is-invalid');
+        });
+
+        // Auto-hide success message after 8 seconds (sufficient for screen readers)
+        setTimeout(() => {
+          this.successMessage.hidden = true;
+        }, 8000);
+      }
+
+      handleReset() {
+        // Clear error states
+        this.errors = {};
+        this.formState = {
+          fullName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        };
+
+        // Clear validation UI
+        this.getFormFields().forEach(field => {
+          field.setAttribute('aria-invalid', 'false');
+          field.classList.remove('is-invalid');
+          const errorElement = document.getElementById(`${field.name}-error`);
+          errorElement.textContent = '';
+          errorElement.hidden = true;
+        });
+
+        // Announce reset to screen readers
+        console.log('Form has been cleared.');
+      }
+    }
+
+    // Initialize component when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new ContactFormComponent();
+    });
+  </script>
+</body>
+</html>

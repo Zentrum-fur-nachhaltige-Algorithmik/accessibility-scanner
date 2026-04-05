@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - Accessible Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Screen reader only class */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Focus styles - visible and contrasting */
+    :focus-visible {
+      outline: 3px solid #1e40af;
+      outline-offset: 2px;
+    }
+
+    /* Skip link styling */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #1e40af;
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 0 0 4px 0;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Modal styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* Sortable table styles */
+    .sortable-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: none;
+      color: #1e40af;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .sortable-button:hover {
+      color: #1e3a8a;
+    }
+
+    .sort-indicator {
+      display: inline-block;
+      font-size: 0.875rem;
+    }
+
+    /* Toast region */
+    #toast-region {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 40;
+    }
+
+    .toast {
+      background: #10b981;
+      color: white;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      min-width: 250px;
+    }
+
+    .toast-error {
+      background: #ef4444;
+    }
+
+    /* Table styles */
+    table {
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f3f4f6;
+    }
+
+    th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #1f2937;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    /* Button styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #2563eb;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #d1d5db;
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Stat card styles */
+    .stat-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: left;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0.5rem 0;
+    }
+
+    .stat-change {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .stat-change.positive {
+      color: #10b981;
+    }
+
+    .stat-change.negative {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Skip link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Toast region (aria-live must exist before content added) -->
+  <div id="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <h1 class="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+      <p class="text-gray-600 text-sm mt-1">Real-time performance metrics and insights</p>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Stats section -->
+    <section aria-labelledby="stats-heading">
+      <h2 id="stats-heading" class="sr-only">Key Performance Indicators</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+        <!-- Stat card 1: Total Users -->
+        <div class="stat-card">
+          <p class="stat-label">Total Users</p>
+          <p class="stat-value">24,582</p>
+          <p class="stat-change positive">
+            <span aria-hidden="true">↑</span> 12.5% from last month
+          </p>
+        </div>
+
+        <!-- Stat card 2: Revenue -->
+        <div class="stat-card">
+          <p class="stat-label">Revenue</p>
+          <p class="stat-value">$124,850</p>
+          <p class="stat-change positive">
+            <span aria-hidden="true">↑</span> 8.2% from last month
+          </p>
+        </div>
+
+        <!-- Stat card 3: Conversion Rate -->
+        <div class="stat-card">
+          <p class="stat-label">Conversion Rate</p>
+          <p class="stat-value">3.24%</p>
+          <p class="stat-change negative">
+            <span aria-hidden="true">↓</span> 0.8% from last month
+          </p>
+        </div>
+
+        <!-- Stat card 4: Avg Order Value -->
+        <div class="stat-card">
+          <p class="stat-label">Avg Order Value</p>
+          <p class="stat-value">$285.40</p>
+          <p class="stat-change positive">
+            <span aria-hidden="true">↑</span> 5.3% from last month
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Table section -->
+    <section aria-labelledby="table-heading">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 id="table-heading" class="text-xl font-bold text-gray-900">Recent Transactions</h2>
+          <button
+            id="export-btn"
+            class="btn btn-secondary btn-sm"
+            aria-label="Export transaction data as CSV">
+            <span aria-hidden="true">↓</span> Export Data
+          </button>
+        </div>
+
+        <!-- Live region for table updates -->
+        <div id="table-status" role="status" aria-live="polite" class="sr-only"></div>
+
+        <!-- Responsive wrapper -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <caption class="sr-only">Transaction list with 12 recent transactions, sortable by date, amount, status, and customer</caption>
+            <thead>
+              <tr>
+                <th scope="col">
+                  <button class="sortable-button" onclick="sortTable('date')">
+                    Date
+                    <span class="sort-indicator" aria-hidden="true">↕</span>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button class="sortable-button" onclick="sortTable('customer')">
+                    Customer
+                    <span class="sort-indicator" aria-hidden="true">↕</span>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button class="sortable-button" onclick="sortTable('amount')">
+                    Amount
+                    <span class="sort-indicator" aria-hidden="true">↕</span>
+                  </button>
+                </th>
+                <th scope="col">
+                  <button class="sortable-button" onclick="sortTable('status')">
+                    Status
+                    <span class="sort-indicator" aria-hidden="true">↕</span>
+                  </button>
+                </th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr>
+                <td>2024-04-05</td>
+                <td>Sarah Johnson</td>
+                <td>$1,250.00</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(1, 'Sarah Johnson', 1250)" aria-label="View details for Sarah Johnson transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-04-04</td>
+                <td>Michael Chen</td>
+                <td>$892.50</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(2, 'Michael Chen', 892.50)" aria-label="View details for Michael Chen transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-04-03</td>
+                <td>Emily Rodriguez</td>
+                <td>$2,345.00</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(3, 'Emily Rodriguez', 2345)" aria-label="View details for Emily Rodriguez transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-04-02</td>
+                <td>David Martinez</td>
+                <td>$567.80</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    Pending
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(4, 'David Martinez', 567.80)" aria-label="View details for David Martinez transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-04-01</td>
+                <td>Jessica Lee</td>
+                <td>$1,675.25</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(5, 'Jessica Lee', 1675.25)" aria-label="View details for Jessica Lee transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-31</td>
+                <td>Robert Thompson</td>
+                <td>$450.00</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                    Cancelled
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(6, 'Robert Thompson', 450)" aria-label="View details for Robert Thompson transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-30</td>
+                <td>Amanda Walsh</td>
+                <td>$3,200.00</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(7, 'Amanda Walsh', 3200)" aria-label="View details for Amanda Walsh transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-29</td>
+                <td>Christopher Brown</td>
+                <td>$1,125.50</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(8, 'Christopher Brown', 1125.50)" aria-label="View details for Christopher Brown transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-28</td>
+                <td>Lauren Bennett</td>
+                <td>$876.40</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(9, 'Lauren Bennett', 876.40)" aria-label="View details for Lauren Bennett transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-27</td>
+                <td>Kevin Patterson</td>
+                <td>$2,100.75</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(10, 'Kevin Patterson', 2100.75)" aria-label="View details for Kevin Patterson transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-26</td>
+                <td>Sophia Williams</td>
+                <td>$1,450.00</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    Pending
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(11, 'Sophia Williams', 1450)" aria-label="View details for Sophia Williams transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-03-25</td>
+                <td>Nathan Harris</td>
+                <td>$995.80</td>
+                <td>
+                  <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Completed
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm" onclick="openDetailModal(12, 'Nathan Harris', 995.80)" aria-label="View details for Nathan Harris transaction">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Transaction pagination" class="mt-6 border-t border-gray-200 pt-6">
+          <ul class="flex items-center justify-center gap-2">
+            <li>
+              <a href="#" class="btn btn-secondary btn-sm" aria-label="Go to previous page">
+                <span aria-hidden="true">←</span> Previous
+              </a>
+            </li>
+            <li><a href="#" class="btn btn-primary btn-sm" aria-current="page" aria-label="Page 1, current page">1</a></li>
+            <li><a href="#" class="btn btn-secondary btn-sm" aria-label="Go to page 2">2</a></li>
+            <li><a href="#" class="btn btn-secondary btn-sm" aria-label="Go to page 3">3</a></li>
+            <li>
+              <a href="#" class="btn btn-secondary btn-sm" aria-label="Go to next page">
+                Next <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal for row details -->
+  <div id="detail-modal-overlay" class="modal-overlay">
+    <div role="dialog" aria-modal="true" aria-labelledby="modal-title" class="modal">
+      <div class="p-6">
+        <h2 id="modal-title" class="text-xl font-bold text-gray-900 mb-4">Transaction Details</h2>
+
+        <div class="space-y-4 mb-6">
+          <div>
+            <p class="text-sm font-semibold text-gray-600">Customer</p>
+            <p id="modal-customer" class="text-lg text-gray-900">—</p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-600">Transaction ID</p>
+            <p id="modal-id" class="text-lg text-gray-900">—</p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-600">Amount</p>
+            <p id="modal-amount" class="text-lg font-bold text-gray-900">—</p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-600">Date</p>
+            <p id="modal-date" class="text-lg text-gray-900">—</p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-600">Status</p>
+            <p id="modal-status" class="text-lg text-gray-900">—</p>
+          </div>
+          <details>
+            <summary class="cursor-pointer font-semibold text-gray-900 py-2">
+              Additional Information
+            </summary>
+            <div class="mt-3 pt-3 border-t border-gray-200">
+              <p class="text-sm text-gray-600">Payment Method: Credit Card (Visa ending in 4242)</p>
+              <p class="text-sm text-gray-600 mt-2">Processing Time: 2-3 business days</p>
+              <p class="text-sm text-gray-600 mt-2">Invoice: INV-2024-12345</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="flex gap-3 justify-end border-t border-gray-200 pt-6">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeDetailModal()">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="exportTransaction()">
+            Export Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-white border-t border-gray-200 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <p class="text-gray-600 text-sm">© 2024 Analytics Dashboard. All rights reserved.</p>
+      <nav aria-label="Footer navigation" class="mt-4">
+        <ul class="flex gap-6 text-sm">
+          <li><a href="#" class="text-blue-600 underline">Privacy Policy</a></li>
+          <li><a href="#" class="text-blue-600 underline">Terms of Service</a></li>
+          <li><a href="#" class="text-blue-600 underline">Contact Support</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Track the triggering element for focus return
+    let modalTrigger = null;
+
+    // Open modal with transaction details
+    function openDetailModal(id, customer, amount) {
+      const modal = document.getElementById('detail-modal-overlay');
+      const overlay = document.getElementById('detail-modal-overlay');
+
+      // Populate modal content
+      document.getElementById('modal-id').textContent = `TXN-${String(id).padStart(5, '0')}`;
+      document.getElementById('modal-customer').textContent = customer;
+      document.getElementById('modal-amount').textContent = `$${amount.toFixed(2)}`;
+      document.getElementById('modal-date').textContent = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      document.getElementById('modal-status').textContent = 'Completed';
+
+      // Save trigger element for focus return
+      modalTrigger = event.target;
+
+      // Show modal and set focus
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Focus first focusable element in modal (close button)
+      setTimeout(() => {
+        const firstFocusable = document.querySelector('#detail-modal-overlay .btn-secondary');
+        if (firstFocusable) firstFocusable.focus();
+      }, 0);
+
+      // Trap focus and handle Escape key
+      overlay.addEventListener('keydown', handleModalKeydown);
+
+      showToast(`Showing details for transaction TXN-${String(id).padStart(5, '0')}`);
+    }
+
+    function closeDetailModal() {
+      const overlay = document.getElementById('detail-modal-overlay');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      overlay.removeEventListener('keydown', handleModalKeydown);
+
+      // Return focus to trigger button
+      if (modalTrigger) {
+        modalTrigger.focus();
+      }
+    }
+
+    function handleModalKeydown(e) {
+      if (e.key === 'Escape') {
+        closeDetailModal();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const overlay = document.getElementById('detail-modal-overlay');
+        const focusable = [...overlay.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )];
+
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    // Sort table by column
+    function sortTable(column) {
+      const status = document.getElementById('table-status');
+      const direction = Math.random() > 0.5 ? 'ascending' : 'descending';
+
+      // Announce sort change
+      status.textContent = `Table sorted by ${column}, ${direction} order`;
+
+      showToast(`Table sorted by ${column} (${direction})`);
+    }
+
+    // Export transaction details
+    function exportTransaction() {
+      const customer = document.getElementById('modal-customer').textContent;
+      const id = document.getElementById('modal-id').textContent;
+      showToast(`Exported transaction ${id} for ${customer}`);
+      closeDetailModal();
+    }
+
+    // Show toast notification
+    function showToast(message) {
+      const region = document.getElementById('toast-region');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      toast.setAttribute('role', 'status');
+
+      region.appendChild(toast);
+
+      // Auto-dismiss after 6 seconds
+      setTimeout(() => {
+        toast.remove();
+      }, 6000);
+    }
+
+    // Close modal on overlay background click (optional, but good UX)
+    document.getElementById('detail-modal-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closeDetailModal();
+      }
+    });
+
+    // Export data button
+    document.getElementById('export-btn').addEventListener('click', () => {
+      showToast('Exporting transaction data as CSV...');
+    });
+  </script>
+</body>
+</html>

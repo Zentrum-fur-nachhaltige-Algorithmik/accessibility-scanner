@@ -32,6 +32,7 @@ const InputModalitiesScanner = require('./input-modalities-scanner');
 const ResponsiveDesignScanner = require('./responsive-design-scanner');
 const MobileSpecificScanner = require('./phase6d-mobile-specific-scanner');
 const DynamicSPAScanner = require('./phase6e-dynamic-spa-scanner');
+const MultipleWaysScanner = require('./multiple-ways-scanner');
 
 /**
  * Create LLM scanner instances if OPENROUTER_API_KEY is available.
@@ -50,6 +51,8 @@ function createLLMScanners() {
   const LLMVisualPresentationScanner = require('./llm-visual-presentation-scanner');
   const LLMBehavioralScanner = require('./llm-behavioral-scanner');
   const LLMFocusAppearanceScanner = require('./llm-focus-appearance-scanner');
+  const LLMSensoryCharacteristicsScanner = require('./llm-sensory-characteristics-scanner');
+  const LLMReadingLevelScanner = require('./llm-reading-level-scanner');
 
   const client = new LLMClient({ apiKey });
 
@@ -62,6 +65,8 @@ function createLLMScanners() {
     new LLMVisualPresentationScanner(client),
     new LLMBehavioralScanner(client),
     new LLMFocusAppearanceScanner(client),
+    new LLMSensoryCharacteristicsScanner(client),
+    new LLMReadingLevelScanner(client),
   ];
 }
 
@@ -96,6 +101,7 @@ function createAllScanners() {
     // Concurrent scanners (operable)
     new SeizurePreventionScanner(),
     new TimingControlsScanner(),
+    new MultipleWaysScanner(),
 
     // Exclusive scanners (operable)
     new KeyboardNavigationScanner(),
@@ -148,6 +154,7 @@ const PROFILES = {
     'dynamic-spa',
     'accessibility-statement', 'contact-mechanism',
     'compliance-monitoring', 'eaa-procedure',
+    'multiple-ways', 'llm-sensory-characteristics',
   ],
   full: null, // all scanners
 };

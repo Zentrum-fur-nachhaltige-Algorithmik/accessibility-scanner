@@ -137,13 +137,15 @@ class ReportGenerator {
 
   body {
     font-family: 'Source Sans Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    font-size: 10pt;
+    font-size: 0.875rem;
     line-height: 1.55;
     color: #2b2b2b;
     background: #fff;
-    max-width: 210mm;
+    max-width: 60rem;
     margin: 0 auto;
-    padding: 32px 40px 80px;
+    padding: 2rem clamp(0.5rem, 4vw, 2.5rem) 5rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 
   /* --- Screen-reader-only utility --- */
@@ -162,15 +164,16 @@ class ReportGenerator {
   /* --- Skip link --- */
   .skip-link {
     position: absolute;
-    left: -9999px;
-    top: auto;
     width: 1px;
     height: 1px;
-    overflow: hidden;
-    padding: 4px 12px;
+    padding: 0;
+    margin: -1px;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
     background: #1b2a4a;
     color: #fff;
-    font-size: 9pt;
+    font-size: 0.8125rem;
     text-decoration: none;
     z-index: 100;
   }
@@ -181,7 +184,10 @@ class ReportGenerator {
     left: 0;
     width: auto;
     height: auto;
-    overflow: visible;
+    padding: 0.75rem 1.5rem;
+    margin: 0;
+    clip: auto;
+    white-space: normal;
     outline: 3px solid #1b2a4a;
     outline-offset: 2px;
   }
@@ -192,12 +198,12 @@ class ReportGenerator {
     color: #1b2a4a;
     letter-spacing: -0.01em;
   }
-  h1 { font-size: 15pt; font-weight: 700; margin: 0 0 2px; }
-  h2 { font-size: 12pt; font-weight: 700; margin: 28px 0 10px; padding-bottom: 4px; border-bottom: 1.5px solid #1b2a4a; }
-  h3 { font-size: 10.5pt; font-weight: 600; margin: 20px 0 6px; }
-  h4 { font-size: 10pt; font-weight: 600; margin: 14px 0 4px; }
+  h1 { font-size: 1.375rem; font-weight: 700; margin: 0 0 0.125rem; }
+  h2 { font-size: 1.125rem; font-weight: 700; margin: 1.75rem 0 0.625rem; padding-bottom: 0.25rem; border-bottom: 1.5px solid #1b2a4a; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 0.375rem; }
+  h4 { font-size: 0.875rem; font-weight: 600; margin: 0.875rem 0 0.25rem; }
 
-  p { margin: 0 0 8px; }
+  p { margin: 0 0 0.5rem; }
   a { color: #1b2a4a; text-decoration: underline; }
   a:focus-visible,
   button:focus-visible,
@@ -209,72 +215,72 @@ class ReportGenerator {
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 2px solid #1b2a4a;
-    padding-bottom: 14px;
-    margin-bottom: 6px;
+    padding-bottom: 0.875rem;
+    margin-bottom: 0.375rem;
   }
-  .doc-header-left { flex: 1; padding-right: 24px; }
+  .doc-header-left { flex: 1; padding-right: 1.5rem; }
   .doc-header-right {
     text-align: left;
-    font-size: 8pt;
+    font-size: 0.75rem;
     color: #555;
     line-height: 1.6;
-    min-width: 170px;
-    padding-left: 16px;
+    min-width: 10.625rem;
+    padding-left: 1rem;
     border-left: 0.5px solid #ccc;
   }
   .org-name {
-    font-size: 8.5pt;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #1b2a4a;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
   }
   .org-logo {
-    max-height: 32px;
-    margin-bottom: 6px;
+    max-height: 2rem;
+    margin-bottom: 0.375rem;
     display: block;
   }
   .doc-subtitle {
-    font-size: 9pt;
+    font-size: 0.8125rem;
     color: #555;
-    margin-top: 3px;
+    margin-top: 0.1875rem;
   }
   .doc-meta-line {
-    margin: 0 0 1px;
-    font-size: 8pt;
+    margin: 0 0 0.0625rem;
+    font-size: 0.75rem;
     color: #555;
   }
   .doc-meta-line.doc-id {
-    font-size: 8.5pt;
+    font-size: 0.8125rem;
     color: #1b2a4a;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
   }
 
   /* --- Table of contents --- */
   .toc {
     border: 0.5px solid #999;
-    padding: 12px 18px;
-    margin: 16px 0 24px;
+    padding: 0.75rem 1.125rem;
+    margin: 1rem 0 1.5rem;
     background: none;
   }
   .toc-title {
-    font-size: 9pt;
+    font-size: 0.8125rem;
     font-weight: 700;
     color: #1b2a4a;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin: 0 0 6px;
+    margin: 0 0 0.375rem;
   }
   .toc ol {
     margin: 0;
     padding-left: 1.4em;
-    font-size: 9pt;
+    font-size: 0.8125rem;
     line-height: 1.9;
   }
   .toc ol ol { margin-top: 0; line-height: 1.7; list-style: none; padding-left: 1.6em; }
-  .toc a { text-decoration: none; color: #2b2b2b; }
+  .toc a { text-decoration: none; color: #2b2b2b; min-height: 2.75rem; display: inline-flex; align-items: center; }
   .toc a:hover,
   .toc a:focus-visible { text-decoration: underline; }
 
@@ -282,31 +288,41 @@ class ReportGenerator {
   caption {
     caption-side: top;
     text-align: left;
-    font-size: 8.5pt;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #1b2a4a;
-    padding: 0 0 4px;
+    padding: 0 0 0.25rem;
     font-style: italic;
   }
+
+  /* --- Responsive table wrapper --- */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0.5rem 0 0.875rem;
+  }
+  .table-responsive:focus-within { outline: 2px solid #1b2a4a; outline-offset: 2px; }
 
   /* --- Tables --- */
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: 8px 0 14px;
-    font-size: 9pt;
+    margin: 0.5rem 0 0.875rem;
+    font-size: 0.8125rem;
   }
+  .table-responsive table { margin: 0; }
   thead { display: table-header-group; }
   th, td {
     border: 0.5px solid #999;
-    padding: 5px 8px;
+    padding: 0.5rem 0.625rem;
     text-align: left;
     vertical-align: top;
   }
   th {
     background: #e8ecf2;
     font-weight: 600;
-    font-size: 8pt;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: #1b2a4a;
@@ -314,8 +330,8 @@ class ReportGenerator {
   tr:nth-child(even) td { background: #f6f7f9; }
 
   /* --- Severity: monochrome labels, row tint for emphasis --- */
-  .sev { font-weight: 600; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.03em; color: #2b2b2b; }
-  .method-badge { font-size: 7pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 5px; border: 1px solid #999; border-radius: 2px; }
+  .sev { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: #2b2b2b; }
+  .method-badge { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.125rem 0.3125rem; border: 1px solid #999; border-radius: 2px; }
   .method-llm { background: #f0f0f0; color: #444; }
   .method-auto { background: transparent; color: #666; border-color: #ccc; }
   tr.row-critical td { border-left: 3px solid #7a2e2e; }
@@ -338,19 +354,19 @@ class ReportGenerator {
   tr.row-minor th:first-child .sev::before    { content: "\\25CB  "; }
 
   /* --- Table column widths (replaces inline styles) --- */
-  .col-num { width: 28px; }
-  .col-sev { width: 62px; }
-  .col-criterion { width: 60px; }
-  .col-method { width: 48px; }
-  .col-label { text-align: left; width: 160px; }
-  .col-criteria-ref { font-size: 7.5pt; }
+  .col-num { width: 1.75rem; }
+  .col-sev { width: 3.875rem; }
+  .col-criterion { width: 3.75rem; }
+  .col-method { width: 3rem; }
+  .col-label { text-align: left; width: 10rem; }
+  .col-criteria-ref { font-size: 0.6875rem; }
 
   /* --- Code elements --- */
   code {
     font-family: 'Consolas', 'SF Mono', 'Monaco', monospace;
-    font-size: 8pt;
+    font-size: 0.75rem;
     background: #eef0f3;
-    padding: 1px 4px;
+    padding: 0.0625rem 0.25rem;
     color: #2b2b2b;
     overflow-wrap: break-word;
     word-break: normal;
@@ -365,33 +381,56 @@ class ReportGenerator {
 
   /* --- Table footnotes --- */
   .table-note {
-    font-size: 7.5pt;
+    font-size: 0.6875rem;
     color: #555;
-    margin: -8px 0 14px;
+    margin: -0.5rem 0 0.875rem;
     line-height: 1.5;
   }
 
   /* --- Scope disclaimer --- */
   .scope-note {
-    font-size: 8pt;
+    font-size: 0.75rem;
     color: #555;
     border-left: 2px solid #ccc;
-    padding: 6px 0 6px 12px;
-    margin: 10px 0 14px;
+    padding: 0.375rem 0 0.375rem 0.75rem;
+    margin: 0.625rem 0 0.875rem;
     line-height: 1.5;
   }
 
   /* --- Running footer --- */
   .doc-footer {
     position: static;
-    margin-top: 40px;
-    padding: 8px 40px;
-    font-size: 7pt;
+    margin-top: 2.5rem;
+    padding: 0.5rem clamp(0.5rem, 4vw, 2.5rem);
+    font-size: 0.6875rem;
     color: #595959;
     border-top: 0.5px solid #ccc;
     display: flex;
     justify-content: space-between;
     background: #fff;
+  }
+
+  /* --- Mobile responsive --- */
+  @media (max-width: 600px) {
+    .doc-header {
+      flex-direction: column;
+    }
+    .doc-header-left {
+      padding-right: 0;
+    }
+    .doc-header-right {
+      border-left: none;
+      padding-left: 0;
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+      border-top: 0.5px solid #ccc;
+      min-width: auto;
+    }
+    .doc-footer {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.5rem 1rem;
+    }
   }
 
   /* --- Reduced motion --- */
@@ -452,9 +491,10 @@ class ReportGenerator {
   }
 
   /* --- Print --- */
-  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 7pt; color: #595959; } }
+  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 0.6875rem; color: #595959; } }
   @media print {
     body { padding: 0; max-width: none; font-size: 9pt; }
+    .table-responsive { overflow: visible; }
     .skip-link { display: none; }
     .doc-footer { position: fixed; bottom: 0; left: 0; right: 0; }
     .toc { break-after: page; }
@@ -760,7 +800,7 @@ class ReportGenerator {
   }
 
   renderViolationTable(violations, tableNum, captionText) {
-    let html = `<table>\n`;
+    let html = `<div class="table-responsive" tabindex="0" role="region" aria-label="${captionText || 'Data table'}">\n<table>\n`;
     if (tableNum && captionText) html += `<caption>Table ${tableNum}: ${captionText}</caption>\n`;
     const hasLlm = violations.some(v => (v.scannerId || '').startsWith('llm-'));
     html += `<thead><tr><th scope="col" class="col-num">#</th><th scope="col" class="col-sev">Severity</th><th scope="col" class="col-criterion">Criterion</th>${hasLlm ? '<th scope="col" class="col-method">Method</th>' : ''}<th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
@@ -777,7 +817,7 @@ class ReportGenerator {
       html += `<tr class="row-${sev}"><th scope="row">${i + 1}</th><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(String(criterion)) || '\u2014'}</td>${methodCol}<td>${desc}</td><td>${el}</td><td>${rec}</td></tr>`;
     });
 
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
     return html;
   }
 

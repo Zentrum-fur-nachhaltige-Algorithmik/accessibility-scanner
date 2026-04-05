@@ -583,6 +583,10 @@ class ResponsiveDesignScanner extends BaseScanner {
       // Check for !important on spacing properties in stylesheets
       try {
         for (const sheet of document.styleSheets) {
+          // Skip disabled stylesheets
+          if (sheet.disabled) continue;
+          if (sheet.ownerNode && sheet.ownerNode.disabled) continue;
+
           let rules;
           try {
             rules = sheet.cssRules || sheet.rules;
@@ -594,12 +598,17 @@ class ResponsiveDesignScanner extends BaseScanner {
           for (const rule of rules) {
             if (!(rule instanceof CSSStyleRule)) continue;
             const style = rule.style;
+            const sel = rule.selectorText || '';
+
+            // Skip universal selectors — these are typically user-override styles,
+            // not author-lock styles (e.g. * { line-height: 1.5 !important })
+            if (sel.trim() === '*') continue;
 
             const spacingProps = ['line-height', 'letter-spacing', 'word-spacing'];
             for (const prop of spacingProps) {
               if (style.getPropertyPriority(prop) === 'important') {
                 // Verify the selector targets real elements
-                const matched = document.querySelectorAll(rule.selectorText);
+                const matched = document.querySelectorAll(sel);
                 if (matched.length > 0) {
                   importantOverrides++;
                   violations.push({

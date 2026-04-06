@@ -46,19 +46,32 @@ class ResponsiveDesignScanner extends BaseScanner {
     const scanDir = path.join(screenshotDir, `scan-${timestamp}`);
     await fs.ensureDir(scanDir);
 
-    // Fast heuristic-only mode: skip viewport cycling, only run text spacing heuristic
+    // Fast heuristic-only mode: skip viewport cycling, run CSS heuristics
     if (scanOptions.heuristicOnly) {
-      const heuristicResult = await this.heuristicTextSpacingCheck(page);
+      const [textSpacingResult, reflowResult, textResizeResult] = await Promise.all([
+        this.heuristicTextSpacingCheck(page),
+        this.heuristicReflowCheck(page),
+        this.heuristicTextResizeCheck(page),
+      ]);
+
+      const allViolations = [
+        ...textSpacingResult.violations,
+        ...reflowResult.violations,
+        ...textResizeResult.violations,
+      ];
+
       return {
         scannerId: this.id,
-        criteria: ["9.1.4.12"],
-        passed: heuristicResult.violations.length === 0,
-        violations: heuristicResult.violations,
+        criteria: ["9.1.4.4", "9.1.4.10", "9.1.4.12"],
+        passed: allViolations.length === 0,
+        violations: allViolations,
         summary: {
-          textSpacingOk: heuristicResult.violations.length === 0,
+          textSpacingOk: textSpacingResult.violations.length === 0,
+          reflowOk: reflowResult.violations.length === 0,
+          textResizeOk: textResizeResult.violations.length === 0,
           heuristicOnly: true,
-          clippingContainers: heuristicResult.clippingContainers,
-          importantOverrides: heuristicResult.importantOverrides,
+          clippingContainers: textSpacingResult.clippingContainers,
+          importantOverrides: textSpacingResult.importantOverrides,
         },
       };
     }
@@ -671,6 +684,160 @@ class ResponsiveDesignScanner extends BaseScanner {
     });
 
     console.log(`Heuristic text spacing check complete: ${result.violations.length} violations found`);
+    return result;
+  }
+
+  /**
+   * Heuristic reflow check (WCAG 1.4.10) — detects fixed-width elements that prevent reflow at 320px
+   */
+  async heuristicReflowCheck(page) {
+    console.log('Running heuristic reflow check...');
+
+    const result = await page.evaluate(() => {
+      const violations = [];
+
+      function getSelector(el) {
+        return el.tagName.toLowerCase() +
+          (el.id ? `#${el.id}` : '') +
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+      }
+
+      function isInsideScrollableContainer(el) {
+        let parent = el.parentElement;
+        while (parent && parent !== document.documentElement) {
+          const ps = window.getComputedStyle(parent);
+          if (ps.overflowX === 'auto' || ps.overflowX === 'scroll') return true;
+          parent = parent.parentElement;
+        }
+        return false;
+      }
+
+      const allElements = document.querySelectorAll('*');
+
+      allElements.forEach(el => {
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return;
+
+        // Check for fixed width > 320px (the reflow threshold)
+        const width = style.width;
+        const minWidth = style.minWidth;
+
+        // Only flag explicit px widths, not auto/percentage/etc
+        if (width && width.endsWith('px')) {
+          const widthVal = parseFloat(width);
+          if (widthVal > 320 && !isInsideScrollableContainer(el)) {
+            violations.push({
+              criterion: '9.1.4.10',
+              element: getSelector(el),
+              issue: 'reflow-fixed-width',
+              description: `Element has fixed width ${width} which exceeds 320px reflow threshold`,
+              severity: 'serious',
+              suggestion: 'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
+            });
+          }
+        }
+
+        if (minWidth && minWidth.endsWith('px')) {
+          const minWidthVal = parseFloat(minWidth);
+          if (minWidthVal > 320 && !isInsideScrollableContainer(el)) {
+            violations.push({
+              criterion: '9.1.4.10',
+              element: getSelector(el),
+              issue: 'reflow-min-width',
+              description: `Element has min-width: ${minWidth} which prevents reflow below 320px`,
+              severity: 'serious',
+              suggestion: 'Remove or reduce min-width to allow content to reflow at narrow viewports.',
+            });
+          }
+        }
+      });
+
+      return { violations };
+    });
+
+    console.log(`Heuristic reflow check complete: ${result.violations.length} violations found`);
+    return result;
+  }
+
+  /**
+   * Heuristic text resize check (WCAG 1.4.4) — detects fixed font sizes and clipping containers
+   */
+  async heuristicTextResizeCheck(page) {
+    console.log('Running heuristic text resize check...');
+
+    const result = await page.evaluate(() => {
+      const violations = [];
+
+      function getSelector(el) {
+        return el.tagName.toLowerCase() +
+          (el.id ? `#${el.id}` : '') +
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+      }
+
+      // Scan stylesheets for font-size declarations in px
+      const pxFontRules = [];
+      try {
+        for (const sheet of document.styleSheets) {
+          try {
+            for (const rule of sheet.cssRules || []) {
+              if (!(rule instanceof CSSStyleRule)) continue;
+              const fontSize = rule.style.fontSize;
+              if (fontSize && fontSize.endsWith('px')) {
+                const sel = rule.selectorText || '';
+                // Skip selectors that are pseudo-elements or already use relative patterns
+                if (sel.includes('::')) continue;
+                const matched = document.querySelectorAll(sel);
+                if (matched.length > 0) {
+                  pxFontRules.push({ selector: sel, fontSize, count: matched.length });
+                }
+              }
+            }
+          } catch (e) { /* cross-origin */ }
+        }
+      } catch (e) { /* no stylesheets */ }
+
+      // Report px font-size rules
+      for (const rule of pxFontRules) {
+        violations.push({
+          criterion: '9.1.4.4',
+          element: rule.selector,
+          issue: 'text-resize-fixed-font',
+          description: `CSS rule "${rule.selector}" sets font-size: ${rule.fontSize} (absolute unit) affecting ${rule.count} element(s). Text may not resize properly to 200%`,
+          severity: 'serious',
+          suggestion: 'Use relative units (rem, em, %) for font-size to allow text to scale with user zoom.',
+        });
+      }
+
+      // Check for fixed-height containers with overflow:hidden that contain text
+      const allElements = document.querySelectorAll('*');
+      allElements.forEach(el => {
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return;
+
+        const isOverflowHidden = style.overflow === 'hidden' ||
+          style.overflowY === 'hidden';
+        const height = style.height;
+        const hasFixedHeight = height && height !== 'auto' && height.endsWith('px');
+
+        if (isOverflowHidden && hasFixedHeight) {
+          const text = el.textContent.trim();
+          if (text && text.length > 10) {
+            violations.push({
+              criterion: '9.1.4.4',
+              element: getSelector(el),
+              issue: 'text-resize-clip-risk',
+              description: `Text container with height: ${height} and overflow: hidden will clip content when text is zoomed to 200%`,
+              severity: 'serious',
+              suggestion: 'Use min-height instead of fixed height, or change overflow to auto/visible.',
+            });
+          }
+        }
+      });
+
+      return { violations };
+    });
+
+    console.log(`Heuristic text resize check complete: ${result.violations.length} violations found`);
     return result;
   }
 

@@ -26,11 +26,21 @@ function normalizeSeverity(violation) {
   if (raw === 'serious' || raw === 'major' || raw === 'high') return 'serious';
   if (raw === 'moderate' || raw === 'warning') return 'moderate';
   if (raw === 'minor') return 'minor';
+  if (raw === 'best-practice') return 'best-practice';
+  if (raw === 'info') return 'info';
   return 'moderate';
 }
 
-const SEVERITY_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3 };
-const SEVERITY_LABELS = { critical: 'Critical', serious: 'Serious', moderate: 'Moderate', minor: 'Minor' };
+/**
+ * Returns true if the violation is a hard WCAG failure (not best-practice or info).
+ */
+function isHardViolation(violation) {
+  const sev = normalizeSeverity(violation);
+  return sev !== 'best-practice' && sev !== 'info';
+}
+
+const SEVERITY_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3, 'best-practice': 4, info: 5 };
+const SEVERITY_LABELS = { critical: 'Critical', serious: 'Serious', moderate: 'Moderate', minor: 'Minor', 'best-practice': 'Best Practice', info: 'Info' };
 
 function formatDocNumber(id) {
   const short = id.split('-')[0].toUpperCase();
@@ -591,7 +601,9 @@ class ReportGenerator {
     };
 
     const reportDate = new Date(data.timestamp).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
-    const violationsCount = data.violations ? data.violations.length : 0;
+    const allFindings = data.violations || [];
+    const violationsCount = allFindings.filter(isHardViolation).length;
+    const bestPracticeCount = allFindings.filter(v => !isHardViolation(v)).length;
     const passes = data.passes || 0;
 
     html = html.replace(/{{pageTitle}}/g, data.pageTitle || data.url || 'Unknown Page');

@@ -1,0 +1,194 @@
+<!-- WCAG-TEST
+criterion: 1.4.3, 1.4.6, 4.1.2
+level: AA
+title: Color Contrast, Name Role Value - Bootstrap CDN Patterns
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: color-contrast, advanced-contrast, advanced-aria, page-structure
+description: Tests that scanners handle Bootstrap CDN-loaded CSS correctly - computed styles override raw HTML, collapse components hidden by default.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Bootstrap Patterns (GOOD)</title>
+    <!-- Bootstrap CDN deliberately omitted to keep test self-contained,
+         but styles mimic Bootstrap's cascade -->
+    <style>
+        /* Bootstrap-like reset */
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            margin: 0;
+            padding: 2rem;
+        }
+        /* High-contrast Bootstrap-like color palette */
+        .text-primary { color: #0d47a1; } /* 8.5:1 on white */
+        .text-success { color: #1b5e20; } /* 7.8:1 on white */
+        .text-danger { color: #b71c1c; }  /* 7.1:1 on white */
+        .text-muted { color: #495057; }   /* 7.0:1 on white */
+        .bg-dark { background-color: #212529; color: #f8f9fa; } /* 15.4:1 */
+        .bg-light { background-color: #f8f9fa; }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            border: 2px solid transparent;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:focus { outline: 3px solid #0d47a1; outline-offset: 2px; }
+        .btn-primary { background-color: #0d47a1; color: #ffffff; border-color: #0d47a1; }
+        .btn-outline-secondary { background-color: transparent; color: #212529; border-color: #6c757d; }
+
+        /* Cards */
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+            padding: 1.25rem;
+        }
+
+        /* Navbar */
+        .navbar {
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+        }
+        .navbar a {
+            color: #f8f9fa;
+            text-decoration: none;
+            padding: 0.5rem;
+        }
+        .navbar a:focus {
+            outline: 3px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        /* Collapse */
+        .collapse { display: none; }
+        .collapse.show { display: block; }
+
+        /* Alert */
+        .alert {
+            padding: 0.75rem 1.25rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .alert-success { color: #1b5e20; background-color: #e8f5e9; border-color: #c8e6c9; }
+        .alert-danger { color: #b71c1c; background-color: #ffebee; border-color: #ffcdd2; }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 0.25rem;
+        }
+        .badge-success { background-color: #1b5e20; color: #ffffff; }
+        .badge-warning { background-color: #4a3800; color: #ffffff; }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="visually-hidden">Skip to main content</a>
+
+    <!-- Bootstrap-like dark navbar -->
+    <nav class="navbar bg-dark" aria-label="Main navigation">
+        <a href="#home"><strong>MyApp</strong></a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#reports">Reports</a>
+        <button class="btn btn-outline-secondary" style="color:#f8f9fa; border-color:#f8f9fa;"
+                aria-expanded="false" aria-controls="navCollapse">
+            Menu
+        </button>
+    </nav>
+
+    <!-- Collapsed nav content — hidden by default, standard Bootstrap pattern -->
+    <div id="navCollapse" class="collapse" role="region" aria-label="Extended navigation">
+        <nav aria-label="Extended navigation links">
+            <ul>
+                <li><a href="#settings">Settings</a></li>
+                <li><a href="#help">Help Center</a></li>
+                <li><a href="#logout">Log Out</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main id="main-content">
+        <h1>Dashboard</h1>
+
+        <!-- Alert with adequate contrast -->
+        <div class="alert alert-success" role="alert">
+            <strong>Success!</strong> Your report has been generated.
+        </div>
+
+        <!-- Card with computed styles from Bootstrap-like cascade -->
+        <div class="card">
+            <h2>Monthly Summary</h2>
+            <p class="text-muted">Last updated: April 2026</p>
+            <p>Total tasks completed: <strong>142</strong></p>
+            <p>Status: <span class="badge badge-success">Active</span></p>
+            <a href="#details" class="btn btn-primary">View Full Report</a>
+        </div>
+
+        <!-- Another card with danger alert -->
+        <div class="card">
+            <h2>Pending Issues</h2>
+            <p class="text-danger"><strong>3 issues</strong> require attention.</p>
+            <ul>
+                <li><a href="#issue-1">Missing alt text on product images</a></li>
+                <li><a href="#issue-2">Form labels not associated with inputs</a></li>
+                <li><a href="#issue-3">Color-only status indicators</a></li>
+            </ul>
+        </div>
+
+        <!-- Bootstrap accordion-like collapsed content -->
+        <h2>FAQ</h2>
+        <div>
+            <h3>
+                <button class="btn btn-outline-secondary" aria-expanded="true" aria-controls="faq-1" style="width:100%; text-align:left;">
+                    How do I run an accessibility scan?
+                </button>
+            </h3>
+            <div id="faq-1" class="collapse show" role="region" aria-labelledby="faq-1-btn">
+                <p>Navigate to the Reports page and click "New Scan". Select the URL and criteria, then click "Start".</p>
+            </div>
+
+            <h3>
+                <button class="btn btn-outline-secondary" aria-expanded="false" aria-controls="faq-2" style="width:100%; text-align:left;">
+                    What WCAG level do we target?
+                </button>
+            </h3>
+            <div id="faq-2" class="collapse" role="region" aria-labelledby="faq-2-btn">
+                <p>We target WCAG 2.2 Level AA for all public-facing content.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p class="text-muted">&copy; 2026 MyApp. All rights reserved.</p>
+    </footer>
+</body>
+</html>

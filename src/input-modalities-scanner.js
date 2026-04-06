@@ -302,13 +302,19 @@ class InputModalitiesScanner extends BaseScanner {
           // Check if there's corresponding up-event or cancellation mechanism
           const hasUpEvent = element.onmouseup || element.ontouchend ||
                            element.getAttribute('onmouseup') ||
-                           element.getAttribute('ontouchend');
+                           element.getAttribute('ontouchend') ||
+                           element.onclick || element.getAttribute('onclick');
 
           const hasLeaveEvent = element.onmouseleave || element.ontouchcancel ||
                               element.getAttribute('onmouseleave') ||
                               element.getAttribute('ontouchcancel');
 
-          if (!hasUpEvent && !hasLeaveEvent) {
+          // Elements with keydown/keyup handlers likely have JS-registered up events too
+          const hasKeyboardHandler = element.onkeydown || element.getAttribute('onkeydown') ||
+                                    element.getAttribute('role') === 'slider' ||
+                                    element.getAttribute('role') === 'scrollbar';
+
+          if (!hasUpEvent && !hasLeaveEvent && !hasKeyboardHandler) {
             // Check if it's a critical action that requires cancellation
             const criticalKeywords = ['delete', 'remove', 'buy', 'purchase', 'pay', 'submit', 'send', 'confirm'];
             const isCritical = criticalKeywords.some(keyword => 
@@ -512,9 +518,11 @@ class InputModalitiesScanner extends BaseScanner {
       const hasDeviceOrientation = window.DeviceOrientationEvent !== undefined;
 
       if (hasDeviceMotion || hasDeviceOrientation) {
-        // Look for motion-related keywords in page content
+        // Look for motion-related keywords in visible page content (exclude script/style)
         const motionKeywords = ['shake', 'tilt', 'rotate', 'motion', 'gesture', 'device orientation'];
-        const pageText = document.body.textContent.toLowerCase();
+        const clone = document.body.cloneNode(true);
+        clone.querySelectorAll('script, style, noscript').forEach(el => el.remove());
+        const pageText = clone.textContent.toLowerCase();
         
         const hasMotionFeatures = motionKeywords.some(keyword => pageText.includes(keyword));
 

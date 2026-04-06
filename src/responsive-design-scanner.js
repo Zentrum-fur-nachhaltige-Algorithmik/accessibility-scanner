@@ -80,11 +80,26 @@ class ResponsiveDesignScanner extends BaseScanner {
     const url = page.url();
     const responsiveResults = await this.performResponsiveAnalysis(page, url, scanDir, scanOptions);
 
+    // Navigate back to original page for CSS heuristic checks (viewport cycling changes the page)
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+
+    // Also run CSS heuristic checks in full mode to catch patterns the viewport/zoom tests miss
+    const [reflowHeuristic, textResizeHeuristic] = await Promise.all([
+      this.heuristicReflowCheck(page),
+      this.heuristicTextResizeCheck(page),
+    ]);
+
+    const allViolations = [
+      ...responsiveResults.violations,
+      ...reflowHeuristic.violations,
+      ...textResizeHeuristic.violations,
+    ];
+
     return {
       scannerId: this.id,
       criteria: ["9.1.4.4", "9.1.4.10", "9.1.4.12"],
-      passed: responsiveResults.violations.length === 0,
-      violations: responsiveResults.violations,
+      passed: allViolations.length === 0,
+      violations: allViolations,
       summary: {
         reflowWorks: responsiveResults.reflowWorks,
         textResizable: responsiveResults.textResizable,
@@ -688,19 +703,14 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic reflow check (WCAG 1.4.10) — detects fixed-width elements that prevent reflow at 320px
+   * Heuristic reflow check (WCAG 1.4.10) — detects fixed-width elements that prevent reflow at 320px.
+   * Scans CSS rules (not computed styles) to avoid false positives from responsive layouts.
    */
   async heuristicReflowCheck(page) {
     console.log('Running heuristic reflow check...');
 
     const result = await page.evaluate(() => {
       const violations = [];
-
-      function getSelector(el) {
-        return el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
-      }
 
       function isInsideScrollableContainer(el) {
         let parent = el.parentElement;
@@ -712,43 +722,89 @@ class ResponsiveDesignScanner extends BaseScanner {
         return false;
       }
 
-      const allElements = document.querySelectorAll('*');
+      // Scan stylesheets for explicit px width/min-width declarations > 320px
+      const pxWidthRules = [];
+      try {
+        for (const sheet of document.styleSheets) {
+          try {
+            for (const rule of sheet.cssRules || []) {
+              if (!(rule instanceof CSSStyleRule)) continue;
+              const sel = rule.selectorText || '';
+              if (sel.includes('::')) continue;
 
+              const widthVal = rule.style.width;
+              const minWidthVal = rule.style.minWidth;
+
+              if (widthVal && widthVal.endsWith('px') && parseFloat(widthVal) > 320) {
+                const matched = document.querySelectorAll(sel);
+                const validMatches = Array.from(matched).filter(el => {
+                  const s = window.getComputedStyle(el);
+                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el);
+                });
+                if (validMatches.length > 0) {
+                  pxWidthRules.push({ selector: sel, property: 'width', value: widthVal, count: validMatches.length });
+                }
+              }
+
+              if (minWidthVal && minWidthVal.endsWith('px') && parseFloat(minWidthVal) > 320) {
+                const matched = document.querySelectorAll(sel);
+                const validMatches = Array.from(matched).filter(el => {
+                  const s = window.getComputedStyle(el);
+                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el);
+                });
+                if (validMatches.length > 0) {
+                  pxWidthRules.push({ selector: sel, property: 'min-width', value: minWidthVal, count: validMatches.length });
+                }
+              }
+            }
+          } catch (e) { /* cross-origin */ }
+        }
+      } catch (e) { /* no stylesheets */ }
+
+      for (const rule of pxWidthRules) {
+        violations.push({
+          criterion: '9.1.4.10',
+          element: rule.selector,
+          issue: rule.property === 'width' ? 'reflow-fixed-width' : 'reflow-min-width',
+          description: `CSS rule "${rule.selector}" sets ${rule.property}: ${rule.value} which exceeds 320px reflow threshold, affecting ${rule.count} element(s)`,
+          severity: 'serious',
+          suggestion: 'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
+        });
+      }
+
+      // Also check inline styles on elements
+      const allElements = document.querySelectorAll('[style]');
       allElements.forEach(el => {
+        const inlineWidth = el.style.width;
+        const inlineMinWidth = el.style.minWidth;
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
+        if (isInsideScrollableContainer(el)) return;
 
-        // Check for fixed width > 320px (the reflow threshold)
-        const width = style.width;
-        const minWidth = style.minWidth;
+        const getSelector = (e) => e.tagName.toLowerCase() +
+          (e.id ? `#${e.id}` : '') +
+          (e.className && typeof e.className === 'string' ? `.${e.className.split(' ')[0]}` : '');
 
-        // Only flag explicit px widths, not auto/percentage/etc
-        if (width && width.endsWith('px')) {
-          const widthVal = parseFloat(width);
-          if (widthVal > 320 && !isInsideScrollableContainer(el)) {
-            violations.push({
-              criterion: '9.1.4.10',
-              element: getSelector(el),
-              issue: 'reflow-fixed-width',
-              description: `Element has fixed width ${width} which exceeds 320px reflow threshold`,
-              severity: 'serious',
-              suggestion: 'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
-            });
-          }
+        if (inlineWidth && inlineWidth.endsWith('px') && parseFloat(inlineWidth) > 320) {
+          violations.push({
+            criterion: '9.1.4.10',
+            element: getSelector(el),
+            issue: 'reflow-fixed-width',
+            description: `Element has inline style width: ${inlineWidth} which exceeds 320px reflow threshold`,
+            severity: 'serious',
+            suggestion: 'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
+          });
         }
 
-        if (minWidth && minWidth.endsWith('px')) {
-          const minWidthVal = parseFloat(minWidth);
-          if (minWidthVal > 320 && !isInsideScrollableContainer(el)) {
-            violations.push({
-              criterion: '9.1.4.10',
-              element: getSelector(el),
-              issue: 'reflow-min-width',
-              description: `Element has min-width: ${minWidth} which prevents reflow below 320px`,
-              severity: 'serious',
-              suggestion: 'Remove or reduce min-width to allow content to reflow at narrow viewports.',
-            });
-          }
+        if (inlineMinWidth && inlineMinWidth.endsWith('px') && parseFloat(inlineMinWidth) > 320) {
+          violations.push({
+            criterion: '9.1.4.10',
+            element: getSelector(el),
+            issue: 'reflow-min-width',
+            description: `Element has inline style min-width: ${inlineMinWidth} which prevents reflow below 320px`,
+            severity: 'serious',
+            suggestion: 'Remove or reduce min-width to allow content to reflow at narrow viewports.',
+          });
         }
       });
 

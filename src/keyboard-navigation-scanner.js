@@ -1297,10 +1297,20 @@ class KeyboardNavigationScanner extends BaseScanner {
       const nonInteractiveWithTabindex = document.querySelectorAll('[tabindex="0"]:not(button):not(a):not(input):not(textarea):not(select):not([role="button"]):not([role="link"]):not([role="tab"]):not([role="menuitem"]):not([role="checkbox"]):not([role="radio"])');
       
       nonInteractiveWithTabindex.forEach(element => {
-        const hasInteractiveRole = element.hasAttribute('role') && 
+        const hasInteractiveRole = element.hasAttribute('role') &&
           ['button', 'link', 'tab', 'menuitem', 'checkbox', 'radio', 'slider', 'spinbutton'].includes(element.getAttribute('role'));
-        
-        if (!hasInteractiveRole) {
+
+        // Scrollable containers with tabindex="0" are correct a11y pattern
+        const style = window.getComputedStyle(element);
+        const isScrollable = (style.overflowY === 'auto' || style.overflowY === 'scroll' ||
+                              style.overflowX === 'auto' || style.overflowX === 'scroll') &&
+                             (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth);
+
+        // Landmark roles (region, log, etc.) with tabindex="0" are acceptable
+        const hasLandmarkRole = element.hasAttribute('role') &&
+          ['region', 'log', 'group', 'toolbar', 'tree', 'treegrid', 'grid', 'application'].includes(element.getAttribute('role'));
+
+        if (!hasInteractiveRole && !isScrollable && !hasLandmarkRole) {
           issues.push({
             type: 'focusable-element',
             element: getElementSelector(element),
@@ -1473,7 +1483,15 @@ class KeyboardNavigationScanner extends BaseScanner {
         
         if (tabIndex === 0 && !isInteractive) {
           const hasClickHandler = element.onclick || element.hasAttribute('onclick');
-          if (!hasClickHandler) {
+          // Scrollable containers and landmark roles legitimately need tabindex="0"
+          const elStyle = window.getComputedStyle(element);
+          const isScrollContainer = (elStyle.overflowY === 'auto' || elStyle.overflowY === 'scroll' ||
+                                     elStyle.overflowX === 'auto' || elStyle.overflowX === 'scroll') &&
+                                    (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth);
+          const isLandmark = element.hasAttribute('role') &&
+            ['region', 'log', 'group', 'toolbar', 'tree', 'treegrid', 'grid', 'application'].includes(element.getAttribute('role'));
+
+          if (!hasClickHandler && !isScrollContainer && !isLandmark) {
             issues.push({
               type: 'tabindex',
               element: selector,

@@ -292,6 +292,63 @@ async function main() {
     }
   }
 
+  // ---- Full-mode responsive tests for 1.4.4 (text resize) and 1.4.10 (reflow) ----
+  origLog(`\n--- responsive-design FULL-MODE criterion tests ---`);
+  if (responsiveScanner) {
+    for (const { file, criteria, expectViolations } of [
+      { file: 'bad-text-resize.html', criteria: ['1.4.4'], expectViolations: true },
+      { file: 'good-text-resize.html', criteria: ['1.4.4'], expectViolations: false },
+      { file: 'bad-reflow.html', criteria: ['1.4.10'], expectViolations: true },
+      { file: 'good-reflow.html', criteria: ['1.4.10'], expectViolations: false },
+    ]) {
+      if (!fs.existsSync(path.join(testDir, file))) {
+        origLog(`  SKIP ${file}: file not found`);
+        continue;
+      }
+      const page = await browser.newPage();
+      try {
+        await page.goto(`http://localhost:${port}/${file}`, { waitUntil: 'networkidle0', timeout: 30000 });
+        silence();
+        const result = await Promise.race([
+          responsiveScanner.scan(page, { heuristicOnly: false }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 120000)),
+        ]);
+        restore();
+
+        const allViolations = result.violations || [];
+        // Filter to only violations matching the target criteria
+        const relevant = allViolations.filter(v => matchesCriteria(v, criteria));
+
+        if (expectViolations) {
+          if (relevant.length > 0) {
+            origLog(`  PASS [FULL-MODE] ${file}: ${relevant.length} violations for ${criteria.join(',')}`);
+            passed++;
+          } else {
+            origLog(`  FAIL [FULL-MODE TRUE-POS] ${file}: 0 violations for ${criteria.join(',')} (${allViolations.length} total)`);
+            failed++;
+            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MODE-TRUE-POS', detail: `0 relevant violations for ${criteria.join(',')}` });
+          }
+        } else {
+          if (relevant.length === 0) {
+            origLog(`  PASS [FULL-MODE] ${file}: 0 violations for ${criteria.join(',')}`);
+            passed++;
+          } else {
+            origLog(`  FAIL [FULL-MODE FALSE-POS] ${file}: ${relevant.length} spurious violations for ${criteria.join(',')}`);
+            failed++;
+            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MODE-FALSE-POS', detail: `${relevant.length} spurious violations` });
+          }
+        }
+      } catch (err) {
+        restore();
+        origLog(`  ERROR [FULL-MODE] ${file}: ${err.message}`);
+        failed++;
+        failures.push({ file, scanner: 'responsive-design', label: 'FULL-MODE-ERROR', detail: err.message });
+      } finally {
+        await page.close().catch(() => {});
+      }
+    }
+  }
+
   await browser.close();
   server.close();
 

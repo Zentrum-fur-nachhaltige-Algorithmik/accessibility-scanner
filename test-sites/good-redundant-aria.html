@@ -1,0 +1,107 @@
+<!-- WCAG-TEST
+criterion: 4.1.2, 1.3.1
+level: A
+title: Name, Role, Value - Redundant ARIA Roles
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: advanced-aria, page-structure, html-validation
+description: Tests that explicit ARIA roles matching implicit HTML5 roles are not flagged as violations. Also tests nav-without-list pattern.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Redundant ARIA Roles (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        h1, h2 { color: #1a1a1a; }
+        a {
+            color: #1a5276;
+            text-decoration: underline;
+        }
+        a:focus {
+            outline: 3px solid #2980b9;
+            outline-offset: 2px;
+        }
+        .top-nav a {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            color: #1a5276;
+        }
+        footer {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-top: 2px solid #4a4a4a;
+        }
+        main { padding: 1rem 0; }
+    </style>
+</head>
+<body>
+    <!-- Redundant role="banner" on header — valid, aids older AT -->
+    <header role="banner">
+        <h1>Company Portal</h1>
+
+        <!-- Redundant role="navigation" on nav — valid HTML5 -->
+        <nav role="navigation" aria-label="Main navigation">
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <!-- Nav with direct links (no list wrapper) — valid, not a WCAG violation -->
+        <nav class="top-nav" aria-label="Quick links">
+            <a href="#dashboard">Dashboard</a>
+            <a href="#notifications">Notifications</a>
+            <a href="#profile">My Profile</a>
+        </nav>
+    </header>
+
+    <!-- Redundant role="main" on main — valid HTML5 -->
+    <main role="main">
+        <h2>Welcome to the Portal</h2>
+        <p>This page demonstrates valid patterns that should not trigger accessibility violations.</p>
+
+        <!-- Redundant role="article" on article -->
+        <article role="article">
+            <h2>Latest News</h2>
+            <p>Our company recently launched a new accessibility initiative.</p>
+        </article>
+
+        <!-- Redundant role="complementary" on aside -->
+        <aside role="complementary" aria-label="Related links">
+            <h2>Related Resources</h2>
+            <ul>
+                <li><a href="#wcag">WCAG 2.2 Guidelines</a></li>
+                <li><a href="#aria">ARIA Authoring Practices</a></li>
+            </ul>
+        </aside>
+
+        <!-- Section with role="region" — valid, common pattern -->
+        <section role="region" aria-label="User statistics">
+            <h2>Your Statistics</h2>
+            <p>You have completed 15 of 20 tasks this month.</p>
+        </section>
+    </main>
+
+    <!-- Redundant role="contentinfo" on footer — valid HTML5 -->
+    <footer role="contentinfo">
+        <p>&copy; 2026 Company Portal. All rights reserved.</p>
+        <nav aria-label="Footer navigation">
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms of Service</a>
+            <a href="#accessibility">Accessibility Statement</a>
+        </nav>
+    </footer>
+</body>
+</html>

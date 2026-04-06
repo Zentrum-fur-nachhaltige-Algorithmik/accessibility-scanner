@@ -156,10 +156,13 @@ class ResponsiveDesignScanner extends BaseScanner {
     // 4. Test content reflow specifically
     await this.testContentReflow(page, scanDir, violations, options);
 
-    console.log(`Responsive analysis complete: ${violations.length} violations found`);
+    // Deduplicate violations by element + issue type across viewport/zoom combos
+    const dedupedViolations = this.deduplicateViolations(violations);
+
+    console.log(`Responsive analysis complete: ${violations.length} raw → ${dedupedViolations.length} deduplicated violations`);
 
     return {
-      violations,
+      violations: dedupedViolations,
       visualEvidence,
       reflowWorks,
       textResizable,
@@ -633,6 +636,57 @@ class ResponsiveDesignScanner extends BaseScanner {
 
     console.log(`Heuristic text spacing check complete: ${result.violations.length} violations found`);
     return result;
+  }
+
+  /**
+   * Deduplicate violations by element+issue type, merging viewport/zoom metadata.
+   * A single CSS overflow issue reported at 16 viewport/zoom combos becomes one
+   * violation with an affectedViewports array.
+   */
+  deduplicateViolations(violations) {
+    const map = new Map();
+
+    for (const v of violations) {
+      // Build dedup key from element selector (or description fallback) + issue type
+      const elementKey = v.element || v.description || '';
+      const key = `${elementKey}::${v.issue}::${v.criterion}`;
+
+      if (map.has(key)) {
+        const existing = map.get(key);
+        // Merge viewport/zoom info
+        if (v.viewport || v.zoomLevel) {
+          existing.affectedViewports.push({
+            viewport: v.viewport || 'unknown',
+            zoomLevel: v.zoomLevel || null,
+            screenshot: v.screenshot || null,
+          });
+        }
+      } else {
+        const deduped = {
+          criterion: v.criterion,
+          element: v.element || null,
+          issue: v.issue,
+          description: v.description,
+          suggestion: v.suggestion,
+          severity: v.severity || null,
+          affectedViewports: [],
+        };
+        if (v.viewport || v.zoomLevel) {
+          deduped.affectedViewports.push({
+            viewport: v.viewport || 'unknown',
+            zoomLevel: v.zoomLevel || null,
+            screenshot: v.screenshot || null,
+          });
+        }
+        // Preserve screenshot for single-viewport violations
+        if (v.screenshot && !v.viewport) {
+          deduped.screenshot = v.screenshot;
+        }
+        map.set(key, deduped);
+      }
+    }
+
+    return Array.from(map.values());
   }
 
 }

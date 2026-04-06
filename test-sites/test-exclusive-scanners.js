@@ -233,6 +233,65 @@ async function main() {
     }
   }
 
+  // ---- Full-matrix responsive dedup test ----
+  origLog(`\n--- responsive-design FULL-MATRIX dedup test ---`);
+  const responsiveScanner = scannerInstances['responsive-design'];
+  if (responsiveScanner) {
+    for (const { file, expectZero } of [
+      { file: 'bad-reflow.html', expectZero: false },
+      { file: 'good-reflow.html', expectZero: true },
+    ]) {
+      if (!fs.existsSync(path.join(testDir, file))) {
+        origLog(`  SKIP ${file}: file not found`);
+        continue;
+      }
+      const page = await browser.newPage();
+      try {
+        await page.goto(`http://localhost:${port}/${file}`, { waitUntil: 'networkidle0', timeout: 30000 });
+        silence();
+        // Full mode: no heuristicOnly
+        const result = await Promise.race([
+          responsiveScanner.scan(page, { heuristicOnly: false }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 120000)),
+        ]);
+        restore();
+
+        const violations = result.violations || [];
+        const hasAffectedViewports = violations.every(v => Array.isArray(v.affectedViewports));
+
+        if (expectZero) {
+          if (violations.length === 0) {
+            origLog(`  PASS [FULL-MATRIX] ${file}: 0 violations`);
+            passed++;
+          } else {
+            origLog(`  FAIL [FULL-MATRIX] ${file}: expected 0 violations, got ${violations.length}`);
+            failed++;
+            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MATRIX', detail: `${violations.length} violations` });
+          }
+        } else {
+          // Bad file: should have violations but deduped (< 20, not 800+), each with affectedViewports
+          const dedupOk = violations.length > 0 && violations.length < 30;
+          const structureOk = hasAffectedViewports;
+          if (dedupOk && structureOk) {
+            origLog(`  PASS [FULL-MATRIX DEDUP] ${file}: ${violations.length} deduplicated violations, all have affectedViewports`);
+            passed++;
+          } else {
+            origLog(`  FAIL [FULL-MATRIX DEDUP] ${file}: ${violations.length} violations, affectedViewports=${structureOk}`);
+            failed++;
+            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MATRIX-DEDUP', detail: `${violations.length} violations, structure=${structureOk}` });
+          }
+        }
+      } catch (err) {
+        restore();
+        origLog(`  ERROR [FULL-MATRIX] ${file}: ${err.message}`);
+        failed++;
+        failures.push({ file, scanner: 'responsive-design', label: 'FULL-MATRIX-ERROR', detail: err.message });
+      } finally {
+        await page.close().catch(() => {});
+      }
+    }
+  }
+
   await browser.close();
   server.close();
 

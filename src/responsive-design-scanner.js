@@ -203,22 +203,34 @@ class ResponsiveDesignScanner extends BaseScanner {
       const elements = document.querySelectorAll('*');
       let contentLoss = false;
       let overlappingElements = 0;
-      
+
       elements.forEach(el => {
         const rect = el.getBoundingClientRect();
         const style = window.getComputedStyle(el);
-        
-        // Check for elements that overflow beyond viewport
-        if (rect.right > clientWidth && style.overflow === 'hidden') {
+        if (style.display === 'none' || style.visibility === 'hidden') return;
+        if (rect.width === 0 || rect.height === 0) return;
+
+        // Check for elements that overflow beyond viewport AND clip content
+        if (rect.right > clientWidth && style.overflow === 'hidden' &&
+            el.scrollWidth > el.clientWidth && el.textContent.trim().length > 0) {
           contentLoss = true;
         }
-        
-        // Check for overlapping text
+
+        // Check for overlapping text — skip off-screen/visually-hidden elements
         if (style.position === 'absolute' || style.position === 'fixed') {
+          // Skip elements that are intentionally off-screen (skip links, sr-only, etc.)
+          if (rect.width <= 1 || rect.height <= 1) return;
+          if (rect.right < 0 || rect.bottom < 0) return;
+          if (style.clip && style.clip !== 'auto') return;
+          if (style.clipPath && style.clipPath !== 'none') return;
+
           const siblings = Array.from(el.parentElement?.children || []);
           siblings.forEach(sibling => {
             if (sibling !== el) {
+              const siblingStyle = window.getComputedStyle(sibling);
+              if (siblingStyle.display === 'none' || siblingStyle.visibility === 'hidden') return;
               const siblingRect = sibling.getBoundingClientRect();
+              if (siblingRect.width === 0 || siblingRect.height === 0) return;
               if (rect.left < siblingRect.right && rect.right > siblingRect.left &&
                   rect.top < siblingRect.bottom && rect.bottom > siblingRect.top) {
                 overlappingElements++;
@@ -228,16 +240,19 @@ class ResponsiveDesignScanner extends BaseScanner {
         }
       });
 
-      // Check text readability
-      const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div');
+      // Check text readability — only flag if actual text content is affected
+      const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, li, td, th, label, a');
       let textNotReadable = false;
-      
+
       textElements.forEach(el => {
         const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return;
+        const text = el.textContent.trim();
+        if (!text) return;
         const fontSize = parseFloat(style.fontSize);
-        
-        // At high zoom, text should still be readable (not too small or cut off)
-        if (fontSize < 8 || style.overflow === 'hidden') {
+
+        // Only flag genuinely tiny text, not overflow:hidden (which is often intentional)
+        if (fontSize < 8) {
           textNotReadable = true;
         }
       });
@@ -430,31 +445,52 @@ class ResponsiveDesignScanner extends BaseScanner {
     const reflowAnalysis = await page.evaluate(() => {
       const body = document.body;
       const html = document.documentElement;
-      
+
+      // Check if an element or any ancestor has overflow:auto/scroll (scrollable container)
+      function isInsideScrollableContainer(el) {
+        let parent = el.parentElement;
+        while (parent && parent !== document.documentElement) {
+          const ps = window.getComputedStyle(parent);
+          if (ps.overflowX === 'auto' || ps.overflowX === 'scroll') return true;
+          parent = parent.parentElement;
+        }
+        return false;
+      }
+
       // Check for fixed-width elements that don't reflow
       const fixedElements = [];
       const allElements = document.querySelectorAll('*');
-      
+
       allElements.forEach(el => {
+        // Skip structural elements that naturally match viewport width
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'html' || tag === 'body' || tag === 'head' || tag === 'script' || tag === 'style') return;
+
         const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') return;
+
         const rect = el.getBoundingClientRect();
-        
-        // Check for elements with fixed widths that exceed viewport
-        if ((style.width && style.width.includes('px') && parseInt(style.width) > 320) ||
-            (style.minWidth && style.minWidth.includes('px') && parseInt(style.minWidth) > 320) ||
-            rect.width > 320) {
-          
-          const selector = el.tagName.toLowerCase() + 
-                          (el.id ? `#${el.id}` : '') + 
-                          (el.className ? `.${el.className.split(' ').join('.')}` : '');
-          
-          fixedElements.push({
-            selector,
-            width: rect.width,
-            fixedWidth: style.width,
-            minWidth: style.minWidth
-          });
-        }
+        // Skip zero-size elements
+        if (rect.width === 0 || rect.height === 0) return;
+
+        // Only flag elements with explicit fixed CSS widths or min-widths that exceed 320px
+        const hasFixedCssWidth = style.width && style.width.includes('px') && parseInt(style.width) > 320;
+        const hasFixedMinWidth = style.minWidth && style.minWidth.includes('px') && parseInt(style.minWidth) > 320;
+
+        if (!hasFixedCssWidth && !hasFixedMinWidth) return;
+        // Skip elements properly contained in a scrollable ancestor
+        if (isInsideScrollableContainer(el)) return;
+
+        const selector = el.tagName.toLowerCase() +
+                        (el.id ? `#${el.id}` : '') +
+                        (el.className && typeof el.className === 'string' ? `.${el.className.split(' ').join('.')}` : '');
+
+        fixedElements.push({
+          selector,
+          width: rect.width,
+          fixedWidth: style.width,
+          minWidth: style.minWidth
+        });
       });
 
       return {

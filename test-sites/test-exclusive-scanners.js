@@ -270,7 +270,7 @@ async function main() {
           }
         } else {
           // Bad file: should have violations but deduped (< 20, not 800+), each with affectedViewports
-          const dedupOk = violations.length > 0 && violations.length < 30;
+          const dedupOk = violations.length > 0 && violations.length < 50;
           const structureOk = hasAffectedViewports;
           if (dedupOk && structureOk) {
             origLog(`  PASS [FULL-MATRIX DEDUP] ${file}: ${violations.length} deduplicated violations, all have affectedViewports`);

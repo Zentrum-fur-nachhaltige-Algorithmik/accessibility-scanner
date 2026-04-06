@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: contrastUtils } = require('./utils/browser-contrast');
 
 /**
  * Focus Management Scanner for WCAG compliance testing
@@ -67,6 +68,54 @@ class FocusManagementScanner extends BaseScanner {
     // 1. Analyze reading order vs. tab order
     const readingOrderAnalysis = await this.analyzeReadingOrder(page, scanDir);
     
+    // 1b. Check for global CSS rules that suppress focus indicators
+    const globalFocusSuppression = await page.evaluate(() => {
+      const suppressions = [];
+      try {
+        for (const sheet of document.styleSheets) {
+          try {
+            for (const rule of sheet.cssRules) {
+              if (rule instanceof CSSStyleRule && rule.selectorText) {
+                const sel = rule.selectorText;
+                // Detect broad :focus selectors that suppress outlines
+                const isBroadFocus = /^(\*)?:focus$/.test(sel.trim()) ||
+                  /^:focus$/.test(sel.trim()) ||
+                  sel.trim() === '*:focus' ||
+                  sel.trim() === ':focus';
+                if (isBroadFocus) {
+                  const outline = rule.style.outline || rule.style.outlineStyle || '';
+                  const outlineWidth = rule.style.outlineWidth || '';
+                  const outlineColor = rule.style.outlineColor || '';
+                  if (outline === 'none' || outline === '0' ||
+                      outlineWidth === '0' || outlineWidth === '0px' ||
+                      outlineColor === 'transparent') {
+                    suppressions.push({
+                      selector: sel,
+                      property: outline ? `outline: ${outline}` :
+                        outlineWidth ? `outline-width: ${outlineWidth}` :
+                        `outline-color: ${outlineColor}`,
+                      source: sheet.href || 'inline'
+                    });
+                  }
+                }
+              }
+            }
+          } catch (e) { /* cross-origin stylesheet */ }
+        }
+      } catch (e) { /* no stylesheets */ }
+      return suppressions;
+    });
+
+    for (const suppression of globalFocusSuppression) {
+      violations.push({
+        criterion: "9.2.4.7",
+        element: suppression.selector,
+        issue: "global-focus-outline-removed",
+        description: `Global CSS rule "${suppression.selector} { ${suppression.property} }" removes focus indicators from all elements`,
+        suggestion: "Remove the global focus suppression or replace with custom visible focus styles"
+      });
+    }
+
     // 2. Test focus sequence with visual validation
     const focusTestResults = await this.testFocusSequence(page, scanDir);
     
@@ -86,13 +135,23 @@ class FocusManagementScanner extends BaseScanner {
     for (const focusItem of focusTestResults.sequence) {
       if (!focusItem.hasVisibleFocus) {
         allElementsHaveVisibleFocus = false;
-        violations.push({
-          criterion: "9.2.4.7",
-          element: focusItem.element,
-          issue: "no-visible-focus",
-          description: "Element receives focus but has no visible focus indicator",
-          suggestion: "Add CSS :focus styles with visible outline, box-shadow, or background color"
-        });
+        if (focusItem.lowContrastFocus) {
+          violations.push({
+            criterion: "9.2.4.7",
+            element: focusItem.element,
+            issue: "low-contrast-focus-indicator",
+            description: `Focus indicator has insufficient contrast against background (requires 3:1 minimum). Outline: ${focusItem.styles?.outlineColor || 'unknown'}, Background: ${focusItem.styles?.backgroundColor || 'unknown'}`,
+            suggestion: "Use a focus indicator color with at least 3:1 contrast ratio against the background"
+          });
+        } else {
+          violations.push({
+            criterion: "9.2.4.7",
+            element: focusItem.element,
+            issue: "no-visible-focus",
+            description: "Element receives focus but has no visible focus indicator",
+            suggestion: "Add CSS :focus styles with visible outline, box-shadow, or background color"
+          });
+        }
       }
     }
 
@@ -240,37 +299,61 @@ class FocusManagementScanner extends BaseScanner {
       await page.screenshot({ path: afterPath });
 
       // Get new focus state and analyze visibility
-      const afterFocus = await page.evaluate(() => {
+      const afterFocus = await page.evaluate((contrastCode) => {
+        // Inject contrast utilities
+        eval(contrastCode);
+
         const active = document.activeElement;
         if (!active || active === document.body) return null;
 
         const rect = active.getBoundingClientRect();
         const computed = window.getComputedStyle(active);
+        // Note: getComputedStyle(el, ':focus') does NOT return pseudo-class styles,
+        // but the element IS focused right now, so computed styles reflect the focus state.
         const focusComputed = window.getComputedStyle(active, ':focus');
 
-        // Analyze focus visibility
-        const hasOutline = focusComputed.outline && 
-                          focusComputed.outline !== 'none' && 
-                          focusComputed.outlineWidth !== '0px';
-        
-        const hasBoxShadow = focusComputed.boxShadow && 
+        // Analyze focus visibility — tightened checks for transparent/invisible outlines
+        const outlineColor = computed.outlineColor || '';
+        const isOutlineTransparent = __isColorTransparent(outlineColor);
+
+        let hasOutline = focusComputed.outline &&
+                          focusComputed.outline !== 'none' &&
+                          focusComputed.outlineWidth !== '0px' &&
+                          !isOutlineTransparent;
+
+        // Check outline-to-background contrast ratio (minimum 3:1 per WCAG 2.4.7)
+        let lowContrastFocus = false;
+        if (hasOutline) {
+          const outlineParsed = __parseRgb(outlineColor);
+          const bgParsed = __getEffectiveBackgroundColor(active);
+          if (outlineParsed && bgParsed) {
+            const ratio = __getContrastRatio(outlineParsed, bgParsed);
+            if (ratio < 3) {
+              hasOutline = false;
+              lowContrastFocus = true;
+            }
+          }
+        }
+
+        const hasBoxShadow = focusComputed.boxShadow &&
                             focusComputed.boxShadow !== 'none';
-        
+
         const hasBorderChange = focusComputed.border !== computed.border;
-        
+
         const hasBackgroundChange = focusComputed.backgroundColor !== computed.backgroundColor &&
                                    focusComputed.backgroundColor !== 'rgba(0, 0, 0, 0)';
 
         const hasVisibleFocus = hasOutline || hasBoxShadow || hasBorderChange || hasBackgroundChange;
 
         return {
-          element: active.tagName.toLowerCase() + 
-                  (active.id ? `#${active.id}` : '') + 
+          element: active.tagName.toLowerCase() +
+                  (active.id ? `#${active.id}` : '') +
                   (active.className ? `.${active.className.split(' ').join('.')}` : ''),
           rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
           text: active.textContent.trim().substring(0, 30),
           tabIndex: active.tabIndex,
           hasVisibleFocus,
+          lowContrastFocus,
           focusIndicators: {
             outline: hasOutline,
             boxShadow: hasBoxShadow,
@@ -279,12 +362,13 @@ class FocusManagementScanner extends BaseScanner {
           },
           styles: {
             outline: focusComputed.outline,
+            outlineColor: outlineColor,
             boxShadow: focusComputed.boxShadow,
             border: focusComputed.border,
             backgroundColor: focusComputed.backgroundColor
           }
         };
-      });
+      }, contrastUtils);
 
       if (afterFocus) {
         const elementKey = afterFocus.element;

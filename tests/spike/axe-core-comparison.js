@@ -3,9 +3,10 @@
  *
  * Usage:  node tests/spike/axe-core-comparison.js
  *
- * Loads 6 HTML fixtures through a local HTTP server (same pattern as
- * tests/helpers/fixture-server.js), runs axe-core on each, and prints a
- * structured comparison against our 23 PROFILES.fast scanners.
+ * Loads ALL test-sites/*.html fixtures + 1 experiment file through a local
+ * HTTP server (same pattern as tests/helpers/fixture-server.js), runs
+ * axe-core on each, and prints a structured comparison against our 23
+ * PROFILES.fast scanners.
  */
 
 const http = require('http');
@@ -80,16 +81,28 @@ const OUR_SCANNER_WCAG = {
   'hover-focus-content':   ['1.4.13'],
 };
 
-// ── Test files ──────────────────────────────────────────────────────────
+// ── Test files (auto-discover all test-sites/*.html) ────────────────────
 
-const TEST_FILES = [
-  { label: 'good-accessibility',  path: '/test-sites/good-accessibility.html' },
-  { label: 'good-reflow',         path: '/test-sites/good-reflow.html' },
-  { label: 'good-color-contrast', path: '/test-sites/good-color-contrast.html' },
-  { label: 'bad-image-alt',       path: '/test-sites/bad-image-alt.html' },
-  { label: 'bad-target-size',     path: '/test-sites/bad-target-size.html' },
-  { label: 'experiment-form',     path: '/experiments/haiku-a11y/generated/html-tailwind/form.html' },
-];
+function discoverTestFiles() {
+  const testSitesDir = path.join(PROJECT_ROOT, 'test-sites');
+  const htmlFiles = fs.readdirSync(testSitesDir)
+    .filter(f => f.endsWith('.html'))
+    .sort()
+    .map(f => ({
+      label: f.replace('.html', ''),
+      path: `/test-sites/${f}`,
+    }));
+
+  // Add experiment file
+  htmlFiles.push({
+    label: 'experiment-form',
+    path: '/experiments/haiku-a11y/generated/html-tailwind/form.html',
+  });
+
+  return htmlFiles;
+}
+
+const TEST_FILES = discoverTestFiles();
 
 // ── Main ────────────────────────────────────────────────────────────────
 
@@ -109,15 +122,17 @@ async function main() {
   });
 
   const allResults = [];
+  const total = TEST_FILES.length;
 
-  for (const file of TEST_FILES) {
+  for (let i = 0; i < total; i++) {
+    const file = TEST_FILES[i];
+    process.stdout.write(`\r  Scanning ${i + 1}/${total}: ${file.label.padEnd(50)}`);
     const url = `${baseUrl}${file.path}`;
     const page = await browser.newPage();
 
     try {
       await page.goto(url, { waitUntil: 'networkidle0', timeout: 15000 });
     } catch (err) {
-      console.error(`  ⚠ Failed to load ${file.label}: ${err.message}`);
       await page.close();
       allResults.push({ label: file.label, error: err.message });
       continue;
@@ -150,28 +165,69 @@ async function main() {
       passes: axeResults.passes.length,
     });
   }
+  console.log('\r  Done.                                                          ');
 
   await browser.close();
   server.close();
 
   // ── Part (a): per-file violation counts ───────────────────────────────
 
-  console.log('═══════════════════════════════════════════════════════════');
+  console.log('═══════════════════════════════════════════════════════════════════════════════');
   console.log('(a) axe-core violations per file');
-  console.log('═══════════════════════════════════════════════════════════');
-  for (const r of allResults) {
-    if (r.error) {
-      console.log(`\n  ${r.label}: ERROR – ${r.error}`);
-      continue;
+  console.log('═══════════════════════════════════════════════════════════════════════════════');
+
+  // Compact table
+  const header = `${'File'.padEnd(50)} ${'Rules'.padStart(5)} ${'Nodes'.padStart(5)} ${'Crit'.padStart(4)} ${'Ser'.padStart(4)} ${'Mod'.padStart(4)} ${'Min'.padStart(4)}`;
+  console.log(`\n  ${header}`);
+  console.log(`  ${'─'.repeat(header.length)}`);
+
+  const goodResults = allResults.filter(r => r.label.startsWith('good-') && !r.error);
+  const badResults = allResults.filter(r => r.label.startsWith('bad-') && !r.error);
+  const otherResults = allResults.filter(r => !r.label.startsWith('good-') && !r.label.startsWith('bad-') && !r.error);
+  const errorResults = allResults.filter(r => r.error);
+
+  for (const group of [
+    { title: '── good-* files ──', items: goodResults },
+    { title: '── bad-* files ──', items: badResults },
+    { title: '── other ──', items: otherResults },
+  ]) {
+    if (group.items.length === 0) continue;
+    console.log(`\n  ${group.title}`);
+    for (const r of group.items) {
+      const line = `${r.label.padEnd(50)} ${String(r.totalViolations).padStart(5)} ${String(r.totalNodes).padStart(5)} ${String(r.impactCounts.critical || 0).padStart(4)} ${String(r.impactCounts.serious || 0).padStart(4)} ${String(r.impactCounts.moderate || 0).padStart(4)} ${String(r.impactCounts.minor || 0).padStart(4)}`;
+      console.log(`  ${line}`);
     }
-    console.log(`\n  ${r.label}`);
-    console.log(`    Violation rules : ${r.totalViolations}`);
-    console.log(`    Affected nodes  : ${r.totalNodes}`);
-    console.log(`    Impact          : ${JSON.stringify(r.impactCounts)}`);
-    console.log(`    Rule IDs        : ${r.ruleIds.join(', ') || '(none)'}`);
-    console.log(`    WCAG tags       : ${r.wcagTags.join(', ') || '(none)'}`);
-    console.log(`    Incomplete      : ${r.incomplete} rules need manual review`);
-    console.log(`    Passes          : ${r.passes} rules passed`);
+  }
+  if (errorResults.length > 0) {
+    console.log(`\n  ── errors ──`);
+    for (const r of errorResults) console.log(`  ${r.label}: ${r.error}`);
+  }
+
+  // Aggregate stats
+  const goodWithViolations = goodResults.filter(r => r.totalViolations > 0);
+  const badWithViolations = badResults.filter(r => r.totalViolations > 0);
+  const goodTotalNodes = goodResults.reduce((n, r) => n + r.totalNodes, 0);
+  const badTotalNodes = badResults.reduce((n, r) => n + r.totalNodes, 0);
+
+  console.log(`\n  ── DETECTION SUMMARY ──`);
+  console.log(`  good-* files: ${goodResults.length} total, ${goodWithViolations.length} with violations (${goodTotalNodes} total nodes) — FP indicator`);
+  console.log(`  bad-*  files: ${badResults.length} total, ${badWithViolations.length} with violations (${badTotalNodes} total nodes) — detection rate: ${badResults.length > 0 ? ((badWithViolations.length / badResults.length) * 100).toFixed(1) : 'N/A'}%`);
+  console.log(`  bad-* files with 0 violations (axe misses):`)
+  const missed = badResults.filter(r => r.totalViolations === 0);
+  for (const r of missed) console.log(`    - ${r.label}`);
+  if (missed.length === 0) console.log(`    (none)`);
+
+  // Show rule IDs for bad-* files with violations — detailed view
+  console.log(`\n  ── TOP RULE IDs across bad-* files ──`);
+  const ruleCounts = {};
+  for (const r of badResults) {
+    for (const id of r.ruleIds) {
+      ruleCounts[id] = (ruleCounts[id] || 0) + 1;
+    }
+  }
+  const sortedRules = Object.entries(ruleCounts).sort((a, b) => b[1] - a[1]);
+  for (const [rule, count] of sortedRules.slice(0, 20)) {
+    console.log(`    ${String(count).padStart(3)}x  ${rule}`);
   }
 
   // ── Part (b): WCAG coverage comparison ────────────────────────────────
@@ -250,14 +306,11 @@ async function main() {
   console.log('(d) Recommendation');
   console.log('═══════════════════════════════════════════════════════════');
 
-  // Calculate false-positive rate from experiment file
   const expResult = allResults.find(r => r.label === 'experiment-form');
-  const goodResults = allResults.filter(r => r.label.startsWith('good-') && !r.error);
-  const badResults = allResults.filter(r => r.label.startsWith('bad-') && !r.error);
 
   console.log('\n  Summary of findings:');
-  console.log(`    Good files  : axe found ${goodResults.map(r => r.totalViolations).join(', ')} violation rules (expect ~0)`);
-  console.log(`    Bad files   : axe found ${badResults.map(r => r.totalViolations).join(', ')} violation rules`);
+  console.log(`    Good files  : ${goodResults.length} tested, ${goodWithViolations.length} with violations (FP noise)`);
+  console.log(`    Bad files   : ${badResults.length} tested, ${badWithViolations.length} detected (${((badWithViolations.length / badResults.length) * 100).toFixed(1)}%), ${missed.length} missed`);
   if (expResult && !expResult.error) {
     console.log(`    Experiment  : axe found ${expResult.totalViolations} violation rules (${expResult.totalNodes} nodes)`);
     console.log(`                  vs. our scanners: 800+ violations (97-99% false positives)`);

@@ -24,13 +24,17 @@ These are NOT missing scanners — the scanners exist and are marked DONE in `sp
 ## Gap 2: tabindex=-1 blocking gesture alternatives
 
 **Test:** `bad-keyboard-native-override.html` (2.1.1, 2.5.1)  
-**Scanner:** `input-modalities-scanner.js`
+**Scanner:** `input-modalities-scanner.js`  
+**Status:** SCANNER FIX DONE — test file deficiency remains (see below)
 
 **Violation:** Controls have `tabindex="-1"` applied, removing them from keyboard tab order. Gesture-dependent elements have no keyboard-accessible alternative because the alternatives themselves are keyboard-blocked.
 
 **Root cause:** `analyzePointerGestures()` checks whether gesture alternatives exist (buttons, links) but never verifies that those alternatives are keyboard-reachable. An element with `tabindex="-1"` passes the "alternative exists" check despite being unreachable.
 
 **Fix:** When detecting gesture alternatives, verify `tabindex !== "-1"` and the element is not `aria-hidden` or `disabled`.
+
+**OPEN ISSUE — Test file deficiency:** `bad-keyboard-native-override.html` lists criterion 2.5.1 (Pointer Gestures) but contains NO actual gesture-dependent elements (no `draggable`, `ontouchstart`, swipe patterns, or pointer gesture events). The file only has `tabindex="-1"` on native form controls, which is a 2.1.1 (Keyboard) violation caught by `keyboard-navigation-scanner`. The input-modalities scanner correctly finds 0 relevant 2.5.1 violations because there are no gestures to analyze.  
+**Required:** Either remove criterion 2.5.1 from the test metadata, or add actual gesture-dependent elements (e.g., `draggable="true"` items, swipe carousels, pinch-to-zoom) whose keyboard alternatives are blocked by `tabindex="-1"`.
 
 ---
 

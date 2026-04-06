@@ -159,8 +159,8 @@ class InputModalitiesScanner extends BaseScanner {
 
         // Check for drag and drop without keyboard alternatives
         if (element.hasAttribute('draggable') && element.getAttribute('draggable') === 'true') {
-          const hasKeyboardAlternative = element.hasAttribute('tabindex') ||
-                                        element.querySelector('[tabindex]') ||
+          const hasKeyboardAlternative = (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1') ||
+                                        element.querySelector('[tabindex]:not([tabindex="-1"])') ||
                                         element.closest('[role="button"]') ||
                                         document.querySelector(`button[aria-controls="${element.id}"]`);
 
@@ -185,7 +185,7 @@ class InputModalitiesScanner extends BaseScanner {
           const hasSimpleAlternative = element.onclick || element.onmouseup ||
                                       element.getAttribute('onclick') ||
                                       element.getAttribute('onmouseup') ||
-                                      element.hasAttribute('tabindex');
+                                      (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
 
           if (!hasSimpleAlternative) {
             issues.push({
@@ -202,7 +202,7 @@ class InputModalitiesScanner extends BaseScanner {
         const isInteractiveElement = element.tagName.toLowerCase() === 'button' ||
                                    element.hasAttribute('onclick') ||
                                    element.hasAttribute('role') ||
-                                   element.hasAttribute('tabindex');
+                                   (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
 
         if (isInteractiveElement) {
           const swipeIndicators = ['swipe', 'slide'];
@@ -220,7 +220,7 @@ class InputModalitiesScanner extends BaseScanner {
                                            document.querySelector('.pagination') ||
                                            document.querySelector('[role="tablist"]') ||
                                            element.closest('form') ||
-                                           element.hasAttribute('tabindex');
+                                           (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
 
             if (!hasAlternativeNavigation) {
               issues.push({

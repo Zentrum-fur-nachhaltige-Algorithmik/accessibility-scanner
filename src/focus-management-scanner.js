@@ -449,29 +449,49 @@ class FocusManagementScanner extends BaseScanner {
     
     const violations = [];
 
-    // Look for modal triggers
+    // Look for modal triggers (expanded selectors + text matching)
     const modalTriggers = await page.evaluate(() => {
       const triggers = [];
+      const seen = new Set();
       const selectors = [
-        '[data-toggle="modal"]', '[data-target*="modal"]', 
+        '[data-toggle="modal"]', '[data-target*="modal"]',
+        '[data-bs-toggle="modal"]', 'button[data-modal]',
         '.modal-trigger', '.open-modal', '.show-modal',
-        'button[aria-haspopup="dialog"]'
+        'button[aria-haspopup="dialog"]', '[aria-haspopup="true"]',
+        '[aria-haspopup="dialog"]'
       ];
-      
+
+      function addTrigger(el) {
+        const key = el.tagName + (el.id || '') + el.textContent.trim().substring(0, 20);
+        if (seen.has(key)) return;
+        seen.add(key);
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          const className = el.className && typeof el.className === 'string' ? el.className : '';
+          triggers.push({
+            element: el.tagName.toLowerCase() +
+                    (el.id ? `#${el.id}` : '') +
+                    (className ? `.${className.split(' ').join('.')}` : ''),
+            text: el.textContent.trim().substring(0, 30)
+          });
+        }
+      }
+
       selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
-          const rect = el.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            triggers.push({
-              element: el.tagName.toLowerCase() + 
-                      (el.id ? `#${el.id}` : '') + 
-                      (el.className ? `.${el.className.split(' ').join('.')}` : ''),
-              text: el.textContent.trim().substring(0, 30)
-            });
-          }
-        });
+        document.querySelectorAll(selector).forEach(addTrigger);
       });
-      
+
+      // Text-based matching for buttons
+      const modalTextPattern = /modal|dialog|öffnen|open|popup/i;
+      document.querySelectorAll('button, [role="button"]').forEach(el => {
+        const text = (el.textContent || '').trim() +
+          (el.getAttribute('aria-label') || '') +
+          (el.getAttribute('title') || '');
+        if (modalTextPattern.test(text)) {
+          addTrigger(el);
+        }
+      });
+
       return triggers;
     });
 
@@ -537,6 +557,144 @@ class FocusManagementScanner extends BaseScanner {
 
       } catch (error) {
         console.warn(`Error testing modal trigger ${trigger.element}:`, error.message);
+      }
+    }
+
+    // Test focus management after delete/remove actions
+    const deleteButtons = await page.evaluate(() => {
+      const buttons = [];
+      const deletePattern = /delete|remove|löschen|entfernen|close|schließen/i;
+      document.querySelectorAll('button, [role="button"]').forEach(el => {
+        const text = (el.textContent || '').trim() +
+          (el.getAttribute('aria-label') || '') +
+          (el.getAttribute('title') || '');
+        if (deletePattern.test(text)) {
+          const rect = el.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            const className = el.className && typeof el.className === 'string' ? el.className : '';
+            buttons.push({
+              element: el.tagName.toLowerCase() +
+                (el.id ? `#${el.id}` : '') +
+                (className ? `.${className.split(' ')[0]}` : ''),
+              text: el.textContent.trim().substring(0, 30),
+            });
+          }
+        }
+      });
+      return buttons;
+    });
+
+    // Test first few delete buttons (avoid testing too many)
+    for (const [idx, btn] of deleteButtons.slice(0, 3).entries()) {
+      try {
+        // Record DOM state before
+        const before = await page.evaluate((sel) => {
+          const el = document.querySelector(sel);
+          if (!el) return null;
+          el.focus();
+          return {
+            activeElement: document.activeElement?.tagName?.toLowerCase() || 'unknown',
+            bodyChildCount: document.body.querySelectorAll('*').length,
+          };
+        }, btn.element);
+
+        if (!before) continue;
+
+        // Click the delete button
+        const clicked = await page.evaluate((sel) => {
+          const el = document.querySelector(sel);
+          if (el) { el.click(); return true; }
+          return false;
+        }, btn.element);
+
+        if (!clicked) continue;
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Check if focus fell to body (bad) or stayed on a meaningful element (good)
+        const after = await page.evaluate(() => {
+          const active = document.activeElement;
+          const isBody = !active || active === document.body || active === document.documentElement;
+          return {
+            isBody,
+            activeElement: active?.tagName?.toLowerCase() || 'body',
+            activeId: active?.id || '',
+          };
+        });
+
+        // Check if DOM actually changed (something was deleted)
+        const domChanged = await page.evaluate((prevCount) => {
+          return document.body.querySelectorAll('*').length < prevCount;
+        }, before.bodyChildCount);
+
+        if (domChanged && after.isBody) {
+          violations.push({
+            criterion: "9.2.4.3",
+            element: btn.element,
+            issue: "focus-lost-after-deletion",
+            description: `After clicking "${btn.text}", an element was removed and focus fell to document body instead of moving to a sibling or parent`,
+            suggestion: "After removing an element, move focus to the next sibling, previous sibling, or parent container"
+          });
+        }
+      } catch (error) {
+        console.warn(`Error testing delete button ${btn.element}:`, error.message);
+      }
+    }
+
+    // Test focus management after load-more actions
+    const loadMoreButtons = await page.evaluate(() => {
+      const buttons = [];
+      const loadPattern = /load more|mehr laden|show more|mehr anzeigen|weitere/i;
+      document.querySelectorAll('button, [role="button"], a[href]').forEach(el => {
+        const text = (el.textContent || '').trim() +
+          (el.getAttribute('aria-label') || '');
+        if (loadPattern.test(text)) {
+          const rect = el.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            const className = el.className && typeof el.className === 'string' ? el.className : '';
+            buttons.push({
+              element: el.tagName.toLowerCase() +
+                (el.id ? `#${el.id}` : '') +
+                (className ? `.${className.split(' ')[0]}` : ''),
+              text: el.textContent.trim().substring(0, 30),
+            });
+          }
+        }
+      });
+      return buttons;
+    });
+
+    for (const [idx, btn] of loadMoreButtons.slice(0, 2).entries()) {
+      try {
+        const beforeCount = await page.evaluate(() => document.body.querySelectorAll('*').length);
+
+        const clicked = await page.evaluate((sel) => {
+          const el = document.querySelector(sel);
+          if (el) { el.click(); return true; }
+          return false;
+        }, btn.element);
+
+        if (!clicked) continue;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const after = await page.evaluate((prevCount) => {
+          const newCount = document.body.querySelectorAll('*').length;
+          const contentAdded = newCount > prevCount;
+          const active = document.activeElement;
+          const isBody = !active || active === document.body || active === document.documentElement;
+          return { contentAdded, isBody, newCount, prevCount };
+        }, beforeCount);
+
+        if (after.contentAdded && after.isBody) {
+          violations.push({
+            criterion: "9.2.4.3",
+            element: btn.element,
+            issue: "focus-lost-after-load-more",
+            description: `After clicking "${btn.text}", new content was added but focus fell to document body instead of moving to the new content`,
+            suggestion: "After loading more content, move focus to the first new element or announce the addition to screen readers"
+          });
+        }
+      } catch (error) {
+        console.warn(`Error testing load-more button ${btn.element}:`, error.message);
       }
     }
 

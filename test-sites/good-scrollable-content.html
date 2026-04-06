@@ -1,0 +1,561 @@
+<!-- WCAG-TEST
+criterion: 2.1.1
+level: A
+title: Keyboard
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation, focus-management
+description: Keyboard accessible scrollable content
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Scrollable Content - WCAG 2.1.1 Compliant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .success {
+            background: #efe;
+            border-left: 4px solid #0c0;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #666;
+            margin-top: 30px;
+        }
+        
+        /* Good Example 1: Scrollable div with keyboard access */
+        .code-container {
+            width: 100%;
+            height: 200px;
+            overflow: auto;
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            /* CORRECT: tabindex="0" makes it keyboard focusable */
+            tabindex: 0;
+        }
+        
+        .code-container:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: 2px;
+        }
+        
+        /* Good Example 2: Larger textarea for better readability */
+        .large-textarea {
+            width: 100%;
+            min-height: 200px;
+            resize: vertical;
+            /* Proper size prevents need for scrolling */
+        }
+        
+        /* Good Example 3: Horizontal scroll container with keyboard access */
+        .horizontal-scroll {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            background: white;
+            border: 1px solid #ddd;
+            /* CORRECT: tabindex="0" for keyboard access */
+            tabindex: 0;
+        }
+        
+        .horizontal-scroll:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: -2px;
+        }
+        
+        .horizontal-content {
+            width: 1500px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .card {
+            min-width: 200px;
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        /* Good Example 4: Accessible height content box */
+        .terms-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: white;
+            /* CORRECT: tabindex="0" for keyboard scrolling */
+            tabindex: 0;
+        }
+        
+        .terms-container:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: -2px;
+        }
+        
+        /* Good Example 5: Chat window with keyboard access */
+        .chat-window {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            background: white;
+            /* CORRECT: tabindex="0" for keyboard access */
+            tabindex: 0;
+        }
+        
+        .chat-window:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: -2px;
+        }
+        
+        .message {
+            padding: 10px;
+            margin: 5px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
+        
+        /* Good Example 6: Data table container with keyboard access */
+        .table-container {
+            max-height: 250px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            /* CORRECT: tabindex="0" for keyboard access */
+            tabindex: 0;
+        }
+        
+        .table-container:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: -2px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+        
+        /* Good Example 7: News with proper controls */
+        .news-container {
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .news-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .news-controls button {
+            background: #0056b3;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .news-controls button:hover {
+            background: #0056b3;
+        }
+        
+        .news-content {
+            height: 40px;
+            overflow: hidden;
+        }
+        
+        /* Good Example 8: Sidebar navigation with proper focus */
+        .sidebar-nav {
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            /* CORRECT: tabindex="0" for keyboard access */
+            tabindex: 0;
+        }
+        
+        .sidebar-nav:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: -2px;
+        }
+        
+        .nav-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        /* Good Example 9: Log viewer with keyboard access */
+        .log-viewer {
+            height: 200px;
+            overflow: auto;
+            background: black;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            /* CORRECT: tabindex="0" for keyboard access */
+            tabindex: 0;
+        }
+        
+        .log-viewer:focus {
+            outline: 2px solid #0f0;
+            outline-offset: -2px;
+        }
+        
+        /* Screen reader only instructions */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Good Scrollable Content - WCAG 2.1.1 Keyboard Accessible</h1>
+    
+    <div class="success">
+        <strong>WCAG 2.1.1 Compliant:</strong> This page contains scrollable regions that are fully accessible
+        using only the keyboard. All content can be reached and interacted with by keyboard-only users.
+    </div>
+
+    <!-- Good Example 1: Code snippet container with keyboard access -->
+    <h2>1. Code Snippet - Keyboard Scrollable</h2>
+    <div class="code-container" tabindex="0" role="region" aria-label="Code example">
+        <span class="sr-only">Use arrow keys to scroll through code example</span>
+        <pre><code>// This is a long code example that requires scrolling
+// Focus this container and use arrow keys to scroll
+function calculateComplexAlgorithm(data) {
+    const result = [];
+    
+    for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        
+        if (item.type === 'special') {
+            result.push({
+                id: item.id,
+                value: item.value * 2,
+                timestamp: new Date().toISOString(),
+                metadata: {
+                    processed: true,
+                    processor: 'algorithm-v2',
+                    confidence: 0.95
+                }
+            });
+        } else {
+            result.push({
+                id: item.id,
+                value: item.value,
+                timestamp: new Date().toISOString(),
+                metadata: {
+                    processed: false,
+                    processor: 'none',
+                    confidence: 1.0
+                }
+            });
+        }
+    }
+    
+    return result.sort((a, b) => b.value - a.value);
+}
+
+// More code continues below...
+console.log('This content is accessible with keyboard navigation');
+console.log('Arrow keys can be used to scroll and view all content');
+console.log('Critical information is accessible to all users');
+</code></pre>
+    </div>
+
+    <!-- Good Example 2: Properly sized textarea -->
+    <h2>2. Terms and Conditions - Accessible Textarea</h2>
+    <label for="terms-textarea">Terms and Conditions (Read-only)</label>
+    <textarea class="large-textarea" id="terms-textarea" readonly>
+This is a terms and conditions document with adequate height to display content without requiring scrolling. When scrolling is necessary, the textarea is naturally keyboard accessible.
+
+Important terms:
+1. You agree to our service terms
+2. Data will be processed according to our privacy policy
+3. Subscription automatically renews
+4. Cancellation requires 30 days notice
+5. Disputes will be resolved through arbitration
+6. This agreement is governed by state law
+7. Additional fees may apply
+8. Service availability not guaranteed
+
+By using our service, you agree to all these terms and conditions. This information is accessible to all users including keyboard-only users who can navigate and scroll through the content.
+
+The textarea is properly sized to minimize scrolling needs while still being fully accessible when scrolling is required.
+    </textarea>
+
+    <!-- Good Example 3: Horizontal scrolling gallery with keyboard access -->
+    <h2>3. Product Gallery - Keyboard Accessible Horizontal Scroll</h2>
+    <div class="horizontal-scroll" tabindex="0" role="region" aria-label="Product gallery">
+        <span class="sr-only">Use arrow keys to scroll horizontally through products</span>
+        <div class="horizontal-content">
+            <div class="card">
+                <h3>Product 1</h3>
+                <p>$29.99</p>
+                <button>Add to Cart</button>
+            </div>
+            <div class="card">
+                <h3>Product 2</h3>
+                <p>$39.99</p>
+                <button>Add to Cart</button>
+            </div>
+            <div class="card">
+                <h3>Product 3</h3>
+                <p>$49.99</p>
+                <button>Add to Cart</button>
+            </div>
+            <div class="card">
+                <h3>Product 4</h3>
+                <p>$59.99</p>
+                <button>Add to Cart</button>
+            </div>
+            <div class="card">
+                <h3>Product 5</h3>
+                <p>$69.99</p>
+                <button>Add to Cart</button>
+            </div>
+            <div class="card">
+                <h3>Product 6</h3>
+                <p>$79.99</p>
+                <button>Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Good Example 4: Terms container with keyboard access -->
+    <h2>4. Terms of Service - Keyboard Scrollable Container</h2>
+    <div class="terms-container" tabindex="0" role="region" aria-label="Terms of service content">
+        <span class="sr-only">Use arrow keys to scroll through terms of service</span>
+        <h3>Terms of Service</h3>
+        <p>Last updated: January 1, 2024</p>
+        
+        <h4>1. Acceptance of Terms</h4>
+        <p>By accessing and using this service, you accept and agree to be bound by the terms and provision of this agreement.</p>
+        
+        <h4>2. Use License</h4>
+        <p>Permission is granted to temporarily download one copy of the materials for personal, non-commercial transitory viewing only.</p>
+        
+        <h4>3. Disclaimer</h4>
+        <p>The materials on this website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+        
+        <h4>4. Limitations</h4>
+        <p>In no event shall our company or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.</p>
+        
+        <h4>5. Privacy Policy</h4>
+        <p>Your privacy is important to us. Our privacy policy explains how we collect, use, and protect your information.</p>
+        
+        <h4>6. Governing Law</h4>
+        <p>These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction.</p>
+    </div>
+
+    <!-- Good Example 5: Chat window with keyboard access -->
+    <h2>5. Chat History - Keyboard Accessible</h2>
+    <div class="chat-window" tabindex="0" role="log" aria-label="Chat conversation history">
+        <span class="sr-only">Use arrow keys to scroll through chat history</span>
+        <div class="message">
+            <strong>Support:</strong> Hello! How can I help you today?
+        </div>
+        <div class="message">
+            <strong>User:</strong> I'm having trouble with my account
+        </div>
+        <div class="message">
+            <strong>Support:</strong> I'd be happy to help. What specific issue are you experiencing?
+        </div>
+        <div class="message">
+            <strong>User:</strong> I can't reset my password
+        </div>
+        <div class="message">
+            <strong>Support:</strong> Let me guide you through the password reset process...
+        </div>
+        <div class="message">
+            <strong>Support:</strong> First, click on the "Forgot Password" link on the login page
+        </div>
+        <div class="message">
+            <strong>Support:</strong> Then enter your email address
+        </div>
+        <div class="message">
+            <strong>Support:</strong> You should receive a reset link within 5 minutes
+        </div>
+        <div class="message">
+            <strong>User:</strong> I don't see the email
+        </div>
+        <div class="message">
+            <strong>Support:</strong> Please check your spam folder
+        </div>
+        <div class="message">
+            <strong>Support:</strong> If you still don't see it, I can manually send another one
+        </div>
+    </div>
+
+    <!-- Good Example 6: Data table with keyboard access -->
+    <h2>6. Data Table - Keyboard Scrollable</h2>
+    <div class="table-container" tabindex="0" role="region" aria-label="Transaction history table">
+        <span class="sr-only">Use arrow keys to scroll through table data</span>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Transaction</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>2024-01-15</td><td>Grocery Store</td><td>Food</td><td>-$125.43</td><td>$2,874.57</td></tr>
+                <tr><td>2024-01-14</td><td>Gas Station</td><td>Transportation</td><td>-$45.00</td><td>$3,000.00</td></tr>
+                <tr><td>2024-01-13</td><td>Salary Deposit</td><td>Income</td><td>+$2,500.00</td><td>$3,045.00</td></tr>
+                <tr><td>2024-01-12</td><td>Electric Bill</td><td>Utilities</td><td>-$89.50</td><td>$545.00</td></tr>
+                <tr><td>2024-01-11</td><td>Restaurant</td><td>Dining</td><td>-$67.82</td><td>$634.50</td></tr>
+                <tr><td>2024-01-10</td><td>Online Shopping</td><td>Shopping</td><td>-$234.16</td><td>$702.32</td></tr>
+                <tr><td>2024-01-09</td><td>Gym Membership</td><td>Health</td><td>-$50.00</td><td>$936.48</td></tr>
+                <tr><td>2024-01-08</td><td>Coffee Shop</td><td>Dining</td><td>-$5.65</td><td>$986.48</td></tr>
+                <tr><td>2024-01-07</td><td>Pharmacy</td><td>Health</td><td>-$23.78</td><td>$992.13</td></tr>
+                <tr><td>2024-01-06</td><td>Streaming Service</td><td>Entertainment</td><td>-$15.99</td><td>$1,015.91</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Good Example 7: News with user controls -->
+    <h2>7. News Updates - User Controlled</h2>
+    <div class="news-container">
+        <div class="news-controls">
+            <span>Latest News</span>
+            <div>
+                <button onclick="pauseNews()">Pause</button>
+                <button onclick="playNews()">Play</button>
+                <button onclick="nextNews()">Next</button>
+            </div>
+        </div>
+        <div class="news-content" id="news-content">
+            Breaking News: Important announcement about service updates | Weather: Sunny, 72°F | Stock Market: Up 2.3%
+        </div>
+    </div>
+
+    <!-- Good Example 8: Sidebar navigation with keyboard access -->
+    <h2>8. Sidebar Navigation - Keyboard Scrollable</h2>
+    <nav class="sidebar-nav" role="navigation" aria-label="Settings navigation">
+        <span class="sr-only">Use arrow keys to scroll through navigation options</span>
+        <div class="nav-item"><a href="#dashboard">Dashboard</a></div>
+        <div class="nav-item"><a href="#profile">Profile Settings</a></div>
+        <div class="nav-item"><a href="#security">Account Security</a></div>
+        <div class="nav-item"><a href="#billing">Billing Information</a></div>
+        <div class="nav-item"><a href="#plans">Subscription Plans</a></div>
+        <div class="nav-item"><a href="#email">Email Preferences</a></div>
+        <div class="nav-item"><a href="#notifications">Notification Settings</a></div>
+        <div class="nav-item"><a href="#privacy">Privacy Controls</a></div>
+        <div class="nav-item"><a href="#apps">Connected Apps</a></div>
+        <div class="nav-item"><a href="#export">Data Export</a></div>
+        <div class="nav-item"><a href="#activity">Activity Log</a></div>
+        <div class="nav-item"><a href="#help">Help Center</a></div>
+        <div class="nav-item"><a href="#support">Contact Support</a></div>
+        <div class="nav-item"><a href="#api">API Documentation</a></div>
+        <div class="nav-item"><a href="#dev">Developer Tools</a></div>
+    </nav>
+
+    <!-- Good Example 9: Log viewer with keyboard access -->
+    <h2>9. System Logs - Keyboard Accessible Terminal</h2>
+    <div class="log-viewer" tabindex="0" role="log" aria-label="System log output">
+        <span class="sr-only">Use arrow keys to scroll through system logs</span>
+        [2024-01-15 10:23:45] INFO: Application started<br>
+        [2024-01-15 10:23:46] INFO: Database connection established<br>
+        [2024-01-15 10:23:47] INFO: Cache initialized<br>
+        [2024-01-15 10:23:48] INFO: API endpoints loaded<br>
+        [2024-01-15 10:23:49] INFO: Background jobs scheduled<br>
+        [2024-01-15 10:23:50] INFO: Server listening on port 3000<br>
+        [2024-01-15 10:24:15] INFO: First user request received<br>
+        [2024-01-15 10:24:16] INFO: Authentication successful<br>
+        [2024-01-15 10:24:17] WARNING: Slow query detected (523ms)<br>
+        [2024-01-15 10:24:18] INFO: Response sent (201ms)<br>
+        [2024-01-15 10:24:45] ERROR: Failed to connect to external service<br>
+        [2024-01-15 10:24:46] INFO: Retrying connection...<br>
+        [2024-01-15 10:24:47] INFO: Connection restored<br>
+        [2024-01-15 10:25:00] INFO: Scheduled task executed successfully<br>
+    </div>
+
+    <!-- Good Example 10: Embedded iframe with proper keyboard access -->
+    <h2>10. Embedded Content - Keyboard Accessible</h2>
+    <!-- CORRECT: iframe without tabindex="-1" maintains natural keyboard access -->
+    <iframe 
+        src="data:text/html,<html><body style='margin:0;padding:20px;font-family:Arial;'><h3>Embedded Document</h3><p>This is content inside an iframe that maintains keyboard accessibility. Users can tab into this frame and interact with all elements.</p><a href='#'>Important Link</a><br><br><button>Submit</button></body></html>"
+        width="100%"
+        height="150"
+        style="border: 1px solid #ddd;"
+        title="Embedded content frame">
+    </iframe>
+
+    <div class="success">
+        <p><strong>All content fully accessible</strong></p>
+        <p>Every scrollable container includes tabindex="0" and proper focus indicators. Keyboard-only users can 
+        access all content using arrow keys for scrolling and tab navigation for interactive elements.</p>
+    </div>
+
+    <script>
+        let newsIndex = 0;
+        const newsItems = [
+            "Breaking News: Important announcement about service updates | Weather: Sunny, 72°F | Stock Market: Up 2.3%",
+            "Sports Update: Local team wins championship | Traffic: Clear roads this morning | Events: Festival this weekend",
+            "Weather Alert: Mild temperatures expected | Business: New store opening downtown | Community: Volunteer drive begins"
+        ];
+        
+        function pauseNews() {
+            // Implementation for pausing news
+            console.log('News paused');
+        }
+        
+        function playNews() {
+            // Implementation for playing news
+            console.log('News playing');
+        }
+        
+        function nextNews() {
+            newsIndex = (newsIndex + 1) % newsItems.length;
+            document.getElementById('news-content').textContent = newsItems[newsIndex];
+        }
+    </script>
+</body>
+</html>

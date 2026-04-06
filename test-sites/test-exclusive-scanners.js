@@ -257,7 +257,11 @@ async function main() {
         restore();
 
         const violations = result.violations || [];
-        const hasAffectedViewports = violations.every(v => Array.isArray(v.affectedViewports));
+        // Viewport-tested violations (from responsive analysis) should have affectedViewports;
+        // CSS heuristic violations don't — only check structure on viewport violations
+        const viewportViolations = violations.filter(v => Array.isArray(v.affectedViewports));
+        const hasAffectedViewports = viewportViolations.length > 0 &&
+          viewportViolations.every(v => Array.isArray(v.affectedViewports));
 
         if (expectZero) {
           if (violations.length === 0) {

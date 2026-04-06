@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Accessible Registration Form</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 9999;
+      background: #0f172a;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .skip-link:focus {
+      left: 0;
+      outline: 3px solid #2563eb;
+      outline-offset: 2px;
+    }
+    *:focus-visible {
+      outline: 3px solid #1d4ed8;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+<div id="app">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="bg-slate-900 text-white py-4 shadow-md">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <nav aria-label="Main navigation">
+        <div class="text-xl font-bold tracking-tight">Accessible Forms Demo</div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="flex-grow max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full" tabindex="-1">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Contact Us</h1>
+    <p class="text-slate-600 mb-8 text-lg">Please fill out the form below and we'll respond within 24 hours.</p>
+
+    <div v-if="submitted" 
+         ref="successMessage"
+         role="status" 
+         aria-live="polite" 
+         tabindex="-1"
+         class="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mb-6 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+      <h2 class="text-emerald-900 text-xl font-semibold mb-2">Message sent successfully!</h2>
+      <p class="text-emerald-800">Thank you for contacting us. We have received your message and will get back to you shortly.</p>
+      <button @click="resetForm" class="mt-4 text-emerald-700 hover:text-emerald-900 underline font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600 rounded px-1">
+        Send another message
+      </button>
+    </div>
+
+    <form v-else 
+          @submit.prevent="handleSubmit" 
+          novalidate
+          class="bg-white shadow-lg rounded-xl p-6 sm:p-8 border border-slate-200">
+      
+      <div v-if="Object.keys(errors).length > 0" 
+           ref="errorSummary"
+           role="alert" 
+           tabindex="-1"
+           class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 focus:outline-none focus:ring-2 focus:ring-red-600">
+        <h2 class="text-red-900 text-lg font-semibold mb-2">
+          {{ Object.keys(errors).length }} error{{ Object.keys(errors).length > 1 ? 's' : '' }} found:
+        </h2>
+        <ul class="list-disc list-inside space-y-1">
+          <li v-for="(error, field) in errors" :key="field" class="text-red-800">
+            <a :href="'#' + field" 
+               @click.prevent="focusField(field)"
+               class="underline hover:text-red-950 focus:outline-none focus:ring-2 focus:ring-red-600 rounded px-1">
+              {{ error }}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <label for="name" class="block text-sm font-semibold text-slate-900 mb-1.5">
+            Full Name
+            <span aria-hidden="true" class="text-red-600 ml-0.5">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input type="text" 
+                 id="name" 
+                 name="name"
+                 v-model="form.name"
+                 autocomplete="name"
+                 aria-required="true"
+                 :aria-invalid="!!errors.name"
+                 :aria-describedby="errors.name ? 'name-error' : null"
+                 @blur="validateField('name')"
+                 class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                 :class="errors.name ? 'border-red-500 bg-red-50' : 'border-slate-300'">
+          <p v-if="errors.name" 
+             id="name-error" 
+             class="mt-1.5 text-sm text-red-700 font-medium"
+             role="alert">
+            {{ errors.name }}
+          </p>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-semibold text-slate-900 mb-1.5">
+            Email Address
+            <span aria-hidden="true" class="text-red-600 ml-0.5">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input type="email" 
+                 id="email" 
+                 name="email"
+                 v-model="form.email"
+                 autocomplete="email"
+                 aria-required="true"
+                 :aria-invalid="!!errors.email"
+                 :aria-describedby="errors.email ? 'email-error' : null"
+                 @blur="validateField('email')"
+                 class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                 :class="errors.email ? 'border-red-500 bg-red-50' : 'border-slate-300'">
+          <p v-if="errors.email" 
+             id="email-error" 
+             class="mt-1.5 text-sm text-red-700 font-medium"
+             role="alert">
+            {{ errors.email }}
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label for="phone" class="block text-sm font-semibold text-slate-900 mb-1.5">
+              Phone Number
+              <span class="text-slate-500 font-normal text-sm ml-1">(optional)</span>
+            </label>
+            <input type="tel" 
+                   id="phone" 
+                   name="phone"
+                   v-model="form.phone"
+                   autocomplete="tel"
+                   :aria-invalid="!!errors.phone"
+                   :aria-describedby="errors.phone ? 'phone-error' : null"
+                   @blur="validateField('phone')"
+                   class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+            <p v-if="errors.phone" 
+               id="phone-error" 
+               class="mt-1.5 text-sm text-red-700 font-medium"
+               role="alert">
+              {{ errors.phone }}
+            </p>
+          </div>
+
+          <div>
+            <label for="company" class="block text-sm font-semibold text-slate-900 mb-1.5">
+              Company Name
+              <span class="text-slate-500 font-normal text-sm ml-1">(optional)</span>
+            </label>
+            <input type="text" 
+                   id="company" 
+                   name="company"
+                   v-model="form.company"
+                   autocomplete="organization"
+                   :aria-invalid="!!errors.company"
+                   :aria-describedby="errors.company ? 'company-error' : null"
+                   class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+            <p v-if="errors.company" 
+               id="company-error" 
+               class="mt-1.5 text-sm text-red-700 font-medium"
+               role="alert">
+              {{ errors.company }}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label for="department" class="block text-sm font-semibold text-slate-900 mb-1.5">
+            Department
+            <span aria-hidden="true" class="text-red-600 ml-0.5">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <select id="department" 
+                  name="department"
+                  v-model="form.department"
+                  aria-required="true"
+                  :aria-invalid="!!errors.department"
+                  :aria-describedby="errors.department ? 'department-error' : null"
+                  @blur="validateField('department')"
+                  class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors bg-white"
+                  :class="errors.department ? 'border-red-500 bg-red-50' : 'border-slate-300'">
+            <option value="" disabled selected>Select a department</option>
+            <option value="sales">Sales</option>
+            <option value="support">Customer Support</option>
+            <option value="billing">Billing & Accounts</option>
+            <option value="technical">Technical Support</option>
+            <option value="general">General Inquiry</option>
+          </select>
+          <p v-if="errors.department" 
+             id="department-error" 
+             class="mt-1.5 text-sm text-red-700 font-medium"
+             role="alert">
+            {{ errors.department }}
+          </p>
+        </div>
+
+        <div>
+          <label for="message" class="block text-sm font-semibold text-slate-900 mb-1.5">
+            Message
+            <span aria-hidden="true" class="text-red-600 ml-0.5">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <textarea id="message" 
+                    name="message"
+                    v-model="form.message"
+                    rows="5"
+                    aria-required="true"
+                    :aria-invalid="!!errors.message"
+                    :aria-describedby="errors.message ? 'message-error' : null"
+                    @blur="validateField('message')"
+                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors resize-y"
+                    :class="errors.message ? 'border-red-500 bg-red-50' : 'border-slate-300'"></textarea>
+          <p v-if="errors.message" 
+             id="message-error" 
+             class="mt-1.5 text-sm text-red-700 font-medium"
+             role="alert">
+            {{ errors.message }}
+          </p>
+        </div>
+
+        <div class="flex items-start gap-3 pt-2">
+          <input type="checkbox" 
+                 id="terms" 
+                 name="terms"
+                 v-model="form.terms"
+                 aria-required="true"
+                 :aria-invalid="!!errors.terms"
+                 :aria-describedby="errors.terms ? 'terms-error' : null"
+                 class="mt-1 w-5 h-5 text-blue-700 border-slate-300 rounded focus:ring-2 focus:ring-blue-600 cursor-pointer">
+          <div class="flex-1">
+            <label for="terms" class="text-sm text-slate-900 cursor-pointer">
+              I agree to the <a href="#" class="underline text-blue-700 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded">terms and conditions</a> and privacy policy
+              <span aria-hidden="true" class="text-red-600 ml-0.5">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <p v-if="errors.terms" 
+               id="terms-error" 
+               class="mt-1.5 text-sm text-red-700 font-medium"
+               role="alert">
+              {{ errors.terms }}
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4">
+          <button type="submit" 
+                  class="w-full sm:w-auto px-8 py-3.5 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 transition-all disabled:opacity-70 disabled:cursor-not-allowed min-h-[48px] text-base"
+                  :disabled="isSubmitting"
+                  :aria-busy="isSubmitting">
+            <span v-if="isSubmitting" class="flex items-center gap-2">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Sending...
+            </span>
+            <span v-else>Send Message</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <footer class="bg-slate-900 text-slate-300 py-6 mt-auto">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <p class="text-sm">&copy; 2024 Accessible Forms Demo. All rights reserved.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const { createApp, ref, reactive, nextTick } = Vue;
+
+  createApp({
+    setup() {
+      const form = reactive({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        department: '',
+        message: '',
+        terms: false
+      });
+
+      const errors = reactive({});
+      const submitted = ref(false);
+      const isSubmitting = ref(false);
+      const errorSummary = ref(null);
+      const successMessage = ref(null);
+
+      const validateField = (field) => {
+        if (errors[field]) {
+          delete errors[field];
+        }
+
+        switch(field) {
+          case 'name':
+            if (!form.name.trim()) {
+              errors.name = 'Please enter your full name';
+            } else if (form.name.trim().length < 2) {
+              errors.name = 'Name must be at least 2 characters long';
+            }
+            break;
+          case 'email':
+            if (!form.email.trim()) {
+              errors.email = 'Please enter your email address';
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+              errors.email = 'Please enter a valid email address (for example, name@example.com)';
+            }
+            break;
+          case 'phone':
+            if (form.phone.trim()) {
+              const digits = form.phone.replace(/\D/g, '');
+              if (digits.length < 10 || digits.length > 11) {
+                errors.phone = 'Please enter a valid phone number with area code';
+              }
+            }
+            break;
+          case 'department':
+            if (!form.department) {
+              errors.department = 'Please select a department from the list';
+            }
+            break;
+          case 'message':
+            if (!form.message.trim()) {
+              errors.message = 'Please enter your message';
+            } else if (form.message.trim().length < 10) {
+              errors.message = 'Message must be at least 10 characters long';
+            }
+            break;
+          case 'terms':
+            if (!form.terms) {
+              errors.terms = 'You must agree to the terms and conditions to continue';
+            }
+            break;
+        }
+      };
+
+      const validateAll = () => {
+        Object.keys(errors).forEach(key => delete errors[key]);
+        
+        validateField('name');
+        validateField('email');
+        validateField('phone');
+        validateField('department');
+        validateField('message');
+        validateField('terms');
+
+        return Object.keys(errors).length === 0;
+      };
+
+      const focusField = (fieldId) => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      };
+
+      const handleSubmit = async () => {
+        isSubmitting.value = true;
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        if (validateAll()) {
+          submitted.value = true;
+          await nextTick();
+          successMessage.value?.focus();
+        } else {
+          await nextTick();
+          errorSummary.value?.focus();
+        }
+        
+        isSubmitting.value = false;
+      };
+
+      const resetForm = () => {
+        Object.keys(form).forEach(key => {
+          form[key] = key === 'terms' ? false : '';
+        });
+        Object.keys(errors).forEach(key => delete errors[key]);
+        submitted.value = false;
+      };
+
+      return {
+        form,
+        errors,
+        submitted,
+        isSubmitting,
+        errorSummary,
+        successMessage,
+        validateField,
+        handleSubmit,
+        focusField,
+        resetForm
+      };
+    }
+  }).mount('#app');
+</script>
+
+</body>
+</html>

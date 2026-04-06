@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Accessibility Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 0 0 0.5rem 0.5rem;
+      z-index: 50;
+      transition: top 0.2s ease;
+    }
+
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    .input-error {
+      border-color: #b91c1c !important;
+    }
+
+    .error-message {
+      color: #b91c1c;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .success-message {
+      background: #d1fae5;
+      border: 2px solid #059669;
+      color: #065f46;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header with Navigation -->
+  <header class="bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 py-4">
+      <nav aria-label="Main navigation">
+        <ul class="flex items-center gap-6">
+          <li>
+            <a href="#" class="text-gray-700 hover:text-gray-900 font-medium" aria-label="Home">
+              <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </a>
+          </li>
+          <li><a href="#" class="text-gray-700 hover:text-gray-900 font-medium">About</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-gray-900 font-medium" aria-current="page">Contact</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-gray-900 font-medium">Services</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" tabindex="-1" class="flex-1 py-12 px-4">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
+      <p class="text-gray-600 mb-8">Have a question or feedback? Fill out the form below and we'll get back to you within 24 hours.</p>
+
+      <!-- Success Message Container -->
+      <div id="success-message" class="success-message mb-8 hidden" role="alert" aria-live="assertive">
+        <div class="flex items-start gap-3">
+          <svg class="w-6 h-6 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <div>
+            <p class="font-semibold text-lg">Thank you for your message!</p>
+            <p>We've received your inquiry and will respond to <span id="confirm-email"></span> within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <form id="contact-form" novalidate class="space-y-6 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+        <div class="grid gap-6 sm:grid-cols-2">
+          <!-- First Name -->
+          <div class="form-group">
+            <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">
+              First Name <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              id="first-name"
+              name="firstName"
+              autocomplete="given-name"
+              aria-required="true"
+              aria-describedby="first-name-error"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600"
+              placeholder="Jane"
+            >
+            <p id="first-name-error" class="error-message hidden" role="alert">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+              <span class="error-text"></span>
+            </p>
+          </div>
+
+          <!-- Last Name -->
+          <div class="form-group">
+            <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">
+              Last Name <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              id="last-name"
+              name="lastName"
+              autocomplete="family-name"
+              aria-required="true"
+              aria-describedby="last-name-error"
+              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600"
+              placeholder="Smith"
+            >
+            <p id="last-name-error" class="error-message hidden" role="alert">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+              <span class="error-text"></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+            Email Address <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            autocomplete="email"
+            aria-required="true"
+            aria-describedby="email-hint email-error"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600"
+            placeholder="jane.smith@company.com"
+          >
+          <p id="email-hint" class="text-sm text-gray-500 mt-1">We'll never share your email with anyone else.</p>
+          <p id="email-error" class="error-message hidden" role="alert">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span class="error-text"></span>
+          </p>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+            Phone Number <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            autocomplete="tel"
+            aria-describedby="phone-hint phone-error"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600"
+            placeholder="+1 (555) 123-4567"
+          >
+          <p id="phone-hint" class="text-sm text-gray-500 mt-1">Include country code for international numbers.</p>
+          <p id="phone-error" class="error-message hidden" role="alert">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span class="error-text"></span>
+          </p>
+        </div>
+
+        <!-- Company -->
+        <div class="form-group">
+          <label for="company" class="block text-sm font-medium text-gray-700 mb-1">
+            Company <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            type="text"
+            id="company"
+            name="company"
+            autocomplete="organization"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600"
+            placeholder="Acme Corporation"
+          >
+        </div>
+
+        <!-- Department Dropdown -->
+        <div class="form-group">
+          <label for="department" class="block text-sm font-medium text-gray-700 mb-1">
+            Department <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <div class="relative">
+            <select
+              id="department"
+              name="department"
+              aria-required="true"
+              aria-describedby="department-error"
+              class="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600 appearance-none bg-white"
+            >
+              <option value="">Select a department</option>
+              <option value="sales">Sales</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing</option>
+              <option value="partnerships">Partnerships</option>
+              <option value="press">Press & Media</option>
+              <option value="careers">Careers</option>
+              <option value="other">Other</option>
+            </select>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <p id="department-error" class="error-message hidden" role="alert">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span class="error-text"></span>
+          </p>
+        </div>
+
+        <!-- Message -->
+        <fieldset class="form-group border-0 p-0 m-0">
+          <legend class="block text-sm font-medium text-gray-700 mb-1">
+            Message <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </legend>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            aria-required="true"
+            aria-describedby="message-hint message-error"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg transition-colors hover:border-gray-400 focus:border-blue-600 resize-y min-h-[120px]"
+            placeholder="How can we help you today?"
+          ></textarea>
+          <p id="message-hint" class="text-sm text-gray-500 mt-1">Please provide as much detail as possible.</p>
+          <p id="message-error" class="error-message hidden" role="alert">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span class="error-text"></span>
+          </p>
+        </fieldset>
+
+        <!-- Terms Checkbox -->
+        <div class="form-group">
+          <div class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              aria-required="true"
+              aria-describedby="terms-error"
+              class="mt-1 w-5 h-5 border-gray-300 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+            >
+            <div>
+              <label for="terms" class="text-sm text-gray-700 cursor-pointer">
+                I agree to the <a href="#" class="text-blue-700 underline hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">Terms of Service</a> and <a href="#" class="text-blue-700 underline hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">Privacy Policy</a>
+                <span aria-hidden="true" class="text-red-600">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <p id="terms-error" class="error-message mt-2 hidden" role="alert">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                <span class="error-text"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-4">
+          <button
+            type="submit"
+            id="submit-btn"
+            class="w-full sm:w-auto px-8 py-3 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 active:bg-blue-900 transition-colors cursor-pointer"
+          >
+            <span class="btn-text">Send Message</span>
+            <span class="btn-loading hidden">
+              <svg class="animate-spin inline-block w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Sending...
+            </span>
+          </button>
+          <p class="text-sm text-gray-500 mt-3">Fields marked with <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">asterisk</span> are required.</p>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-300 py-8 px-4">
+    <div class="max-w-4xl mx-auto">
+      <div class="grid gap-8 sm:grid-cols-3">
+        <div>
+          <h2 class="text-white font-semibold mb-4">Contact</h2>
+          <ul class="space-y-2">
+            <li>
+              <a href="mailto:hello@example.com" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded">
+                hello@example.com
+              </a>
+            </li>
+            <li>
+              <a href="tel:+15551234567" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded">
+                +1 (555) 123-4567
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="text-white font-semibold mb-4">Links</h2>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded">About Us</a></li>
+            <li><a href="#" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded">Services</a></li>
+            <li><a href="#" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="text-white font-semibold mb-4">Follow Us</h2>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded" aria-label="Follow us on Twitter">Twitter</a></li>
+            <li><a href="#" class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white rounded" aria-label="Follow us on LinkedIn">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
+        <p>&copy; 2024 Example Company. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Status Announcer for Screen Readers -->
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only" id="form-status"></div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const form = document.getElementById('contact-form');
+      const successMessage = document.getElementById('success-message');
+      const confirmEmail = document.getElementById('confirm-email');
+      const formStatus = document.getElementById('form-status');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnLoading = submitBtn.querySelector('.btn-loading');
+
+      const validationRules = {
+        'first-name': {
+          required: true,
+          minLength: 2,
+          messages: {
+            required: 'First name is required.',
+            minLength: 'First name must be at least 2 characters.'
+          }
+        },
+        'last-name': {
+          required: true,
+          minLength: 2,
+          messages: {
+            required: 'Last name is required.',
+            minLength: 'Last name must be at least 2 characters.'
+          }
+        },
+        'email': {
+          required: true,
+          pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+          messages: {
+            required: 'Email address is required.',
+            pattern: 'Please enter a valid email address.'
+          }
+        },
+        'phone': {
+          required: false,
+          pattern: /^[\d\s\-\+\(\)]+$/,
+          messages: {
+            pattern: 'Please enter a valid phone number.'
+          }
+        },
+        'department': {
+          required: true,
+          messages: {
+            required: 'Please select a department.'
+          }
+        },
+        'message': {
+          required: true,
+          minLength: 10,
+          messages: {
+            required: 'Message is required.',
+            minLength: 'Message must be at least 10 characters.'
+          }
+        },
+        'terms': {
+          required: true,
+          messages: {
+            required: 'You must agree to the terms and conditions.'
+          }
+        }
+      };
+
+      function getFieldValue(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (!field) return '';
+        return field.type === 'checkbox' ? field.checked : field.value.trim();
+      }
+
+      function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorEl = document.getElementById(fieldId + '-error');
+        const errorText = errorEl?.querySelector('.error-text');
+
+        if (field && !field.classList.contains('input-error')) {
+          field.classList.add('input-error');
+        }
+        if (field) {
+          field.setAttribute('aria-invalid', 'true');
+        }
+        if (errorEl && message) {
+          errorEl.classList.remove('hidden');
+          if (errorText) {
+            errorText.textContent = message;
+          }
+        }
+      }
+
+      function clearError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorEl = document.getElementById(fieldId + '-error');
+
+        if (field) {
+          field.classList.remove('input-error');
+          field.removeAttribute('aria-invalid');
+        }
+        if (errorEl) {
+          errorEl.classList.add('hidden');
+        }
+      }
+
+      function validateField(fieldId) {
+        const rules = validationRules[fieldId];
+        if (!rules) return true;
+
+        const value = getFieldValue(fieldId);
+        const isCheckbox = document.getElementById(fieldId)?.type === 'checkbox';
+
+        if (rules.required) {
+          const isEmpty = isCheckbox ? !value : !value;
+          if (isEmpty || (typeof value === 'string' && value === '')) {
+            showError(fieldId, rules.messages.required);
+            return false;
+          }
+        }
+
+        if (value && rules.minLength && value.length < rules.minLength) {
+          showError(fieldId, rules.messages.minLength);
+          return false;
+        }
+
+        if (value && rules.pattern && !rules.pattern.test(value)) {
+          showError(fieldId, rules.messages.pattern);
+          return false;
+        }
+
+        clearError(fieldId);
+        return true;
+      }
+
+      function validateForm() {
+        let isValid = true;
+        let firstInvalidField = null;
+
+        Object.keys(validationRules).forEach(fieldId => {
+          const fieldValid = validateField(fieldId);
+          if (!fieldValid && !firstInvalidField) {
+            firstInvalidField = document.getElementById(fieldId);
+          }
+          if (!fieldValid) {
+            isValid = false;
+          }
+        });
+
+        if (firstInvalidField) {
+          firstInvalidField.focus();
+          return false;
+        }
+
+        return isValid;
+      }
+
+      Object.keys(validationRules).forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          field.addEventListener('blur', () => validateField(fieldId), true);
+          field.addEventListener('input', () => {
+            if (field.getAttribute('aria-invalid') === 'true') {
+              validateField(fieldId);
+            }
+          });
+        }
+      });
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+          formStatus.textContent = 'Form submission failed. Please correct the errors and try again.';
+          return;
+        }
+
+        btnText.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+        submitBtn.disabled = true;
+
+        const formData = {
+          firstName: getFieldValue('first-name'),
+          lastName: getFieldValue('last-name'),
+          email: getFieldValue('email'),
+          phone: getFieldValue('phone'),
+          company: getFieldValue('company'),
+          department: getFieldValue('department'),
+          message: getFieldValue('message'),
+          terms: getFieldValue('terms')
+        };
+
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+
+          form.classList.add('hidden');
+          confirmEmail.textContent = formData.email;
+          successMessage.classList.remove('hidden');
+          successMessage.focus();
+
+          formStatus.textContent = 'Form submitted successfully. Thank you for your message.';
+        } catch (error) {
+          formStatus.textContent = 'An error occurred. Please try again later.';
+          btnText.classList.remove('hidden');
+          btnLoading.classList.add('hidden');
+          submitBtn.disabled = false;
+        }
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !successMessage.classList.contains('hidden')) {
+          form.classList.remove('hidden');
+          successMessage.classList.add('hidden');
+          submitBtn.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

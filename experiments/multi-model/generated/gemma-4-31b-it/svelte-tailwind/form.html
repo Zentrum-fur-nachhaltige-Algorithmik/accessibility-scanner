@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Accessible Registration Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0;
+      margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
+    :focus-visible {
+      outline: 3px solid #1b2a4a !important;
+      outline-offset: 2px !important;
+    }
+    html {
+      scroll-padding-top: 60px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans leading-relaxed">
+
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:p-4 focus:text-blue-700 focus:border-2 focus:border-blue-700 focus:rounded">
+    Skip to main content
+  </a>
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <nav class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between" aria-label="Main navigation">
+      <div class="font-bold text-xl tracking-tight">Company<span class="text-blue-600">Logo</span></div>
+      <ul class="flex gap-6 text-sm font-medium">
+        <li><a href="/" class="hover:text-blue-600 transition-colors">Home</a></li>
+        <li><a href="/about" class="hover:text-blue-600 transition-colors">About</a></li>
+        <li><a href="/contact" class="text-blue-600 underline underline-offset-4" aria-current="page">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto px-4 py-12">
+    <header class="mb-8">
+      <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Contact Us</h1>
+      <p class="text-slate-600">Fill out the form below and our team will get back to you within 24 hours.</p>
+    </header>
+
+    <div id="form-container">
+      <form id="registration-form" novalidate class="space-y-6 bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+        
+        <!-- Name -->
+        <div class="form-group">
+          <label for="full-name" class="block text-sm font-semibold text-slate-700 mb-1">
+            Full Name <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+          </label>
+          <input type="text" id="full-name" name="fullName" autocomplete="name" required 
+            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            aria-required="true">
+          <p id="name-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please enter your full name.</p>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="block text-sm font-semibold text-slate-700 mb-1">
+            Email Address <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+          </label>
+          <input type="email" id="email" name="email" autocomplete="email" required 
+            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            aria-required="true">
+          <p id="email-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please enter a valid email address.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Phone -->
+          <div class="form-group">
+            <label for="phone" class="block text-sm font-semibold text-slate-700 mb-1">
+              Phone Number
+            </label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel" 
+              class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+          </div>
+
+          <!-- Company -->
+          <div class="form-group">
+            <label for="company" class="block text-sm font-semibold text-slate-700 mb-1">
+              Company
+            </label>
+            <input type="text" id="company" name="company" autocomplete="organization" 
+              class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+          </div>
+        </div>
+
+        <!-- Department Dropdown -->
+        <div class="form-group">
+          <label for="department" class="block text-sm font-semibold text-slate-700 mb-1">
+            Department <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+          </label>
+          <select id="department" name="department" required 
+            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white"
+            aria-required="true">
+            <option value="">Select a department...</option>
+            <option value="sales">Sales</option>
+            <option value="support">Technical Support</option>
+            <option value="billing">Billing</option>
+            <option value="other">Other</option>
+          </select>
+          <p id="dept-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please select a department.</p>
+        </div>
+
+        <!-- Message -->
+        <div class="form-group">
+          <label for="message" class="block text-sm font-semibold text-slate-700 mb-1">
+            Message <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+          </label>
+          <textarea id="message" name="message" rows="4" required 
+            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            aria-required="true"></textarea>
+          <p id="message-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please enter your message.</p>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="flex items-start gap-3">
+          <div class="flex items-center h-5">
+            <input id="terms" name="terms" type="checkbox" required 
+              class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 outline-none"
+              aria-required="true">
+          </div>
+          <label for="terms" class="text-sm text-slate-600">
+            I agree to the <a href="/terms" class="text-blue-600 underline hover:text-blue-800">Terms of Service</a> and <a href="/privacy" class="text-blue-600 underline hover:text-blue-800">Privacy Policy</a>.
+          </label>
+        </div>
+        <p id="terms-error" class="mt-1 text-sm text-red-600 hidden" role="alert">You must agree to the terms to proceed.</p>
+
+        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all shadow-md">
+          Submit Request
+        </button>
+      </form>
+    </div>
+
+    <!-- Success State -->
+    <div id="success-message" hidden class="text-center py-12 bg-white p-8 rounded-xl shadow-sm border border-green-200" role="status" aria-live="polite">
+      <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">✓</div>
+      <h2 class="text-2xl font-bold text-slate-900 mb-2">Request Received!</h2>
+      <p class="text-slate-600 mb-6">Thank you for reaching out. We've sent a confirmation email to your address.</p>
+      <button onclick="location.reload()" class="px-6 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-900 focus:ring-4 focus:ring-slate-300 transition-all">
+        Send another message
+      </button>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 mt-12 py-8">
+    <div class="max-w-4xl mx-auto px-4 text-center text-sm text-slate-500">
+      <p>&copy; 2024 Accessible Company Inc. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const form = document.getElementById('registration-form');
+      const formContainer = document.getElementById('form-container');
+      const successMessage = document.getElementById('success-message');
+
+      const fields = {
+        fullName: { input: document.getElementById('full-name'), error: document.getElementById('name-error') },
+        email: { input: document.getElementById('email'), error: document.getElementById('email-error') },
+        department: { input: document.getElementById('department'), error: document.getElementById('dept-error') },
+        message: { input: document.getElementById('message'), error: document.getElementById('message-error') },
+        terms: { input: document.getElementById('terms'), error: document.getElementById('terms-error') }
+      };
+
+      function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function setError(fieldKey, isInvalid) {
+        const field = fields[fieldKey];
+        if (isInvalid) {
+          field.input.classList.add('border-red-500');
+          field.input.setAttribute('aria-invalid', 'true');
+          field.input.setAttribute('aria-describedby', field.error.id);
+          field.error.classList.remove('hidden');
+        } else {
+          field.input.classList.remove('border-red-500');
+          field.input.removeAttribute('aria-invalid');
+          field.input.removeAttribute('aria-describedby');
+          field.error.classList.add('hidden');
+        }
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let isValid = true;
+
+        // Validation Logic
+        if (!fields.fullName.input.value.trim()) {
+          setError('fullName', true);
+          isValid = false;
+        } else {
+          setError('fullName', false);
+        }
+
+        if (!validateEmail(fields.email.input.value)) {
+          setError('email', true);
+          isValid = false;
+        } else {
+          setError('email', false);
+        }
+
+        if (!fields.department.input.value) {
+          setError('department', true);
+          isValid = false;
+        } else {
+          setError('department', false);
+        }
+
+        if (!fields.message.input.value.trim()) {
+          setError('message', true);
+          isValid = false;
+        } else {
+          setError('message', false);
+        }
+
+        if (!fields.terms.input.checked) {
+          setError('terms', true);
+          isValid = false;
+        } else {
+          setError('terms', false);
+        }
+
+        if (isValid) {
+          // Simulate API Call
+          const submitBtn = form.querySelector('button[type="submit"]');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Sending...';
+
+          setTimeout(() => {
+            formContainer.hidden = true;
+            successMessage.hidden = false;
+            successMessage.focus();
+            window.scrollTo(0, 0);
+          }, 1000);
+        } else {
+          // Focus first error
+          const firstError = Object.values(fields).find(f => f.error.classList.contains('hidden') === false);
+          if (firstError) firstError.input.focus();
+        }
+      });
+
+      // Clear error on input
+      Object.keys(fields).forEach(key => {
+        fields[key].input.addEventListener('input', () => {
+          if (fields[key].input.getAttribute('aria-invalid') === 'true') {
+            setError(key, false);
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

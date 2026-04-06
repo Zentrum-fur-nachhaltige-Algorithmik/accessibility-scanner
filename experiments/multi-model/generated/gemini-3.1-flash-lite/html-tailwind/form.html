@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Accessible Form | Company Name</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; white-space: nowrap; }
+        @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans leading-normal">
+
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-white focus:text-blue-700 focus:font-bold">Skip to main content</a>
+
+    <header class="bg-white shadow-sm p-4">
+        <nav aria-label="Main navigation">
+            <h1 class="text-xl font-bold">Company Name</h1>
+        </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto p-6">
+        <h2 class="text-3xl font-bold mb-6">Contact Us</h2>
+        
+        <div id="status-message" role="status" aria-live="polite" class="mb-4"></div>
+
+        <form id="contact-form" novalidate class="space-y-6 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+            
+            <div class="space-y-2">
+                <label for="full-name" class="block font-semibold">Full Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="text" id="full-name" name="full-name" autocomplete="name" required 
+                    class="w-full p-2 border border-gray-400 rounded focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                    aria-describedby="name-error">
+                <div id="name-error" class="text-red-700 text-sm hidden" role="alert">Please enter your full name.</div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="email" class="block font-semibold">Email Address <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <input type="email" id="email" name="email" autocomplete="email" required 
+                    class="w-full p-2 border border-gray-400 rounded focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                    aria-describedby="email-error">
+                <div id="email-error" class="text-red-700 text-sm hidden" role="alert">Please enter a valid email address.</div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="subject" class="block font-semibold">Department <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <select id="subject" name="subject" required class="w-full p-2 border border-gray-400 rounded focus:border-blue-600 focus:ring-1 focus:ring-blue-600">
+                    <option value="">Select a department</option>
+                    <option value="sales">Sales</option>
+                    <option value="support">Support</option>
+                </select>
+                <div id="subject-error" class="text-red-700 text-sm hidden" role="alert">Please select a department.</div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="message" class="block font-semibold">Message <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                <textarea id="message" name="message" rows="4" required class="w-full p-2 border border-gray-400 rounded focus:border-blue-600 focus:ring-1 focus:ring-blue-600" aria-describedby="message-error"></textarea>
+                <div id="message-error" class="text-red-700 text-sm hidden" role="alert">Please enter your message.</div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="terms" name="terms" required class="w-5 h-5 cursor-pointer">
+                <label for="terms" class="cursor-pointer">I agree to the <a href="#" class="text-blue-700 underline">Terms and Conditions</a> <span aria-hidden="true">*</span></label>
+            </div>
+            <div id="terms-error" class="text-red-700 text-sm hidden" role="alert">You must agree to the terms.</div>
+
+            <button type="submit" class="bg-blue-700 text-white font-bold py-3 px-6 rounded hover:bg-blue-800 transition-colors w-full sm:w-auto">
+                Submit Message
+            </button>
+        </form>
+    </main>
+
+    <footer class="text-center p-6 text-gray-600 border-t border-gray-200 mt-10">
+        <p>&copy; 2024 Company Name. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById('contact-form');
+        const status = document.getElementById('status-message');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
+
+            const fields = ['full-name', 'email', 'subject', 'message', 'terms'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                const error = document.getElementById(id + '-error');
+                if (!el.validity.valid || (id === 'terms' && !el.checked)) {
+                    el.setAttribute('aria-invalid', 'true');
+                    if (error) error.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    el.removeAttribute('aria-invalid');
+                    if (error) error.classList.add('hidden');
+                }
+            });
+
+            if (isValid) {
+                status.innerHTML = '<div class="bg-green-100 text-green-900 p-4 rounded font-bold" role="alert">✓ Thank you, your message has been sent successfully.</div>';
+                form.reset();
+                window.scrollTo(0, 0);
+            } else {
+                status.innerHTML = '<div class="bg-red-100 text-red-900 p-4 rounded font-bold" role="alert">✕ Please correct the errors in the form.</div>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Acme Corp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              600: '#1d4ed8',
+              700: '#1e3a5f',
+              800: '#15294a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html {
+      scroll-padding-top: 72px;
+      scroll-padding-bottom: 40px;
+    }
+
+    /* Accessible focus indicator — works in Windows High Contrast Mode */
+    :focus-visible {
+      outline: 3px solid #1d4ed8;
+      outline-offset: 2px;
+    }
+
+    /* High Contrast Mode support */
+    @media (forced-colors: active) {
+      :focus-visible {
+        outline: 3px solid LinkText;
+      }
+      .required-star {
+        color: LinkText;
+      }
+      .error-text {
+        color: LinkText;
+        forced-color-adjust: auto;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      :root {
+        --border-strong: #000000;
+      }
+      input, select, textarea {
+        border-color: #000000;
+        border-width: 2px;
+      }
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Screen reader only utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 16px;
+      z-index: 100;
+      padding: 8px 16px;
+      background: #1d4ed8;
+      color: #ffffff;
+      font-weight: 600;
+      border-radius: 0 0 8px 8px;
+      text-decoration: none;
+    }
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    /* Form error state */
+    .input-error {
+      border-color: #b91c1c !important;
+    }
+    .input-error:focus-visible {
+      outline-color: #b91c1c;
+    }
+
+    /* Error text — meets contrast on white */
+    .error-text {
+      color: #b91c1c;
+    }
+
+    /* Success banner */
+    .success-banner {
+      background-color: #d1fae5;
+      border-left: 4px solid #065f46;
+      color: #065f46;
+    }
+
+    /* Text block readability */
+    .text-block {
+      max-width: 80ch;
+      line-height: 1.6;
+    }
+
+    /* Checkbox custom styling that maintains accessibility */
+    .custom-checkbox {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      min-height: 24px;
+      border: 2px solid #525252;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .custom-checkbox:checked {
+      background-color: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+    .custom-checkbox:checked::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 7px;
+      width: 6px;
+      height: 11px;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .custom-checkbox:focus-visible {
+      outline: 3px solid #1d4ed8;
+      outline-offset: 2px;
+    }
+    .custom-checkbox.input-error {
+      border-color: #b91c1c;
+    }
+    @media (forced-colors: active) {
+      .custom-checkbox {
+        -webkit-appearance: checkbox;
+        appearance: checkbox;
+        width: auto;
+        height: auto;
+        min-width: auto;
+        min-height: auto;
+        border: none;
+        border-radius: 0;
+        background: none;
+      }
+      .custom-checkbox:checked::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+
+  <!-- Route announcer for any dynamic content changes -->
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only" id="route-announcer"></div>
+
+  <!-- Skip link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-300 sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-[72px]">
+        <a href="/" class="text-xl font-bold text-brand-800" aria-label="Acme Corp home">
+          Acme Corp
+        </a>
+        <nav aria-label="Main navigation">
+          <ul class="flex items-center gap-6 text-sm font-medium">
+            <li><a href="/" class="text-gray-700 hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">Home</a></li>
+            <li><a href="/about" class="text-gray-700 hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">About</a></li>
+            <li><a href="/contact" aria-current="page" class="text-brand-600 underline decoration-brand-600 underline-offset-4">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main id="main-content" tabindex="-1" class="flex-1">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+
+      <!-- Page heading -->
+      <div class="mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-brand-800 mb-3">Contact Us</h1>
+        <p class="text-block text-gray-700">
+          Have a question or want to work with us? Fill out the form below and our team will get back to you within one business day.
+        </p>
+      </div>
+
+      <!-- Success message (hidden by default) -->
+      <div id="success-message" class="success-banner rounded-lg p-4 mb-8 hidden" role="status" aria-live="polite">
+        <div class="flex items-start gap-3">
+          <svg aria-hidden="true" class="w-6 h-6 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <p class="font-semibold">Message sent successfully</p>
+            <p class="text-sm mt-1">Thank you for contacting us. We will respond to your inquiry within one business day.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <form id="contact-form" novalidate>
+        <fieldset class="border-0 p-0 m-0">
+          <legend class="sr-only">Contact form fields</legend>
+
+          <!-- Name -->
+          <div class="mb-6">
+            <label for="name" class="block text-sm font-semibold text-gray-900 mb-1.5">
+              Full name
+              <span aria-hidden="true" class="required-star text-red-700 ml-0.5">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              autocomplete="name"
+              aria-required="true"
+              aria-describedby="name-error"
+              class="w-full px-3 py-2.5 border-2 border-gray-400 rounded-lg text-base bg-white text-gray-900 placeholder:text-gray-500"
+              placeholder="Jane Doe"
+            >
+            <p id="name-error" class="error-text text-sm mt-1.5 hidden" role="alert"></p>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-6">
+            <label for="email" class="block text-sm font-semibold text-gray-900 mb-1.5">
+              Email address
+              <span aria-hidden="true" class="required-star text-red-700 ml-0.5">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              aria-required="true"
+              aria-describedby="email-error email-hint"
+              class="w-full px-3 py-2.5 border-2 border-gray-400 rounded-lg text-base bg-white text-gray-900 placeholder:text-gray-500"
+              placeholder="jane@example.com"
+            >
+            <p id="email-hint" class="text-sm text-gray-600 mt-1">We will never share your email with anyone else.</p>
+            <p id="email-error" class="error-text text-sm mt-1 hidden" role="alert"></p>
+          </div>
+
+          <!-- Phone -->
+          <div class="mb-6">
+            <label for="phone" class="block text-sm font-semibold text-gray-900 mb-1.5">
+              Phone number
+              <span class="text-sm font-normal text-gray-500">(optional)</span>
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              autocomplete="tel"
+              aria-describedby="phone-error phone-hint"
+              class="w-full px-3 py-2.5 border-2 border-gray-400 rounded-lg text-base bg-white text-gray-900 placeholder:text-gray-500"
+              placeholder="(555) 123-4567"
+            >
+            <p id="phone-hint" class="text-sm text-gray-600 mt-1">Include country code if outside the US.</p>
+            <p id="phone-error" class="error-text text-sm mt-1 hidden" role="alert"></p>
+          </div>
+
+          <!-- Company -->
+          <div class="mb-6">
+            <label for="company" class="block text-sm font-semibold text-gray-900 mb-1.5">
+              Company
+              <span class="text-sm font-normal text-gray-500">(optional)</span>
+            </label>
+            <input
+              type="text"
+              id="company"
+              name="company"
+              autocomplete="organization"
+              class="w-full px-3 py-2.5 border-2 border-gray-400 rounded-lg text-base bg-white text-gray-900 placeholder:text-gray-500"
+              placeholder="Acme Inc."
+            >
+          </div>
+
+          <!-- Department dropdown -->
+          <div class="mb-6">
+            <label for="department" class="block text-sm font-semibold text-gray-900 mb-1.5">
+              Department
+              <span aria-hidden="true" class="required-star text-red-700 ml-0.5">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <select
+              id="department"
+              name="department"
+              autocomplete="organization-title"
+              aria-required="true"
+              aria-describedby="department-error"
+              class="w-full px-3 py-2.5 border-2 border-gray-400 rounded-lg text-base bg-white text-gray-900 appearance-none"
+            >
+              <option value="">Select a department...</option>
+              <option value="sales">Sales</option>
+              <option value="support">Customer Support</option>
+              <option value="engineering">Engineering</option>
+              <option value="hr">Human Resources</option>
+              <option value="partnerships">Partnerships</option>
+              <option value="other">Other</option>
+            </select>
+            <p id="department-error" class="error-text text-sm mt-1.5 hidden" role="alert"></p>
+          </div>
+
+          <!-- Message -->
+          <div class="mb-6">
+            <label for="message" class="block text-sm font-semibold text-gray-900 mb-1.5">
+              Message
+              <span aria-hidden="true" class="required-star text-red-700 ml-0.5">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              aria-required="true"
+              aria-describedby="message-error message-hint"
+              class="w-full px-3 py-2.5 border-2 border-gray-400 rounded-lg text-base bg-white text-gray-900 placeholder:text-gray-500 resize-vertical min-h-[120px]"
+              placeholder="How can we help you?"
+            ></textarea>
+            <p id="message-hint" class="text-sm text-gray-600 mt-1">Minimum 10 characters.</p>
+            <p id="message-error" class="error-text text-sm mt-1 hidden" role="alert"></p>
+          </div>
+
+          <!-- Terms checkbox -->
+          <div class="mb-8">
+            <div class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                value="accepted"
+                aria-required="true"
+                aria-describedby="terms-error"
+                class="custom-checkbox mt-0.5"
+              >
+              <label for="terms" class="text-sm text-gray-800 leading-relaxed cursor-pointer select-none">
+                I agree to the
+                <a href="/terms" class="text-brand-600 underline hover:text-brand-700">Terms of Service</a>
+                and
+                <a href="/privacy" class="text-brand-600 underline hover:text-brand-700">Privacy Policy</a>.
+                <span aria-hidden="true" class="required-star text-red-700 ml-0.5">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+            </div>
+            <p id="terms-error" class="error-text text-sm mt-1.5 ml-9 hidden" role="alert"></p>
+          </div>
+
+          <!-- General form error summary -->
+          <div id="form-summary" class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6 hidden" role="alert" aria-live="assertive">
+            <div class="flex items-start gap-3">
+              <svg aria-hidden="true" class="w-5 h-5 mt-0.5 flex-shrink-0 text-red-800" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <div>
+                <p class="font-semibold text-red-900">Please fix the following errors</p>
+                <ul id="form-summary-list" class="text-sm text-red-800 mt-1 list-disc list-inside"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit button -->
+          <div>
+            <button
+              type="submit"
+              class="w-full sm:w-auto px-8 py-3 bg-brand-600 text-white font-semibold rounded-lg text-base hover:bg-brand-700 active:bg-brand-800 transition-colors min-h-[44px] min-w-[44px]"
+            >
+              Send Message
+            </button>
+            <p class="text-sm text-gray-500 mt-2">All fields marked with * are required.</p>
+          </div>
+
+        </fieldset>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-300 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <nav aria-label="Footer navigation">
+        <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
+          <li><a href="/terms" class="hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">Terms of Service</a></li>
+          <li><a href="/privacy" class="hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">Privacy Policy</a></li>
+          <li><a href="/accessibility" class="hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">Accessibility</a></li>
+          <li><a href="/help" class="hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">Help Center</a></li>
+        </ul>
+      </nav>
+      <p class="text-sm text-gray-500 mt-4">&copy; 2024 Acme Corp. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var form = document.getElementById('contact-form');
+      var successMessage = document.getElementById('success-message');
+      var formSummary = document.getElementById('form-summary');
+      var formSummaryList = document.getElementById('form-summary-list');
+      var routeAnnouncer = document.getElementById('route-announcer');
+
+      var fields = {
+        name: {
+          input: document.getElementById('name'),
+          error: document.getElementById('name-error'),
+          validate: function(value) {
+            if (!value.trim()) return 'Please enter your full name.';
+            if (value.trim().length < 2) return 'Name must be at least 2 characters.';
+            return '';
+          }
+        },
+        email: {
+          input: document.getElementById('email'),
+          error: document.getElementById('email-error'),
+          validate: function(value) {
+            if (!value.trim()) return 'Please enter your email address.';
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(value.trim())) return 'Please enter a valid email address (e.g., jane@example.com).';
+            return '';
+          }
+        },
+        phone: {
+          input: document.getElementById('phone'),
+          error: document.getElementById('phone-error'),
+          validate: function(value) {
+            if (value.trim() && !/^[\d\s\-\+\(\)]+$/.test(value.trim())) {
+              return 'Please enter a valid phone number using digits, spaces, dashes, or parentheses.';
+            }
+            return '';
+          }
+        },
+        department: {
+          input: document.getElementById('department'),
+          error: document.getElementById('department-error'),
+          validate: function(value) {
+            if (!value) return 'Please select a department.';
+            return '';
+          }
+        },
+        message: {
+          input: document.getElementById('message'),
+          error: document.getElementById('message-error'),
+          validate: function(value) {
+            if (!value.trim()) return 'Please enter a message.';
+            if (value.trim().length < 10) return 'Message must be at least 10 characters.';
+            return '';
+          }
+        },
+        terms: {
+          input: document.getElementById('terms'),
+          error: document.getElementById('terms-error'),
+          validate: function(_, checkbox) {
+            if (!checkbox.checked) return 'You must agree to the Terms of Service and Privacy Policy.';
+            return '';
+          }
+        }
+      };
+
+      function showError(fieldKey, message) {
+        var field = fields[fieldKey];
+        var input = field.input;
+        var errorEl = field.error;
+
+        input.classList.add('input-error');
+        input.setAttribute('aria-invalid', 'true');
+
+        // Update aria-describedby to include error element
+        var describedBy = input.getAttribute('aria-describedby') || '';
+        var describedIds = describedBy.split(' ').filter(function(id) { return id && id !== fieldKey + '-error'; });
+        describedIds.push(fieldKey + '-error');
+        input.setAttribute('aria-describedby', describedIds.join(' ').trim());
+
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
+      }
+
+      function clearError(fieldKey) {
+        var field = fields[fieldKey];
+        var input = field.input;
+        var errorEl = field.error;
+
+        input.classList.remove('input-error');
+        input.removeAttribute('aria-invalid');
+
+        // Remove error id from aria-describedby
+        var describedBy = input.getAttribute('aria-describedby') || '';
+        var describedIds = describedBy.split(' ').filter(function(id) { return id && id !== fieldKey + '-error'; });
+        if (describedIds.length > 0) {
+          input.setAttribute('aria-describedby', describedIds.join(' ').trim());
+        } else {
+          input.removeAttribute('aria-describedby');
+        }
+
+        errorEl.textContent = '';
+        errorEl.classList.add('hidden');
+      }
+
+      function clearAllErrors() {
+        Object.keys(fields).forEach(function(key) {
+          clearError(key);
+        });
+        formSummary.classList.add('hidden');
+        formSummaryList.innerHTML = '';
+      }
+
+      function validateForm() {
+        var errors = [];
+        var errorSummaryItems = [];
+
+        Object.keys(fields).forEach(function(key) {
+          var field = fields[key];
+          var value = field.input.value;
+          var errorMsg = field.validate(value, field.input);
+
+          if (errorMsg) {
+            errors.push({ key: key, message: errorMsg });
+            showError(key, errorMsg);
+
+            // Build summary list item with link to the field
+            var listItem = document.createElement('li');
+            var link = document.createElement('a');
+            link.href = '#' + key;
+            link.textContent = errorMsg;
+            link.addEventListener('click', function(e) {
+              e.preventDefault();
+              field.input.focus();
+            });
+            listItem.appendChild(link);
+            errorSummaryItems.push(listItem);
+          } else {
+            clearError(key);
+          }
+        });
+
+        if (errors.length > 0) {
+          formSummaryList.innerHTML = '';
+          errorSummaryItems.forEach(function(item) {
+            formSummaryList.appendChild(item);
+          });
+          formSummary.classList.remove('hidden');
+          routeAnnouncer.textContent = 'Form has ' + errors.length + ' error' + (errors.length > 1 ? 's' : '') + '. Please fix the errors below.';
+          return false;
+        }
+
+        formSummary.classList.add('hidden');
+        formSummaryList.innerHTML = '';
+        return true;
+      }
+
+      // Clear individual field error on input/change
+      fields.name.input.addEventListener('input', function() { clearError('name'); });
+      fields.email.input.addEventListener('input', function() { clearError('email'); });
+      fields.phone.input.addEventListener('input', function() { clearError('phone'); });
+      fields.department.input.addEventListener('change', function() { clearError('department'); });
+      fields.message.input.addEventListener('input', function() { clearError('message'); });
+      fields.terms.input.addEventListener('change', function() { clearError('terms'); });
+
+      // Form submission
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!validateForm()) {
+          // Focus the first field with an error
+          var firstErrorKey = Object.keys(fields).find(function(key) {
+            return fields[key].input.getAttribute('aria-invalid') === 'true';
+          });
+          if (firstErrorKey) {
+            fields[firstErrorKey].input.focus();
+          }
+          return;
+        }
+
+        // Simulate successful submission
+        form.classList.add('hidden');
+        successMessage.classList.remove('hidden');
+        successMessage.focus();
+        routeAnnouncer.textContent = 'Your message has been sent successfully.';
+
+        // Provide a way to send another message
+        var resetLink = document.createElement('button');
+        resetLink.type = 'button';
+        resetLink.className = 'text-sm font-medium underline mt-3 block';
+        resetLink.textContent = 'Send another message';
+        resetLink.addEventListener('click', function() {
+          form.reset();
+          clearAllErrors();
+          successMessage.classList.add('hidden');
+          form.classList.remove('hidden');
+          resetLink.remove();
+          fields.name.input.focus();
+          routeAnnouncer.textContent = 'Form has been reset. You may send a new message.';
+        });
+
+        // Remove any existing reset link
+        var existingReset = successMessage.querySelector('button');
+        if (existingReset) existingReset.remove();
+        successMessage.querySelector('div').appendChild(resetLink);
+      });
+
+    })();
+  </script>
+
+</body>
+</html>

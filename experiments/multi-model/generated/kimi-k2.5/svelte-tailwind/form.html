@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Accessible Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+    .skip-link {
+      position: absolute;
+      left: 0;
+      top: -40px;
+      background: #000;
+      color: #fff;
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 100;
+      transition: top 0.3s;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [aria-invalid="true"] {
+      border-color: #b91c1c !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <nav aria-label="Main navigation">
+        <div class="text-xl font-bold text-gray-900">Company Name</div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="flex-grow w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8" tabindex="-1">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
+    <p class="text-gray-700 mb-6">Fields marked with an asterisk (<span class="text-red-700" aria-hidden="true">*</span>) are required.</p>
+
+    <div id="success-banner" role="status" tabindex="-1" class="hidden mb-6 p-4 bg-green-50 border border-green-300 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-700" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-green-900">Thank you! Your message has been sent successfully. We will respond within 2 business days.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="error-summary" role="alert" aria-live="assertive" tabindex="-1" class="hidden mb-6 p-4 bg-red-50 border border-red-300 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600">
+      <h2 class="text-lg font-semibold text-red-900 mb-2">There were errors with your submission</h2>
+      <ul id="error-list" class="list-disc list-inside text-sm text-red-800"></ul>
+    </div>
+
+    <form id="contact-form" novalidate class="space-y-6">
+      <div class="space-y-6">
+        <div>
+          <label for="full-name" class="block text-sm font-medium text-gray-900">
+            Full Name <span class="text-red-700" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input 
+            type="text" 
+            id="full-name" 
+            name="fullName"
+            autocomplete="name"
+            aria-required="true"
+            aria-describedby="name-hint name-error"
+            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
+          >
+          <p id="name-hint" class="mt-1 text-sm text-gray-600">Please enter your first and last name.</p>
+          <p id="name-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-900">
+            Email Address <span class="text-red-700" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email"
+            autocomplete="email"
+            aria-required="true"
+            aria-describedby="email-error"
+            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
+          >
+          <p id="email-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+        </div>
+
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-900">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone"
+            autocomplete="tel"
+            aria-describedby="phone-error"
+            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
+          >
+          <p id="phone-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+          <p class="mt-1 text-sm text-gray-600">Optional. Include area code.</p>
+        </div>
+
+        <div>
+          <label for="company" class="block text-sm font-medium text-gray-900">Company</label>
+          <input 
+            type="text" 
+            id="company" 
+            name="company"
+            autocomplete="organization"
+            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
+          >
+        </div>
+
+        <div>
+          <label for="department" class="block text-sm font-medium text-gray-900">
+            Department <span class="text-red-700" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <select 
+            id="department" 
+            name="department"
+            aria-required="true"
+            aria-describedby="department-error"
+            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border bg-white"
+          >
+            <option value="">Select a department</option>
+            <option value="sales">Sales</option>
+            <option value="support">Customer Support</option>
+            <option value="technical">Technical Support</option>
+            <option value="billing">Billing</option>
+            <option value="other">Other</option>
+          </select>
+          <p id="department-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+        </div>
+
+        <div>
+          <label for="message" class="block text-sm font-medium text-gray-900">
+            Message <span class="text-red-700" aria-hidden="true">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <textarea 
+            id="message" 
+            name="message"
+            rows="5"
+            aria-required="true"
+            aria-describedby="message-error"
+            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
+          ></textarea>
+          <p id="message-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+        </div>
+
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              name="terms"
+              aria-required="true"
+              aria-describedby="terms-error"
+              class="h-4 w-4 text-blue-700 border-gray-500 rounded focus:ring-blue-600"
+            >
+          </div>
+          <div class="ml-3">
+            <label for="terms" class="block text-sm font-medium text-gray-900">
+              I agree to the Terms and Conditions <span class="text-red-700" aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <p class="text-sm text-gray-600">By checking this box, you agree to our privacy policy and terms of service.</p>
+            <p id="terms-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button 
+          type="submit" 
+          class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-700 min-h-[48px]"
+        >
+          Submit Request
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <footer class="bg-gray-100 border-t border-gray-200 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <p class="text-center text-sm text-gray-700">&copy; 2024 Company Name. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const errorSummary = document.getElementById('error-summary');
+    const errorList = document.getElementById('error-list');
+    const successBanner = document.getElementById('success-banner');
+    
+    const fields = {
+      fullName: { 
+        el: document.getElementById('full-name'), 
+        errorEl: document.getElementById('name-error'), 
+        label: 'Full Name',
+        validate: (v) => v.trim() ? '' : 'Full Name is required'
+      },
+      email: { 
+        el: document.getElementById('email'), 
+        errorEl: document.getElementById('email-error'), 
+        label: 'Email Address',
+        validate: (v) => {
+          if (!v.trim()) return 'Email Address is required';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Please enter a valid email address';
+          return '';
+        }
+      },
+      phone: { 
+        el: document.getElementById('phone'), 
+        errorEl: document.getElementById('phone-error'), 
+        label: 'Phone Number',
+        required: false,
+        validate: (v) => {
+          if (!v.trim()) return '';
+          const cleaned = v.replace(/[\s\-\(\)\.]/g, '');
+          if (cleaned.length < 10) return 'Please enter a valid phone number with at least 10 digits';
+          return '';
+        }
+      },
+      company: { 
+        el: document.getElementById('company'), 
+        errorEl: null, 
+        label: 'Company',
+        required: false,
+        validate: () => ''
+      },
+      department: { 
+        el: document.getElementById('department'), 
+        errorEl: document.getElementById('department-error'), 
+        label: 'Department',
+        validate: (v) => v ? '' : 'Please select a department'
+      },
+      message: { 
+        el: document.getElementById('message'), 
+        errorEl: document.getElementById('message-error'), 
+        label: 'Message',
+        validate: (v) => v.trim() ? '' : 'Message is required'
+      },
+      terms: { 
+        el: document.getElementById('terms'), 
+        errorEl: document.getElementById('terms-error'), 
+        label: 'Terms and Conditions',
+        validate: (v) => v ? '' : 'You must agree to the Terms and Conditions'
+      }
+    };
+
+    function showFieldError(fieldKey, message) {
+      const field = fields[fieldKey];
+      if (field.errorEl) {
+        field.errorEl.textContent = message;
+        field.errorEl.classList.remove('hidden');
+      }
+      field.el.setAttribute('aria-invalid', 'true');
+      field.el.classList.add('border-red-600');
+      field.el.classList.remove('border-gray-500');
+    }
+
+    function clearFieldError(fieldKey) {
+      const field = fields[fieldKey];
+      if (field.errorEl) {
+        field.errorEl.textContent = '';
+        field.errorEl.classList.add('hidden');
+      }
+      field.el.removeAttribute('aria-invalid');
+      field.el.classList.remove('border-red-600');
+      field.el.classList.add('border-gray-500');
+    }
+
+    function validateField(fieldKey) {
+      const field = fields[fieldKey];
+      const value = fieldKey === 'terms' ? field.el.checked : field.el.value;
+      const error = field.validate(value);
+      
+      if (error) {
+        showFieldError(fieldKey, error);
+        return false;
+      } else {
+        clearFieldError(fieldKey);
+        return true;
+      }
+    }
+
+    Object.keys(fields).forEach(key => {
+      const field = fields[key];
+      field.el.addEventListener('blur', () => validateField(key));
+      field.el.addEventListener('input', () => {
+        if (field.el.getAttribute('aria-invalid') === 'true') {
+          validateField(key);
+        }
+      });
+      if (key === 'terms') {
+        field.el.addEventListener('change', () => validateField(key));
+      }
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      errorSummary.classList.add('hidden');
+      errorList.innerHTML = '';
+      successBanner.classList.add('hidden');
+      
+      const errors = [];
+      let firstErrorKey = null;
+
+      Object.keys(fields).forEach(key => {
+        const isValid = validateField(key);
+        if (!isValid) {
+          const field = fields[key];
+          const errorMsg = field.errorEl ? field.errorEl.textContent : `${field.label} is required`;
+          errors.push(`${field.label}: ${errorMsg}`);
+          if (!firstErrorKey) firstErrorKey = key;
+        }
+      });
+
+      if (errors.length > 0) {
+        errors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error;
+          errorList.appendChild(li);
+        });
+        
+        errorSummary.classList.remove('hidden');
+        errorSummary.focus();
+        
+        if (firstErrorKey) {
+          setTimeout(() => fields[firstErrorKey].el.focus(), 100);
+        }
+      } else {
+        successBanner.classList.remove('hidden');
+        successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => successBanner.focus(), 100);
+        
+        form.reset();
+        Object.keys(fields).forEach(key => clearFieldError(key));
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "model": "minimax/minimax-m2.7",
+  "slug": "minimax-m2.7",
+  "timestamp": "2026-04-06T08:26:17.387Z",
+  "pages": [
+    {
+      "tech": "html",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/minimax-m2.7/html-tailwind/form.html",
+      "size": 26556,
+      "promptTokens": 8516,
+      "completionTokens": 7033,
+      "elapsed": 94.9,
+      "validationIssues": []
+    },
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/minimax-m2.7/react-tailwind/form.html",
+      "size": 38616,
+      "promptTokens": 11338,
+      "completionTokens": 10305,
+      "elapsed": 143.9,
+      "validationIssues": []
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/minimax-m2.7/vue-tailwind/form.html",
+      "size": 25061,
+      "promptTokens": 10798,
+      "completionTokens": 6333,
+      "elapsed": 87.4,
+      "validationIssues": []
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/minimax-m2.7/svelte-tailwind/form.html",
+      "size": 23609,
+      "promptTokens": 8522,
+      "completionTokens": 6730,
+      "elapsed": 93.6,
+      "validationIssues": []
+    },
+    {
+      "tech": "angular",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/minimax-m2.7/angular-tailwind/form.html",
+      "size": 25549,
+      "promptTokens": 8522,
+      "completionTokens": 6604,
+      "elapsed": 94,
+      "validationIssues": []
+    }
+  ],
+  "totalPromptTokens": 47696,
+  "totalCompletionTokens": 37005,
+  "errors": []
+}

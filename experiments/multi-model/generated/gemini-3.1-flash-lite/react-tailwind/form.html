@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Accessible Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        :focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+        .skip-link { position: absolute; top: -40px; left: 0; background: #2563eb; color: #fff; padding: 8px; z-index: 100; }
+        .skip-link:focus { top: 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <header class="p-6 bg-white border-b border-gray-200">
+        <nav aria-label="Main navigation">
+            <h1 class="text-2xl font-bold">Acme Corp Portal</h1>
+        </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto p-6">
+        <div id="root"></div>
+    </main>
+
+    <footer class="p-6 text-center text-sm text-gray-600">
+        &copy; 2024 Acme Corp. All rights reserved.
+    </footer>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        function ContactForm() {
+            const [formData, setFormData] = useState({ name: '', email: '', phone: '', company: '', subject: '', message: '', terms: false });
+            const [errors, setErrors] = useState({});
+            const [status, setStatus] = useState('');
+            const errorRef = useRef(null);
+
+            const validate = () => {
+                const newErrors = {};
+                if (!formData.name) newErrors.name = 'Name is required';
+                if (!formData.email.includes('@')) newErrors.email = 'Valid email is required';
+                if (!formData.subject) newErrors.subject = 'Please select a subject';
+                if (!formData.terms) newErrors.terms = 'You must accept the terms';
+                return newErrors;
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const newErrors = validate();
+                if (Object.keys(newErrors).length > 0) {
+                    setErrors(newErrors);
+                    errorRef.current?.focus();
+                } else {
+                    setErrors({});
+                    setStatus('Success! Application submitted.');
+                }
+            };
+
+            return (
+                <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-xl font-semibold mb-6">Contact Request</h2>
+                    
+                    {status && <div role="status" className="p-4 mb-4 bg-green-100 text-green-800 rounded">{status}</div>}
+                    
+                    {Object.keys(errors).length > 0 && (
+                        <div ref={errorRef} tabIndex="-1" role="alert" className="p-4 mb-4 bg-red-50 border border-red-200 rounded">
+                            <h3 class="font-bold text-red-800">Please correct the following:</h3>
+                            <ul className="list-disc ml-5 text-red-700">{Object.values(errors).map((err, i) => <li key={i}>{err}</li>)}</ul>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                        {[
+                            { id: 'name', label: 'Full Name', type: 'text', auto: 'name' },
+                            { id: 'email', label: 'Email Address', type: 'email', auto: 'email' },
+                            { id: 'phone', label: 'Phone Number', type: 'tel', auto: 'tel' },
+                            { id: 'company', label: 'Company', type: 'text', auto: 'organization' }
+                        ].map(field => (
+                            <div key={field.id}>
+                                <label htmlFor={field.id} className="block font-medium mb-1">{field.label} <span aria-hidden="true">*</span></label>
+                                <input id={field.id} type={field.type} autoComplete={field.auto} aria-required="true" aria-invalid={!!errors[field.id]}
+                                    className="w-full p-2 border border-gray-400 rounded"
+                                    onChange={(e) => setFormData({...formData, [field.id]: e.target.value})} />
+                            </div>
+                        ))}
+
+                        <div>
+                            <label htmlFor="subject" className="block font-medium mb-1">Subject <span aria-hidden="true">*</span></label>
+                            <select id="subject" className="w-full p-2 border border-gray-400 rounded" onChange={(e) => setFormData({...formData, subject: e.target.value})}>
+                                <option value="">Select an option</option>
+                                <option value="sales">Sales</option>
+                                <option value="support">Support</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="message" className="block font-medium mb-1">Message</label>
+                            <textarea id="message" rows="4" className="w-full p-2 border border-gray-400 rounded" onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <input id="terms" type="checkbox" onChange={(e) => setFormData({...formData, terms: e.target.checked})} />
+                            <label htmlFor="terms">I agree to the terms and conditions <span aria-hidden="true">*</span></label>
+                        </div>
+
+                        <button type="submit" className="bg-blue-700 text-white p-3 rounded font-medium hover:bg-blue-800">Submit Request</button>
+                    </form>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ContactForm />);
+    </script>
+</body>
+</html>

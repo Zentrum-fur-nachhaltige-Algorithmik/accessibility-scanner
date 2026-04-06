@@ -1,0 +1,70 @@
+{
+  "model": "z-ai/glm-5-turbo",
+  "slug": "glm-5-turbo",
+  "timestamp": "2026-04-06T08:52:15.847Z",
+  "pages": [
+    {
+      "tech": "html",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/glm-5-turbo/html-tailwind/form.html",
+      "size": 23987,
+      "promptTokens": 8500,
+      "completionTokens": 6135,
+      "elapsed": 105.7,
+      "validationIssues": []
+    },
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/glm-5-turbo/react-tailwind/form.html",
+      "size": 21703,
+      "promptTokens": 11230,
+      "completionTokens": 16238,
+      "elapsed": 295.5,
+      "validationIssues": []
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/glm-5-turbo/vue-tailwind/form.html",
+      "size": 17064,
+      "promptTokens": 10761,
+      "completionTokens": 4787,
+      "elapsed": 81.7,
+      "validationIssues": []
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "file": null,
+      "error": "No content in response: \n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n"
+    },
+    {
+      "tech": "angular",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/glm-5-turbo/angular-tailwind/form.html",
+      "size": 11347,
+      "promptTokens": 8505,
+      "completionTokens": 16384,
+      "elapsed": 252.2,
+      "validationIssues": [
+        "missing closing </html>"
+      ]
+    }
+  ],
+  "totalPromptTokens": 38996,
+  "totalCompletionTokens": 43544,
+  "errors": [
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "error": "No content in response: \n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n\n         \n"
+    }
+  ]
+}

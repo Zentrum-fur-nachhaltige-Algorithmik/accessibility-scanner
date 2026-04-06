@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Accessible Form Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+    
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #1b2a4a;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+    }
+    
+    @media (forced-colors: active) {
+      :focus-visible {
+        outline: 3px solid LinkText;
+      }
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 py-4">
+      <nav aria-label="Main navigation">
+        <div class="flex items-center justify-between">
+          <div class="text-xl font-bold text-gray-900">Company Name</div>
+          <ul class="flex space-x-6 list-none">
+            <li><a href="#" class="text-blue-700 underline hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Home</a></li>
+            <li><a href="#" class="text-blue-700 underline hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" aria-current="page">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="flex-grow max-w-4xl mx-auto px-4 py-8 w-full" tabindex="-1">
+    <h1 class="text-3xl font-bold mb-2 text-gray-900">Contact Us</h1>
+    <p class="text-gray-700 mb-8 max-w-prose">Fill out the form below and we'll get back to you within 24 hours. Fields marked with an asterisk (*) are required.</p>
+    
+    <div id="success-message" role="status" aria-live="polite" class="sr-only"></div>
+    
+    <form id="contact-form" class="space-y-6 bg-white p-6 sm:p-8 rounded-lg shadow-sm border border-gray-200" novalidate>
+      <div class="form-group">
+        <label for="fullName" class="block text-sm font-medium text-gray-900 mb-1">
+          Full Name <span class="text-red-700" aria-hidden="true">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <input 
+          type="text" 
+          id="fullName" 
+          name="fullName"
+          class="w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          autocomplete="name"
+          aria-required="true"
+          aria-describedby="fullName-hint fullName-error"
+        >
+        <p id="fullName-hint" class="mt-1 text-sm text-gray-600">Please enter your first and last name.</p>
+        <p id="fullName-error" class="mt-1 text-sm text-red-800 hidden" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="block text-sm font-medium text-gray-900 mb-1">
+          Email Address <span class="text-red-700" aria-hidden="true">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          class="w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          autocomplete="email"
+          aria-required="true"
+          aria-describedby="email-hint email-error"
+        >
+        <p id="email-hint" class="mt-1 text-sm text-gray-600">We'll never share your email with anyone else.</p>
+        <p id="email-error" class="mt-1 text-sm text-red-800 hidden" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="phone" class="block text-sm font-medium text-gray-900 mb-1">
+          Phone Number
+        </label>
+        <input 
+          type="tel" 
+          id="phone" 
+          name="phone"
+          class="w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          autocomplete="tel"
+          aria-describedby="phone-hint phone-error"
+        >
+        <p id="phone-hint" class="mt-1 text-sm text-gray-600">Optional, but helps us reach you faster.</p>
+        <p id="phone-error" class="mt-1 text-sm text-red-800 hidden" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="company" class="block text-sm font-medium text-gray-900 mb-1">
+          Company
+        </label>
+        <input 
+          type="text" 
+          id="company" 
+          name="company"
+          class="w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          autocomplete="organization"
+          aria-describedby="company-hint"
+        >
+        <p id="company-hint" class="mt-1 text-sm text-gray-600">Your organization or business name.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="department" class="block text-sm font-medium text-gray-900 mb-1">
+          Department <span class="text-red-700" aria-hidden="true">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <select 
+          id="department" 
+          name="department"
+          class="w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+          aria-required="true"
+          aria-describedby="department-hint department-error"
+        >
+          <option value="">Select a department...</option>
+          <option value="sales">Sales</option>
+          <option value="support">Technical Support</option>
+          <option value="billing">Billing</option>
+          <option value="general">General Inquiry</option>
+        </select>
+        <p id="department-hint" class="mt-1 text-sm text-gray-600">Which department should handle your inquiry?</p>
+        <p id="department-error" class="mt-1 text-sm text-red-800 hidden" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <label for="message" class="block text-sm font-medium text-gray-900 mb-1">
+          Message <span class="text-red-700" aria-hidden="true">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <textarea 
+          id="message" 
+          name="message"
+          rows="5"
+          class="w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          aria-required="true"
+          aria-describedby="message-hint message-error"
+        ></textarea>
+        <p id="message-hint" class="mt-1 text-sm text-gray-600">Please provide details about your inquiry (minimum 10 characters).</p>
+        <p id="message-error" class="mt-1 text-sm text-red-800 hidden" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              name="terms"
+              class="h-4 w-4 text-blue-600 border-gray-500 rounded focus:ring-2 focus:ring-blue-500"
+              aria-required="true"
+              aria-describedby="terms-error"
+            >
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="terms" class="font-medium text-gray-900">
+              I agree to the Terms and Conditions <span class="text-red-700" aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <p class="text-gray-600">By checking this box, you agree to our <a href="#" class="text-blue-700 underline hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">Privacy Policy</a> and Terms of Service.</p>
+          </div>
+        </div>
+        <p id="terms-error" class="mt-1 text-sm text-red-800 hidden" role="alert"></p>
+      </div>
+
+      <div class="form-group pt-4">
+        <button 
+          type="submit" 
+          id="submit-btn"
+          class="w-full sm:w-auto px-6 py-3 bg-blue-700 text-white font-medium rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[44px]"
+        >
+          Send Message
+        </button>
+      </div>
+    </form>
+
+    <div id="success-container" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-md" tabindex="-1">
+      <h2 class="text-lg font-semibold text-green-900 mb-2">Thank you!</h2>
+      <p class="text-green-800 mb-4">Your message has been sent successfully. We'll get back to you within 24 hours.</p>
+      <button 
+        type="button" 
+        id="reset-btn"
+        class="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 min-h-[44px]"
+      >
+        Send another message
+      </button>
+    </div>
+  </main>
+
+  <footer class="bg-gray-100 border-t border-gray-200 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+      <p class="text-sm text-gray-600 text-center">&copy; 2024 Company Name. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    class ContactFormComponent {
+      constructor() {
+        this.form = document.getElementById('contact-form');
+        this.successContainer = document.getElementById('success-container');
+        this.successMessage = document.getElementById('success-message');
+        this.resetBtn = document.getElementById('reset-btn');
+        this.submitBtn = document.getElementById('submit-btn');
+        
+        this.fields = {
+          fullName: {
+            element: document.getElementById('fullName'),
+            errorElement: document.getElementById('fullName-error'),
+            validate: (value) => {
+              if (!value.trim()) return 'Full name is required.';
+              if (value.trim().length < 2) return 'Name must be at least 2 characters.';
+              return null;
+            }
+          },
+          email: {
+            element: document.getElementById('email'),
+            errorElement: document.getElementById('email-error'),
+            validate: (value) => {
+              if (!value.trim()) return 'Email address is required.';
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(value)) return 'Please enter a valid email address.';
+              return null;
+            }
+          },
+          phone: {
+            element: document.getElementById('phone'),
+            errorElement: document.getElementById('phone-error'),
+            validate: (value) => {
+              if (!value) return null;
+              if (!/^[\d\s\-\+\(\)]{10,}$/.test(value)) {
+                return 'Please enter a valid phone number.';
+              }
+              return null;
+            }
+          },
+          department: {
+            element: document.getElementById('department'),
+            errorElement: document.getElementById('department-error'),
+            validate: (value) => {
+              if (!value) return 'Please select a department.';
+              return null;
+            }
+          },
+          message: {
+            element: document.getElementById('message'),
+            errorElement: document.getElementById('message-error'),
+            validate: (value) => {
+              if (!value.trim()) return 'Message is required.';
+              if (value.trim().length < 10) return 'Message must be at least 10 characters.';
+              return null;
+            }
+          },
+          terms: {
+            element: document.getElementById('terms'),
+            errorElement: document.getElementById('terms-error'),
+            validate: (checked) => {
+              if (!checked) return 'You must agree to the Terms and Conditions.';
+              return null;
+            }
+          }
+        };
+
+        this.init();
+      }
+
+      init() {
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.resetBtn.addEventListener('click', () => this.resetForm());
+        
+        Object.keys(this.fields).forEach(fieldName => {
+          const field = this.fields[fieldName];
+          field.element.addEventListener('blur', () => this.validateField(fieldName));
+          field.element.addEventListener('input', () => this.clearError(fieldName));
+          if (field.element.type === 'checkbox') {
+            field.element.addEventListener('change', () => this.clearError(fieldName));
+          }
+        });
+      }
+
+      validateField(fieldName) {
+        const field = this.fields[fieldName];
+        const value = field.element.type === 'checkbox' ? field.element.checked : field.element.value;
+        const error = field.validate(value);
+        
+        if (error) {
+          this.showError(fieldName, error);
+          return false;
+        } else {
+          this.clearError(fieldName);
+          return true;
+        }
+      }
+
+      validateAll() {
+        let isValid = true;
+        Object.keys(this.fields).forEach(fieldName => {
+          if (!this.validateField(fieldName)) {
+            isValid = false;
+          }
+        });
+        return isValid;
+      }
+
+      showError(fieldName, message) {
+        const field = this.fields[fieldName];
+        field.errorElement.textContent = message;
+        field.errorElement.classList.remove('hidden');
+        field.element.setAttribute('aria-invalid', 'true');
+        if (field.element.type !== 'checkbox') {
+          field.element.classList.add('border-red-700');
+          field.element.classList.remove('border-gray-500');
+        }
+      }
+
+      clearError(fieldName) {
+        const field = this.fields[fieldName];
+        field.errorElement.textContent = '';
+        field.errorElement.classList.add('hidden');
+        field.element.removeAttribute('aria-invalid');
+        if (field.element.type !== 'checkbox') {
+          field.element.classList.remove('border-red-700');
+          field.element.classList.add('border-gray-500');
+        }
+      }
+
+      handleSubmit(e) {
+        e.preventDefault();
+        
+        this.successMessage.textContent = '';
+        
+        if (this.validateAll()) {
+          this.submitBtn.disabled = true;
+          this.submitBtn.textContent = 'Sending...';
+          
+          setTimeout(() => {
+            this.showSuccess();
+            this.submitBtn.disabled = false;
+            this.submitBtn.textContent = 'Send Message';
+          }, 1000);
+        } else {
+          const firstError = this.form.querySelector('[aria-invalid="true"]');
+          if (firstError) {
+            firstError.focus();
+          }
+        }
+      }
+
+      showSuccess() {
+        this.form.classList.add('hidden');
+        this.successContainer.classList.remove('hidden');
+        this.successContainer.focus();
+        this.successMessage.textContent = 'Your message has been sent successfully. We will get back to you within 24 hours.';
+      }
+
+      resetForm() {
+        this.form.reset();
+        this.form.classList.remove('hidden');
+        this.successContainer.classList.add('hidden');
+        
+        Object.keys(this.fields).forEach(fieldName => this.clearError(fieldName));
+        
+        this.fields.fullName.element.focus();
+        this.successMessage.textContent = '';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      new ContactFormComponent();
+    });
+  </script>
+</body>
+</html>

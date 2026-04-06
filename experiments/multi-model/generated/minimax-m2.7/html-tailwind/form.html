@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Accessible Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 0;
+      z-index: 50;
+      padding: 1rem;
+      background: #1f2937;
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 0 0 0.5rem 0;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #2563eb;
+      outline-offset: 2px;
+    }
+    
+    :focus-visible {
+      outline: 3px solid #2563eb;
+      outline-offset: 2px;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    input::placeholder,
+    textarea::placeholder {
+      color: #525252;
+    }
+    
+    .error-message {
+      color: #b91c1c;
+    }
+    
+    .success-container {
+      background: #d1fae5;
+      border: 2px solid #059669;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3 text-xl font-bold text-gray-900" aria-label="Homepage">
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect width="24" height="24" rx="4" fill="#2563eb"/>
+            <path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Acme Corp</span>
+        </a>
+        <nav aria-label="Header navigation">
+          <ul class="flex gap-6">
+            <li><a href="/" class="text-gray-600 hover:text-gray-900 font-medium">Home</a></li>
+            <li><a href="#contact" class="text-gray-900 font-medium" aria-current="page">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" tabindex="-1" class="flex-1">
+    <div class="max-w-2xl mx-auto px-4 py-12">
+      <!-- Page Header -->
+      <div class="text-center mb-10">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Contact Us</h1>
+        <p class="text-lg text-gray-600 max-w-md mx-auto">Have a question or want to work with us? Fill out the form below and we'll get back to you within 24 hours.</p>
+      </div>
+
+      <!-- Success Message Container (hidden by default) -->
+      <div id="success-message" role="status" aria-live="polite" aria-atomic="true" class="success-container rounded-lg p-6 mb-8 hidden">
+        <div class="flex items-start gap-4">
+          <svg class="w-6 h-6 text-green-700 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 12l3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <h2 class="text-lg font-semibold text-green-800 mb-1">Thank you for reaching out!</h2>
+            <p class="text-green-700">Your message has been successfully submitted. We'll respond to <span id="success-email-display"></span> within 24 hours.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Summary Container (hidden by default) -->
+      <div id="error-summary" role="alert" aria-live="assertive" class="bg-red-50 border-2 border-red-300 rounded-lg p-6 mb-8 hidden">
+        <h2 class="text-lg font-semibold text-red-800 mb-3">Please correct the following errors:</h2>
+        <ul class="list-disc list-inside text-red-700 space-y-1" id="error-list"></ul>
+      </div>
+
+      <!-- Contact Form -->
+      <form id="contact-form" novalidate class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8" action="#" method="post" aria-labelledby="form-title">
+        <h2 id="form-title" class="text-xl font-semibold text-gray-900 mb-6 sr-only">Contact Form</h2>
+
+        <!-- Full Name -->
+        <div class="mb-5">
+          <label for="fullname" class="block text-sm font-medium text-gray-700 mb-2">
+            Full Name <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input 
+            type="text" 
+            id="fullname" 
+            name="fullname" 
+            required 
+            autocomplete="name"
+            aria-required="true"
+            aria-describedby="fullname-hint fullname-error"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition-colors duration-200 hover:border-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            placeholder="Enter your full name"
+          >
+          <p id="fullname-hint" class="mt-1.5 text-sm text-gray-500">As it appears on your ID or passport.</p>
+          <p id="fullname-error" role="alert" class="mt-1.5 text-sm error-message hidden"></p>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-5">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email Address <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            autocomplete="email"
+            aria-required="true"
+            aria-describedby="email-hint email-error"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition-colors duration-200 hover:border-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            placeholder="you@company.com"
+          >
+          <p id="email-hint" class="mt-1.5 text-sm text-gray-500">We'll send our response to this address.</p>
+          <p id="email-error" role="alert" class="mt-1.5 text-sm error-message hidden"></p>
+        </div>
+
+        <!-- Phone -->
+        <div class="mb-5">
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+            Phone Number
+            <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone" 
+            autocomplete="tel"
+            aria-describedby="phone-hint phone-error"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition-colors duration-200 hover:border-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            placeholder="+1 (555) 123-4567"
+          >
+          <p id="phone-hint" class="mt-1.5 text-sm text-gray-500">Include country code for international numbers.</p>
+          <p id="phone-error" role="alert" class="mt-1.5 text-sm error-message hidden"></p>
+        </div>
+
+        <!-- Company -->
+        <div class="mb-5">
+          <label for="company" class="block text-sm font-medium text-gray-700 mb-2">
+            Company Name
+            <span class="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input 
+            type="text" 
+            id="company" 
+            name="company" 
+            autocomplete="organization"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition-colors duration-200 hover:border-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            placeholder="Your company or organization"
+          >
+        </div>
+
+        <!-- Department/Subject Dropdown -->
+        <div class="mb-5">
+          <label for="department" class="block text-sm font-medium text-gray-700 mb-2">
+            Subject <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <div class="relative">
+            <select 
+              id="department" 
+              name="department" 
+              required 
+              aria-required="true"
+              aria-describedby="department-error department-hint"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 bg-white appearance-none cursor-pointer transition-colors duration-200 hover:border-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 pr-10"
+            >
+              <option value="">Select a subject</option>
+              <option value="sales">Sales Inquiry</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing Question</option>
+              <option value="partnership">Partnership Opportunity</option>
+              <option value="careers">Careers</option>
+              <option value="press">Press & Media</option>
+              <option value="other">Other</option>
+            </select>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p id="department-hint" class="mt-1.5 text-sm text-gray-500">Choose the topic that best describes your inquiry.</p>
+          <p id="department-error" role="alert" class="mt-1.5 text-sm error-message hidden"></p>
+        </div>
+
+        <!-- Message -->
+        <div class="mb-6">
+          <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+            Message <span aria-hidden="true" class="text-red-600">*</span>
+            <span class="sr-only">(required)</span>
+          </label>
+          <textarea 
+            id="message" 
+            name="message" 
+            required 
+            aria-required="true"
+            aria-describedby="message-hint message-error message-count"
+            rows="5"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition-colors duration-200 hover:border-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 resize-y min-h-[120px]"
+            placeholder="Tell us how we can help you..."
+          ></textarea>
+          <div class="flex justify-between items-start mt-1.5">
+            <p id="message-hint" class="text-sm text-gray-500">Minimum 20 characters. Please be as detailed as possible.</p>
+            <p id="message-count" class="text-sm text-gray-500 ml-4" aria-live="polite">
+              <span id="char-count">0</span> / 20 min
+            </p>
+          </div>
+          <p id="message-error" role="alert" class="mt-1.5 text-sm error-message hidden"></p>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="mb-8">
+          <div class="flex gap-3">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              name="terms" 
+              required 
+              aria-required="true"
+              aria-describedby="terms-error"
+              class="w-5 h-5 mt-0.5 border-gray-300 rounded text-blue-600 cursor-pointer focus:ring-2 focus:ring-blue-100 flex-shrink-0"
+            >
+            <label for="terms" class="text-sm text-gray-700 cursor-pointer">
+              I agree to the <a href="/terms" class="text-blue-600 underline hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded">Terms of Service</a> and <a href="/privacy" class="text-blue-600 underline hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded">Privacy Policy</a> <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+            </label>
+          </div>
+          <p id="terms-error" role="alert" class="mt-2 text-sm error-message hidden"></p>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button 
+            type="submit" 
+            id="submit-btn"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors duration-200 focus:ring-4 focus:ring-blue-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span id="btn-text">Send Message</span>
+            <svg id="btn-spinner" class="hidden w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+          </button>
+          <button 
+            type="reset"
+            class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors duration-200 cursor-pointer"
+          >
+            Clear Form
+          </button>
+        </div>
+
+        <!-- Help Text -->
+        <p class="mt-6 text-center text-sm text-gray-500">
+          <span aria-hidden="true">*</span>
+          <span class="sr-only">Required</span> indicates required fields
+        </p>
+      </form>
+
+      <!-- Alternative Contact Methods -->
+      <section class="mt-12 pt-8 border-t border-gray-200" aria-labelledby="alt-contact-heading">
+        <h2 id="alt-contact-heading" class="text-lg font-semibold text-gray-900 mb-4">Prefer another way to reach us?</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
+            <svg class="w-6 h-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <h3 class="font-medium text-gray-900">Email</h3>
+              <a href="mailto:support@acmecorp.com" class="text-blue-600 hover:underline">support@acmecorp.com</a>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-200">
+            <svg class="w-6 h-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <h3 class="font-medium text-gray-900">Phone</h3>
+              <a href="tel:+15551234567" class="text-blue-600 hover:underline">+1 (555) 123-4567</a>
+              <p class="text-sm text-gray-500 mt-0.5">Mon–Fri, 9am–6pm EST</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+      <nav aria-label="Footer navigation">
+        <ul class="flex flex-wrap gap-6 mb-6">
+          <li><a href="/about" class="hover:text-white transition-colors">About Us</a></li>
+          <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
+          <li><a href="/accessibility" class="hover:text-white transition-colors">Accessibility</a></li>
+        </ul>
+      </nav>
+      <p class="text-sm text-gray-400">© 2024 Acme Corp. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Live Region for Announcements -->
+  <div role="status" aria-live="polite" aria-atomic="true" class="sr-only" id="announcer"></div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // Form elements
+      const form = document.getElementById('contact-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const successMessage = document.getElementById('success-message');
+      const successEmailDisplay = document.getElementById('success-email-display');
+      const errorSummary = document.getElementById('error-summary');
+      const errorList = document.getElementById('error-list');
+      const messageField = document.getElementById('message');
+      const charCount = document.getElementById('char-count');
+      const announcer = document.getElementById('announcer');
+
+      // Validation rules
+      const validationRules = {
+        fullname: {
+          required: true,
+          minLength: 2,
+          maxLength: 100,
+          messages: {
+            required: 'Please enter your full name.',
+            minLength: 'Your name must be at least 2 characters long.',
+            maxLength: 'Your name must be less than 100 characters.'
+          }
+        },
+        email: {
+          required: true,
+          pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+          messages: {
+            required: 'Please enter your email address.',
+            pattern: 'Please enter a valid email address (e.g., name@example.com).'
+          }
+        },
+        phone: {
+          required: false,
+          pattern: /^[\d\s\-\+\(\)]{7,20}$/,
+          messages: {
+            pattern: 'Please enter a valid phone number.'
+          }
+        },
+        department: {
+          required: true,
+          messages: {
+            required: 'Please select a subject from the dropdown.'
+          }
+        },
+        message: {
+          required: true,
+          minLength: 20,
+          maxLength: 5000,
+          messages: {
+            required: 'Please enter your message.',
+            minLength: 'Your message must be at least 20 characters long.',
+            maxLength: 'Your message must be less than 5000 characters.'
+          }
+        },
+        terms: {
+          required: true,
+          messages: {
+            required: 'You must agree to the Terms of Service and Privacy Policy.'
+          }
+        }
+      };
+
+      // Announce message to screen readers
+      function announce(message) {
+        announcer.textContent = '';
+        setTimeout(() => {
+          announcer.textContent = message;
+        }, 100);
+      }
+
+      // Validate a single field
+      function validateField(field) {
+        const name = field.name;
+        const value = field.type === 'checkbox' ? field.checked : field.value.trim();
+        const rules = validationRules[name];
+        
+        if (!rules) return { valid: true };
+
+        // Required check
+        if (rules.required) {
+          if (field.type === 'checkbox' && !value) {
+            return { valid: false, message: rules.messages.required };
+          }
+          if (field.type !== 'checkbox' && !value) {
+            return { valid: false, message: rules.messages.required };
+          }
+        }
+
+        // Skip further validation if empty and not required
+        if (!value) return { valid: true };
+
+        // Pattern check
+        if (rules.pattern && !rules.pattern.test(value)) {
+          return { valid: false, message: rules.messages.pattern };
+        }
+
+        // Min length check
+        if (rules.minLength && value.length < rules.minLength) {
+          return { valid: false, message: rules.messages.minLength };
+        }
+
+        // Max length check
+        if (rules.maxLength && value.length > rules.maxLength) {
+          return { valid: false, message: rules.messages.maxLength };
+        }
+
+        return { valid: true };
+      }
+
+      // Show error for a field
+      function showFieldError(field, message) {
+        const errorEl = document.getElementById(`${field.id}-error`);
+        if (errorEl) {
+          errorEl.textContent = message;
+          errorEl.classList.remove('hidden');
+        }
+        field.classList.add('border-red-500');
+        field.classList.remove('border-gray-300');
+        field.setAttribute('aria-invalid', 'true');
+      }
+
+      // Clear error for a field
+      function clearFieldError(field) {
+        const errorEl = document.getElementById(`${field.id}-error`);
+        if (errorEl) {
+          errorEl.textContent = '';
+          errorEl.classList.add('hidden');
+        }
+        field.classList.remove('border-red-500');
+        field.classList.add('border-gray-300');
+        field.removeAttribute('aria-invalid');
+      }
+
+      // Validate entire form
+      function validateForm() {
+        const fields = form.querySelectorAll('input, select, textarea');
+        const errors = [];
+        let isValid = true;
+
+        fields.forEach(field => {
+          clearFieldError(field);
+        });
+
+        fields.forEach(field => {
+          const result = validateField(field);
+          if (!result.valid) {
+            isValid = false;
+            errors.push(result.message);
+            showFieldError(field, result.message);
+          }
+        });
+
+        return { valid: isValid, errors };
+      }
+
+      // Clear all errors
+      function clearAllErrors() {
+        errorSummary.classList.add('hidden');
+        const fields = form.querySelectorAll('input, select, textarea');
+        fields.forEach(field => clearFieldError(field));
+      }
+
+      // Show error summary
+      function showErrorSummary(errors) {
+        errorList.innerHTML = '';
+        errors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error;
+          errorList.appendChild(li);
+        });
+        errorSummary.classList.remove('hidden');
+        
+        // Focus error summary for screen readers
+        errorSummary.focus();
+        
+        // Announce errors
+        announce(`Form submission failed. Please correct ${errors.length} error${errors.length > 1 ? 's' : ''}.`);
+      }
+
+      // Show success state
+      function showSuccess(email) {
+        successEmailDisplay.textContent = email;
+        successMessage.classList.remove('hidden');
+        form.classList.add('hidden');
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Announce success
+        announce('Form submitted successfully. Thank you for your message.');
+      }
+
+      // Update character count
+      function updateCharCount() {
+        const count = messageField.value.length;
+        charCount.textContent = count;
+        
+        const remaining = 20 - count;
+        if (remaining > 0) {
+          charCount.parentElement.classList.remove('text-green-600');
+          charCount.parentElement.classList.add('text-gray-500');
+        } else {
+          charCount.parentElement.classList.remove('text-gray-500');
+          charCount.parentElement.classList.add('text-green-600');
+        }
+      }
+
+      // Handle field blur validation
+      function handleBlur(event) {
+        const field = event.target;
+        if (field.type === 'submit' || field.type === 'reset') return;
+        
+        const result = validateField(field);
+        if (!result.valid) {
+          showFieldError(field, result.message);
+        } else {
+          clearFieldError(field);
+        }
+      }
+
+      // Handle input changes to clear errors
+      function handleInput(event) {
+        const field = event.target;
+        if (field.type === 'checkbox') return;
+        
+        clearFieldError(field);
+        
+        if (field.id === 'message') {
+          updateCharCount();
+        }
+      }
+
+      // Handle form submission
+      function handleSubmit(event) {
+        event.preventDefault();
+        
+        // Clear previous errors
+        clearAllErrors();
+        
+        // Validate form
+        const { valid, errors } = validateForm();
+        
+        if (!valid) {
+          showErrorSummary(errors);
+          return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.textContent = 'Sending...';
+        btnSpinner.classList.remove('hidden');
+
+        // Simulate form submission (replace with actual API call)
+        const email = document.getElementById('email').value.trim();
+        
+        setTimeout(() => {
+          showSuccess(email);
+        }, 1500);
+      }
+
+      // Handle form reset
+      function handleReset() {
+        clearAllErrors();
+        successMessage.classList.add('hidden');
+        form.classList.remove('hidden');
+        submitBtn.disabled = false;
+        btnText.textContent = 'Send Message';
+        btnSpinner.classList.add('hidden');
+        charCount.textContent = '0';
+        
+        // Reset autocomplete fields
+        setTimeout(() => {
+          form.reset();
+        }, 0);
+      }
+
+      // Event listeners
+      form.addEventListener('submit', handleSubmit);
+      form.addEventListener('reset', handleReset);
+      
+      // Add blur and input listeners to fields
+      const fields = form.querySelectorAll('input, select, textarea');
+      fields.forEach(field => {
+        field.addEventListener('blur', handleBlur);
+        field.addEventListener('input', handleInput);
+      });
+
+      // Initial character count
+      updateCharCount();
+
+      // Keyboard navigation improvements for dropdown
+      const departmentSelect = document.getElementById('department');
+      departmentSelect.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !departmentSelect.value) {
+          e.preventDefault();
+          departmentSelect.focus();
+          announce('Please select a subject from the dropdown.');
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>

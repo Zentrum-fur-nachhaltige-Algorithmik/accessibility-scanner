@@ -1,0 +1,65 @@
+{
+  "model": "moonshotai/kimi-k2.5",
+  "slug": "kimi-k2.5",
+  "timestamp": "2026-04-06T08:34:51.579Z",
+  "pages": [
+    {
+      "tech": "html",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/kimi-k2.5/html-tailwind/form.html",
+      "size": 15208,
+      "promptTokens": 8474,
+      "completionTokens": 10590,
+      "elapsed": 311.3,
+      "validationIssues": []
+    },
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/kimi-k2.5/react-tailwind/form.html",
+      "size": 22996,
+      "promptTokens": 11283,
+      "completionTokens": 8599,
+      "elapsed": 32.4,
+      "validationIssues": []
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/kimi-k2.5/vue-tailwind/form.html",
+      "size": 16458,
+      "promptTokens": 10738,
+      "completionTokens": 9030,
+      "elapsed": 224.2,
+      "validationIssues": []
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/kimi-k2.5/svelte-tailwind/form.html",
+      "size": 14031,
+      "promptTokens": 8480,
+      "completionTokens": 10003,
+      "elapsed": 125.2,
+      "validationIssues": []
+    },
+    {
+      "tech": "angular",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/kimi-k2.5/angular-tailwind/form.html",
+      "size": 16172,
+      "promptTokens": 8480,
+      "completionTokens": 9455,
+      "elapsed": 350.9,
+      "validationIssues": []
+    }
+  ],
+  "totalPromptTokens": 47455,
+  "totalCompletionTokens": 47677,
+  "errors": []
+}

@@ -1,0 +1,65 @@
+{
+  "model": "google/gemini-3.1-flash-lite-preview",
+  "slug": "gemini-3.1-flash-lite",
+  "timestamp": "2026-04-06T08:09:04.141Z",
+  "pages": [
+    {
+      "tech": "html",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemini-3.1-flash-lite/html-tailwind/form.html",
+      "size": 6260,
+      "promptTokens": 9255,
+      "completionTokens": 1792,
+      "elapsed": 7.6,
+      "validationIssues": []
+    },
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemini-3.1-flash-lite/react-tailwind/form.html",
+      "size": 6477,
+      "promptTokens": 12375,
+      "completionTokens": 1662,
+      "elapsed": 5.3,
+      "validationIssues": []
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemini-3.1-flash-lite/vue-tailwind/form.html",
+      "size": 6481,
+      "promptTokens": 11840,
+      "completionTokens": 1747,
+      "elapsed": 7,
+      "validationIssues": []
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemini-3.1-flash-lite/svelte-tailwind/form.html",
+      "size": 5805,
+      "promptTokens": 9257,
+      "completionTokens": 1551,
+      "elapsed": 5.2,
+      "validationIssues": []
+    },
+    {
+      "tech": "angular",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemini-3.1-flash-lite/angular-tailwind/form.html",
+      "size": 5835,
+      "promptTokens": 9258,
+      "completionTokens": 1627,
+      "elapsed": 5.7,
+      "validationIssues": []
+    }
+  ],
+  "totalPromptTokens": 51985,
+  "totalCompletionTokens": 8379,
+  "errors": []
+}

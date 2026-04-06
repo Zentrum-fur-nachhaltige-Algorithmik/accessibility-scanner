@@ -1,0 +1,72 @@
+{
+  "model": "qwen/qwen3.6-plus:free",
+  "slug": "qwen3.6-plus",
+  "timestamp": "2026-04-06T08:20:44.571Z",
+  "pages": [
+    {
+      "tech": "html",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/qwen3.6-plus/html-tailwind/form.html",
+      "size": 21632,
+      "promptTokens": 9117,
+      "completionTokens": 7357,
+      "elapsed": 146.2,
+      "validationIssues": []
+    },
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "file": null,
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula"
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "file": null,
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula"
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "file": null,
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula"
+    },
+    {
+      "tech": "angular",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/qwen3.6-plus/angular-tailwind/form.html",
+      "size": 22678,
+      "promptTokens": 9121,
+      "completionTokens": 7314,
+      "elapsed": 134.9,
+      "validationIssues": []
+    }
+  ],
+  "totalPromptTokens": 18238,
+  "totalCompletionTokens": 14671,
+  "errors": [
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula"
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula"
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "error": "HTTP 429: {\"error\":{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula"
+    }
+  ]
+}

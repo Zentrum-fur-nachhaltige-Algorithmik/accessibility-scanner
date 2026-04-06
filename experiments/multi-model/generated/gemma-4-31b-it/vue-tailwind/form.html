@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Acme Corp</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0;
+      margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
+    .skip-link:focus {
+      position: absolute; top: 0; left: 0; z-index: 100;
+      background: #1b2a4a; color: white; padding: 1rem;
+    }
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <div id="app">
+    <a href="#main-content" class="skip-link sr-only">Skip to main content</a>
+
+    <header class="bg-white border-b border-slate-200">
+      <nav class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between" aria-label="Main navigation">
+        <div class="font-bold text-xl">Acme Corp</div>
+        <ul class="flex gap-6">
+          <li><a href="#" class="hover:underline underline-offset-4">Home</a></li>
+          <li><a href="#" class="hover:underline underline-offset-4" aria-current="page">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="flex-grow max-w-4xl mx-auto w-full px-4 py-12">
+      <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2">Get in Touch</h1>
+        <p class="text-slate-600 mb-8">Fill out the form below and our team will get back to you within 24 hours.</p>
+
+        <!-- Error Summary -->
+        <div v-if="hasErrors" ref="errorSummary" role="alert" tabindex="-1" class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 text-red-900">
+          <h2 class="font-bold text-lg mb-2">There are {{ errorCount }} errors in your submission:</h2>
+          <ul class="list-disc list-inside">
+            <li v-for="(msg, field) in errors" :key="field">
+              <a :href="`#${field}`" class="underline hover:text-red-700">{{ msg }}</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Success Message -->
+        <div v-if="submitted" role="status" class="mb-6 p-4 bg-green-50 border-l-4 border-green-600 text-green-900">
+          <p class="font-bold text-lg">Message sent successfully!</p>
+          <p>We have received your inquiry and will contact you shortly.</p>
+        </div>
+
+        <form @submit.prevent="handleSubmit" novalidate class="space-y-6 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200">
+          
+          <!-- Name -->
+          <div class="form-group">
+            <label for="name" class="block font-medium mb-1">
+              Full Name <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input 
+              type="text" id="name" v-model="form.name"
+              autocomplete="name"
+              :aria-invalid="!!errors.name"
+              :aria-describedby="errors.name ? 'name-error' : undefined"
+              class="w-full p-2 border rounded-md focus:ring-2 ring-slate-400 outline-none"
+              :class="errors.name ? 'border-red-600' : 'border-slate-300'"
+            >
+            <p v-if="errors.name" id="name-error" role="alert" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="block font-medium mb-1">
+              Email Address <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <input 
+              type="email" id="email" v-model="form.email"
+              autocomplete="email"
+              :aria-invalid="!!errors.email"
+              :aria-describedby="errors.email ? 'email-error' : undefined"
+              class="w-full p-2 border rounded-md focus:ring-2 ring-slate-400 outline-none"
+              :class="errors.email ? 'border-red-600' : 'border-slate-300'"
+            >
+            <p v-if="errors.email" id="email-error" role="alert" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Phone -->
+            <div class="form-group">
+              <label for="phone" class="block font-medium mb-1">Phone Number</label>
+              <input 
+                type="tel" id="phone" v-model="form.phone"
+                autocomplete="tel"
+                :aria-invalid="!!errors.phone"
+                :aria-describedby="errors.phone ? 'phone-error' : undefined"
+                class="w-full p-2 border rounded-md focus:ring-2 ring-slate-400 outline-none"
+                :class="errors.phone ? 'border-red-600' : 'border-slate-300'"
+              >
+              <p v-if="errors.phone" id="phone-error" role="alert" class="mt-1 text-sm text-red-600">{{ errors.phone }}</p>
+            </div>
+
+            <!-- Company -->
+            <div class="form-group">
+              <label for="company" class="block font-medium mb-1">Company</label>
+              <input 
+                type="text" id="company" v-model="form.company"
+                autocomplete="organization"
+                class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 ring-slate-400 outline-none"
+              >
+            </div>
+          </div>
+
+          <!-- Subject Dropdown -->
+          <div class="form-group">
+            <label for="subject" class="block font-medium mb-1">
+              Subject <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <select 
+              id="subject" v-model="form.subject"
+              :aria-invalid="!!errors.subject"
+              :aria-describedby="errors.subject ? 'subject-error' : undefined"
+              class="w-full p-2 border rounded-md focus:ring-2 ring-slate-400 outline-none bg-white"
+              :class="errors.subject ? 'border-red-600' : 'border-slate-300'"
+            >
+              <option value="">Please select a subject</option>
+              <option value="sales">Sales Inquiry</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing Question</option>
+              <option value="other">Other</option>
+            </select>
+            <p v-if="errors.subject" id="subject-error" role="alert" class="mt-1 text-sm text-red-600">{{ errors.subject }}</p>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label for="message" class="block font-medium mb-1">
+              Message <span aria-hidden="true" class="text-red-600">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <textarea 
+              id="message" v-model="form.message"
+              rows="5"
+              :aria-invalid="!!errors.message"
+              :aria-describedby="errors.message ? 'message-error' : undefined"
+              class="w-full p-2 border rounded-md focus:ring-2 ring-slate-400 outline-none"
+              :class="errors.message ? 'border-red-600' : 'border-slate-300'"
+            ></textarea>
+            <p v-if="errors.message" id="message-error" role="alert" class="mt-1 text-sm text-red-600">{{ errors.message }}</p>
+          </div>
+
+          <!-- Terms Checkbox -->
+          <div class="flex items-start gap-3">
+            <div class="flex items-center h-5">
+              <input 
+                id="terms" type="checkbox" v-model="form.terms"
+                :aria-invalid="!!errors.terms"
+                :aria-describedby="errors.terms ? 'terms-error' : undefined"
+                class="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-400"
+              >
+            </div>
+            <div class="flex flex-col">
+              <label for="terms" class="text-sm font-medium text-slate-700">
+                I agree to the <a href="#" class="underline hover:text-slate-900">Terms of Service</a> and Privacy Policy <span aria-hidden="true" class="text-red-600">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <p v-if="errors.terms" id="terms-error" role="alert" class="text-sm text-red-600">{{ errors.terms }}</p>
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-md hover:bg-slate-800 transition-colors"
+          >
+            Submit Request
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-8 mt-12">
+      <div class="max-w-4xl mx-auto px-4 text-center text-slate-500 text-sm">
+        &copy; 2024 Acme Corp. All rights reserved.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, nextTick } = Vue;
+
+    createApp({
+      setup() {
+        const form = ref({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          subject: '',
+          message: '',
+          terms: false
+        });
+
+        const errors = ref({});
+        const submitted = ref(false);
+        const errorSummary = ref(null);
+
+        const hasErrors = computed(() => Object.keys(errors.value).length > 0);
+        const errorCount = computed(() => Object.keys(errors.value).length);
+
+        const validateEmail = (email) => {
+          return String(email).toLowerCase().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+        };
+
+        const handleSubmit = async () => {
+          submitted.value = false;
+          errors.value = {};
+
+          // Validation logic
+          if (!form.value.name.trim()) errors.value.name = 'Full name is required.';
+          if (!form.value.email.trim()) {
+            errors.value.email = 'Email address is required.';
+          } else if (!validateEmail(form.value.email)) {
+            errors.value.email = 'Please enter a valid email address.';
+          }
+          if (!form.value.subject) errors.value.subject = 'Please select a subject.';
+          if (!form.value.message.trim()) errors.value.message = 'Please enter your message.';
+          if (!form.value.terms) errors.value.terms = 'You must agree to the terms and conditions.';
+
+          if (hasErrors.value) {
+            await nextTick();
+            errorSummary.value?.focus();
+            return;
+          }
+
+          // Simulate API call
+          submitted.value = true;
+          // Reset form
+          form.value = { name: '', email: '', phone: '', company: '', subject: '', message: '', terms: false };
+          
+          // Focus success message for SR
+          await nextTick();
+          document.querySelector('[role="status"]').focus();
+        };
+
+        return {
+          form,
+          errors,
+          submitted,
+          hasErrors,
+          errorCount,
+          errorSummary,
+          handleSubmit
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

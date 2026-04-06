@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Accessible Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        .skip-link { position: absolute; top: -40px; left: 0; background: #1e40af; color: white; padding: 8px; z-index: 100; }
+        .skip-link:focus { top: 0; }
+        :focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+        .form-error { border: 2px solid #b91c1c; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans leading-relaxed">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="bg-white border-b border-gray-200 p-4">
+        <nav aria-label="Main navigation">
+            <h1 class="text-xl font-bold">Contact Our Team</h1>
+        </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto p-6">
+        <section aria-labelledby="contact-form-title">
+            <h2 id="contact-form-title" class="text-2xl font-semibold mb-6">Registration Form</h2>
+            
+            <div id="success-message" role="status" aria-live="polite" class="hidden p-4 mb-4 bg-green-100 text-green-800 rounded">
+                Form submitted successfully!
+            </div>
+
+            <form id="registration-form" novalidate class="space-y-6">
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block font-medium mb-1">Full Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                    <input type="text" id="name" name="name" required autocomplete="name" class="w-full p-2 border border-gray-400 rounded">
+                    <p id="name-error" class="text-red-700 text-sm mt-1 hidden" role="alert">Please enter your name.</p>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block font-medium mb-1">Email Address <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                    <input type="email" id="email" name="email" required autocomplete="email" class="w-full p-2 border border-gray-400 rounded">
+                    <p id="email-error" class="text-red-700 text-sm mt-1 hidden" role="alert">Please enter a valid email address.</p>
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone" class="block font-medium mb-1">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" name="phone" autocomplete="tel" class="w-full p-2 border border-gray-400 rounded">
+                </div>
+
+                <!-- Department -->
+                <div>
+                    <label for="dept" class="block font-medium mb-1">Department</label>
+                    <select id="dept" name="dept" class="w-full p-2 border border-gray-400 rounded bg-white">
+                        <option value="sales">Sales</option>
+                        <option value="support">Support</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Message -->
+                <div>
+                    <label for="message" class="block font-medium mb-1">Message</label>
+                    <textarea id="message" name="message" rows="4" class="w-full p-2 border border-gray-400 rounded"></textarea>
+                </div>
+
+                <!-- Terms -->
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="terms" name="terms" required class="w-5 h-5">
+                    <label for="terms">I agree to the terms and conditions <span aria-hidden="true">*</span></label>
+                </div>
+                <p id="terms-error" class="text-red-700 text-sm hidden" role="alert">You must agree to the terms.</p>
+
+                <button type="submit" class="bg-blue-800 text-white p-3 rounded font-bold hover:bg-blue-900 w-full md:w-auto px-8">
+                    Submit Registration
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="mt-12 p-4 text-center text-sm text-gray-600 border-t">
+        &copy; 2024 Accessibility Demo
+    </footer>
+
+    <script>
+        const form = document.getElementById('registration-form');
+        const successMsg = document.getElementById('success-message');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
+            
+            // Basic Validation
+            const fields = ['name', 'email', 'terms'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                const error = document.getElementById(`${id}-error`) || document.getElementById('terms-error');
+                
+                if (!el.value || (el.type === 'checkbox' && !el.checked)) {
+                    el.classList.add('form-error');
+                    error.classList.remove('hidden');
+                    el.setAttribute('aria-invalid', 'true');
+                    isValid = false;
+                } else {
+                    el.classList.remove('form-error');
+                    error.classList.add('hidden');
+                    el.setAttribute('aria-invalid', 'false');
+                }
+            });
+
+            if (isValid) {
+                form.classList.add('hidden');
+                successMsg.classList.remove('hidden');
+                successMsg.focus();
+            }
+        });
+    </script>
+</body>
+</html>

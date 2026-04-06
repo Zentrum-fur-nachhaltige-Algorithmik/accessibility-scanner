@@ -1,0 +1,65 @@
+{
+  "model": "google/gemma-4-31b-it",
+  "slug": "gemma-4-31b-it",
+  "timestamp": "2026-04-06T08:09:35.047Z",
+  "pages": [
+    {
+      "tech": "html",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemma-4-31b-it/html-tailwind/form.html",
+      "size": 10222,
+      "promptTokens": 10422,
+      "completionTokens": 3114,
+      "elapsed": 101.1,
+      "validationIssues": []
+    },
+    {
+      "tech": "react",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemma-4-31b-it/react-tailwind/form.html",
+      "size": 18898,
+      "promptTokens": 13978,
+      "completionTokens": 3999,
+      "elapsed": 197,
+      "validationIssues": []
+    },
+    {
+      "tech": "vue",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemma-4-31b-it/vue-tailwind/form.html",
+      "size": 11425,
+      "promptTokens": 13397,
+      "completionTokens": 3337,
+      "elapsed": 148.1,
+      "validationIssues": []
+    },
+    {
+      "tech": "svelte",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemma-4-31b-it/svelte-tailwind/form.html",
+      "size": 11740,
+      "promptTokens": 10426,
+      "completionTokens": 3459,
+      "elapsed": 121.1,
+      "validationIssues": []
+    },
+    {
+      "tech": "angular",
+      "css": "tailwind",
+      "page": "form",
+      "file": "generated/gemma-4-31b-it/angular-tailwind/form.html",
+      "size": 12438,
+      "promptTokens": 10427,
+      "completionTokens": 3079,
+      "elapsed": 102,
+      "validationIssues": []
+    }
+  ],
+  "totalPromptTokens": 58650,
+  "totalCompletionTokens": 16988,
+  "errors": []
+}

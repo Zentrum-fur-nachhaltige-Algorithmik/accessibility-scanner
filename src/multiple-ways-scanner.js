@@ -109,15 +109,19 @@ class MultipleWaysScanner extends BaseScanner {
       }
 
       // Process page heuristic: checkout/wizard/auth steps are exempt
+      // Only match on URL, page title, and H1 to avoid false positives from
+      // pages that merely mention these words in body content
       const isProcess = (() => {
         const url = window.location.href.toLowerCase();
-        const bodyText = (document.body?.textContent || '').slice(0, 2000).toLowerCase();
+        const title = (document.title || '').toLowerCase();
+        const h1 = (document.querySelector('h1')?.textContent || '').toLowerCase();
+        const processContext = url + ' ' + title + ' ' + h1;
         const processPatterns = [
           /checkout/i, /payment/i, /step\s*\d/i, /wizard/i,
           /sign[\s-]?in/i, /log[\s-]?in/i, /register/i, /registration/i,
           /reset[\s-]?password/i, /verify/i, /confirmation/i,
         ];
-        return processPatterns.some(p => p.test(url) || p.test(bodyText));
+        return processPatterns.some(p => p.test(processContext));
       })();
 
       // Deduplicate by type

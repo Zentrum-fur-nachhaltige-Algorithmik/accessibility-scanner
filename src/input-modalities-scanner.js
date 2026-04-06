@@ -620,6 +620,75 @@ class InputModalitiesScanner extends BaseScanner {
         }
       });
 
+      // Check for infinite CSS animations without pause controls or prefers-reduced-motion
+      let hasReducedMotionQuery = false;
+      try {
+        for (const sheet of document.styleSheets) {
+          try {
+            for (const rule of sheet.cssRules || []) {
+              if (rule instanceof CSSMediaRule &&
+                  rule.conditionText && rule.conditionText.includes('prefers-reduced-motion')) {
+                hasReducedMotionQuery = true;
+                break;
+              }
+            }
+          } catch (e) { /* cross-origin */ }
+          if (hasReducedMotionQuery) break;
+        }
+      } catch (e) { /* no stylesheets */ }
+
+      if (!hasReducedMotionQuery) {
+        const allElements = document.querySelectorAll('*');
+        const animatedElements = [];
+
+        allElements.forEach(el => {
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden') return;
+
+          const iterationCount = style.animationIterationCount;
+          const duration = style.animationDuration;
+          const animName = style.animationName;
+
+          if (iterationCount === 'infinite' && animName && animName !== 'none' &&
+              duration && duration !== '0s' && duration !== '0ms') {
+            const className = el.className && typeof el.className === 'string'
+              ? el.className : '';
+            animatedElements.push({
+              selector: el.tagName.toLowerCase() +
+                (el.id ? `#${el.id}` : '') +
+                (className ? `.${className.split(' ')[0]}` : ''),
+              animation: animName,
+              duration: duration,
+            });
+          }
+        });
+
+        if (animatedElements.length > 0) {
+          // Check for pause/stop controls
+          const pauseControls = document.querySelectorAll('button, [role="button"], input[type="checkbox"], [role="switch"]');
+          let hasPauseControl = false;
+          const pauseKeywords = /pause|stop|disable|reduce|animation|motion/i;
+          pauseControls.forEach(ctrl => {
+            const text = (ctrl.textContent || '') +
+              (ctrl.getAttribute('aria-label') || '') +
+              (ctrl.getAttribute('title') || '');
+            if (pauseKeywords.test(text)) hasPauseControl = true;
+          });
+
+          if (!hasPauseControl) {
+            for (const anim of animatedElements) {
+              issues.push({
+                type: 'infinite-animation-no-pause',
+                element: anim.selector,
+                description: `Infinite CSS animation "${anim.animation}" (${anim.duration}) without pause control or prefers-reduced-motion media query`,
+                severity: 'error',
+              });
+              alternativesProvided = false;
+            }
+          }
+        }
+      }
+
       return { issues, alternativesProvided };
     });
 
@@ -977,7 +1046,8 @@ class InputModalitiesScanner extends BaseScanner {
     const suggestions = {
       'motion-no-disable-option': 'Provide user controls to disable motion-activated features',
       'motion-no-alternative-method': 'Add button or keyboard alternatives to motion-triggered actions',
-      'orientation-css-no-alternative': 'Provide manual controls for orientation-dependent functionality'
+      'orientation-css-no-alternative': 'Provide manual controls for orientation-dependent functionality',
+      'infinite-animation-no-pause': 'Add a pause/stop control and a @media (prefers-reduced-motion: reduce) CSS rule to disable or reduce animations'
     };
     return suggestions[violationType] || 'Ensure motion-based features can be disabled and have alternatives';
   }

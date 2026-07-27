@@ -1,0 +1,212 @@
+<!-- WCAG-TEST
+criterion: 3.2.6
+level: A
+title: Consistent Help
+test_type: bad
+expected_violations: 3
+testable_by: dom
+scanners: navigation-consistency
+description: Help mechanisms change position across page sections
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Consistent Help - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Page section simulating different pages */
+        .page-section {
+            border: 2px solid #ccc;
+            margin: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .page-section .page-header {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .page-section .page-header nav {
+            display: flex;
+            gap: 15px;
+        }
+        .page-section .page-header nav a {
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+        }
+        .page-section .page-content {
+            padding: 20px;
+            min-height: 150px;
+        }
+        .page-section .page-footer {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+        .page-section .page-footer a {
+            color: #1565c0;
+        }
+
+        /* VIOLATION 1: Help link in different positions across "pages" */
+        .header-1 { background: #1a237e; }
+        .header-2 { background: #1b5e20; }
+        .header-3 { background: #b71c1c; }
+
+        .help-link {
+            color: #ffeb3b;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        /* VIOLATION 2: Contact info inconsistently placed */
+        .contact-box {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* VIOLATION 3: Chat widget that appears and disappears */
+        .chat-widget {
+            position: relative;
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="padding: 20px;">Multi-Page Application (Simulated)</h1>
+
+    <!-- VIOLATION 1: Help link position changes across pages -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 1: Help Link in Different Positions</div>
+        <p>The "Help" link appears in different locations in the navigation across pages: far right, far left, and in the footer only.</p>
+    </div>
+
+    <!-- Simulated Page 1: Help link on the RIGHT side of nav -->
+    <div class="page-section">
+        <div class="page-header header-1">
+            <strong style="color:white;">Page 1: Home</strong>
+            <nav>
+                <a href="#products">Products</a>
+                <a href="#about">About</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#help" class="help-link">Help</a>
+            </nav>
+        </div>
+        <div class="page-content">
+            <h2>Welcome to Our Platform</h2>
+            <p>Explore our products and services.</p>
+        </div>
+        <div class="page-footer">
+            <span>&copy; 2026 Company</span>
+            <div>
+                <a href="#terms">Terms</a> | <a href="#privacy">Privacy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulated Page 2: Help link on the LEFT side of nav (inconsistent!) -->
+    <div class="page-section">
+        <div class="page-header header-2">
+            <nav>
+                <a href="#help" class="help-link">Help</a>
+                <a href="#docs">Docs</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <strong style="color:white;">Page 2: Documentation</strong>
+        </div>
+        <div class="page-content">
+            <h2>Documentation</h2>
+            <p>Read the API documentation and integration guides.</p>
+            <!-- VIOLATION 2: Contact info in main content area instead of footer/sidebar -->
+            <div class="contact-box" style="margin-top: 20px;">
+                <strong>Need help?</strong> Call us: 1-800-555-0123 or email support@example.com
+            </div>
+        </div>
+        <div class="page-footer">
+            <span>&copy; 2026 Company</span>
+            <div>
+                <a href="#terms">Terms</a> | <a href="#privacy">Privacy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulated Page 3: Help link ONLY in footer (inconsistent!), no nav help link -->
+    <div class="page-section">
+        <div class="page-header header-3">
+            <strong style="color:white;">Page 3: Account Settings</strong>
+            <nav>
+                <a href="#profile">Profile</a>
+                <a href="#billing">Billing</a>
+                <a href="#security">Security</a>
+                <!-- No help link in nav! -->
+            </nav>
+        </div>
+        <div class="page-content">
+            <h2>Account Settings</h2>
+            <p>Manage your profile and preferences.</p>
+            <!-- Contact info absent from this page entirely -->
+        </div>
+        <div class="page-footer">
+            <span>&copy; 2026 Company</span>
+            <div>
+                <a href="#help" class="help-link">Help</a> |
+                <a href="#terms">Terms</a> | <a href="#privacy">Privacy</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIOLATION 2: Contact information inconsistently placed -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 2: Inconsistent Contact Information Placement</div>
+        <p>Contact information appears in the main content area on Page 2 but is absent on Pages 1 and 3. Users cannot reliably find support contact details.</p>
+    </div>
+
+    <!-- VIOLATION 3: Chat widget appears on some pages but not others -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 3: Chat Widget Appears/Disappears</div>
+        <p>A live chat widget is shown on Page 1 but removed from Pages 2 and 3, making the help mechanism inconsistent.</p>
+    </div>
+
+    <!-- Chat widget only present near first simulated page -->
+    <div style="padding: 20px;">
+        <p>Chat widget appears below Page 1 only:</p>
+        <div class="chat-widget">&#128172; Live Chat</div>
+        <p style="color: #757575; font-size: 13px;">(This widget does not appear on the Documentation or Account Settings pages)</p>
+    </div>
+
+</body>
+</html>

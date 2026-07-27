@@ -1,0 +1,133 @@
+<!-- WCAG-TEST
+criterion: 1.3.2
+level: A
+title: Meaningful Sequence
+test_type: good
+expected_violations: 0
+testable_by: manual
+scanners: structure
+description: DOM order matches visual presentation order, maintaining a meaningful reading sequence
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Correct Meaningful Sequence (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+
+        /* Pattern 1: DOM order matches visual order with flexbox */
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Pattern 2: Grid layout preserving logical flow */
+        .article-layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+        }
+        .article-layout .main {
+            grid-column: 1;
+        }
+        .article-layout .aside {
+            grid-column: 2;
+        }
+
+        /* Pattern 3: CSS decoration that does not affect reading order */
+        .decorated-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .decorated-list .item {
+            flex: 1 1 200px;
+            /* No order property used -- DOM order is visual order */
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 4px;
+        }
+        .aside-box {
+            background: #f7f7f7;
+            padding: 12px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Correct Meaningful Sequence (GOOD)</h1>
+    <p>This page demonstrates WCAG 1.3.2 compliance: DOM order matches visual presentation order throughout.</p>
+
+    <!-- Pattern 1: Steps in correct DOM order, no CSS reordering -->
+    <h2>Pattern 1: Sequential Steps in Correct DOM Order</h2>
+    <div class="steps-container">
+        <div class="card">
+            <h3>Step 1: Create your account</h3>
+            <p>Fill in the registration form with your name and email address.</p>
+        </div>
+        <div class="card">
+            <h3>Step 2: Verify your email</h3>
+            <p>Click the verification link sent to your inbox.</p>
+        </div>
+        <div class="card">
+            <h3>Step 3: Complete your profile</h3>
+            <p>Add a profile photo and set your preferences.</p>
+        </div>
+    </div>
+
+    <!-- Pattern 2: Two-column layout with main content first in DOM -->
+    <h2>Pattern 2: Article Layout with Logical DOM Order</h2>
+    <div class="article-layout">
+        <div class="main">
+            <h3>Quantum Computing Breakthrough Announced</h3>
+            <p><em>By Jane Doe, Science Correspondent &mdash; March 12, 2026</em></p>
+            <p>Scientists at the National Laboratory announced a breakthrough in quantum computing that could reduce processing times by a factor of 1000. The research team demonstrated a new error-correction method that maintains qubit coherence far longer than previous approaches.</p>
+            <p>The implications span cryptography, drug discovery, and climate modelling. Commercial applications are expected within five years.</p>
+        </div>
+        <aside class="aside">
+            <div class="aside-box">
+                <h4>Related Articles</h4>
+                <ul>
+                    <li><a href="#">History of Quantum Computing</a></li>
+                    <li><a href="#">Error Correction Explained</a></li>
+                    <li><a href="#">Industry Reactions</a></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Pattern 3: Decorative flex layout without order manipulation -->
+    <h2>Pattern 3: Card Grid Without Order Manipulation</h2>
+    <div class="decorated-list">
+        <div class="card item">
+            <h3>Introduction</h3>
+            <p>Welcome to the course on database fundamentals.</p>
+        </div>
+        <div class="card item">
+            <h3>Prerequisites</h3>
+            <p>Basic programming knowledge and familiarity with data types.</p>
+        </div>
+        <div class="card item">
+            <h3>Module Details</h3>
+            <p>SQL queries, indexing, and normalization techniques.</p>
+        </div>
+        <div class="card item">
+            <h3>Conclusion</h3>
+            <p>Design efficient database schemas with confidence.</p>
+        </div>
+    </div>
+
+</body>
+</html>

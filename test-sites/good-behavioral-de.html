@@ -1,0 +1,124 @@
+<!-- WCAG-TEST
+criterion: 2.2.3, 3.2.5, 3.3.5
+level: AAA
+title: Verhaltensbezogene Verstöße — Anamnesebogen (German)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-behavioral-scanner
+description: Kein Meta-Refresh, Standortauswahl mit separatem Bestätigen-Button, Hilfetexte per aria-describedby auf jedem komplexen Feld, kein automatisches Absenden
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anamnesebogen — Ordination Dr. Berger (Test: gut)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; color: #1a1a1a; }
+        .compliant-section { border: 2px solid #1b5e20; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-top: 12px; }
+        input, select { padding: 8px; margin: 4px 0; display: block; width: 100%; max-width: 400px; border: 1px solid #767676; font-size: 16px; }
+        input:focus-visible, select:focus-visible, button:focus-visible {
+            outline: 3px solid #1b5e20; outline-offset: 2px;
+        }
+        .field-help { font-size: 0.85em; color: #333333; margin: 2px 0 8px 0; }
+        .standort-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        button {
+            background: #1f5c2e; color: #ffffff; border: none; padding: 10px 18px; border-radius: 4px;
+            cursor: pointer; font-size: 16px; min-height: 40px;
+        }
+        .global-help {
+            background: #f8f9fa; border-left: 4px solid #1f5c2e; padding: 12px 16px; margin: 20px 0; border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Anamnesebogen — Ordination Dr. Julia Berger</h1>
+    <p>Bitte füllen Sie den folgenden Anamnesebogen in Ruhe aus. Es gibt kein Zeitlimit und keine automatische
+       Aktualisierung dieser Seite.</p>
+
+    <!-- Compliant (3.2.5): Select requires an explicit confirm step, no auto-navigation -->
+    <div class="compliant-section">
+        <div class="compliant-title">Korrekt (3.2.5): Standortauswahl erst nach Bestätigung</div>
+        <label for="standort">Praxisstandort wählen</label>
+        <div class="standort-row">
+            <select id="standort" name="standort">
+                <option value="">Bitte wählen</option>
+                <option value="wien-mitte">Wien Mitte</option>
+                <option value="wien-west">Wien West</option>
+                <option value="melk">Melk</option>
+            </select>
+            <button type="button" id="standort-submit">Standort übernehmen</button>
+        </div>
+        <p class="field-help">Die Seite wechselt erst, nachdem Sie "Standort übernehmen" ausgewählt haben.</p>
+    </div>
+
+    <!-- Compliant (3.3.5): Every complex field has help text via aria-describedby -->
+    <div class="compliant-section">
+        <div class="compliant-title">Korrekt (3.3.5): Hilfetexte auf jedem komplexen Feld</div>
+        <form>
+            <label for="a-name">Name</label>
+            <input type="text" id="a-name" autocomplete="name">
+
+            <label for="a-geburt">Geburtsdatum</label>
+            <input type="text" id="a-geburt" placeholder="TT.MM.JJJJ" aria-describedby="help-geburt">
+            <p class="field-help" id="help-geburt">Format: Tag.Monat.Jahr, zum Beispiel 05.03.1978.</p>
+
+            <label for="a-svnr">Sozialversicherungsnummer</label>
+            <input type="text" id="a-svnr" placeholder="1234 010180" aria-describedby="help-svnr">
+            <p class="field-help" id="help-svnr">10-stellige Nummer von Ihrer e-card, z. B. 1234 010180.</p>
+
+            <label for="a-hausarzt">Bisheriger Hausarzt (optional)</label>
+            <input type="text" id="a-hausarzt" aria-describedby="help-hausarzt">
+            <p class="field-help" id="help-hausarzt">Falls vorhanden — Name und Ort der Ordination genügen.</p>
+
+            <label for="a-medikamente">Aktuelle Medikamente</label>
+            <input type="text" id="a-medikamente" aria-describedby="help-medikamente">
+            <p class="field-help" id="help-medikamente">Bitte Wirkstoff, Dosierung und Einnahmezeitpunkt angeben, z. B. "Ramipril 5mg, morgens".</p>
+
+            <label for="a-allergien">Bekannte Allergien und Unverträglichkeiten</label>
+            <input type="text" id="a-allergien" aria-describedby="help-allergien">
+            <p class="field-help" id="help-allergien">Auch Medikamenten- und Nahrungsmittelallergien bitte angeben.</p>
+
+            <label for="a-vorerkrankungen">Vorerkrankungen</label>
+            <input type="text" id="a-vorerkrankungen" aria-describedby="help-vorerkrankungen">
+            <p class="field-help" id="help-vorerkrankungen">Chronische Erkrankungen, z. B. Bluthochdruck oder Diabetes.</p>
+
+            <label for="a-voroperationen">Voroperationen mit Datum</label>
+            <input type="text" id="a-voroperationen" aria-describedby="help-voroperationen">
+            <p class="field-help" id="help-voroperationen">Ungefähres Datum reicht, z. B. "Blinddarm, 2019".</p>
+
+            <label for="a-raucher">Raucherstatus</label>
+            <input type="text" id="a-raucher" aria-describedby="help-raucher">
+            <p class="field-help" id="help-raucher">Nichtraucher, Ex-Raucher oder Raucher (Packungsjahre falls bekannt).</p>
+
+            <button type="submit">Absenden</button>
+        </form>
+
+        <div class="global-help">
+            <p><strong>Hilfe:</strong> Falls Sie beim Ausfüllen Unterstützung benötigen, rufen Sie uns unter
+               <a href="tel:+43123456789" style="color:#0d47a1;">01 234 56 789</a> an — wir helfen Ihnen gerne
+               persönlich oder am Telefon weiter.</p>
+        </div>
+    </div>
+
+    <div class="compliant-section">
+        <div class="compliant-title">Korrekt (2.2.3): Kein Zeitlimit und kein automatisches Absenden</div>
+        <p>Diese Seite hat keine Meta-Refresh-Aktualisierung und kein Countdown-Skript. Sie können sich beim
+           Ausfüllen so viel Zeit lassen, wie Sie benötigen.</p>
+    </div>
+
+    <script>
+        document.getElementById('standort-submit').addEventListener('click', () => {
+            const standort = document.getElementById('standort').value;
+            if (standort) {
+                console.log('Nutzer hat Standortwechsel ausdrücklich bestätigt: ' + standort);
+            }
+        });
+    </script>
+</main>
+</body>
+</html>

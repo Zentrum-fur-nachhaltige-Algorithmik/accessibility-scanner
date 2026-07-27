@@ -1,0 +1,146 @@
+<!-- WCAG-TEST
+criterion: 2.4.12
+level: AAA
+title: Focus Not Obscured (Enhanced)
+test_type: bad
+expected_violations: 5
+testable_by: llm
+scanners: llm-focus-appearance-scanner
+description: Focused elements partially or fully hidden behind overlays, sticky elements, and popovers
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Focus Not Obscured (Enhanced) - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
+
+        /* Violation 1: Sticky header covers focused elements */
+        .sticky-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 80px;
+            background: #333; color: #fff; z-index: 100; padding: 20px;
+        }
+        .content-under-header { margin-top: 20px; /* intentionally too small */ }
+
+        /* Violation 2: Cookie banner covering bottom inputs */
+        .cookie-banner {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 120px;
+            background: #1a1a2e; color: #fff; z-index: 200; padding: 20px;
+        }
+
+        /* Violation 3: Sticky sidebar overlapping form */
+        .layout { display: flex; gap: 0; }
+        .sticky-sidebar {
+            position: sticky; top: 80px; width: 300px; height: 400px;
+            background: #e8e8e8; z-index: 50; margin-left: -60px;
+        }
+        .main-form { flex: 1; padding: 20px; }
+
+        /* Violation 4: Popover that stays open and obscures */
+        .popover-trigger { position: relative; display: inline-block; }
+        .popover-content {
+            position: absolute; top: 100%; left: 0; width: 300px;
+            background: #fff; border: 1px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            padding: 15px; z-index: 90; display: block;
+        }
+
+        /* Violation 5: Chat widget covering interactive elements */
+        .chat-widget {
+            position: fixed; bottom: 140px; right: 20px; width: 350px; height: 300px;
+            background: #fff; border: 2px solid #007bff; border-radius: 12px;
+            z-index: 300; padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Violation 1: Fixed header obscures focused elements when scrolled -->
+    <div class="sticky-header">
+        <nav>Site Navigation — This header covers focused elements below</nav>
+    </div>
+
+    <div class="content-under-header">
+        <div class="violation-section">
+            <div class="violation-title">Violation 1: Fixed header obscures focused inputs</div>
+            <p>These inputs are partially hidden behind the fixed header when focused via tab:</p>
+            <label for="name">Name:</label>
+            <input type="text" id="name" style="display:block; margin: 5px 0;">
+            <label for="email">Email:</label>
+            <input type="email" id="email" style="display:block; margin: 5px 0;">
+        </div>
+
+        <!-- Violation 2: Cookie banner at bottom covers inputs -->
+        <div class="violation-section">
+            <div class="violation-title">Violation 2: Cookie banner obscures bottom-of-page inputs</div>
+            <p>The persistent cookie banner at the bottom covers these fields:</p>
+            <div style="margin-top: 20px;">
+                <label for="feedback">Feedback:</label>
+                <textarea id="feedback" rows="3" style="display:block; width:100%;"></textarea>
+                <button type="submit">Submit Feedback</button>
+            </div>
+        </div>
+
+        <!-- Violation 3: Sidebar overlaps form area -->
+        <div class="violation-section">
+            <div class="violation-title">Violation 3: Sticky sidebar partially covers form inputs</div>
+            <div class="layout">
+                <div class="main-form">
+                    <label for="address">Street Address:</label>
+                    <input type="text" id="address" style="display:block; width:100%; margin: 5px 0;">
+                    <label for="city">City:</label>
+                    <input type="text" id="city" style="display:block; width:100%; margin: 5px 0;">
+                    <label for="zip">ZIP Code:</label>
+                    <input type="text" id="zip" style="display:block; width:100%; margin: 5px 0;">
+                </div>
+                <aside class="sticky-sidebar">
+                    <h3>Related Links</h3>
+                    <p>This sidebar overlaps the form inputs to the left.</p>
+                </aside>
+            </div>
+        </div>
+
+        <!-- Violation 4: Persistent popover obscures next focusable element -->
+        <div class="violation-section">
+            <div class="violation-title">Violation 4: Popover menu obscures focused elements below</div>
+            <div class="popover-trigger">
+                <button>Options Menu</button>
+                <div class="popover-content">
+                    <p>This popover stays open and covers the input below when you tab past it.</p>
+                    <a href="#">Option A</a><br>
+                    <a href="#">Option B</a><br>
+                    <a href="#">Option C</a>
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="obscured-input">This input is hidden under the popover:</label>
+                <input type="text" id="obscured-input" style="display:block; margin: 5px 0;">
+            </div>
+        </div>
+
+        <!-- Violation 5: Chat widget covering interactive elements -->
+        <div class="violation-section">
+            <div class="violation-title">Violation 5: Chat widget covers interactive elements</div>
+            <div style="text-align: right; padding: 20px;">
+                <label for="promo">Promo Code:</label>
+                <input type="text" id="promo" style="margin: 5px;">
+                <button>Apply</button>
+                <p>The chat widget on the right side covers this area.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persistent overlays -->
+    <div class="cookie-banner">
+        <p>We use cookies. This banner never goes away and covers focused elements at the bottom.</p>
+        <button>Accept</button>
+    </div>
+    <div class="chat-widget">
+        <strong>Live Chat</strong>
+        <p>Need help? This widget covers interactive elements beneath it.</p>
+        <input type="text" placeholder="Type a message...">
+    </div>
+</body>
+</html>

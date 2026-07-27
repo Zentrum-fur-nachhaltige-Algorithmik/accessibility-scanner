@@ -1,0 +1,562 @@
+<!-- WCAG-TEST
+criterion: 2.4.1
+level: A
+title: Bypass Blocks
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation, page-structure
+description: Functional skip navigation implementation
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Skip Links - WCAG 2.4.1 Compliant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+        
+        .success {
+            background: #efe;
+            border-left: 4px solid #0c0;
+            padding: 10px;
+            margin: 10px 20px;
+        }
+        
+        /* Skip links that work properly */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            z-index: 1000;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        /* CORRECT: Skip links become visible on focus */
+        .skip-link:focus {
+            top: 6px;
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+        
+        /* Header styling */
+        .header {
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+        
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .user-menu {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .user-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .main-nav {
+            display: flex;
+            gap: 30px;
+            border-top: 1px solid #555;
+            padding-top: 10px;
+        }
+        
+        .main-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 0;
+        }
+        
+        /* Main content styling */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .content-area {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            padding: 8px 0;
+            display: block;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #666;
+            margin-top: 30px;
+        }
+        
+        .breadcrumb {
+            background: #e9ecef;
+            padding: 10px 20px;
+            margin: 0 -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .breadcrumb a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+        
+        /* Product grid styling */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            text-align: center;
+        }
+        
+        .product-card a {
+            color: #0056b3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .product-card a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer styling */
+        .footer {
+            background: #333;
+            color: white;
+            padding: 40px 20px 20px 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-section li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        /* Screen reader only text */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Properly styled skip targets */
+        .skip-target {
+            /* CORRECT: Can receive focus programmatically */
+            outline: none;
+        }
+        
+        .skip-target:focus {
+            outline: 2px solid #0056b3;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- CORRECT: Skip links to valid targets with proper labels -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#sidebar-nav" class="skip-link">Skip to navigation</a>
+    <a href="#footer-nav" class="skip-link">Skip to footer</a>
+    
+    <header class="header">
+        <div class="top-nav">
+            <div class="logo">
+                <!-- color override: the page-wide `h2 { color: #666 }` rule direct-matches
+                     this heading and beats the inherited .header white, clashing with the
+                     dark header background (2.2:1); lightened to clear 3:1 for large text -->
+                <h2 style="margin: 0; color: #7d7d7d;">Company Logo</h2>
+            </div>
+            <div class="user-menu">
+                <a href="#login">Login</a>
+                <a href="#register">Register</a>
+                <a href="#support">Support</a>
+                <a href="#language">Language</a>
+                <a href="#currency">Currency</a>
+                <a href="#cart">Cart (3)</a>
+                <a href="#wishlist">Wishlist</a>
+                <a href="#compare">Compare</a>
+            </div>
+        </div>
+        
+        <nav class="main-nav" role="navigation" aria-label="Main navigation">
+            <a href="#home">Home</a>
+            <a href="#products">Products</a>
+            <a href="#categories">Categories</a>
+            <a href="#brands">Brands</a>
+            <a href="#deals">Special Deals</a>
+            <a href="#new-arrivals">New Arrivals</a>
+            <a href="#clearance">Clearance</a>
+            <a href="#gift-cards">Gift Cards</a>
+            <a href="#about">About Us</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="success">
+            <strong>WCAG 2.4.1 Compliant:</strong> This page provides effective skip links that allow keyboard users
+            to bypass repetitive navigation and jump directly to main content, sidebar navigation, or footer sections.
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="#home">Home</a> &gt; 
+            <a href="#products">Products</a> &gt; 
+            <a href="#electronics">Electronics</a> &gt; 
+            <a href="#computers">Computers</a> &gt; 
+            <span aria-current="page">Laptops</span>
+        </nav>
+
+        <div class="content-area">
+            <!-- CORRECT: Sidebar with proper skip target -->
+            <aside class="sidebar" id="sidebar-nav" tabindex="-1" aria-label="Product navigation">
+                <span class="sr-only">Product categories and filters navigation</span>
+                <h3>Categories</h3>
+                <ul>
+                    <li><a href="#laptops">Laptops</a></li>
+                    <li><a href="#desktops">Desktop Computers</a></li>
+                    <li><a href="#tablets">Tablets</a></li>
+                    <li><a href="#monitors">Monitors</a></li>
+                    <li><a href="#keyboards">Keyboards</a></li>
+                    <li><a href="#mice">Computer Mice</a></li>
+                    <li><a href="#speakers">Speakers</a></li>
+                    <li><a href="#webcams">Webcams</a></li>
+                    <li><a href="#headsets">Headsets</a></li>
+                    <li><a href="#cables">Cables</a></li>
+                    <li><a href="#storage">Storage</a></li>
+                    <li><a href="#memory">Memory</a></li>
+                    <li><a href="#processors">Processors</a></li>
+                    <li><a href="#graphics">Graphics Cards</a></li>
+                    <li><a href="#motherboards">Motherboards</a></li>
+                </ul>
+
+                <h3>Price Range</h3>
+                <ul>
+                    <li><a href="#under-500">Under $500</a></li>
+                    <li><a href="#500-1000">$500 - $1,000</a></li>
+                    <li><a href="#1000-1500">$1,000 - $1,500</a></li>
+                    <li><a href="#1500-2000">$1,500 - $2,000</a></li>
+                    <li><a href="#over-2000">Over $2,000</a></li>
+                </ul>
+
+                <h3>Brands</h3>
+                <ul>
+                    <li><a href="#apple">Apple</a></li>
+                    <li><a href="#dell">Dell</a></li>
+                    <li><a href="#hp">HP</a></li>
+                    <li><a href="#lenovo">Lenovo</a></li>
+                    <li><a href="#asus">ASUS</a></li>
+                    <li><a href="#acer">Acer</a></li>
+                    <li><a href="#msi">MSI</a></li>
+                    <li><a href="#samsung">Samsung</a></li>
+                </ul>
+                
+                <!-- CORRECT: Additional skip link within long content -->
+                <!-- color override: the more-specific `.sidebar a { color: #333 }` rule
+                     was beating `.skip-link { color: white }` here (1.79:1); restored to
+                     white to match the other skip-link instances on this page -->
+                <a href="#product-list" class="skip-link" style="position: static; background: #0056b3; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 14px; margin: 10px 0; display: inline-block;">Skip to product list</a>
+            </aside>
+
+            <!-- CORRECT: Main content with proper skip target -->
+            <main class="main-content skip-target" id="main-content" tabindex="-1">
+                <span class="sr-only">Main content area - laptop products</span>
+                <h1>Good Skip Links - Accessible Navigation</h1>
+                
+                <h2>Effective Skip Link Implementation</h2>
+                <p>This page demonstrates proper skip link implementation that provides keyboard users with 
+                efficient navigation options.</p>
+                
+                <h3>Key Features:</h3>
+                <ul>
+                    <li>Skip links point to valid targets with proper IDs</li>
+                    <li>Skip targets have tabindex="-1" for programmatic focus</li>
+                    <li>Skip links become visible when focused</li>
+                    <li>Multiple skip options for different page sections</li>
+                    <li>Proper ARIA labels and descriptions</li>
+                </ul>
+
+                <!-- CORRECT: Product list with proper skip target -->
+                <section id="product-list" tabindex="-1" aria-label="Laptop products">
+                    <h2>Featured Laptops</h2>
+                    <span class="sr-only">Grid of 12 laptop products with skip option to footer</span>
+                    
+                    <!-- CORRECT: Skip link to bypass long product list -->
+                    <!-- background darkened from #28a745: white text was 3.13:1, below AA 4.5:1 -->
+                    <a href="#footer-nav" class="skip-link" style="position: static; background: #208738; padding: 5px 10px; border-radius: 4px; font-size: 14px; margin-bottom: 20px; display: inline-block;">Skip product list to footer</a>
+                    
+                    <div class="product-grid">
+                        <div class="product-card">
+                            <h3><a href="#product1">Gaming Laptop Pro 15"</a></h3>
+                            <p>$1,299.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product2">Business Ultrabook 14"</a></h3>
+                            <p>$899.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product3">Student Laptop Basic</a></h3>
+                            <p>$549.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product4">Creative Workstation 17"</a></h3>
+                            <p>$2,199.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product5">Travel Notebook 13"</a></h3>
+                            <p>$679.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product6">Gaming Beast RGB</a></h3>
+                            <p>$1,899.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product7">Office Professional</a></h3>
+                            <p>$799.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product8">Designer Studio Max</a></h3>
+                            <p>$2,499.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product9">Budget Friendly Basic</a></h3>
+                            <p>$399.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product10">Performance Plus 15"</a></h3>
+                            <p>$1,599.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product11">Lightweight Travel</a></h3>
+                            <p>$729.99</p>
+                        </div>
+                        <div class="product-card">
+                            <h3><a href="#product12">Power User Pro</a></h3>
+                            <p>$1,799.99</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- CORRECT: Footer with proper skip target -->
+    <footer class="footer" id="footer-nav" tabindex="-1">
+        <span class="sr-only">Footer navigation and company information</span>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Customer Service</h3>
+                <ul>
+                    <li><a href="#contact-us">Contact Us</a></li>
+                    <li><a href="#shipping-info">Shipping Information</a></li>
+                    <li><a href="#returns">Returns & Exchanges</a></li>
+                    <li><a href="#size-guide">Size Guide</a></li>
+                    <li><a href="#care-instructions">Care Instructions</a></li>
+                    <li><a href="#track-order">Track Your Order</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#live-chat">Live Chat</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#about-us">About Us</a></li>
+                    <li><a href="#careers">Careers</a></li>
+                    <li><a href="#press">Press</a></li>
+                    <li><a href="#investors">Investors</a></li>
+                    <li><a href="#sustainability">Sustainability</a></li>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#events">Events</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#privacy-policy">Privacy Policy</a></li>
+                    <li><a href="#terms-of-service">Terms of Service</a></li>
+                    <li><a href="#cookie-policy">Cookie Policy</a></li>
+                    <li><a href="#accessibility">Accessibility Statement</a></li>
+                    <li><a href="#compliance">Compliance</a></li>
+                    <li><a href="#patents">Patents</a></li>
+                    <li><a href="#trademarks">Trademarks</a></li>
+                    <li><a href="#licenses">Licenses</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <ul>
+                    <li><a href="#facebook">Facebook</a></li>
+                    <li><a href="#twitter">Twitter</a></li>
+                    <li><a href="#instagram">Instagram</a></li>
+                    <li><a href="#linkedin">LinkedIn</a></li>
+                    <li><a href="#youtube">YouTube</a></li>
+                    <li><a href="#pinterest">Pinterest</a></li>
+                    <li><a href="#newsletter">Newsletter Signup</a></li>
+                    <li><a href="#mobile-app">Mobile App</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- CORRECT: Return to top link -->
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #555;">
+            <a href="#top" style="color: #ccc; text-decoration: none;">Return to top</a>
+        </div>
+    </footer>
+
+    <div class="success" style="margin: 20px;">
+        <p><strong>All skip links functional and accessible</strong></p>
+        <p>Skip link features:</p>
+        <ul>
+            <li>✅ Skip links point to existing, focusable targets</li>
+            <li>✅ Skip targets use tabindex="-1" for programmatic focus</li>
+            <li>✅ Skip links are visible when focused</li>
+            <li>✅ Multiple skip options for different page sections</li>
+            <li>✅ Screen reader announcements for skip targets</li>
+            <li>✅ Skip links within long content sections</li>
+            <li>✅ Return to top link in footer</li>
+            <li>✅ Proper ARIA labels and descriptions</li>
+        </ul>
+        <p>Keyboard users can efficiently navigate to any major page section without tabbing through all content.</p>
+    </div>
+
+    <!-- CORRECT: JavaScript that properly handles skip links -->
+    <script>
+        // Enhanced skip link functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle skip link clicks
+            document.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    
+                    if (target) {
+                        e.preventDefault();
+                        
+                        // CORRECT: Set focus on target element
+                        target.focus();
+                        
+                        // CORRECT: Scroll target into view
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        
+                        // CORRECT: Announce to screen readers
+                        const announcement = document.createElement('div');
+                        announcement.setAttribute('aria-live', 'polite');
+                        announcement.setAttribute('aria-atomic', 'true');
+                        announcement.className = 'sr-only';
+                        announcement.textContent = `Jumped to ${target.getAttribute('aria-label') || targetId}`;
+                        document.body.appendChild(announcement);
+                        
+                        // Remove announcement after brief delay
+                        setTimeout(() => {
+                            document.body.removeChild(announcement);
+                        }, 1000);
+                    }
+                });
+            });
+            
+            // Add "top" anchor for return to top link
+            document.body.setAttribute('id', 'top');
+        });
+    </script>
+</body>
+</html>

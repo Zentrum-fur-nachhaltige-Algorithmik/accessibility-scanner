@@ -123,6 +123,18 @@ class BaseScanner {
         if (style.visibility === 'hidden') return false;
         return true;
       }
+
+      function isSrOnlyElement(el) {
+        if (!el || el.nodeType !== 1) return false;
+        const cls = el.className || '';
+        if (typeof cls === 'string' && (/\\bsr-only\\b/.test(cls) || /\\bvisually-hidden\\b/.test(cls))) return true;
+        const s = window.getComputedStyle(el);
+        if (s.position !== 'absolute' && s.position !== 'fixed') return false;
+        const w = parseFloat(s.width), h = parseFloat(s.height);
+        if (w > 1 || h > 1) return false;
+        if (s.overflow !== 'hidden') return false;
+        return true;
+      }
     `;
   }
 }

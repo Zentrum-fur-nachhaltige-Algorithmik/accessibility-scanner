@@ -1,0 +1,970 @@
+<!-- WCAG-TEST
+criterion: 1.4.13
+level: AA
+title: Content on Hover or Focus
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management, input-modalities
+description: Properly implemented hover/focus content
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Hover/Focus Content Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Persistent tooltip with escape mechanism */
+        .good-tooltip-trigger {
+            background-color: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            margin: 10px;
+        }
+        
+        .good-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            margin-bottom: 5px;
+            /* GUT: Bleibt sichtbar wenn Maus darüber ist */
+        }
+        
+        .good-tooltip-trigger:hover .good-tooltip,
+        .good-tooltip-trigger:focus .good-tooltip,
+        .good-tooltip:hover {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .good-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+        }
+        
+        .close-tooltip {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            float: right;
+            margin-left: 10px;
+        }
+        
+        /* GOOD 2: Dropdown with hover delay and keyboard support */
+        .good-dropdown {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        
+        .good-dropdown-button {
+            background-color: #327d36;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .good-dropdown-button:focus {
+            outline: 2px solid #2e7d32;
+            outline-offset: 2px;
+        }
+        
+        .good-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            /* GUT: Bleibt offen mit Verzögerung und kann mit Maus erreicht werden */
+        }
+        
+        .good-dropdown.open .good-dropdown-content,
+        .good-dropdown:hover .good-dropdown-content,
+        .good-dropdown:focus-within .good-dropdown-content {
+            display: block;
+        }
+        
+        .good-dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .good-dropdown-content a:hover,
+        .good-dropdown-content a:focus {
+            background-color: #f1f1f1;
+            outline: 2px solid #327d36;
+            outline-offset: -2px;
+        }
+        
+        /* GOOD 3: Accessible sidebar with keyboard support */
+        .good-sidebar-container {
+            position: relative;
+            height: 200px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin: 15px 0;
+        }
+        
+        .good-sidebar-trigger {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 100%;
+            background-color: #007cba;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            /* GUT: Fokussierbar und mit Label */
+        }
+        
+        .good-sidebar {
+            position: absolute;
+            left: -180px;
+            top: 0;
+            width: 180px;
+            height: 100%;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            transition: left 0.3s;
+            z-index: 100;
+            /* GUT: Bleibt offen für Interaktion */
+        }
+        
+        .good-sidebar.open {
+            left: 40px;
+        }
+        
+        .good-sidebar a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .good-sidebar a:focus {
+            outline: 2px solid white;
+            outline-offset: 2px;
+        }
+        
+        .good-sidebar .close-sidebar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        /* GOOD 4: Modal with proper persistence */
+        .good-modal-trigger {
+            background-color: #a66300;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .good-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .good-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 500px;
+            /* GUT: Modal bleibt offen bis explizit geschlossen */
+        }
+        
+        .good-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .good-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            color: #666;
+        }
+        
+        /* GOOD 5: Hover cards with keyboard accessibility */
+        .good-card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .good-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+            /* GUT: Fokussierbar und mit keyboard support */
+        }
+        
+        .good-card:hover,
+        .good-card:focus-within {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .good-card:focus {
+            outline: 2px solid #007cba;
+            outline-offset: 2px;
+        }
+        
+        .good-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            border-radius: 8px;
+            /* GUT: Overlay auch mit Focus erreichbar */
+        }
+        
+        .good-card:hover .good-card-overlay,
+        .good-card:focus-within .good-card-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .good-card-overlay button {
+            background: #327d36;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .good-card-overlay button:focus {
+            outline: 2px solid white;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 6: Mega menu with proper navigation */
+        .good-nav {
+            background-color: #2c3e50;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .good-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        
+        .good-nav li {
+            position: relative;
+        }
+        
+        .good-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+        }
+        
+        .good-nav a:hover,
+        .good-nav a:focus {
+            background-color: #34495e;
+            outline: 2px solid white;
+            outline-offset: -2px;
+        }
+        
+        .good-mega-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 600px;
+            padding: 20px;
+            display: none;
+            z-index: 1000;
+            /* GUT: Mega menu mit hover delay und focus support */
+        }
+        
+        .good-nav li:hover .good-mega-menu,
+        .good-nav li:focus-within .good-mega-menu {
+            display: block;
+        }
+        
+        .good-mega-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .good-mega-column h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .good-mega-column a {
+            color: #333;
+            padding: 5px 0;
+            font-size: 14px;
+            display: block;
+        }
+        
+        .good-mega-column a:focus {
+            outline: 2px solid #2c3e50;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 7: Persistent notification with dismiss */
+        .good-notification {
+            position: fixed;
+            top: 20px;
+            right: -350px;
+            width: 350px;
+            background-color: #d32f2f;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            transition: right 0.3s;
+            z-index: 1000;
+            /* GUT: Bleibt bis explizit geschlossen */
+        }
+        
+        .good-notification.show {
+            right: 20px;
+        }
+        
+        .good-notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .good-notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+        }
+        
+        /* GOOD 8: Focus-stable content area */
+        .good-focus-container {
+            border: 2px solid #007cba;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            border-radius: 4px;
+        }
+        
+        .good-focus-content {
+            display: none;
+            background-color: #e3f2fd;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            /* GUT: Content bleibt sichtbar auch wenn Focus innerhalb wandert */
+        }
+        
+        .good-focus-container.expanded .good-focus-content {
+            display: block;
+        }
+        
+        .good-focus-button {
+            background-color: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .good-focus-button:focus {
+            outline: 2px solid #004494;
+            outline-offset: 2px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Hover delay implementation */
+        .hover-delay {
+            transition-delay: 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Hover/Focus Content Accessible (GOOD)</h1>
+    <p><strong>WCAG 1.4.13 Konforme Implementierung:</strong> Content bei Hover/Focus ist dismissible, hoverable und persistent</p>
+    
+    <!-- GOOD 1: Persistent tooltip with escape mechanism -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Persistent Tooltip mit Schließen-Option</div>
+        <p><strong>Lösung:</strong> Tooltip bleibt sichtbar wenn Maus darüber ist, kann geschlossen werden</p>
+        <div class="interactive-area">
+            <button class="good-tooltip-trigger" aria-describedby="tooltip1">
+                Hover/Focus für Tooltip
+                <div id="tooltip1" class="good-tooltip" role="tooltip">
+                    Diese Information bleibt sichtbar bis Sie sie schließen!
+                    <button class="close-tooltip" onclick="closeTooltip(this)" aria-label="Tooltip schließen">×</button>
+                </div>
+            </button>
+            <p>✅ Tooltip ist stabil - kann mit Maus erreicht und gelesen werden</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Dropdown with persistence and keyboard support -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Dropdown mit Hover-Delay und Tastatur-Support</div>
+        <p><strong>Lösung:</strong> Menu bleibt offen für Navigation, auch mit Tastatur zugänglich</p>
+        <div class="interactive-area">
+            <div class="good-dropdown">
+                <button class="good-dropdown-button" 
+                        onclick="toggleDropdown(this)"
+                        onkeydown="handleDropdownKey(event, this)"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    Dropdown Menu
+                </button>
+                <div class="good-dropdown-content" role="menu">
+                    <a href="#option1" role="menuitem">Option 1: Sehr lange Beschreibung</a>
+                    <a href="#option2" role="menuitem">Option 2: Noch längere Option</a>
+                    <a href="#option3" role="menuitem">Option 3: Extrem ausführliche Beschreibung</a>
+                    <a href="#option4" role="menuitem">Option 4: Weitere Details</a>
+                </div>
+            </div>
+            <p>✅ Menu bleibt offen bis bewusst geschlossen, alle Links sind erreichbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Accessible sidebar with keyboard support -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Zugängliche Sidebar mit Tastatur-Support</div>
+        <p><strong>Lösung:</strong> Sidebar kann mit Tastatur geöffnet werden, bleibt für Navigation offen</p>
+        <div class="interactive-area">
+            <div class="good-sidebar-container">
+                <button class="good-sidebar-trigger" 
+                        onclick="toggleSidebar()"
+                        onkeydown="handleSidebarKey(event)"
+                        aria-expanded="false"
+                        aria-controls="sidebar1"
+                        aria-label="Navigation Sidebar öffnen">
+                    ☰
+                </button>
+                <nav id="sidebar1" class="good-sidebar" role="navigation" aria-label="Hauptnavigation">
+                    <button class="close-sidebar" onclick="closeSidebar()" aria-label="Sidebar schließen">×</button>
+                    <h4>Navigation</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#settings">Einstellungen</a></li>
+                        <li><a href="#profile">Profile</a></li>
+                        <li><a href="#help">Hilfe</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <p>✅ Sidebar-Navigation ist vollständig mit Tastatur zugänglich</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Modal with proper persistence -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Modal mit expliziter Kontrolle</div>
+        <p><strong>Lösung:</strong> Modal bleibt offen bis Benutzer es bewusst schließt</p>
+        <div class="interactive-area">
+            <button class="good-modal-trigger" onclick="showGoodModal()">Modal öffnen</button>
+            <div id="goodModal" class="good-modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+                <div class="good-modal-content">
+                    <div class="good-modal-header">
+                        <h3 id="modal-title">Wichtige Information</h3>
+                        <button class="good-modal-close" onclick="closeGoodModal()" aria-label="Modal schließen">×</button>
+                    </div>
+                    <p>Dieses Modal bleibt offen bis Sie es explizit schließen. Sie haben alle Zeit der Welt zum Lesen und Verstehen.</p>
+                    <p>Benutzer mit Leseschwierigkeiten können den Inhalt in ihrem eigenen Tempo erfassen.</p>
+                    <p>Das Modal kann geschlossen werden durch:</p>
+                    <ul>
+                        <li>Klick auf das X</li>
+                        <li>Escape-Taste</li>
+                        <li>Klick außerhalb des Modals</li>
+                    </ul>
+                </div>
+            </div>
+            <p>✅ Modal gibt Benutzern vollständige Kontrolle über Timing</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Hover cards with keyboard accessibility -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Hover-Cards mit Tastatur-Zugänglichkeit</div>
+        <p><strong>Lösung:</strong> Card-Overlays auch bei Focus erreichbar, stabile Interaktion</p>
+        <div class="interactive-area">
+            <div class="good-card-grid">
+                <div class="good-card" tabindex="0" role="button" aria-label="Produkt A Details anzeigen">
+                    <h4>Produkt A</h4>
+                    <p>Basis Information</p>
+                    <div class="good-card-overlay">
+                        <div style="text-align: center;">
+                            <h4>Detailansicht</h4>
+                            <p>Preis: €299</p>
+                            <button onclick="alert('Produkt A gekauft')">Kaufen</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="good-card" tabindex="0" role="button" aria-label="Produkt B Details anzeigen">
+                    <h4>Produkt B</h4>
+                    <p>Standard Version</p>
+                    <div class="good-card-overlay">
+                        <div style="text-align: center;">
+                            <h4>Detailansicht</h4>
+                            <p>Preis: €399</p>
+                            <button onclick="alert('Produkt B gekauft')">Kaufen</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="good-card" tabindex="0" role="button" aria-label="Produkt C Details anzeigen">
+                    <h4>Produkt C</h4>
+                    <p>Premium Edition</p>
+                    <div class="good-card-overlay">
+                        <div style="text-align: center;">
+                            <h4>Detailansicht</h4>
+                            <p>Preis: €599</p>
+                            <button onclick="alert('Produkt C gekauft')">Kaufen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p>✅ Alle Kaufen-Buttons sind mit Tastatur erreichbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Mega menu with proper navigation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Mega-Menu mit stabiler Navigation</div>
+        <p><strong>Lösung:</strong> Menu bleibt offen für vollständige Navigation aller Links</p>
+        <div class="interactive-area">
+            <nav class="good-nav" role="navigation" aria-label="Hauptmenü">
+                <ul>
+                    <li>
+                        <a href="#" aria-expanded="false" aria-haspopup="true">Produkte</a>
+                        <div class="good-mega-menu" role="menu">
+                            <div class="good-mega-columns">
+                                <div class="good-mega-column">
+                                    <h4>Kategorie A</h4>
+                                    <a href="#" role="menuitem">Produkt 1</a>
+                                    <a href="#" role="menuitem">Produkt 2</a>
+                                    <a href="#" role="menuitem">Produkt 3</a>
+                                    <a href="#" role="menuitem">Produkt 4</a>
+                                    <a href="#" role="menuitem">Produkt 5</a>
+                                </div>
+                                <div class="good-mega-column">
+                                    <h4>Kategorie B</h4>
+                                    <a href="#" role="menuitem">Service 1</a>
+                                    <a href="#" role="menuitem">Service 2</a>
+                                    <a href="#" role="menuitem">Service 3</a>
+                                    <a href="#" role="menuitem">Service 4</a>
+                                    <a href="#" role="menuitem">Service 5</a>
+                                </div>
+                                <div class="good-mega-column">
+                                    <h4>Support</h4>
+                                    <a href="#" role="menuitem">Dokumentation</a>
+                                    <a href="#" role="menuitem">FAQ</a>
+                                    <a href="#" role="menuitem">Contact</a>
+                                    <a href="#" role="menuitem">Live Chat</a>
+                                    <a href="#" role="menuitem">Tickets</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </nav>
+            <p>✅ Alle Mega-Menu Links sind sicher erreichbar</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Persistent notification with dismiss -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Persistente Benachrichtigung mit Kontrolle</div>
+        <p><strong>Lösung:</strong> Benachrichtigung bleibt bis explizit geschlossen</p>
+        <div class="interactive-area">
+            <button onclick="showGoodNotification()">Kritische Benachrichtigung zeigen</button>
+            <div id="goodNotification" class="good-notification" role="alert" aria-live="assertive">
+                <div class="good-notification-header">
+                    <strong>⚠️ Kritischer Fehler!</strong>
+                    <button class="good-notification-close" onclick="closeGoodNotification()" aria-label="Benachrichtigung schließen">×</button>
+                </div>
+                <p>Ihre Sitzung läuft in 60 Sekunden ab. Speichern Sie Ihre Arbeit sofort!</p>
+                <p>Diese Nachricht bleibt sichtbar bis Sie reagiert haben.</p>
+            </div>
+            <p>✅ Kritische Warnungen bleiben bis Benutzer sie bewusst schließen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Focus-stable content area -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Stabiler Content bei Focus-Navigation</div>
+        <p><strong>Lösung:</strong> Content bleibt sichtbar während Navigation innerhalb</p>
+        <div class="interactive-area">
+            <div class="good-focus-container" tabindex="0" onclick="toggleFocusContent(this)">
+                <p><strong>Klicken Sie hier für wichtige Informationen (bleibt offen)</strong></p>
+                <div class="good-focus-content">
+                    <h4>Kritische Sicherheitsinformation</h4>
+                    <p>Ihr Konto wurde kompromittiert. Bitte ändern Sie sofort Ihr Passwort über die folgenden Buttons:</p>
+                    <button class="good-focus-button" onclick="alert('Passwort wird geändert')">Passwort ändern</button>
+                    <button class="good-focus-button" onclick="alert('Sicherheitsteam kontaktiert')">Sicherheitsteam kontaktieren</button>
+                    <button class="good-focus-button" onclick="alert('Konto gesperrt')">Konto sperren</button>
+                    <button class="good-focus-button" onclick="toggleFocusContent(this.closest('.good-focus-container'))">Schließen</button>
+                </div>
+            </div>
+            <p>✅ Sicherheits-Buttons bleiben zugänglich während Navigation</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das besser ist</div>
+        <p><strong>WCAG 1.4.13 Content on Hover or Focus Erfüllung:</strong></p>
+        <ul>
+            <li>✅ <strong>Dismissible:</strong> Content kann mit Escape oder Schließen-Button entfernt werden</li>
+            <li>✅ <strong>Hoverable:</strong> Content bleibt sichtbar wenn Maus darüber bewegt wird</li>
+            <li>✅ <strong>Persistent:</strong> Content verschwindet nur durch bewusste Benutzeraktion</li>
+        </ul>
+        
+        <p><strong>Zusätzliche Vorteile:</strong></p>
+        <ul>
+            <li>⌨️ Vollständige Tastatur-Zugänglichkeit</li>
+            <li>📱 Mobile-freundlich (Touch-Interaktionen)</li>
+            <li>🎯 Präzise Zeiger-Kontrolle für motorische Beeinträchtigungen</li>
+            <li>⏱️ Kein Zeitdruck für langsamere Benutzer</li>
+            <li>🔍 Bessere Nutzererfahrung für alle</li>
+        </ul>
+    </div>
+
+    <script>
+        // Accessible tooltip management
+        function closeTooltip(button) {
+            const tooltip = button.closest('.good-tooltip');
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+        }
+        
+        // Accessible dropdown management
+        function toggleDropdown(button) {
+            const dropdown = button.closest('.good-dropdown');
+            const isOpen = dropdown.classList.contains('open');
+            
+            if (isOpen) {
+                dropdown.classList.remove('open');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                dropdown.classList.add('open');
+                button.setAttribute('aria-expanded', 'true');
+                // Focus first menu item
+                const firstItem = dropdown.querySelector('.good-dropdown-content a');
+                if (firstItem) firstItem.focus();
+            }
+        }
+        
+        function handleDropdownKey(event, button) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleDropdown(button);
+            } else if (event.key === 'Escape') {
+                const dropdown = button.closest('.good-dropdown');
+                dropdown.classList.remove('open');
+                button.setAttribute('aria-expanded', 'false');
+                button.focus();
+            }
+        }
+        
+        // Accessible sidebar management
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar1');
+            const trigger = document.querySelector('[aria-controls="sidebar1"]');
+            const isOpen = sidebar.classList.contains('open');
+            
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            } else {
+                sidebar.classList.add('open');
+                trigger.setAttribute('aria-expanded', 'true');
+                // Focus first link in sidebar
+                const firstLink = sidebar.querySelector('a');
+                if (firstLink) firstLink.focus();
+            }
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar1');
+            const trigger = document.querySelector('[aria-controls="sidebar1"]');
+            sidebar.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+        }
+        
+        function handleSidebarKey(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleSidebar();
+            }
+        }
+        
+        // Accessible modal management
+        function showGoodModal() {
+            const modal = document.getElementById('goodModal');
+            modal.style.display = 'block';
+            
+            // Focus the close button
+            const closeButton = modal.querySelector('.good-modal-close');
+            if (closeButton) closeButton.focus();
+            
+            // Trap focus in modal
+            trapFocus(modal);
+        }
+        
+        function closeGoodModal() {
+            const modal = document.getElementById('goodModal');
+            modal.style.display = 'none';
+            
+            // Return focus to trigger
+            const trigger = document.querySelector('[onclick="showGoodModal()"]');
+            if (trigger) trigger.focus();
+        }
+        
+        // Focus stable content management
+        function toggleFocusContent(container) {
+            const isExpanded = container.classList.contains('expanded');
+            
+            if (isExpanded) {
+                container.classList.remove('expanded');
+                container.setAttribute('aria-expanded', 'false');
+            } else {
+                container.classList.add('expanded');
+                container.setAttribute('aria-expanded', 'true');
+            }
+        }
+        
+        // Persistent notification management
+        function showGoodNotification() {
+            const notification = document.getElementById('goodNotification');
+            notification.classList.add('show');
+            
+            // Focus close button for screen reader announcement
+            const closeButton = notification.querySelector('.good-notification-close');
+            setTimeout(() => {
+                if (closeButton) closeButton.focus();
+            }, 100);
+        }
+        
+        function closeGoodNotification() {
+            const notification = document.getElementById('goodNotification');
+            notification.classList.remove('show');
+        }
+        
+        // Utility: Focus trap for modals
+        function trapFocus(element) {
+            const focusableElements = element.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            
+            element.addEventListener('keydown', function(event) {
+                if (event.key === 'Tab') {
+                    if (event.shiftKey) {
+                        if (document.activeElement === firstElement) {
+                            event.preventDefault();
+                            lastElement.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastElement) {
+                            event.preventDefault();
+                            firstElement.focus();
+                        }
+                    }
+                }
+                
+                if (event.key === 'Escape') {
+                    closeGoodModal();
+                }
+            });
+        }
+        
+        // Global keyboard handlers
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                // Close any open dropdowns
+                const openDropdowns = document.querySelectorAll('.good-dropdown.open');
+                openDropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                    const button = dropdown.querySelector('button');
+                    if (button) {
+                        button.setAttribute('aria-expanded', 'false');
+                        button.focus();
+                    }
+                });
+                
+                // Close sidebar
+                const openSidebar = document.querySelector('.good-sidebar.open');
+                if (openSidebar) {
+                    closeSidebar();
+                }
+                
+                // Close modal
+                const openModal = document.querySelector('.good-modal[style*="block"]');
+                if (openModal) {
+                    closeGoodModal();
+                }
+                
+                // Close notification
+                const openNotification = document.querySelector('.good-notification.show');
+                if (openNotification) {
+                    closeGoodNotification();
+                }
+            }
+        });
+        
+        // Click outside to close modals
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('goodModal');
+            if (event.target === modal) {
+                closeGoodModal();
+            }
+        });
+        
+        // Demonstration: Hover/Focus accessibility analysis
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ACCESSIBLE HOVER/FOCUS CONTENT ANALYSIS ===');
+            
+            // Find elements with hover/focus content
+            const interactiveElements = document.querySelectorAll('[class*="good-"], button, a, [tabindex]');
+            console.log(`Found ${interactiveElements.length} interactive elements`);
+            
+            interactiveElements.forEach((element, index) => {
+                const analysis = {
+                    isKeyboardAccessible: element.tabIndex >= 0 || element.tagName === 'BUTTON' || element.tagName === 'A',
+                    hasAriaExpanded: element.hasAttribute('aria-expanded'),
+                    hasAriaControls: element.hasAttribute('aria-controls'),
+                    hasEscapeSupport: true, // implemented globally
+                    isPersistent: true, // all content is persistent in good examples
+                    isDismissible: true // all content can be dismissed
+                };
+                
+                console.log(`Element ${index + 1}:`, analysis);
+            });
+            
+            console.log('✅ All hover/focus content follows WCAG 1.4.13 guidelines');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!-- WCAG-TEST
+criterion: 3.3.5
+level: AAA
+title: Help
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-behavioral-scanner
+description: Context-sensitive help for every field, tooltips, documentation links, clear instructions
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Help AAA - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        label { display: block; margin-top: 12px; font-weight: bold; }
+        input, select { padding: 8px; width: 100%; max-width: 400px; border: 1px solid #666; display: block; margin: 4px 0; }
+        .help-text { font-size: 0.85em; color: #555; margin-top: 2px; }
+        .help-link { font-size: 0.85em; margin-left: 8px; }
+        button:focus, input:focus, select:focus { outline: 3px solid #005fcc; outline-offset: 2px; }
+        .help-bar { background: #f0f4f8; padding: 10px 15px; border-radius: 4px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Good Help (3.3.5 AAA)</h1>
+
+    <!-- Compliant 1: Form fields with contextual help -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Tax form with help text for every field</h2>
+        <div class="help-bar">
+            Need help? <a href="#help-docs">View full documentation</a> |
+            <a href="#faq">FAQ</a> |
+            <a href="tel:+18005551234">Call support: 1-800-555-1234</a>
+        </div>
+        <form>
+            <label for="tin">Taxpayer Identification Number (TIN):</label>
+            <input type="text" id="tin" aria-describedby="tin-help" placeholder="XXX-XX-XXXX">
+            <div class="help-text" id="tin-help">Your 9-digit Social Security Number or Employer Identification Number. Format: XXX-XX-XXXX. <a href="#tin-info" class="help-link">Learn more about TINs</a></div>
+
+            <label for="agi">Adjusted Gross Income (AGI):</label>
+            <input type="text" id="agi" aria-describedby="agi-help" placeholder="$0.00">
+            <div class="help-text" id="agi-help">Your total income minus specific deductions. Find this on line 11 of your previous year's Form 1040. <a href="#agi-info" class="help-link">How to calculate AGI</a></div>
+
+            <label for="filing">Filing Status:</label>
+            <select id="filing" aria-describedby="filing-help">
+                <option value="">Select your filing status...</option>
+                <option value="single">Single</option>
+                <option value="mfj">Married Filing Jointly</option>
+                <option value="mfs">Married Filing Separately</option>
+                <option value="hoh">Head of Household</option>
+                <option value="qw">Qualifying Widow(er)</option>
+            </select>
+            <div class="help-text" id="filing-help">Choose the status that matches your situation as of December 31. <a href="#filing-info" class="help-link">Which status should I choose?</a></div>
+        </form>
+    </div>
+
+    <!-- Compliant 2: Error messages with corrective guidance -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Error messages with specific corrective guidance</h2>
+        <form>
+            <label for="acct2">Account Number:</label>
+            <input type="text" id="acct2" value="12345" aria-describedby="acct2-error" aria-invalid="true" style="border-color:#d32f2f;">
+            <div id="acct2-error" style="color:#d32f2f; font-size:0.85em;">Account numbers must be exactly 10 digits. You entered 5 digits. Please add the leading zeros (e.g., 0000012345).</div>
+
+            <label for="routing2">Routing Number:</label>
+            <input type="text" id="routing2" value="ABC" aria-describedby="routing2-error" aria-invalid="true" style="border-color:#d32f2f;">
+            <div id="routing2-error" style="color:#d32f2f; font-size:0.85em;">Routing numbers must be 9 digits (numbers only, no letters). Find your routing number on the bottom-left of your checks. <a href="#routing-help">Where to find your routing number</a></div>
+        </form>
+    </div>
+
+    <!-- Compliant 3: Tooltip and inline help for specialized fields -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Specialized fields with inline help and lookup tools</h2>
+        <form>
+            <label for="icd2">ICD-10 Diagnosis Code:</label>
+            <input type="text" id="icd2" aria-describedby="icd2-help" placeholder="e.g., J06.9">
+            <div class="help-text" id="icd2-help">The International Classification of Diseases code for the patient's diagnosis. <a href="#icd-lookup" class="help-link">Search ICD-10 codes</a> | <a href="#icd-guide" class="help-link">ICD-10 coding guide</a></div>
+        </form>
+    </div>
+
+    <!-- Help documentation section -->
+    <div class="compliant-section" id="help-docs">
+        <h2 class="compliant-title">Compliant: Help documentation always accessible</h2>
+        <p>Comprehensive help is available at every step:</p>
+        <ul>
+            <li><a href="#full-guide">Complete form filing guide (PDF)</a></li>
+            <li><a href="#video-tutorial">Video tutorial with captions</a></li>
+            <li><a href="#faq">Frequently Asked Questions</a></li>
+            <li>Phone support: <a href="tel:+18005551234">1-800-555-1234</a> (Mon-Fri, 8am-6pm)</li>
+            <li>Email: <a href="mailto:help@example.com">help@example.com</a></li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>

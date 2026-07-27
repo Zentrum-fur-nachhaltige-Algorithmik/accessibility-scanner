@@ -1,0 +1,94 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: color-contrast
+description: UI components and graphical objects meet 3:1 contrast ratio
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Non-text Contrast</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; background: #ffffff; }
+        h1, h2 { color: #111; }
+        /* Form inputs: #555555 border on #ffffff = 7.5:1 */
+        input, select, textarea { border: 2px solid #555555; padding: 0.5rem; font-size: 1rem; border-radius: 4px; background: #ffffff; color: #1a1a1a; }
+        input:focus, select:focus, textarea:focus { outline: 3px solid #0051a8; outline-offset: 2px; border-color: #0051a8; }
+        label { display: block; margin-top: 1rem; font-weight: bold; }
+        /* Checkbox and radio with visible borders */
+        input[type="checkbox"], input[type="radio"] { width: 1.25rem; height: 1.25rem; accent-color: #1a6b3c; }
+        /* Icon buttons with sufficient contrast */
+        .icon-btn { background: none; border: 2px solid #555555; border-radius: 4px; padding: 0.5rem; cursor: pointer; }
+        .icon-btn svg { fill: #333333; width: 24px; height: 24px; }
+        .icon-btn:focus { outline: 3px solid #0051a8; outline-offset: 2px; }
+        /* Chart bars with distinct colors meeting 3:1 against white */
+        .chart { display: flex; align-items: flex-end; gap: 1rem; height: 200px; border-bottom: 2px solid #333333; border-left: 2px solid #333333; padding: 0 1rem; margin: 1rem 0; }
+        .bar { width: 60px; text-align: center; color: #ffffff; font-weight: bold; font-size: 0.875rem; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.25rem; }
+        /* All bar colors meet 3:1 against #ffffff */
+        .bar-a { background: #1a6b3c; height: 80%; } /* #1a6b3c on white = 5.9:1 */
+        .bar-b { background: #0051a8; height: 60%; } /* #0051a8 on white = 7.1:1 */
+        .bar-c { background: #8b1a1a; height: 90%; } /* #8b1a1a on white = 7.8:1 */
+        /* Toggle switch */
+        .toggle-track { width: 48px; height: 26px; background: #555555; border-radius: 13px; position: relative; display: inline-block; cursor: pointer; }
+        .toggle-track[aria-checked="true"] { background: #1a6b3c; }
+        .toggle-knob { width: 22px; height: 22px; background: #ffffff; border-radius: 50%; position: absolute; top: 2px; left: 2px; border: 1px solid #333333; }
+        .section { margin: 2rem 0; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Non-text Contrast - Compliant Examples</h1>
+
+        <!-- Pattern 1: Form inputs with visible borders -->
+        <section class="section">
+            <h2>Form Controls with Visible Boundaries</h2>
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email">
+            <label for="role">Role</label>
+            <select id="role" name="role">
+                <option>Developer</option>
+                <option>Designer</option>
+            </select>
+            <label><input type="checkbox" name="agree"> I agree to the terms</label>
+            <label><input type="radio" name="contact" value="email"> Contact by email</label>
+            <label><input type="radio" name="contact" value="phone"> Contact by phone</label>
+        </section>
+
+        <!-- Pattern 2: Icon buttons with proper contrast -->
+        <section class="section">
+            <h2>Icon Buttons</h2>
+            <button class="icon-btn" aria-label="Search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="#333333" stroke-width="2" fill="none"/><line x1="15" y1="15" x2="21" y2="21" stroke="#333333" stroke-width="2"/></svg>
+            </button>
+            <button class="icon-btn" aria-label="Settings">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" fill="#333333"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-2.82.33v.18a2 2 0 01-4 0v-.09A1.65 1.65 0 008.4 19.4" fill="#333333"/></svg>
+            </button>
+        </section>
+
+        <!-- Pattern 3: Chart with high-contrast bars -->
+        <section class="section">
+            <h2>Data Visualization</h2>
+            <div class="chart" role="img" aria-label="Quarterly sales: Q1 80%, Q2 60%, Q3 90%">
+                <div class="bar bar-a" aria-hidden="true">Q1</div>
+                <div class="bar bar-b" aria-hidden="true">Q2</div>
+                <div class="bar bar-c" aria-hidden="true">Q3</div>
+            </div>
+        </section>
+
+        <!-- Pattern 4: Toggle switch -->
+        <section class="section">
+            <h2>Toggle Control</h2>
+            <span id="notif-label">Enable notifications</span>
+            <div class="toggle-track" role="switch" aria-checked="true" aria-labelledby="notif-label" tabindex="0">
+                <div class="toggle-knob"></div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,54 @@
+# Version control
+.git
+.gitignore
+
+# Reinstalled fresh in the image (see Dockerfile)
+node_modules
+
+# Next.js build cache/output — rebuilt fresh by `npm run frontend:build`
+frontend/.next
+
+# Tests and QA scaffolding — not needed at runtime
+tests
+test-results
+test-sites
+test-html
+test-pages
+isolated-tests
+isolated-elements
+visual-inspection
+tts-eval
+experiments
+false-positive-reports
+debug-tools
+fixes
+examples
+vitest.config.js
+
+# Generated reports / one-off debug artifacts (reports/ is a runtime volume,
+# populated by the running container, not by the image build)
+reports
+*.pdf
+*.log
+debug-report-phase6b.html
+debug-violations-table.html
+integration-report-phase6b.html
+phase6f-test-report.html
+beeproduced-accessibility-report.html
+llm-wcag-judge-all.txt
+
+# Docs — not needed inside the image
+docs
+*.md
+
+# Local tooling / editor / OS cruft
+.claude
+.vscode
+.DS_Store
+tmp
+config
+
+# Env files — never bake secrets into the image; passed in at `docker run`/
+# `docker compose up` time instead
+.env
+.env.*

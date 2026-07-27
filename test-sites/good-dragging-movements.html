@@ -1,0 +1,208 @@
+<!-- WCAG-TEST
+criterion: 2.5.7
+level: AA
+title: Dragging Movements
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: All drag interactions have single-pointer alternatives
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Dragging Movements - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .compliant-note {
+            border: 2px solid #2e7d32;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5e9;
+        }
+        .compliant-label {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* PATTERN 1: Sortable list with button alternatives */
+        .sortable-list {
+            list-style: none;
+            padding: 0;
+            max-width: 500px;
+        }
+        .sortable-list li {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 10px 16px;
+            margin: 4px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sortable-list .item-text {
+            flex: 1;
+        }
+        .move-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .move-btn:hover {
+            background: #1565c0;
+        }
+        .move-btn:focus-visible {
+            outline: 3px solid #0d47a1;
+            outline-offset: 2px;
+        }
+        .move-btn:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+        }
+
+        /* PATTERN 2: Slider with native range input + number input */
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            max-width: 500px;
+        }
+        .slider-group input[type="range"] {
+            flex: 1;
+        }
+        .slider-group input[type="number"] {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        /* PATTERN 3: File upload with both drag and click */
+        .upload-zone {
+            border: 3px dashed #bdbdbd;
+            padding: 40px 20px;
+            text-align: center;
+            background: #fafafa;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 20px 0;
+        }
+        .upload-zone .browse-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 24px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .upload-zone .browse-btn:hover {
+            background: #1565c0;
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 3px solid #1565c0;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Task Management Dashboard</h1>
+
+    <!-- PATTERN 1: Sortable list with up/down button alternatives -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 1: Sortable List with Button Controls</div>
+        <p>Each item has up/down buttons as single-pointer alternatives to drag-and-drop reordering.</p>
+    </div>
+
+    <h2>Priority Tasks</h2>
+    <p>Use the arrow buttons to reorder, or drag items:</p>
+    <ul class="sortable-list" role="list" aria-label="Reorderable task list">
+        <li>
+            <button class="move-btn" aria-label="Move Review pull request up" disabled>&#9650;</button>
+            <button class="move-btn" aria-label="Move Review pull request down">&#9660;</button>
+            <span class="item-text">Review pull request #142</span>
+        </li>
+        <li>
+            <button class="move-btn" aria-label="Move Update database up">&#9650;</button>
+            <button class="move-btn" aria-label="Move Update database down">&#9660;</button>
+            <span class="item-text">Update database schema</span>
+        </li>
+        <li>
+            <button class="move-btn" aria-label="Move Fix login page up">&#9650;</button>
+            <button class="move-btn" aria-label="Move Fix login page down">&#9660;</button>
+            <span class="item-text">Fix login page CSS</span>
+        </li>
+        <li>
+            <button class="move-btn" aria-label="Move Write unit tests up">&#9650;</button>
+            <button class="move-btn" aria-label="Move Write unit tests down" disabled>&#9660;</button>
+            <span class="item-text">Write unit tests for API</span>
+        </li>
+    </ul>
+
+    <!-- PATTERN 2: Native range input with number input alternative -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 2: Slider with Keyboard-Accessible Alternatives</div>
+        <p>A native <code>&lt;input type="range"&gt;</code> is used (keyboard-accessible by default) alongside a number input for precise entry.</p>
+    </div>
+
+    <h2>Volume Control</h2>
+    <div class="slider-group">
+        <label for="volumeRange">Volume:</label>
+        <input type="range" id="volumeRange" name="volume" min="0" max="100" value="40" aria-label="Volume slider">
+        <input type="number" id="volumeNumber" name="volumeNum" min="0" max="100" value="40" aria-label="Volume value">
+        <span>%</span>
+    </div>
+
+    <!-- PATTERN 3: File upload with drag-and-drop AND click/browse button -->
+    <div class="compliant-note">
+        <div class="compliant-label">PATTERN 3: File Upload with Click Alternative</div>
+        <p>Files can be uploaded via drag-and-drop or by clicking the browse button which opens a native file picker.</p>
+    </div>
+
+    <h2>Upload Documents</h2>
+    <div class="upload-zone">
+        <p style="font-size: 18px; color: #757575;">Drag files here or click to browse</p>
+        <p style="font-size: 14px; color: #9e9e9e;">Supported formats: PDF, DOCX, PNG</p>
+        <label>
+            <input type="file" id="fileInput" multiple accept=".pdf,.docx,.png" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0);">
+            <span class="browse-btn" role="button">Browse Files</span>
+        </label>
+    </div>
+
+    <script>
+        // Sync range and number inputs
+        const range = document.getElementById('volumeRange');
+        const number = document.getElementById('volumeNumber');
+        range.addEventListener('input', () => { number.value = range.value; });
+        number.addEventListener('input', () => { range.value = number.value; });
+    </script>
+
+</body>
+</html>

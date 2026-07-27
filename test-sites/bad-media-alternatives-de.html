@@ -1,0 +1,62 @@
+<!-- WCAG-TEST
+criterion: 1.2.6, 1.2.8
+level: AAA
+title: Medienalternativen — Praxisrundgang (German)
+test_type: bad
+expected_violations: 2
+testable_by: llm
+scanners: llm-media-alternatives-scanner
+description: Aufklärungsvideo ohne Gebärdensprach-Version und ohne vollständige Textalternative
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praxisrundgang — Ordination Dr. Berger (Test: schlecht)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+        h1, h2 { color: #111; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #b71c1c; font-weight: bold; margin-bottom: 10px; }
+        .media-section { margin-bottom: 2rem; border: 1px solid #666; padding: 1rem; border-radius: 4px; }
+        video { max-width: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Ordination Dr. Julia Berger — Praxisrundgang</h1>
+    <p>Lernen Sie unsere Ordination und den Ablauf Ihrer Untersuchung im Video kennen.</p>
+
+    <!-- VIOLATION 1 (1.2.6): No sign language interpretation available -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 1 (1.2.6): Keine Gebärdensprach-Version</div>
+        <p>Das Video enthält gesprochene Erklärungen zum Ablauf der Untersuchung, aber keine Gebärdensprach-Version
+           und keinen Verweis auf eine solche.</p>
+    </div>
+
+    <section class="media-section" aria-labelledby="rundgang-heading">
+        <h2 id="rundgang-heading">Praxisrundgang und Aufklärungsvideo</h2>
+        <video controls width="640" aria-label="Praxisrundgang und Erklärung des Untersuchungsablaufs">
+            <source src="praxisrundgang.mp4" type="video/mp4">
+            <track kind="captions" src="praxisrundgang-captions-de.vtt" srclang="de" label="Deutsche Untertitel" default>
+            <p>Ihr Browser unterstützt das Video-Element nicht. <a href="praxisrundgang.mp4">Video herunterladen</a>.</p>
+        </video>
+    </section>
+
+    <!-- VIOLATION 2 (1.2.8): No full text alternative document -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 2 (1.2.8): Keine vollständige Textalternative</div>
+        <p>Es gibt kein Transkript und kein separates Dokument, das den vollständigen Inhalt des Videos
+           in Textform wiedergibt. Nutzer:innen, die weder Bild noch Ton wahrnehmen können, haben keinen Zugang
+           zu diesen Informationen.</p>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <ul>
+            <li>Gehörlose Nutzer:innen, deren Erstsprache Gebärdensprache ist, haben keine gleichwertige Alternative.</li>
+            <li>Ohne Volltext-Alternative ist der Videoinhalt für taubblinde Nutzer:innen komplett unzugänglich.</li>
+        </ul>
+    </div>
+</body>
+</html>

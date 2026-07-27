@@ -1,0 +1,1171 @@
+<!-- WCAG-TEST
+criterion: 2.5.5
+level: AAA
+title: Target Size (Enhanced)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: Adequate touch target sizes
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Target Size Compliant (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Appropriately sized buttons (44x44px minimum) */
+        .good-action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .good-action-button {
+            min-width: 44px;
+            min-height: 44px;
+            background-color: #327d36;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* GUT: Mindestens 44x44px gemäß WCAG 2.5.5 */
+        }
+        
+        .good-action-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .good-action-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 2: Appropriately spaced close buttons */
+        .good-close-container {
+            position: relative;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .good-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            min-width: 44px;
+            min-height: 44px;
+            background: #327d36;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* GUT: 44x44px mit ausreichend Abstand */
+        }
+        
+        .good-close-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-close-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 3: Properly sized form controls */
+        .good-form-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-form-row {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .good-form-row label {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 120px;
+        }
+        
+        .good-checkbox,
+        .good-radio {
+            width: 20px;
+            height: 20px;
+            margin: 12px;
+            cursor: pointer;
+            /* GUT: 20px Element + 12px Padding = 44px Zielbereich */
+        }
+        
+        .good-checkbox-container,
+        .good-radio-container {
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .good-checkbox-container:hover,
+        .good-radio-container:hover {
+            background-color: #e8f5e8;
+        }
+        
+        .good-checkbox-container:focus-within,
+        .good-radio-container:focus-within {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-checkbox-label,
+        .good-radio-label {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        /* GOOD 4: Accessible pagination */
+        .good-pagination {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-page-button {
+            min-width: 44px;
+            min-height: 44px;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s;
+            /* GUT: 44x44px Minimum mit klarem visuellen Feedback */
+        }
+        
+        .good-page-button:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .good-page-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-page-button.active {
+            background-color: #0056b3;
+            border-color: #0056b3;
+            color: white;
+        }
+        
+        .good-page-button.disabled {
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* GOOD 5: Mobile-friendly menu */
+        .good-mobile-menu {
+            background-color: #343a40;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        
+        .good-hamburger-button {
+            min-width: 44px;
+            min-height: 44px;
+            background: transparent;
+            border: 2px solid #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            /* GUT: 44x44px Hamburger Button */
+        }
+        
+        .good-hamburger-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .good-hamburger-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-hamburger-line {
+            width: 20px;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        
+        .good-menu-items {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .good-menu-items.show {
+            display: block;
+        }
+        
+        .good-menu-item {
+            display: block;
+            min-height: 44px;
+            padding: 12px 16px;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 4px 0;
+            transition: background-color 0.2s;
+            /* GUT: 44px Mindesthöhe für Touch-Targets */
+        }
+        
+        .good-menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        
+        .good-menu-item:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 6: Accessible slider controls */
+        .good-slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .good-slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .good-slider {
+            flex: 1;
+            height: 8px;
+            background: #dee2e6;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .good-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #0056b3;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            /* GUT: 24px Thumb + 4px Border = 32px sichtbar, aber Touch-Target ist größer */
+        }
+        
+        .good-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #0056b3;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .good-slider:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-slider-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .good-slider-button {
+            min-width: 44px;
+            min-height: 44px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .good-slider-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .good-slider-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 7: Properly sized social media icons */
+        .good-social-icons {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-social-link {
+            min-width: 44px;
+            min-height: 44px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 20px;
+            transition: all 0.2s;
+            /* GUT: 44x44px Social Media Icons */
+        }
+        
+        .good-social-link:hover {
+            background-color: #5a6268;
+            transform: scale(1.1);
+        }
+        
+        .good-social-link:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-social-link.facebook {
+            background-color: #3b5998;
+        }
+        
+        .good-social-link.twitter {
+            background-color: #1da1f2;
+        }
+        
+        .good-social-link.instagram {
+            background-color: #e4405f;
+        }
+        
+        .good-social-link.linkedin {
+            background-color: #0077b5;
+        }
+        
+        /* GOOD 8: Accessible tab interface */
+        .good-tabs-container {
+            margin: 20px 0;
+        }
+        
+        .good-tab-list {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .good-tab-button {
+            min-height: 44px;
+            padding: 12px 20px;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            color: #495057;
+            transition: all 0.2s;
+            /* GUT: 44px Mindesthöhe für Tabs */
+        }
+        
+        .good-tab-button:hover {
+            background-color: #e9ecef;
+        }
+        
+        .good-tab-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-tab-button.active {
+            background-color: #ffffff;
+            border-color: #dee2e6;
+            color: #0056b3;
+            margin-bottom: -2px;
+        }
+        
+        .good-tab-panel {
+            padding: 20px;
+            background-color: #ffffff;
+            border: 2px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+        
+        /* GOOD 9: Accessible toolbar */
+        .good-toolbar {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 20px 0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .good-toolbar-button {
+            min-width: 44px;
+            min-height: 44px;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #495057;
+            transition: all 0.2s;
+            /* GUT: 44x44px Toolbar Buttons */
+        }
+        
+        .good-toolbar-button:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+        
+        .good-toolbar-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-toolbar-button.active {
+            background-color: #0056b3;
+            border-color: #0056b3;
+            color: white;
+        }
+        
+        /* GOOD 10: Accessible rating system */
+        .good-rating-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .good-rating-stars {
+            display: flex;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .good-rating-star {
+            min-width: 44px;
+            min-height: 44px;
+            background: transparent;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            /* GUT: 44x44px Rating Stars */
+        }
+        
+        .good-rating-star:hover {
+            color: #ffc107;
+            border-color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+        
+        .good-rating-star:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-rating-star.filled {
+            color: #ffc107;
+            border-color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+        
+        .good-rating-text {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            border-left: 4px solid #1a78c2;
+        }
+        
+        .size-guide {
+            background-color: #e3f2fd;
+            border: 2px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .size-guide h4 {
+            color: #0d47a1;
+            margin-top: 0;
+        }
+        
+        .size-example {
+            display: inline-block;
+            margin: 5px;
+            text-align: center;
+            vertical-align: top;
+        }
+        
+        .size-44x44 {
+            width: 44px;
+            height: 44px;
+            background-color: #327d36;
+            border: 2px solid #2e7d32;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Target Size Compliant (GOOD)</h1>
+    <p><strong>WCAG 2.5.5 konforme Implementierung:</strong> Alle Touch-Targets mindestens 44x44px mit angemessenen Abständen</p>
+    
+    <!-- GOOD 1: Appropriately sized action buttons -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Angemessen dimensionierte Action-Buttons</div>
+        <p><strong>Lösung:</strong> Mindestens 44x44px mit ausreichend Padding und Abstand</p>
+        <div class="interactive-area">
+            <div class="good-action-buttons">
+                <!-- GUT: Alle Buttons mindestens 44x44px -->
+                <button class="good-action-button" onclick="goodActionClick('save')">💾 Speichern</button>
+                <button class="good-action-button" onclick="goodActionClick('edit')">✏️ Bearbeiten</button>
+                <button class="good-action-button" onclick="goodActionClick('delete')">🗑️ Löschen</button>
+                <button class="good-action-button" onclick="goodActionClick('share')">📤 Teilen</button>
+                <button class="good-action-button" onclick="goodActionClick('print')">🖨️ Drucken</button>
+                <button class="good-action-button" onclick="goodActionClick('download')">⬇️ Download</button>
+            </div>
+            <div class="size-guide">
+                <h4>✅ WCAG 2.5.5 konform:</h4>
+                <p>• Mindestens 44x44px Zielbereich<br>
+                • Ausreichend Abstand zwischen Targets<br>
+                • Visuelles und taktiles Feedback<br>
+                • Tastatur-zugänglich mit Focus-Indikatoren</p>
+                <div class="size-example">
+                    <div class="size-44x44">44×44</div>
+                    <div>Minimum</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Appropriately spaced close buttons -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Angemessen platzierte Close-Buttons</div>
+        <p><strong>Lösung:</strong> 44x44px Close-Buttons mit ausreichend Abstand zu Rändern</p>
+        <div class="interactive-area">
+            <div class="good-close-container">
+                <!-- GUT: 44x44px Close-Button mit Abstand -->
+                <button class="good-close-button" onclick="goodCloseDialog()" aria-label="Dialog schließen">✕</button>
+                <h4>📋 Modal Dialog Beispiel</h4>
+                <p>Dies ist ein Beispiel-Dialog mit einem korrekt dimensionierten Close-Button.</p>
+                <p>Der Close-Button ist mindestens 44x44px groß und hat ausreichend Abstand zum Rand, um versehentliche Aktivierung zu vermeiden.</p>
+                <button class="good-action-button" onclick="goodCloseDialog()">Dialog schließen</button>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Close-Button beste Praktiken:</h4>
+                <p>• 44x44px Mindestgröße auch für X-Buttons<br>
+                • Mindestens 8px Abstand zu Rändern<br>
+                • Beschriftung per aria-label<br>
+                • Deutliches Hover/Focus-Feedback</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Properly sized form controls -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Korrekt dimensionierte Formular-Steuerelemente</div>
+        <p><strong>Lösung:</strong> Touch-Bereich um kleine Steuerelemente erweitert</p>
+        <div class="interactive-area">
+            <div class="good-form-container">
+                <h4>📝 Barrierefreie Formulare</h4>
+                <div class="good-form-row">
+                    <label for="good-checkbox1">Optionen auswählen:</label>
+                    <div class="good-checkbox-container">
+                        <!-- GUT: Erweiterter Touch-Bereich um Checkbox -->
+                        <input type="checkbox" id="good-checkbox1" class="good-checkbox">
+                        <label for="good-checkbox1" class="good-checkbox-label">Newsletter abonnieren</label>
+                    </div>
+                </div>
+                <div class="good-form-row">
+                    <label>Bewertung:</label>
+                    <div class="good-checkbox-container">
+                        <input type="checkbox" id="good-checkbox2" class="good-checkbox">
+                        <label for="good-checkbox2" class="good-checkbox-label">Sehr zufrieden</label>
+                    </div>
+                </div>
+                <div class="good-form-row">
+                    <label>Geschlecht:</label>
+                    <div class="good-radio-container">
+                        <!-- GUT: Erweiterter Touch-Bereich um Radio-Button -->
+                        <input type="radio" id="good-radio1" name="gender" class="good-radio">
+                        <label for="good-radio1" class="good-radio-label">Weiblich</label>
+                    </div>
+                    <div class="good-radio-container">
+                        <input type="radio" id="good-radio2" name="gender" class="good-radio">
+                        <label for="good-radio2" class="good-radio-label">Männlich</label>
+                    </div>
+                </div>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Formular-Steuerelemente:</h4>
+                <p>• Touch-Bereich durch Padding erweitert<br>
+                • Gesamter Label-Text ist klickbar<br>
+                • 44x44px effektive Zielgröße<br>
+                • Visuelles Feedback bei Hover/Focus</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Accessible pagination -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Barrierefreie Pagination</div>
+        <p><strong>Lösung:</strong> 44x44px Pagination-Buttons mit klarem visuellen Feedback</p>
+        <div class="interactive-area">
+            <nav aria-label="Seitennummerierung">
+                <div class="good-pagination">
+                    <!-- GUT: Alle Pagination-Buttons mindestens 44x44px -->
+                    <a href="#" class="good-page-button disabled" aria-label="Vorherige Seite">‹</a>
+                    <a href="#" class="good-page-button active" aria-current="page" aria-label="Seite 1">1</a>
+                    <a href="#" class="good-page-button" aria-label="Seite 2">2</a>
+                    <a href="#" class="good-page-button" aria-label="Seite 3">3</a>
+                    <a href="#" class="good-page-button" aria-label="Seite 4">4</a>
+                    <a href="#" class="good-page-button" aria-label="Seite 5">5</a>
+                    <a href="#" class="good-page-button" aria-label="Nächste Seite">›</a>
+                </div>
+            </nav>
+            <div class="size-guide">
+                <h4>✅ Pagination beste Praktiken:</h4>
+                <p>• 44x44px Mindestgröße für alle Links<br>
+                • Angemessener Abstand zwischen Elementen<br>
+                • Beschriftung mit aria-label<br>
+                • Aktuelle Seite mit aria-current markiert</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Mobile-friendly menu -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Mobilfreundliches Menü</div>
+        <p><strong>Lösung:</strong> 44x44px Hamburger-Button und Menü-Items mit Touch-optimierten Größen</p>
+        <div class="interactive-area">
+            <div class="good-mobile-menu">
+                <!-- GUT: 44x44px Hamburger-Button -->
+                <button class="good-hamburger-button" onclick="goodToggleMenu()" aria-label="Hauptmenü öffnen" aria-expanded="false">
+                    <div class="good-hamburger-line"></div>
+                    <div class="good-hamburger-line"></div>
+                    <div class="good-hamburger-line"></div>
+                </button>
+                <nav class="good-menu-items" id="goodMobileMenu">
+                    <!-- GUT: Alle Menü-Items mindestens 44px hoch -->
+                    <a href="#" class="good-menu-item">🏠 Startseite</a>
+                    <a href="#" class="good-menu-item">📱 Produkte</a>
+                    <a href="#" class="good-menu-item">💼 Dienstleistungen</a>
+                    <a href="#" class="good-menu-item">📞 Kontakt</a>
+                    <a href="#" class="good-menu-item">ℹ️ Über uns</a>
+                </nav>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Mobile Menü Standards:</h4>
+                <p>• 44x44px Hamburger-Button<br>
+                • 44px Mindesthöhe für Menü-Items<br>
+                • Angemessenes Padding für Touch<br>
+                • ARIA-Labels für Barrierefreiheit</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Accessible slider controls -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Barrierefreie Slider-Steuerelemente</div>
+        <p><strong>Lösung:</strong> Große Slider-Handles und zusätzliche Button-Steuerung</p>
+        <div class="interactive-area">
+            <div class="good-slider-container">
+                <h4>🎚️ Lautstärke-Einstellung</h4>
+                <div class="good-slider-wrapper">
+                    <button class="good-slider-button" onclick="goodAdjustSlider(-10)" aria-label="Lautstärke verringern">−</button>
+                    <!-- GUT: Slider mit großem Touch-Target -->
+                    <input type="range" class="good-slider" id="goodVolumeSlider" min="0" max="100" value="50" 
+                           oninput="goodUpdateSliderValue(this)" aria-label="Lautstärke">
+                    <button class="good-slider-button" onclick="goodAdjustSlider(10)" aria-label="Lautstärke erhöhen">+</button>
+                    <span id="goodSliderValue">50%</span>
+                </div>
+                <div style="margin: 15px 0;">
+                    <label for="goodBrightnessSlider"><strong>🔆 Helligkeit:</strong></label>
+                    <div class="good-slider-wrapper">
+                        <button class="good-slider-button" onclick="goodAdjustBrightness(-10)" aria-label="Helligkeit verringern">−</button>
+                        <input type="range" class="good-slider" id="goodBrightnessSlider" min="0" max="100" value="75" 
+                               oninput="goodUpdateBrightnessValue(this)" aria-label="Helligkeit">
+                        <button class="good-slider-button" onclick="goodAdjustBrightness(10)" aria-label="Helligkeit erhöhen">+</button>
+                        <span id="goodBrightnessValue">75%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Slider Barrierefreiheit:</h4>
+                <p>• Große Slider-Handles (24px + padding)<br>
+                • Alternative Button-Steuerung (44x44px)<br>
+                • Tastatur-Navigation unterstützt<br>
+                • Wert-Anzeige für aktuellen Status</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Properly sized social media icons -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Korrekt dimensionierte Social Media Icons</div>
+        <p><strong>Lösung:</strong> 44x44px Social Media Links mit ausreichend Abstand</p>
+        <div class="interactive-area">
+            <h4>🌐 Folgen Sie uns</h4>
+            <div class="good-social-icons">
+                <!-- GUT: Alle Social Media Icons mindestens 44x44px -->
+                <a href="#" class="good-social-link facebook" aria-label="Facebook folgen">f</a>
+                <a href="#" class="good-social-link twitter" aria-label="Twitter folgen">t</a>
+                <a href="#" class="good-social-link instagram" aria-label="Instagram folgen">i</a>
+                <a href="#" class="good-social-link linkedin" aria-label="LinkedIn folgen">in</a>
+                <a href="#" class="good-social-link" aria-label="YouTube folgen">yt</a>
+                <a href="#" class="good-social-link" aria-label="GitHub folgen">gh</a>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Social Media Icons:</h4>
+                <p>• 44x44px Mindestgröße für alle Icons<br>
+                • Angemessener Abstand (12px) zwischen Icons<br>
+                • Beschreibende aria-label Texte<br>
+                • Hover-Effekte für visuelles Feedback</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Accessible tab interface -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Barrierefreie Tab-Schnittstelle</div>
+        <p><strong>Lösung:</strong> 44px hohe Tabs mit angemessenem Padding</p>
+        <div class="interactive-area">
+            <div class="good-tabs-container">
+                <ul class="good-tab-list" role="tablist">
+                    <!-- GUT: Alle Tabs mindestens 44px hoch -->
+                    <li role="presentation">
+                        <button class="good-tab-button active" id="goodTab1" role="tab" aria-controls="goodPanel1" 
+                                aria-selected="true" onclick="goodSwitchTab(1)">📋 Übersicht</button>
+                    </li>
+                    <li role="presentation">
+                        <button class="good-tab-button" id="goodTab2" role="tab" aria-controls="goodPanel2" 
+                                aria-selected="false" onclick="goodSwitchTab(2)">⚙️ Einstellungen</button>
+                    </li>
+                    <li role="presentation">
+                        <button class="good-tab-button" id="goodTab3" role="tab" aria-controls="goodPanel3" 
+                                aria-selected="false" onclick="goodSwitchTab(3)">📊 Statistiken</button>
+                    </li>
+                    <li role="presentation">
+                        <button class="good-tab-button" id="goodTab4" role="tab" aria-controls="goodPanel4" 
+                                aria-selected="false" onclick="goodSwitchTab(4)">❓ Hilfe</button>
+                    </li>
+                </ul>
+                <div class="good-tab-panel" id="goodPanel1" role="tabpanel" aria-labelledby="goodTab1">
+                    <h4>📋 Übersicht</h4>
+                    <p>Dies ist das Übersichts-Panel mit wichtigen Informationen.</p>
+                </div>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Tab-Interface Standards:</h4>
+                <p>• 44px Mindesthöhe für alle Tabs<br>
+                • Angemessenes horizontales Padding<br>
+                • ARIA-Attributes für Barrierefreiheit<br>
+                • Tastatur-Navigation zwischen Tabs</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Accessible toolbar -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Barrierefreie Toolbar</div>
+        <p><strong>Lösung:</strong> 44x44px Toolbar-Buttons mit klaren Icons</p>
+        <div class="interactive-area">
+            <div class="good-toolbar" role="toolbar" aria-label="Formatierung">
+                <!-- GUT: Alle Toolbar-Buttons mindestens 44x44px -->
+                <button class="good-toolbar-button" onclick="goodToolbarAction('bold')" aria-label="Fett formatieren">B</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('italic')" aria-label="Kursiv formatieren">I</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('underline')" aria-label="Unterstreichen">U</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('align-left')" aria-label="Links ausrichten">⇤</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('align-center')" aria-label="Zentrieren">↔</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('align-right')" aria-label="Rechts ausrichten">⇥</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('list')" aria-label="Liste einfügen">⁝</button>
+                <button class="good-toolbar-button" onclick="goodToolbarAction('link')" aria-label="Link einfügen">🔗</button>
+            </div>
+            <div style="margin: 15px 0; padding: 10px; background: #e3f2fd; border-radius: 4px;">
+                <strong>Aktuelle Auswahl:</strong> <span id="goodToolbarStatus">Keine Formatierung aktiv</span>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Toolbar beste Praktiken:</h4>
+                <p>• 44x44px für alle Toolbar-Buttons<br>
+                • ARIA-Labels für alle Aktionen<br>
+                • Visueller Status für aktive Tools<br>
+                • Tastatur-Navigation in der Toolbar</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Accessible rating system -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Barrierefreies Bewertungssystem</div>
+        <p><strong>Lösung:</strong> 44x44px Bewertungs-Sterne mit klarem Feedback</p>
+        <div class="interactive-area">
+            <div class="good-rating-container">
+                <h4>⭐ Bewerten Sie unseren Service</h4>
+                <div class="good-rating-stars" role="radiogroup" aria-label="Service-Bewertung von 1 bis 5 Sternen">
+                    <!-- GUT: Alle Rating-Sterne mindestens 44x44px -->
+                    <button class="good-rating-star" onclick="goodSetRating(1)" aria-label="1 Stern" role="radio" aria-checked="false">★</button>
+                    <button class="good-rating-star" onclick="goodSetRating(2)" aria-label="2 Sterne" role="radio" aria-checked="false">★</button>
+                    <button class="good-rating-star" onclick="goodSetRating(3)" aria-label="3 Sterne" role="radio" aria-checked="false">★</button>
+                    <button class="good-rating-star" onclick="goodSetRating(4)" aria-label="4 Sterne" role="radio" aria-checked="false">★</button>
+                    <button class="good-rating-star" onclick="goodSetRating(5)" aria-label="5 Sterne" role="radio" aria-checked="false">★</button>
+                </div>
+                <div class="good-rating-text" id="goodRatingFeedback">
+                    Bitte wählen Sie eine Bewertung von 1 bis 5 Sternen.
+                </div>
+                <button class="good-action-button" onclick="goodSubmitRating()" disabled id="goodSubmitRating">
+                    Bewertung abgeben
+                </button>
+            </div>
+            <div class="size-guide">
+                <h4>✅ Rating-System Standards:</h4>
+                <p>• 44x44px für alle Bewertungs-Sterne<br>
+                • ARIA-Radiogroup für semantische Struktur<br>
+                • Klares Feedback bei Auswahl<br>
+                • Tastatur-Navigation zwischen Sternen</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 2.5.5 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Alle Touch-Targets mindestens 44x44px</li>
+            <li>✅ Angemessene Abstände zwischen anklickbaren Elementen</li>
+            <li>✅ Erweiterte Touch-Bereiche für kleine Steuerelemente</li>
+            <li>✅ Alternative Eingabemethoden verfügbar</li>
+            <li>✅ Visuelles und taktiles Feedback bei Interaktion</li>
+            <li>✅ ARIA-Labels und semantische Struktur</li>
+        </ul>
+        
+        <p><strong>Verbesserte Benutzerfreundlichkeit für:</strong></p>
+        <ul>
+            <li>👥 Mobile Benutzer: Große Touch-Targets reduzieren Eingabefehler</li>
+            <li>👥 Motor-Beeinträchtigungen: Größere Ziele sind einfacher zu treffen</li>
+            <li>👥 Zitternde Hände: Weniger Präzision erforderlich</li>
+            <li>👥 Ältere Benutzer: Altersbedingte motorische Einschränkungen</li>
+            <li>👥 Einhandige Bedienung: Einfachere Erreichbarkeit</li>
+            <li>👥 Alle Benutzer: Reduzierte Frustration durch Fehlklicks</li>
+        </ul>
+    </div>
+
+    <script>
+        let goodCurrentRating = 0;
+        let goodCurrentSliderValue = 50;
+        let goodCurrentBrightness = 75;
+        let goodMenuOpen = false;
+        
+        // GOOD 1: Action button clicks
+        function goodActionClick(action) {
+            const messages = {
+                'save': '💾 Dokument wurde erfolgreich gespeichert!',
+                'edit': '✏️ Bearbeitungsmodus aktiviert',
+                'delete': '🗑️ Element wurde gelöscht',
+                'share': '📤 Freigabe-Dialog geöffnet',
+                'print': '🖨️ Druckvorschau wird geladen...',
+                'download': '⬇️ Download gestartet'
+            };
+            
+            alert(messages[action] || 'Aktion ausgeführt');
+            console.log(`✅ GOOD: ${action} button clicked - 44x44px target size maintained`);
+        }
+        
+        // GOOD 2: Close button
+        function goodCloseDialog() {
+            alert('✅ Dialog geschlossen - 44x44px Close-Button mit angemessenem Abstand');
+            console.log('✅ GOOD: Close button provides adequate touch target size');
+        }
+        
+        // GOOD 5: Mobile menu toggle
+        function goodToggleMenu() {
+            goodMenuOpen = !goodMenuOpen;
+            const menu = document.getElementById('goodMobileMenu');
+            const button = document.querySelector('.good-hamburger-button');
+            
+            if (goodMenuOpen) {
+                menu.classList.add('show');
+                button.setAttribute('aria-expanded', 'true');
+                button.setAttribute('aria-label', 'Hauptmenü schließen');
+                console.log('✅ GOOD: Mobile menu opened - 44x44px hamburger button');
+            } else {
+                menu.classList.remove('show');
+                button.setAttribute('aria-expanded', 'false');
+                button.setAttribute('aria-label', 'Hauptmenü öffnen');
+                console.log('✅ GOOD: Mobile menu closed');
+            }
+        }
+        
+        // GOOD 6: Slider controls
+        function goodAdjustSlider(change) {
+            const slider = document.getElementById('goodVolumeSlider');
+            goodCurrentSliderValue = Math.max(0, Math.min(100, goodCurrentSliderValue + change));
+            slider.value = goodCurrentSliderValue;
+            document.getElementById('goodSliderValue').textContent = goodCurrentSliderValue + '%';
+            console.log(`✅ GOOD: Slider adjusted via 44x44px buttons - Value: ${goodCurrentSliderValue}%`);
+        }
+        
+        function goodUpdateSliderValue(slider) {
+            goodCurrentSliderValue = parseInt(slider.value);
+            document.getElementById('goodSliderValue').textContent = goodCurrentSliderValue + '%';
+        }
+        
+        function goodAdjustBrightness(change) {
+            const slider = document.getElementById('goodBrightnessSlider');
+            goodCurrentBrightness = Math.max(0, Math.min(100, goodCurrentBrightness + change));
+            slider.value = goodCurrentBrightness;
+            document.getElementById('goodBrightnessValue').textContent = goodCurrentBrightness + '%';
+            console.log(`✅ GOOD: Brightness adjusted via 44x44px buttons - Value: ${goodCurrentBrightness}%`);
+        }
+        
+        function goodUpdateBrightnessValue(slider) {
+            goodCurrentBrightness = parseInt(slider.value);
+            document.getElementById('goodBrightnessValue').textContent = goodCurrentBrightness + '%';
+        }
+        
+        // GOOD 8: Tab switching
+        function goodSwitchTab(tabNumber) {
+            // Reset all tabs
+            for (let i = 1; i <= 4; i++) {
+                const tab = document.getElementById(`goodTab${i}`);
+                const panel = document.getElementById(`goodPanel${i}`);
+                
+                if (tab) {
+                    tab.classList.remove('active');
+                    tab.setAttribute('aria-selected', 'false');
+                }
+                if (panel) {
+                    panel.style.display = 'none';
+                }
+            }
+            
+            // Activate selected tab
+            const activeTab = document.getElementById(`goodTab${tabNumber}`);
+            const activePanel = document.getElementById(`goodPanel${tabNumber}`);
+            
+            if (activeTab) {
+                activeTab.classList.add('active');
+                activeTab.setAttribute('aria-selected', 'true');
+            }
+            if (activePanel) {
+                activePanel.style.display = 'block';
+            }
+            
+            console.log(`✅ GOOD: Tab ${tabNumber} activated - 44px height maintained`);
+        }
+        
+        // GOOD 9: Toolbar actions
+        function goodToolbarAction(action) {
+            const button = event.target;
+            button.classList.toggle('active');
+            
+            const statusElement = document.getElementById('goodToolbarStatus');
+            const activeTools = document.querySelectorAll('.good-toolbar-button.active');
+            
+            if (activeTools.length > 0) {
+                const activeNames = Array.from(activeTools).map(btn => btn.getAttribute('aria-label'));
+                statusElement.textContent = 'Aktiv: ' + activeNames.join(', ');
+            } else {
+                statusElement.textContent = 'Keine Formatierung aktiv';
+            }
+            
+            console.log(`✅ GOOD: Toolbar action '${action}' - 44x44px button size maintained`);
+        }
+        
+        // GOOD 10: Rating system
+        function goodSetRating(rating) {
+            goodCurrentRating = rating;
+            
+            // Update all stars
+            const stars = document.querySelectorAll('.good-rating-star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('filled');
+                    star.setAttribute('aria-checked', 'true');
+                } else {
+                    star.classList.remove('filled');
+                    star.setAttribute('aria-checked', 'false');
+                }
+            });
+            
+            // Update feedback text
+            const feedbackTexts = {
+                1: '⭐ 1 Stern: Sehr unzufrieden',
+                2: '⭐⭐ 2 Sterne: Unzufrieden',
+                3: '⭐⭐⭐ 3 Sterne: Neutral',
+                4: '⭐⭐⭐⭐ 4 Sterne: Zufrieden',
+                5: '⭐⭐⭐⭐⭐ 5 Sterne: Sehr zufrieden'
+            };
+            
+            document.getElementById('goodRatingFeedback').textContent = feedbackTexts[rating];
+            document.getElementById('goodSubmitRating').disabled = false;
+            
+            console.log(`✅ GOOD: Rating ${rating} selected - 44x44px star buttons`);
+        }
+        
+        function goodSubmitRating() {
+            if (goodCurrentRating > 0) {
+                alert(`✅ Vielen Dank für Ihre ${goodCurrentRating}-Sterne Bewertung!`);
+                console.log(`✅ GOOD: Rating ${goodCurrentRating} submitted successfully`);
+            }
+        }
+        
+        // Initialize good behaviors
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== TARGET SIZE COMPLIANCE ANALYSIS ===');
+            
+            // Verify all interactive elements meet 44x44px requirement
+            const interactiveElements = document.querySelectorAll('button, a, input[type="range"], input[type="checkbox"], input[type="radio"]');
+            let compliantCount = 0;
+            
+            interactiveElements.forEach(element => {
+                const computedStyle = window.getComputedStyle(element);
+                const width = parseFloat(computedStyle.width);
+                const height = parseFloat(computedStyle.height);
+                const paddingTop = parseFloat(computedStyle.paddingTop);
+                const paddingBottom = parseFloat(computedStyle.paddingBottom);
+                const paddingLeft = parseFloat(computedStyle.paddingLeft);
+                const paddingRight = parseFloat(computedStyle.paddingRight);
+                
+                const effectiveWidth = width + paddingLeft + paddingRight;
+                const effectiveHeight = height + paddingTop + paddingBottom;
+                
+                if (effectiveWidth >= 44 && effectiveHeight >= 44) {
+                    compliantCount++;
+                }
+            });
+            
+            console.log(`✅ ${compliantCount}/${interactiveElements.length} interactive elements meet 44x44px requirement`);
+            console.log('✅ WCAG 2.5.5 COMPLIANCE:');
+            console.log('- All touch targets meet minimum size requirement');
+            console.log('- Adequate spacing between targets maintained');
+            console.log('- Alternative input methods provided where applicable');
+            console.log('- Visual and tactile feedback implemented');
+            console.log('- ARIA labels and semantic structure provided');
+            
+            // Initialize tab interface
+            goodSwitchTab(1);
+            
+            // Set up keyboard navigation for rating
+            const ratingStars = document.querySelectorAll('.good-rating-star');
+            ratingStars.forEach((star, index) => {
+                star.addEventListener('keydown', function(e) {
+                    if (e.key === 'ArrowRight' && index < ratingStars.length - 1) {
+                        ratingStars[index + 1].focus();
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowLeft' && index > 0) {
+                        ratingStars[index - 1].focus();
+                        e.preventDefault();
+                    } else if (e.key === 'Enter' || e.key === ' ') {
+                        goodSetRating(index + 1);
+                        e.preventDefault();
+                    }
+                });
+            });
+            
+            console.log('✅ Keyboard navigation set up for rating system');
+            console.log('✅ All target size compliance measures implemented successfully');
+        });
+    </script>
+</body>
+</html>

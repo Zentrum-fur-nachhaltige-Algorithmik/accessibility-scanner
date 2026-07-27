@@ -148,13 +148,15 @@ class InputModalitiesScanner extends BaseScanner {
       const allElements = document.querySelectorAll('*');
       
       allElements.forEach(element => {
+        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
+        const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
           tagName: element.tagName.toLowerCase(),
           id: element.id,
-          className: element.className,
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className ? `.${element.className.split(' ')[0]}` : '')
+          className: className,
+          selector: element.tagName.toLowerCase() +
+                   (element.id ? `#${element.id}` : '') +
+                   (className ? `.${className.split(' ')[0]}` : '')
         };
 
         // Check for drag and drop without keyboard alternatives
@@ -283,13 +285,15 @@ class InputModalitiesScanner extends BaseScanner {
       const interactiveElements = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"], a[href], [onclick], [onmousedown], [ontouchstart]');
 
       interactiveElements.forEach(element => {
+        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
+        const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
           tagName: element.tagName.toLowerCase(),
           id: element.id,
-          className: element.className,
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className ? `.${element.className.split(' ')[0]}` : ''),
+          className: className,
+          selector: element.tagName.toLowerCase() +
+                   (element.id ? `#${element.id}` : '') +
+                   (className ? `.${className.split(' ')[0]}` : ''),
           textContent: element.textContent.trim().substring(0, 50)
         };
 
@@ -395,13 +399,15 @@ class InputModalitiesScanner extends BaseScanner {
       const labeledElements = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"], a[href], label');
 
       labeledElements.forEach(element => {
+        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
+        const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
           tagName: element.tagName.toLowerCase(),
           id: element.id,
-          className: element.className,
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className ? `.${element.className.split(' ')[0]}` : '')
+          className: className,
+          selector: element.tagName.toLowerCase() +
+                   (element.id ? `#${element.id}` : '') +
+                   (className ? `.${className.split(' ')[0]}` : '')
         };
 
         // Get visible text
@@ -592,15 +598,17 @@ class InputModalitiesScanner extends BaseScanner {
       const elementsWithTransform = document.querySelectorAll('[style*="transform"], [class*="rotate"], [class*="shake"]');
       
       elementsWithTransform.forEach(element => {
+        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
+        const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className ? `.${element.className.split(' ')[0]}` : '')
+          selector: element.tagName.toLowerCase() +
+                   (element.id ? `#${element.id}` : '') +
+                   (className ? `.${className.split(' ')[0]}` : '')
         };
 
         // Check if element responds to device orientation
         const style = window.getComputedStyle(element);
-        const hasOrientationCSS = element.className.includes('orientation') || 
+        const hasOrientationCSS = className.includes('orientation') ||
                                 element.style.transform.includes('rotate');
 
         if (hasOrientationCSS) {

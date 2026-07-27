@@ -1,0 +1,937 @@
+<!-- WCAG-TEST
+criterion: 3.1.5
+level: AAA
+title: Reading Level
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: language-detection
+description: Appropriate reading level with alternatives
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Reading Level Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            font-size: 18px;
+            /* GUT: Große, gut lesbare Schrift mit ausreichend Zeilenabstand */
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Clear, simple language */
+        .good-simple-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #000000;
+            margin: 15px 0;
+            /* GUT: Einfache, klare Sprache */
+        }
+        
+        /* GOOD 2: Technical terms with explanations */
+        .good-technical-text {
+            font-size: 18px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .term-explanation {
+            background-color: #e3f2fd;
+            border-left: 4px solid #1a78c2;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .definition {
+            color: #0d47a1;
+            font-weight: bold;
+        }
+        
+        /* GOOD 3: Legal text with plain language version */
+        .good-legal-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #000000;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .plain-language-version {
+            background-color: #e8f5e8;
+            border: 2px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .plain-language-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* GOOD 4: Medical information with patient-friendly version */
+        .good-medical-text {
+            font-size: 18px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .patient-friendly {
+            background-color: #fff3e0;
+            border: 2px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .patient-friendly-title {
+            color: #c44500; /* darkened from #e65100: 3.46:1 was below AA 4.5:1 */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* GOOD 5: Financial information simplified */
+        .good-financial-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #000000;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .simplified-version {
+            background-color: #e1f5fe;
+            border: 2px solid #03a9f4;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .simplified-title {
+            color: #0272b5; /* darkened from #0277bd: 4.27:1 was below AA 4.5:1 */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* GOOD 6: Academic content with summary */
+        .good-academic-text {
+            font-size: 18px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .summary-version {
+            background-color: #f3e5f5;
+            border: 2px solid #9c27b0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .summary-title {
+            color: #7b1fa2;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* GOOD 7: Government information citizen-friendly */
+        .good-government-text {
+            font-size: 18px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .citizen-friendly {
+            background-color: #e8f5e8;
+            border: 2px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .citizen-friendly-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* GOOD 8: Technical documentation with glossary */
+        .good-tech-docs {
+            font-size: 18px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .glossary-term {
+            color: #0d47a1;
+            text-decoration: underline;
+            cursor: help;
+            position: relative;
+        }
+        
+        .glossary-definition {
+            background-color: #263238;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .glossary-term:hover .glossary-definition {
+            display: block;
+        }
+        
+        /* GOOD 9: Short sentences and clear structure */
+        .good-structured-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #000000;
+        }
+        
+        .good-structured-text h4 {
+            color: #0d47a1;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .good-structured-text ul {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        
+        .good-structured-text li {
+            margin: 8px 0;
+        }
+        
+        /* GOOD 10: Translated foreign phrases */
+        .good-clear-language {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #000000;
+        }
+        
+        .translation {
+            color: #666666;
+            font-style: italic;
+            font-size: 16px;
+        }
+        
+        .reading-level-guide {
+            background-color: #e3f2fd;
+            border: 2px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .reading-level-guide h4 {
+            color: #0d47a1;
+            margin-top: 0;
+        }
+        
+        .readability-meter {
+            background-color: #f1f8e9;
+            border: 2px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .readability-score {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .score-bar {
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            flex: 1;
+            margin: 0 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .score-excellent {
+            background-color: #327d36;
+        }
+        
+        .score-good {
+            background-color: #8bc34a;
+        }
+        
+        .score-fair {
+            background-color: #ffc107;
+        }
+        
+        .controls {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        button {
+            background-color: #327d36;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button.secondary {
+            background-color: #1a78c2;
+        }
+        
+        button.secondary:hover {
+            background-color: #0d47a1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Reading Level Accessible (GOOD)</h1>
+    <p><strong>WCAG 3.1.5 konforme Implementierung:</strong> Klare, verständliche Sprache mit vereinfachten Alternativen für komplexe Inhalte</p>
+    
+    <!-- GOOD 1: Clear, simple language -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Klare, einfache Sprache</div>
+        <p><strong>Lösung:</strong> Einfache Wörter und kurze Sätze verwenden</p>
+        <div class="interactive-area">
+            <div class="good-simple-text">
+                <!-- GUT: Einfache, verständliche Sprache -->
+                <h4>🌐 Willkommen auf unserer Website</h4>
+                <p>Wir freuen uns, dass Sie da sind. Diese Website ist einfach zu benutzen.</p>
+                
+                <p>Hier finden Sie alle wichtigen Informationen über unser Unternehmen. Wir haben die Texte so geschrieben, dass sie jeder verstehen kann.</p>
+                
+                <p>Wenn Sie Fragen haben, können Sie uns gerne kontaktieren. Wir helfen Ihnen gerne weiter.</p>
+                
+                <h4>📞 So erreichen Sie uns:</h4>
+                <ul>
+                    <li>Telefon: 0800 123 456 (kostenlos)</li>
+                    <li>E-Mail: hilfe@beispiel.de</li>
+                    <li>Chat: Klicken Sie auf den blauen Button rechts unten</li>
+                </ul>
+            </div>
+            <div class="reading-level-guide">
+                <h4>✅ Lesegrad-Analyse:</h4>
+                <p>• Bildungsgrad: Sekundarstufe I (9. Klasse)<br>
+                • Durchschnittliche Satzlänge: 12 Wörter<br>
+                • Einfache, alltägliche Begriffe<br>
+                • Klare Struktur mit Überschriften und Listen</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Technical terms with explanations -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Fachbegriffe mit Erklärungen</div>
+        <p><strong>Lösung:</strong> Komplexe Begriffe werden sofort erklärt</p>
+        <div class="interactive-area">
+            <div class="good-technical-text">
+                <h4>🔐 Website-Sicherheit</h4>
+                <p>Unsere Website nutzt <span class="glossary-term">SSL-Verschlüsselung<span class="glossary-definition">Eine Technik, die Ihre Daten während der Übertragung schützt</span></span>. Das bedeutet: Ihre persönlichen Daten sind sicher.</p>
+                
+                <div class="term-explanation">
+                    <span class="definition">SSL-Verschlüsselung:</span> 
+                    Das ist wie ein sicherer Brief-Umschlag für Ihre Daten. Niemand außer uns kann diese Informationen lesen.
+                </div>
+                
+                <p>Wir verwenden auch <span class="glossary-term">Cookies<span class="glossary-definition">Kleine Dateien, die sich merken, was Sie auf der Website machen</span></span>. Diese helfen uns, die Website besser zu machen.</p>
+                
+                <div class="term-explanation">
+                    <span class="definition">Cookies:</span> 
+                    Das sind kleine Helfer-Programme. Sie merken sich zum Beispiel, welche Sprache Sie sprechen. Sie können Cookies jederzeit ausschalten.
+                </div>
+                
+                <p>Ihre <span class="glossary-term">IP-Adresse<span class="glossary-definition">Eine eindeutige Nummer, die Ihr Computer im Internet hat</span></span> wird nur für technische Zwecke gespeichert.</p>
+                
+                <div class="term-explanation">
+                    <span class="definition">IP-Adresse:</span> 
+                    Das ist wie Ihre Haus-Adresse im Internet. Jeder Computer hat eine andere Nummer.
+                </div>
+            </div>
+            <div class="reading-level-guide">
+                <h4>✅ Fachbegriff-Behandlung:</h4>
+                <p>• Sofortige Erklärung komplexer Begriffe<br>
+                • Tooltip-Definitionen beim Überfahren<br>
+                • Vergleiche mit alltäglichen Dingen<br>
+                • Zusätzliche Erklärungsboxen</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Legal text with plain language version -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Rechtliche Texte mit verständlicher Version</div>
+        <p><strong>Lösung:</strong> Zusätzlich zur Rechtssprache eine einfache Erklärung anbieten</p>
+        <div class="interactive-area">
+            <div class="good-legal-text">
+                <h4>📋 Original-Vertragstext:</h4>
+                <p>Der Vertragspartner verpflichtet sich zur termingerechten Erfüllung der vereinbarten Leistungen gemäß den in diesem Vertrag festgelegten Bedingungen.</p>
+            </div>
+            
+            <div class="plain-language-version">
+                <div class="plain-language-title">📝 Einfach erklärt:</div>
+                <p><strong>Das bedeutet:</strong> Sie müssen das tun, was wir vereinbart haben. Und das bis zum vereinbarten Termin.</p>
+                
+                <p><strong>Beispiel:</strong> Wenn Sie ein Produkt bestellen, liefern wir es zum vereinbarten Datum. Wenn wir einen Service anbieten, machen wir das wie besprochen.</p>
+                
+                <p><strong>Ihre Rechte:</strong> Wenn wir uns nicht an den Vertrag halten, können Sie sich beschweren oder den Vertrag beenden.</p>
+            </div>
+            
+            <div class="controls">
+                <button onclick="toggleLegalView()">🔄 Zwischen Original und einfacher Version wechseln</button>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Rechtliche Klarheit:</h4>
+                <p>• Original-Rechtstext verfügbar<br>
+                • Vereinfachte Übersetzung daneben<br>
+                • Konkrete Beispiele<br>
+                • Erklärung der Rechte und Pflichten</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Medical information with patient-friendly version -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Medizinische Informationen patientenfreundlich</div>
+        <p><strong>Lösung:</strong> Medizinische Fachsprache für Patienten übersetzen</p>
+        <div class="interactive-area">
+            <div class="good-medical-text">
+                <h4>🩺 Medizinische Information:</h4>
+                <p>Bei einer Hypertonie können ACE-Hemmer zur Blutdrucksenkung verschrieben werden.</p>
+            </div>
+            
+            <div class="patient-friendly">
+                <div class="patient-friendly-title">👨‍⚕️ Für Patienten erklärt:</div>
+                <p><strong>Hypertonie = Bluthochdruck</strong><br>
+                Das bedeutet: Ihr Blut fließt mit zu viel Druck durch die Adern.</p>
+                
+                <p><strong>ACE-Hemmer = Blutdruck-Medikament</strong><br>
+                Das sind Tabletten, die den Blutdruck senken. Sie machen die Blutgefäße weiter.</p>
+                
+                <p><strong>Was das für Sie bedeutet:</strong></p>
+                <ul>
+                    <li>Nehmen Sie die Tabletten jeden Tag</li>
+                    <li>Messen Sie regelmäßig Ihren Blutdruck</li>
+                    <li>Kommen Sie zu den Kontroll-Terminen</li>
+                    <li>Bei Nebenwirkungen rufen Sie uns an</li>
+                </ul>
+                
+                <p><strong>Fragen?</strong> Sprechen Sie mit Ihrem Arzt oder Apotheker.</p>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Medizinische Klarheit:</h4>
+                <p>• Fachbegriffe in Alltagssprache übersetzt<br>
+                • Konkrete Handlungsanweisungen<br>
+                • Kontaktmöglichkeiten bei Fragen<br>
+                • Wichtige Punkte hervorgehoben</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Financial information simplified -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Finanzinformationen vereinfacht</div>
+        <p><strong>Lösung:</strong> Komplexe Finanzprodukte verständlich erklären</p>
+        <div class="interactive-area">
+            <div class="good-financial-text">
+                <h4>💰 Finanzprodukt:</h4>
+                <p>Unser Portfolio bietet eine diversifizierte Anlagestrategie mit optimiertem Risiko-Rendite-Verhältnis.</p>
+            </div>
+            
+            <div class="simplified-version">
+                <div class="simplified-title">💡 Einfach erklärt:</div>
+                <p><strong>Portfolio = Sammlung verschiedener Geldanlagen</strong><br>
+                Wir investieren Ihr Geld nicht nur in eine Sache, sondern in viele verschiedene.</p>
+                
+                <p><strong>Diversifiziert = Risikoverteilung</strong><br>
+                Wie beim Sprichwort: "Nicht alle Eier in einen Korb legen". Wenn eine Anlage schlecht läuft, können andere das ausgleichen.</p>
+                
+                <p><strong>Risiko-Rendite-Verhältnis = Sicherheit vs. Gewinn</strong><br>
+                Wir achten darauf, dass Sie nicht zu viel riskieren, aber trotzdem Gewinn machen können.</p>
+                
+                <p><strong>Das bedeutet für Sie:</strong></p>
+                <ul>
+                    <li>Ihr Geld ist sicherer als bei nur einer Anlage</li>
+                    <li>Sie können trotzdem Gewinn machen</li>
+                    <li>Wir passen die Strategie an Ihre Wünsche an</li>
+                    <li>Sie bekommen regelmäßige Berichte</li>
+                </ul>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Finanzielle Klarheit:</h4>
+                <p>• Fachwörter mit Beispielen erklärt<br>
+                • Auswirkungen für den Kunden beschrieben<br>
+                • Konkrete Vorteile aufgelistet<br>
+                • Alltagsvergleiche verwendet</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Academic content with summary -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Wissenschaftliche Inhalte mit Zusammenfassung</div>
+        <p><strong>Lösung:</strong> Forschungsergebnisse für die Öffentlichkeit aufbereiten</p>
+        <div class="interactive-area">
+            <div class="good-academic-text">
+                <h4>🔬 Forschungsergebnis:</h4>
+                <p>Unsere Studie zeigt signifikante Korrelationen zwischen regelmäßiger körperlicher Aktivität und kognitiven Funktionen bei älteren Erwachsenen.</p>
+            </div>
+            
+            <div class="summary-version">
+                <div class="summary-title">📊 Kurz zusammengefasst:</div>
+                <p><strong>Was haben wir untersucht?</strong><br>
+                Wir wollten wissen: Hilft Sport dem Gehirn von älteren Menschen?</p>
+                
+                <p><strong>Was haben wir herausgefunden?</strong><br>
+                Ja! Menschen ab 60, die regelmäßig Sport machen, können besser denken und sich besser konzentrieren.</p>
+                
+                <p><strong>Was bedeutet das?</strong></p>
+                <ul>
+                    <li>30 Minuten Bewegung pro Tag reichen schon</li>
+                    <li>Das kann Spazierengehen, Schwimmen oder Fahrradfahren sein</li>
+                    <li>Das Gehirn bleibt dadurch länger fit</li>
+                    <li>Es kann sogar vor Demenz schützen</li>
+                </ul>
+                
+                <p><strong>Unser Tipp:</strong> Fangen Sie langsam an und steigern Sie sich. Jede Bewegung hilft!</p>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Wissenschaftliche Kommunikation:</h4>
+                <p>• Forschungsfrage verständlich erklärt<br>
+                • Ergebnisse in Alltagssprache übersetzt<br>
+                • Praktische Tipps abgeleitet<br>
+                • Relevanz für den Leser aufgezeigt</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Government information citizen-friendly -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Behördeninformationen bürgerfreundlich</div>
+        <p><strong>Lösung:</strong> Amtsdeutsch in verständliche Sprache übersetzen</p>
+        <div class="interactive-area">
+            <div class="good-government-text">
+                <h4>🏛️ Amtliche Information:</h4>
+                <p>Für die Beantragung des Personalausweises sind folgende Unterlagen erforderlich und bei der zuständigen Behörde vorzulegen.</p>
+            </div>
+            
+            <div class="citizen-friendly">
+                <div class="citizen-friendly-title">🆔 Für Bürger erklärt:</div>
+                <p><strong>Sie brauchen einen neuen Personalausweis?</strong><br>
+                Dann bringen Sie diese Dokumente mit zum Bürgeramt:</p>
+                
+                <p><strong>Das brauchen Sie:</strong></p>
+                <ul>
+                    <li>Ihr alter Personalausweis (falls vorhanden)</li>
+                    <li>Ein aktuelles Passfoto (nicht älter als 6 Monate)</li>
+                    <li>55 Euro für den neuen Ausweis</li>
+                    <li>Bei Minderjährigen: Zustimmung der Eltern</li>
+                </ul>
+                
+                <p><strong>So geht's:</strong></p>
+                <ol>
+                    <li>Termin online buchen oder direkt hingehen</li>
+                    <li>Dokumente vorlegen</li>
+                    <li>Fingerabdrücke geben</li>
+                    <li>Bezahlen</li>
+                    <li>Nach 2-3 Wochen abholen</li>
+                </ol>
+                
+                <p><strong>Öffnungszeiten:</strong> Mo-Fr 8-16 Uhr, Do bis 18 Uhr</p>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Bürgerfreundliche Kommunikation:</h4>
+                <p>• Amtssprache in Alltagssprache übersetzt<br>
+                • Schritt-für-Schritt Anleitung<br>
+                • Konkrete Kosten und Zeiten genannt<br>
+                • Praktische Hinweise gegeben</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Technical documentation with glossary -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Technische Dokumentation mit Glossar</div>
+        <p><strong>Lösung:</strong> Fachbegriffe durch Hover-Definitionen erklären</p>
+        <div class="interactive-area">
+            <div class="good-tech-docs">
+                <h4>⚙️ Setup-Anleitung</h4>
+                <p>Um den <span class="glossary-term">Load Balancer<span class="glossary-definition">Verteilt Anfragen auf mehrere Server für bessere Leistung</span></span> zu konfigurieren, müssen Sie zunächst die <span class="glossary-term">Upstream-Server<span class="glossary-definition">Die echten Server, die die Arbeit machen</span></span> einrichten.</p>
+                
+                <p>Aktivieren Sie <span class="glossary-term">SSL Termination<span class="glossary-definition">Verschlüsselung wird am Load Balancer beendet</span></span> für sichere Verbindungen.</p>
+                
+                <p>Stellen Sie <span class="glossary-term">Health Checks<span class="glossary-definition">Automatische Prüfung, ob Server noch funktionieren</span></span> ein, um defekte Server automatisch zu erkennen.</p>
+                
+                <div class="term-explanation">
+                    <span class="definition">Tipp:</span> 
+                    Fahren Sie mit der Maus über die unterstrichenen Begriffe, um sofort eine Erklärung zu sehen.
+                </div>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Technische Dokumentation:</h4>
+                <p>• Fachbegriffe mit Hover-Tooltips erklärt<br>
+                • Einfache Sprache für komplexe Konzepte<br>
+                • Schritt-für-Schritt Anleitungen<br>
+                • Hilfreiche Tipps eingebaut</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Short sentences and clear structure -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Kurze Sätze und klare Struktur</div>
+        <p><strong>Lösung:</strong> Lange Sätze aufteilen und strukturieren</p>
+        <div class="interactive-area">
+            <div class="good-structured-text">
+                <h4>🏗️ Website erstellen - einfach erklärt</h4>
+                
+                <p>Eine Website zu erstellen ist heute einfacher als früher. Es gibt viele Tools, die Ihnen dabei helfen.</p>
+                
+                <h4>Das brauchen Sie:</h4>
+                <ul>
+                    <li>Eine Idee für Ihre Website</li>
+                    <li>Texte und Bilder für den Inhalt</li>
+                    <li>Ein Website-Tool (z.B. WordPress)</li>
+                    <li>Einen Hosting-Anbieter</li>
+                </ul>
+                
+                <h4>So gehen Sie vor:</h4>
+                <ol>
+                    <li><strong>Planen Sie Ihre Website.</strong> Überlegen Sie: Was soll auf die Website? Wer soll sie besuchen?</li>
+                    <li><strong>Wählen Sie ein Design.</strong> Das bestimmt, wie Ihre Website aussieht.</li>
+                    <li><strong>Fügen Sie Inhalte hinzu.</strong> Schreiben Sie Texte und laden Sie Bilder hoch.</li>
+                    <li><strong>Testen Sie alles.</strong> Prüfen Sie, ob alle Links funktionieren.</li>
+                    <li><strong>Veröffentlichen Sie die Website.</strong> Jetzt können andere sie besuchen.</li>
+                </ol>
+                
+                <h4>Wichtige Tipps:</h4>
+                <ul>
+                    <li>Halten Sie die Website einfach</li>
+                    <li>Machen Sie sie handyfreundlich</li>
+                    <li>Aktualisieren Sie sie regelmäßig</li>
+                    <li>Denken Sie an die Sicherheit</li>
+                </ul>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Strukturierte Kommunikation:</h4>
+                <p>• Kurze Sätze (max. 15 Wörter)<br>
+                • Klare Überschriften zur Orientierung<br>
+                • Listen für bessere Übersicht<br>
+                • Wichtige Punkte hervorgehoben</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Translated foreign phrases -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Übersetzte Fremdwörter</div>
+        <p><strong>Lösung:</strong> Deutsche Begriffe verwenden oder Fremdwörter erklären</p>
+        <div class="interactive-area">
+            <div class="good-clear-language">
+                <h4>🌍 Unser Unternehmen</h4>
+                
+                <p>Wir sind der wichtigste Anbieter in unserer Branche. <span class="translation">(statt: "primus inter pares")</span></p>
+                
+                <p>Wir halten uns an alle geschlossenen Verträge. <span class="translation">(statt: "pacta sunt servanda")</span></p>
+                
+                <p>Unser Motto: Durch Anstrengung zum Erfolg. <span class="translation">(statt: "per aspera ad astra")</span></p>
+                
+                <p>Wir vermeiden spontane Entscheidungen. <span class="translation">(statt: "ad hoc" Entscheidungen)</span></p>
+                
+                <p>Unsere Arbeitsweise folgt bewährten Standards. <span class="translation">(statt: "modus operandi")</span></p>
+                
+                <p>Wir verwenden bereits etablierte Lösungen. <span class="translation">(statt: "de facto" Standards)</span></p>
+                
+                <p>Unser besonderer Ansatz sorgt für Planungssicherheit. <span class="translation">(statt: "sui generis" und "ex ante")</span></p>
+                
+                <p>Im Vergleich zur Konkurrenz sind wir Innovationsführer. <span class="translation">(statt: "vis-à-vis" und "avant-garde")</span></p>
+                
+                <p>Der Hauptzweck unserer Firma ist es, die besten Lösungen zu schaffen. <span class="translation">(statt: "raison d'être" und "synergies par excellence")</span></p>
+            </div>
+            
+            <div class="reading-level-guide">
+                <h4>✅ Sprachliche Klarheit:</h4>
+                <p>• Deutsche Begriffe statt Fremdwörter<br>
+                • Übersetzungen in Klammern gezeigt<br>
+                • Alltagssprache bevorzugt<br>
+                • Bedeutung immer klar erkennbar</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 3.1.5 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Texte auf Sekundarstufe I/II Niveau (Klassen 9-12)</li>
+            <li>✅ Vereinfachte Alternativen für komplexe Inhalte</li>
+            <li>✅ Fachbegriffe werden sofort erklärt</li>
+            <li>✅ Kurze Sätze und klare Struktur</li>
+            <li>✅ Deutsche Begriffe statt Fremdwörter</li>
+            <li>✅ Große, gut lesbare Schrift (18px)</li>
+            <li>✅ Ausreichend Zeilenabstand (1.6)</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Menschen mit geringerer Bildung: Verstehen die Inhalte</li>
+            <li>👥 Nicht-Muttersprachler: Einfache Sprache ist leichter</li>
+            <li>👥 Ältere Menschen: Bevorzugen klare, einfache Texte</li>
+            <li>👥 Menschen mit Legasthenie: Profitieren von Struktur</li>
+            <li>👥 Menschen mit Konzentrationsproblemen: Kurze Sätze helfen</li>
+            <li>👥 Alle Benutzer: Verstehen Inhalte schneller und besser</li>
+        </ul>
+    </div>
+
+    <div class="readability-meter">
+        <h4>📊 Lesegrad-Analyse dieser Seite</h4>
+        
+        <div class="readability-score">
+            <span>Flesch Reading Ease:</span>
+            <div class="score-bar">
+                <div class="score-fill score-excellent" style="width: 85%"></div>
+            </div>
+            <span>85/100 (Sehr gut)</span>
+        </div>
+        
+        <div class="readability-score">
+            <span>Bildungsgrad:</span>
+            <div class="score-bar">
+                <div class="score-fill score-excellent" style="width: 90%"></div>
+            </div>
+            <span>9.-10. Klasse</span>
+        </div>
+        
+        <div class="readability-score">
+            <span>Satzlänge:</span>
+            <div class="score-bar">
+                <div class="score-fill score-good" style="width: 80%"></div>
+            </div>
+            <span>12 Wörter (Optimal)</span>
+        </div>
+        
+        <div class="readability-score">
+            <span>WCAG 3.1.5:</span>
+            <div class="score-bar">
+                <div class="score-fill score-excellent" style="width: 95%"></div>
+            </div>
+            <span>✅ Konform</span>
+        </div>
+    </div>
+
+    <script>
+        let currentView = 'simple';
+        
+        // Toggle between legal original and simplified view
+        function toggleLegalView() {
+            const original = document.querySelector('.good-legal-text');
+            const simplified = document.querySelector('.plain-language-version');
+            
+            if (currentView === 'simple') {
+                original.style.display = 'none';
+                simplified.style.display = 'block';
+                currentView = 'detailed';
+                console.log('✅ GOOD: Showing simplified legal language');
+            } else {
+                original.style.display = 'block';
+                simplified.style.display = 'block';
+                currentView = 'simple';
+                console.log('✅ GOOD: Showing both original and simplified versions');
+            }
+        }
+        
+        // Initialize reading level compliance
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== READING LEVEL COMPLIANCE ANALYSIS ===');
+            
+            // Count text elements and analyze readability
+            const textElements = document.querySelectorAll('p, li, div');
+            let totalWords = 0;
+            let totalSentences = 0;
+            let complexWords = 0;
+            
+            textElements.forEach(element => {
+                const text = element.textContent;
+                const words = text.split(/\s+/).filter(word => word.length > 0);
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                
+                totalWords += words.length;
+                totalSentences += sentences.length;
+                
+                // Count complex words (simplified heuristic)
+                words.forEach(word => {
+                    if (word.length > 6 && !word.includes('-')) {
+                        complexWords++;
+                    }
+                });
+            });
+            
+            const avgWordsPerSentence = totalWords / totalSentences;
+            const complexWordRatio = (complexWords / totalWords) * 100;
+            
+            console.log(`✅ READING LEVEL ANALYSIS:`);
+            console.log(`- Total words: ${totalWords}`);
+            console.log(`- Total sentences: ${totalSentences}`);
+            console.log(`- Average words per sentence: ${Math.round(avgWordsPerSentence)}`);
+            console.log(`- Complex words: ${complexWords} (${Math.round(complexWordRatio)}%)`);
+            
+            // Estimate reading level
+            let readingLevel = 'Elementary';
+            if (avgWordsPerSentence > 20 || complexWordRatio > 15) {
+                readingLevel = 'Graduate';
+            } else if (avgWordsPerSentence > 15 || complexWordRatio > 10) {
+                readingLevel = 'High School';
+            } else if (avgWordsPerSentence > 12 || complexWordRatio > 7) {
+                readingLevel = 'Middle School';
+            }
+            
+            console.log(`- Estimated reading level: ${readingLevel}`);
+            console.log(`- WCAG 3.1.5 Target: Secondary Education (Middle/High School)`);
+            
+            if (readingLevel === 'Elementary' || readingLevel === 'Middle School' || readingLevel === 'High School') {
+                console.log(`✅ WCAG 3.1.5 COMPLIANT: Reading level appropriate`);
+            } else {
+                console.log(`❌ WCAG 3.1.5 VIOLATION: Reading level too high`);
+            }
+            
+            // Check for accessibility features
+            console.log('✅ ACCESSIBILITY FEATURES PRESENT:');
+            console.log('- Plain language alternatives provided');
+            console.log('- Technical terms explained immediately');
+            console.log('- Glossary tooltips available');
+            console.log('- Clear section headings');
+            console.log('- Bullet points and numbered lists used');
+            console.log('- Translation of foreign phrases');
+            console.log('- Large, readable fonts (18px)');
+            console.log('- Adequate line spacing (1.6)');
+            
+            // Analyze specific good practices
+            const glossaryTerms = document.querySelectorAll('.glossary-term');
+            const explanationBoxes = document.querySelectorAll('.term-explanation');
+            const simplifiedVersions = document.querySelectorAll('[class*="simplified"], [class*="friendly"], [class*="summary"]');
+            
+            console.log(`✅ GOOD PRACTICES IMPLEMENTED:`);
+            console.log(`- ${glossaryTerms.length} glossary terms with hover explanations`);
+            console.log(`- ${explanationBoxes.length} immediate term explanations`);
+            console.log(`- ${simplifiedVersions.length} simplified alternative versions`);
+            
+            // Font size check
+            const bodyFontSize = window.getComputedStyle(document.body).fontSize;
+            console.log(`✅ FONT SIZE: ${bodyFontSize} (meets accessibility standards)`);
+            
+            // Line height check
+            const bodyLineHeight = window.getComputedStyle(document.body).lineHeight;
+            console.log(`✅ LINE HEIGHT: ${bodyLineHeight} (adequate for readability)`);
+            
+            setTimeout(() => {
+                console.log('✅ READING LEVEL COMPLIANCE SUMMARY:');
+                console.log('- All content at or below Secondary Education level');
+                console.log('- Complex topics have simplified explanations');
+                console.log('- Technical terms are immediately defined');
+                console.log('- Foreign phrases are translated');
+                console.log('- Clear structure with headings and lists');
+                console.log('- Large fonts and adequate spacing');
+                console.log('- Interactive elements for better understanding');
+                console.log('✅ FULLY COMPLIANT WITH WCAG 3.1.5');
+            }, 2000);
+        });
+        
+        // Add interactive glossary behavior
+        document.querySelectorAll('.glossary-term').forEach(term => {
+            term.addEventListener('click', function() {
+                const definition = this.querySelector('.glossary-definition');
+                if (definition) {
+                    definition.style.display = definition.style.display === 'block' ? 'none' : 'block';
+                }
+            });
+        });
+        
+        // Simulate readability score animation
+        function animateScores() {
+            const scoreFills = document.querySelectorAll('.score-fill');
+            scoreFills.forEach((fill, index) => {
+                setTimeout(() => {
+                    fill.style.width = fill.style.width;
+                }, index * 200);
+            });
+        }
+        
+        // Trigger score animation after load
+        setTimeout(animateScores, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!-- WCAG-TEST
+criterion: 1.2.6, 1.2.8
+level: AAA
+title: Medienalternativen — Praxisrundgang (German)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-media-alternatives-scanner
+description: Aufklärungsvideo mit verlinkter Gebärdensprach-Version, vollständiger Textalternative und sichtbarer Zusammenfassung
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praxisrundgang — Ordination Dr. Berger (Test: gut)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+        h1, h2 { color: #111; }
+        .compliant-section { border: 2px solid #1b5e20; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
+        .media-section { margin-bottom: 2rem; border: 1px solid #666; padding: 1rem; border-radius: 4px; }
+        video { max-width: 100%; }
+        .transcript { background: #f5f5f5; padding: 1rem; border-left: 3px solid #333; margin-top: 1rem; }
+        .transcript summary { font-weight: bold; cursor: pointer; }
+        .media-links { margin-top: 1rem; }
+        a { color: #0d47a1; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Ordination Dr. Julia Berger — Praxisrundgang</h1>
+    <p>Lernen Sie unsere Ordination und den Ablauf Ihrer Untersuchung im Video kennen.</p>
+
+    <div class="compliant-section">
+        <div class="compliant-title">Korrekt (1.2.6 und 1.2.8): Gebärdensprache und Volltext-Alternative verfügbar</div>
+        <p>Das Video steht mit deutschen Untertiteln, einer Gebärdensprach-Version und einer vollständigen
+           Textalternative zur Verfügung.</p>
+    </div>
+
+    <section class="media-section" aria-labelledby="rundgang-heading">
+        <h2 id="rundgang-heading">Praxisrundgang und Aufklärungsvideo</h2>
+        <video controls width="640" aria-label="Praxisrundgang und Erklärung des Untersuchungsablaufs" aria-describedby="video-summary">
+            <source src="praxisrundgang.mp4" type="video/mp4">
+            <track kind="captions" src="praxisrundgang-captions-de.vtt" srclang="de" label="Deutsche Untertitel" default>
+            <p>Ihr Browser unterstützt das Video-Element nicht. <a href="praxisrundgang.mp4">Video herunterladen</a>.</p>
+        </video>
+
+        <div class="media-links">
+            <p><a href="praxisrundgang-gebaerdensprache.mp4">Gebärdensprach-Version des Praxisrundgangs ansehen (ÖGS)</a></p>
+            <p><a href="praxisrundgang-volltext.html">Volltext-Alternative zum Praxisrundgang lesen</a></p>
+        </div>
+
+        <!-- Visible summary, satisfying both a quick overview and part of the 1.2.8 text alternative -->
+        <p id="video-summary"><strong>Zusammenfassung:</strong> Das dreiminütige Video zeigt den Empfangsbereich,
+           die Wartezone und die Untersuchungsräume unserer Ordination. Anschließend erklärt Dr. Berger in
+           einfachen Worten, wie eine Vorsorgeuntersuchung abläuft: Anmeldung am Empfang, kurzes Anamnesegespräch,
+           die eigentliche Untersuchung und die Besprechung der Ergebnisse.</p>
+
+        <details class="transcript">
+            <summary>Vollständiges Transkript lesen</summary>
+            <p><strong>Sprecherin (Dr. Berger):</strong> Willkommen in unserer Ordination. Am Empfang werden Sie
+               von unserem Team begrüßt und Ihre Daten werden aufgenommen.</p>
+            <p><strong>Sprecherin:</strong> Im Wartebereich finden Sie aktuelle Informationen zu unseren Leistungen
+               und Öffnungszeiten.</p>
+            <p><strong>Sprecherin:</strong> Im Untersuchungsraum führen wir zunächst ein kurzes Gespräch über Ihre
+               Beschwerden, danach folgt die körperliche Untersuchung.</p>
+            <p><strong>Sprecherin:</strong> Am Ende besprechen wir gemeinsam die Ergebnisse und die nächsten
+               Schritte.</p>
+        </details>
+    </section>
+</main>
+</body>
+</html>

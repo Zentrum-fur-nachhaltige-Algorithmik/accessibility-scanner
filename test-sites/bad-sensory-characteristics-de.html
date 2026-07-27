@@ -1,0 +1,111 @@
+<!-- WCAG-TEST
+criterion: 1.3.3
+level: A
+title: Sinnesbezogene Eigenschaften — Terminbuchung (German)
+test_type: bad
+expected_violations: 4
+testable_by: manual
+scanners: structure
+description: Anweisungen verweisen ausschließlich auf Form, Farbe, Größe oder Position ohne Textalternative
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminbuchung — Ordination Dr. Berger (Test: schlecht)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .violation-note {
+            background: #fff3cd; border-left: 4px solid #ffc107; padding: 8px 12px; margin: 8px 0; font-size: 0.9em;
+        }
+        .form-section { border: 1px solid #ddd; padding: 20px; border-radius: 4px; margin: 10px 0; }
+        .round-btn {
+            width: 50px; height: 50px; border-radius: 50%; background: #28a745; color: #fff; border: none;
+            cursor: pointer; font-size: 1.2em;
+        }
+        .square-btn {
+            width: 50px; height: 50px; background: #dc3545; color: #fff; border: none; cursor: pointer; font-size: 1.2em;
+        }
+        .required-field { border: 2px solid #dc3545 !important; }
+        .layout-container { display: flex; gap: 20px; }
+        .layout-container .left-panel { flex: 1; background: #f8f9fa; padding: 15px; border-radius: 4px; }
+        .layout-container .right-panel { flex: 1; padding: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Terminbuchung — Ordination Dr. Julia Berger (schlecht)</h1>
+    <p>Diese Seite zeigt Verstöße gegen WCAG 1.3.3: Anweisungen, die sich ausschließlich auf sinnliche
+       Eigenschaften stützen.</p>
+
+    <!-- Violation 1: Shape-only reference -->
+    <h2>Verstoß 1: Verweis nur auf die Form</h2>
+    <div class="violation-note">Die Anweisung nennt nur die Form der Schaltfläche. Nutzer:innen, die die Form
+        nicht sehen können, haben keine Möglichkeit, das richtige Element zu finden.</div>
+    <div class="form-section">
+        <p><strong>Klicken Sie auf den runden Knopf</strong>, um Ihren Termin zu buchen. Um abzubrechen,
+           <strong>drücken Sie den eckigen Knopf</strong>.</p>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 10px;">
+            <button class="round-btn" aria-label="Buchen">&#10003;</button>
+            <button class="square-btn" aria-label="Abbrechen">&#10005;</button>
+        </div>
+    </div>
+
+    <!-- Violation 2: Color-only reference -->
+    <h2>Verstoß 2: Verweis nur auf die Farbe</h2>
+    <div class="violation-note">Pflichtfelder werden ausschließlich über eine rote Umrandung kommuniziert.
+        Nutzer:innen, die Farbe nicht wahrnehmen können, erkennen die Anweisung nicht.</div>
+    <div class="form-section">
+        <p><strong>Die roten Felder sind Pflichtfelder.</strong> Bitte füllen Sie diese vollständig aus.</p>
+        <form>
+            <div style="margin-bottom: 10px;">
+                <label>Name:</label><br>
+                <input type="text" class="required-field" value="">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Geburtsdatum:</label><br>
+                <input type="text" class="required-field" value="">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Telefonnummer (optional):</label><br>
+                <input type="text" value="">
+            </div>
+        </form>
+    </div>
+
+    <!-- Violation 3: Location-only reference -->
+    <h2>Verstoß 3: Verweis nur auf die Position</h2>
+    <div class="violation-note">Anweisungen verweisen auf Bildschirmpositionen ("links oben", "in der Seitenleiste")
+        ohne Elemente beim Namen zu nennen.</div>
+    <div class="layout-container">
+        <div class="left-panel">
+            <h3>Menü</h3>
+            <ul>
+                <li><a href="#">Termine</a></li>
+                <li><a href="#">Leistungen</a></li>
+                <li><a href="#">Kontakt</a></li>
+            </ul>
+        </div>
+        <div class="right-panel">
+            <h3>Erste Schritte</h3>
+            <p>Um einen Termin zu buchen, <strong>benutzen Sie das Menü links oben</strong>.</p>
+            <p>Ihre gespeicherten Termine finden Sie <strong>im Kasten rechts unten auf der Seite</strong>.</p>
+        </div>
+    </div>
+
+    <!-- Violation 4: Size-only reference -->
+    <h2>Verstoß 4: Verweis nur auf die Größe</h2>
+    <div class="violation-note">Die Anweisung nennt nur die relative Größe der Schaltfläche. Für Screenreader-Nutzer:innen
+        ist das bedeutungslos.</div>
+    <div class="form-section">
+        <p><strong>Drücken Sie den größeren Knopf</strong>, um Ihre Vorsorgeuntersuchung zu bestätigen. Der kleinere
+           Knopf verschiebt den Termin auf später.</p>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 10px;">
+            <button style="padding: 15px 30px; font-size: 1.3em;">Bestätigen</button>
+            <button style="padding: 5px 10px; font-size: 0.8em;">Verschieben</button>
+        </div>
+    </div>
+</body>
+</html>

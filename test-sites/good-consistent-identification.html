@@ -1,0 +1,91 @@
+<!-- WCAG-TEST
+criterion: 3.2.4
+level: AA
+title: Consistent Identification
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: page-structure
+description: Same functional components consistently identified with same names and icons across all sections
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good: Consistent Identification - WCAG 3.2.4</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+        .page-section { border-bottom: 3px solid #4caf50; padding: 1.5rem 2rem 2rem; }
+        .page-section h2 { margin-top: 0; color: #1a1a1a; border-bottom: 1px solid #ddd; padding-bottom: 0.5rem; }
+        .toolbar { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+        .toolbar button, .toolbar a { padding: 0.5rem 1rem; border: 1px solid #999; background: #fff; border-radius: 4px; cursor: pointer; text-decoration: none; color: #333; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .toolbar button:hover, .toolbar a:hover { background: #e8f5e9; }
+        .search-box { display: flex; gap: 0.3rem; }
+        .search-box input { padding: 0.4rem 0.8rem; border: 1px solid #999; border-radius: 4px; }
+        .search-box button { padding: 0.4rem 0.8rem; }
+        .icon { font-size: 1.1rem; }
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+    <h1 style="padding: 1rem 2rem; margin: 0; background: #1b5e20; color: #fff;">Document Management System (Accessible)</h1>
+
+    <!-- Compliant pattern 1: Consistent labels and icons on every section -->
+    <div class="page-section">
+        <h2>Section: Documents Library</h2>
+        <div class="toolbar">
+            <div class="search-box" role="search">
+                <label for="search1" style="display:none;">Search documents</label>
+                <input type="search" id="search1" placeholder="Search documents...">
+                <button type="button" aria-label="Search"><span class="icon">&#128269;</span> Search</button>
+            </div>
+            <a href="#" aria-label="Home"><span class="icon">&#127968;</span> Home</a>
+            <button type="button" aria-label="Print"><span class="icon">&#128424;</span> Print</button>
+            <button type="button" aria-label="Download"><span class="icon">&#11015;</span> Download</button>
+            <a href="#login" aria-label="Log In"><span class="icon">&#128274;</span> Log In</a>
+        </div>
+        <div class="card">
+            <p>Browse the complete document library.</p>
+        </div>
+    </div>
+
+    <!-- Compliant pattern 2: Same labels, same icons, same order -->
+    <div class="page-section">
+        <h2>Section: Recent Documents</h2>
+        <div class="toolbar">
+            <div class="search-box" role="search">
+                <label for="search2" style="display:none;">Search documents</label>
+                <input type="search" id="search2" placeholder="Search documents...">
+                <button type="button" aria-label="Search"><span class="icon">&#128269;</span> Search</button>
+            </div>
+            <a href="#" aria-label="Home"><span class="icon">&#127968;</span> Home</a>
+            <button type="button" aria-label="Print"><span class="icon">&#128424;</span> Print</button>
+            <button type="button" aria-label="Download"><span class="icon">&#11015;</span> Download</button>
+            <a href="#login" aria-label="Log In"><span class="icon">&#128274;</span> Log In</a>
+        </div>
+        <div class="card">
+            <p>View your recently accessed documents.</p>
+        </div>
+    </div>
+
+    <!-- Compliant: Identical identification across all sections -->
+    <div class="page-section">
+        <h2>Section: Shared With Me</h2>
+        <div class="toolbar">
+            <div class="search-box" role="search">
+                <label for="search3" style="display:none;">Search documents</label>
+                <input type="search" id="search3" placeholder="Search documents...">
+                <button type="button" aria-label="Search"><span class="icon">&#128269;</span> Search</button>
+            </div>
+            <a href="#" aria-label="Home"><span class="icon">&#127968;</span> Home</a>
+            <button type="button" aria-label="Print"><span class="icon">&#128424;</span> Print</button>
+            <button type="button" aria-label="Download"><span class="icon">&#11015;</span> Download</button>
+            <a href="#login" aria-label="Log In"><span class="icon">&#128274;</span> Log In</a>
+        </div>
+        <div class="card">
+            <p>Documents shared with you by collaborators.</p>
+        </div>
+    </div>
+</body>
+</html>

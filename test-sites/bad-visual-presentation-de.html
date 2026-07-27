@@ -1,0 +1,68 @@
+<!-- WCAG-TEST
+criterion: 1.4.8
+level: AAA
+title: Visuelle Darstellung — Leistungsbeschreibung (German)
+test_type: bad
+expected_violations: 4
+testable_by: llm
+scanners: llm-visual-presentation-scanner
+description: Blocksatz, zu lange Zeilen, zu geringer Zeilenabstand, keine Farbanpassung durch Nutzer
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leistungen — Ordination Dr. Berger (Test: schlecht)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; line-height: 1.2; /* Verstoß: unter 1.5 */ }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #b71c1c; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Leistungen unserer Ordination (1.4.8 AAA)</h1>
+
+    <!-- Violation 1: Line width far beyond 80 characters -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 1: Zeilenlänge weit über 80 Zeichen</div>
+        <p style="width: 100%; max-width: none;">
+            Unsere Ordination bietet ein umfassendes Leistungsspektrum für die gesamte Familie an, von der allgemeinen Vorsorgeuntersuchung über die Behandlung akuter und chronischer Erkrankungen bis hin zu Impfungen, Gesundenuntersuchungen und der Betreuung von Patient:innen mit Mehrfacherkrankungen, wobei wir stets auf eine ausführliche Beratung und eine verständliche Erklärung aller Untersuchungsschritte größten Wert legen, damit sich unsere Patient:innen während des gesamten Aufenthalts in unserer Ordination gut aufgehoben und informiert fühlen können.
+        </p>
+    </div>
+
+    <!-- Violation 2: No user control over colors -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 2: Farben fest vorgegeben, keine Anpassung möglich</div>
+        <div style="background-color: #1a1a2e !important; color: #a0a0c0 !important; padding: 20px;">
+            <p>Dieser Textblock verwendet fest codierte Farben mit <code>!important</code>-Deklarationen, die
+               Benutzer-Stylesheets überschreiben. Es gibt keinen Mechanismus, mit dem Patient:innen eigene
+               Vorder- und Hintergrundfarben wählen könnten.</p>
+        </div>
+    </div>
+
+    <!-- Violation 3: Justified text -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 3: Blocksatz erzeugt ungleichmäßige Wortabstände</div>
+        <p style="text-align: justify; width: 500px;">
+            Dieser Absatz verwendet vollständigen Blocksatz, wodurch ungleichmäßige Abstände zwischen den Wörtern
+            entstehen. Die unterschiedlichen Lücken zwischen den Wörtern können "Flussbildungen" erzeugen, die
+            ablenken und das Lesen erschweren, insbesondere für Patient:innen mit Legasthenie oder anderen
+            Leseeinschränkungen. Manche Wörter haben große Lücken, während andere eng zusammengedrängt sind.
+        </p>
+    </div>
+
+    <!-- Violation 4: Line spacing less than 1.5 -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 4: Zu geringer Zeilenabstand (line-height: 1.0)</div>
+        <div style="line-height: 1.0; max-width: 600px;">
+            <p>Dieser Text hat einen Zeilenabstand von 1,0, das heißt es gibt keinen zusätzlichen Raum zwischen
+               den Zeilen. Die Zeilen sind eng zusammengedrängt, wodurch es sehr schwierig wird, vom Ende einer
+               Zeile zum Anfang der nächsten zu springen. Die AAA-Anforderung schreibt mindestens 1,5-fachen
+               Zeilenabstand innerhalb von Absätzen vor.</p>
+            <p>Auch dieser zweite Absatz hat einen zu engen Zeilenabstand. Zusätzlich ist der Abstand zwischen
+               den Absätzen minimal, sodass schwer erkennbar ist, wo ein Absatz endet und der nächste beginnt.</p>
+        </div>
+    </div>
+</body>
+</html>

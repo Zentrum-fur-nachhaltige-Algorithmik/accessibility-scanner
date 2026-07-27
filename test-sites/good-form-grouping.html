@@ -1,0 +1,717 @@
+<!-- WCAG-TEST
+criterion: 1.3.1, 3.3.2
+level: A
+title: Info and Relationships, Labels or Instructions
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: page-structure, error-handling
+description: Proper form control grouping with fieldset and legend
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Form Grouping Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-form {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #327d36;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .good-fieldset {
+            border: 2px solid #327d36;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f8f9fa;
+        }
+        
+        .good-legend {
+            color: #2e7d32;
+            font-weight: bold;
+            padding: 0 10px;
+            background-color: #f1f8e9;
+        }
+        
+        .good-input-group {
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .good-radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .good-checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .good-input {
+            padding: 8px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .good-input:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-select {
+            padding: 8px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 16px;
+        }
+        
+        .good-select:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-button {
+            background-color: #327d36;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px 5px 0;
+            font-size: 16px;
+        }
+        
+        .good-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .form-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        
+        .form-section h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        
+        .required {
+            color: #d32f2f;
+        }
+        
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Form Grouping Accessible (GOOD)</h1>
+    <p><strong>WCAG 1.3.1 & 3.3.2 konforme Implementierung:</strong> Korrekte Gruppierung von Formularelementen mit semantischer Struktur</p>
+    
+    <!-- GOOD 1: Radio button groups with fieldset and legend -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Radio Button-Gruppen mit Fieldset und Legend</div>
+        <p><strong>Lösung:</strong> Zusammengehörige Radio Buttons sind in Fieldsets gruppiert</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Bevorzugte Kontaktmethode <span class="required">*</span></legend>
+                    <div class="good-radio-group">
+                        <label>
+                            <input type="radio" name="contact" value="email" required>
+                            E-Mail
+                        </label>
+                        <label>
+                            <input type="radio" name="contact" value="phone" required>
+                            Telefon
+                        </label>
+                        <label>
+                            <input type="radio" name="contact" value="post" required>
+                            Briefpost
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Bevorzugte Tageszeit für Kontakt</legend>
+                    <div class="good-radio-group">
+                        <label>
+                            <input type="radio" name="time" value="morning">
+                            Vormittag (9-12 Uhr)
+                        </label>
+                        <label>
+                            <input type="radio" name="time" value="afternoon">
+                            Nachmittag (12-18 Uhr)
+                        </label>
+                        <label>
+                            <input type="radio" name="time" value="evening">
+                            Abend (18-21 Uhr)
+                        </label>
+                    </div>
+                </fieldset>
+            </form>
+            <p>✅ Radio Button-Gruppen sind semantisch korrekt gruppiert und beschriftet</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Checkbox groups with proper grouping -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Checkbox-Gruppen mit korrekter Gruppierung</div>
+        <p><strong>Lösung:</strong> Zusammengehörige Checkboxes in Fieldsets mit beschreibenden Legends</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Interessensgebiete</legend>
+                    <div class="good-checkbox-group">
+                        <label>
+                            <input type="checkbox" name="interests" value="technology">
+                            Technologie
+                        </label>
+                        <label>
+                            <input type="checkbox" name="interests" value="design">
+                            Design
+                        </label>
+                        <label>
+                            <input type="checkbox" name="interests" value="accessibility">
+                            Barrierefreiheit
+                        </label>
+                        <label>
+                            <input type="checkbox" name="interests" value="development">
+                            Softwareentwicklung
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Newsletter-Abonnements</legend>
+                    <div class="good-checkbox-group">
+                        <label>
+                            <input type="checkbox" name="newsletters" value="weekly">
+                            Wöchentlicher Newsletter
+                        </label>
+                        <label>
+                            <input type="checkbox" name="newsletters" value="monthly">
+                            Monatlicher Newsletter
+                        </label>
+                        <label>
+                            <input type="checkbox" name="newsletters" value="special">
+                            Spezielle Angebote
+                        </label>
+                    </div>
+                    <div class="help-text">Sie können jederzeit abbestellen</div>
+                </fieldset>
+            </form>
+            <p>✅ Checkbox-Gruppen haben klare semantische Struktur</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Address forms with fieldset grouping -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Adressformulare mit Fieldset-Gruppierung</div>
+        <p><strong>Lösung:</strong> Adressbereiche sind logisch in Fieldsets unterteilt</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Rechnungsadresse <span class="required">*</span></legend>
+                    <div class="good-input-group">
+                        <label for="billStreet">Straße und Hausnummer <span class="required">*</span></label>
+                        <input type="text" id="billStreet" class="good-input" required>
+                    </div>
+                    <div class="good-input-group">
+                        <label for="billCity">Stadt <span class="required">*</span></label>
+                        <input type="text" id="billCity" class="good-input" required>
+                    </div>
+                    <div class="good-input-group">
+                        <label for="billZip">PLZ <span class="required">*</span></label>
+                        <input type="text" id="billZip" class="good-input" required autocomplete="postal-code">
+                    </div>
+                    <div class="good-input-group">
+                        <label for="billCountry">Land <span class="required">*</span></label>
+                        <select id="billCountry" class="good-select" required autocomplete="country">
+                            <option value="">Bitte wählen</option>
+                            <option value="DE">Deutschland</option>
+                            <option value="AT">Österreich</option>
+                            <option value="CH">Schweiz</option>
+                        </select>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Lieferadresse</legend>
+                    <div class="good-checkbox-group">
+                        <label>
+                            <input type="checkbox" id="sameAddress" onchange="toggleDeliveryAddress()">
+                            Gleiche Adresse wie Rechnungsadresse
+                        </label>
+                    </div>
+                    <div id="deliveryFields">
+                        <div class="good-input-group">
+                            <label for="delStreet">Straße und Hausnummer</label>
+                            <input type="text" id="delStreet" class="good-input">
+                        </div>
+                        <div class="good-input-group">
+                            <label for="delCity">Stadt</label>
+                            <input type="text" id="delCity" class="good-input">
+                        </div>
+                        <div class="good-input-group">
+                            <label for="delZip">PLZ</label>
+                            <input type="text" id="delZip" class="good-input" autocomplete="postal-code">
+                        </div>
+                        <div class="good-input-group">
+                            <label for="delCountry">Land</label>
+                            <select id="delCountry" class="good-select" autocomplete="country">
+                                <option value="">Bitte wählen</option>
+                                <option value="DE">Deutschland</option>
+                                <option value="AT">Österreich</option>
+                                <option value="CH">Schweiz</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <p>✅ Adressbereiche sind klar voneinander getrennt und beschriftet</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Payment methods with proper grouping -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Zahlungsmethoden mit korrekter Gruppierung</div>
+        <p><strong>Lösung:</strong> Zahlungsoptionen und zugehörige Felder sind gruppiert</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Zahlungsmethode wählen <span class="required">*</span></legend>
+                    <div class="good-radio-group">
+                        <label>
+                            <input type="radio" name="payment" value="credit" onchange="showPaymentFields('credit')" required>
+                            Kreditkarte
+                        </label>
+                        <label>
+                            <input type="radio" name="payment" value="debit" onchange="showPaymentFields('debit')" required>
+                            EC-Karte
+                        </label>
+                        <label>
+                            <input type="radio" name="payment" value="paypal" onchange="showPaymentFields('paypal')" required>
+                            PayPal
+                        </label>
+                        <label>
+                            <input type="radio" name="payment" value="transfer" onchange="showPaymentFields('transfer')" required>
+                            Überweisung
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset" id="creditFields" style="display: none;">
+                    <legend class="good-legend">Kreditkarten-Informationen</legend>
+                    <div class="good-input-group">
+                        <label for="cardNumber">Kartennummer <span class="required">*</span></label>
+                        <input type="text" id="cardNumber" class="good-input" autocomplete="cc-number">
+                    </div>
+                    <div class="good-input-group">
+                        <label for="cardName">Name auf der Karte <span class="required">*</span></label>
+                        <input type="text" id="cardName" class="good-input" autocomplete="cc-name">
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="good-input-group" style="flex: 1;">
+                            <label for="expiry">Ablaufdatum <span class="required">*</span></label>
+                            <input type="text" id="expiry" class="good-input" placeholder="MM/JJ" autocomplete="cc-exp">
+                        </div>
+                        <div class="good-input-group" style="flex: 1;">
+                            <label for="cvv">CVV <span class="required">*</span></label>
+                            <input type="text" id="cvv" class="good-input" autocomplete="cc-csc">
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset" id="paypalFields" style="display: none;">
+                    <legend class="good-legend">PayPal-Anmeldung</legend>
+                    <div class="good-input-group">
+                        <label for="paypalEmail">PayPal E-Mail <span class="required">*</span></label>
+                        <input type="email" id="paypalEmail" class="good-input" autocomplete="email">
+                        <div class="help-text">Sie werden zu PayPal weitergeleitet</div>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset" id="transferFields" style="display: none;">
+                    <legend class="good-legend">Überweisungs-Informationen</legend>
+                    <div class="help-text">
+                        <p>Nach Ihrer Bestellung erhalten Sie die Kontodaten per E-Mail.</p>
+                        <p>Bitte überweisen Sie den Betrag innerhalb von 7 Tagen.</p>
+                    </div>
+                </fieldset>
+            </form>
+            <p>✅ Zahlungsmethoden und zugehörige Felder sind semantisch verknüpft</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Complex survey questions with structure -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Komplexe Umfragefragen mit Struktur</div>
+        <p><strong>Lösung:</strong> Umfrage-Bereiche sind thematisch gruppiert und beschriftet</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Demografische Angaben</legend>
+                    <div class="good-input-group">
+                        <label for="age">Alter</label>
+                        <select id="age" class="good-select">
+                            <option value="">Bitte wählen</option>
+                            <option value="18-25">18-25 Jahre</option>
+                            <option value="26-35">26-35 Jahre</option>
+                            <option value="36-45">36-45 Jahre</option>
+                            <option value="46-55">46-55 Jahre</option>
+                            <option value="56+">56+ Jahre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="good-radio-group">
+                        <span style="font-weight: bold; margin-bottom: 8px; display: block;">Beruflicher Bereich</span>
+                        <label>
+                            <input type="radio" name="profession" value="tech">
+                            Technologie/IT
+                        </label>
+                        <label>
+                            <input type="radio" name="profession" value="education">
+                            Bildung/Lehre
+                        </label>
+                        <label>
+                            <input type="radio" name="profession" value="healthcare">
+                            Gesundheitswesen
+                        </label>
+                        <label>
+                            <input type="radio" name="profession" value="other">
+                            Sonstiges
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Erfahrung mit Barrierefreiheit</legend>
+                    <div class="good-radio-group">
+                        <span style="font-weight: bold; margin-bottom: 8px; display: block;">Wie würden Sie Ihre Erfahrung bewerten?</span>
+                        <label>
+                            <input type="radio" name="experience" value="none">
+                            Keine Erfahrung
+                        </label>
+                        <label>
+                            <input type="radio" name="experience" value="basic">
+                            Grundkenntnisse
+                        </label>
+                        <label>
+                            <input type="radio" name="experience" value="intermediate">
+                            Fortgeschritten
+                        </label>
+                        <label>
+                            <input type="radio" name="experience" value="expert">
+                            Experte
+                        </label>
+                    </div>
+                    
+                    <div class="good-checkbox-group">
+                        <span style="font-weight: bold; margin-bottom: 8px; display: block;">Welche Tools nutzen Sie? (Mehrfachauswahl möglich)</span>
+                        <label>
+                            <input type="checkbox" name="tools" value="screenreader">
+                            Screen Reader
+                        </label>
+                        <label>
+                            <input type="checkbox" name="tools" value="magnifier">
+                            Bildschirmlupe
+                        </label>
+                        <label>
+                            <input type="checkbox" name="tools" value="keyboard">
+                            Nur Tastatur
+                        </label>
+                        <label>
+                            <input type="checkbox" name="tools" value="voice">
+                            Sprachsteuerung
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">Feedback und Kommentare</legend>
+                    <div class="good-input-group">
+                        <label for="feedback">Ihre Anmerkungen und Verbesserungsvorschläge</label>
+                        <textarea id="feedback" class="good-input" rows="4" style="resize: vertical;"></textarea>
+                        <div class="help-text">Optional: Teilen Sie Ihre Gedanken und Erfahrungen mit uns</div>
+                    </div>
+                </fieldset>
+                
+                <button type="submit" class="good-button">Umfrage absenden</button>
+            </form>
+            <p>✅ Umfrage-Bereiche sind thematisch strukturiert und gut verständlich</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Multi-section forms with semantic grouping -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Mehrteilige Formulare mit semantischer Gruppierung</div>
+        <p><strong>Lösung:</strong> Große Formulare sind in logische Abschnitte unterteilt</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <h3>Vollständiges Profil erstellen</h3>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">1. Persönliche Daten</legend>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="good-input-group">
+                            <label for="firstName">Vorname <span class="required">*</span></label>
+                            <input type="text" id="firstName" class="good-input" required autocomplete="given-name">
+                        </div>
+                        <div class="good-input-group">
+                            <label for="lastName">Nachname <span class="required">*</span></label>
+                            <input type="text" id="lastName" class="good-input" required autocomplete="family-name">
+                        </div>
+                    </div>
+                    <div class="good-input-group">
+                        <label for="email">E-Mail-Adresse <span class="required">*</span></label>
+                        <input type="email" id="email" class="good-input" required autocomplete="email">
+                    </div>
+                    <div class="good-input-group">
+                        <label for="phone">Telefonnummer</label>
+                        <input type="tel" id="phone" class="good-input" autocomplete="tel">
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">2. Zugänglichkeitseinstellungen</legend>
+                    <div class="good-checkbox-group">
+                        <span style="font-weight: bold; margin-bottom: 8px; display: block;">Benötigte Anpassungen</span>
+                        <label>
+                            <input type="checkbox" name="accessibility" value="highcontrast">
+                            Hoher Kontrast
+                        </label>
+                        <label>
+                            <input type="checkbox" name="accessibility" value="largetext">
+                            Große Schrift
+                        </label>
+                        <label>
+                            <input type="checkbox" name="accessibility" value="screenreader">
+                            Screen Reader-Optimierung
+                        </label>
+                        <label>
+                            <input type="checkbox" name="accessibility" value="keyboard">
+                            Tastatur-Navigation
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <fieldset class="good-fieldset">
+                    <legend class="good-legend">3. Benachrichtigungseinstellungen</legend>
+                    <div class="good-checkbox-group">
+                        <span style="font-weight: bold; margin-bottom: 8px; display: block;">Wie möchten Sie informiert werden?</span>
+                        <label>
+                            <input type="checkbox" name="notifications" value="email">
+                            E-Mail-Benachrichtigungen
+                        </label>
+                        <label>
+                            <input type="checkbox" name="notifications" value="sms">
+                            SMS-Benachrichtigungen
+                        </label>
+                        <label>
+                            <input type="checkbox" name="notifications" value="app">
+                            App-Benachrichtigungen
+                        </label>
+                    </div>
+                    
+                    <div class="good-radio-group">
+                        <span style="font-weight: bold; margin-bottom: 8px; display: block;">Häufigkeit der Benachrichtigungen</span>
+                        <label>
+                            <input type="radio" name="frequency" value="immediate">
+                            Sofort
+                        </label>
+                        <label>
+                            <input type="radio" name="frequency" value="daily">
+                            Täglich
+                        </label>
+                        <label>
+                            <input type="radio" name="frequency" value="weekly">
+                            Wöchentlich
+                        </label>
+                    </div>
+                </fieldset>
+                
+                <button type="submit" class="good-button">Profil erstellen</button>
+            </form>
+            <p>✅ Mehrteilige Formulare haben klare Abschnittsstruktur</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 1.3.1 & 3.3.2 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Radio Button-Gruppen verwenden fieldset und legend</li>
+            <li>✅ Checkbox-Gruppen sind semantisch strukturiert</li>
+            <li>✅ Adressformulare haben logische Bereiche</li>
+            <li>✅ Zahlungsmethoden sind mit zugehörigen Feldern verknüpft</li>
+            <li>✅ Umfragen haben thematische Gruppierung</li>
+            <li>✅ Mehrteilige Formulare sind klar gegliedert</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Screen Reader-Nutzer: Verstehen Gruppierungen und Kontext</li>
+            <li>👥 Tastatur-Nutzer: Können effizient zwischen Gruppen navigieren</li>
+            <li>👥 Kognitive Beeinträchtigungen: Profitieren von klarer Struktur</li>
+            <li>👥 Sehbeeinträchtigte: Haben bessere Orientierung in Formularen</li>
+            <li>👥 Alle Nutzer: Verstehen Zusammenhänge zwischen Formularelementen</li>
+        </ul>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        // Helper function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // Toggle delivery address fields
+        function toggleDeliveryAddress() {
+            const checkbox = document.getElementById('sameAddress');
+            const fields = document.getElementById('deliveryFields');
+            
+            if (checkbox.checked) {
+                fields.style.display = 'none';
+                announceToScreenReader('Lieferadresse-Felder ausgeblendet');
+                console.log('✅ GOOD: Delivery address fields hidden when same as billing');
+            } else {
+                fields.style.display = 'block';
+                announceToScreenReader('Lieferadresse-Felder eingeblendet');
+                console.log('✅ GOOD: Delivery address fields shown for separate address');
+            }
+        }
+        
+        // Show payment fields based on selected method
+        function showPaymentFields(method) {
+            // Hide all payment fields first
+            const allFields = ['creditFields', 'paypalFields', 'transferFields'];
+            allFields.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            
+            // Show relevant fields
+            if (method === 'credit' || method === 'debit') {
+                document.getElementById('creditFields').style.display = 'block';
+                announceToScreenReader('Karteninformationen-Felder angezeigt');
+                console.log('✅ GOOD: Card information fields shown for card payment');
+            } else if (method === 'paypal') {
+                document.getElementById('paypalFields').style.display = 'block';
+                announceToScreenReader('PayPal-Felder angezeigt');
+                console.log('✅ GOOD: PayPal fields shown for PayPal payment');
+            } else if (method === 'transfer') {
+                document.getElementById('transferFields').style.display = 'block';
+                announceToScreenReader('Überweisungs-Informationen angezeigt');
+                console.log('✅ GOOD: Transfer information shown for bank transfer');
+            }
+        }
+        
+        // Initialize form grouping
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD FORM GROUPING IMPLEMENTATION ===');
+            console.log('✅ Radio button groups use fieldset and legend');
+            console.log('✅ Checkbox groups have proper semantic structure');
+            console.log('✅ Address forms are divided into logical sections');
+            console.log('✅ Payment methods are grouped with related fields');
+            console.log('✅ Survey questions have thematic grouping');
+            console.log('✅ Multi-section forms use clear structural divisions');
+            console.log('✅ All form groups provide context for screen readers');
+            
+            announceToScreenReader('Strukturierte Formulare geladen');
+            
+            // Add form validation examples
+            const forms = document.querySelectorAll('form');
+            forms.forEach((form, index) => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    announceToScreenReader('Formular Nummer ' + (index + 1) + ' abgesendet');
+                    console.log('✅ GOOD: Form ' + (index + 1) + ' submitted with proper grouping structure');
+                });
+            });
+            
+            // Demonstrate fieldset/legend structure
+            const fieldsets = document.querySelectorAll('fieldset');
+            console.log(`✅ Found ${fieldsets.length} properly structured fieldsets with legends`);
+            
+            fieldsets.forEach((fieldset, index) => {
+                const legend = fieldset.querySelector('legend');
+                if (legend) {
+                    console.log(`✅ Fieldset ${index + 1}: "${legend.textContent.trim()}"`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

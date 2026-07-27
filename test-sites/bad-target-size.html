@@ -1,0 +1,969 @@
+<!-- WCAG-TEST
+criterion: 2.5.5
+level: AAA
+title: Target Size (Enhanced)
+test_type: bad
+expected_violations: 5
+testable_by: dom
+scanners: input-modalities
+description: Touch targets smaller than minimum size requirements
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Target Size Violations (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Tiny buttons below 44x44px */
+        .bad-tiny-buttons {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .bad-tiny-button {
+            width: 20px;
+            height: 20px;
+            background-color: #007cba;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 10px;
+            /* SCHLECHT: Nur 20x20px - weit unter WCAG Minimum */
+        }
+        
+        .bad-tiny-button:hover {
+            background-color: #005a87;
+        }
+        
+        /* VIOLATION 2: Close buttons without adequate spacing */
+        .bad-close-buttons {
+            position: relative;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .bad-close-x {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 16px;
+            height: 16px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            /* SCHLECHT: Nur 16x16px in der Ecke */
+        }
+        
+        /* VIOLATION 3: Dense form controls */
+        .bad-dense-form {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .bad-form-row {
+            display: flex;
+            gap: 5px;
+            margin: 5px 0;
+            align-items: center;
+        }
+        
+        .bad-form-row label {
+            font-size: 12px;
+            min-width: 80px;
+        }
+        
+        .bad-tiny-checkbox {
+            width: 12px;
+            height: 12px;
+            margin: 0 3px;
+            /* SCHLECHT: 12x12px Checkboxen */
+        }
+        
+        .bad-tiny-radio {
+            width: 12px;
+            height: 12px;
+            margin: 0 3px;
+            /* SCHLECHT: 12x12px Radio Buttons */
+        }
+        
+        .bad-small-input {
+            height: 20px;
+            padding: 2px;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            /* SCHLECHT: Nur 20px hoch */
+        }
+        
+        .bad-small-select {
+            height: 22px;
+            font-size: 11px;
+            padding: 1px;
+            /* SCHLECHT: Sehr kleine Dropdown */
+        }
+        
+        /* VIOLATION 4: Pagination with tiny page numbers */
+        .bad-pagination {
+            display: flex;
+            gap: 1px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .bad-page-link {
+            width: 18px;
+            height: 18px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            text-decoration: none;
+            color: #007cba;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            /* SCHLECHT: 18x18px Paginierung */
+        }
+        
+        .bad-page-link:hover {
+            background: #e9ecef;
+        }
+        
+        .bad-page-link.active {
+            background: #007cba;
+            color: white;
+        }
+        
+        /* VIOLATION 5: Mobile menu with small touch targets */
+        .bad-mobile-menu {
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .bad-hamburger {
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            /* SCHLECHT: 24x24px Hamburger-Menu */
+        }
+        
+        .bad-hamburger span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+        
+        .bad-menu-items {
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 10px;
+        }
+        
+        .bad-menu-items.open {
+            display: flex;
+        }
+        
+        .bad-menu-item {
+            padding: 6px 8px;
+            background: #444;
+            border: none;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            font-size: 12px;
+            height: 28px;
+            /* SCHLECHT: Nur 28px hoch auf Mobile */
+        }
+        
+        .bad-menu-item:hover {
+            background: #555;
+        }
+        
+        /* VIOLATION 6: Slider controls with tiny handles */
+        .bad-slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .bad-range-slider {
+            width: 100%;
+            height: 4px;
+            background: #ddd;
+            outline: none;
+            border-radius: 2px;
+            /* SCHLECHT: Sehr dünner Slider */
+        }
+        
+        .bad-range-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #007cba;
+            border-radius: 50%;
+            cursor: pointer;
+            /* SCHLECHT: 12x12px Slider-Handle */
+        }
+        
+        .bad-range-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #007cba;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        /* VIOLATION 7: Social media icons too small */
+        .bad-social-icons {
+            display: flex;
+            gap: 4px;
+            margin: 20px 0;
+        }
+        
+        .bad-social-icon {
+            width: 16px;
+            height: 16px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* SCHLECHT: 16x16px Social Icons */
+        }
+        
+        .bad-social-icon.facebook { background: #3b5998; }
+        .bad-social-icon.twitter { background: #1da1f2; }
+        .bad-social-icon.instagram { background: #e4405f; }
+        .bad-social-icon.linkedin { background: #0077b5; }
+        .bad-social-icon.youtube { background: #ff0000; }
+        
+        /* VIOLATION 8: Tab navigation with insufficient target size */
+        .bad-tab-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .bad-tab-list {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .bad-tab {
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            height: 32px;
+            min-width: 60px;
+            /* SCHLECHT: Nur 32px hoch */
+        }
+        
+        .bad-tab:hover {
+            background: #e9ecef;
+        }
+        
+        .bad-tab.active {
+            background: white;
+            border-bottom: 2px solid #007cba;
+        }
+        
+        .bad-tab-content {
+            padding: 15px;
+            min-height: 100px;
+        }
+        
+        /* VIOLATION 9: Toolbar with cramped buttons */
+        .bad-toolbar {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 4px;
+            border-radius: 4px;
+            margin: 15px 0;
+            display: flex;
+            gap: 2px;
+        }
+        
+        .bad-tool-button {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* SCHLECHT: 22x22px Toolbar-Buttons */
+        }
+        
+        .bad-tool-button:hover {
+            background: #e9ecef;
+        }
+        
+        .bad-tool-button.active {
+            background: #007cba;
+            color: white;
+        }
+        
+        /* VIOLATION 10: Rating stars too small */
+        .bad-rating-stars {
+            display: flex;
+            gap: 1px;
+            margin: 15px 0;
+        }
+        
+        .bad-star {
+            width: 14px;
+            height: 14px;
+            background: #ddd;
+            border: none;
+            cursor: pointer;
+            font-size: 10px;
+            color: #ffc107;
+            /* SCHLECHT: 14x14px Sterne */
+        }
+        
+        .bad-star:hover,
+        .bad-star.filled {
+            background: #ffc107;
+            color: white;
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        /* Touch simulation */
+        .touch-indicator {
+            position: fixed;
+            width: 44px;
+            height: 44px;
+            border: 2px solid #ff0000;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Target Size Violations (BAD)</h1>
+    <p><strong>WCAG 2.5.5 Verletzungen:</strong> Touch-Ziele unter 44x44px ohne ausreichenden Abstand</p>
+    
+    <!-- Touch indicator for testing -->
+    <div class="touch-indicator" id="touchIndicator"></div>
+    
+    <!-- VIOLATION 1: Tiny buttons below 44x44px -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Winzige Buttons unter 44x44px</div>
+        <p><strong>Problem:</strong> Buttons nur 20x20px - schwer zu treffen auf Touch-Geräten</p>
+        <div class="interactive-area">
+            <h4>Aktionen (versuchen Sie diese auf einem Smartphone zu bedienen):</h4>
+            <div class="bad-tiny-buttons">
+                <!-- SCHLECHT: 20x20px Buttons -->
+                <button class="bad-tiny-button" onclick="badTinyAction('save')" title="Speichern">💾</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('edit')" title="Bearbeiten">✏️</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('delete')" title="Löschen">🗑️</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('copy')" title="Kopieren">📋</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('share')" title="Teilen">📤</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('print')" title="Drucken">🖨️</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('download')" title="Download">⬇️</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('upload')" title="Upload">⬆️</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('settings')" title="Einstellungen">⚙️</button>
+                <button class="bad-tiny-button" onclick="badTinyAction('help')" title="Hilfe">❓</button>
+            </div>
+            <p>☝️ 20x20px Ziele sind auf Touch-Geräten schwer präzise zu treffen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Close buttons without adequate spacing -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Schließen-Buttons ohne ausreichenden Abstand</div>
+        <p><strong>Problem:</strong> 16x16px X-Button in der Ecke ohne Sicherheitsabstand</p>
+        <div class="interactive-area">
+            <div class="bad-close-buttons">
+                <!-- SCHLECHT: 16x16px X ohne Abstand -->
+                <button class="bad-close-x" onclick="badCloseAction(this)">×</button>
+                <h4>Wichtige Nachricht</h4>
+                <p>Dies ist eine wichtige Benachrichtigung mit einem sehr kleinen Schließen-Button in der oberen rechten Ecke. Versuchen Sie ihn zu treffen!</p>
+            </div>
+            
+            <div class="bad-close-buttons">
+                <button class="bad-close-x" onclick="badCloseAction(this)">×</button>
+                <h4>Modal Dialog</h4>
+                <p>Ein weiterer Dialog mit winzigem X-Button. Besonders problematisch auf Touch-Geräten.</p>
+            </div>
+            
+            <div class="bad-close-buttons">
+                <button class="bad-close-x" onclick="badCloseAction(this)">×</button>
+                <h4>Popup-Fenster</h4>
+                <p>Noch ein Popup mit dem gleichen Problem - zu kleiner Schließen-Button.</p>
+            </div>
+            <p>☝️ X-Buttons sind zu klein und haben keinen Sicherheitsabstand zu den Rändern</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Dense form controls -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Dichte Formular-Kontrollen</div>
+        <p><strong>Problem:</strong> Form-Elemente unter 44px Höhe dicht gepackt</p>
+        <div class="interactive-area">
+            <form class="bad-dense-form">
+                <!-- SCHLECHT: Winzige Checkboxen und Inputs -->
+                <div class="bad-form-row">
+                    <label>Newsletter:</label>
+                    <input type="checkbox" class="bad-tiny-checkbox" id="newsletter">
+                    <label for="newsletter">Ja</label>
+                    <input type="checkbox" class="bad-tiny-checkbox" id="updates">
+                    <label for="updates">Updates</label>
+                    <input type="checkbox" class="bad-tiny-checkbox" id="offers">
+                    <label for="offers">Angebote</label>
+                </div>
+                
+                <div class="bad-form-row">
+                    <label>Geschlecht:</label>
+                    <input type="radio" class="bad-tiny-radio" name="gender" id="male">
+                    <label for="male">M</label>
+                    <input type="radio" class="bad-tiny-radio" name="gender" id="female">
+                    <label for="female">W</label>
+                    <input type="radio" class="bad-tiny-radio" name="gender" id="other">
+                    <label for="other">D</label>
+                </div>
+                
+                <div class="bad-form-row">
+                    <label>Name:</label>
+                    <input type="text" class="bad-small-input" style="width: 100px;">
+                    <label>Alter:</label>
+                    <input type="number" class="bad-small-input" style="width: 40px;">
+                </div>
+                
+                <div class="bad-form-row">
+                    <label>Land:</label>
+                    <select class="bad-small-select">
+                        <option>DE</option>
+                        <option>AT</option>
+                        <option>CH</option>
+                        <option>FR</option>
+                        <option>IT</option>
+                    </select>
+                    <label>Sprache:</label>
+                    <select class="bad-small-select">
+                        <option>Deutsch</option>
+                        <option>English</option>
+                        <option>Français</option>
+                    </select>
+                </div>
+            </form>
+            <p>☝️ Form-Kontrollen sind zu klein für Touch-Eingabe und zu dicht gepackt</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Pagination with tiny page numbers -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Paginierung mit winzigen Seitenzahlen</div>
+        <p><strong>Problem:</strong> Seitenzahlen nur 18x18px ohne Abstand</p>
+        <div class="interactive-area">
+            <div class="bad-pagination">
+                <!-- SCHLECHT: 18x18px Paginierung -->
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 1)">1</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 2)">2</a>
+                <a href="#" class="bad-page-link active" onclick="badPageClick(this, 3)">3</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 4)">4</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 5)">5</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 6)">6</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 7)">7</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 8)">8</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 9)">9</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 10)">10</a>
+                <a href="#" class="bad-page-link" onclick="badPageClick(this, 11)">></a>
+            </div>
+            <div style="margin: 15px 0; text-align: center;">
+                Seite <span id="badCurrentPage">3</span> von 50
+            </div>
+            <p>☝️ Seitenzahlen zu klein zum präzisen Antippen, besonders bei langen Listen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Mobile menu with small touch targets -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Mobile-Menu mit kleinen Touch-Zielen</div>
+        <p><strong>Problem:</strong> Hamburger-Menu und Items unter empfohlener Größe</p>
+        <div class="interactive-area">
+            <div class="bad-mobile-menu">
+                <!-- SCHLECHT: 24x24px Hamburger Menu -->
+                <button class="bad-hamburger" onclick="badToggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <div class="bad-menu-items" id="badMenuItems">
+                    <!-- SCHLECHT: Nur 28px hohe Menu-Items -->
+                    <button class="bad-menu-item" onclick="badMenuAction('home')">🏠 Startseite</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('products')">📦 Produkte</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('services')">🛠️ Services</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('about')">ℹ️ Über uns</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('contact')">📞 Kontakt</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('support')">❓ Support</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('account')">👤 Account</button>
+                    <button class="bad-menu-item" onclick="badMenuAction('settings')">⚙️ Settings</button>
+                </div>
+            </div>
+            <p>☝️ Hamburger-Menu-Button und Items sind zu klein für Touch-Navigation</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Slider controls with tiny handles -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Slider mit winzigen Handles</div>
+        <p><strong>Problem:</strong> Slider-Griffe nur 12x12px schwer zu greifen</p>
+        <div class="interactive-area">
+            <div class="bad-slider-container">
+                <h4>Lautstärke-Regler</h4>
+                <!-- SCHLECHT: 12x12px Slider-Handle -->
+                <input type="range" class="bad-range-slider" min="0" max="100" value="50" 
+                       oninput="badSliderChange(this, 'volume')">
+                <div>Lautstärke: <span id="volumeValue">50</span>%</div>
+                
+                <h4>Helligkeit</h4>
+                <input type="range" class="bad-range-slider" min="0" max="100" value="75" 
+                       oninput="badSliderChange(this, 'brightness')">
+                <div>Helligkeit: <span id="brightnessValue">75</span>%</div>
+                
+                <h4>Kontrast</h4>
+                <input type="range" class="bad-range-slider" min="0" max="200" value="100" 
+                       oninput="badSliderChange(this, 'contrast')">
+                <div>Kontrast: <span id="contrastValue">100</span>%</div>
+            </div>
+            <p>☝️ Slider-Handles sind zu klein um sie präzise zu greifen und zu ziehen</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Social media icons too small -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Social Media Icons zu klein</div>
+        <p><strong>Problem:</strong> 16x16px Social Icons ohne Abstand</p>
+        <div class="interactive-area">
+            <h4>Folgen Sie uns:</h4>
+            <div class="bad-social-icons">
+                <!-- SCHLECHT: 16x16px Social Icons -->
+                <button class="bad-social-icon facebook" onclick="badSocialAction('facebook')" title="Facebook">f</button>
+                <button class="bad-social-icon twitter" onclick="badSocialAction('twitter')" title="Twitter">t</button>
+                <button class="bad-social-icon instagram" onclick="badSocialAction('instagram')" title="Instagram">i</button>
+                <button class="bad-social-icon linkedin" onclick="badSocialAction('linkedin')" title="LinkedIn">in</button>
+                <button class="bad-social-icon youtube" onclick="badSocialAction('youtube')" title="YouTube">yt</button>
+            </div>
+            
+            <h4>Teilen:</h4>
+            <div class="bad-social-icons">
+                <button class="bad-social-icon facebook" onclick="badShareAction('facebook')" title="Auf Facebook teilen">📤</button>
+                <button class="bad-social-icon twitter" onclick="badShareAction('twitter')" title="Auf Twitter teilen">🐦</button>
+                <button class="bad-social-icon" onclick="badShareAction('email')" title="Per E-Mail teilen" style="background: #666;">📧</button>
+                <button class="bad-social-icon" onclick="badShareAction('whatsapp')" title="WhatsApp" style="background: #25d366;">💬</button>
+                <button class="bad-social-icon" onclick="badShareAction('copy')" title="Link kopieren" style="background: #999;">🔗</button>
+            </div>
+            <p>☝️ Social Icons sind zu klein und stehen zu dicht beieinander</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Tab navigation with insufficient target size -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Tab-Navigation mit unzureichender Größe</div>
+        <p><strong>Problem:</strong> Tabs nur 32px hoch schwer zu treffen</p>
+        <div class="interactive-area">
+            <div class="bad-tab-container">
+                <!-- SCHLECHT: 32px hohe Tabs -->
+                <ul class="bad-tab-list" role="tablist">
+                    <li><button class="bad-tab active" onclick="badSwitchTab(0, this)" role="tab">Übersicht</button></li>
+                    <li><button class="bad-tab" onclick="badSwitchTab(1, this)" role="tab">Details</button></li>
+                    <li><button class="bad-tab" onclick="badSwitchTab(2, this)" role="tab">Bewertungen</button></li>
+                    <li><button class="bad-tab" onclick="badSwitchTab(3, this)" role="tab">Galerie</button></li>
+                    <li><button class="bad-tab" onclick="badSwitchTab(4, this)" role="tab">FAQ</button></li>
+                    <li><button class="bad-tab" onclick="badSwitchTab(5, this)" role="tab">Support</button></li>
+                    <li><button class="bad-tab" onclick="badSwitchTab(6, this)" role="tab">Download</button></li>
+                </ul>
+                
+                <div class="bad-tab-content" id="badTabContent">
+                    <h4>Produkt-Übersicht</h4>
+                    <p>Hier finden Sie eine allgemeine Übersicht über das Produkt mit den wichtigsten Features.</p>
+                </div>
+            </div>
+            <p>☝️ Tab-Buttons sind zu niedrig für komfortable Touch-Bedienung</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 9: Toolbar with cramped buttons -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Toolbar mit zusammengedrängten Buttons</div>
+        <p><strong>Problem:</strong> Werkzeug-Buttons nur 22x22px dicht gepackt</p>
+        <div class="interactive-area">
+            <h4>Text-Editor Toolbar:</h4>
+            <div class="bad-toolbar">
+                <!-- SCHLECHT: 22x22px Toolbar-Buttons -->
+                <button class="bad-tool-button" onclick="badToolAction('bold')" title="Fett">B</button>
+                <button class="bad-tool-button" onclick="badToolAction('italic')" title="Kursiv">I</button>
+                <button class="bad-tool-button" onclick="badToolAction('underline')" title="Unterstrichen">U</button>
+                <button class="bad-tool-button" onclick="badToolAction('strike')" title="Durchgestrichen">S</button>
+                <button class="bad-tool-button" onclick="badToolAction('left')" title="Linksbündig">⬅</button>
+                <button class="bad-tool-button" onclick="badToolAction('center')" title="Zentriert">⬄</button>
+                <button class="bad-tool-button" onclick="badToolAction('right')" title="Rechtsbündig">➡</button>
+                <button class="bad-tool-button" onclick="badToolAction('justify')" title="Blocksatz">⬌</button>
+                <button class="bad-tool-button" onclick="badToolAction('list')" title="Liste">•</button>
+                <button class="bad-tool-button" onclick="badToolAction('link')" title="Link">🔗</button>
+                <button class="bad-tool-button" onclick="badToolAction('image')" title="Bild">🖼</button>
+                <button class="bad-tool-button" onclick="badToolAction('table')" title="Tabelle">⊞</button>
+            </div>
+            
+            <h4>Grafik-Editor Toolbar:</h4>
+            <div class="bad-toolbar">
+                <button class="bad-tool-button" onclick="badToolAction('select')" title="Auswählen">↖</button>
+                <button class="bad-tool-button" onclick="badToolAction('move')" title="Verschieben">✋</button>
+                <button class="bad-tool-button" onclick="badToolAction('brush')" title="Pinsel">🖌</button>
+                <button class="bad-tool-button" onclick="badToolAction('eraser')" title="Radierer">🧽</button>
+                <button class="bad-tool-button" onclick="badToolAction('line')" title="Linie">📏</button>
+                <button class="bad-tool-button" onclick="badToolAction('rectangle')" title="Rechteck">⬜</button>
+                <button class="bad-tool-button" onclick="badToolAction('circle')" title="Kreis">⭕</button>
+                <button class="bad-tool-button" onclick="badToolAction('text')" title="Text">T</button>
+                <button class="bad-tool-button" onclick="badToolAction('color')" title="Farbe">🎨</button>
+                <button class="bad-tool-button" onclick="badToolAction('zoom')" title="Zoom">🔍</button>
+            </div>
+            <p>☝️ Toolbar-Buttons sind zu klein und dicht gepackt für Touch-Geräte</p>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 10: Rating stars too small -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 10: Bewertungs-Sterne zu klein</div>
+        <p><strong>Problem:</strong> Sterne nur 14x14px schwer zu treffen</p>
+        <div class="interactive-area">
+            <h4>Produkt bewerten:</h4>
+            <div class="bad-rating-stars" id="productRating">
+                <!-- SCHLECHT: 14x14px Sterne -->
+                <button class="bad-star" onclick="badRateProduct(1)">★</button>
+                <button class="bad-star" onclick="badRateProduct(2)">★</button>
+                <button class="bad-star" onclick="badRateProduct(3)">★</button>
+                <button class="bad-star" onclick="badRateProduct(4)">★</button>
+                <button class="bad-star" onclick="badRateProduct(5)">★</button>
+            </div>
+            <div>Bewertung: <span id="productRatingValue">0</span> von 5 Sternen</div>
+            
+            <h4>Service bewerten:</h4>
+            <div class="bad-rating-stars" id="serviceRating">
+                <button class="bad-star" onclick="badRateService(1)">★</button>
+                <button class="bad-star" onclick="badRateService(2)">★</button>
+                <button class="bad-star" onclick="badRateService(3)">★</button>
+                <button class="bad-star" onclick="badRateService(4)">★</button>
+                <button class="bad-star" onclick="badRateService(5)">★</button>
+            </div>
+            <div>Service: <span id="serviceRatingValue">0</span> von 5 Sternen</div>
+            
+            <h4>Lieferung bewerten:</h4>
+            <div class="bad-rating-stars" id="deliveryRating">
+                <button class="bad-star" onclick="badRateDelivery(1)">★</button>
+                <button class="bad-star" onclick="badRateDelivery(2)">★</button>
+                <button class="bad-star" onclick="badRateDelivery(3)">★</button>
+                <button class="bad-star" onclick="badRateDelivery(4)">★</button>
+                <button class="bad-star" onclick="badRateDelivery(5)">★</button>
+            </div>
+            <div>Lieferung: <span id="deliveryRatingValue">0</span> von 5 Sternen</div>
+            <p>☝️ Rating-Sterne sind zu klein für präzise Touch-Eingabe</p>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 2.5.5 Target Size Verletzungen:</strong></p>
+        <ul>
+            <li>❌ Touch-Ziele unter 44x44px schwer zu treffen</li>
+            <li>❌ Unzureichender Abstand zwischen anklickbaren Elementen</li>
+            <li>❌ Besonders problematisch für Benutzer mit motorischen Beeinträchtigungen</li>
+            <li>❌ Erhöhte Fehlerrate durch versehentliche Berührungen</li>
+            <li>❌ Frustrierender Bedienungsablauf auf Touch-Geräten</li>
+        </ul>
+        
+        <p><strong>Betroffene Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Motor-Beeinträchtigungen: Schwierigkeiten bei präziser Zielverfolgung</li>
+            <li>👥 Tremor/Zittern: Können kleine Ziele nicht stabil treffen</li>
+            <li>👥 Ältere Benutzer: Reduzierte Feinmotorik</li>
+            <li>👥 Touch-Device Nutzer: Finger größer als Mauszeiger</li>
+            <li>👥 Verwendung von Hilfsmitteln: Stylus oder andere Eingabehilfen</li>
+            <li>👥 Situative Beeinträchtigungen: Während Bewegung, mit Handschuhen</li>
+        </ul>
+    </div>
+
+    <script>
+        let badCurrentPage = 3;
+        let badMenuOpen = false;
+        let badActiveTab = 0;
+        let badProductRating = 0;
+        let badServiceRating = 0;
+        let badDeliveryRating = 0;
+        let badMissedClicks = 0;
+        
+        // Track missed clicks for demonstration
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BODY' || e.target.classList.contains('interactive-area')) {
+                badMissedClicks++;
+                badShowTouchIndicator(e.clientX, e.clientY);
+                console.log('ACCESSIBILITY VIOLATION: Missed click - likely targeting issue');
+            }
+        });
+        
+        function badShowTouchIndicator(x, y) {
+            const indicator = document.getElementById('touchIndicator');
+            indicator.style.left = (x - 22) + 'px';
+            indicator.style.top = (y - 22) + 'px';
+            indicator.style.display = 'block';
+            
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 1000);
+        }
+        
+        // VIOLATION 1: Tiny button actions
+        function badTinyAction(action) {
+            alert(`Aktion "${action}" ausgeführt!\n\nAber war es schwer, den kleinen Button zu treffen?`);
+            console.log('ACCESSIBILITY VIOLATION: 20x20px button successfully clicked (but difficult to target)');
+        }
+        
+        // VIOLATION 2: Close button actions
+        function badCloseAction(button) {
+            const container = button.parentElement;
+            container.style.opacity = '0.5';
+            container.style.pointerEvents = 'none';
+            
+            alert('Dialog geschlossen!\n\nWar der kleine X-Button schwer zu treffen?\n\nAuf Touch-Geräten sind 16x16px viel zu klein.');
+            console.log('ACCESSIBILITY VIOLATION: 16x16px close button successfully clicked (but too small)');
+        }
+        
+        // VIOLATION 4: Pagination
+        function badPageClick(link, page) {
+            event.preventDefault();
+            
+            // Remove active class from all
+            document.querySelectorAll('.bad-page-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            badCurrentPage = page;
+            document.getElementById('badCurrentPage').textContent = page;
+            
+            alert(`Seite ${page} geladen!\n\nWaren die 18x18px Seitenzahlen schwer zu treffen?`);
+            console.log('ACCESSIBILITY VIOLATION: 18x18px pagination link clicked (too small for touch)');
+        }
+        
+        // VIOLATION 5: Mobile menu
+        function badToggleMenu() {
+            badMenuOpen = !badMenuOpen;
+            const menuItems = document.getElementById('badMenuItems');
+            
+            if (badMenuOpen) {
+                menuItems.classList.add('open');
+            } else {
+                menuItems.classList.remove('open');
+            }
+            
+            console.log('ACCESSIBILITY VIOLATION: 24x24px hamburger menu toggled (too small)');
+        }
+        
+        function badMenuAction(action) {
+            alert(`Navigation zu "${action}"\n\nWaren die 28px hohen Menu-Items schwer zu treffen?`);
+            badToggleMenu(); // Close menu
+            console.log('ACCESSIBILITY VIOLATION: 28px high menu item clicked (too small for touch)');
+        }
+        
+        // VIOLATION 6: Slider controls
+        function badSliderChange(slider, type) {
+            const value = slider.value;
+            document.getElementById(type + 'Value').textContent = value;
+            
+            console.log('ACCESSIBILITY VIOLATION: Slider with 12x12px handle used (difficult to grab)');
+        }
+        
+        // VIOLATION 7: Social media actions
+        function badSocialAction(platform) {
+            alert(`${platform} geöffnet!\n\nWar das 16x16px Icon schwer zu treffen?`);
+            console.log('ACCESSIBILITY VIOLATION: 16x16px social icon clicked (too small)');
+        }
+        
+        function badShareAction(platform) {
+            alert(`Geteilt auf ${platform}!\n\nWar der kleine Share-Button einfach zu treffen?`);
+            console.log('ACCESSIBILITY VIOLATION: 16x16px share button clicked (too small)');
+        }
+        
+        // VIOLATION 8: Tab navigation
+        function badSwitchTab(index, button) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.bad-tab').forEach(tab => tab.classList.remove('active'));
+            button.classList.add('active');
+            
+            badActiveTab = index;
+            
+            const content = document.getElementById('badTabContent');
+            const tabContents = [
+                '<h4>Produkt-Übersicht</h4><p>Allgemeine Informationen über das Produkt.</p>',
+                '<h4>Detaillierte Spezifikationen</h4><p>Technische Details und Spezifikationen.</p>',
+                '<h4>Kundenbewertungen</h4><p>Bewertungen und Erfahrungen anderer Kunden.</p>',
+                '<h4>Bildergalerie</h4><p>Produktfotos und Screenshots.</p>',
+                '<h4>Häufige Fragen</h4><p>Antworten auf die häufigsten Fragen.</p>',
+                '<h4>Support & Hilfe</h4><p>Kontakt und Unterstützung.</p>',
+                '<h4>Downloads</h4><p>Handbücher und Software-Downloads.</p>'
+            ];
+            
+            content.innerHTML = tabContents[index] || tabContents[0];
+            
+            console.log('ACCESSIBILITY VIOLATION: 32px high tab clicked (too small for comfortable touch)');
+        }
+        
+        // VIOLATION 9: Toolbar actions
+        function badToolAction(tool) {
+            // Toggle active state
+            event.target.classList.toggle('active');
+            
+            alert(`Werkzeug "${tool}" ausgewählt!\n\nWar der 22x22px Button einfach zu treffen?`);
+            console.log('ACCESSIBILITY VIOLATION: 22x22px toolbar button clicked (too small)');
+        }
+        
+        // VIOLATION 10: Rating stars
+        function badRateProduct(rating) {
+            badProductRating = rating;
+            badUpdateStars('productRating', rating);
+            document.getElementById('productRatingValue').textContent = rating;
+            
+            alert(`Produkt mit ${rating} Sternen bewertet!\n\nWaren die 14x14px Sterne einfach zu treffen?`);
+            console.log('ACCESSIBILITY VIOLATION: 14x14px star rating clicked (too small)');
+        }
+        
+        function badRateService(rating) {
+            badServiceRating = rating;
+            badUpdateStars('serviceRating', rating);
+            document.getElementById('serviceRatingValue').textContent = rating;
+            
+            console.log('ACCESSIBILITY VIOLATION: 14x14px service star clicked');
+        }
+        
+        function badRateDelivery(rating) {
+            badDeliveryRating = rating;
+            badUpdateStars('deliveryRating', rating);
+            document.getElementById('deliveryRatingValue').textContent = rating;
+            
+            console.log('ACCESSIBILITY VIOLATION: 14x14px delivery star clicked');
+        }
+        
+        function badUpdateStars(containerId, rating) {
+            const container = document.getElementById(containerId);
+            const stars = container.querySelectorAll('.bad-star');
+            
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+        
+        // Demo: Show touch size comparison
+        function badShowTouchDemo() {
+            alert('👆 Touch-Demo\n\nEin durchschnittlicher Fingertip ist 44x44px groß.\nDie meisten Elemente auf dieser Seite sind deutlich kleiner.\n\nVersuchen Sie die Bedienung auf einem Smartphone!');
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== TARGET SIZE VIOLATIONS ANALYSIS ===');
+            
+            // Count small targets
+            const tinyButtons = document.querySelectorAll('.bad-tiny-button, .bad-close-x, .bad-page-link, .bad-menu-item, .bad-tool-button, .bad-star, .bad-social-icon, .bad-tab');
+            console.log(`Found ${tinyButtons.length} targets smaller than 44x44px`);
+            
+            // Measure actual sizes
+            tinyButtons.forEach((element, index) => {
+                const rect = element.getBoundingClientRect();
+                if (rect.width < 44 || rect.height < 44) {
+                    console.log(`Element ${index + 1}: ${Math.round(rect.width)}x${Math.round(rect.height)}px - WCAG 2.5.5 VIOLATION`);
+                }
+            });
+            
+            console.log('⚠️ ACCESSIBILITY VIOLATIONS ACTIVE:');
+            console.log('- Tiny action buttons (20x20px)');
+            console.log('- Small close buttons (16x16px)');
+            console.log('- Dense form controls (12x12px)');
+            console.log('- Cramped pagination (18x18px)');
+            console.log('- Small mobile menu (24x24px + 28px items)');
+            console.log('- Tiny slider handles (12x12px)');
+            console.log('- Miniature social icons (16x16px)');
+            console.log('- Low tab targets (32px high)');
+            console.log('- Cramped toolbar (22x22px)');
+            console.log('- Small rating stars (14x14px)');
+            
+            // Show demo after 3 seconds
+            setTimeout(badShowTouchDemo, 3000);
+        });
+    </script>
+</body>
+</html>

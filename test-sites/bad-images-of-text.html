@@ -1,0 +1,272 @@
+<!-- WCAG-TEST
+criterion: 1.4.5, 1.4.9
+level: AAA
+title: Images of Text, Images of Text (No Exception)
+test_type: bad
+expected_violations: 5
+testable_by: regex
+scanners: images-of-text
+description: Text rendered as images instead of actual text
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Bilder mit Text (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #333333;
+        }
+        
+        /* VIOLATION 1: Text-Buttons als Bilder */
+        .text-button-image {
+            background: linear-gradient(to bottom, #4CAF50, #45a049);
+            color: white;
+            width: 200px;
+            height: 50px;
+            display: inline-block;
+            text-align: center;
+            line-height: 50px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* VIOLATION 2: Header als Bild simuliert */
+        .header-as-image {
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgNDAwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNjAiIGZpbGw9IiMzMzMzMzMiLz48dGV4dCB4PSIyMCIgeT0iMzgiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPldpY2h0aWdlciBIZWFkZXI8L3RleHQ+PC9zdmc+') no-repeat;
+            width: 400px;
+            height: 60px;
+            margin: 20px 0;
+        }
+        
+        /* VIOLATION 3: Navigation als Text-Bilder */
+        .nav-text-images {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        
+        /* VIOLATION 4: Preise und Zahlen als Bilder */
+        .price-image {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 10px 20px;
+            display: inline-block;
+            margin: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        
+        /* VIOLATION 5: Zitate als stylisierte Text-Bilder */
+        .quote-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            margin: 20px 0;
+            font-style: italic;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        /* VIOLATION 6: Call-to-Action als Text-Bild */
+        .cta-text-image {
+            background: linear-gradient(45deg, #FF6B35, #F7931E);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+        
+        /* VIOLATION 7: Informationsboxen mit Text als Bild */
+        .info-box-image {
+            background: linear-gradient(to right, #74b9ff, #0984e3);
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        /* VIOLATION 8: Formular Labels als stylisierte Bilder */
+        .form-label-image {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 8px 12px;
+            display: inline-block;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        /* VIOLATION 9: Überschriften mit spezieller Schriftart als Bild */
+        .special-font-header {
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMzAwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjEwIiB5PSIyOCIgZmlsbD0iIzMzMzMzMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iYm9sZCI+U3BlemlhbGxlIFNjaHJpZnRhcnQ8L3RleHQ+PC9zdmc+') no-repeat;
+            width: 300px;
+            height: 40px;
+            margin: 15px 0;
+        }
+        
+        /* VIOLATION 10: Banner mit Text */
+        .banner-with-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0;
+            border-radius: 15px;
+        }
+        
+        /* Simulated image attributes for detection */
+        .simulated-text-image {
+            /* Diese Klassen simulieren Bilder mit Text-Inhalten für den Scanner */
+            display: inline-block;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Website: Bilder mit Text (SOLL ALS SCHLECHT ERKANNT WERDEN)</h1>
+    
+    <p>Diese Website verletzt WCAG 2.1 Kriterium 1.4.5 (Images of Text) durch Verwendung von Text in Bildern statt HTML-Text.</p>
+    
+    <section>
+        <h2>VIOLATION 1: Buttons mit Text als Bilder</h2>
+        <div class="text-button-image simulated-text-image" title="button-submit.png">
+            Jetzt kaufen!
+        </div>
+        <div class="text-button-image simulated-text-image" title="button-cancel.png" style="background: linear-gradient(to bottom, #f44336, #d32f2f);">
+            Abbrechen
+        </div>
+        <div class="text-button-image simulated-text-image" title="button-info.png" style="background: linear-gradient(to bottom, #2196F3, #1976D2);">
+            Mehr Infos
+        </div>
+        <p>Diese Buttons sollten als HTML-Buttons mit CSS-Styling implementiert werden, nicht als Bilder.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 2: Header/Überschrift als Bild</h2>
+        <div class="header-as-image simulated-text-image" title="header-wichtiger-header.png" alt="Wichtiger Header"></div>
+        <p>Dieser Header ist als Bild implementiert statt als HTML &lt;h1&gt; Element.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 3: Navigation mit Text-Bildern</h2>
+        <nav class="nav-text-images">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA4MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iMzAiIGZpbGw9IiM0Q0FGNTAI/><dGV4dCB4PSIxMCIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkhvbWU8L3RleHQ+PC9zdmc+" alt="nav-home.png" style="margin-right: 10px;">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMTAwIDMwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMzAiIGZpbGw9IiM0Q0FGNTAI/><dGV4dCB4PSIxMCIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPlByb2R1a3RlPC90ZXh0Pjwvc3ZnPg==" alt="nav-produkte.png" style="margin-right: 10px;">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA5MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iOTAiIGhlaWdodD0iMzAiIGZpbGw9IiM0Q0FGNTAI/><dGV4dCB4PSIxMCIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPktvbnRha3Q8L3RleHQ+PC9zdmc+" alt="nav-kontakt.png">
+        </nav>
+        <p>Navigation sollte als HTML-Links implementiert werden, nicht als Bilder mit Text.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 4: Preise und wichtige Zahlen als Bilder</h2>
+        <div class="price-image simulated-text-image" title="price-999-euro.png">
+            999,99 €
+        </div>
+        <div class="price-image simulated-text-image" title="discount-50-percent.png" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+            -50% RABATT
+        </div>
+        <div class="price-image simulated-text-image" title="shipping-free.png" style="background: linear-gradient(45deg, #27ae60, #2ecc71);">
+            VERSANDKOSTENFREI
+        </div>
+        <p>Preise und wichtige Informationen sollten als HTML-Text verfügbar sein für Screenreader und Suchmaschinen.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 5: Zitate als stylisierte Text-Bilder</h2>
+        <div class="quote-image simulated-text-image" title="testimonial-quote.png">
+            "Dieses Produkt hat mein Leben verändert! Absolut empfehlenswert für jeden."
+            <br><br>- Maria Müller, zufriedene Kundin
+        </div>
+        <p>Kundenstimmen sollten als HTML-Text mit CSS-Styling implementiert werden.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 6: Call-to-Action Banner als Text-Bild</h2>
+        <div class="cta-text-image simulated-text-image" title="cta-banner-jetzt-bestellen.png">
+            🚀 JETZT BESTELLEN UND 20% SPAREN! 🚀
+        </div>
+        <p>Call-to-Action Elemente sollten als HTML-Buttons oder -Links implementiert werden.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 7: Informationsboxen mit Text</h2>
+        <div class="info-box-image simulated-text-image" title="info-box-wichtig.png">
+            ⚠️ WICHTIGER HINWEIS: Lieferzeiten können sich aufgrund hoher Nachfrage verlängern.
+        </div>
+        <div class="info-box-image simulated-text-image" title="info-box-tipp.png" style="background: linear-gradient(to right, #00b894, #00cec9);">
+            💡 TIPP: Bestellen Sie vor 14:00 Uhr für Lieferung am nächsten Tag.
+        </div>
+        <p>Informationsboxen sollten als HTML-Elemente mit semantischem Markup implementiert werden.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 8: Formular-Labels als Bilder</h2>
+        <form>
+            <div class="form-label-image simulated-text-image" title="label-vollstaendiger-name.png">
+                Vollständiger Name *
+            </div>
+            <input type="text" style="width: 200px; margin-left: 10px;"><br><br>
+            
+            <div class="form-label-image simulated-text-image" title="label-email-adresse.png">
+                E-Mail Adresse *
+            </div>
+            <input type="email" style="width: 200px; margin-left: 10px;"><br><br>
+            
+            <div class="form-label-image simulated-text-image" title="label-telefonnummer.png">
+                Telefonnummer
+            </div>
+            <input type="tel" style="width: 200px; margin-left: 10px;"><br><br>
+        </form>
+        <p>Formular-Labels sollten als HTML &lt;label&gt; Elemente implementiert werden.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 9: Überschriften mit spezieller Schriftart als Bild</h2>
+        <div class="special-font-header simulated-text-image" title="header-spezielle-schriftart.png"></div>
+        <p>Auch spezielle Schriftarten sollten über Web-Fonts als HTML-Text implementiert werden.</p>
+    </section>
+    
+    <section>
+        <h2>VIOLATION 10: Werbebanner mit Text</h2>
+        <div class="banner-with-text simulated-text-image" title="banner-sonderangebot.png">
+            🎉 MEGA SONDERANGEBOT! 🎉<br>
+            Nur heute: Bis zu 70% Rabatt auf alle Artikel!<br>
+            <small>*Angebot gültig bis 23:59 Uhr</small>
+        </div>
+        <p>Werbebanner mit wichtigen Informationen sollten als HTML-Text verfügbar sein.</p>
+    </section>
+    
+    <section>
+        <h2>Zusätzliche problematische Text-Bilder</h2>
+        <!-- Simulierte IMG-Tags mit Text-Inhalten -->
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMjAwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iNDAiIGZpbGw9IiNmZjY2NjYiLz48dGV4dCB4PSIxMCIgeT0iMjgiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5XaWNodGlnZSBJbmZvPC90ZXh0Pjwvc3ZnPg==" alt="wichtige-info-button.png" style="margin: 10px;">
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMTUwIDMwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMzAiIGZpbGw9IiM0Q0FGNTAI/><dGV4dCB4PSIxMCIgeT0iMjAiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkRvd25sb2FkIFBERjwvdGV4dD48L3N2Zz4=" alt="download-pdf-text.png" style="margin: 10px;">
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjM1IiB2aWV3Qm94PSIwIDAgMTgwIDM1IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMzUiIGZpbGw9IiNmZjk5MDAiLz48dGV4dCB4PSIxMCIgeT0iMjMiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiPkFubWVsZGVuIGpldHp0PC90ZXh0Pjwvc3ZnPg==" alt="signup-now-button-text.png" style="margin: 10px;">
+        
+        <p>Diese Bilder enthalten wichtige Text-Informationen die für Screenreader nicht zugänglich sind.</p>
+    </section>
+    
+    <footer style="margin-top: 40px; padding: 20px; background-color: #f5f5f5;">
+        <p><strong>Diese Website sollte von Phase6a als SCHLECHT erkannt werden</strong> aufgrund multipler "Images of Text" Verletzungen.</p>
+        <p>Sämtliche Text-Inhalte sind als Bilder implementiert statt als zugänglicher HTML-Text mit CSS-Styling.</p>
+        <p>Problematische Dateinamen: button-submit.png, header-wichtiger-header.png, nav-home.png, price-999-euro.png, testimonial-quote.png, etc.</p>
+    </footer>
+</body>
+</html>

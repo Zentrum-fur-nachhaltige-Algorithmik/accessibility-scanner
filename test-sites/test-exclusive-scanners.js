@@ -59,6 +59,10 @@ const EXCLUSIVE_SCANNERS = {
     module: '../src/multiple-ways-scanner',
     criteria: ['2.4.5'],
   },
+  'concurrent-input': {
+    module: '../src/concurrent-input-scanner',
+    criteria: ['2.5.6'],
+  },
 };
 
 /**
@@ -83,6 +87,13 @@ function matchesCriteria(violation, criteria) {
 }
 
 async function main() {
+  const argv = process.argv.slice(2);
+  const jsonPath = argv.includes('--json') ? argv[argv.indexOf('--json') + 1] : null;
+  // Machine-readable record of every assertion, consumed by
+  // tests/coverage-matrix.js to report per-criterion DETECTION (not just
+  // "a harness entry exists").
+  const jsonResults = [];
+
   const puppeteer = await loadPuppeteer();
   const testDir = __dirname;
 
@@ -199,15 +210,31 @@ async function main() {
         ]);
         restore();
 
-        // Filter violations to the criteria this test file covers
+        // Violation-level ground truth: a bad file counts as DETECTED only when
+        // a violation matches a criterion the file declares AND that this
+        // scanner claims to cover. ">0 violations of any kind" is not detection,
+        // and a scanner is never credited for a criterion outside its remit
+        // (e.g. input-modalities must produce a real 2.5.1 finding on a file
+        // that declares "2.1.1, 2.5.1" — 2.1.1 findings belong to
+        // keyboard-navigation and do not count here).
         const allViolations = result.violations || [];
-        const relevant = allViolations.filter(v => matchesCriteria(v, t.criteria));
+        const targetCriteria = t.criteria.filter(c => scannerDef.criteria.includes(c));
+        const relevant = allViolations.filter(v => matchesCriteria(v, targetCriteria));
 
         const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
         const label = t.expectViolations ? 'TRUE-POS' : 'FALSE-POS';
         const detail = t.expectViolations
-          ? `${relevant.length} violations`
-          : `${relevant.length} false positives`;
+          ? `${relevant.length} violations for ${targetCriteria.join(',')}`
+          : `${relevant.length} false positives for ${targetCriteria.join(',')}`;
+
+        jsonResults.push({
+          file: t.file,
+          scanner: scannerId,
+          expectViolations: t.expectViolations,
+          criteria: targetCriteria,
+          matched: relevant.length,
+          status: ok ? 'PASS' : 'FAIL',
+        });
 
         if (ok) {
           origLog(`  PASS [${label}] ${t.file}: ${detail}`);
@@ -227,6 +254,15 @@ async function main() {
         origLog(`  ERROR ${t.file}: ${err.message}`);
         failed++;
         failures.push({ file: t.file, scanner: scannerId, label: 'ERROR', detail: err.message });
+        jsonResults.push({
+          file: t.file,
+          scanner: scannerId,
+          expectViolations: t.expectViolations,
+          criteria: t.criteria.filter(c => scannerDef.criteria.includes(c)),
+          matched: 0,
+          status: 'ERROR',
+          detail: err.message,
+        });
       } finally {
         await page.close().catch(() => {});
       }
@@ -315,7 +351,12 @@ async function main() {
         silence();
         const result = await Promise.race([
           responsiveScanner.scan(page, { heuristicOnly: false }),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 120000)),
+          // 180s, not 120s: this is the second full viewport-matrix run over
+          // bad-reflow.html in the same process (the FULL-MATRIX dedup test
+          // above already did one), and the browser is measurably slower by
+          // then. At 120s it timed out here while passing there — a harness
+          // budget artefact, not a scanner defect.
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 180000)),
         ]);
         restore();
 
@@ -356,6 +397,16 @@ async function main() {
   await browser.close();
   server.close();
 
+  if (jsonPath) {
+    fs.writeFileSync(jsonPath, JSON.stringify({
+      generatedAt: new Date().toISOString(),
+      harness: 'exclusive',
+      totals: { passed, failed },
+      results: jsonResults,
+    }, null, 2));
+    origLog(`\nWrote ${jsonPath}`);
+  }
+
   origLog(`\n=== SUMMARY ===`);
   origLog(`Total: ${passed + failed} | Passed: ${passed} | Failed: ${failed}`);
 
@@ -368,7 +419,14 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('Fatal:', err);
-  process.exit(1);
-});
+// Exported so `tests/coverage-matrix.js` can read the real scanner→criteria
+// table instead of regex-scraping this file. Guarded so requiring it never
+// launches a browser.
+module.exports = { EXCLUSIVE_SCANNERS, CRITERION_TO_SCANNER, matchesCriteria };
+
+if (require.main === module) {
+  main().catch(err => {
+    console.error('Fatal:', err);
+    process.exit(1);
+  });
+}

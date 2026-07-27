@@ -1,0 +1,112 @@
+<!-- WCAG-TEST
+criterion: 2.1.3
+level: AAA
+title: Keyboard (No Exception)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: All interactions operable via keyboard, including drawing and path-dependent tasks
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Keyboard No Exception - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        canvas { border: 2px solid #333; display: block; margin: 10px 0; }
+        input, button, select { padding: 8px; margin: 4px; }
+        button:focus, input:focus, select:focus { outline: 3px solid #005fcc; outline-offset: 2px; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Good Keyboard No Exception (2.1.3 AAA)</h1>
+
+    <!-- Compliant 1: Drawing with keyboard coordinate input -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Drawing canvas with keyboard coordinate input</h2>
+        <p>Draw using mouse or enter coordinates with keyboard:</p>
+        <canvas id="drawCanvas" width="400" height="200" style="background:#fff;" tabindex="0"
+                aria-label="Drawing canvas. Use the coordinate inputs below for keyboard access."></canvas>
+        <div style="margin-top:10px;">
+            <label for="drawX">X:</label>
+            <input type="number" id="drawX" min="0" max="400" value="0" style="width:60px;">
+            <label for="drawY">Y:</label>
+            <input type="number" id="drawY" min="0" max="200" value="0" style="width:60px;">
+            <button type="button" onclick="addPoint()">Add Point (Enter)</button>
+            <button type="button" onclick="clearCanvas()">Clear</button>
+        </div>
+        <script>
+            var canvas = document.getElementById('drawCanvas');
+            var ctx = canvas.getContext('2d');
+            var points = [];
+            function addPoint(){
+                var x = parseInt(document.getElementById('drawX').value);
+                var y = parseInt(document.getElementById('drawY').value);
+                points.push({x:x,y:y});
+                if(points.length > 1){ ctx.beginPath(); ctx.moveTo(points[points.length-2].x, points[points.length-2].y); ctx.lineTo(x,y); ctx.stroke(); }
+                ctx.fillRect(x-2,y-2,4,4);
+            }
+            function clearCanvas(){ ctx.clearRect(0,0,400,200); points=[]; }
+        </script>
+    </div>
+
+    <!-- Compliant 2: Type-to-sign signature alternative -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Signature with type-to-sign alternative</h2>
+        <p>Sign using mouse or type your signature:</p>
+        <canvas id="sigCanvas" width="350" height="100" style="background:#fffff0;" tabindex="0"
+                aria-label="Signature pad. Use the text input below to type your signature."></canvas>
+        <div style="margin-top:10px;">
+            <label for="typeSig">Type your signature:</label>
+            <input type="text" id="typeSig" style="width:250px; font-family:'Brush Script MT',cursive; font-size:1.2em;"
+                   placeholder="Type your full name" autocomplete="name">
+            <button type="button">Apply Typed Signature</button>
+        </div>
+    </div>
+
+    <!-- Compliant 3: Sortable list with keyboard controls -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Sortable list with keyboard reordering</h2>
+        <p>Use drag-and-drop or arrow buttons to reorder:</p>
+        <ul style="list-style:none; padding:0;" role="listbox" aria-label="Priority list">
+            <li role="option" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; display:flex; justify-content:space-between; align-items:center;">
+                <span>Task A</span>
+                <span>
+                    <button type="button" aria-label="Move Task A up">Up</button>
+                    <button type="button" aria-label="Move Task A down">Down</button>
+                </span>
+            </li>
+            <li role="option" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; display:flex; justify-content:space-between; align-items:center;">
+                <span>Task B</span>
+                <span>
+                    <button type="button" aria-label="Move Task B up">Up</button>
+                    <button type="button" aria-label="Move Task B down">Down</button>
+                </span>
+            </li>
+            <li role="option" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; display:flex; justify-content:space-between; align-items:center;">
+                <span>Task C</span>
+                <span>
+                    <button type="button" aria-label="Move Task C up">Up</button>
+                    <button type="button" aria-label="Move Task C down">Down</button>
+                </span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Compliant 4: Color picker with text input alternative -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Color picker with keyboard hex input</h2>
+        <label for="colorHex">Enter color (hex):</label>
+        <input type="text" id="colorHex" value="#3366cc" style="width:100px;" aria-describedby="colorHelp">
+        <input type="color" id="colorVisual" value="#3366cc" aria-label="Visual color picker">
+        <span id="colorHelp" style="font-size:0.85em; color:#555;">Type a hex value or use the color input.</span>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!-- WCAG-TEST
+criterion: 3.2.3
+level: AA
+title: Consistent Navigation
+test_type: bad
+expected_violations: 3
+testable_by: regex
+scanners: page-structure
+description: Navigation order and structure changes between page sections, violating consistent navigation expectations
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad: Consistent Navigation - WCAG 3.2.3</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+        .page-section { border-bottom: 3px solid #0066cc; padding-bottom: 2rem; margin-bottom: 2rem; }
+        .page-header { background: #1a1a2e; color: #fff; padding: 0.75rem 2rem; }
+        .page-header h2 { margin: 0; font-size: 1rem; }
+        nav { padding: 0.5rem 2rem; }
+        nav ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 1.5rem; }
+        nav a { color: #0066cc; text-decoration: none; padding: 0.3rem 0; }
+        nav a:hover { text-decoration: underline; }
+        .content { padding: 1rem 2rem; max-width: 800px; }
+        .content h3 { margin-top: 0; }
+        .label { background: #e3f2fd; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; color: #1565c0; display: inline-block; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <h1 style="padding: 1rem 2rem; margin: 0;">Multi-Page Application (Simulated)</h1>
+    <p style="padding: 0 2rem;">Each section below simulates a different page. Notice how the navigation order changes.</p>
+
+    <!-- "Page 1": Navigation order = Home, Products, Services, About, Contact -->
+    <div class="page-section">
+        <div class="page-header"><h2>Page 1: Homepage</h2></div>
+        <nav aria-label="Main navigation - page 1">
+            <ul>
+                <li><a href="#page1">Home</a></li>
+                <li><a href="#page2">Products</a></li>
+                <li><a href="#page3">Services</a></li>
+                <li><a href="#page4">About</a></li>
+                <li><a href="#page5">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <span class="label">Nav order: Home, Products, Services, About, Contact</span>
+            <h3>Welcome to Our Company</h3>
+            <p>We provide innovative solutions for businesses of all sizes.</p>
+        </div>
+    </div>
+
+    <!-- Violation 1: "Page 2" nav order changed - About moved before Products, Contact before Services -->
+    <div class="page-section">
+        <div class="page-header"><h2>Page 2: Products</h2></div>
+        <nav aria-label="Main navigation - page 2">
+            <ul>
+                <li><a href="#page1">Home</a></li>
+                <li><a href="#page4">About</a></li>
+                <li><a href="#page2">Products</a></li>
+                <li><a href="#page5">Contact</a></li>
+                <li><a href="#page3">Services</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <span class="label">Nav order: Home, About, Products, Contact, Services (CHANGED)</span>
+            <h3>Our Products</h3>
+            <p>Browse our catalog of enterprise solutions, developer tools, and cloud services.</p>
+        </div>
+    </div>
+
+    <!-- Violation 2: "Page 3" nav order changed again, plus an item removed -->
+    <div class="page-section">
+        <div class="page-header"><h2>Page 3: Services</h2></div>
+        <nav aria-label="Main navigation - page 3">
+            <ul>
+                <li><a href="#page3">Services</a></li>
+                <li><a href="#page1">Home</a></li>
+                <li><a href="#page2">Products</a></li>
+                <li><a href="#page5">Contact</a></li>
+                <!-- "About" link removed entirely on this page -->
+            </ul>
+        </nav>
+        <div class="content">
+            <span class="label">Nav order: Services, Home, Products, Contact (About MISSING, order CHANGED)</span>
+            <h3>Professional Services</h3>
+            <p>Our team of consultants helps you implement, customize, and optimize your solutions.</p>
+        </div>
+    </div>
+
+    <!-- Violation 3: "Page 4" completely different nav structure and order -->
+    <div class="page-section">
+        <div class="page-header"><h2>Page 4: About Us</h2></div>
+        <nav aria-label="Main navigation - page 4">
+            <ul>
+                <li><a href="#page5">Contact</a></li>
+                <li><a href="#page4">About</a></li>
+                <li><a href="#careers">Careers</a></li>
+                <li><a href="#page1">Home</a></li>
+                <!-- Products and Services links gone, new "Careers" link added mid-nav -->
+            </ul>
+        </nav>
+        <div class="content">
+            <span class="label">Nav order: Contact, About, Careers(NEW), Home (Products & Services MISSING)</span>
+            <h3>About Our Company</h3>
+            <p>Founded in 2005, we have grown from a small startup to a global enterprise serving customers in 40 countries.</p>
+        </div>
+    </div>
+</body>
+</html>

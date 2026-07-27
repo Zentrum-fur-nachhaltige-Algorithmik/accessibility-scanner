@@ -204,8 +204,18 @@ class InputPurposeScanner extends BaseScanner {
             }
           }
         } else {
-          // No autocomplete attribute — flag if purpose is detectable
-          if (detectedPurpose) {
+          // No autocomplete attribute — flag if purpose is detectable.
+          //
+          // Radio buttons and checkboxes are excluded: SC 1.3.5's autocomplete
+          // tokens describe fields that COLLECT the user's own data, not
+          // preference selectors. A radio group "Bevorzugte Kontaktmethode:
+          // E-Mail / Telefon" or a checkbox "E-Mail-Benachrichtigungen" has
+          // label text that trips the purpose patterns while collecting no
+          // personal datum at all — there is no meaningful token to autofill
+          // into it. (Explicitly-authored WRONG tokens on these types are still
+          // caught above, where the attribute is present.)
+          const isPreferenceSelector = type === 'radio' || type === 'checkbox';
+          if (detectedPurpose && !isPreferenceSelector) {
             violations.push({
               criterion: '9.1.3.5',
               element: getSelector(el),

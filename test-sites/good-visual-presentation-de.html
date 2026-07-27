@@ -1,0 +1,84 @@
+<!-- WCAG-TEST
+criterion: 1.4.8
+level: AAA
+title: Visuelle Darstellung — Leistungsbeschreibung (German)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-visual-presentation-scanner
+description: Linksbündiger Text, max-width 70ch, Zeilenabstand 1.6, Nutzer-Farbanpassung, Absatzabstand über 1.5-fachem Zeilenabstand
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leistungen — Ordination Dr. Berger (Test: gut)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 70ch; /* Begrenzt die Zeilenlänge auf ca. 70 Zeichen */
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6; /* Über dem 1.5-Minimum */
+            color: var(--fg-color, #1a1a1a);
+            background: var(--bg-color, #fff);
+            font-size: 1rem;
+        }
+        .compliant-section { border: 2px solid #1b5e20; margin: 1.5em 0; padding: 1em; background-color: #e8f5e9; }
+        .compliant-title { color: #1b5e20; font-weight: bold; margin-bottom: 0.5em; }
+        p { text-align: left; margin-bottom: 1.5em; /* Absatzabstand 1.5x Zeilenabstand */ }
+        .color-controls { background: #f5f5f5; padding: 1em; border-radius: 4px; margin: 1em 0; }
+        .color-controls label { margin-right: 1em; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Leistungen unserer Ordination (1.4.8 AAA)</h1>
+
+    <!-- Compliant 1: Line width limited to ~70 characters -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Korrekt: Zeilenbreite mit max-width: 70ch begrenzt</h2>
+        <p>Dieser Absatz ist mithilfe der Einheit <code>ch</code> auf ungefähr 70 Zeichen pro Zeile begrenzt.
+           Das sorgt für gute Lesbarkeit unabhängig von der Bildschirmbreite. Patient:innen können vom Ende
+           einer Zeile zum Anfang der nächsten springen, ohne die Stelle zu verlieren.</p>
+    </div>
+
+    <!-- Compliant 2: User can adjust colors -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Korrekt: Vom Nutzer wählbare Vorder- und Hintergrundfarbe</h2>
+        <div class="color-controls">
+            <label for="fgColor">Textfarbe:</label>
+            <input type="color" id="fgColor" value="#1a1a1a"
+                   onchange="document.body.style.setProperty('--fg-color', this.value)">
+            <label for="bgColor">Hintergrundfarbe:</label>
+            <input type="color" id="bgColor" value="#ffffff"
+                   onchange="document.body.style.setProperty('--bg-color', this.value)">
+        </div>
+        <p>Patient:innen können ihre bevorzugte Vorder- und Hintergrundfarbe über die obigen Regler wählen.
+           Es gibt keine <code>!important</code>-Deklarationen, die Benutzer-Stylesheets überschreiben.</p>
+    </div>
+
+    <!-- Compliant 3: Left-aligned text with proper spacing -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Korrekt: Linksbündiger Text mit 1.6-fachem Zeilenabstand</h2>
+        <p>Der gesamte Text auf dieser Seite ist linksbündig (nicht im Blocksatz) ausgerichtet, was gleichmäßige
+           Wortabstände gewährleistet. Der Zeilenabstand beträgt 1,6 und liegt damit über dem AAA-Minimum von 1,5.
+           Der Absatzabstand beträgt mindestens das 1,5-Fache des Zeilenabstands, wodurch klare visuelle Trennung
+           zwischen Textblöcken entsteht.</p>
+        <p>Dieser zweite Absatz zeigt den Absatzabstand. Der Abstand zwischen den Absätzen ist deutlich größer
+           als der Abstand zwischen Zeilen innerhalb eines Absatzes, wodurch Absatzgrenzen leicht erkennbar sind.</p>
+    </div>
+
+    <!-- Compliant 4: Text resizable without content loss -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Korrekt: Text bis 200% vergrößerbar ohne Inhaltsverlust</h2>
+        <div style="overflow: auto; min-height: auto; padding: 1em; border: 1px solid #767676;">
+            <p style="margin:0;">Dieser Textbereich verwendet relative Einheiten (em/rem), automatischen Überlauf
+               und eine flexible Höhe. Bei einer Vergrößerung auf 200% passt sich der Bereich an, um den gesamten
+               Inhalt darzustellen. Kein Text wird abgeschnitten oder verborgen.</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

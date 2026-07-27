@@ -1,0 +1,140 @@
+<!-- WCAG-TEST
+criterion: 3.3.8
+level: AA
+title: Barrierefreie Authentifizierung — Patientenportal (German)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: forms, authentication
+description: Patientenportal-Login unterstützt Passwort-Manager, erlaubt Einfügen, und bietet einen kognitionsfreien Alternativweg
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patientenportal Login — Ordination Dr. Berger (Test: gut)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+            color: #1a1a1a;
+        }
+        .compliant-note { border: 2px solid #1b5e20; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-label { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
+        .login-card {
+            background: white; border-radius: 8px; padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0;
+        }
+        .login-card h2 { margin-top: 0; color: #1b5e20; }
+        .login-card label { display: block; font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
+        .login-card input[type="text"],
+        .login-card input[type="password"] {
+            display: block; width: 100%; padding: 10px; border: 1px solid #767676;
+            border-radius: 4px; box-sizing: border-box; font-size: 16px;
+        }
+        .login-card input:focus-visible {
+            outline: 3px solid #1b5e20; outline-offset: 2px;
+        }
+        .login-btn {
+            display: block; width: 100%; padding: 12px; background: #1f5c2e; color: #ffffff;
+            border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 20px; min-height: 44px;
+        }
+        .login-btn:focus-visible { outline: 3px solid #1b5e20; outline-offset: 2px; }
+        .alt-login { margin: 20px 0; text-align: center; }
+        .alt-login-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+            padding: 12px; background: white; color: #1a1a1a; border: 2px solid #767676; border-radius: 4px;
+            font-size: 16px; cursor: pointer; margin: 8px 0; min-height: 44px;
+        }
+        .alt-login-btn:focus-visible { outline: 3px solid #1b5e20; outline-offset: 2px; }
+        .divider { display: flex; align-items: center; gap: 15px; margin: 20px 0; color: #444444; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ccc; }
+        .help-text { color: #1b5e20; font-size: 13px; margin-top: 4px; }
+        a { color: #0d47a1; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Patientenportal — Anmeldung</h1>
+    <p>Melden Sie sich an, um Ihre Befunde und Termine online einzusehen.</p>
+
+    <!-- PATTERN 1: Correct autocomplete, paste allowed -->
+    <div class="compliant-note">
+        <div class="compliant-label">Korrekt 1: Passwort-Manager und Einfügen werden unterstützt</div>
+        <p>Die Anmeldefelder verwenden die passenden <code>autocomplete</code>-Attribute und blockieren weder
+           Einfügen, Kopieren noch Ausschneiden. Passwort-Manager können Zugangsdaten automatisch ausfüllen.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Anmelden</h2>
+
+        <label for="login-user">Benutzername</label>
+        <!-- Korrektes autocomplete ermöglicht Passwort-Manager-Autofill -->
+        <input type="text" id="login-user" name="username" autocomplete="username" placeholder="Benutzername eingeben">
+        <p class="help-text">Ihr Benutzername wird automatisch ausgefüllt, falls im Browser gespeichert.</p>
+
+        <label for="login-password">Passwort</label>
+        <!-- Kein Blockieren von Einfügen, korrektes autocomplete für aktuelles Passwort -->
+        <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Passwort eingeben">
+        <p class="help-text">Einfügen aus Ihrem Passwort-Manager wird vollständig unterstützt.</p>
+
+        <button class="login-btn" type="button">Anmelden</button>
+
+        <!-- PATTERN 2: Alternative authentication that avoids cognitive function tests -->
+        <div class="divider">oder</div>
+
+        <div class="compliant-note" style="margin: 10px 0;">
+            <div class="compliant-label">Korrekt 2: Alternativen ohne kognitiven Test</div>
+            <p>Es werden mehrere Anmeldewege angeboten, die kein Auswendiglernen, Abtippen von Zeichen
+               oder sonstige kognitive Funktionstests erfordern.</p>
+        </div>
+
+        <div class="alt-login">
+            <button class="alt-login-btn" type="button">
+                <span aria-hidden="true">&#128273;</span> Mit Passkey anmelden
+            </button>
+            <button class="alt-login-btn" type="button">
+                <span aria-hidden="true">&#128231;</span> Anmeldelink per E-Mail
+            </button>
+            <button class="alt-login-btn" type="button">
+                <span aria-hidden="true">&#128241;</span> Einmalcode per SMS
+            </button>
+        </div>
+
+        <p style="font-size: 13px; color: #444444; text-align: center; margin-top: 15px;">
+            <a href="#zuruecksetzen">Passwort vergessen?</a> |
+            <a href="#registrieren">Konto erstellen</a>
+        </p>
+    </div>
+
+    <!-- PATTERN 3: Accessible verification if additional confirmation is needed -->
+    <div class="compliant-note">
+        <div class="compliant-label">Korrekt 3: Barrierefreie Verifizierung</div>
+        <p>Falls eine zusätzliche Verifizierung nötig ist, kommen Methoden zum Einsatz, die nicht von
+           kognitiven Fähigkeiten abhängen: E-Mail- oder SMS-Bestätigungscodes (Einfügen wird unterstützt)
+           oder unsichtbare Bot-Erkennung.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Bestätigungscode</h2>
+        <p>Wir haben einen 6-stelligen Code an Ihre E-Mail-Adresse gesendet. Fügen Sie ihn unten ein:</p>
+
+        <label for="verify-code">Bestätigungscode</label>
+        <!-- Einfügen ist erlaubt, autocomplete unterstützt Einmalcodes -->
+        <input type="text" id="verify-code" name="otp" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6-stelligen Code eingeben">
+        <p class="help-text">Sie können den Code aus Ihrer E-Mail einfügen. Auf Mobilgeräten wird Autofill aus SMS unterstützt.</p>
+
+        <button class="login-btn" type="button">Bestätigen</button>
+
+        <p style="font-size: 13px; color: #444444; margin-top: 10px;">
+            Keinen Code erhalten? <a href="#erneut-senden">Code erneut senden</a>
+        </p>
+    </div>
+</main>
+</body>
+</html>

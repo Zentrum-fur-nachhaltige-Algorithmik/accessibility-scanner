@@ -1,0 +1,99 @@
+<!-- WCAG-TEST
+criterion: 2.1.3
+level: AAA
+title: Keyboard (No Exception)
+test_type: bad
+expected_violations: 5
+testable_by: dom
+scanners: keyboard-navigation
+description: Interactions requiring mouse path-dependent input with no keyboard alternative
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Keyboard No Exception - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
+        canvas { border: 2px solid #333; display: block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Bad Keyboard No Exception (2.1.3 AAA)</h1>
+
+    <!-- Violation 1: Freehand drawing with no keyboard alternative -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 1: Freehand drawing canvas — mouse only</div>
+        <p>Draw your design below. There is no keyboard-based alternative:</p>
+        <canvas id="drawCanvas" width="500" height="250" style="background:#fff; cursor:crosshair;"></canvas>
+        <script>
+            (function(){
+                var c = document.getElementById('drawCanvas');
+                var ctx = c.getContext('2d');
+                var drawing = false;
+                c.addEventListener('mousedown', function(e){ drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+                c.addEventListener('mousemove', function(e){ if(drawing){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }});
+                c.addEventListener('mouseup', function(){ drawing = false; });
+            })();
+        </script>
+        <p style="color:#999; font-size:0.85em;">No keyboard input available for this canvas.</p>
+    </div>
+
+    <!-- Violation 2: Signature pad requiring mouse -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 2: Signature pad — requires mouse drawing</div>
+        <p>Please sign below using your mouse:</p>
+        <canvas id="sigCanvas" width="400" height="150" style="background:#fffff0; cursor:crosshair;"></canvas>
+        <script>
+            (function(){
+                var c = document.getElementById('sigCanvas');
+                var ctx = c.getContext('2d');
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+                var signing = false;
+                c.addEventListener('mousedown', function(e){ signing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+                c.addEventListener('mousemove', function(e){ if(signing){ ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); }});
+                c.addEventListener('mouseup', function(){ signing = false; });
+            })();
+        </script>
+        <p style="color:#999; font-size:0.85em;">No type-to-sign or keyboard alternative provided.</p>
+    </div>
+
+    <!-- Violation 3: Drag-path-dependent sorting -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 3: Drag-and-drop sort — no keyboard reordering</div>
+        <p>Drag items to reorder your priority list:</p>
+        <ul id="sortList" style="list-style:none; padding:0;">
+            <li draggable="true" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; cursor:grab;">Task A</li>
+            <li draggable="true" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; cursor:grab;">Task B</li>
+            <li draggable="true" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; cursor:grab;">Task C</li>
+            <li draggable="true" style="padding:10px; margin:5px 0; background:#e3f2fd; border:1px solid #90caf9; cursor:grab;">Task D</li>
+        </ul>
+        <p style="color:#999; font-size:0.85em;">No keyboard-based reordering mechanism available.</p>
+    </div>
+
+    <!-- Violation 4: Image crop tool requiring mouse drag -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 4: Image crop — mouse drag required</div>
+        <p>Drag to select the crop area on the image:</p>
+        <div style="position:relative; width:400px; height:250px; background:#ddd; border:2px solid #666; overflow:hidden;">
+            <div style="position:absolute; top:30px; left:30px; width:200px; height:120px; border:2px dashed #f00; cursor:move; background:rgba(255,0,0,0.1);">
+                <span style="position:absolute; bottom:-20px; left:0; font-size:0.75em; color:#f00;">Drag to move</span>
+            </div>
+        </div>
+        <p style="color:#999; font-size:0.85em;">No keyboard controls for positioning or resizing the crop area.</p>
+    </div>
+
+    <!-- Violation 5: Color picker with mouse-only hue wheel -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 5: Color picker — mouse-only interaction</div>
+        <p>Click on the color gradient to select a color:</p>
+        <div style="width:200px; height:200px; background: linear-gradient(to right, red, yellow, green, cyan, blue, magenta, red); cursor:crosshair; border:2px solid #333;" onmousedown="this.querySelector('span').textContent='Color selected!'">
+            <span style="color:#fff; text-shadow:1px 1px #000; padding:5px; display:block;">Click to pick</span>
+        </div>
+        <p style="color:#999; font-size:0.85em;">No keyboard alternative: no text input for hex values, no arrow key navigation.</p>
+    </div>
+</body>
+</html>

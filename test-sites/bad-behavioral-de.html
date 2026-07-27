@@ -1,0 +1,101 @@
+<!-- WCAG-TEST
+criterion: 2.2.3, 3.2.5, 3.3.5
+level: AAA
+title: Verhaltensbezogene Verstöße — Anamnesebogen (German)
+test_type: bad
+expected_violations: 4
+testable_by: llm
+scanners: llm-behavioral-scanner
+description: Meta-Refresh-Zeitlimit, automatische Navigation bei Standortauswahl, Anamnesebogen ohne Hilfetexte, automatisches Absenden nach Countdown
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- VIOLATION 1 (2.2.3): Forced time limit via meta-refresh, no way to disable -->
+    <meta http-equiv="refresh" content="30;url=/anamnese-neu-laden">
+    <title>Anamnesebogen — Ordination Dr. Berger (Test: schlecht)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #b71c1c; font-weight: bold; margin-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-top: 12px; }
+        input, select { padding: 8px; margin: 4px 0; display: block; width: 100%; max-width: 400px; border: 1px solid #ccc; }
+        .timer { font-family: monospace; color: #b71c1c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Anamnesebogen — Ordination Dr. Julia Berger</h1>
+    <p style="color:#b71c1c; font-size:0.9em;">Diese Seite lädt sich automatisch alle 30 Sekunden neu. Es gibt keine Möglichkeit, dies zu deaktivieren oder zu verlängern.</p>
+
+    <!-- VIOLATION 2 (3.2.5): Select auto-navigates on change, no confirm/submit step -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß (3.2.5): Standortauswahl navigiert automatisch bei Änderung</div>
+        <label for="standort">Praxisstandort wählen</label>
+        <select id="standort" onchange="window.location.href = '/standort/' + this.value">
+            <option value="">Bitte wählen</option>
+            <option value="wien-mitte">Wien Mitte</option>
+            <option value="wien-west">Wien West</option>
+            <option value="melk">Melk</option>
+        </select>
+        <p>Sobald Sie eine Auswahl treffen, wechselt die Seite sofort zum gewählten Standort, ohne Bestätigung.</p>
+    </div>
+
+    <!-- VIOLATION 3 (3.3.5): 9-field intake form with no help text or contact anywhere -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß (3.3.5): Anamnesebogen ohne jegliche Hilfestellung</div>
+        <form>
+            <label for="a-name">Name</label>
+            <input type="text" id="a-name">
+
+            <label for="a-geburt">Geburtsdatum</label>
+            <input type="text" id="a-geburt">
+
+            <label for="a-svnr">Sozialversicherungsnummer</label>
+            <input type="text" id="a-svnr">
+
+            <label for="a-hausarzt">Bisheriger Hausarzt</label>
+            <input type="text" id="a-hausarzt">
+
+            <label for="a-medikamente">Aktuelle Medikamente (Wirkstoff, Dosierung, Einnahmezeitpunkt)</label>
+            <input type="text" id="a-medikamente">
+
+            <label for="a-allergien">Bekannte Allergien und Unverträglichkeiten</label>
+            <input type="text" id="a-allergien">
+
+            <label for="a-vorerkrankungen">Vorerkrankungen</label>
+            <input type="text" id="a-vorerkrankungen">
+
+            <label for="a-voroperationen">Voroperationen mit Datum</label>
+            <input type="text" id="a-voroperationen">
+
+            <label for="a-raucher">Raucherstatus (Packungsjahre falls zutreffend)</label>
+            <input type="text" id="a-raucher">
+
+            <button type="submit">Absenden</button>
+        </form>
+        <p>Keine Erklärungen, keine Beispiele, keine Telefonnummer oder Kontaktmöglichkeit bei Fragen zu diesem Formular.</p>
+    </div>
+
+    <!-- VIOLATION 4 (2.2.3): Inline countdown auto-submits the form after 60 seconds -->
+    <div class="violation-section">
+        <div class="violation-title">Verstoß (2.2.3): Automatisches Absenden nach Countdown</div>
+        <p>Verbleibende Zeit bis zum automatischen Absenden: <span class="timer" id="countdown">60</span> Sekunden</p>
+        <p>Es gibt keine Möglichkeit, den Countdown zu stoppen, zu pausieren oder zu verlängern.</p>
+    </div>
+
+    <script>
+        let secondsLeft = 60;
+        const el = document.getElementById('countdown');
+        const interval = setInterval(() => {
+            secondsLeft -= 1;
+            if (el) el.textContent = String(secondsLeft);
+            if (secondsLeft <= 0) {
+                clearInterval(interval);
+                console.log('Formular würde jetzt automatisch abgesendet (kein Stopp/Pause möglich)');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -9,12 +9,12 @@
 
 | Model | Pages OK | Errors | Prompt Tokens | Completion Tokens | Validation Issues |
 |-------|----------|--------|---------------|-------------------|-------------------|
-| gemini-3.1-flash-lite | 5/5 | 0 | 51,985 | 8,379 | 0 |
-| gemma-4-31b-it | 5/5 | 0 | 58,650 | 16,988 | 0 |
-| qwen3.6-plus | 2/5 | 3 | 18,238 | 14,671 | 0 |
-| minimax-m2.7 | 5/5 | 0 | 47,696 | 37,005 | 0 |
-| kimi-k2.5 | 5/5 | 0 | 47,455 | 47,677 | 0 |
-| glm-5-turbo | 4/5 | 1 | 38,996 | 43,544 | 1 |
+| gemini-3.1-flash-lite | 5/5 | 0 | 58,900 | 9,788 | 0 |
+| gemma-4-31b-it | 5/5 | 0 | 63,525 | 18,820 | 1 |
+| qwen3.6-plus | 3/5 | 2 | 36,978 | 19,782 | 0 |
+| minimax-m2.7 | 4/5 | 1 | 44,194 | 35,565 | 0 |
+| kimi-k2.5 | 5/5 | 0 | 53,770 | 49,305 | 0 |
+| glm-5-turbo | 4/5 | 1 | 44,053 | 58,116 | 0 |
 
 ## Per-Model Details
 
@@ -22,65 +22,45 @@
 
 | Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
 |---------------|------|-----------------|------|--------|
-| html-tailwind/form | 6.1KB | 9255+1792 | 7.6s | — |
-| react-tailwind/form | 6.3KB | 12375+1662 | 5.3s | — |
-| vue-tailwind/form | 6.3KB | 11840+1747 | 7s | — |
-| svelte-tailwind/form | 5.7KB | 9257+1551 | 5.2s | — |
-| angular-tailwind/form | 5.7KB | 9258+1627 | 5.7s | — |
+| html-tailwind/form | 7.1KB | 10636+1945 | 8.1s | — |
+| react-tailwind/form | 6.2KB | 13760+1815 | 8.3s | — |
+| vue-tailwind/form | 7.4KB | 13223+2069 | 8.1s | — |
+| svelte-tailwind/form | 5.5KB | 10640+1731 | 7.4s | — |
+| angular-tailwind/form | 7.7KB | 10641+2228 | 9.8s | — |
 
 ### gemma-4-31b-it
 
 | Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
 |---------------|------|-----------------|------|--------|
-| html-tailwind/form | 10.0KB | 10422+3114 | 101.1s | — |
-| react-tailwind/form | 18.5KB | 13978+3999 | 197s | — |
-| vue-tailwind/form | 11.2KB | 13397+3337 | 148.1s | — |
-| svelte-tailwind/form | 11.5KB | 10426+3459 | 121.1s | — |
-| angular-tailwind/form | 12.1KB | 10427+3079 | 102s | — |
+| html-tailwind/form | 10.1KB | 11870+3033 | 113.1s | — |
+| react-tailwind/form | 18.7KB | 13061+4999 | 1585.5s | missing closing </html> |
+| vue-tailwind/form | 15.7KB | 14845+3854 | 182.9s | — |
+| svelte-tailwind/form | 11.5KB | 11874+3485 | 190.2s | — |
+| angular-tailwind/form | 11.6KB | 11875+3449 | 995.2s | — |
 
 ### qwen3.6-plus
 
 | Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
 |---------------|------|-----------------|------|--------|
-| html-tailwind/form | 21.1KB | 9117+7357 | 146.2s | — |
-| react-tailwind/form | ERROR | — | — | HTTP 429: {"error":{"message":"Provider returned error","cod |
-| vue-tailwind/form | ERROR | — | — | HTTP 429: {"error":{"message":"Provider returned error","cod |
-| svelte-tailwind/form | ERROR | — | — | HTTP 429: {"error":{"message":"Provider returned error","cod |
-| angular-tailwind/form | 22.1KB | 9121+7314 | 134.9s | — |
+| html-tailwind/form | ERROR | — | — | HTTP 429: {"error":{"message":"Provider returned error","cod |
+| react-tailwind/form | 25.8KB | 13501+7347 | 143.3s | — |
+| vue-tailwind/form | 21.8KB | 12989+6596 | 121s | — |
+| svelte-tailwind/form | ERROR | — | — | API error: Upstream error from Alibaba: Request rate increas |
+| angular-tailwind/form | 20.8KB | 10488+5839 | 109.4s | — |
 
 **Errors:**
-- react-tailwind/form: HTTP 429: {"error":{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula
-- vue-tailwind/form: HTTP 429: {"error":{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula
-- svelte-tailwind/form: HTTP 429: {"error":{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula
+- html-tailwind/form: HTTP 429: {"error":{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.6-plus:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumula
+- svelte-tailwind/form: API error: Upstream error from Alibaba: Request rate increased too quickly. To ensure system stability, please adjust your client logic to scale requests more smoothly over time.
 
 ### minimax-m2.7
 
 | Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
 |---------------|------|-----------------|------|--------|
-| html-tailwind/form | 25.9KB | 8516+7033 | 94.9s | — |
-| react-tailwind/form | 37.7KB | 11338+10305 | 143.9s | — |
-| vue-tailwind/form | 24.5KB | 10798+6333 | 87.4s | — |
-| svelte-tailwind/form | 23.1KB | 8522+6730 | 93.6s | — |
-| angular-tailwind/form | 25.0KB | 8522+6604 | 94s | — |
-
-### kimi-k2.5
-
-| Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
-|---------------|------|-----------------|------|--------|
-| html-tailwind/form | 14.9KB | 8474+10590 | 311.3s | — |
-| react-tailwind/form | 22.5KB | 11283+8599 | 32.4s | — |
-| vue-tailwind/form | 16.1KB | 10738+9030 | 224.2s | — |
-| svelte-tailwind/form | 13.7KB | 8480+10003 | 125.2s | — |
-| angular-tailwind/form | 15.8KB | 8480+9455 | 350.9s | — |
-
-### glm-5-turbo
-
-| Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
-|---------------|------|-----------------|------|--------|
-| html-tailwind/form | 23.4KB | 8500+6135 | 105.7s | — |
-| react-tailwind/form | 21.2KB | 11230+16238 | 295.5s | — |
-| vue-tailwind/form | 16.7KB | 10761+4787 | 81.7s | — |
-| svelte-tailwind/form | ERROR | — | — | No content in response: 
+| html-tailwind/form | 29.2KB | 9771+7964 | 90.2s | — |
+| react-tailwind/form | 32.8KB | 12593+9450 | 93.2s | — |
+| vue-tailwind/form | 25.5KB | 12053+7591 | 88.3s | — |
+| svelte-tailwind/form | 28.1KB | 9777+10560 | 111.5s | — |
+| angular-tailwind/form | ERROR | — | — | No content in response: 
          
 
          
@@ -88,10 +68,71 @@
          
 
    |
-| angular-tailwind/form | 11.1KB | 8505+16384 | 252.2s | missing closing </html> |
 
 **Errors:**
-- svelte-tailwind/form: No content in response: 
+- angular-tailwind/form: No content in response: 
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+         
+
+
+### kimi-k2.5
+
+| Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
+|---------------|------|-----------------|------|--------|
+| html-tailwind/form | 14.1KB | 9738+8699 | 550.6s | — |
+| react-tailwind/form | 18.7KB | 12546+9833 | 179.4s | — |
+| vue-tailwind/form | 12.8KB | 12001+9292 | 200.2s | — |
+| svelte-tailwind/form | 13.7KB | 9742+9596 | 265.8s | — |
+| angular-tailwind/form | 15.7KB | 9743+11885 | 466s | — |
+
+### glm-5-turbo
+
+| Tech-CSS/Page | Size | Tokens (in+out) | Time | Issues |
+|---------------|------|-----------------|------|--------|
+| html-tailwind/form | ERROR | — | — | No content in response: 
+         
+
+         
+
+         
+
+   |
+| react-tailwind/form | 16.5KB | 12493+12921 | 193.2s | — |
+| vue-tailwind/form | 16.0KB | 12024+15504 | 313.1s | — |
+| svelte-tailwind/form | 19.1KB | 9768+15212 | 224.1s | — |
+| angular-tailwind/form | 18.9KB | 9768+14479 | 269.3s | — |
+
+**Errors:**
+- html-tailwind/form: No content in response: 
          
 
          

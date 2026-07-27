@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-02-28T16:06:24.793Z",
+  "papers": {
+    "2012.13450": {
+      "paperId": "2012.13450",
+      "recall": 0.9785067873303167,
+      "conversionRate": 0.995475113122172,
+      "lossRate": 0.004524886877828055,
+      "fallbackCoverage": 0.995475113122172,
+      "cascadeFailed": 4,
+      "tierRates": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 0
+      },
+      "formulaStats": {
+        "total": 872,
+        "converted": 871,
+        "fallbackLevel1": 1,
+        "failed": 1
+      },
+      "totalFormulas": 884,
+      "matched": 865
+    },
+    "2303.09244": {
+      "paperId": "2303.09244",
+      "recall": 0.8567073170731707,
+      "conversionRate": 0.9908536585365854,
+      "lossRate": 0.009146341463414634,
+      "fallbackCoverage": 0.9908536585365854,
+      "cascadeFailed": 3,
+      "tierRates": {
+        "1": 1,
+        "2": 0.9875,
+        "3": 0.9333333333333333
+      },
+      "formulaStats": {
+        "total": 387,
+        "converted": 382,
+        "fallbackLevel1": 18,
+        "failed": 5
+      },
+      "totalFormulas": 328,
+      "matched": 281
+    },
+    "2303.16681": {
+      "paperId": "2303.16681",
+      "recall": 0.3568702290076336,
+      "conversionRate": 0.9980916030534351,
+      "lossRate": 0.0019083969465648854,
+      "fallbackCoverage": 0.9980916030534351,
+      "cascadeFailed": 1,
+      "tierRates": {
+        "1": 1,
+        "2": 1,
+        "3": 0.9333333333333333
+      },
+      "formulaStats": {
+        "total": 199,
+        "converted": 199,
+        "fallbackLevel1": 3,
+        "failed": 0
+      },
+      "totalFormulas": 524,
+      "matched": 187
+    }
+  }
+}

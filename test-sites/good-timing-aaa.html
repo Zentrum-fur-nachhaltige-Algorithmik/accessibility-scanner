@@ -1,0 +1,80 @@
+<!-- WCAG-TEST
+criterion: 2.2.3, 2.2.4, 2.2.5, 2.2.6
+level: AAA
+title: Timing AAA (No Timing, Interruptions, Re-authentication, Timeouts)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-behavioral-scanner
+description: No time limits, user-controlled interruptions, data preserved on re-auth, timeout warnings
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Timing AAA - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        input, textarea, select { padding: 8px; margin: 4px 0; display: block; width: 100%; max-width: 400px; border: 1px solid #666; }
+        button { padding: 8px 16px; margin: 4px; cursor: pointer; }
+        button:focus, input:focus, textarea:focus { outline: 3px solid #005fcc; outline-offset: 2px; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Good Timing AAA (2.2.3, 2.2.4, 2.2.5, 2.2.6)</h1>
+
+    <!-- Compliant (2.2.3): Untimed quiz -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant (2.2.3): Quiz with no time limit</div>
+        <p>Complete this certification quiz at your own pace. There is no time limit.</p>
+        <div style="margin:15px 0;">
+            <p><strong>Question 1:</strong> What does WCAG stand for?</p>
+            <label><input type="radio" name="q1" value="a"> Web Content Accessibility Guidelines</label><br>
+            <label><input type="radio" name="q1" value="b"> Web Compliance Assessment Guide</label><br>
+            <label><input type="radio" name="q1" value="c"> Website Content Analysis Group</label>
+        </div>
+        <button type="button">Save Progress</button>
+        <button type="submit">Submit When Ready</button>
+    </div>
+
+    <!-- Compliant (2.2.4): User-controllable notifications -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant (2.2.4): All interruptions are user-controlled</div>
+        <p>Notification preferences:</p>
+        <label><input type="checkbox" checked> Enable promotional notifications</label><br>
+        <label><input type="checkbox"> Enable social notifications</label><br>
+        <label><input type="checkbox" checked> Enable system alerts only</label>
+        <p style="font-size:0.85em; color:#555;">Non-essential notifications are suppressed by default. Only system alerts are enabled. Users can change preferences at any time.</p>
+    </div>
+
+    <!-- Compliant (2.2.5): Re-authentication preserves data -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant (2.2.5): Re-authentication preserves all form data</div>
+        <label for="app-name2">Full Name:</label>
+        <input type="text" id="app-name2" value="Jane Doe">
+        <label for="app-essay2">Personal Statement:</label>
+        <textarea id="app-essay2" rows="3">I have spent the past three years working in accessibility consulting...</textarea>
+        <div style="background:#c8e6c9; padding:10px; margin:10px 0; border-radius:4px;">
+            <strong>Session renewed.</strong> All your form data has been preserved. You can continue where you left off.
+        </div>
+        <p style="font-size:0.85em; color:#555;">Form data is auto-saved every 30 seconds. If re-authentication is needed, all data is restored after login.</p>
+    </div>
+
+    <!-- Compliant (2.2.6): Clear timeout warning with save option -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant (2.2.6): Timeout warning with save option</div>
+        <div style="background:#fff3e0; padding:15px; margin:10px 0; border:2px solid #ff9800; border-radius:4px;" role="alert">
+            <strong>Session timeout warning:</strong> Your session will expire in 5 minutes due to inactivity.
+            <br>
+            <button type="button" style="background:#ff9800; color:#fff; border:none; margin-top:8px;">Extend Session (20 more minutes)</button>
+            <button type="button" style="margin-top:8px;">Save Progress and Log Out</button>
+        </div>
+        <p style="font-size:0.85em; color:#555;">Users are warned at least 2 minutes before timeout with the option to extend or save their work.</p>
+    </div>
+</main>
+</body>
+</html>

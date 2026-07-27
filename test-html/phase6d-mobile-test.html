@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <!-- GOOD: Proper viewport meta tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6D Test: Mobile Accessibility (WCAG 1.4.4, 1.4.10, 2.5.5) - Good and Bad Examples</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .test-good {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .test-bad {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .mobile-info {
+            background-color: #e7f3ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        /* GOOD EXAMPLES: Responsive and mobile-friendly */
+        
+        /* Good: Responsive touch targets */
+        .good-touch-target {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 12px 20px;
+            margin: 8px;
+            border: 2px solid #4a90e2;
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: #2c3e50;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .good-touch-target:hover {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        /* Good: Responsive containers */
+        .good-responsive-container {
+            max-width: 100%;
+            padding: 1em;
+            box-sizing: border-box;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        
+        /* Good: Responsive images */
+        .good-responsive-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+        }
+        
+        /* Good: Responsive text that scales properly */
+        .good-responsive-text {
+            font-size: 1rem; /* 16px base */
+            line-height: 1.5;
+            margin-bottom: 1em;
+        }
+        
+        .good-responsive-text h2 {
+            font-size: 1.5rem; /* Scales proportionally */
+            margin-bottom: 0.75em;
+        }
+        
+        /* Good: Responsive navigation */
+        .good-responsive-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .good-responsive-nav li {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        
+        .good-responsive-nav a {
+            display: block;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #495057;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        
+        /* Good: Responsive table container */
+        .good-table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+        }
+        
+        .good-table {
+            width: 100%;
+            min-width: 300px;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .good-table th,
+        .good-table td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .good-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        /* Good: Form elements with proper touch targets */
+        .good-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .good-form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .good-form-input {
+            width: 100%;
+            min-height: 44px;
+            padding: 12px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .good-form-button {
+            min-width: 44px;
+            min-height: 44px;
+            padding: 12px 24px;
+            margin: 8px 8px 8px 0;
+            border: none;
+            border-radius: 4px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        /* BAD EXAMPLES: Non-responsive and mobile-unfriendly */
+        
+        /* Bad: Touch targets too small */
+        .bad-small-touch-target {
+            width: 20px;
+            height: 20px;
+            padding: 2px;
+            margin: 1px;
+            border: 1px solid #999;
+            background-color: #f0f0f0;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        /* Bad: Fixed width containers */
+        .bad-fixed-container {
+            width: 800px; /* Fixed width - will overflow on mobile */
+            padding: 20px;
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        
+        /* Bad: Non-responsive images */
+        .bad-fixed-image {
+            width: 600px; /* Fixed width - will overflow */
+            height: 400px;
+            background-color: #ddd;
+            border: 1px solid #999;
+            margin: 10px 0;
+        }
+        
+        /* Bad: Very small text */
+        .bad-small-text {
+            font-size: 10px; /* Too small for mobile */
+            line-height: 1.2;
+            color: #666;
+        }
+        
+        /* Bad: Touch targets too close together */
+        .bad-crowded-buttons {
+            margin: 1px;
+            padding: 8px 12px;
+            border: 1px solid #999;
+            background: #f0f0f0;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* Bad: Table without responsive container */
+        .bad-wide-table {
+            width: 800px; /* Fixed width table */
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .bad-wide-table th,
+        .bad-wide-table td {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            white-space: nowrap; /* Prevents wrapping */
+        }
+        
+        /* Bad: Form elements with tiny touch targets */
+        .bad-form-input {
+            width: 200px;
+            height: 24px; /* Too small */
+            padding: 4px;
+            border: 1px solid #ccc;
+            font-size: 12px;
+        }
+        
+        .bad-form-button {
+            width: 60px;
+            height: 28px; /* Too small */
+            padding: 2px 6px;
+            border: 1px solid #999;
+            background: #ddd;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        /* Bad: Content that causes horizontal scroll */
+        .bad-overflow-content {
+            width: 500px; /* Will overflow on mobile */
+            background: linear-gradient(to right, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d);
+            padding: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        /* Responsive behavior for demonstration */
+        @media (max-width: 768px) {
+            .good-responsive-nav {
+                flex-direction: column;
+            }
+            
+            .good-responsive-nav a {
+                margin-bottom: 4px;
+            }
+            
+            .good-table {
+                font-size: 12px;
+            }
+            
+            .good-table th,
+            .good-table td {
+                padding: 6px 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .good-responsive-text {
+                font-size: 0.9rem;
+            }
+            
+            .good-responsive-text h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-info">
+        <h1>📱 Phase 6D: Mobile Accessibility Test</h1>
+        <p><strong>WCAG Criteria:</strong> 1.4.4 (Resize text), 1.4.10 (Reflow), 2.5.5 (Target Size)</p>
+        <p><strong>Purpose:</strong> Test mobile-specific accessibility requirements</p>
+        <p><strong>Focus Areas:</strong> 400% zoom, touch targets (44x44px), orientation, responsive design</p>
+        <p><strong>Testing:</strong> Use real mobile devices and browser responsive testing tools</p>
+        <p><strong>Device Testing:</strong> iPhone, Android, iPad in portrait and landscape modes</p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Proper touch targets -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Proper Touch Targets (44x44px minimum)</h2>
+        <p><strong>Features:</strong> Minimum 44x44px size, adequate spacing, easy to tap</p>
+        
+        <div class="good-responsive-container">
+            <p>These buttons meet WCAG 2.5.5 requirements for touch target size:</p>
+            
+            <button class="good-touch-target">Primary Action</button>
+            <button class="good-touch-target">Secondary</button>
+            <button class="good-touch-target">Cancel</button>
+            
+            <br><br>
+            
+            <a href="#" class="good-touch-target">Link Button</a>
+            <a href="#" class="good-touch-target">Another Link</a>
+            
+            <p><em>✅ All touch targets are minimum 44x44 CSS pixels with 8px spacing</em></p>
+        </div>
+    </div>
+
+    <!-- BAD EXAMPLE: Touch targets too small -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Touch Targets Too Small</h2>
+        <p><strong>Issues:</strong> Targets smaller than 44x44px, difficult to tap accurately</p>
+        
+        <div class="good-responsive-container">
+            <p>These buttons violate WCAG 2.5.5 touch target requirements:</p>
+            
+            <button class="bad-small-touch-target">×</button>
+            <button class="bad-small-touch-target">+</button>
+            <button class="bad-small-touch-target">-</button>
+            <button class="bad-small-touch-target">?</button>
+            
+            <br><br>
+            
+            <button class="bad-crowded-buttons">Save</button>
+            <button class="bad-crowded-buttons">Cancel</button>
+            <button class="bad-crowded-buttons">Delete</button>
+            <button class="bad-crowded-buttons">Edit</button>
+            <button class="bad-crowded-buttons">Copy</button>
+            
+            <p><em>❌ Touch targets too small and crowded - difficult to tap accurately</em></p>
+        </div>
+    </div>
+
+    <!-- GOOD EXAMPLE: Responsive design at 400% zoom -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Content Works at 400% Zoom</h2>
+        <p><strong>Features:</strong> Relative units, flexible layout, no horizontal scrolling at 400% zoom</p>
+        
+        <div class="good-responsive-container">
+            <div class="good-responsive-text">
+                <h2>Responsive Heading</h2>
+                <p>This content uses relative units (rem, em, %) and flexible layouts. When you zoom to 400% on mobile, the content will reflow properly without requiring horizontal scrolling.</p>
+                
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPiBSZXNwb25zaXZlIEltYWdlIDQwMHgyMDA8L3RleHQ+PC9zdmc+" alt="Responsive image example" class="good-responsive-image">
+                
+                <p>The image above uses max-width: 100% to scale responsively. Navigation and interactive elements maintain proper spacing and touch target sizes.</p>
+            </div>
+            
+            <nav>
+                <ul class="good-responsive-nav">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Products</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+        <p><em>✅ Content reflows properly at 400% zoom without horizontal scrolling</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Fixed widths break at 400% zoom -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Fixed Widths Break at 400% Zoom</h2>
+        <p><strong>Issues:</strong> Fixed pixel widths, horizontal scrolling required at 400% zoom</p>
+        
+        <div class="bad-fixed-container">
+            <h2>Fixed Width Container (800px)</h2>
+            <p class="bad-small-text">This container has a fixed width of 800px and very small text (10px). At 400% zoom on mobile, this will require horizontal scrolling and the text will be difficult to read.</p>
+            
+            <div class="bad-fixed-image"></div>
+            
+            <p class="bad-small-text">The image placeholder above also has fixed dimensions (600x400px) that don't adapt to the viewport.</p>
+        </div>
+        <p><em>❌ Requires horizontal scrolling at 400% zoom on mobile devices</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Responsive table -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Responsive Table with Scroll Container</h2>
+        <p><strong>Features:</strong> Horizontal scroll container, maintains readability on mobile</p>
+        
+        <div class="good-responsive-container">
+            <div class="good-table-container">
+                <table class="good-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Professional Laptop</td>
+                            <td>Electronics</td>
+                            <td>€1,299.00</td>
+                            <td>15</td>
+                            <td>4.5/5</td>
+                            <td>
+                                <button class="good-touch-target" style="min-width: 44px; min-height: 44px; padding: 8px; margin: 2px; font-size: 14px;">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Wireless Headphones</td>
+                            <td>Audio</td>
+                            <td>€299.00</td>
+                            <td>42</td>
+                            <td>4.8/5</td>
+                            <td>
+                                <button class="good-touch-target" style="min-width: 44px; min-height: 44px; padding: 8px; margin: 2px; font-size: 14px;">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p><em>✅ Table scrolls horizontally when needed while maintaining touch target sizes</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Table without responsive container -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Wide Table Without Responsive Container</h2>
+        <p><strong>Issues:</strong> Fixed width table, no scroll container, poor mobile experience</p>
+        
+        <table class="bad-wide-table">
+            <thead>
+                <tr>
+                    <th>Very Long Product Name Column</th>
+                    <th>Extended Category Description</th>
+                    <th>Detailed Price Information</th>
+                    <th>Available Stock Quantity</th>
+                    <th>Customer Rating Average</th>
+                    <th>Administrative Actions</th>
+                    <th>Additional Metadata</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Professional High-End Gaming Laptop</td>
+                    <td>Electronics - Computer Hardware</td>
+                    <td>€1,299.00 (including VAT)</td>
+                    <td>15 units available</td>
+                    <td>4.5 out of 5 stars</td>
+                    <td>
+                        <button class="bad-form-button">Edit</button>
+                        <button class="bad-form-button">Delete</button>
+                    </td>
+                    <td>SKU: LP-001-PRO</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>❌ Table causes horizontal scrolling and has tiny action buttons</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Accessible form with proper touch targets -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Mobile-Friendly Form</h2>
+        <p><strong>Features:</strong> Large touch targets, proper spacing, 16px font to prevent zoom</p>
+        
+        <form class="good-responsive-container">
+            <div class="good-form-group">
+                <label for="good-name" class="good-form-label">Full Name</label>
+                <input type="text" id="good-name" class="good-form-input" placeholder="Enter your full name">
+            </div>
+            
+            <div class="good-form-group">
+                <label for="good-email" class="good-form-label">Email Address</label>
+                <input type="email" id="good-email" class="good-form-input" placeholder="your.email@example.com">
+            </div>
+            
+            <div class="good-form-group">
+                <label for="good-message" class="good-form-label">Message</label>
+                <textarea id="good-message" class="good-form-input" rows="4" placeholder="Your message here..."></textarea>
+            </div>
+            
+            <button type="submit" class="good-form-button">Send Message</button>
+            <button type="reset" class="good-form-button" style="background-color: #6c757d;">Clear Form</button>
+        </form>
+        <p><em>✅ All form elements have proper touch target sizes and 16px+ font size</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Form with tiny touch targets -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Form with Tiny Touch Targets</h2>
+        <p><strong>Issues:</strong> Small inputs, tiny buttons, difficult to use on mobile</p>
+        
+        <form>
+            <div style="margin-bottom: 10px;">
+                <label for="bad-name" style="font-size: 12px;">Name:</label><br>
+                <input type="text" id="bad-name" class="bad-form-input">
+            </div>
+            
+            <div style="margin-bottom: 10px;">
+                <label for="bad-email" style="font-size: 12px;">Email:</label><br>
+                <input type="email" id="bad-email" class="bad-form-input">
+            </div>
+            
+            <button type="submit" class="bad-form-button">Send</button>
+            <button type="reset" class="bad-form-button">Clear</button>
+        </form>
+        <p><em>❌ Form elements are too small for comfortable mobile interaction</em></p>
+    </div>
+
+    <!-- Content that demonstrates horizontal overflow -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Content Causes Horizontal Scrolling</h2>
+        <p><strong>Issues:</strong> Fixed width content overflows viewport on mobile</p>
+        
+        <div class="bad-overflow-content">
+            This content has a fixed width of 500px and will cause horizontal scrolling on mobile devices. The content doesn't wrap or adapt to smaller viewports.
+        </div>
+        <p><em>❌ Requires horizontal scrolling on mobile devices</em></p>
+    </div>
+
+    <!-- Orientation testing info -->
+    <div class="test-section test-good">
+        <h2>📱 Orientation Testing</h2>
+        <p><strong>Testing Instructions:</strong></p>
+        <ul>
+            <li><strong>Portrait Mode:</strong> Verify no horizontal scrolling required</li>
+            <li><strong>Landscape Mode:</strong> Ensure content remains accessible and usable</li>
+            <li><strong>400% Zoom:</strong> Test both orientations at maximum zoom level</li>
+            <li><strong>Touch Targets:</strong> Verify all interactive elements are easily tappable</li>
+            <li><strong>Text Size:</strong> Ensure text remains readable at all zoom levels</li>
+        </ul>
+        <p><em>💡 Use real devices for the most accurate testing results</em></p>
+    </div>
+
+    <script>
+        // Add viewport information for testing
+        function displayViewportInfo() {
+            const info = document.createElement('div');
+            info.style.position = 'fixed';
+            info.style.top = '10px';
+            info.style.right = '10px';
+            info.style.background = 'rgba(0,0,0,0.8)';
+            info.style.color = 'white';
+            info.style.padding = '10px';
+            info.style.borderRadius = '4px';
+            info.style.fontSize = '12px';
+            info.style.zIndex = '9999';
+            info.innerHTML = `
+                Viewport: ${window.innerWidth}x${window.innerHeight}<br>
+                Device Pixel Ratio: ${window.devicePixelRatio}<br>
+                Orientation: ${window.innerWidth > window.innerHeight ? 'Landscape' : 'Portrait'}
+            `;
+            document.body.appendChild(info);
+            
+            // Update on resize
+            window.addEventListener('resize', () => {
+                info.innerHTML = `
+                    Viewport: ${window.innerWidth}x${window.innerHeight}<br>
+                    Device Pixel Ratio: ${window.devicePixelRatio}<br>
+                    Orientation: ${window.innerWidth > window.innerHeight ? 'Landscape' : 'Portrait'}
+                `;
+            });
+        }
+        
+        // Display viewport info when testing
+        if (window.location.search.includes('debug')) {
+            displayViewportInfo();
+        }
+        
+        // Test touch target size function
+        function checkTouchTargets() {
+            const interactiveElements = document.querySelectorAll('button, a, input, select, textarea, [role="button"], [tabindex]');
+            const problems = [];
+            
+            interactiveElements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                if (rect.width < 44 || rect.height < 44) {
+                    problems.push({
+                        element: element,
+                        size: `${Math.round(rect.width)}x${Math.round(rect.height)}`,
+                        meets44px: false
+                    });
+                }
+            });
+            
+            if (problems.length > 0) {
+                console.log('Touch target size violations found:', problems);
+            } else {
+                console.log('All touch targets meet 44x44px requirement');
+            }
+            
+            return problems;
+        }
+        
+        // Run touch target check on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkTouchTargets, 1000);
+        });
+    </script>
+</body>
+</html>
+
+<!-- Additional viewport test for bad example -->
+<script>
+document.write('<!-- BAD VIEWPORT META EXAMPLE -->');
+</script>
+
+<!-- This would be a bad viewport meta tag (commented out to not break the page):
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+-->

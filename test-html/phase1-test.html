@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="refresh" content="5">
+    <title>Phase 1 CSP-Immune Rules Test Page</title>
+    <style>
+        .content { padding: 20px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Phase 1 Test Page</h1>
+        
+        <!-- Button name violations -->
+        <button></button>
+        <button aria-label=""></button>
+        <input type="button" value="">
+        <div role="button"></div>
+        
+        <!-- Link name violations -->
+        <a href="/test"></a>
+        <a href="/test2" aria-label=""></a>
+        <a href="/test3"><img src="missing.jpg" alt=""></a>
+        
+        <!-- Frame title violations -->
+        <iframe src="about:blank"></iframe>
+        <iframe src="about:blank" title=""></iframe>
+        
+        <!-- Media alternative violations -->
+        <area href="/map" coords="0,0,10,10" shape="rect">
+        <object data="test.pdf"></object>
+        <input type="image" src="submit.jpg">
+        
+        <!-- ARIA violations -->
+        <div aria-invalid-attr="true">Test</div>
+        <div role="invalid-role">Test</div>
+        <div aria-labelledby="nonexistent">Test</div>
+        <div aria-describedby="missing">Test</div>
+        
+        <!-- Duplicate ID violations -->
+        <div id="duplicate">First</div>
+        <div id="duplicate">Second</div>
+        <input id="active-duplicate" type="text">
+        <button id="active-duplicate">Button</button>
+        
+        <!-- Language violations -->
+        <div lang="invalid">Test</div>
+        <span lang="">Empty lang</span>
+        
+        <!-- Form accessibility violations -->
+        <input type="text" placeholder="Unlabeled input">
+        <textarea placeholder="Unlabeled textarea"></textarea>
+        <select>
+            <option>Unlabeled select</option>
+        </select>
+        
+        <!-- Heading structure violations -->
+        <h3>Skipped H2</h3>
+        <h1>Second H1</h1>
+        <h5>Skipped H4</h5>
+        
+        <h2>Proper heading structure</h2>
+        <p>This page contains intentional accessibility violations to test Phase 1 CSP-immune rules.</p>
+    </div>
+</body>
+</html>

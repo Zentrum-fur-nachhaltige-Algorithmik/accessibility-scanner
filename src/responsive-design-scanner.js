@@ -54,11 +54,12 @@ class ResponsiveDesignScanner extends BaseScanner {
         this.heuristicTextResizeCheck(page),
       ]);
 
-      const allViolations = [
+      const rawViolations = [
         ...textSpacingResult.violations,
         ...reflowResult.violations,
         ...textResizeResult.violations,
       ];
+      const allViolations = this.deduplicateViolations(rawViolations);
 
       return {
         scannerId: this.id,
@@ -89,11 +90,12 @@ class ResponsiveDesignScanner extends BaseScanner {
       this.heuristicTextResizeCheck(page),
     ]);
 
-    const allViolations = [
+    const rawViolations = [
       ...responsiveResults.violations,
       ...reflowHeuristic.violations,
       ...textResizeHeuristic.violations,
     ];
+    const allViolations = this.deduplicateViolations(rawViolations);
 
     return {
       scannerId: this.id,
@@ -583,9 +585,22 @@ class ResponsiveDesignScanner extends BaseScanner {
 
       const allElements = document.querySelectorAll('*');
 
+      function isSrOnly(el) {
+        if (!el || el.nodeType !== 1) return false;
+        const cls = el.className || '';
+        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
+        const s = window.getComputedStyle(el);
+        if (s.position !== 'absolute' && s.position !== 'fixed') return false;
+        const w = parseFloat(s.width), h = parseFloat(s.height);
+        if (w > 1 || h > 1) return false;
+        if (s.overflow !== 'hidden') return false;
+        return true;
+      }
+
       allElements.forEach(el => {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
+        if (isSrOnly(el)) return;
 
         const overflow = style.overflow;
         const overflowY = style.overflowY;
@@ -722,6 +737,18 @@ class ResponsiveDesignScanner extends BaseScanner {
         return false;
       }
 
+      function isSrOnly(el) {
+        if (!el || el.nodeType !== 1) return false;
+        const cls = el.className || '';
+        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
+        const s = window.getComputedStyle(el);
+        if (s.position !== 'absolute' && s.position !== 'fixed') return false;
+        const w = parseFloat(s.width), h = parseFloat(s.height);
+        if (w > 1 || h > 1) return false;
+        if (s.overflow !== 'hidden') return false;
+        return true;
+      }
+
       // Scan stylesheets for explicit px width/min-width declarations > 320px
       const pxWidthRules = [];
       try {
@@ -739,7 +766,7 @@ class ResponsiveDesignScanner extends BaseScanner {
                 const matched = document.querySelectorAll(sel);
                 const validMatches = Array.from(matched).filter(el => {
                   const s = window.getComputedStyle(el);
-                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el);
+                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el) && !isSrOnly(el);
                 });
                 if (validMatches.length > 0) {
                   pxWidthRules.push({ selector: sel, property: 'width', value: widthVal, count: validMatches.length });
@@ -750,7 +777,7 @@ class ResponsiveDesignScanner extends BaseScanner {
                 const matched = document.querySelectorAll(sel);
                 const validMatches = Array.from(matched).filter(el => {
                   const s = window.getComputedStyle(el);
-                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el);
+                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el) && !isSrOnly(el);
                 });
                 if (validMatches.length > 0) {
                   pxWidthRules.push({ selector: sel, property: 'min-width', value: minWidthVal, count: validMatches.length });
@@ -780,6 +807,7 @@ class ResponsiveDesignScanner extends BaseScanner {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
         if (isInsideScrollableContainer(el)) return;
+        if (isSrOnly(el)) return;
 
         const getSelector = (e) => e.tagName.toLowerCase() +
           (e.id ? `#${e.id}` : '') +
@@ -864,11 +892,24 @@ class ResponsiveDesignScanner extends BaseScanner {
         });
       }
 
+      function isSrOnlyResize(el) {
+        if (!el || el.nodeType !== 1) return false;
+        const cls = el.className || '';
+        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
+        const s = window.getComputedStyle(el);
+        if (s.position !== 'absolute' && s.position !== 'fixed') return false;
+        const w = parseFloat(s.width), h = parseFloat(s.height);
+        if (w > 1 || h > 1) return false;
+        if (s.overflow !== 'hidden') return false;
+        return true;
+      }
+
       // Check for fixed-height containers with overflow:hidden that contain text
       const allElements = document.querySelectorAll('*');
       allElements.forEach(el => {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
+        if (isSrOnlyResize(el)) return;
 
         const isOverflowHidden = style.overflow === 'hidden' ||
           style.overflowY === 'hidden';

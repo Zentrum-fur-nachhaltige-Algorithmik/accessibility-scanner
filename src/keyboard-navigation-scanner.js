@@ -1648,9 +1648,31 @@ class KeyboardNavigationScanner extends BaseScanner {
       // Find elements with click handlers but no keyboard support
       const clickableElements = document.querySelectorAll('*');
       
+      /**
+       * An element that renders nothing cannot be a click target, so it cannot
+       * fail "clickable but not keyboard accessible". Screen-reader-only live
+       * regions are the specific trap: Next.js ships `<next-route-announcer>`,
+       * a 1x1 clipped custom element, and React assigns unknown props as
+       * PROPERTIES on custom elements — which leaves a truthy but non-callable
+       * `element.onclick` behind. That combination made every Next.js page
+       * report a spurious "serious" keyboard violation.
+       */
+      function isNonInteractiveByRendering(element) {
+        const style = window.getComputedStyle(element);
+        if (style.display === 'none' || style.visibility === 'hidden') return true;
+        if (element.getAttribute('aria-hidden') === 'true') return true;
+        const rect = element.getBoundingClientRect();
+        if (rect.width < 2 || rect.height < 2) return true;
+        // Classic visually-hidden clip rectangle.
+        if (/rect\(0px,\s*0px,\s*0px,\s*0px\)/.test(style.clip || '')) return true;
+        return false;
+      }
+
       clickableElements.forEach(element => {
-        // Check if element has click handler - be more specific to avoid false positives
-        const hasClickHandler = element.onclick || 
+        // Check if element has click handler - be more specific to avoid false
+        // positives. `element.onclick` must be an actual FUNCTION: on custom
+        // elements a framework can leave a non-callable value in that property.
+        const hasClickHandler = typeof element.onclick === 'function' ||
                                element.hasAttribute('onclick') ||
                                element.hasAttribute('ng-click') ||
                                element.hasAttribute('@click') ||
@@ -1659,8 +1681,8 @@ class KeyboardNavigationScanner extends BaseScanner {
                                element.classList.contains('fake-button') ||
                                (element.hasAttribute('role') && element.getAttribute('role') === 'button') ||
                                element.style.cursor === 'pointer';
-        
-        if (hasClickHandler) {
+
+        if (hasClickHandler && !isNonInteractiveByRendering(element)) {
           const selector = getElementSelector(element);
           const tagName = element.tagName.toLowerCase();
           const tabIndex = element.tabIndex;

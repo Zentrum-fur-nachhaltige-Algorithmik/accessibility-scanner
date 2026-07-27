@@ -1,0 +1,119 @@
+{
+  "testCriteria": {
+    "maxViolations": 999,
+    "requiredElements": [
+      "lang",
+      "title",
+      "alt-texts"
+    ],
+    "keyboardNavigation": true,
+    "colorContrast": "AA",
+    "performanceThreshold": 3000,
+    "mobileResponsive": true,
+    "htmlValidation": true,
+    "screenReaderCompatibility": true
+  },
+  "browser": {
+    "headless": true,
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "timeout": 30000,
+    "userAgent": null,
+    "enableJavaScript": true,
+    "enableImages": true,
+    "enableCSS": true
+  },
+  "screenshots": {
+    "enabled": true,
+    "captureFullPage": true,
+    "captureViewports": [
+      "desktop",
+      "tablet",
+      "mobile"
+    ],
+    "quality": 80,
+    "formats": [
+      "png"
+    ],
+    "captureOnFailure": true,
+    "captureInteractiveStates": false
+  },
+  "batch": {
+    "maxConcurrent": 3,
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "retryBackoff": 2,
+    "circuitBreakerThreshold": 5,
+    "circuitBreakerTimeout": 30000,
+    "timeoutPerTest": 60000,
+    "enablePersistence": true
+  },
+  "reporting": {
+    "formats": [
+      "json",
+      "html",
+      "csv"
+    ],
+    "includeScreenshots": true,
+    "includeDebugInfo": true,
+    "generateSummary": true,
+    "includeFailureAnalysis": true,
+    "realTimeUpdates": true
+  },
+  "failedTestIsolation": {
+    "enabled": true,
+    "isolateOnFirstFailure": true,
+    "preserveScreenshots": true,
+    "preserveHtmlSnapshot": true,
+    "generateRetryInstructions": true,
+    "categorizeFailures": true
+  },
+  "performance": {
+    "trackMemoryUsage": true,
+    "trackExecutionTime": true,
+    "enableProfiling": false,
+    "logResourceUsage": true
+  },
+  "accessibility": {
+    "enableAxeCore": true,
+    "axeRules": {
+      "color-contrast": {
+        "enabled": true
+      },
+      "keyboard-navigation": {
+        "enabled": true
+      },
+      "aria-labels": {
+        "enabled": true
+      },
+      "heading-order": {
+        "enabled": true
+      },
+      "alt-text": {
+        "enabled": true
+      },
+      "form-labels": {
+        "enabled": true
+      },
+      "focus-management": {
+        "enabled": true
+      }
+    },
+    "customTests": {
+      "screenReaderCompatibility": true,
+      "keyboardNavigation": true,
+      "colorContrastAnalysis": true,
+      "responsiveDesign": true
+    }
+  },
+  "logging": {
+    "level": "info",
+    "enableFileLogging": true,
+    "enableConsoleLogging": true,
+    "logToSeparateFiles": true,
+    "maxLogFileSize": "10MB",
+    "maxLogFiles": 5
+  }
+}

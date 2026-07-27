@@ -1,0 +1,121 @@
+<!-- WCAG-TEST
+criterion: 3.3.8
+level: AA
+title: Barrierefreie Authentifizierung — Patientenportal (German)
+test_type: bad
+expected_violations: 4
+testable_by: dom
+scanners: forms, authentication
+description: Patientenportal-Login erfordert CAPTCHA ohne Alternative, blockiert Copy/Paste, und deaktiviert autocomplete
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patientenportal Login — Ordination Dr. Berger (Test: schlecht)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label { color: #b71c1c; font-weight: bold; margin-bottom: 10px; }
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .login-card h2 { margin-top: 0; color: #1a237e; }
+        .login-card label { display: block; font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
+        .login-card input[type="text"],
+        .login-card input[type="password"] {
+            display: block; width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 4px; box-sizing: border-box; font-size: 16px;
+        }
+        .login-btn {
+            display: block; width: 100%; padding: 12px; background: #1976d2; color: white;
+            border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 20px;
+        }
+        .captcha-box {
+            margin: 15px 0; padding: 15px; border: 2px solid #e0e0e0; border-radius: 4px;
+            background: #fafafa; text-align: center;
+        }
+        .captcha-image {
+            display: inline-block; background: #263238; color: #a5d6a7; font-family: 'Courier New', monospace;
+            font-size: 28px; letter-spacing: 8px; padding: 10px 20px; border-radius: 4px;
+            text-decoration: line-through; font-style: italic; user-select: none;
+        }
+        .warning-text { color: #d32f2f; font-size: 13px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Patientenportal — Anmeldung</h1>
+    <p>Melden Sie sich an, um Ihre Befunde und Termine online einzusehen.</p>
+
+    <!-- VIOLATION 1: Copy/paste blocked and autocomplete disabled -->
+    <div class="violation-section">
+        <div class="violation-label">Verstoß 1: Copy/Paste blockiert, autocomplete deaktiviert</div>
+        <p>Das Passwortfeld blockiert das Einfügen per <code>onpaste="return false"</code> und verwendet
+           <code>autocomplete="off"</code>, wodurch Passwort-Manager nicht funktionieren.</p>
+    </div>
+
+    <div class="login-card">
+        <h2>Anmelden</h2>
+
+        <label for="login-user">Benutzername (Sozialversicherungsnummer)</label>
+        <!-- autocomplete="off" verhindert Autofill durch Browser/Passwort-Manager -->
+        <input type="text" id="login-user" name="user" autocomplete="off" placeholder="SVNR eingeben">
+
+        <label for="login-password">Passwort</label>
+        <!-- onpaste="return false" blockiert das Einfügen aus dem Passwort-Manager -->
+        <input type="password" id="login-password" name="password"
+               autocomplete="off"
+               onpaste="return false"
+               oncopy="return false"
+               oncut="return false"
+               placeholder="Passwort eingeben (Einfügen deaktiviert)">
+        <p class="warning-text">Aus Sicherheitsgründen ist das Einfügen in dieses Feld deaktiviert.</p>
+
+        <!-- VIOLATION 2: CAPTCHA puzzle as the only path, no accessible alternative -->
+        <div class="violation-section">
+            <div class="violation-label">Verstoß 2: CAPTCHA ohne Alternative als einziger Weg</div>
+            <p>Ein verzerrtes Text-CAPTCHA ohne Audio-Alternative und ohne Möglichkeit für Screenreader-Nutzer,
+               es zu lösen.</p>
+        </div>
+
+        <div class="captcha-box">
+            <p>Bitte geben Sie die Zeichen aus dem Bild ein:</p>
+            <div class="captcha-image" aria-hidden="true">Qx7Lm2</div>
+            <!-- Kein Alt-Text, keine Audio-Alternative, kein anderer Mechanismus -->
+            <div>
+                <label for="captcha-text">CAPTCHA-Text eingeben</label>
+                <input type="text" id="captcha-text" name="captcha" autocomplete="off" placeholder="Verzerrten Text oben eintippen">
+            </div>
+        </div>
+
+        <button class="login-btn" type="button" onclick="return false;">Anmelden</button>
+        <p class="warning-text">Es gibt keinen alternativen Anmeldeweg — das CAPTCHA muss immer gelöst werden.</p>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-label">Warum das problematisch ist</div>
+        <ul>
+            <li>Das visuelle CAPTCHA ist die einzige Möglichkeit, sich anzumelden — es gibt keine kognitionsfreie Alternative.</li>
+            <li><code>autocomplete="off"</code> verhindert, dass Passwort-Manager Zugangsdaten automatisch ausfüllen.</li>
+            <li>Blockiertes Einfügen zwingt Patient:innen, Zugangsdaten manuell abzutippen.</li>
+        </ul>
+    </div>
+</body>
+</html>

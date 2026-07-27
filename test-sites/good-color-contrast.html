@@ -1,0 +1,88 @@
+<!-- WCAG-TEST
+criterion: 1.4.3
+level: AA
+title: Contrast (Minimum)
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: color-contrast
+description: All text meets minimum 4.5:1 contrast ratio
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Color Contrast</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; background: #ffffff; color: #1a1a1a; }
+        /* Normal text: #1a1a1a on #ffffff = 17.4:1 ratio */
+        h1 { color: #111111; font-size: 2rem; }
+        h2 { color: #222222; font-size: 1.5rem; }
+        /* Secondary text: #555555 on #ffffff = 7.5:1 ratio */
+        .secondary { color: #555555; }
+        /* Large text (18pt+): #767676 on #ffffff = 4.5:1, exceeds 3:1 minimum for large text */
+        .large-text { color: #767676; font-size: 24px; font-weight: bold; }
+        /* Link text: #0051a8 on #ffffff = 7.1:1 ratio */
+        a { color: #0051a8; }
+        a:hover { color: #003366; }
+        /* Button: #ffffff on #1a6b3c = 7.2:1 ratio */
+        .btn { background: #1a6b3c; color: #ffffff; border: none; padding: 0.75rem 1.5rem; font-size: 1rem; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #145530; }
+        /* Card with sufficient contrast */
+        .card { background: #f0f0f0; color: #1a1a1a; padding: 1.5rem; border: 2px solid #555555; border-radius: 4px; margin: 1rem 0; }
+        /* Input styling with proper contrast */
+        input, select { border: 2px solid #555555; padding: 0.5rem; font-size: 1rem; color: #1a1a1a; background: #ffffff; }
+        label { display: block; margin-top: 1rem; font-weight: bold; color: #1a1a1a; }
+        .badge { background: #1a1a1a; color: #ffffff; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.875rem; }
+        .hint { color: #555555; font-size: 0.875rem; margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Color Contrast - Compliant Examples</h1>
+
+        <!-- Pattern 1: Normal text at 4.5:1+ -->
+        <section>
+            <h2>Body Text with Sufficient Contrast</h2>
+            <p>This paragraph uses #1a1a1a on #ffffff, providing a contrast ratio of 17.4:1, well above the 4.5:1 minimum.</p>
+            <p class="secondary">Secondary text uses #555555 on white, achieving a 7.5:1 ratio.</p>
+        </section>
+
+        <!-- Pattern 2: Large text at 3:1+ -->
+        <section>
+            <h2>Large Text with Sufficient Contrast</h2>
+            <p class="large-text">Large bold text at 24px can use lighter colors since only 3:1 is required.</p>
+        </section>
+
+        <!-- Pattern 3: Interactive elements -->
+        <section>
+            <h2>Interactive Elements</h2>
+            <p>Visit our <a href="#resources">accessibility resources</a> for detailed guidance.</p>
+            <button class="btn">Submit Application</button>
+            <span class="badge">New</span>
+        </section>
+
+        <!-- Pattern 4: Form elements -->
+        <section>
+            <h2>Form Controls</h2>
+            <label for="full-name">Full Name</label>
+            <input type="text" id="full-name" name="full-name" autocomplete="name" placeholder="Jane Doe">
+            <p class="hint">Enter your legal name as it appears on your ID.</p>
+
+            <label for="country">Country</label>
+            <select id="country" name="country" autocomplete="country-name">
+                <option value="">Select a country</option>
+                <option value="us">United States</option>
+                <option value="uk">United Kingdom</option>
+            </select>
+        </section>
+
+        <!-- Pattern 5: Card component -->
+        <div class="card" id="resources">
+            <h2>Resources</h2>
+            <p>All text within this card maintains a minimum 4.5:1 contrast ratio against the #f0f0f0 background.</p>
+        </div>
+    </main>
+</body>
+</html>

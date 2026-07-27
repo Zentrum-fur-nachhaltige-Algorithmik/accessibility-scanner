@@ -568,18 +568,155 @@ class AdvancedAriaScanner extends BaseScanner {
                 return `${tagName}${id}${className}`;
             }
 
-            // Find potential carousel containers (skip hidden)
-            const carousels = Array.from(document.querySelectorAll(
-                '[role="region"][aria-label*="carousel"], [role="region"][aria-label*="slider"], ' +
+            // ── Candidate net ────────────────────────────────────────────
+            // A className substring is NOT evidence of a carousel. The old net
+            // alone flagged 8 elements belonging to ONE carousel in
+            // good-motion-vestibular.html: the container, its
+            // `.good-carousel-track`, all five `.good-carousel-slide` children
+            // and the `.carousel-controls` bar — seven of which are structural
+            // parts, not carousels. Widen the net (aria-roledescription is the
+            // APG marker) but treat every hit as a candidate that must prove
+            // itself below.
+            const candidates = Array.from(document.querySelectorAll(
+                '[aria-roledescription], [role="region"][aria-label*="carousel"], ' +
+                '[role="region"][aria-label*="slider"], ' +
                 '.carousel, .slider, .swiper, [class*="carousel"], [class*="slider"], [class*="swiper"]'
-            )).filter(isElementVisible);
+            )).filter(isElementVisible)
+              // `[class*="slider"]` also matches range/volume sliders. Those
+              // are a different widget with a different naming contract.
+              .filter(el => el.getAttribute('role') !== 'slider' &&
+                            !(el.tagName === 'INPUT' && el.getAttribute('type') === 'range'));
+
+            const classTokens = (el) => (typeof el.className === 'string' ? el.className : '')
+                .split(/\s+/).filter(Boolean);
+
+            // "slide"/"item" as a whole word inside a hyphen/underscore class
+            // name — `swiper-slide`, `carousel-item`, `good-carousel-slide`.
+            // Deliberately does NOT match `slider`, `slider-handle`, `slideshow`.
+            const SLIDE_TOKEN = /(^|[-_])(slides?|items?)([-_]|$)/i;
+
+            // Evidence A — the author DECLARED a carousel (APG pattern).
+            function hasDeclaredCarouselEvidence(el) {
+                const rd = (el.getAttribute('aria-roledescription') || '').toLowerCase();
+                if (/carousel|karussell|slideshow|diashow/.test(rd)) return true;
+                const role = el.getAttribute('role');
+                if (role === 'region' || role === 'group') {
+                    const label = (el.getAttribute('aria-label') || '').toLowerCase();
+                    if (/carousel|karussell|slider|slideshow/.test(label)) return true;
+                }
+                return false;
+            }
+
+            // Evidence B1 — slide children: ≥2 elements sharing one parent
+            // (the track) that are marked as slides/items.
+            function countSlides(el) {
+                const marked = Array.from(el.querySelectorAll(
+                    '[data-slide], [data-slide-index], [class*="slide"], [class*="item"]'
+                )).filter(n => n !== el && (
+                    n.hasAttribute('data-slide') || n.hasAttribute('data-slide-index') ||
+                    classTokens(n).some(t => SLIDE_TOKEN.test(t))
+                ));
+                const byParent = new Map();
+                for (const n of marked) {
+                    if (!n.parentElement) continue;
+                    byParent.set(n.parentElement, (byParent.get(n.parentElement) || 0) + 1);
+                }
+                let best = 0;
+                for (const count of byParent.values()) best = Math.max(best, count);
+                return best;
+            }
+
+            // Evidence B2 — something actually advances the slides: a prev/next
+            // affordance (en/de/glyph), a strip of ≥2 slide indicators, or
+            // declared/observable auto-rotation.
+            const CONTROL_WORDS = /prev|previous|next|zur[üu]ck|weiter|vorheri|n[äa]chst|◀|▶|‹|›|←|→/i;
+            function hasPrevNextControl(el) {
+                const controls = Array.from(el.querySelectorAll(
+                    'button, a, [role="button"], input[type="button"], input[type="submit"]'
+                ));
+                return controls.some(c => CONTROL_WORDS.test(
+                    [c.getAttribute('aria-label') || '', c.id || '',
+                     typeof c.className === 'string' ? c.className : '',
+                     c.getAttribute('title') || '', c.textContent || ''].join(' ')
+                ));
+            }
+            function hasSlideIndicators(el) {
+                return el.querySelectorAll(
+                    '.indicator, .dot, [class*="indicator"], [class*="dot"], [data-slide-to]'
+                ).length >= 2;
+            }
+            function hasAutoRotation(el) {
+                if (el.querySelector('[data-autoplay], [data-auto], [data-interval]')) return true;
+                if (el.hasAttribute('data-interval') || el.hasAttribute('data-autoplay')) return true;
+                if (classTokens(el).some(t => /auto/i.test(t))) return true;
+                // A CSS animation running on the slides is concrete evidence of
+                // an auto-rotating carousel (bad-motion-vestibular.html).
+                const slides = Array.from(el.querySelectorAll('[class*="slide"]'))
+                    .filter(n => classTokens(n).some(t => SLIDE_TOKEN.test(t)));
+                return slides.some(n => {
+                    const anim = getComputedStyle(n).animationName;
+                    return anim && anim !== 'none';
+                });
+            }
+            function hasCarouselControls(el) {
+                return hasPrevNextControl(el) || hasSlideIndicators(el) || hasAutoRotation(el);
+            }
+
+            const confirmed = candidates.filter(el =>
+                hasDeclaredCarouselEvidence(el) ||
+                (countSlides(el) >= 2 && hasCarouselControls(el))
+            );
+
+            // Outermost wins: a track/viewport nested inside a confirmed
+            // carousel is part of it, not a second carousel.
+            const carousels = confirmed.filter(el =>
+                !confirmed.some(other => other !== el && other.contains(el))
+            );
+
+            // Accessible-name resolution. The old check only looked at
+            // aria-label / aria-labelledby ON the element, so a carousel named
+            // by a wrapping labelled region, by title, or by a heading
+            // referenced through aria-labelledby was reported as nameless.
+            function textOfIds(idref) {
+                if (!idref) return '';
+                return idref.split(/\s+/).filter(Boolean)
+                    .map(id => { const t = document.getElementById(id); return t ? t.textContent.trim() : ''; })
+                    .join(' ').trim();
+            }
+            function accessibleName(el) {
+                const label = (el.getAttribute('aria-label') || '').trim();
+                if (label) return label;
+                const byIds = textOfIds(el.getAttribute('aria-labelledby'));
+                if (byIds) return byIds;
+                const title = (el.getAttribute('title') || '').trim();
+                if (title) return title;
+                const fig = el.closest('figure');
+                if (fig) {
+                    const cap = fig.querySelector('figcaption');
+                    if (cap && cap.textContent.trim()) return cap.textContent.trim();
+                }
+                // A wrapping section/region/group that itself carries a name
+                // makes the carousel identifiable in the region tree.
+                let wrapper = el.parentElement
+                    ? el.parentElement.closest('section, aside, [role="region"], [role="group"]')
+                    : null;
+                while (wrapper) {
+                    const wl = (wrapper.getAttribute('aria-label') || '').trim() ||
+                               textOfIds(wrapper.getAttribute('aria-labelledby'));
+                    if (wl) return wl;
+                    wrapper = wrapper.parentElement
+                        ? wrapper.parentElement.closest('section, aside, [role="region"], [role="group"]')
+                        : null;
+                }
+                return '';
+            }
 
             for (let i = 0; i < carousels.length; i++) {
                 const carousel = carousels[i];
                 const carouselSelector = getElementSelector(carousel);
 
                 // Check carousel has accessible name
-                if (!carousel.hasAttribute('aria-label') && !carousel.hasAttribute('aria-labelledby')) {
+                if (!accessibleName(carousel)) {
                     violations.push({
                         type: 'missing-carousel-label',
                         category: 'carousel',
@@ -588,7 +725,12 @@ class AdvancedAriaScanner extends BaseScanner {
                         description: 'Carousel lacks accessible name',
                         details: {
                             carouselId: carousel.id,
-                            carouselClass: carousel.className
+                            carouselClass: carousel.className,
+                            evidence: {
+                                declared: hasDeclaredCarouselEvidence(carousel),
+                                slideCount: countSlides(carousel),
+                                hasControls: hasCarouselControls(carousel)
+                            }
                         },
                         wcagCriteria: '4.1.2',
                         impact: 'Screen reader users cannot identify carousel purpose',
@@ -596,9 +738,11 @@ class AdvancedAriaScanner extends BaseScanner {
                     });
                 }
 
-                // Check for live region for auto-rotating carousels
-                const hasAutoRotate = carousel.querySelector('[data-autoplay], [data-auto]') ||
-                                    carousel.className.includes('auto') ||
+                // Check for live region for auto-rotating carousels.
+                // `className` is an SVGAnimatedString on SVG/MathML elements —
+                // guard before calling .includes() on it.
+                const hasAutoRotate = !!carousel.querySelector('[data-autoplay], [data-auto]') ||
+                                    classTokens(carousel).some(t => /auto/i.test(t)) ||
                                     carousel.hasAttribute('data-interval');
 
                 if (hasAutoRotate && !carousel.hasAttribute('aria-live')) {
@@ -1162,27 +1306,49 @@ class AdvancedAriaScanner extends BaseScanner {
                     });
                 }
 
-                // Check live regions are not empty initially (if they should contain content)
                 const role = region.getAttribute('role');
-                if ((role === 'status' || role === 'alert') && region.textContent.trim() === '') {
-                    // This might be acceptable for dynamic content, so only warn
+
+                // An INITIALLY EMPTY live region is not a violation — it is the correct
+                // implementation of SC 4.1.3. The announcing container must already be in
+                // the accessibility tree before the content arrives, otherwise assistive
+                // technology has nothing to observe and the update is never announced.
+                // Framework-generated, textbook-correct markup such as Next.js's route
+                // announcer (<p id="__next-route-announcer__" role="alert"
+                // aria-live="assertive"> rendered empty at load) was being flagged here.
+                // The old 'empty-live-region' finding is therefore dropped entirely; only
+                // the genuinely-broken cases below survive.
+
+                // Contradictory politeness: role="alert"/"status"/"log" carry an implicit
+                // politeness setting, and an explicit aria-live="off" overrides it — the
+                // author asks for an announcement and suppresses it in the same element.
+                if (ariaLive === 'off' && (role === 'alert' || role === 'status' || role === 'log')) {
                     violations.push({
-                        type: 'empty-live-region',
+                        type: 'contradictory-live-region-politeness',
                         category: 'live-region',
-                        severity: 'low',
+                        severity: 'moderate',
                         element: regionSelector,
-                        description: 'Live region is initially empty',
+                        description: `Element has role="${role}" but aria-live="off", which suppresses the announcement the role asks for`,
                         details: {
                             regionIndex: i,
                             role: role,
-                            hasContent: region.textContent.trim().length > 0
+                            ariaLive: ariaLive
                         },
                         wcagCriteria: '4.1.2',
-                        impact: 'May indicate unused or incorrectly implemented live region',
-                        recommendation: 'Ensure live regions are populated with relevant content when needed'
+                        impact: 'Updates to this region are never announced despite the live-region role',
+                        recommendation: 'Remove aria-live="off", or drop the role if the region should stay silent'
                     });
                 }
             });
+
+            // A display:none / visibility:hidden live region was considered as the other
+            // "genuinely broken" case, but it does not survive contact with real markup:
+            // `<p role="alert" hidden>` for an error message that is unhidden and filled
+            // together, and error containers toggled with display:none, are the standard
+            // working implementation of SC 4.1.3 — revealing and populating the region in
+            // the same task announces correctly. Measured against the test corpus that
+            // check produced 8 findings, all of them on good-* fixtures and all of them
+            // false positives, so it is deliberately not implemented. (Such regions are
+            // dropped by the isElementVisible() filter above anyway.)
 
             return violations;
         }, BaseScanner.visibilityFilterScript);

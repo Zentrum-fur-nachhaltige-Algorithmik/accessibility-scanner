@@ -1,0 +1,124 @@
+<!-- WCAG-TEST
+criterion: 2.4.2
+level: A
+title: Page Titled
+test_type: good
+expected_violations: 0
+testable_by: automated
+scanners: structure
+description: Descriptive, unique page titles that identify the page content and site
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - Manage Profile and Preferences | MyStore</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .page-frame {
+            border: 2px solid #adb5bd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .page-frame .frame-bar {
+            background: #dee2e6;
+            padding: 4px 10px;
+            font-size: 0.85em;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-frame .frame-bar .tab-title {
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 3px 3px 0 0;
+            padding: 2px 12px;
+            font-weight: bold;
+        }
+        .page-frame .frame-content {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Descriptive Page Titles (GOOD)</h1>
+    <p>This page demonstrates WCAG 2.4.2 compliance. Its own title is "Account Settings - Manage Profile and Preferences | MyStore", which is descriptive, unique, and identifies both the page content and the site.</p>
+
+    <!-- Pattern 1: Unique, descriptive titles per page -->
+    <h2>Pattern 1: Unique Descriptive Titles Across a Site</h2>
+    <div class="section">
+        <p>Each page in the site has a unique title that describes its specific content, followed by the site name:</p>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Featured Products and Deals | MyStore</span>
+                <span>mystore.com/</span>
+            </div>
+            <div class="frame-content"><p>Homepage with featured products and seasonal deals.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Shopping Cart (3 items) | MyStore</span>
+                <span>mystore.com/cart</span>
+            </div>
+            <div class="frame-content"><p>Shopping cart displaying 3 items totalling $149.97.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Shipping Address - Checkout Step 2 of 4 | MyStore</span>
+                <span>mystore.com/checkout/shipping</span>
+            </div>
+            <div class="frame-content"><p>Shipping address form, the second step in the checkout process.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Order History - View Past Orders | MyStore</span>
+                <span>mystore.com/account/order-history</span>
+            </div>
+            <div class="frame-content"><p>Complete order history with tracking information.</p></div>
+        </div>
+    </div>
+
+    <!-- Pattern 2: Title reflects dynamic content -->
+    <h2>Pattern 2: Titles Reflect Dynamic State</h2>
+    <div class="section">
+        <p>Page titles update to reflect the current content or state, so users always know what they are viewing:</p>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Search Results for "wireless headphones" (42 found) | MyStore</span>
+                <span>mystore.com/search?q=wireless+headphones</span>
+            </div>
+            <div class="frame-content"><p>Search results showing 42 wireless headphone products with filters.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Sony WH-1000XM5 - Product Details | MyStore</span>
+                <span>mystore.com/products/sony-wh-1000xm5</span>
+            </div>
+            <div class="frame-content"><p>Product detail page with specifications, reviews, and purchase options.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">(2) New Messages - Support Tickets | MyStore</span>
+                <span>mystore.com/support/tickets</span>
+            </div>
+            <div class="frame-content"><p>Support tickets with unread message count shown in the title.</p></div>
+        </div>
+    </div>
+
+</body>
+</html>

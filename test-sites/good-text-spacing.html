@@ -1,0 +1,577 @@
+<!-- WCAG-TEST
+criterion: 1.4.12
+level: AA
+title: Text Spacing
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: page-structure
+description: Content that adapts properly to increased text spacing
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Text Spacing - WCAG 1.4.12 Compliant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .success {
+            background: #efe;
+            border-left: 4px solid #0c0;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #666;
+            margin-top: 30px;
+        }
+        
+        /* Good Example 1: Flexible height containers */
+        .flexible-card {
+            min-height: 120px; /* CORRECT: min-height instead of fixed height */
+            width: 300px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            /* CORRECT: No overflow hidden, content can expand */
+            margin: 10px;
+            display: inline-block;
+            vertical-align: top;
+        }
+        
+        /* Good Example 2: Flexible button container */
+        .button-container {
+            min-height: 50px; /* CORRECT: min-height allows expansion */
+            width: 100%;
+            max-width: 600px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            /* CORRECT: No overflow hidden */
+            /* CORRECT: Flexbox handles spacing gracefully */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .button-container button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            /* CORRECT: Flexible margins */
+            margin: 0;
+        }
+        
+        /* Good Example 3: Overridable line-height */
+        .flexible-line-height {
+            line-height: 1.5; /* CORRECT: No !important, can be overridden */
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+        
+        /* Good Example 4: Flexible inline elements */
+        .flexible-elements {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .flexible-elements .tag {
+            background: #e9ecef;
+            padding: 5px 10px;
+            margin: 2px; /* CORRECT: Adequate margin for spacing changes */
+            border-radius: 4px;
+            display: inline-block; /* CORRECT: inline-block prevents overlap */
+        }
+        
+        /* Good Example 5: Flexible width containers */
+        .flexible-text {
+            min-width: 200px; /* CORRECT: min-width instead of fixed */
+            max-width: 400px; /* CORRECT: max-width for readability */
+            min-height: 100px; /* CORRECT: min-height allows expansion */
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            /* CORRECT: No overflow hidden */
+            margin: 10px;
+            word-wrap: break-word; /* CORRECT: Handle long words */
+        }
+        
+        /* Good Example 6: Navigation with flexible spacing */
+        .nav-bar {
+            background: #333;
+            min-height: 50px; /* CORRECT: min-height allows expansion */
+            /* CORRECT: No overflow hidden */
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; /* CORRECT: Wrap on smaller screens */
+            gap: 15px; /* CORRECT: CSS gap for consistent spacing */
+        }
+        
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            /* CORRECT: No fixed margins, using gap instead */
+        }
+        
+        .nav-bar a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        /* Good Example 7: Flexible form elements */
+        .form-row {
+            min-height: 60px; /* CORRECT: min-height allows expansion */
+            background: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            /* CORRECT: No overflow hidden */
+            display: flex;
+            flex-wrap: wrap; /* CORRECT: Wrap for increased spacing */
+            align-items: flex-start; /* CORRECT: Align to top */
+            gap: 10px; /* CORRECT: Use gap for spacing */
+        }
+        
+        .form-row label {
+            min-width: 150px; /* CORRECT: min-width instead of fixed */
+            flex-shrink: 0; /* CORRECT: Prevent label shrinking */
+        }
+        
+        .form-row input {
+            flex: 1;
+            min-width: 200px; /* CORRECT: Minimum usable width */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        /* Good Example 8: Card grid with flexible dimensions */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .grid-card {
+            min-height: 150px; /* CORRECT: min-height allows expansion */
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            /* CORRECT: No overflow hidden */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .grid-card h3 {
+            margin-top: 0;
+        }
+        
+        .grid-card p {
+            flex: 1; /* CORRECT: Allow content to expand */
+        }
+        
+        /* Good Example 9: Table with flexible row heights */
+        .flexible-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin: 20px 0;
+        }
+        
+        .flexible-table th,
+        .flexible-table td {
+            min-height: 40px; /* CORRECT: min-height instead of fixed */
+            padding: 12px; /* CORRECT: Adequate padding */
+            border: 1px solid #ddd;
+            /* CORRECT: No overflow hidden */
+            text-align: left;
+            vertical-align: top; /* CORRECT: Top alignment for flexibility */
+        }
+        
+        .flexible-table th {
+            background: #f8f9fa;
+        }
+        
+        /* Good Example 10: Tooltip with flexible dimensions */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+        }
+        
+        .tooltip {
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%); /* CORRECT: Center using transform */
+            min-width: 200px; /* CORRECT: min-width instead of fixed */
+            max-width: 300px; /* CORRECT: max-width for readability */
+            /* CORRECT: No fixed height */
+            background: #333;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 12px; /* CORRECT: Adequate padding */
+            /* CORRECT: No overflow hidden */
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            /* CORRECT: z-index for layering */
+            z-index: 100;
+        }
+        
+        .tooltip-container:hover .tooltip {
+            opacity: 1;
+        }
+        
+        /* Good Example 11: Sidebar with flexible width */
+        .layout-container {
+            display: flex;
+            background: white;
+            border: 1px solid #ddd;
+            margin: 20px 0;
+            flex-wrap: wrap; /* CORRECT: Allow wrapping on small screens */
+            gap: 20px;
+        }
+        
+        .sidebar {
+            min-width: 200px; /* CORRECT: min-width instead of fixed */
+            flex: 0 0 250px; /* CORRECT: Flexible basis */
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            /* CORRECT: No overflow hidden */
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 300px; /* CORRECT: Minimum width for readability */
+            padding: 20px;
+        }
+        
+        /* Good Example 12: Badge elements with flexible size */
+        .badge-container {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .badge {
+            display: inline-block;
+            min-width: 60px; /* CORRECT: min-width instead of fixed */
+            /* CORRECT: No fixed height */
+            background: #dc3545;
+            color: white;
+            text-align: center;
+            border-radius: 12px;
+            padding: 5px 12px; /* CORRECT: Padding instead of line-height */
+            /* CORRECT: No overflow hidden */
+            font-size: 12px;
+            white-space: nowrap; /* CORRECT: Prevent breaking within badge */
+        }
+        
+        /* Additional responsive considerations */
+        @media (max-width: 768px) {
+            .flexible-card {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .layout-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Good Text Spacing - WCAG 1.4.12 Compliant</h1>
+    
+    <div class="success">
+        <strong>WCAG 1.4.12 Compliant:</strong> This page maintains full functionality and readability when users apply
+        custom text spacing styles. Content adapts gracefully to increased line height, letter spacing, word spacing,
+        and paragraph spacing without clipping or breaking.
+    </div>
+
+    <!-- Good Example 1: Flexible height cards -->
+    <h2>1. Product Cards - Flexible Height Containers</h2>
+    <div class="flexible-card">
+        <h3>Premium Plan</h3>
+        <p>Get access to all premium features including advanced analytics, priority support, and unlimited storage space for your growing business needs.</p>
+        <button>Select Plan</button>
+    </div>
+    <div class="flexible-card">
+        <h3>Business Plan</h3>
+        <p>Perfect for growing businesses with team collaboration tools, comprehensive reporting features, and dedicated account management support.</p>
+        <button>Choose Business</button>
+    </div>
+
+    <!-- Good Example 2: Flexible button container -->
+    <h2>2. Action Buttons - Flexible Container</h2>
+    <div class="button-container">
+        <button>Save Changes</button>
+        <button>Cancel Operation</button>
+        <button>Export Data</button>
+        <button>Share Content</button>
+        <button>Print Document</button>
+        <button>Download File</button>
+    </div>
+
+    <!-- Good Example 3: Overridable line height -->
+    <h2>3. Important Notice - Flexible Line Height</h2>
+    <div class="flexible-line-height">
+        <p>This is an important notice about our terms of service updates. The line-height can be overridden by user 
+        stylesheets, allowing users with dyslexia or other reading difficulties to increase line spacing for better 
+        readability. The container expands to accommodate the increased spacing without clipping content.</p>
+    </div>
+
+    <!-- Good Example 4: Flexible inline elements -->
+    <h2>4. Tags - Flexible Inline Elements</h2>
+    <div class="flexible-elements">
+        <p>Related topics:</p>
+        <span class="tag">Web Design</span>
+        <span class="tag">User Experience</span>
+        <span class="tag">Accessibility</span>
+        <span class="tag">CSS Architecture</span>
+        <span class="tag">JavaScript Development</span>
+        <span class="tag">HTML Semantics</span>
+        <span class="tag">Frontend Development</span>
+        <span class="tag">Responsive Design</span>
+    </div>
+
+    <!-- Good Example 5: Flexible width text containers -->
+    <h2>5. Sidebar Widgets - Flexible Width Text</h2>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div class="flexible-text">
+            <h4>Quick Links</h4>
+            <p>Access your Dashboard, Account Settings, User Profile, Help Center, and Contact Support quickly.</p>
+        </div>
+        <div class="flexible-text">
+            <h4>Recent Activity</h4>
+            <p>Login at 9:15 AM, Profile information updated successfully, Password changed for security.</p>
+        </div>
+        <div class="flexible-text">
+            <h4>Notifications</h4>
+            <p>You have 3 new messages awaiting your attention. System maintenance scheduled for tonight.</p>
+        </div>
+    </div>
+
+    <!-- Good Example 6: Navigation bar with flexible height -->
+    <h2>6. Main Navigation - Flexible Height</h2>
+    <nav class="nav-bar">
+        <a href="#home">Home</a>
+        <a href="#products">Products & Services</a>
+        <a href="#solutions">Business Solutions</a>
+        <a href="#about">About Our Company</a>
+        <a href="#contact">Contact Information</a>
+        <a href="#support">Customer Support</a>
+    </nav>
+
+    <!-- Good Example 7: Form with flexible row heights -->
+    <h2>7. Registration Form - Flexible Row Heights</h2>
+    <form>
+        <div class="form-row">
+            <label for="fname">First Name:</label>
+            <input type="text" id="fname" name="firstname" required>
+        </div>
+        <div class="form-row">
+            <label for="lname">Last Name:</label>
+            <input type="text" id="lname" name="lastname" required>
+        </div>
+        <div class="form-row">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-row">
+            <label for="company">Company Name:</label>
+            <input type="text" id="company" name="company">
+        </div>
+    </form>
+
+    <!-- Good Example 8: Card grid with flexible heights -->
+    <h2>8. Feature Cards - Flexible Grid Layout</h2>
+    <div class="card-grid">
+        <div class="grid-card">
+            <h3>Advanced Analytics</h3>
+            <p>Comprehensive analytics dashboard with real-time data visualization, detailed reporting capabilities, and customizable metrics tracking for informed decision making.</p>
+        </div>
+        <div class="grid-card">
+            <h3>Enterprise Security</h3>
+            <p>Enterprise-grade security features including two-factor authentication, end-to-end encryption, compliance monitoring, and regular security audits.</p>
+        </div>
+        <div class="grid-card">
+            <h3>Seamless Integration</h3>
+            <p>Easily integrate with over 50 popular business tools and services through our robust API platform and pre-built connectors for enhanced workflow efficiency.</p>
+        </div>
+    </div>
+
+    <!-- Good Example 9: Data table with flexible row heights -->
+    <h2>9. Data Table - Flexible Row Heights</h2>
+    <table class="flexible-table">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Position Title</th>
+                <th>Start Date</th>
+                <th>Employment Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>John Smith</td>
+                <td>Engineering</td>
+                <td>Senior Software Developer</td>
+                <td>January 15, 2020</td>
+                <td>Active Full-time</td>
+            </tr>
+            <tr>
+                <td>Sarah Johnson</td>
+                <td>Marketing</td>
+                <td>Digital Marketing Manager</td>
+                <td>March 8, 2021</td>
+                <td>Active Full-time</td>
+            </tr>
+            <tr>
+                <td>Michael Brown</td>
+                <td>Sales</td>
+                <td>Senior Account Executive</td>
+                <td>September 12, 2019</td>
+                <td>On Medical Leave</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Good Example 10: Tooltip with flexible dimensions -->
+    <h2>10. Help Tooltips - Flexible Size</h2>
+    <p>Hover over this 
+        <span class="tooltip-container">
+            help icon
+            <span class="tooltip">This tooltip automatically adjusts its size to accommodate increased text spacing while maintaining readability and proper positioning</span>
+        </span> 
+        to see the adaptive tooltip.
+    </p>
+
+    <!-- Good Example 11: Sidebar layout -->
+    <h2>11. Page Layout - Flexible Sidebar Width</h2>
+    <div class="layout-container">
+        <aside class="sidebar">
+            <h4>Navigation Menu</h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 10px;"><a href="#dashboard" style="text-decoration: none; color: #007bff;">Dashboard Overview</a></li>
+                <li style="margin-bottom: 10px;"><a href="#settings" style="text-decoration: none; color: #007bff;">Account Settings</a></li>
+                <li style="margin-bottom: 10px;"><a href="#billing" style="text-decoration: none; color: #007bff;">Billing Information</a></li>
+                <li style="margin-bottom: 10px;"><a href="#security" style="text-decoration: none; color: #007bff;">Security Settings</a></li>
+                <li style="margin-bottom: 10px;"><a href="#support" style="text-decoration: none; color: #007bff;">Support Center</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h3>Main Content Area</h3>
+            <p>This is the main content area. The sidebar uses flexible width that adapts when text spacing is 
+            increased, ensuring content remains accessible and readable without overflow issues.</p>
+        </main>
+    </div>
+
+    <!-- Good Example 12: Status badges -->
+    <h2>12. Status Badges - Flexible Dimensions</h2>
+    <div class="badge-container">
+        <p>Order status tracking: </p>
+        <span class="badge">Pending Review</span>
+        <span class="badge">Processing Order</span>
+        <span class="badge">Shipped Today</span>
+        <span class="badge">Delivered Successfully</span>
+        <span class="badge">Cancelled by User</span>
+        <span class="badge">Returned Item</span>
+    </div>
+
+    <div class="success">
+        <p><strong>All content fully adaptable</strong></p>
+        <p>When users apply the following CSS to increase text spacing:</p>
+        <ul>
+            <li>line-height: 1.5 or greater</li>
+            <li>letter-spacing: 0.12em</li>
+            <li>word-spacing: 0.16em</li>
+            <li>paragraph spacing: 2x font size</li>
+        </ul>
+        <p>All content on this page remains fully functional and readable. Containers expand appropriately,
+        text doesn't get clipped, and the layout maintains its integrity.</p>
+    </div>
+
+    <!-- Test CSS that demonstrates compliance -->
+    <style id="spacing-test" disabled>
+        /* This CSS simulates increased text spacing requirements */
+        * {
+            line-height: 1.6 !important;
+            letter-spacing: 0.12em !important;
+            word-spacing: 0.16em !important;
+        }
+        
+        p, div, li {
+            margin-bottom: 2em !important;
+        }
+    </style>
+
+    <script>
+        // Demonstration toggle for testing compliance
+        function toggleSpacingTest() {
+            const style = document.getElementById('spacing-test');
+            const button = document.getElementById('test-button');
+            style.disabled = !style.disabled;
+            button.textContent = style.disabled ? 'Apply Text Spacing Test' : 'Remove Text Spacing Test';
+            button.style.background = style.disabled ? '#28a745' : '#dc3545';
+        }
+        
+        // Add test button
+        const testButton = document.createElement('button');
+        testButton.id = 'test-button';
+        testButton.textContent = 'Apply Text Spacing Test';
+        testButton.onclick = toggleSpacingTest;
+        testButton.style.position = 'fixed';
+        testButton.style.top = '20px';
+        testButton.style.right = '20px';
+        testButton.style.zIndex = '1000';
+        testButton.style.background = '#28a745';
+        testButton.style.color = 'white';
+        testButton.style.border = 'none';
+        testButton.style.padding = '10px 15px';
+        testButton.style.borderRadius = '4px';
+        testButton.style.cursor = 'pointer';
+        document.body.appendChild(testButton);
+    </script>
+</body>
+</html>

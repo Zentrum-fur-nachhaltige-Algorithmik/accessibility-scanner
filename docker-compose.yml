@@ -1,0 +1,100 @@
+# Host-agnostic local/deployment stack for the accessibility checker.
+#
+# Two services from ONE image (see Dockerfile for why): `app` runs the
+# Express API + Puppeteer scan engine, `frontend` runs the built Next.js UI
+# with its CMD overridden to `next start`. frontend/next.config.js proxies
+# the browser's /api/* calls to a hardcoded `http://localhost:3000`, so
+# `frontend` joins `app`'s network namespace (`network_mode: service:app`)
+# rather than talking to it over the compose network by service name — that
+# hardcoded rewrite would otherwise resolve to the frontend container itself
+# and fail. This is a deliberate workaround to avoid editing frontend source.
+#
+# Docker Compose auto-loads a `.env` file from this directory for the
+# ${VAR} substitutions below — copy .env.example (see docs/deployment.md) or
+# reuse the existing root .env.
+#
+# See docs/deployment.md for the full env var reference and security
+# checklist (API_TOKEN and SCAN_ALLOWED_HOSTS in particular).
+
+services:
+  app:
+    build:
+      context: .
+      target: production
+    image: accessability:latest
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+      # Published here (not on `frontend`) because frontend shares this
+      # service's network namespace — see network_mode below.
+      - "${FRONTEND_HOST_PORT:-3001}:3001"
+    environment:
+      # Fixed at 3000 inside the container: frontend/next.config.js hardcodes
+      # its API proxy destination to http://localhost:3000. Use HOST_PORT
+      # above to change the externally-published port instead.
+      PORT: "3000"
+      # Auth token API consumers must send (server-hardening work in
+      # progress on another branch — currently a no-op if the running image
+      # predates that work, but always safe to set).
+      API_TOKEN: ${API_TOKEN:-}
+      # Server-side only. Never expose to the frontend/browser.
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      # Comma-separated hostname allowlist for scan targets (SSRF guard,
+      # same parallel hardening work as API_TOKEN).
+      SCAN_ALLOWED_HOSTS: ${SCAN_ALLOWED_HOSTS:-}
+      # Concurrent scans; each holds a Chrome instance in memory.
+      SCAN_CONCURRENCY: ${SCAN_CONCURRENCY:-1}
+    volumes:
+      - reports:/app/reports
+    # Chrome is the memory-hungry part of this app; give the container enough
+    # headroom for a couple of concurrent scans plus PDF rendering.
+    mem_limit: 2g
+    # Puppeteer/Chrome uses /dev/shm heavily; Docker's 64MB default is too
+    # small and can crash Chrome under load. The code launches Chrome without
+    # --disable-dev-shm-usage (see src/scan-pipeline.js), so this is the
+    # container-level mitigation instead of a source change.
+    shm_size: "1gb"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      target: production
+    image: accessability:latest
+    command: ["node_modules/.bin/next", "start", "frontend", "-p", "3001"]
+    # Shares app's network namespace so the frontend's hardcoded
+    # `http://localhost:3000` API proxy (frontend/next.config.js) reaches the
+    # `app` container. Do not add a `ports:` entry here — Compose forbids it
+    # together with network_mode: service:*; the port is published on `app`.
+    network_mode: "service:app"
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 512m
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3001/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+volumes:
+  reports:

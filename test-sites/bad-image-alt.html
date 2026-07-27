@@ -1,0 +1,171 @@
+<!-- WCAG-TEST
+criterion: 1.1.1
+level: A
+title: Non-text Content
+test_type: bad
+expected_violations: 5
+testable_by: regex
+scanners: page-structure
+description: Images without alternative text - should trigger page structure scanner for ARIA/semantic issues
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Image Alt Text - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-title {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+        }
+        .article-list {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+        }
+        .chart-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bad Image Alt Text - Multiple WCAG 1.1.1 Violations</h1>
+    <p>This page demonstrates common image accessibility failures that prevent screen reader users from understanding image content.</p>
+
+    <!-- VIOLATION 1: Missing alt attribute completely -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Missing alt attribute</div>
+        <p>These images have no alt attribute at all:</p>
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmY5ODAwIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+V0FSTklORzwvdGV4dD4KPHN2Zz4=" width="100" height="100">
+        <p>Important safety warning icon above has no alt text!</p>
+        
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDIwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNGNhZjUwIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNIQVJUPC90ZXh0Pgo8L3N2Zz4=" width="200" height="100">
+        <p>Financial performance chart above is invisible to screen readers!</p>
+    </div>
+
+    <!-- VIOLATION 2: Empty alt on informative images -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Empty alt="" on informative images</div>
+        <p>These informative images incorrectly use alt="":</p>
+        
+        <a href="/shopping-cart">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMjE5NmYzIi8+Cjx0ZXh0IHg9IjIwIiB5PSIyNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q0FSVC90ZXh0Pgo8L3N2Zz4=" alt="" width="40" height="40">
+        </a>
+        <p>Shopping cart link above has no accessible name!</p>
+
+        <div class="product-card">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDE1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmY1NzIyIi8+Cjx0ZXh0IHg9Ijc1IiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UFJPRFVDVC90ZXh0Pgo8L3N2Zz4=" alt="" width="150" height="100">
+            <h3>Premium Laptop</h3>
+            <p>$1,299.99</p>
+            <button>Add to Cart</button>
+        </div>
+        <p>Product image above is essential but marked as decorative!</p>
+    </div>
+
+    <!-- VIOLATION 3: Useless/generic alt text -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Useless/generic alt text</div>
+        <p>These images have unhelpful alt text:</p>
+        
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjOWM0ZGNjIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iODAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkdSQVBIPC90ZXh0Pgo8L3N2Zz4=" alt="graph" width="200" height="150">
+        <p>Sales performance graph with useless alt="graph"</p>
+
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjNjA3ZDhiIi8+Cjx0ZXh0IHg9Ijc1IiB5PSI4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UEhPVE88L3RleHQ+Cjwvc3ZnPg==" alt="photo" width="150" height="150">
+        <p>Team photo with useless alt="photo"</p>
+
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDE4MCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTIwIiBmaWxsPSIjNzk1NTQ4Ii8+Cjx0ZXh0IHg9IjkwIiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+aW1hZ2UuanBnPC90ZXh0Pgo8L3N2Zz4=" alt="image.jpg" width="180" height="120">
+        <p>Company logo with filename as alt text</p>
+    </div>
+
+    <!-- VIOLATION 4: Keyword-stuffed alt text -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Keyword-stuffed alt text</div>
+        <p>Images with SEO-spammed alt text:</p>
+        
+        <div class="product-grid">
+            <div class="product-card">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDE1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMDA5Njg4Ii8+Cjx0ZXh0IHg9Ijc1IiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+V0lER0VUPC90ZXh0Pgo8L3N2Zz4=" alt="blue widget buy now best price special offer discount sale cheap widgets widget store online widgets best widgets" width="150" height="100">
+                <h3>Blue Widget</h3>
+                <p>$29.99</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIOLATION 5: Redundant alt text -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Redundant alt text</div>
+        <p>Images with redundant alt text that duplicates visible content:</p>
+        
+        <figure>
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjM2Y1MWI1Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iODAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRSLiBFVkE8L3RleHQ+Cjwvc3ZnPg==" alt="Photo of Dr. Eva Rostova" width="200" height="150">
+            <figcaption>Photo of Dr. Eva Rostova</figcaption>
+        </figure>
+        <p>Caption and alt text are identical - redundant for screen readers!</p>
+
+        <div class="article-list">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmY5ODAwIi8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TkVXUzwvdGV4dD4KPHN2Zz4=" alt="Breaking News: Market Update" width="80" height="80">
+            <h3>Breaking News: Market Update</h3>
+            <p>Latest financial developments...</p>
+        </div>
+        <p>Image alt duplicates the heading text!</p>
+    </div>
+
+    <!-- VIOLATION 6: Complex images without adequate descriptions -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Complex images needing detailed descriptions</div>
+        <p>Charts and diagrams with insufficient alt text:</p>
+        
+        <div class="chart-container">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDQwMCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjUwIiBmaWxsPSIjZjVmNWY1Ii8+CjxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIxNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UXVhcnRlcmx5IFNhbGVzIERhdGE8L3RleHQ+CjxyZWN0IHg9IjcwIiB5PSIxMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgZmlsbD0iIzIxOTZmMyIvPgo8cmVjdCB4PSIxMjAiIHk9IjgwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNGNhZjUwIi8+CjxyZWN0IHg9IjE3MCIgeT0iNjAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNmZjk4MDAiLz4KPHJlY3QgeD0iMjIwIiB5PSI5MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjkwIiBmaWxsPSIjZTkxZTYzIi8+CjxyZWN0IHg9IjI3MCIgeT0iNzAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxMTAiIGZpbGw9IiM5YzI3YjAiLz4KPHN2Zz4=" alt="chart" width="400" height="250">
+            <p>Critical quarterly sales data chart with only alt="chart"!</p>
+        </div>
+
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjVmNWY1Ii8+Cjx0ZXh0IHg9IjE1MCIgeT0iMzAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSI+T3JnYW5pemF0aW9uYWwgU3RydWN0dXJlPC90ZXh0Pgo8cmVjdCB4PSIxMjAiIHk9IjUwIiB3aWR0aD0iNjAiIGhlaWdodD0iMzAiIGZpbGw9IiMyMTk2ZjMiLz4KPHRleHQgeD0iMTUwIiB5PSI3MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q0VPPC90ZXh0Pgo8cmVjdCB4PSI1MCIgeT0iMTAwIiB3aWR0aD0iNjAiIGhlaWdodD0iMzAiIGZpbGw9IiM0Y2FmNTAiLz4KPHRleHQgeD0iODAiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VlA8L3RleHQ+CjxyZWN0IHg9IjE5MCIgeT0iMTAwIiB3aWR0aD0iNjAiIGhlaWdodD0iMzAiIGZpbGw9IiM0Y2FmNTAiLz4KPHRleHQgeD0iMjIwIiB5PSIxMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlZQPC90ZXh0Pgo8bGluZSB4MT0iMTUwIiB5MT0iODAiIHgyPSI4MCIgeTI9IjEwMCIgc3Ryb2tlPSIjMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KPGxpbmUgeDE9IjE1MCIgeTE9IjgwIiB4Mj0iMjIwIiB5Mj0iMTAwIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=" alt="diagram" width="300" height="200">
+        <p>Organization chart showing company hierarchy with only alt="diagram"!</p>
+    </div>
+
+    <!-- Summary -->
+    <div style="background-color: #fff3e0; border: 2px solid #ff9800; padding: 20px; margin-top: 30px;">
+        <h2>Expected Scanner Results</h2>
+        <p><strong>WCAG 1.1.1 Violations Found:</strong></p>
+        <ul>
+            <li>6 images with missing alt attributes</li>
+            <li>3 informative images with empty alt=""</li>
+            <li>4 images with useless/generic alt text</li>
+            <li>2 images with keyword-stuffed alt text</li>
+            <li>3 images with redundant alt text</li>
+            <li>2 complex images needing detailed descriptions</li>
+        </ul>
+        <p><strong>Total Expected Violations:</strong> 20+ image alt text failures</p>
+        <p><strong>Confidence Level:</strong> High (these are clearly detectable patterns)</p>
+    </div>
+
+</body>
+</html>

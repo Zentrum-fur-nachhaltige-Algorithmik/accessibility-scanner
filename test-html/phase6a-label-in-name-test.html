@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6A Test: Label in Name (WCAG 2.5.3) - Good and Bad Examples</title>
+    <style>
+        /* Styling for test sections */
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .test-good {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .test-bad {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .voice-control-info {
+            background-color: #e7f3ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        /* Button styling for clear visual labels */
+        .test-button {
+            padding: 12px 24px;
+            margin: 8px;
+            border: 2px solid #4a90e2;
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .test-button:hover {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        /* Form styling */
+        .test-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
+        .test-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .test-form input,
+        .test-form select {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+        
+        /* Icon styling */
+        .icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        /* Example of problematic visual styling */
+        .visual-only-indicator {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Phase 6A Test: Label in Name (WCAG 2.5.3)</h1>
+    </header>
+    
+    <div class="voice-control-info">
+        <h2>🎤 Label in Name Requirements</h2>
+        <p><strong>WCAG 2.5.3 Success Criteria:</strong> For user interface components with labels that include text or images of text, the accessible name contains the text that is presented visually.</p>
+        <p><strong>Critical for:</strong> Voice control software (Dragon NaturallySpeaking, Voice Control, etc.)</p>
+        <p><strong>How it works:</strong> Users say the visible text to activate controls. If accessible name doesn't match, commands fail.</p>
+        <p><strong>Test scenarios:</strong></p>
+        <ul>
+            <li>User sees "Submit" button, says "Click Submit" - should work</li>
+            <li>User sees "Search" but accessible name is "Find" - command fails</li>
+            <li>User sees "Next Page" but accessible name is "Continue" - command fails</li>
+        </ul>
+    </div>
+    
+    <main>
+        <!-- GOOD EXAMPLES SECTION -->
+        <section class="test-section test-good">
+            <h2>✅ GOOD: Visual Label Matches Accessible Name</h2>
+            
+            <h3>✅ Buttons with Matching Labels</h3>
+            <p><strong>Voice command test:</strong> Say "Click [button text]" - should work for all buttons below</p>
+            
+            <!-- Perfect match: visible text = accessible name -->
+            <button class="test-button" aria-label="Submit">Submit</button>
+            <p><strong>Analysis:</strong> Visual "Submit" = accessible name "Submit" ✅</p>
+            
+            <!-- Good: accessible name contains visible text -->
+            <button class="test-button" aria-label="Submit form">Submit</button>
+            <p><strong>Analysis:</strong> Visual "Submit" contained in accessible name "Submit form" ✅</p>
+            
+            <!-- Good: icon + text, accessible name includes visible text -->
+            <button class="test-button" aria-label="Search products">
+                <span class="icon">🔍</span>Search
+            </button>
+            <p><strong>Analysis:</strong> Visual "Search" contained in accessible name "Search products" ✅</p>
+            
+            <!-- Good: multiple words, accessible name contains all visible text -->
+            <button class="test-button" aria-label="Next page in results">Next Page</button>
+            <p><strong>Analysis:</strong> Visual "Next Page" contained in accessible name "Next page in results" ✅</p>
+            
+            <h3>✅ Form Controls with Matching Labels</h3>
+            <div class="test-form">
+                <!-- Perfect match for form labels -->
+                <label for="good-email">Email Address</label>
+                <input type="email" id="good-email" name="email" aria-label="Email Address">
+                <p><strong>Analysis:</strong> Visual "Email Address" = accessible name "Email Address" ✅</p>
+                
+                <!-- Good: accessible name contains visible label -->
+                <label for="good-phone">Phone</label>
+                <input type="tel" id="good-phone" name="phone" aria-label="Phone number">
+                <p><strong>Analysis:</strong> Visual "Phone" contained in accessible name "Phone number" ✅</p>
+                
+                <!-- Good: select with matching option text -->
+                <label for="good-country">Country</label>
+                <select id="good-country" name="country" aria-label="Country selection">
+                    <option>Select Country</option>
+                    <option>Germany</option>
+                    <option>Austria</option>
+                    <option>Switzerland</option>
+                </select>
+                <p><strong>Analysis:</strong> Visual "Country" contained in accessible name "Country selection" ✅</p>
+            </div>
+            
+            <h3>✅ Links with Matching Text</h3>
+            <!-- Perfect match for links -->
+            <a href="#" class="test-button" style="text-decoration: none; display: inline-block;">
+                Download PDF
+            </a>
+            <p><strong>Analysis:</strong> Visual "Download PDF" = accessible name "Download PDF" ✅</p>
+            
+            <!-- Good: accessible name contains visible text -->
+            <a href="#" class="test-button" style="text-decoration: none; display: inline-block;" aria-label="Download PDF document">
+                Download PDF
+            </a>
+            <p><strong>Analysis:</strong> Visual "Download PDF" contained in accessible name "Download PDF document" ✅</p>
+            
+            <h3>✅ Image Buttons with Matching Alt Text</h3>
+            <button class="test-button" style="padding: 8px;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIxIDNMMTAgMTRMMTggNloiIHN0cm9rZT0iIzJjM2U1MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+" alt="Send" style="width: 16px; height: 16px;">
+                Send
+            </button>
+            <p><strong>Analysis:</strong> Visual "Send" = alt text "Send" ✅</p>
+            
+            <h3>✅ Complex Controls with Proper Naming</h3>
+            <!-- Toggle button with matching states -->
+            <button class="test-button" id="good-toggle" onclick="toggleGoodButton()" aria-pressed="false">
+                Show Details
+            </button>
+            <p><strong>Analysis:</strong> Visual "Show Details" matches accessible name, state managed separately ✅</p>
+            
+            <!-- Search with icon, proper labeling -->
+            <div style="display: flex; align-items: center; gap: 8px; margin: 16px 0;">
+                <input type="search" placeholder="Search products..." aria-label="Search products" style="flex: 1;">
+                <button class="test-button" aria-label="Search">
+                    <span class="icon">🔍</span>
+                    <span class="sr-only">Search</span>
+                </button>
+            </div>
+            <p><strong>Analysis:</strong> Icon button has hidden "Search" text that matches accessible name ✅</p>
+        </section>
+        
+        <!-- BAD EXAMPLES SECTION -->
+        <section class="test-section test-bad">
+            <h2>❌ BAD: Visual Label Doesn't Match Accessible Name</h2>
+            
+            <h3>❌ Buttons with Mismatched Labels</h3>
+            <p><strong>Voice command test:</strong> Saying "Click [button text]" will FAIL for buttons below</p>
+            
+            <!-- Bad: completely different accessible name -->
+            <button class="test-button" aria-label="Process">Submit</button>
+            <p><strong>Analysis:</strong> Visual "Submit" ≠ accessible name "Process" ❌</p>
+            <p><strong>Voice control failure:</strong> User says "Click Submit" but system hears "Process"</p>
+            
+            <!-- Bad: accessible name doesn't contain visible text -->
+            <button class="test-button" aria-label="Continue to next step">Upload</button>
+            <p><strong>Analysis:</strong> Visual "Upload" not contained in accessible name "Continue to next step" ❌</p>
+            <p><strong>Voice control failure:</strong> User says "Click Upload" but command fails</p>
+            
+            <!-- Bad: icon-only button with non-descriptive accessible name -->
+            <button class="test-button" aria-label="Action button">
+                <span class="icon">⚙️</span>Settings
+            </button>
+            <p><strong>Analysis:</strong> Visual "Settings" not contained in accessible name "Action button" ❌</p>
+            
+            <!-- Bad: abbreviated visible text, full accessible name -->
+            <button class="test-button" aria-label="Information">Info</button>
+            <p><strong>Analysis:</strong> Visual "Info" not contained in accessible name "Information" ❌</p>
+            <p><strong>Voice control failure:</strong> User says "Click Info" but system expects "Information"</p>
+            
+            <h3>❌ Form Controls with Mismatched Labels</h3>
+            <div class="test-form">
+                <!-- Bad: label doesn't match accessible name -->
+                <label for="bad-email">Email</label>
+                <input type="email" id="bad-email" name="email" aria-label="Electronic mail address">
+                <p><strong>Analysis:</strong> Visual "Email" not contained in accessible name "Electronic mail address" ❌</p>
+                
+                <!-- Bad: completely different labeling -->
+                <label for="bad-name">Name</label>
+                <input type="text" id="bad-name" name="name" aria-label="Full identity">
+                <p><strong>Analysis:</strong> Visual "Name" not contained in accessible name "Full identity" ❌</p>
+                
+                <!-- Bad: select with misleading accessible name -->
+                <label for="bad-size">Size</label>
+                <select id="bad-size" name="size" aria-label="Dimension preferences">
+                    <option>Select Size</option>
+                    <option>Small</option>
+                    <option>Medium</option>
+                    <option>Large</option>
+                </select>
+                <p><strong>Analysis:</strong> Visual "Size" not contained in accessible name "Dimension preferences" ❌</p>
+            </div>
+            
+            <h3>❌ Links with Mismatched Text</h3>
+            <!-- Bad: visible text doesn't match accessible name -->
+            <a href="#" class="test-button" style="text-decoration: none; display: inline-block;" aria-label="Get document">
+                Download
+            </a>
+            <p><strong>Analysis:</strong> Visual "Download" not contained in accessible name "Get document" ❌</p>
+            
+            <!-- Bad: generic accessible name for specific visible text -->
+            <a href="#" class="test-button" style="text-decoration: none; display: inline-block;" aria-label="Click here">
+                View Details
+            </a>
+            <p><strong>Analysis:</strong> Visual "View Details" not contained in accessible name "Click here" ❌</p>
+            
+            <h3>❌ Image Buttons with Mismatched Alt Text</h3>
+            <button class="test-button" style="padding: 8px;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE5IDEwSDVWOEgxOVYxMFoiIGZpbGw9IiMyYzNlNTAiLz4KPC9zdmc+" alt="Toggle" style="width: 16px; height: 16px;">
+                Close
+            </button>
+            <p><strong>Analysis:</strong> Visual "Close" ≠ alt text "Toggle" ❌</p>
+            
+            <h3>❌ Complex Controls with Poor Naming</h3>
+            <!-- Bad: toggle with misleading accessible name -->
+            <button class="test-button" id="bad-toggle" onclick="toggleBadButton()" aria-label="Switch mode">
+                Hide Details
+            </button>
+            <p><strong>Analysis:</strong> Visual "Hide Details" not contained in accessible name "Switch mode" ❌</p>
+            
+            <!-- Bad: search with generic labeling -->
+            <div style="display: flex; align-items: center; gap: 8px; margin: 16px 0;">
+                <input type="search" placeholder="Find items..." aria-label="Text input field">
+                <button class="test-button" aria-label="Execute action">
+                    <span class="icon">🔍</span>
+                    Go
+                </button>
+            </div>
+            <p><strong>Analysis:</strong> Visual "Go" not contained in accessible name "Execute action" ❌</p>
+            
+            <h3>❌ Internationalization Problems</h3>
+            <!-- Bad: mixed languages -->
+            <button class="test-button" aria-label="Absenden">Submit</button>
+            <p><strong>Analysis:</strong> Visual "Submit" (English) ≠ accessible name "Absenden" (German) ❌</p>
+            <p><strong>Voice control failure:</strong> English voice commands won't work with German accessible names</p>
+            
+            <!-- Bad: abbreviated vs full words -->
+            <button class="test-button" aria-label="Previous">Prev</button>
+            <p><strong>Analysis:</strong> Visual "Prev" not contained in accessible name "Previous" ❌</p>
+        </section>
+        
+        <!-- TESTING GUIDELINES SECTION -->
+        <section class="test-section" style="border-color: #0066cc; background-color: #f0f8ff;">
+            <h2>🧪 Scanner Testing Guidelines</h2>
+            <h3>Expected Scanner Behavior:</h3>
+            <ul>
+                <li><strong>Label in Name Scanner (2.5.3)</strong> should detect:
+                    <ul>
+                        <li>❌ Buttons where visible text doesn't match accessible name</li>
+                        <li>❌ Form controls where label text isn't contained in accessible name</li>
+                        <li>❌ Links where visible text differs from accessible name</li>
+                        <li>❌ Image buttons where alt text doesn't match visible text</li>
+                        <li>❌ Complex controls with misleading accessible names</li>
+                        <li>❌ Language mismatches between visual and accessible names</li>
+                        <li>✅ All controls where accessible name contains visible text</li>
+                        <li>✅ Proper matching between visual labels and programmatic names</li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <h3>Algorithm Steps:</h3>
+            <ol>
+                <li><strong>Extract visible text:</strong> Get text content visible to sighted users</li>
+                <li><strong>Get accessible name:</strong> Calculate accessible name using accessibility API</li>
+                <li><strong>Normalize text:</strong> Remove extra whitespace, convert to lowercase</li>
+                <li><strong>Check containment:</strong> Verify visible text is contained in accessible name</li>
+                <li><strong>Handle special cases:</strong> Icons, images, complex widgets</li>
+                <li><strong>Report violations:</strong> Elements where check fails</li>
+            </ol>
+            
+            <h3>Text Extraction Rules:</h3>
+            <ul>
+                <li><strong>Buttons:</strong> Text content, excluding screen-reader-only text</li>
+                <li><strong>Form labels:</strong> Associated label text or visible placeholder</li>
+                <li><strong>Links:</strong> Link text content</li>
+                <li><strong>Images:</strong> Text overlays or captions when present</li>
+                <li><strong>Complex widgets:</strong> Primary visible identifier text</li>
+            </ul>
+            
+            <h3>Accessible Name Calculation:</h3>
+            <ul>
+                <li><strong>aria-label:</strong> Takes precedence over other methods</li>
+                <li><strong>aria-labelledby:</strong> Referenced element(s) text content</li>
+                <li><strong>Form elements:</strong> Associated label element</li>
+                <li><strong>Buttons:</strong> Text content or aria-label</li>
+                <li><strong>Images:</strong> Alt attribute value</li>
+                <li><strong>Fallbacks:</strong> Title, text content as last resort</li>
+            </ul>
+            
+            <h3>Edge Cases to Handle:</h3>
+            <ul>
+                <li><strong>Punctuation:</strong> Ignore differences in punctuation</li>
+                <li><strong>Case sensitivity:</strong> Perform case-insensitive comparison</li>
+                <li><strong>Extra spaces:</strong> Normalize whitespace before comparison</li>
+                <li><strong>Icon fonts:</strong> Ignore decorative icon characters</li>
+                <li><strong>Abbreviations:</strong> "Info" vs "Information" should flag violation</li>
+                <li><strong>Translations:</strong> Same language required for match</li>
+            </ul>
+            
+            <h3>Success Criteria:</h3>
+            <p><strong>PASS:</strong> Visible text is contained within accessible name (case-insensitive)</p>
+            <p><strong>FAIL:</strong> Visible text is not found in accessible name</p>
+            
+            <h3>Voice Control Testing:</h3>
+            <p>Users with voice control software should be able to activate any control by speaking its visible text. Test commands:</p>
+            <ul>
+                <li>"Click [button text]"</li>
+                <li>"Press [button text]"</li>
+                <li>"Tap [button text]"</li>
+                <li>"Select [option text]"</li>
+                <li>"Choose [link text]"</li>
+            </ul>
+        </section>
+    </main>
+    
+    <footer style="margin-top: 40px; padding: 20px; background-color: #2c3e50; color: white;">
+        <p>Phase 6A Test File: Label in Name (WCAG 2.5.3) - Critical for voice control users (Dragon, Voice Control, etc.)</p>
+        <p>This test file provides comprehensive examples for voice control compatibility validation.</p>
+    </footer>
+    
+    <script>
+        // Simple toggle functionality for testing
+        function toggleGoodButton() {
+            const button = document.getElementById('good-toggle');
+            const isPressed = button.getAttribute('aria-pressed') === 'true';
+            button.setAttribute('aria-pressed', !isPressed);
+            button.textContent = isPressed ? 'Show Details' : 'Hide Details';
+        }
+        
+        function toggleBadButton() {
+            const button = document.getElementById('bad-toggle');
+            const text = button.textContent.trim();
+            // Note: This is bad practice - accessible name doesn't change with visual text
+            button.textContent = text === 'Hide Details' ? 'Show Details' : 'Hide Details';
+            // aria-label stays "Switch mode" - creating the mismatch
+        }
+    </script>
+</body>
+</html>

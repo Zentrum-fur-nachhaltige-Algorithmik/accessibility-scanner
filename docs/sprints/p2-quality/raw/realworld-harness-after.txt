@@ -1,0 +1,48 @@
+Serving /home/xyz/accessability/test-sites/realworld on http://localhost:38463
+Profile: standard | LLM scanners: disabled | fixtures: 5
+
+--- own-audit-ui.html
+  29 violations | 32/32 scanners | 0 errors | spot-truths 3/4 | 1865.4s
+    SPOT-TRUTH FAIL REAL: <html lang="de"> contradicts English content / inner lang="en": no 3.1.1/3.1.2 language violation reported despite lang="de" on an all-English page
+--- med-theme.html
+  41 violations | 32/32 scanners | 0 errors | spot-truths 3/3 | 90.9s
+--- beeproduced.html
+  430 violations | 32/32 scanners | 0 errors | spot-truths 3/4 | 95.4s
+    SPOT-TRUTH FAIL CLEAN: logo link has an accessible name via its inner img alt: logo link (named by <img alt="Logo">) flagged as unnamed: [undefined/9.2.4.4] Link text "[empty]" does not clearly describe the link's purpose
+--- wiki-medical-de.html
+  1637 violations | 32/32 scanners | 0 errors | spot-truths 4/5 | 360.2s
+    SPOT-TRUTH FAIL CLEAN: valid ISO 639-3 subtags on interlanguage links: 18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code "arz"; [undefined/9.3.1.2] Element has invalid language code "ast"; [undefined/9.3.1.2] Element has invalid language code "bcl"; [undefined/9.3.1.2] Element has invalid language code "ckb"; [undefined/9.3.1.2] Element has invalid language code "gpe"; [undefined/9.3.1.2] Element has invalid language code "new"
+--- modern-commercial.html
+  250 violations | 32/32 scanners | 0 errors | spot-truths 2/5 | 204.6s
+    SPOT-TRUTH FAIL CLEAN: heading whose accessible name comes from an image alt: the only text-empty h2 (named by <img alt="Mozilla Anzeigen">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading "[empty]" is not descriptive (empty-heading)
+    SPOT-TRUTH FAIL CLEAN: nav logo link is named by its inner img alt: logo link (named by <img alt="Mozilla">) flagged as unnamed: [undefined/9.2.4.4] Link text "[empty]" does not clearly describe the link's purpose
+    SPOT-TRUTH FAIL CLEAN: valid 3-letter BCP-47 subtags are not "invalid language codes": 9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code "ast"; [undefined/9.3.1.2] Element has invalid language code "cak"; [undefined/9.3.1.2] Element has invalid language code "dsb"; [undefined/9.3.1.2] Element has invalid language code "hsb"; [undefined/9.3.1.2] Element has invalid language code "kab"
+
+=== SUMMARY ===
+profile=standard  llm=off  fixtures=5
+
+file                        viol  band            scanners  errors   spot     time
+----------------------------------------------------------------------------------
+own-audit-ui.html             29  [14-56]            32/32       0    3/4  1865.4s
+med-theme.html                41  [22-88]            32/32       0    3/3    90.9s
+beeproduced.html             430  [189-758]          32/32       0    3/4    95.4s
+wiki-medical-de.html        1637  [810-3240]         32/32       0    4/5   360.2s
+modern-commercial.html       250  [111-446]          32/32       0    2/5   204.6s
+----------------------------------------------------------------------------------
+
+SLOW FILES (> 240s — not a failure, but a real performance finding):
+  own-audit-ui.html: 1865.4s
+  wiki-medical-de.html: 360.2s
+
+SPOT-TRUTH FAILURES (6):
+  own-audit-ui.html: REAL: <html lang="de"> contradicts English content / inner lang="en" — no 3.1.1/3.1.2 language violation reported despite lang="de" on an all-English page
+  beeproduced.html: CLEAN: logo link has an accessible name via its inner img alt — logo link (named by <img alt="Logo">) flagged as unnamed: [undefined/9.2.4.4] Link text "[empty]" does not clearly describe the link's purpose
+  wiki-medical-de.html: CLEAN: valid ISO 639-3 subtags on interlanguage links — 18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code "arz"; [undefined/9.3.1.2] Element has invalid language code "ast"; [undefined/9.3.1.2] Element has invalid language code "bcl"; [undefined/9.3.1.2] Element has invalid language code "ckb"; [undefined/9.3.1.2] Element has invalid language code "gpe"; [undefined/9.3.1.2] Element has invalid language code "new"
+  modern-commercial.html: CLEAN: heading whose accessible name comes from an image alt — the only text-empty h2 (named by <img alt="Mozilla Anzeigen">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading "[empty]" is not descriptive (empty-heading)
+  modern-commercial.html: CLEAN: nav logo link is named by its inner img alt — logo link (named by <img alt="Mozilla">) flagged as unnamed: [undefined/9.2.4.4] Link text "[empty]" does not clearly describe the link's purpose
+  modern-commercial.html: CLEAN: valid 3-letter BCP-47 subtags are not "invalid language codes" — 9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code "ast"; [undefined/9.3.1.2] Element has invalid language code "cak"; [undefined/9.3.1.2] Element has invalid language code "dsb"; [undefined/9.3.1.2] Element has invalid language code "hsb"; [undefined/9.3.1.2] Element has invalid language code "kab"
+
+RESULT: FAIL (6 failures)
+=== END SUMMARY ===
+
+JSON report: /home/xyz/accessability/docs/sprints/p2-quality/raw/harness-realworld.json

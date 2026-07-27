@@ -1,123 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Accessible Form</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
-        .skip-link { position: absolute; top: -40px; left: 0; background: #1e40af; color: white; padding: 8px; z-index: 100; }
-        .skip-link:focus { top: 0; }
-        :focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
-        .form-error { border: 2px solid #b91c1c; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us | Accessible Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+    :focus-visible { outline: 3px solid #1e40af; outline-offset: 2px; }
+    .error-border { border-color: #b91c1c !important; }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans leading-relaxed">
+<body class="flex flex-col min-h-full bg-gray-50 text-gray-900">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:p-4 focus:bg-white focus:z-50 underline">Skip to main content</a>
+  
+  <header class="p-6 bg-white shadow-sm">
+    <nav aria-label="Main navigation">
+      <h1 class="text-2xl font-bold">Company Portal</h1>
+    </nav>
+  </header>
 
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content" tabindex="-1" class="flex-grow p-6 max-w-2xl mx-auto w-full">
+    <h2 class="text-3xl font-bold mb-6">Contact Us</h2>
+    
+    <div id="error-summary" role="alert" tabindex="-1" class="hidden mb-6 p-4 bg-red-50 border-l-4 border-red-700" aria-live="assertive">
+      <h3 class="font-bold text-red-900">Please correct the following errors:</h3>
+      <ul id="error-list" class="list-disc ml-5 text-red-800"></ul>
+    </div>
 
-    <header class="bg-white border-b border-gray-200 p-4">
-        <nav aria-label="Main navigation">
-            <h1 class="text-xl font-bold">Contact Our Team</h1>
-        </nav>
-    </header>
+    <form id="contact-form" novalidate class="space-y-6">
+      <fieldset class="space-y-4">
+        <legend class="sr-only">Contact Details</legend>
+        
+        <div>
+          <label for="name" class="block font-medium mb-1">Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input type="text" id="name" name="name" autocomplete="name" required class="w-full p-2 border-2 border-gray-500 rounded">
+          <p id="name-error" class="text-red-700 hidden text-sm mt-1">Name is required.</p>
+        </div>
 
-    <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto p-6">
-        <section aria-labelledby="contact-form-title">
-            <h2 id="contact-form-title" class="text-2xl font-semibold mb-6">Registration Form</h2>
-            
-            <div id="success-message" role="status" aria-live="polite" class="hidden p-4 mb-4 bg-green-100 text-green-800 rounded">
-                Form submitted successfully!
-            </div>
+        <div>
+          <label for="email" class="block font-medium mb-1">Email <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input type="email" id="email" name="email" autocomplete="email" required class="w-full p-2 border-2 border-gray-500 rounded">
+          <p id="email-error" class="text-red-700 hidden text-sm mt-1">Please enter a valid email address.</p>
+        </div>
 
-            <form id="registration-form" novalidate class="space-y-6">
-                <!-- Name -->
-                <div>
-                    <label for="name" class="block font-medium mb-1">Full Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
-                    <input type="text" id="name" name="name" required autocomplete="name" class="w-full p-2 border border-gray-400 rounded">
-                    <p id="name-error" class="text-red-700 text-sm mt-1 hidden" role="alert">Please enter your name.</p>
-                </div>
+        <div>
+          <label for="department" class="block font-medium mb-1">Department <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <select id="department" name="department" required class="w-full p-2 border-2 border-gray-500 rounded">
+            <option value="">Select a department</option>
+            <option value="sales">Sales</option>
+            <option value="support">Support</option>
+          </select>
+          <p id="dept-error" class="text-red-700 hidden text-sm mt-1">Please select a department.</p>
+        </div>
+      </fieldset>
 
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block font-medium mb-1">Email Address <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
-                    <input type="email" id="email" name="email" required autocomplete="email" class="w-full p-2 border border-gray-400 rounded">
-                    <p id="email-error" class="text-red-700 text-sm mt-1 hidden" role="alert">Please enter a valid email address.</p>
-                </div>
+      <div>
+        <label for="message" class="block font-medium mb-1">Message</label>
+        <textarea id="message" name="message" rows="4" class="w-full p-2 border-2 border-gray-500 rounded"></textarea>
+      </div>
 
-                <!-- Phone -->
-                <div>
-                    <label for="phone" class="block font-medium mb-1">Phone Number (Optional)</label>
-                    <input type="tel" id="phone" name="phone" autocomplete="tel" class="w-full p-2 border border-gray-400 rounded">
-                </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="terms" name="terms" required class="w-5 h-5">
+        <label for="terms">I agree to the <a href="#" class="underline text-blue-700">terms and conditions</a> <span aria-hidden="true">*</span></label>
+      </div>
+      <p id="terms-error" class="text-red-700 hidden text-sm">You must agree to the terms.</p>
 
-                <!-- Department -->
-                <div>
-                    <label for="dept" class="block font-medium mb-1">Department</label>
-                    <select id="dept" name="dept" class="w-full p-2 border border-gray-400 rounded bg-white">
-                        <option value="sales">Sales</option>
-                        <option value="support">Support</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
+      <button type="submit" class="px-6 py-3 bg-blue-700 text-white font-bold rounded hover:bg-blue-800 transition">Submit Request</button>
+    </form>
 
-                <!-- Message -->
-                <div>
-                    <label for="message" class="block font-medium mb-1">Message</label>
-                    <textarea id="message" name="message" rows="4" class="w-full p-2 border border-gray-400 rounded"></textarea>
-                </div>
+    <div id="success-message" role="status" class="hidden mt-6 p-4 bg-green-50 border-l-4 border-green-700">
+      <p class="font-bold text-green-900">Thank you! Your form has been submitted successfully.</p>
+    </div>
+  </main>
 
-                <!-- Terms -->
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="terms" name="terms" required class="w-5 h-5">
-                    <label for="terms">I agree to the terms and conditions <span aria-hidden="true">*</span></label>
-                </div>
-                <p id="terms-error" class="text-red-700 text-sm hidden" role="alert">You must agree to the terms.</p>
+  <footer class="p-6 text-center text-gray-600 border-t mt-6">
+    &copy; 2024 Accessible Portal Inc.
+  </footer>
 
-                <button type="submit" class="bg-blue-800 text-white p-3 rounded font-bold hover:bg-blue-900 w-full md:w-auto px-8">
-                    Submit Registration
-                </button>
-            </form>
-        </section>
-    </main>
+  <script>
+    const form = document.getElementById('contact-form');
+    const summary = document.getElementById('error-summary');
+    const errorList = document.getElementById('error-list');
+    const success = document.getElementById('success-message');
 
-    <footer class="mt-12 p-4 text-center text-sm text-gray-600 border-t">
-        &copy; 2024 Accessibility Demo
-    </footer>
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fields = ['name', 'email', 'department', 'terms'];
+      const errors = [];
+      
+      fields.forEach(f => {
+        const input = document.getElementById(f);
+        const err = document.getElementById(f === 'department' ? 'dept-error' : f + '-error');
+        if (!input.value || (f === 'terms' && !input.checked)) {
+          input.setAttribute('aria-invalid', 'true');
+          input.classList.add('error-border');
+          err.classList.remove('hidden');
+          errors.push({ id: f, msg: f.charAt(0).toUpperCase() + f.slice(1) + ' is required' });
+        } else {
+          input.removeAttribute('aria-invalid');
+          input.classList.remove('error-border');
+          err.classList.add('hidden');
+        }
+      });
 
-    <script>
-        const form = document.getElementById('registration-form');
-        const successMsg = document.getElementById('success-message');
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let isValid = true;
-            
-            // Basic Validation
-            const fields = ['name', 'email', 'terms'];
-            fields.forEach(id => {
-                const el = document.getElementById(id);
-                const error = document.getElementById(`${id}-error`) || document.getElementById('terms-error');
-                
-                if (!el.value || (el.type === 'checkbox' && !el.checked)) {
-                    el.classList.add('form-error');
-                    error.classList.remove('hidden');
-                    el.setAttribute('aria-invalid', 'true');
-                    isValid = false;
-                } else {
-                    el.classList.remove('form-error');
-                    error.classList.add('hidden');
-                    el.setAttribute('aria-invalid', 'false');
-                }
-            });
-
-            if (isValid) {
-                form.classList.add('hidden');
-                successMsg.classList.remove('hidden');
-                successMsg.focus();
-            }
-        });
-    </script>
+      if (errors.length > 0) {
+        errorList.innerHTML = errors.map(e => `<li><a href="#${e.id}" class="underline">${e.msg}</a></li>`).join('');
+        summary.classList.remove('hidden');
+        summary.focus();
+        success.classList.add('hidden');
+      } else {
+        summary.classList.add('hidden');
+        success.classList.remove('hidden');
+        form.reset();
+      }
+    });
+  </script>
 </body>
 </html>

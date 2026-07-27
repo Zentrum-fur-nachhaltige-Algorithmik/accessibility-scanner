@@ -3,116 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us — Accessible Form Example</title>
+    <title>Contact Us — Accessible Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
+        :focus-visible { outline: 3px solid #1a365d; outline-offset: 2px; }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-        .skip-link { position: absolute; top: -40px; left: 0; background: #1b2a4a; color: white; padding: 8px; z-index: 100; }
+        .skip-link { position: absolute; top: -40px; left: 0; background: #1a365d; color: white; padding: 8px; z-index: 100; }
         .skip-link:focus { top: 0; }
-        :focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 leading-relaxed">
-    <div id="app">
-        <a href="#main-content" class="skip-link">Skip to main content</a>
-        
-        <header class="bg-white border-b border-gray-200 p-4">
-            <nav aria-label="Main navigation">
-                <h1 class="text-xl font-bold">Accessible Contact Form</h1>
-            </nav>
-        </header>
+<body class="bg-gray-50 text-gray-900 leading-relaxed font-sans min-h-screen">
 
-        <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto p-4 md:py-8">
-            <div v-if="submitted" role="status" class="p-6 bg-green-50 border border-green-200 rounded-md">
-                <h2 class="text-green-800 font-bold">Successfully submitted!</h2>
-                <p>Thank you for reaching out. We will get back to you shortly.</p>
-                <button @click="resetForm" class="mt-4 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800">Send another message</button>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="bg-white shadow">
+        <nav aria-label="Main navigation" class="max-w-3xl mx-auto p-4 flex justify-between items-center">
+            <div class="font-bold text-xl">MyCompany</div>
+            <ul class="flex gap-4">
+                <li><a href="/" class="underline text-gray-700">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="max-w-3xl mx-auto p-4 py-8">
+        <div id="app">
+            <h1 class="text-3xl font-bold mb-6">Contact Us</h1>
+
+            <div v-if="success" role="status" class="bg-green-100 border border-green-600 p-4 mb-6 text-green-900 font-bold">
+                ✓ Thank you for your message. We will get back to you soon.
             </div>
 
-            <form v-else @submit.prevent="validateForm" novalidate class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h2 class="text-2xl font-bold mb-6">Contact Us</h2>
-                
-                <div v-if="Object.keys(errors).length > 0" ref="errorSummary" tabindex="-1" role="alert" class="mb-6 p-4 bg-red-50 border border-red-300 rounded">
-                    <h3 class="font-bold text-red-800">Please correct the following errors:</h3>
-                    <ul class="list-disc pl-5 mt-2">
-                        <li v-for="(msg, field) in errors" :key="field">
-                            <a :href="`#${field}`" class="text-red-700 underline">{{msg}}</a>
-                        </li>
-                    </ul>
-                </div>
+            <div v-if="Object.keys(errors).length > 0" ref="errorSummary" tabindex="-1" role="alert" class="bg-red-100 border border-red-600 p-4 mb-6">
+                <h2 class="font-bold text-red-900 mb-2">{{ Object.keys(errors).length }} error(s) found:</h2>
+                <ul class="list-disc pl-5">
+                    <li v-for="(msg, field) in errors" :key="field">
+                        <a :href="'#' + field" class="underline text-red-900">{{ msg }}</a>
+                    </li>
+                </ul>
+            </div>
 
-                <div class="space-y-4">
-                    <div v-for="field in ['name', 'email', 'phone', 'company', 'subject', 'message']" :key="field">
-                        <label :for="field" class="block font-medium mb-1 capitalize">
-                            {{field}} <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
-                        </label>
-                        
-                        <input v-if="field !== 'message' && field !== 'subject'" 
-                            :id="field" v-model="formData[field]" :type="field === 'email' ? 'email' : 'text'"
-                            :autocomplete="field" :aria-invalid="!!errors[field]" :aria-describedby="errors[field] ? `${field}-error` : null"
-                            class="w-full p-2 border rounded" :class="errors[field] ? 'border-red-600' : 'border-gray-300'">
-                        
-                        <select v-else-if="field === 'subject'" :id="field" v-model="formData[field]"
-                            :aria-invalid="!!errors[field]" class="w-full p-2 border rounded border-gray-300">
-                            <option value="">Select a subject</option>
-                            <option value="support">Technical Support</option>
-                            <option value="sales">Sales Inquiry</option>
+            <form @submit.prevent="validateForm" novalidate class="space-y-6">
+                <fieldset class="border-0 p-0 space-y-6">
+                    <legend class="text-xl font-semibold mb-4">Personal Information</legend>
+                    
+                    <div class="flex flex-col">
+                        <label for="name" class="font-medium mb-1">Name <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                        <input type="text" id="name" v-model="form.name" autocomplete="name" 
+                               :aria-invalid="errors.name ? 'true' : undefined" aria-describedby="name-desc"
+                               class="border-2 border-gray-500 p-2 rounded">
+                        <span id="name-desc" class="text-sm text-gray-600">Enter your full name.</span>
+                        <p v-if="errors.name" id="name-error" class="text-red-700 font-bold mt-1">{{ errors.name }}</p>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="email" class="font-medium mb-1">Email <span aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+                        <input type="email" id="email" v-model="form.email" autocomplete="email"
+                               :aria-invalid="errors.email ? 'true' : undefined"
+                               class="border-2 border-gray-500 p-2 rounded">
+                        <p v-if="errors.email" id="email-error" class="text-red-700 font-bold mt-1">{{ errors.email }}</p>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="phone" class="font-medium mb-1">Phone</label>
+                        <input type="tel" id="phone" v-model="form.phone" autocomplete="tel"
+                               class="border-2 border-gray-500 p-2 rounded">
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="dept" class="font-medium mb-1">Department <span aria-hidden="true">*</span></label>
+                        <select id="dept" v-model="form.dept" class="border-2 border-gray-500 p-2 rounded bg-white">
+                            <option value="">Select a department</option>
+                            <option value="sales">Sales</option>
+                            <option value="support">Support</option>
                         </select>
-
-                        <textarea v-else :id="field" v-model="formData[field]" rows="4"
-                            :aria-invalid="!!errors[field]" class="w-full p-2 border rounded border-gray-300"></textarea>
-                            
-                        <p v-if="errors[field]" :id="`${field}-error`" class="text-red-600 text-sm mt-1" role="alert">{{errors[field]}}</p>
+                        <p v-if="errors.dept" id="dept-error" class="text-red-700 font-bold mt-1">{{ errors.dept }}</p>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="terms" v-model="formData.terms" :aria-invalid="!!errors.terms">
-                        <label for="terms">I agree to the terms and conditions</label>
+                    <div class="flex flex-col">
+                        <label for="msg" class="font-medium mb-1">Message <span aria-hidden="true">*</span></label>
+                        <textarea id="msg" v-model="form.message" rows="4" class="border-2 border-gray-500 p-2 rounded"></textarea>
+                        <p v-if="errors.message" id="msg-error" class="text-red-700 font-bold mt-1">{{ errors.message }}</p>
                     </div>
-                </div>
 
-                <button type="submit" class="mt-6 w-full p-3 bg-blue-700 text-white font-bold rounded hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-                    Submit Message
-                </button>
+                    <div class="flex gap-2 items-center">
+                        <input type="checkbox" id="terms" v-model="form.terms" class="w-5 h-5">
+                        <label for="terms" class="font-medium">I agree to the terms and conditions <span aria-hidden="true">*</span></label>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="bg-gray-800 text-white font-bold py-3 px-6 rounded hover:bg-gray-900 focus:ring-4 focus:ring-blue-600">Submit Message</button>
             </form>
-        </main>
+        </div>
+    </main>
 
-        <footer class="text-center p-8 text-gray-500 text-sm">
-            &copy; 2024 Accessible Forms Demo. All rights reserved.
-        </footer>
-    </div>
+    <footer class="text-center p-8 mt-12 bg-gray-200">
+        <p>&copy; 2024 MyCompany. All accessiblity rights reserved.</p>
+    </footer>
 
     <script>
-        const { createApp, ref, nextTick } = Vue;
+        const { createApp, ref, reactive, nextTick } = Vue;
+
         createApp({
             setup() {
-                const formData = ref({ name: '', email: '', phone: '', company: '', subject: '', message: '', terms: false });
-                const errors = ref({});
-                const submitted = ref(false);
+                const form = reactive({ name: '', email: '', phone: '', dept: '', message: '', terms: false });
+                const errors = reactive({});
+                const success = ref(false);
                 const errorSummary = ref(null);
 
                 const validateForm = async () => {
-                    errors.value = {};
-                    if (!formData.value.name) errors.value.name = "Name is required";
-                    if (!formData.value.email.includes('@')) errors.value.email = "Valid email is required";
-                    if (!formData.value.terms) errors.value.terms = "You must agree to the terms";
+                    Object.keys(errors).forEach(key => delete errors[key]);
+                    success.value = false;
 
-                    if (Object.keys(errors.value).length > 0) {
+                    if (!form.name) errors.name = 'Name is required.';
+                    if (!form.email || !form.email.includes('@')) errors.email = 'Valid email is required.';
+                    if (!form.dept) errors.dept = 'Department is required.';
+                    if (!form.message) errors.message = 'Message cannot be empty.';
+                    if (!form.terms) errors.terms = 'You must agree to the terms.';
+
+                    if (Object.keys(errors).length > 0) {
                         await nextTick();
-                        errorSummary.value.focus();
+                        errorSummary.value?.focus();
                     } else {
-                        submitted.value = true;
+                        success.value = true;
+                        Object.assign(form, { name: '', email: '', phone: '', dept: '', message: '', terms: false });
                     }
                 };
 
-                const resetForm = () => {
-                    formData.value = { name: '', email: '', phone: '', company: '', subject: '', message: '', terms: false };
-                    submitted.value = false;
-                };
-
-                return { formData, errors, submitted, validateForm, resetForm, errorSummary };
+                return { form, errors, success, validateForm, errorSummary };
             }
         }).mount('#app');
     </script>

@@ -1,0 +1,247 @@
+<!-- WCAG-TEST
+criterion: 2.5.7
+level: AA
+title: Dragging Movements
+test_type: bad
+expected_violations: 4
+testable_by: dom
+scanners: input-modalities
+description: Drag-only interactions with no single-pointer alternative
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Dragging Movements - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* VIOLATION 1: Drag-only sortable list */
+        .sortable-list {
+            list-style: none;
+            padding: 0;
+            max-width: 400px;
+        }
+        .sortable-list li {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 12px 16px;
+            margin: 4px 0;
+            cursor: grab;
+            user-select: none;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sortable-list li:active {
+            cursor: grabbing;
+            background: #bbdefb;
+        }
+        .drag-handle {
+            color: #666;
+            font-size: 18px;
+        }
+
+        /* VIOLATION 2: Drag-only slider */
+        .custom-slider-track {
+            width: 300px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            position: relative;
+            margin: 30px 0;
+        }
+        .custom-slider-thumb {
+            width: 20px;
+            height: 20px;
+            background: #1976d2;
+            border-radius: 50%;
+            position: absolute;
+            top: -6px;
+            left: 40%;
+            cursor: grab;
+        }
+        .custom-slider-thumb:active {
+            cursor: grabbing;
+        }
+        .custom-slider-fill {
+            height: 100%;
+            width: 40%;
+            background: #1976d2;
+            border-radius: 4px;
+        }
+
+        /* VIOLATION 3: Drag-to-resize panels */
+        .resizable-container {
+            display: flex;
+            border: 1px solid #ccc;
+            height: 200px;
+            max-width: 600px;
+        }
+        .resizable-panel {
+            padding: 15px;
+            overflow: auto;
+        }
+        .panel-left {
+            width: 50%;
+            background: #f3e5f5;
+        }
+        .panel-right {
+            flex: 1;
+            background: #e8f5e9;
+        }
+        .resize-handle {
+            width: 6px;
+            background: #9e9e9e;
+            cursor: col-resize;
+            flex-shrink: 0;
+        }
+        .resize-handle:hover {
+            background: #616161;
+        }
+
+        /* VIOLATION 4: Drag-only file upload */
+        .drag-upload-zone {
+            border: 3px dashed #bdbdbd;
+            padding: 60px 20px;
+            text-align: center;
+            background: #fafafa;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 20px 0;
+        }
+        .drag-upload-zone p {
+            color: #757575;
+            font-size: 18px;
+        }
+        .drag-upload-zone .icon {
+            font-size: 48px;
+            color: #bdbdbd;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Task Management Dashboard</h1>
+
+    <!-- VIOLATION 1: Drag-only sortable list with no keyboard/button alternative -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 1: Drag-Only Sortable List</div>
+        <p>Items can only be reordered by dragging. No up/down buttons or keyboard controls are provided.</p>
+    </div>
+
+    <h2>Priority Tasks</h2>
+    <p>Drag items to reorder priority:</p>
+    <ul class="sortable-list" id="taskList">
+        <li draggable="true" ondragstart="drag(event)" id="task1">
+            <span class="drag-handle">&#9776;</span>
+            <span>Review pull request #142</span>
+        </li>
+        <li draggable="true" ondragstart="drag(event)" id="task2">
+            <span class="drag-handle">&#9776;</span>
+            <span>Update database schema</span>
+        </li>
+        <li draggable="true" ondragstart="drag(event)" id="task3">
+            <span class="drag-handle">&#9776;</span>
+            <span>Fix login page CSS</span>
+        </li>
+        <li draggable="true" ondragstart="drag(event)" id="task4">
+            <span class="drag-handle">&#9776;</span>
+            <span>Write unit tests for API</span>
+        </li>
+        <li draggable="true" ondragstart="drag(event)" id="task5">
+            <span class="drag-handle">&#9776;</span>
+            <span>Deploy to staging</span>
+        </li>
+    </ul>
+
+    <!-- VIOLATION 2: Custom drag-only slider with no alternative input -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 2: Drag-Only Slider</div>
+        <p>Volume can only be adjusted by dragging the thumb. No text input, buttons, or native range input alternative.</p>
+    </div>
+
+    <h2>Volume Control</h2>
+    <p>Drag the slider to adjust volume:</p>
+    <div class="custom-slider-track" id="volumeSlider">
+        <div class="custom-slider-fill"></div>
+        <div class="custom-slider-thumb" onmousedown="startDrag(event)"></div>
+    </div>
+    <p>Current volume: <span id="volumeValue">40%</span></p>
+
+    <!-- VIOLATION 3: Drag-to-resize with no button alternative -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 3: Drag-Only Panel Resize</div>
+        <p>Panel widths can only be changed by dragging the resize handle. No buttons or keyboard controls provided.</p>
+    </div>
+
+    <h2>Code Editor</h2>
+    <p>Drag the divider to resize panels:</p>
+    <div class="resizable-container">
+        <div class="resizable-panel panel-left">
+            <h3>File Explorer</h3>
+            <p>src/</p>
+            <p>&nbsp;&nbsp;index.js</p>
+            <p>&nbsp;&nbsp;app.js</p>
+            <p>&nbsp;&nbsp;utils.js</p>
+        </div>
+        <div class="resize-handle" onmousedown="startResize(event)"></div>
+        <div class="resizable-panel panel-right">
+            <h3>Editor</h3>
+            <p>function main() {</p>
+            <p>&nbsp;&nbsp;console.log("hello");</p>
+            <p>}</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 4: Drag-only file upload with no click/browse alternative -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 4: Drag-Only File Upload</div>
+        <p>Files can only be uploaded by dragging them into the drop zone. No browse button or file input is provided.</p>
+    </div>
+
+    <h2>Upload Documents</h2>
+    <div class="drag-upload-zone" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+        <div class="icon">&#128194;</div>
+        <p>Drag files here to upload</p>
+        <p style="font-size: 14px; color: #9e9e9e;">Supported formats: PDF, DOCX, PNG</p>
+        <!-- No <input type="file"> or browse button provided -->
+    </div>
+
+    <script>
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+        function startDrag(event) {
+            // Drag-only slider logic - no keyboard alternative
+        }
+        function startResize(event) {
+            // Drag-only resize logic - no keyboard alternative
+        }
+        function handleDrop(event) {
+            event.preventDefault();
+            // Drop-only upload logic - no click alternative
+        }
+    </script>
+
+</body>
+</html>

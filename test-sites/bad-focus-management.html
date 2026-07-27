@@ -1,0 +1,962 @@
+<!-- WCAG-TEST
+criterion: 2.4.3, 2.4.7
+level: AA
+title: Focus Order, Focus Visible
+test_type: bad
+expected_violations: 5
+testable_by: dom
+scanners: focus-management, keyboard-navigation
+description: Poor focus management in dynamic content and modals
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Focus Management Violations (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.4;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* VIOLATION 1: Modal without focus shift */
+        .bad-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            /* SCHLECHT: Modal ohne Fokus-Steuerung */
+        }
+        
+        .bad-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            /* SCHLECHT: Kein automatischer Fokus oder Focus Trap */
+        }
+        
+        /* VIOLATION 2: Dynamic content without focus management */
+        .bad-dynamic-list {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #fafafa;
+            min-height: 200px;
+        }
+        
+        .bad-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .bad-delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            /* SCHLECHT: Nach Löschen springt Fokus unkontrolliert */
+        }
+        
+        /* VIOLATION 3: Load more without focus shift */
+        .bad-content-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #fafafa;
+        }
+        
+        .bad-content-item {
+            padding: 15px;
+            margin: 10px 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .bad-load-more {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            /* SCHLECHT: Fokus bleibt auf Button nach Laden neuer Inhalte */
+        }
+        
+        /* VIOLATION 4: Tab interface without proper focus management */
+        .bad-tab-container {
+            margin: 20px 0;
+        }
+        
+        .bad-tab-list {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .bad-tab-button {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 2px;
+            /* SCHLECHT: Kein ordentliches Focus Management zwischen Tabs */
+        }
+        
+        .bad-tab-button.active {
+            background-color: white;
+            border-bottom: 2px solid white;
+            margin-bottom: -2px;
+        }
+        
+        .bad-tab-panel {
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        
+        /* VIOLATION 5: Form submission with focus loss */
+        .bad-form-container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .bad-form-row {
+            margin: 15px 0;
+        }
+        
+        .bad-form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .bad-submit-button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            /* SCHLECHT: Nach Submit springt Fokus an Seitenanfang */
+        }
+        
+        /* VIOLATION 6: Dropdown without focus restoration */
+        .bad-dropdown-container {
+            position: relative;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        
+        .bad-dropdown-button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .bad-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 100;
+            /* SCHLECHT: Fokus wird nicht ins Dropdown gesetzt */
+        }
+        
+        .bad-dropdown-item {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bad-dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* VIOLATION 7: Accordion without focus management */
+        .bad-accordion {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .bad-accordion-header {
+            background-color: #f0f0f0;
+            border: none;
+            width: 100%;
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            /* SCHLECHT: Kein Focus Management beim Öffnen/Schließen */
+        }
+        
+        .bad-accordion-content {
+            padding: 15px;
+            display: none;
+            background-color: white;
+        }
+        
+        /* VIOLATION 8: Toast notifications stealing focus */
+        .bad-toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .bad-toast {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            display: none;
+            /* SCHLECHT: Toast unterbricht aktuellen Fokus */
+        }
+        
+        /* VIOLATION 9: Infinite scroll without focus consideration */
+        .bad-infinite-scroll {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fafafa;
+        }
+        
+        .bad-scroll-item {
+            padding: 15px;
+            margin: 10px 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            /* SCHLECHT: Neue Inhalte werden geladen ohne Fokus-Information */
+        }
+        
+        .bad-loading-indicator {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            display: none;
+        }
+        
+        /* VIOLATION 10: Search suggestions without proper navigation */
+        .bad-search-container {
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .bad-search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .bad-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 100;
+            /* SCHLECHT: Keine Tastatur-Navigation durch Vorschläge */
+        }
+        
+        .bad-suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bad-suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        button {
+            background-color: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #005a87;
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Focus Management Violations (BAD)</h1>
+    <p><strong>WCAG 2.4.3 Verletzungen:</strong> Unlogisches oder fehlendes Fokus-Management bei dynamischen UI-Änderungen</p>
+    
+    <!-- VIOLATION 1: Modal without focus shift -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Modal ohne Fokus-Verschiebung</div>
+        <p><strong>Problem:</strong> Modal öffnet sich, aber Fokus verbleibt auf öffnendem Button</p>
+        <div class="interactive-area">
+            <button onclick="badOpenModal()">Modal öffnen</button>
+            <div class="status-display">
+                Aktueller Fokus: <span id="focusStatus1">Unbekannt</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for violation 1 -->
+    <div class="bad-modal-overlay" id="badModalOverlay">
+        <div class="bad-modal">
+            <!-- SCHLECHT: Kein Fokus auf Modal-Inhalt -->
+            <h3>Modal Dialog</h3>
+            <p>Dies ist ein Modal-Dialog. Der Fokus sollte automatisch hierher verschoben werden, ist es aber nicht.</p>
+            <p>Benutzer können mit Tab weiter durch die Hintergrund-Seite navigieren, obwohl sie das Modal verwenden sollten.</p>
+            <button onclick="badCloseModal()">Schließen</button>
+            <button onclick="badSaveModal()">Speichern</button>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Dynamic content without focus management -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Dynamische Inhalte ohne Fokus-Management</div>
+        <p><strong>Problem:</strong> Nach dem Löschen von Elementen springt der Fokus unkontrolliert</p>
+        <div class="interactive-area">
+            <div class="bad-dynamic-list" id="badDynamicList">
+                <!-- SCHLECHT: Nach Löschen springt Fokus an Seitenanfang -->
+                <div class="bad-list-item">
+                    <span>Element 1 - Wichtige Informationen</span>
+                    <button class="bad-delete-button" onclick="badDeleteItem(this)">Löschen</button>
+                </div>
+                <div class="bad-list-item">
+                    <span>Element 2 - Weitere wichtige Daten</span>
+                    <button class="bad-delete-button" onclick="badDeleteItem(this)">Löschen</button>
+                </div>
+                <div class="bad-list-item">
+                    <span>Element 3 - Noch mehr Inhalte</span>
+                    <button class="bad-delete-button" onclick="badDeleteItem(this)">Löschen</button>
+                </div>
+                <div class="bad-list-item">
+                    <span>Element 4 - Letzte Informationen</span>
+                    <button class="bad-delete-button" onclick="badDeleteItem(this)">Löschen</button>
+                </div>
+            </div>
+            <div class="status-display">
+                Letzte Aktion: <span id="focusStatus2">Noch keine Löschung</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Load more without focus shift -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: "Mehr laden" ohne Fokus-Verschiebung</div>
+        <p><strong>Problem:</strong> Neue Inhalte werden geladen, aber Fokus bleibt auf "Mehr laden" Button</p>
+        <div class="interactive-area">
+            <div class="bad-content-container" id="badContentContainer">
+                <!-- SCHLECHT: Fokus springt nicht zu neuen Inhalten -->
+                <div class="bad-content-item">
+                    <h4>Artikel 1</h4>
+                    <p>Dies ist der erste Artikel mit wichtigen Informationen.</p>
+                </div>
+                <div class="bad-content-item">
+                    <h4>Artikel 2</h4>
+                    <p>Der zweite Artikel enthält weitere relevante Inhalte.</p>
+                </div>
+                <div class="bad-content-item">
+                    <h4>Artikel 3</h4>
+                    <p>Hier finden Sie den dritten Artikel mit zusätzlichen Details.</p>
+                </div>
+            </div>
+            <button class="bad-load-more" onclick="badLoadMore()">Mehr Artikel laden</button>
+            <div class="status-display">
+                Geladene Artikel: <span id="articleCount">3</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Tab interface without proper focus management -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Tab-Interface ohne ordentliches Fokus-Management</div>
+        <p><strong>Problem:</strong> Tabs haben keine Tastatur-Navigation oder unlogische Fokus-Reihenfolge</p>
+        <div class="interactive-area">
+            <div class="bad-tab-container">
+                <!-- SCHLECHT: Keine Pfeiltasten-Navigation zwischen Tabs -->
+                <ul class="bad-tab-list">
+                    <li><button class="bad-tab-button active" onclick="badSwitchTab(0, this)">Tab 1</button></li>
+                    <li><button class="bad-tab-button" onclick="badSwitchTab(1, this)">Tab 2</button></li>
+                    <li><button class="bad-tab-button" onclick="badSwitchTab(2, this)">Tab 3</button></li>
+                </ul>
+                <div class="bad-tab-panel" id="badTabPanel0">
+                    <h4>Inhalt von Tab 1</h4>
+                    <p>Dies ist der Inhalt des ersten Tabs. Bei Tab-Wechsel sollte der Fokus logisch gesetzt werden.</p>
+                    <button>Aktion in Tab 1</button>
+                </div>
+                <div class="bad-tab-panel" id="badTabPanel1" style="display: none;">
+                    <h4>Inhalt von Tab 2</h4>
+                    <p>Der zweite Tab enthält andere Informationen und Aktionen.</p>
+                    <button>Aktion in Tab 2</button>
+                </div>
+                <div class="bad-tab-panel" id="badTabPanel2" style="display: none;">
+                    <h4>Inhalt von Tab 3</h4>
+                    <p>Der dritte Tab zeigt weitere relevante Inhalte an.</p>
+                    <button>Aktion in Tab 3</button>
+                </div>
+            </div>
+            <div class="status-display">
+                Aktiver Tab: <span id="activeTab">Tab 1</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Form submission with focus loss -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Formular-Übermittlung mit Fokus-Verlust</div>
+        <p><strong>Problem:</strong> Nach dem Absenden springt der Fokus an den Seitenanfang</p>
+        <div class="interactive-area">
+            <form class="bad-form-container" onsubmit="return badSubmitForm(event)">
+                <!-- SCHLECHT: Fokus springt nach Submit an den Anfang -->
+                <div class="bad-form-row">
+                    <label for="badName">Name:</label>
+                    <input type="text" id="badName" class="bad-form-input" required>
+                </div>
+                <div class="bad-form-row">
+                    <label for="badEmail">E-Mail:</label>
+                    <input type="email" id="badEmail" class="bad-form-input" required>
+                </div>
+                <div class="bad-form-row">
+                    <label for="badMessage">Nachricht:</label>
+                    <textarea id="badMessage" class="bad-form-input" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="bad-submit-button">Formular absenden</button>
+            </form>
+            <div class="status-display">
+                Formular-Status: <span id="formStatus">Bereit zum Absenden</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Dropdown without focus restoration -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Dropdown ohne Fokus-Wiederherstellung</div>
+        <p><strong>Problem:</strong> Dropdown öffnet/schließt ohne ordentliches Fokus-Management</p>
+        <div class="interactive-area">
+            <div class="bad-dropdown-container">
+                <!-- SCHLECHT: Kein Fokus-Management für Dropdown -->
+                <button class="bad-dropdown-button" onclick="badToggleDropdown()">
+                    Aktionen ▼
+                </button>
+                <div class="bad-dropdown-menu" id="badDropdownMenu">
+                    <a href="#" class="bad-dropdown-item" onclick="badDropdownAction('edit'); return false;">Bearbeiten</a>
+                    <a href="#" class="bad-dropdown-item" onclick="badDropdownAction('copy'); return false;">Kopieren</a>
+                    <a href="#" class="bad-dropdown-item" onclick="badDropdownAction('delete'); return false;">Löschen</a>
+                    <a href="#" class="bad-dropdown-item" onclick="badDropdownAction('share'); return false;">Teilen</a>
+                </div>
+            </div>
+            <div class="status-display">
+                Letzte Aktion: <span id="dropdownStatus">Keine</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Accordion without focus management -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Accordion ohne Fokus-Management</div>
+        <p><strong>Problem:</strong> Beim Öffnen/Schließen von Accordion-Bereichen wird der Fokus nicht gesetzt</p>
+        <div class="interactive-area">
+            <div class="bad-accordion">
+                <!-- SCHLECHT: Kein Fokus auf Accordion-Inhalt -->
+                <button class="bad-accordion-header" onclick="badToggleAccordion(0)">
+                    Bereich 1: Allgemeine Informationen
+                </button>
+                <div class="bad-accordion-content" id="badAccordion0">
+                    <p>Dies ist der Inhalt des ersten Accordion-Bereichs. Beim Öffnen sollte der Fokus hierher springen.</p>
+                    <button>Aktion in Bereich 1</button>
+                </div>
+            </div>
+            
+            <div class="bad-accordion">
+                <button class="bad-accordion-header" onclick="badToggleAccordion(1)">
+                    Bereich 2: Detaillierte Einstellungen
+                </button>
+                <div class="bad-accordion-content" id="badAccordion1">
+                    <p>Der zweite Bereich enthält spezifische Einstellungen und Optionen.</p>
+                    <button>Aktion in Bereich 2</button>
+                </div>
+            </div>
+            
+            <div class="status-display">
+                Geöffneter Bereich: <span id="accordionStatus">Keiner</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Toast notifications stealing focus -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Toast-Benachrichtigungen stehlen Fokus</div>
+        <p><strong>Problem:</strong> Benachrichtigungen unterbrechen den aktuellen Fokus des Benutzers</p>
+        <div class="interactive-area">
+            <p>Geben Sie Text in das Feld ein und klicken Sie dann auf "Toast anzeigen":</p>
+            <input type="text" placeholder="Tippen Sie hier..." style="width: 100%; padding: 10px; margin: 10px 0;">
+            <br>
+            <button onclick="badShowToast('info')">Info Toast anzeigen</button>
+            <button onclick="badShowToast('warning')">Warnung Toast anzeigen</button>
+            <button onclick="badShowToast('error')">Fehler Toast anzeigen</button>
+            <div class="status-display">
+                Toast-Status: <span id="toastStatus">Keine aktiven Toasts</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast container -->
+    <div class="bad-toast-container" id="badToastContainer"></div>
+    
+    <!-- VIOLATION 9: Infinite scroll without focus consideration -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Unendliches Scrollen ohne Fokus-Berücksichtigung</div>
+        <p><strong>Problem:</strong> Neue Inhalte werden beim Scrollen geladen ohne Fokus-Information</p>
+        <div class="interactive-area">
+            <div class="bad-infinite-scroll" id="badInfiniteScroll" onscroll="badCheckScroll()">
+                <!-- SCHLECHT: Neuer Inhalt wird geladen ohne Fokus-Benachrichtigung -->
+                <div class="bad-scroll-item">
+                    <h4>Scroll-Element 1</h4>
+                    <p>Dies ist das erste Element in der scrollbaren Liste.</p>
+                </div>
+                <div class="bad-scroll-item">
+                    <h4>Scroll-Element 2</h4>
+                    <p>Das zweite Element mit weiteren Informationen.</p>
+                </div>
+                <div class="bad-scroll-item">
+                    <h4>Scroll-Element 3</h4>
+                    <p>Drittes Element in der endlosen Liste.</p>
+                </div>
+                <div class="bad-loading-indicator" id="badLoadingIndicator">
+                    Lädt weitere Inhalte...
+                </div>
+            </div>
+            <div class="status-display">
+                Geladene Elemente: <span id="scrollItemCount">3</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 10: Search suggestions without proper navigation -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 10: Such-Vorschläge ohne ordentliche Navigation</div>
+        <p><strong>Problem:</strong> Keine Tastatur-Navigation durch Suchvorschläge</p>
+        <div class="interactive-area">
+            <div class="bad-search-container">
+                <!-- SCHLECHT: Keine Pfeiltasten-Navigation durch Vorschläge -->
+                <input type="text" class="bad-search-input" placeholder="Suche eingeben..." 
+                       oninput="badShowSuggestions(this.value)" onfocus="badShowSuggestions(this.value)">
+                <div class="bad-suggestions" id="badSuggestions">
+                    <div class="bad-suggestion-item" onclick="badSelectSuggestion('JavaScript')">JavaScript</div>
+                    <div class="bad-suggestion-item" onclick="badSelectSuggestion('Java')">Java</div>
+                    <div class="bad-suggestion-item" onclick="badSelectSuggestion('Python')">Python</div>
+                    <div class="bad-suggestion-item" onclick="badSelectSuggestion('PHP')">PHP</div>
+                    <div class="bad-suggestion-item" onclick="badSelectSuggestion('C++')">C++</div>
+                </div>
+            </div>
+            <div class="status-display">
+                Ausgewählte Suche: <span id="searchStatus">Keine</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Warum das problematisch ist</div>
+        <p><strong>WCAG 2.4.3 Verletzungen:</strong></p>
+        <ul>
+            <li>❌ Modals ohne automatischen Fokus-Shift</li>
+            <li>❌ Fokus springt unkontrolliert nach Aktionen</li>
+            <li>❌ Dynamische Inhalte ohne Fokus-Benachrichtigung</li>
+            <li>❌ Tab-Interfaces ohne Tastatur-Navigation</li>
+            <li>❌ Formulare senden Fokus an Seitenanfang</li>
+            <li>❌ Dropdowns ohne Fokus-Management</li>
+            <li>❌ Accordions ignorieren Fokus-Kontext</li>
+            <li>❌ Toast-Nachrichten unterbrechen Workflow</li>
+            <li>❌ Infinite Scroll ohne Benutzer-Information</li>
+            <li>❌ Such-Vorschläge nicht tastatur-navigierbar</li>
+        </ul>
+        
+        <p><strong>Betroffene Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Tastatur-Nutzer: Verlieren Orientierung und müssen neu navigieren</li>
+            <li>👥 Screen Reader-Nutzer: Wissen nicht, wo sie sich befinden</li>
+            <li>👥 Motorische Einschränkungen: Schwierigkeiten beim erneuten Positionieren</li>
+            <li>👥 Kognitive Beeinträchtigungen: Werden durch Fokus-Sprünge verwirrt</li>
+            <li>👥 Sehbehinderte: Verlieren visuellen Kontext bei Fokus-Verlust</li>
+            <li>👥 Power-User: Workflow wird durch schlechtes Fokus-Management gestört</li>
+        </ul>
+    </div>
+
+    <script>
+        let badModalOpen = false;
+        let badDropdownOpen = false;
+        let badArticleCount = 3;
+        let badScrollItemCount = 3;
+        let badActiveTab = 0;
+        let badScrollLoading = false;
+        
+        // VIOLATION 1: Modal without focus shift
+        function badOpenModal() {
+            const overlay = document.getElementById('badModalOverlay');
+            overlay.style.display = 'block';
+            badModalOpen = true;
+            
+            // SCHLECHT: Fokus bleibt auf öffnendem Button
+            document.getElementById('focusStatus1').textContent = 'Fokus bleibt auf "Modal öffnen" Button';
+            
+            console.log('❌ FOCUS VIOLATION: Modal opened without shifting focus');
+            console.log('User can tab through background content while modal is open');
+        }
+        
+        function badCloseModal() {
+            const overlay = document.getElementById('badModalOverlay');
+            overlay.style.display = 'none';
+            badModalOpen = false;
+            
+            // SCHLECHT: Fokus springt irgendwohin
+            document.body.focus();
+            document.getElementById('focusStatus1').textContent = 'Modal geschlossen, Fokus irgendwo';
+            
+            console.log('❌ FOCUS VIOLATION: Modal closed without restoring focus to opener');
+        }
+        
+        function badSaveModal() {
+            alert('Daten gespeichert - aber Fokus-Management ist schlecht');
+            badCloseModal();
+        }
+        
+        // VIOLATION 2: Dynamic content without focus management
+        function badDeleteItem(button) {
+            const item = button.closest('.bad-list-item');
+            const list = item.parentNode;
+            
+            // SCHLECHT: Element löschen und Fokus an Seitenanfang setzen
+            item.remove();
+            document.body.focus(); // Fokus springt an Anfang
+            
+            document.getElementById('focusStatus2').textContent = 'Element gelöscht, Fokus springt an Seitenanfang';
+            
+            console.log('❌ FOCUS VIOLATION: Item deleted, focus jumps to top of page');
+            console.log('User must navigate back to where they were in the list');
+        }
+        
+        // VIOLATION 3: Load more without focus shift
+        function badLoadMore() {
+            const container = document.getElementById('badContentContainer');
+            
+            // SCHLECHT: Neue Inhalte laden, aber Fokus bleibt auf Button
+            for (let i = 0; i < 3; i++) {
+                badArticleCount++;
+                const newArticle = document.createElement('div');
+                newArticle.className = 'bad-content-item';
+                newArticle.innerHTML = `
+                    <h4>Artikel ${badArticleCount}</h4>
+                    <p>Dies ist ein neu geladener Artikel ${badArticleCount} mit zusätzlichen Informationen.</p>
+                `;
+                container.appendChild(newArticle);
+            }
+            
+            document.getElementById('articleCount').textContent = badArticleCount;
+            
+            // Fokus bleibt auf "Mehr laden" Button
+            console.log('❌ FOCUS VIOLATION: New content loaded but focus remains on "Load More" button');
+            console.log('User is not informed about new content location');
+        }
+        
+        // VIOLATION 4: Tab interface without proper focus management
+        function badSwitchTab(tabIndex, button) {
+            // SCHLECHT: Alle Tabs zurücksetzen ohne ordentliches Focus Management
+            const tabButtons = document.querySelectorAll('.bad-tab-button');
+            const tabPanels = document.querySelectorAll('.bad-tab-panel');
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanels.forEach(panel => panel.style.display = 'none');
+            
+            button.classList.add('active');
+            document.getElementById(`badTabPanel${tabIndex}`).style.display = 'block';
+            
+            badActiveTab = tabIndex;
+            document.getElementById('activeTab').textContent = `Tab ${tabIndex + 1}`;
+            
+            // SCHLECHT: Kein Fokus auf Tab-Inhalt
+            console.log(`❌ FOCUS VIOLATION: Switched to tab ${tabIndex + 1} without moving focus to content`);
+            console.log('No arrow key navigation between tabs implemented');
+        }
+        
+        // VIOLATION 5: Form submission with focus loss
+        function badSubmitForm(event) {
+            event.preventDefault();
+            
+            // SCHLECHT: Nach Submit springt Fokus an Seitenanfang
+            setTimeout(() => {
+                document.getElementById('formStatus').textContent = 'Formular abgesendet - Fokus springt an Anfang';
+                
+                // Simuliere erfolgreiche Übermittlung
+                alert('Formular erfolgreich abgesendet!');
+                
+                // SCHLECHT: Fokus springt an body
+                document.body.focus();
+                
+                console.log('❌ FOCUS VIOLATION: Form submitted, focus jumps to top of page');
+                console.log('User loses context and must navigate back to form area');
+            }, 100);
+            
+            return false;
+        }
+        
+        // VIOLATION 6: Dropdown without focus restoration
+        function badToggleDropdown() {
+            const dropdown = document.getElementById('badDropdownMenu');
+            
+            badDropdownOpen = !badDropdownOpen;
+            dropdown.style.display = badDropdownOpen ? 'block' : 'none';
+            
+            // SCHLECHT: Kein Fokus-Management für Dropdown
+            if (badDropdownOpen) {
+                console.log('❌ FOCUS VIOLATION: Dropdown opened without setting focus to first item');
+            } else {
+                console.log('❌ FOCUS VIOLATION: Dropdown closed without restoring focus properly');
+            }
+        }
+        
+        function badDropdownAction(action) {
+            document.getElementById('dropdownStatus').textContent = action;
+            badToggleDropdown();
+            
+            // SCHLECHT: Fokus wird nicht zur ursprünglichen Stelle zurückgesetzt
+            console.log(`❌ FOCUS VIOLATION: Dropdown action "${action}" completed without focus restoration`);
+        }
+        
+        // VIOLATION 7: Accordion without focus management
+        function badToggleAccordion(index) {
+            const content = document.getElementById(`badAccordion${index}`);
+            const isOpen = content.style.display === 'block';
+            
+            // SCHLECHT: Accordion öffnen/schließen ohne Fokus-Management
+            if (isOpen) {
+                content.style.display = 'none';
+                document.getElementById('accordionStatus').textContent = 'Keiner';
+                console.log(`❌ FOCUS VIOLATION: Accordion ${index} closed without focus management`);
+            } else {
+                content.style.display = 'block';
+                document.getElementById('accordionStatus').textContent = `Bereich ${index + 1}`;
+                console.log(`❌ FOCUS VIOLATION: Accordion ${index} opened without moving focus to content`);
+            }
+        }
+        
+        // VIOLATION 8: Toast notifications stealing focus
+        function badShowToast(type) {
+            const container = document.getElementById('badToastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bad-toast';
+            
+            const messages = {
+                'info': 'ℹ️ Information: Vorgang erfolgreich',
+                'warning': '⚠️ Warnung: Bitte beachten Sie...',
+                'error': '❌ Fehler: Etwas ist schiefgelaufen'
+            };
+            
+            toast.textContent = messages[type];
+            toast.style.display = 'block';
+            container.appendChild(toast);
+            
+            // SCHLECHT: Toast stiehlt Fokus
+            toast.focus();
+            toast.tabIndex = 0;
+            
+            document.getElementById('toastStatus').textContent = `${type.toUpperCase()} Toast aktiv`;
+            
+            console.log(`❌ FOCUS VIOLATION: ${type} toast shown and stole focus from current element`);
+            console.log('User workflow interrupted by notification');
+            
+            // Toast nach 3 Sekunden entfernen
+            setTimeout(() => {
+                container.removeChild(toast);
+                if (container.children.length === 0) {
+                    document.getElementById('toastStatus').textContent = 'Keine aktiven Toasts';
+                }
+            }, 3000);
+        }
+        
+        // VIOLATION 9: Infinite scroll without focus consideration
+        function badCheckScroll() {
+            const container = document.getElementById('badInfiniteScroll');
+            const loadingIndicator = document.getElementById('badLoadingIndicator');
+            
+            if (container.scrollTop + container.clientHeight >= container.scrollHeight - 10 && !badScrollLoading) {
+                badScrollLoading = true;
+                loadingIndicator.style.display = 'block';
+                
+                // SCHLECHT: Neue Inhalte laden ohne Fokus-Information
+                setTimeout(() => {
+                    for (let i = 0; i < 3; i++) {
+                        badScrollItemCount++;
+                        const newItem = document.createElement('div');
+                        newItem.className = 'bad-scroll-item';
+                        newItem.innerHTML = `
+                            <h4>Scroll-Element ${badScrollItemCount}</h4>
+                            <p>Automatisch geladenes Element ${badScrollItemCount}.</p>
+                        `;
+                        container.insertBefore(newItem, loadingIndicator);
+                    }
+                    
+                    document.getElementById('scrollItemCount').textContent = badScrollItemCount;
+                    loadingIndicator.style.display = 'none';
+                    badScrollLoading = false;
+                    
+                    console.log(`❌ FOCUS VIOLATION: ${badScrollItemCount - 3} to ${badScrollItemCount} items loaded without notifying user`);
+                    console.log('Screen reader users are unaware of new content');
+                }, 1000);
+            }
+        }
+        
+        // VIOLATION 10: Search suggestions without proper navigation
+        function badShowSuggestions(value) {
+            const suggestions = document.getElementById('badSuggestions');
+            
+            if (value.length > 0) {
+                suggestions.style.display = 'block';
+                // SCHLECHT: Keine Tastatur-Navigation implementiert
+                console.log('❌ FOCUS VIOLATION: Search suggestions shown without keyboard navigation');
+                console.log('User cannot use arrow keys to navigate through suggestions');
+            } else {
+                suggestions.style.display = 'none';
+            }
+        }
+        
+        function badSelectSuggestion(suggestion) {
+            const input = document.querySelector('.bad-search-input');
+            input.value = suggestion;
+            document.getElementById('badSuggestions').style.display = 'none';
+            document.getElementById('searchStatus').textContent = suggestion;
+            
+            // SCHLECHT: Fokus wird nicht ordentlich zurückgesetzt
+            console.log(`❌ FOCUS VIOLATION: Suggestion "${suggestion}" selected without proper focus restoration`);
+        }
+        
+        // Track focus changes to demonstrate problems
+        let lastFocusedElement = null;
+        
+        document.addEventListener('focusin', function(event) {
+            if (lastFocusedElement !== event.target) {
+                lastFocusedElement = event.target;
+                console.log(`Focus moved to: ${event.target.tagName}${event.target.id ? '#' + event.target.id : ''}${event.target.className ? '.' + event.target.className.split(' ')[0] : ''}`);
+            }
+        });
+        
+        // Initialize focus violations analysis
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== FOCUS MANAGEMENT VIOLATIONS ANALYSIS ===');
+            console.log('This page demonstrates 10 common focus management violations:');
+            console.log('1. Modal without focus shift');
+            console.log('2. Dynamic content deletion without focus management');
+            console.log('3. Load more content without focus shift');
+            console.log('4. Tab interface without proper keyboard navigation');
+            console.log('5. Form submission with focus loss');
+            console.log('6. Dropdown without focus restoration');
+            console.log('7. Accordion without focus management');
+            console.log('8. Toast notifications stealing focus');
+            console.log('9. Infinite scroll without focus consideration');
+            console.log('10. Search suggestions without keyboard navigation');
+            
+            console.log('\n⚠️ IMPACT ON USERS:');
+            console.log('- Keyboard users lose track of their position');
+            console.log('- Screen reader users become disoriented');
+            console.log('- Motor-impaired users struggle to reposition');
+            console.log('- All users experience workflow interruption');
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.bad-dropdown-container')) {
+                    const dropdown = document.getElementById('badDropdownMenu');
+                    if (badDropdownOpen) {
+                        dropdown.style.display = 'none';
+                        badDropdownOpen = false;
+                    }
+                }
+            });
+            
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.bad-search-container')) {
+                    document.getElementById('badSuggestions').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

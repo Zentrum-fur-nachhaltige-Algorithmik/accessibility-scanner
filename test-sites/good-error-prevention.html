@@ -1,0 +1,1385 @@
+<!-- WCAG-TEST
+criterion: 3.3.4, 3.3.6
+level: AAA
+title: Error Prevention (Legal, Financial, Data), Error Prevention (All)
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: error-handling
+description: Comprehensive error prevention implementation
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Error Prevention Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Financial transactions with proper confirmation */
+        .good-payment-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        .good-form-group {
+            margin-bottom: 15px;
+        }
+        
+        .good-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .good-form-group input, .good-form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .good-amount-display {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .good-initial-button {
+            background-color: #327d36;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            /* GUT: Erste Phase - führt zu Bestätigungsschritt */
+        }
+        
+        .good-confirm-button {
+            background-color: #d32f2f;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            /* GUT: Finale Bestätigung nach Review */
+        }
+        
+        .good-cancel-button {
+            background-color: #757575;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        /* GOOD 2: Legal commitments with review step */
+        .good-legal-form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-contract-summary {
+            background-color: #f0f0f0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .good-checkbox-group {
+            margin: 15px 0;
+        }
+        
+        .good-checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+        
+        .good-checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        /* GOOD 3: Data deletion with safeguards */
+        .good-deletion-area {
+            border: 2px solid #a66300;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #fff3e0;
+        }
+        
+        .good-warning-box {
+            background-color: #ffe0b2;
+            border: 1px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-backup-info {
+            background-color: #e3f2fd;
+            border: 1px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-type-to-confirm {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #a66300;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        
+        /* GOOD 4: Account changes with verification */
+        .good-account-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-current-info {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-verification-step {
+            background-color: #fff3e0;
+            border: 1px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .good-verification-code {
+            padding: 10px;
+            border: 2px solid #a66300;
+            border-radius: 4px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 3px;
+            margin: 10px 0;
+        }
+        
+        /* GOOD 5: Production environment safeguards */
+        .good-environment-controls {
+            border: 2px solid #d32f2f;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #ffebee;
+        }
+        
+        .good-environment-indicator {
+            background-color: #327d36;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .good-data-preview {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        /* GOOD 6: Auto-save with user control */
+        .good-editor-area {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-autosave-controls {
+            background-color: #e3f2fd;
+            border: 1px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-editor-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        
+        .good-autosave-status {
+            background-color: #f1f8e9;
+            border: 1px solid #327d36;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* GOOD 7: Time-sensitive actions with warnings */
+        .good-timing-area {
+            border: 2px solid #a66300;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #fff3e0;
+        }
+        
+        .good-timer-display {
+            background-color: #ffe0b2;
+            border: 2px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        .good-time-extension {
+            background-color: #e3f2fd;
+            border: 1px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        /* GOOD 8: System administration with safeguards */
+        .good-admin-area {
+            border: 3px solid #d32f2f;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #ffebee;
+        }
+        
+        .good-admin-warning {
+            background-color: #ffcdd2;
+            border: 2px solid #d32f2f;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .good-system-status {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-impact-assessment {
+            background-color: #fff3e0;
+            border: 1px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        /* Confirmation dialogs */
+        .confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .confirmation-dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            min-width: 400px;
+        }
+        
+        .confirmation-title {
+            color: #d32f2f;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .confirmation-details {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #a66300;
+        }
+        
+        .confirmation-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .status-display {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #a66300;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Error Prevention Accessible (GOOD)</h1>
+    <p><strong>WCAG 3.3.4 Konform:</strong> Korrekte Implementierung von Fehlerprävention für irreversible Aktionen</p>
+    
+    <!-- GOOD 1: Financial transactions with proper confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Finanzielle Transaktionen mit korrekter Bestätigung</div>
+        <p><strong>Lösung:</strong> Mehrstufiger Bestätigungsprozess mit Review-Schritt</p>
+        <div class="interactive-area">
+            <form class="good-payment-form" id="goodPaymentForm">
+                <!-- GUT: Vollständige Transaktionsdetails sichtbar -->
+                <div class="good-form-group">
+                    <label for="goodRecipient">Empfänger:</label>
+                    <input type="text" id="goodRecipient" name="recipient" value="Max Mustermann" readonly>
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodIban">IBAN:</label>
+                    <input type="text" id="goodIban" name="iban" value="DE89 3704 0044 0532 0130 00" readonly>
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodAmount">Betrag (EUR):</label>
+                    <input type="number" id="goodAmount" name="amount" value="1250.00" step="0.01" readonly>
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodPurpose">Verwendungszweck:</label>
+                    <input type="text" id="goodPurpose" name="purpose" value="Miete Januar 2024" readonly>
+                </div>
+                
+                <div class="good-amount-display">
+                    Überweisungsbetrag: €1,250.00
+                </div>
+                
+                <!-- GUT: Erste Phase - Review-Schritt -->
+                <button type="button" class="good-initial-button" onclick="goodShowPaymentConfirmation()">
+                    📋 Überweisung prüfen
+                </button>
+            </form>
+            <p>✅ Mehrstufiger Bestätigungsprozess mit Review-Möglichkeit</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Legal commitments with review step -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Rechtliche Verpflichtungen mit Review-Schritt</div>
+        <p><strong>Lösung:</strong> Vollständige Vertragsprüfung vor Annahme</p>
+        <div class="interactive-area">
+            <form class="good-legal-form" id="goodLegalForm">
+                <h4>Mietvertrag - Wohnung Berlin-Mitte</h4>
+                
+                <!-- GUT: Vollständige Vertragszusammenfassung -->
+                <div class="good-contract-summary">
+                    <h5>📋 Vertragszusammenfassung:</h5>
+                    <ul>
+                        <li><strong>Miete:</strong> €1,200/Monat + €200 Nebenkosten</li>
+                        <li><strong>Kaution:</strong> €3,600 (3 Monatsmieten)</li>
+                        <li><strong>Laufzeit:</strong> 2 Jahre (unbefristet danach)</li>
+                        <li><strong>Kündigungsfrist:</strong> 3 Monate zum Monatsende</li>
+                        <li><strong>Einzugstermin:</strong> 01.02.2024</li>
+                        <li><strong>Besonderheiten:</strong> Haustiere nach Absprache</li>
+                    </ul>
+                </div>
+                
+                <!-- GUT: Informierte Zustimmung -->
+                <div class="good-checkbox-group">
+                    <label>
+                        <input type="checkbox" id="goodContractRead" required>
+                        Ich habe den vollständigen Vertrag gelesen und verstanden (PDF, 12 Seiten)
+                    </label>
+                    <label>
+                        <input type="checkbox" id="goodLegalAdvice" required>
+                        Ich wurde über mein Recht auf Rechtsberatung informiert
+                    </label>
+                    <label>
+                        <input type="checkbox" id="goodCoolingOff" required>
+                        Ich verstehe, dass ich 14 Tage Widerrufsrecht habe
+                    </label>
+                    <label>
+                        <input type="checkbox" id="goodFinancialImpact" required>
+                        Mir sind alle finanziellen Verpflichtungen bewusst (€20,400/Jahr)
+                    </label>
+                </div>
+                
+                <button type="button" onclick="goodReviewContract()" style="background: #327d36; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px;">
+                    📝 Vertrag final prüfen
+                </button>
+                <button type="button" onclick="goodRequestLegalReview()" style="background: #1a78c2; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    ⚖️ Rechtsprüfung anfordern
+                </button>
+            </form>
+            <p>✅ Informierte Zustimmung mit Widerrufs- und Prüfungsrechten</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Data deletion with safeguards -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Datenlöschung mit Sicherheitsmaßnahmen</div>
+        <p><strong>Lösung:</strong> Backup-Erstellung und mehrstufige Bestätigung</p>
+        <div class="interactive-area">
+            <div class="good-deletion-area">
+                <h4>🗂️ Projektdaten löschen: "Website Relaunch 2024"</h4>
+                
+                <!-- GUT: Backup-Information -->
+                <div class="good-backup-info">
+                    <h5>💾 Automatisches Backup verfügbar:</h5>
+                    <ul>
+                        <li><strong>Backup erstellt:</strong> Heute, 14:23 Uhr</li>
+                        <li><strong>Wiederherstellung möglich:</strong> 30 Tage</li>
+                        <li><strong>Backup-Größe:</strong> 2.3 GB</li>
+                        <li><strong>Enthält:</strong> Alle Dateien, Kommentare, Versionshistorie</li>
+                    </ul>
+                </div>
+                
+                <!-- GUT: Warnung vor Auswirkungen -->
+                <div class="good-warning-box">
+                    <h5>⚠️ Auswirkungen der Löschung:</h5>
+                    <ul>
+                        <li>Alle 847 Projektdateien werden entfernt</li>
+                        <li>23 Teammitglieder verlieren Zugriff</li>
+                        <li>12 laufende Workflows werden abgebrochen</li>
+                        <li>Verknüpfte E-Mails und Kalendertermine bleiben erhalten</li>
+                    </ul>
+                </div>
+                
+                <!-- GUT: Typ-zu-bestätigen Mechanismus -->
+                <label for="goodDeleteConfirm">
+                    <strong>Zum Bestätigen tippen Sie:</strong> "Website Relaunch 2024 LÖSCHEN"
+                </label>
+                <input type="text" id="goodDeleteConfirm" class="good-type-to-confirm" 
+                       placeholder="Projektnamen mit LÖSCHEN eingeben...">
+                
+                <button type="button" id="goodDeleteButton" onclick="goodConfirmDeletion()" 
+                        disabled style="background: #757575; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-top: 10px;">
+                    🗑️ Projekt unwiderruflich löschen
+                </button>
+                <button type="button" onclick="goodExportBeforeDelete()" style="background: #327d36; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin: 10px 0 0 10px;">
+                    📦 Erst exportieren, dann löschen
+                </button>
+            </div>
+            <p>✅ Backup-Schutz, Auswirkungsaufklärung und sichere Bestätigung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Account changes with verification -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Kontoänderungen mit Verifikation</div>
+        <p><strong>Lösung:</strong> Multi-Faktor-Verifizierung für kritische Änderungen</p>
+        <div class="interactive-area">
+            <div class="good-account-section">
+                <h4>🔐 E-Mail-Adresse ändern</h4>
+                
+                <!-- GUT: Aktuelle Information anzeigen -->
+                <div class="good-current-info">
+                    <strong>Aktuelle E-Mail:</strong> max.mustermann@beispiel.de<br>
+                    <strong>Registriert seit:</strong> 15.03.2020<br>
+                    <strong>Letzte Anmeldung:</strong> Heute, 09:42 Uhr<br>
+                    <strong>Sicherheitsstatus:</strong> ✅ Verifiziert, 2FA aktiv
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodNewEmail">Neue E-Mail-Adresse:</label>
+                    <input type="email" id="goodNewEmail" name="newEmail" placeholder="neue.email@beispiel.de">
+                </div>
+                
+                <div class="good-form-group">
+                    <label for="goodCurrentPassword">Aktuelles Passwort bestätigen:</label>
+                    <input type="password" id="goodCurrentPassword" name="currentPassword" required>
+                </div>
+                
+                <button type="button" onclick="goodRequestEmailChange()" style="background: #a66300; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    📧 Verifikation anfordern
+                </button>
+                
+                <!-- GUT: Verifikationsschritt -->
+                <div id="goodVerificationStep" class="good-verification-step">
+                    <h5>📱 Verifikation erforderlich</h5>
+                    <p>Verifikationscode an aktuelle E-Mail gesendet: max.***@beispiel.de</p>
+                    <p>Zusätzlicher SMS-Code an: +49 ***-***-4567</p>
+                    
+                    <label for="goodEmailCode">E-Mail Verifikationscode:</label>
+                    <input type="text" id="goodEmailCode" class="good-verification-code" maxlength="6" placeholder="123456">
+                    
+                    <label for="goodSmsCode">SMS Verifikationscode:</label>
+                    <input type="text" id="goodSmsCode" class="good-verification-code" maxlength="6" placeholder="789012">
+                    
+                    <button type="button" onclick="goodCompleteEmailChange()" style="background: #327d36; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-top: 10px;">
+                        ✅ E-Mail-Änderung bestätigen
+                    </button>
+                    <button type="button" onclick="goodCancelEmailChange()" style="background: #757575; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-left: 10px;">
+                        ❌ Abbrechen
+                    </button>
+                </div>
+            </div>
+            <p>✅ Multi-Faktor-Authentifizierung für kritische Kontoänderungen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Production environment safeguards -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Produktionsumgebung mit Schutzmaßnahmen</div>
+        <p><strong>Lösung:</strong> Umgebungsprüfung und Testdaten-Isolation</p>
+        <div class="interactive-area">
+            <div class="good-environment-controls">
+                <!-- GUT: Klare Umgebungsanzeige -->
+                <div class="good-environment-indicator">
+                    🟢 DEVELOPMENT ENVIRONMENT - Test-Modus aktiv
+                </div>
+                
+                <h4>📊 Datenbank-Management</h4>
+                
+                <!-- GUT: Umgebungsvalidierung -->
+                <div class="good-data-preview">
+                    <strong>Aktuelle Umgebung:</strong> development.beispiel.de<br>
+                    <strong>Datenbankhost:</strong> dev-db.internal<br>
+                    <strong>Datentyp:</strong> ✅ Testdaten (automatisch generiert)<br>
+                    <strong>Produktionszugriff:</strong> ❌ Nicht verfügbar (Schutz aktiv)<br><br>
+                    
+                    <strong>Verfügbare Testdaten:</strong><br>
+                    • 10,000 Demo-Benutzer<br>
+                    • 50,000 Test-Bestellungen<br>
+                    • Anonymisierte Analysedaten<br>
+                    • Sandbox-Zahlungsdaten
+                </div>
+                
+                <button type="button" onclick="goodManageTestData()" style="background: #327d36; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px;">
+                    🧪 Testdaten verwalten
+                </button>
+                <button type="button" onclick="goodResetTestEnvironment()" style="background: #1a78c2; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    🔄 Test-Umgebung zurücksetzen
+                </button>
+                
+                <!-- GUT: Produktionsschutz -->
+                <div style="margin-top: 20px; padding: 15px; background: #ffcdd2; border: 2px solid #d32f2f; border-radius: 4px;">
+                    <strong>🚫 Produktionsschutz aktiv:</strong><br>
+                    Zugriff auf Produktionsdaten erfordert:<br>
+                    • VPN-Verbindung über gesicherten Tunnel<br>
+                    • Zwei-Faktor-Authentifizierung<br>
+                    • Genehmigung durch System-Administrator<br>
+                    • Vollständige Audit-Protokollierung
+                </div>
+            </div>
+            <p>✅ Klare Umgebungstrennung mit Produktionsschutz</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Auto-save with user control -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Auto-Speichern mit Benutzerkontrolle</div>
+        <p><strong>Lösung:</strong> Konfigurierbare Auto-Speichern mit manueller Kontrolle</p>
+        <div class="interactive-area">
+            <div class="good-editor-area">
+                <h4>📝 Dokument-Editor</h4>
+                
+                <!-- GUT: Auto-Speichern Einstellungen -->
+                <div class="good-autosave-controls">
+                    <h5>⚙️ Auto-Speichern Einstellungen:</h5>
+                    <label>
+                        <input type="checkbox" id="goodAutosaveEnabled" checked onchange="goodToggleAutosave()">
+                        Auto-Speichern aktiviert
+                    </label><br>
+                    <label>
+                        Speichern alle: 
+                        <select id="goodAutosaveInterval" onchange="goodUpdateAutosaveInterval()">
+                            <option value="30">30 Sekunden</option>
+                            <option value="60" selected>1 Minute</option>
+                            <option value="300">5 Minuten</option>
+                            <option value="0">Nur manuell</option>
+                        </select>
+                    </label><br>
+                    <label>
+                        <input type="checkbox" id="goodVersionHistory" checked>
+                        Versionshistorie beibehalten (letzte 50 Versionen)
+                    </label>
+                </div>
+                
+                <textarea class="good-editor-textarea" id="goodEditorContent" oninput="goodHandleContentChange()" placeholder="Beginnen Sie mit der Eingabe Ihres Dokuments...">Dies ist ein Beispieldokument mit wichtigen Informationen.</textarea>
+                
+                <!-- GUT: Speicher-Status -->
+                <div id="goodAutosaveStatus" class="good-autosave-status">
+                    ✅ Gespeichert um 14:23:45 - Auto-Speichern aktiv (nächste Speicherung in 58s)
+                </div>
+                
+                <button type="button" onclick="goodManualSave()" style="background: #327d36; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px;">
+                    💾 Jetzt speichern
+                </button>
+                <button type="button" onclick="goodShowVersionHistory()" style="background: #1a78c2; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px;">
+                    📋 Versionsverlauf
+                </button>
+                <button type="button" onclick="goodExportDocument()" style="background: #a66300; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    📤 Exportieren
+                </button>
+            </div>
+            <p>✅ Vollständige Benutzerkontrolle über Auto-Speichern mit Versionshistorie</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Time-sensitive actions with warnings -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Zeitkritische Aktionen mit Warnungen</div>
+        <p><strong>Lösung:</strong> Klare Zeitanzeige mit Verlängerungsoptionen</p>
+        <div class="interactive-area">
+            <div class="good-timing-area">
+                <h4>⏰ Online-Prüfung: Zugangssystem Sicherheit</h4>
+                
+                <!-- GUT: Prominente Zeitanzeige -->
+                <div class="good-timer-display" id="goodTimerDisplay">
+                    Verbleibende Zeit: 14:37
+                </div>
+                
+                <!-- GUT: Zeitverlängerung möglich -->
+                <div class="good-time-extension">
+                    <h5>⏱️ Zeit-Management:</h5>
+                    <p><strong>Ursprüngliche Zeit:</strong> 20 Minuten</p>
+                    <p><strong>Verlängerungen verfügbar:</strong> 2 x 5 Minuten (bei Bedarf)</p>
+                    <p><strong>Auto-Speichern:</strong> ✅ Alle 30 Sekunden</p>
+                    
+                    <button type="button" id="goodExtendTimeButton" onclick="goodExtendTime()" style="background: #a66300; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px;">
+                        ⏰ 5 Minuten verlängern
+                    </button>
+                    <button type="button" onclick="goodPauseExam()" style="background: #1a78c2; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                        ⏸️ Prüfung pausieren
+                    </button>
+                </div>
+                
+                <!-- GUT: Fortschrittsanzeige -->
+                <div style="background: #f5f5f5; padding: 15px; margin: 15px 0; border-radius: 4px;">
+                    <strong>📊 Fortschritt:</strong><br>
+                    Frage 7 von 15 beantwortet (47%)<br>
+                    Letzte Speicherung: vor 12 Sekunden<br>
+                    <div style="background: #ddd; height: 10px; border-radius: 5px; margin: 10px 0;">
+                        <div style="background: #327d36; height: 10px; width: 47%; border-radius: 5px;"></div>
+                    </div>
+                </div>
+                
+                <button type="button" onclick="goodSubmitExam()" style="background: #327d36; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    ✅ Prüfung abgeben
+                </button>
+            </div>
+            <p>✅ Klare Zeitkommunikation mit Kontrollmöglichkeiten</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: System administration with safeguards -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Systemadministration mit Sicherheitsmaßnahmen</div>
+        <p><strong>Lösung:</strong> Umfassende Impaktanalyse vor kritischen Systemänderungen</p>
+        <div class="interactive-area">
+            <div class="good-admin-area">
+                <!-- GUT: Warnung aber kontrolliert -->
+                <div class="good-admin-warning">
+                    🔧 SYSTEM-ADMINISTRATION - Erhöhte Rechte aktiv
+                </div>
+                
+                <h4>🖥️ Server-Neustart: web-prod-01</h4>
+                
+                <!-- GUT: Systemstatus -->
+                <div class="good-system-status">
+                    <h5>📈 Aktueller Systemstatus:</h5>
+                    <ul>
+                        <li><strong>Server-Load:</strong> 23% (normal)</li>
+                        <li><strong>Aktive Verbindungen:</strong> 1,247 Benutzer</li>
+                        <li><strong>Laufende Prozesse:</strong> 8 kritische Services</li>
+                        <li><strong>Wartungszeit:</strong> Außerhalb Peak-Hours</li>
+                        <li><strong>Backup-Status:</strong> ✅ Aktuell (vor 2 Stunden)</li>
+                    </ul>
+                </div>
+                
+                <!-- GUT: Impaktanalyse -->
+                <div class="good-impact-assessment">
+                    <h5>⚠️ Auswirkungen des Neustarts:</h5>
+                    <ul>
+                        <li><strong>Geschätzte Downtime:</strong> 3-5 Minuten</li>
+                        <li><strong>Betroffene Services:</strong> Hauptwebsite, API, Admin-Panel</li>
+                        <li><strong>Failover verfügbar:</strong> ✅ Automatisch zu web-prod-02</li>
+                        <li><strong>Benutzer-Impact:</strong> Minimiert durch Load Balancer</li>
+                        <li><strong>Rollback-Plan:</strong> ✅ Vorbereitet (10 Min. RTO)</li>
+                    </ul>
+                </div>
+                
+                <!-- GUT: Mehrstufige Bestätigung -->
+                <div style="background: #fff3e0; padding: 15px; margin: 15px 0; border-radius: 4px; border: 2px solid #a66300;">
+                    <h5>🔐 Sicherheitsbestätigung erforderlich:</h5>
+                    <label>
+                        <input type="checkbox" id="goodAdminConfirm1" required>
+                        Ich habe alle betroffenen Systeme und Services überprüft
+                    </label><br>
+                    <label>
+                        <input type="checkbox" id="goodAdminConfirm2" required>
+                        Failover-Systeme sind getestet und einsatzbereit
+                    </label><br>
+                    <label>
+                        <input type="checkbox" id="goodAdminConfirm3" required>
+                        Rollback-Verfahren ist verstanden und vorbereitet
+                    </label><br>
+                    <label>
+                        <input type="checkbox" id="goodAdminConfirm4" required>
+                        Stakeholder wurden über geplante Wartung informiert
+                    </label>
+                </div>
+                
+                <button type="button" onclick="goodScheduleRestart()" style="background: #a66300; color: white; border: none; padding: 10px 20px; border-radius: 4px; margin-right: 10px;">
+                    📅 Neustart planen (22:00 Uhr)
+                </button>
+                <button type="button" onclick="goodEmergencyRestart()" style="background: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 4px;">
+                    🚨 Sofort-Neustart (nur Notfall)
+                </button>
+            </div>
+            <p>✅ Vollständige Impaktanalyse mit mehrstufiger Sicherheitsbestätigung</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das zugänglich ist</div>
+        <p><strong>WCAG 3.3.4 Error Prevention Konformität:</strong></p>
+        <ul>
+            <li>✅ Kritische Aktionen haben Review-Schritte</li>
+            <li>✅ Mehrstufige Bestätigungsprozesse</li>
+            <li>✅ Rückgängig-machen oder Korrektur möglich</li>
+            <li>✅ Vollständige Information vor Bestätigung</li>
+            <li>✅ Auswirkungen klar kommuniziert</li>
+        </ul>
+        
+        <p><strong>Unterstützte Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Alle Benutzer: Schutz vor versehentlichen Aktionen</li>
+            <li>👥 Kognitive Beeinträchtigungen: Klare Bestätigungsschritte</li>
+            <li>👥 Motor-Beeinträchtigungen: Zeit für Überlegung und Korrektur</li>
+            <li>👥 Seh-Beeinträchtigungen: Screenreader-zugängliche Warnungen</li>
+        </ul>
+    </div>
+
+    <!-- Confirmation Overlay -->
+    <div id="confirmationOverlay" class="confirmation-overlay">
+        <div class="confirmation-dialog">
+            <div class="confirmation-title" id="confirmationTitle">
+                Überweisung bestätigen
+            </div>
+            <div class="confirmation-details" id="confirmationDetails">
+                <!-- Details werden dynamisch eingefügt -->
+            </div>
+            <div class="confirmation-buttons">
+                <button class="good-confirm-button" onclick="goodExecuteAction()" id="finalConfirmButton">
+                    ✅ Überweisung ausführen
+                </button>
+                <button class="good-cancel-button" onclick="goodCancelAction()">
+                    ❌ Abbrechen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let goodCurrentAction = null;
+        let goodExtensionsUsed = 0;
+        let goodTimeRemaining = 877; // 14:37 in seconds
+        let goodTimerInterval = null;
+        let goodAutosaveInterval = null;
+        let goodLastSaved = new Date();
+        
+        // GOOD 1: Financial transaction with proper confirmation
+        function goodShowPaymentConfirmation() {
+            goodCurrentAction = 'payment';
+            
+            const details = `
+                <strong>📋 Überweisung prüfen:</strong><br><br>
+                <strong>Empfänger:</strong> Max Mustermann<br>
+                <strong>IBAN:</strong> DE89 3704 0044 0532 0130 00<br>
+                <strong>Betrag:</strong> €1,250.00<br>
+                <strong>Verwendungszweck:</strong> Miete Januar 2024<br><br>
+                
+                <div style="background: #fff3e0; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                    ⚠️ <strong>Wichtiger Hinweis:</strong><br>
+                    Diese Überweisung kann nach Ausführung nicht automatisch rückgängig gemacht werden.
+                    Bitte prüfen Sie alle Angaben sorgfältig.
+                </div>
+                
+                <strong>✅ Verfügbare Optionen:</strong><br>
+                • Überweisung ausführen<br>
+                • Daten nochmals bearbeiten<br>
+                • Vorgang abbrechen
+            `;
+            
+            document.getElementById('confirmationDetails').innerHTML = details;
+            document.getElementById('confirmationTitle').textContent = 'Überweisung final bestätigen';
+            document.getElementById('finalConfirmButton').textContent = '💸 Überweisung ausführen';
+            document.getElementById('confirmationOverlay').style.display = 'block';
+            
+            console.log('ACCESSIBILITY SUCCESS: Payment confirmation dialog with full details shown');
+        }
+        
+        // GOOD 2: Legal contract review
+        function goodReviewContract() {
+            const checkboxes = ['goodContractRead', 'goodLegalAdvice', 'goodCoolingOff', 'goodFinancialImpact'];
+            const allChecked = checkboxes.every(id => document.getElementById(id).checked);
+            
+            if (!allChecked) {
+                alert('Bitte bestätigen Sie alle Punkte, bevor Sie den Vertrag final prüfen können.');
+                return;
+            }
+            
+            goodCurrentAction = 'contract';
+            
+            const details = `
+                <strong>📝 Vertrag final bestätigen:</strong><br><br>
+                <strong>Vertragsart:</strong> Mietvertrag Berlin-Mitte<br>
+                <strong>Monatliche Kosten:</strong> €1,400 (Miete + NK)<br>
+                <strong>Jährliche Verpflichtung:</strong> €20,400<br>
+                <strong>Bindungsdauer:</strong> 2 Jahre<br><br>
+                
+                <div style="background: #e3f2fd; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                    ℹ️ <strong>Widerrufsrecht:</strong><br>
+                    Sie haben 14 Tage Zeit, um von diesem Vertrag zurückzutreten.
+                    Nach Ablauf dieser Frist ist der Vertrag rechtlich bindend.
+                </div>
+                
+                <strong>✅ Ihre Bestätigungen:</strong><br>
+                • Vollständiger Vertrag gelesen ✓<br>
+                • Rechtsberatung-Hinweis verstanden ✓<br>
+                • Widerrufsrecht bekannt ✓<br>
+                • Finanzielle Auswirkungen klar ✓
+            `;
+            
+            document.getElementById('confirmationDetails').innerHTML = details;
+            document.getElementById('confirmationTitle').textContent = 'Mietvertrag rechtlich bindend abschließen';
+            document.getElementById('finalConfirmButton').textContent = '📝 Vertrag unterschreiben';
+            document.getElementById('confirmationOverlay').style.display = 'block';
+            
+            console.log('ACCESSIBILITY SUCCESS: Contract review with full disclosure and cooling-off period');
+        }
+        
+        function goodRequestLegalReview() {
+            alert('✅ Anfrage für Rechtsprüfung gesendet!\n\nEin Rechtsexperte wird den Vertrag innerhalb von 2 Werktagen prüfen und Ihnen eine Einschätzung zusenden.\n\nKosten: €150 (bei Vertragsabschluss erstattet)');
+            console.log('ACCESSIBILITY SUCCESS: Legal review option provided');
+        }
+        
+        // GOOD 3: Data deletion with safeguards
+        function goodConfirmDeletion() {
+            const confirmText = document.getElementById('goodDeleteConfirm').value;
+            const expectedText = 'Website Relaunch 2024 LÖSCHEN';
+            
+            if (confirmText !== expectedText) {
+                alert('Bestätigung fehlerhaft. Bitte tippen Sie exakt: "Website Relaunch 2024 LÖSCHEN"');
+                return;
+            }
+            
+            goodCurrentAction = 'deletion';
+            
+            const details = `
+                <strong>🗑️ Projekt-Löschung bestätigen:</strong><br><br>
+                <strong>Projekt:</strong> Website Relaunch 2024<br>
+                <strong>Dateien:</strong> 847 Dateien (2.3 GB)<br>
+                <strong>Betroffene Nutzer:</strong> 23 Teammitglieder<br>
+                <strong>Laufende Workflows:</strong> 12 werden abgebrochen<br><br>
+                
+                <div style="background: #e8f5e8; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                    ✅ <strong>Backup-Schutz aktiv:</strong><br>
+                    Backup vom ${new Date().toLocaleDateString('de-DE')} um 14:23 verfügbar.
+                    Wiederherstellung möglich bis: ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('de-DE')}
+                </div>
+                
+                <strong>🔄 Nach der Löschung:</strong><br>
+                • Backup bleibt 30 Tage verfügbar<br>
+                • Wiederherstellung über Support möglich<br>
+                • Teilweise Wiederherstellung einzelner Dateien möglich
+            `;
+            
+            document.getElementById('confirmationDetails').innerHTML = details;
+            document.getElementById('confirmationTitle').textContent = 'Projekt unwiderruflich löschen';
+            document.getElementById('finalConfirmButton').textContent = '🗑️ Endgültig löschen';
+            document.getElementById('confirmationOverlay').style.display = 'block';
+            
+            console.log('ACCESSIBILITY SUCCESS: Deletion confirmation with backup safety net');
+        }
+        
+        function goodExportBeforeDelete() {
+            alert('✅ Export gestartet!\n\nDas Projekt wird als ZIP-Archiv exportiert (geschätzte Zeit: 3-5 Minuten).\nSie erhalten eine E-Mail mit dem Download-Link.\n\nNach erfolgreichem Export können Sie das Projekt sicher löschen.');
+            console.log('ACCESSIBILITY SUCCESS: Export before delete option provided');
+        }
+        
+        // Enable/disable delete button based on confirmation text
+        document.getElementById('goodDeleteConfirm').addEventListener('input', function(e) {
+            const button = document.getElementById('goodDeleteButton');
+            const expectedText = 'Website Relaunch 2024 LÖSCHEN';
+            
+            if (e.target.value === expectedText) {
+                button.disabled = false;
+                button.style.background = '#d32f2f';
+            } else {
+                button.disabled = true;
+                button.style.background = '#757575';
+            }
+        });
+        
+        // GOOD 4: Account changes with verification
+        function goodRequestEmailChange() {
+            const newEmail = document.getElementById('goodNewEmail').value;
+            const currentPassword = document.getElementById('goodCurrentPassword').value;
+            
+            if (!newEmail || !currentPassword) {
+                alert('Bitte füllen Sie alle Felder aus.');
+                return;
+            }
+            
+            // Show verification step
+            document.getElementById('goodVerificationStep').style.display = 'block';
+            
+            // Simulate sending verification codes
+            setTimeout(() => {
+                alert('✅ Verifikationscodes gesendet!\n\nE-Mail-Code: Gesendet an max.***@beispiel.de\nSMS-Code: Gesendet an +49 ***-***-4567\n\nCodes sind 10 Minuten gültig.');
+            }, 1000);
+            
+            console.log('ACCESSIBILITY SUCCESS: Multi-factor verification initiated for critical account change');
+        }
+        
+        function goodCompleteEmailChange() {
+            const emailCode = document.getElementById('goodEmailCode').value;
+            const smsCode = document.getElementById('goodSmsCode').value;
+            const newEmail = document.getElementById('goodNewEmail').value;
+            
+            if (!emailCode || !smsCode) {
+                alert('Bitte geben Sie beide Verifikationscodes ein.');
+                return;
+            }
+            
+            if (emailCode.length !== 6 || smsCode.length !== 6) {
+                alert('Verifikationscodes müssen 6-stellig sein.');
+                return;
+            }
+            
+            goodCurrentAction = 'emailChange';
+            
+            const details = `
+                <strong>📧 E-Mail-Änderung bestätigen:</strong><br><br>
+                <strong>Aktuelle E-Mail:</strong> max.mustermann@beispiel.de<br>
+                <strong>Neue E-Mail:</strong> ${newEmail}<br><br>
+                
+                <div style="background: #fff3e0; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                    ⚠️ <strong>Wichtiger Hinweis:</strong><br>
+                    Nach der Änderung erhalten Sie alle zukünftigen E-Mails an die neue Adresse.
+                    Stellen Sie sicher, dass Sie Zugriff auf ${newEmail} haben.
+                </div>
+                
+                <strong>✅ Verifikation erfolgreich:</strong><br>
+                • E-Mail-Code bestätigt ✓<br>
+                • SMS-Code bestätigt ✓<br>
+                • Passwort verifiziert ✓
+            `;
+            
+            document.getElementById('confirmationDetails').innerHTML = details;
+            document.getElementById('confirmationTitle').textContent = 'E-Mail-Adresse final ändern';
+            document.getElementById('finalConfirmButton').textContent = '📧 E-Mail ändern';
+            document.getElementById('confirmationOverlay').style.display = 'block';
+            
+            console.log('ACCESSIBILITY SUCCESS: Email change with full multi-factor verification');
+        }
+        
+        function goodCancelEmailChange() {
+            document.getElementById('goodVerificationStep').style.display = 'none';
+            document.getElementById('goodNewEmail').value = '';
+            document.getElementById('goodCurrentPassword').value = '';
+            document.getElementById('goodEmailCode').value = '';
+            document.getElementById('goodSmsCode').value = '';
+            
+            alert('E-Mail-Änderung abgebrochen. Alle Eingaben wurden zurückgesetzt.');
+            console.log('ACCESSIBILITY SUCCESS: User can cancel email change process safely');
+        }
+        
+        // GOOD 5: Production environment safeguards
+        function goodManageTestData() {
+            alert('✅ Testdaten-Management geöffnet!\n\n• Neue Testdaten generieren\n• Bestehende Daten anonymisieren\n• Datenbank-Reset durchführen\n• Export-Funktionen\n\nAlle Aktionen sind sicher - kein Produktionszugriff möglich.');
+            console.log('ACCESSIBILITY SUCCESS: Safe test data management with production protection');
+        }
+        
+        function goodResetTestEnvironment() {
+            alert('🔄 Test-Umgebung wird zurückgesetzt...\n\n• Alle Testdaten werden erneuert\n• Caches werden geleert\n• Services werden neu gestartet\n\nGeschätzte Zeit: 2-3 Minuten\nProduktionsumgebung ist nicht betroffen.');
+            console.log('ACCESSIBILITY SUCCESS: Safe test environment reset');
+        }
+        
+        // GOOD 6: Auto-save with user control
+        function goodToggleAutosave() {
+            const enabled = document.getElementById('goodAutosaveEnabled').checked;
+            const statusElement = document.getElementById('goodAutosaveStatus');
+            
+            if (enabled) {
+                goodStartAutosave();
+                statusElement.textContent = '✅ Auto-Speichern aktiviert - nächste Speicherung in 60s';
+                statusElement.style.background = '#f1f8e9';
+            } else {
+                goodStopAutosave();
+                statusElement.textContent = '⏸️ Auto-Speichern deaktiviert - nur manuelle Speicherung';
+                statusElement.style.background = '#fff3e0';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User has full control over auto-save behavior');
+        }
+        
+        function goodUpdateAutosaveInterval() {
+            const interval = document.getElementById('goodAutosaveInterval').value;
+            const enabled = document.getElementById('goodAutosaveEnabled').checked;
+            
+            if (enabled && interval > 0) {
+                goodStopAutosave();
+                goodStartAutosave();
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User can configure auto-save timing');
+        }
+        
+        function goodStartAutosave() {
+            goodStopAutosave(); // Clear any existing interval
+            
+            const interval = parseInt(document.getElementById('goodAutosaveInterval').value);
+            if (interval > 0) {
+                goodAutosaveInterval = setInterval(() => {
+                    goodAutoSaveDocument();
+                }, interval * 1000);
+            }
+        }
+        
+        function goodStopAutosave() {
+            if (goodAutosaveInterval) {
+                clearInterval(goodAutosaveInterval);
+                goodAutosaveInterval = null;
+            }
+        }
+        
+        function goodAutoSaveDocument() {
+            goodLastSaved = new Date();
+            const statusElement = document.getElementById('goodAutosaveStatus');
+            statusElement.textContent = `✅ Auto-gespeichert um ${goodLastSaved.toLocaleTimeString()} - nächste Speicherung in ${document.getElementById('goodAutosaveInterval').value}s`;
+            
+            console.log('ACCESSIBILITY SUCCESS: Auto-save with clear user feedback');
+        }
+        
+        function goodManualSave() {
+            goodLastSaved = new Date();
+            const statusElement = document.getElementById('goodAutosaveStatus');
+            statusElement.textContent = `✅ Manuell gespeichert um ${goodLastSaved.toLocaleTimeString()} - Auto-Speichern weiterhin aktiv`;
+            
+            alert('✅ Dokument gespeichert!\n\nVersion erstellt: ' + goodLastSaved.toLocaleString());
+            console.log('ACCESSIBILITY SUCCESS: Manual save always available');
+        }
+        
+        function goodHandleContentChange() {
+            // Update unsaved changes indicator
+            const statusElement = document.getElementById('goodAutosaveStatus');
+            const now = new Date();
+            const timeSinceLastSave = Math.floor((now - goodLastSaved) / 1000);
+            
+            if (timeSinceLastSave > 5) {
+                statusElement.style.background = '#fff3e0';
+                statusElement.textContent = `⏳ Ungespeicherte Änderungen - letzte Speicherung vor ${timeSinceLastSave}s`;
+            }
+        }
+        
+        function goodShowVersionHistory() {
+            alert('📋 Versionsverlauf:\n\n• Version 12 - Heute 14:23 (aktuell)\n• Version 11 - Heute 14:20\n• Version 10 - Heute 14:15\n• Version 9 - Heute 13:45\n• ...\n\nJede Version kann wiederhergestellt werden.');
+            console.log('ACCESSIBILITY SUCCESS: Complete version history available');
+        }
+        
+        function goodExportDocument() {
+            alert('📤 Export-Optionen:\n\n• PDF (mit Formatierung)\n• Word (.docx)\n• Einfacher Text (.txt)\n• HTML\n• Markdown\n\nWählen Sie Ihr bevorzugtes Format.');
+            console.log('ACCESSIBILITY SUCCESS: Multiple export options provided');
+        }
+        
+        // GOOD 7: Time-sensitive actions with warnings
+        function goodStartTimer() {
+            goodTimerInterval = setInterval(() => {
+                goodTimeRemaining--;
+                
+                const minutes = Math.floor(goodTimeRemaining / 60);
+                const seconds = goodTimeRemaining % 60;
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('goodTimerDisplay').textContent = `Verbleibende Zeit: ${display}`;
+                
+                // Warning at 5 minutes
+                if (goodTimeRemaining === 300) {
+                    alert('⚠️ Zeitwarnung!\n\n5 Minuten verbleibend.\nSie können jederzeit eine Verlängerung beantragen oder die Prüfung pausieren.');
+                }
+                
+                // Warning at 1 minute
+                if (goodTimeRemaining === 60) {
+                    if (confirm('⏰ Nur noch 1 Minute!\n\nMöchten Sie die Zeit um 5 Minuten verlängern?')) {
+                        goodExtendTime();
+                    }
+                }
+                
+                if (goodTimeRemaining <= 0) {
+                    goodTimeUp();
+                }
+            }, 1000);
+        }
+        
+        function goodExtendTime() {
+            if (goodExtensionsUsed >= 2) {
+                alert('Maximale Anzahl Verlängerungen (2) bereits genutzt.');
+                return;
+            }
+            
+            goodExtensionsUsed++;
+            goodTimeRemaining += 300; // 5 minutes
+            
+            const remaining = 2 - goodExtensionsUsed;
+            alert(`⏰ Zeit um 5 Minuten verlängert!\n\nVerbleibende Verlängerungen: ${remaining}`);
+            
+            if (remaining === 0) {
+                document.getElementById('goodExtendTimeButton').disabled = true;
+                document.getElementById('goodExtendTimeButton').style.background = '#757575';
+                document.getElementById('goodExtendTimeButton').textContent = 'Keine Verlängerungen mehr';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Time extension provided with clear limits');
+        }
+        
+        function goodPauseExam() {
+            clearInterval(goodTimerInterval);
+            alert('⏸️ Prüfung pausiert!\n\nZeit wurde angehalten.\nDrücken Sie "Fortsetzen" um weiterzumachen.\n\nIhre bisherigen Antworten sind gespeichert.');
+            
+            // Change button to resume
+            const button = event.target;
+            button.textContent = '▶️ Fortsetzen';
+            button.onclick = goodResumeExam;
+            
+            console.log('ACCESSIBILITY SUCCESS: Exam can be paused and resumed');
+        }
+        
+        function goodResumeExam() {
+            goodStartTimer();
+            alert('▶️ Prüfung fortgesetzt!\n\nZeit läuft wieder.');
+            
+            // Change button back to pause
+            const button = event.target;
+            button.textContent = '⏸️ Prüfung pausieren';
+            button.onclick = goodPauseExam;
+            
+            console.log('ACCESSIBILITY SUCCESS: Exam resumed with preserved state');
+        }
+        
+        function goodSubmitExam() {
+            clearInterval(goodTimerInterval);
+            
+            if (confirm('✅ Prüfung abgeben?\n\nSie haben noch Zeit verbleibend.\nNach dem Abgeben können Sie keine Änderungen mehr vornehmen.')) {
+                goodCurrentAction = 'examSubmit';
+                
+                const details = `
+                    <strong>✅ Prüfung abgeben:</strong><br><br>
+                    <strong>Fragen beantwortet:</strong> 7 von 15 (47%)<br>
+                    <strong>Verbleibende Zeit:</strong> ${Math.floor(goodTimeRemaining / 60)}:${(goodTimeRemaining % 60).toString().padStart(2, '0')}<br>
+                    <strong>Verlängerungen genutzt:</strong> ${goodExtensionsUsed} von 2<br><br>
+                    
+                    <div style="background: #fff3e0; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                        ⚠️ <strong>Wichtig:</strong><br>
+                        Nach dem Abgeben können Sie keine Antworten mehr ändern.
+                        Unbeantwortet Fragen werden als falsch gewertet.
+                    </div>
+                    
+                    <strong>Optionen:</strong><br>
+                    • Prüfung jetzt abgeben<br>
+                    • Zurück zur Prüfung<br>
+                    • Prüfung pausieren
+                `;
+                
+                document.getElementById('confirmationDetails').innerHTML = details;
+                document.getElementById('confirmationTitle').textContent = 'Prüfung final abgeben';
+                document.getElementById('finalConfirmButton').textContent = '✅ Endgültig abgeben';
+                document.getElementById('confirmationOverlay').style.display = 'block';
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Exam submission with clear warnings about consequences');
+        }
+        
+        function goodTimeUp() {
+            clearInterval(goodTimerInterval);
+            alert('⏰ Zeit abgelaufen!\n\nDie Prüfung wird automatisch abgegeben.\nAlle bisher beantworteten Fragen werden gewertet.');
+            
+            console.log('ACCESSIBILITY SUCCESS: Clear communication when time expires');
+        }
+        
+        // GOOD 8: System administration with safeguards
+        function goodScheduleRestart() {
+            const checkboxes = ['goodAdminConfirm1', 'goodAdminConfirm2', 'goodAdminConfirm3', 'goodAdminConfirm4'];
+            const allChecked = checkboxes.every(id => document.getElementById(id).checked);
+            
+            if (!allChecked) {
+                alert('Bitte bestätigen Sie alle Sicherheitspunkte vor dem Server-Neustart.');
+                return;
+            }
+            
+            alert('📅 Server-Neustart geplant!\n\nZeitpunkt: Heute 22:00 Uhr\nGeschätzte Dauer: 3-5 Minuten\nFailover: Automatisch aktiv\n\nE-Mail-Benachrichtigung an alle Administratoren gesendet.');
+            console.log('ACCESSIBILITY SUCCESS: Scheduled restart with all safety checks');
+        }
+        
+        function goodEmergencyRestart() {
+            const checkboxes = ['goodAdminConfirm1', 'goodAdminConfirm2', 'goodAdminConfirm3', 'goodAdminConfirm4'];
+            const allChecked = checkboxes.every(id => document.getElementById(id).checked);
+            
+            if (!allChecked) {
+                alert('Notfall-Neustart erfordert alle Sicherheitsbestätigungen.');
+                return;
+            }
+            
+            goodCurrentAction = 'emergencyRestart';
+            
+            const details = `
+                <strong>🚨 Notfall-Neustart bestätigen:</strong><br><br>
+                <strong>Server:</strong> web-prod-01<br>
+                <strong>Aktive Verbindungen:</strong> 1,247 Benutzer<br>
+                <strong>Kritische Services:</strong> 8 werden neu gestartet<br>
+                <strong>Geschätzte Downtime:</strong> 3-5 Minuten<br><br>
+                
+                <div style="background: #ffcdd2; padding: 10px; border-radius: 4px; margin: 10px 0;">
+                    🚨 <strong>Notfall-Prozedur:</strong><br>
+                    Dieser Neustart erfolgt sofort ohne Wartungszeit.
+                    Alle aktiven Benutzer werden getrennt.
+                </div>
+                
+                <strong>✅ Bestätigungen:</strong><br>
+                • Systeme geprüft ✓<br>
+                • Failover bereit ✓<br>
+                • Rollback vorbereitet ✓<br>
+                • Stakeholder informiert ✓
+            `;
+            
+            document.getElementById('confirmationDetails').innerHTML = details;
+            document.getElementById('confirmationTitle').textContent = 'NOTFALL: Server sofort neu starten';
+            document.getElementById('finalConfirmButton').textContent = '🚨 Notfall-Neustart';
+            document.getElementById('confirmationOverlay').style.display = 'block';
+            
+            console.log('ACCESSIBILITY SUCCESS: Emergency restart with full impact disclosure');
+        }
+        
+        // Generic confirmation dialog handlers
+        function goodExecuteAction() {
+            const actions = {
+                'payment': () => {
+                    alert('✅ Überweisung erfolgreich!\n\nReferenz: TXN-2024-001234\nBetrag: €1,250.00\nEmpfänger: Max Mustermann\n\nE-Mail-Bestätigung wird gesendet.');
+                },
+                'contract': () => {
+                    alert('📝 Vertrag erfolgreich abgeschlossen!\n\nVertragsnummer: MV-2024-BM-4567\nWiderrufsrecht: 14 Tage\n\nVertragsunterlagen werden per E-Mail zugestellt.');
+                },
+                'deletion': () => {
+                    alert('🗑️ Projekt gelöscht!\n\nProjekt: Website Relaunch 2024\n847 Dateien entfernt\n\nBackup verfügbar bis: ' + new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('de-DE'));
+                },
+                'emailChange': () => {
+                    alert('📧 E-Mail erfolgreich geändert!\n\nNeue E-Mail: ' + document.getElementById('goodNewEmail').value + '\n\nBestätigung an beide Adressen gesendet.');
+                },
+                'examSubmit': () => {
+                    alert('✅ Prüfung abgegeben!\n\nErgebnis wird in 2-3 Werktagen per E-Mail zugestellt.\nZertifikat bei Bestehen: 4 Wochen Bearbeitungszeit.');
+                },
+                'emergencyRestart': () => {
+                    alert('🚨 Notfall-Neustart eingeleitet!\n\nServer wird in 30 Sekunden neu gestartet.\nFailover automatisch aktiv.\n\nStatus-Updates im Admin-Dashboard.');
+                }
+            };
+            
+            if (actions[goodCurrentAction]) {
+                actions[goodCurrentAction]();
+                goodCancelAction();
+                console.log(`ACCESSIBILITY SUCCESS: ${goodCurrentAction} completed with confirmation`);
+            }
+        }
+        
+        function goodCancelAction() {
+            document.getElementById('confirmationOverlay').style.display = 'none';
+            goodCurrentAction = null;
+            console.log('ACCESSIBILITY SUCCESS: User can always cancel critical actions');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ERROR PREVENTION GOOD EXAMPLES LOADED ===');
+            
+            // Start timer for exam
+            goodStartTimer();
+            
+            // Start auto-save for editor
+            goodStartAutosave();
+            
+            console.log('✅ All error prevention mechanisms active with user control');
+        });
+    </script>
+</body>
+</html>

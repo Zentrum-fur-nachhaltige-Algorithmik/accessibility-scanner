@@ -1,0 +1,467 @@
+<!-- WCAG-TEST
+criterion: 2.1.1, 2.1.2
+level: A
+title: Keyboard, No Keyboard Trap
+test_type: bad
+expected_violations: 5
+testable_by: dom
+scanners: keyboard-navigation, focus-management
+description: Interactive elements not accessible via keyboard
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Keyboard Access - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-title {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .interactive-example {
+            background-color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        .fake-button {
+            background-color: #2196f3;
+            color: white;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .fake-button:hover {
+            background-color: #1976d2;
+        }
+        .clickable-div {
+            background-color: #4caf50;
+            color: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .clickable-div:hover {
+            background-color: #45a049;
+        }
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-trigger {
+            background-color: #ff9800;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+            z-index: 1;
+        }
+        .dropdown-content.show {
+            display: block;
+        }
+        .dropdown-item {
+            color: black;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .gallery-item {
+            border: 2px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f5f5f5;
+        }
+        .gallery-item:hover {
+            border-color: #2196f3;
+            background-color: #e3f2fd;
+        }
+        .slider-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .custom-slider {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .slider-thumb {
+            position: absolute;
+            top: 0;
+            left: 30%;
+            width: 20px;
+            height: 20px;
+            background: #2196f3;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 8px;
+        }
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bad Keyboard Access - Multiple WCAG 2.1.1 & 2.1.3 Violations</h1>
+    <p>This page demonstrates keyboard accessibility failures that prevent users from operating interactive elements using only a keyboard.</p>
+
+    <!-- VIOLATION 1: DIV buttons without keyboard support -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: DIV elements styled as buttons</div>
+        <div class="interactive-example">
+            <h3>File Management Interface</h3>
+            <div class="fake-button" onclick="alert('Create folder clicked')">Create Folder</div>
+            <div class="fake-button" onclick="alert('Upload file clicked')">Upload File</div>
+            <div class="fake-button" onclick="alert('Delete selected clicked')">Delete Selected</div>
+            <div class="fake-button" onclick="alert('Share clicked')">Share</div>
+            <p><strong>Problem:</strong> DIVs lack tabindex, role="button", and keyboard event handlers!</p>
+            
+            <h3>Media Player Controls</h3>
+            <div style="background: #333; padding: 15px; text-align: center;">
+                <div class="fake-button" onclick="playPrevious()">⏪ Previous</div>
+                <div class="fake-button" onclick="togglePlay()">▶️ Play</div>
+                <div class="fake-button" onclick="playNext()">⏩ Next</div>
+                <div class="fake-button" onclick="toggleMute()">🔊 Volume</div>
+            </div>
+            <p><strong>Problem:</strong> Essential media controls are mouse-only!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 2: Clickable images without keyboard access -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Interactive images without keyboard support</div>
+        <div class="interactive-example">
+            <h3>Product Gallery - Clickable Images</h3>
+            <div class="image-gallery">
+                <div class="gallery-item" onclick="viewProduct(1)">
+                    <div style="background: #2196f3; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">Product 1</div>
+                    <div>$29.99</div>
+                </div>
+                <div class="gallery-item" onclick="viewProduct(2)">
+                    <div style="background: #4caf50; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">Product 2</div>
+                    <div>$39.99</div>
+                </div>
+                <div class="gallery-item" onclick="viewProduct(3)">
+                    <div style="background: #ff9800; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">Product 3</div>
+                    <div>$49.99</div>
+                </div>
+                <div class="gallery-item" onclick="viewProduct(4)">
+                    <div style="background: #e91e63; height: 80px; color: white; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">Product 4</div>
+                    <div>$59.99</div>
+                </div>
+            </div>
+            <p><strong>Problem:</strong> Product selection impossible with keyboard navigation!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 3: Custom dropdown without keyboard support -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Custom dropdowns without keyboard navigation</div>
+        <div class="interactive-example">
+            <h3>Filter and Sort Options</h3>
+            <div style="margin: 15px 0;">
+                <label>Category: </label>
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown('category')">
+                        Select Category ▼
+                    </div>
+                    <div class="dropdown-content" id="categoryDropdown">
+                        <div class="dropdown-item" onclick="selectCategory('electronics')">Electronics</div>
+                        <div class="dropdown-item" onclick="selectCategory('clothing')">Clothing</div>
+                        <div class="dropdown-item" onclick="selectCategory('books')">Books</div>
+                        <div class="dropdown-item" onclick="selectCategory('home')">Home & Garden</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <label>Sort by: </label>
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown('sort')">
+                        Choose Sort Order ▼
+                    </div>
+                    <div class="dropdown-content" id="sortDropdown">
+                        <div class="dropdown-item" onclick="sortBy('price-low')">Price: Low to High</div>
+                        <div class="dropdown-item" onclick="sortBy('price-high')">Price: High to Low</div>
+                        <div class="dropdown-item" onclick="sortBy('rating')">Customer Rating</div>
+                        <div class="dropdown-item" onclick="sortBy('newest')">Newest First</div>
+                    </div>
+                </div>
+            </div>
+            <p><strong>Problem:</strong> Custom dropdowns lack ARIA patterns and keyboard navigation!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 4: Interactive map areas -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Clickable map regions without keyboard access</div>
+        <div class="interactive-example">
+            <h3>Office Locations Interactive Map</h3>
+            <div style="position: relative; background: #e0e0e0; width: 400px; height: 250px; margin: 15px 0;">
+                <div style="position: absolute; top: 50px; left: 80px; width: 60px; height: 40px; background: #f44336; cursor: pointer;" 
+                     onclick="showOffice('new-york')" title="New York Office">
+                    <div style="color: white; text-align: center; padding-top: 12px; font-size: 12px;">NYC</div>
+                </div>
+                <div style="position: absolute; top: 120px; left: 200px; width: 60px; height: 40px; background: #2196f3; cursor: pointer;" 
+                     onclick="showOffice('london')" title="London Office">
+                    <div style="color: white; text-align: center; padding-top: 12px; font-size: 12px;">LON</div>
+                </div>
+                <div style="position: absolute; top: 180px; left: 320px; width: 60px; height: 40px; background: #4caf50; cursor: pointer;" 
+                     onclick="showOffice('tokyo')" title="Tokyo Office">
+                    <div style="color: white; text-align: center; padding-top: 12px; font-size: 12px;">TYO</div>
+                </div>
+            </div>
+            <p><strong>Problem:</strong> Interactive map regions are not keyboard accessible!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 5: Custom slider controls -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Custom sliders without keyboard control</div>
+        <div class="interactive-example">
+            <h3>Price Range Filter</h3>
+            <div class="slider-container">
+                <label>Price Range: $0 - $1000</label>
+                <div class="custom-slider" onclick="moveSlider(event)">
+                    <div class="slider-thumb" id="sliderThumb"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span>$0</span>
+                    <span>$1000</span>
+                </div>
+            </div>
+            
+            <div class="slider-container">
+                <label>Volume Control</label>
+                <div class="custom-slider" onclick="moveVolumeSlider(event)">
+                    <div class="slider-thumb" style="left: 70%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span>🔇</span>
+                    <span>🔊</span>
+                </div>
+            </div>
+            <p><strong>Problem:</strong> Slider controls require mouse interaction only!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 6: SPAN elements used as interactive controls -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: SPAN elements with click handlers</div>
+        <div class="interactive-example">
+            <h3>Tag-based Navigation</h3>
+            <div style="margin: 15px 0;">
+                <span style="background: #e1f5fe; padding: 8px 12px; margin: 4px; border-radius: 20px; cursor: pointer;"
+                      onclick="filterByTag('technology')">Technology</span>
+                <span style="background: #f3e5f5; padding: 8px 12px; margin: 4px; border-radius: 20px; cursor: pointer;"
+                      onclick="filterByTag('business')">Business</span>
+                <span style="background: #e8f5e8; padding: 8px 12px; margin: 4px; border-radius: 20px; cursor: pointer;"
+                      onclick="filterByTag('science')">Science</span>
+                <span style="background: #fff3e0; padding: 8px 12px; margin: 4px; border-radius: 20px; cursor: pointer;"
+                      onclick="filterByTag('health')">Health</span>
+            </div>
+            
+            <h3>Rating System</h3>
+            <div style="margin: 15px 0;">
+                Rate this product: 
+                <span style="font-size: 24px; color: #ffc107; cursor: pointer;" onclick="rate(1)">★</span>
+                <span style="font-size: 24px; color: #ffc107; cursor: pointer;" onclick="rate(2)">★</span>
+                <span style="font-size: 24px; color: #ffc107; cursor: pointer;" onclick="rate(3)">★</span>
+                <span style="font-size: 24px; color: #e0e0e0; cursor: pointer;" onclick="rate(4)">★</span>
+                <span style="font-size: 24px; color: #e0e0e0; cursor: pointer;" onclick="rate(5)">★</span>
+            </div>
+            <p><strong>Problem:</strong> SPAN elements lack semantic roles and keyboard event handlers!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 7: Modal dialogs without keyboard trap -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Modal dialogs with poor keyboard handling</div>
+        <div class="interactive-example">
+            <h3>User Profile Modal</h3>
+            <div class="fake-button" onclick="openModal()">Edit Profile</div>
+            
+            <div id="profileModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal" onclick="closeModal()">&times;</span>
+                    <h3>Edit Profile</h3>
+                    <p>Name: <input type="text" value="John Doe"></p>
+                    <p>Email: <input type="email" value="john@example.com"></p>
+                    <div class="fake-button" onclick="saveProfile()">Save Changes</div>
+                    <div class="fake-button" onclick="closeModal()">Cancel</div>
+                </div>
+            </div>
+            <p><strong>Problem:</strong> Modal lacks focus management and Escape key handling!</p>
+        </div>
+    </div>
+
+    <!-- VIOLATION 8: Drag and drop without keyboard alternative -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Drag and drop without keyboard alternative</div>
+        <div class="interactive-example">
+            <h3>Task Board - Drag to Reorder</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 15px 0;">
+                <div style="background: #ffebee; padding: 15px; border-radius: 8px;">
+                    <h4>To Do</h4>
+                    <div class="clickable-div" draggable="true" ondragstart="drag(event)" id="task1">
+                        Task 1: Review documents
+                    </div>
+                    <div class="clickable-div" draggable="true" ondragstart="drag(event)" id="task2">
+                        Task 2: Update website
+                    </div>
+                </div>
+                <div style="background: #fff3e0; padding: 15px; border-radius: 8px;" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h4>In Progress</h4>
+                    <div class="clickable-div" draggable="true" ondragstart="drag(event)" id="task3">
+                        Task 3: Database migration
+                    </div>
+                </div>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px;" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h4>Done</h4>
+                    <div class="clickable-div" draggable="true" ondragstart="drag(event)" id="task4">
+                        Task 4: Fix security issue
+                    </div>
+                </div>
+            </div>
+            <p><strong>Problem:</strong> Task management requires mouse for drag and drop!</p>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div style="background-color: #fff3e0; border: 2px solid #ff9800; padding: 20px; margin-top: 30px;">
+        <h2>Expected Scanner Results</h2>
+        <p><strong>WCAG 2.1.1 & 2.1.3 Violations Found:</strong></p>
+        <ul>
+            <li>8 DIV elements styled as buttons without keyboard support</li>
+            <li>4 clickable images/gallery items without tabindex or keyboard handlers</li>
+            <li>2 custom dropdowns lacking ARIA patterns and keyboard navigation</li>
+            <li>3 interactive map regions without keyboard access</li>
+            <li>2 custom sliders requiring mouse interaction only</li>
+            <li>8 SPAN elements with click handlers lacking semantic roles</li>
+            <li>1 modal dialog with poor keyboard handling</li>
+            <li>6 drag-and-drop interactions without keyboard alternatives</li>
+        </ul>
+        <p><strong>Total Expected Violations:</strong> 34+ keyboard accessibility failures</p>
+        <p><strong>Confidence Level:</strong> High (missing semantic elements and attributes are detectable)</p>
+    </div>
+
+    <script>
+        function playPrevious() { alert('Previous track (not accessible!)'); }
+        function togglePlay() { alert('Play/Pause (not accessible!)'); }
+        function playNext() { alert('Next track (not accessible!)'); }
+        function toggleMute() { alert('Mute/Unmute (not accessible!)'); }
+        
+        function viewProduct(id) { alert('View product ' + id + ' (not accessible!)'); }
+        
+        function toggleDropdown(type) {
+            const dropdown = document.getElementById(type + 'Dropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        function selectCategory(cat) { alert('Selected category: ' + cat); }
+        function sortBy(method) { alert('Sort by: ' + method); }
+        
+        function showOffice(location) { alert('Office location: ' + location + ' (not accessible!)'); }
+        
+        function moveSlider(event) { alert('Slider moved (not accessible!)'); }
+        function moveVolumeSlider(event) { alert('Volume adjusted (not accessible!)'); }
+        
+        function filterByTag(tag) { alert('Filter by tag: ' + tag + ' (not accessible!)'); }
+        function rate(stars) { alert('Rated ' + stars + ' stars (not accessible!)'); }
+        
+        function openModal() {
+            document.getElementById('profileModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+        
+        function saveProfile() { alert('Profile saved (not accessible!)'); }
+        
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+        }
+        
+        // Close dropdowns when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-trigger')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -50,6 +50,42 @@ function discoverTestFiles() {
   return files;
 }
 
+// ── Instrumentation: classify a single violation for the noise breakdown ──
+//
+// Our scanners don't share one violation schema. Depending on which scanner
+// produced it, the "what kind of issue is this" field is named differently:
+//   - type      (media-accessibility, predictable-navigation, label-in-name,
+//                status-messages, advanced-aria, nontext-contrast)
+//   - issue     (html-validation, page-structure, language-detection,
+//                error-handling, timing-controls, orientation, input-purpose,
+//                advanced-contrast, use-of-color)
+//   - reason    (images-of-text)
+//   - clause    (screen-reader — this doubles as the EN criterion number)
+//   - (none)    (color-contrast — no sub-type field at all)
+// This tries each in priority order, then falls back to the scanner's
+// declared wcagCriteria, then to a synthetic "<scannerId>-generic" bucket so
+// every violation still lands in *some* group.
+function classifyViolation(v, scanner) {
+  const type = v.type || v.issue || v.clause || v.ruleId || v.reason || `${scanner.id}-generic`;
+
+  let criterion = v.criterion || v.clause;
+  if (!criterion && v.wcagCriteria) {
+    criterion = Array.isArray(v.wcagCriteria) ? v.wcagCriteria.join('+') : v.wcagCriteria;
+  }
+  if (!criterion && scanner.wcagCriteria && scanner.wcagCriteria.length) {
+    criterion = scanner.wcagCriteria.join('+');
+  }
+  if (!criterion) criterion = 'unknown';
+
+  return {
+    scannerId: scanner.id,
+    type: String(type),
+    criterion: String(criterion),
+    element: v.element || null,
+    raw: v,
+  };
+}
+
 // ── Main ────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -133,6 +169,11 @@ async function main() {
   const oursStart = Date.now();
 
   const ourResults = {};
+  // fileLabel -> array of classifyViolation() records, good-* files only.
+  // Populated by wrapping each scanner instance's .scan() so we see exactly
+  // which scanner produced which violation, without re-scanning or touching
+  // src/ (scan-pipeline.js flattens violations without scanner attribution).
+  const goodFileViolationRecords = {};
   for (let i = 0; i < total; i++) {
     const file = testFiles[i];
     process.stdout.write(`\r  ours ${i + 1}/${total}: ${file.label.padEnd(50)}`);
@@ -140,7 +181,25 @@ async function main() {
     const t0 = Date.now();
     // Fresh pipeline per file to avoid stale browser state
     const pipeline = new ScanPipeline();
-    registerAllScanners(pipeline);
+    const scanners = registerAllScanners(pipeline);
+
+    const isGoodFile = file.label.startsWith('good-');
+    if (isGoodFile) {
+      goodFileViolationRecords[file.label] = [];
+      for (const scanner of scanners) {
+        const originalScan = scanner.scan.bind(scanner);
+        scanner.scan = async (page, opts) => {
+          const result = await originalScan(page, opts);
+          if (result && Array.isArray(result.violations)) {
+            for (const v of result.violations) {
+              goodFileViolationRecords[file.label].push(classifyViolation(v, scanner));
+            }
+          }
+          return result;
+        };
+      }
+    }
+
     try {
       const scanPromise = pipeline.scan(url, {
         scannerIds: CONCURRENT_ONLY,
@@ -290,6 +349,91 @@ async function main() {
   console.log(`  axe-core : ${axeGoodSum} good / ${axeBadSum} bad = ${(axeGoodSum / axeBadSum).toFixed(2)} noise ratio`);
   console.log(`  ours     : ${oursGoodSum} good / ${oursBadSum} bad = ${oursBadSum > 0 ? (oursGoodSum / oursBadSum).toFixed(2) : 'N/A'} noise ratio`);
   console.log(`  (lower is better — 0.0 = no FPs, 1.0 = equal noise on good and bad files)`);
+
+  // ── GOOD-FILE NOISE BREAKDOWN (Sprint P2 P1.4) ─────────────────────────
+  //
+  // Which scanners + violation types produce the ~218 violations on 10
+  // known-good files? Aggregated from the per-scanner records captured by
+  // wrapping scanner.scan() above (see goodFileViolationRecords).
+
+  console.log('\n' + '═'.repeat(110));
+  console.log('GOOD-FILE NOISE BREAKDOWN');
+  console.log('═'.repeat(110));
+
+  const goodFileLabels = Object.keys(goodFileViolationRecords);
+  const aggregateMap = new Map(); // `${scannerId}::${type}` -> { scannerId, type, criterion, count, fileCounts }
+  const perFileBreakdown = {};    // fileLabel -> [{ scannerId, type, criterion, count, samples }], desc by count
+
+  for (const label of goodFileLabels) {
+    const records = goodFileViolationRecords[label];
+    const fileMap = new Map();
+    for (const rec of records) {
+      const key = `${rec.scannerId}::${rec.type}`;
+
+      if (!fileMap.has(key)) {
+        fileMap.set(key, { scannerId: rec.scannerId, type: rec.type, criterion: rec.criterion, count: 0, samples: [] });
+      }
+      const fileEntry = fileMap.get(key);
+      fileEntry.count++;
+      if (fileEntry.samples.length < 2) {
+        fileEntry.samples.push({ element: rec.element, raw: rec.raw });
+      }
+
+      if (!aggregateMap.has(key)) {
+        aggregateMap.set(key, { scannerId: rec.scannerId, type: rec.type, criterion: rec.criterion, count: 0, fileCounts: {} });
+      }
+      const aggEntry = aggregateMap.get(key);
+      aggEntry.count++;
+      aggEntry.fileCounts[label] = (aggEntry.fileCounts[label] || 0) + 1;
+    }
+    perFileBreakdown[label] = Array.from(fileMap.values()).sort((a, b) => b.count - a.count);
+  }
+
+  const aggregateList = Array.from(aggregateMap.values()).sort((a, b) => b.count - a.count);
+  const grandTotal = aggregateList.reduce((sum, e) => sum + e.count, 0);
+
+  console.log(`\n  ${grandTotal} recorded violations across ${goodFileLabels.length} good-* files, ` +
+    `grouped by (scannerId, violation type/criterion), sorted descending:\n`);
+  const bHdr = `  ${'scannerId'.padEnd(22)} ${'type'.padEnd(36)} ${'criterion'.padEnd(14)} ${'count'.padStart(5)}`;
+  console.log(bHdr);
+  console.log(`  ${'─'.repeat(bHdr.length - 2)}`);
+  for (const entry of aggregateList) {
+    console.log(`  ${entry.scannerId.padEnd(22)} ${entry.type.padEnd(36)} ${entry.criterion.padEnd(14)} ${String(entry.count).padStart(5)}`);
+  }
+
+  console.log(`\n  Per-file top-3 offenders:\n`);
+  for (const label of goodFileLabels) {
+    const top3 = perFileBreakdown[label].slice(0, 3);
+    const totalForFile = goodFileViolationRecords[label].length;
+    console.log(`  ${label}  (${totalForFile} total our-violations recorded)`);
+    if (top3.length === 0) {
+      console.log(`    (none recorded — either genuinely clean, or the file crashed our pipeline before scanners completed)`);
+    }
+    for (const t of top3) {
+      console.log(`    ${String(t.count).padStart(3)}x  ${t.scannerId} / ${t.type}  (${t.criterion})`);
+    }
+    console.log('');
+  }
+
+  // Write the full breakdown (incl. samples) to JSON for offline analysis.
+  const rawDir = path.join(PROJECT_ROOT, 'docs/sprints/p2-quality/raw');
+  fs.mkdirSync(rawDir, { recursive: true });
+  const breakdownPath = path.join(rawDir, 'good-file-noise-breakdown.json');
+  fs.writeFileSync(breakdownPath, JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    goodFiles: goodFileLabels,
+    perFile: Object.fromEntries(
+      goodFileLabels.map(label => [
+        label,
+        {
+          totalViolations: goodFileViolationRecords[label].length,
+          breakdown: perFileBreakdown[label],
+        },
+      ])
+    ),
+    aggregate: aggregateList,
+  }, null, 2));
+  console.log(`  Full breakdown (incl. samples) written to ${path.relative(PROJECT_ROOT, breakdownPath)}`);
 
   console.log('\n' + '═'.repeat(110));
 }

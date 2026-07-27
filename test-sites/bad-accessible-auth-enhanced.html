@@ -1,0 +1,117 @@
+<!-- WCAG-TEST
+criterion: 3.3.9
+level: AAA
+title: Accessible Authentication (Enhanced)
+test_type: bad
+expected_violations: 5
+testable_by: llm
+scanners: llm-auth-scanner
+description: Authentication requiring cognitive function tests with no exceptions
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Accessible Authentication (Enhanced) - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
+        .auth-form { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0; }
+        .captcha-box { background: #f9f9f9; border: 2px solid #bbb; padding: 15px; margin: 10px 0; text-align: center; }
+        input[type="text"], input[type="password"] { padding: 8px; width: 250px; border: 1px solid #ccc; display: block; margin: 5px 0; }
+        button { padding: 10px 20px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Bad Accessible Authentication Enhanced (3.3.9 AAA)</h1>
+
+    <!-- Violation 1: Object recognition CAPTCHA -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 1: Object recognition CAPTCHA required</div>
+        <div class="auth-form">
+            <label for="user1">Username:</label>
+            <input type="text" id="user1">
+            <label for="pass1">Password:</label>
+            <input type="password" id="pass1">
+            <div class="captcha-box">
+                <p><strong>Select all images containing traffic lights</strong></p>
+                <div style="display:grid; grid-template-columns: repeat(3,80px); gap:5px; justify-content:center;">
+                    <div style="width:80px;height:80px;background:#ccc;border:1px solid #999;"></div>
+                    <div style="width:80px;height:80px;background:#ccc;border:1px solid #999;"></div>
+                    <div style="width:80px;height:80px;background:#ccc;border:1px solid #999;"></div>
+                    <div style="width:80px;height:80px;background:#ccc;border:1px solid #999;"></div>
+                    <div style="width:80px;height:80px;background:#ccc;border:1px solid #999;"></div>
+                    <div style="width:80px;height:80px;background:#ccc;border:1px solid #999;"></div>
+                </div>
+            </div>
+            <button type="submit">Log In</button>
+        </div>
+    </div>
+
+    <!-- Violation 2: Remembering a specific code -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 2: Must remember a specific security code</div>
+        <div class="auth-form">
+            <p>Enter the 6-digit code from your registration confirmation email (sent 3 months ago):</p>
+            <label for="code2">Security Code:</label>
+            <input type="text" id="code2" maxlength="6" placeholder="e.g. 483921" autocomplete="off">
+            <p style="font-size:0.85em;color:#666;">Copy-paste is disabled for security purposes.</p>
+            <button type="submit">Verify</button>
+        </div>
+    </div>
+
+    <!-- Violation 3: Puzzle-based authentication -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 3: Puzzle-based authentication</div>
+        <div class="auth-form">
+            <p>Drag the puzzle piece to the correct position to prove you are human:</p>
+            <div style="position:relative; width:300px; height:150px; background:#ddd; border:2px solid #999; margin:10px 0;">
+                <div style="position:absolute; top:50px; left:200px; width:40px; height:40px; background:#4CAF50; border-radius:4px; cursor:move;">
+                </div>
+                <div style="position:absolute; top:50px; left:50px; width:44px; height:44px; border:2px dashed #666;">
+                </div>
+            </div>
+            <button type="submit">Continue</button>
+        </div>
+    </div>
+
+    <!-- Violation 4: Math problem CAPTCHA -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 4: Math problem required for login</div>
+        <div class="auth-form">
+            <label for="user4">Email:</label>
+            <input type="text" id="user4">
+            <label for="pass4">Password:</label>
+            <input type="password" id="pass4">
+            <div class="captcha-box">
+                <p>What is <strong>17 + 28</strong>?</p>
+                <label for="math">Answer:</label>
+                <input type="text" id="math" style="width:80px; text-align:center;">
+            </div>
+            <button type="submit">Sign In</button>
+        </div>
+    </div>
+
+    <!-- Violation 5: Pattern recall authentication -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 5: Pattern recall required</div>
+        <div class="auth-form">
+            <p>Draw your secret pattern to unlock your account:</p>
+            <div style="display:grid; grid-template-columns: repeat(3,50px); gap:15px; justify-content:center; margin:15px 0;">
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+                <div style="width:50px;height:50px;border-radius:50%;background:#eee;border:2px solid #999;"></div>
+            </div>
+            <button type="submit">Unlock</button>
+        </div>
+    </div>
+</body>
+</html>

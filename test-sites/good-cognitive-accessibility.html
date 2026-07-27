@@ -1,0 +1,1849 @@
+<!-- WCAG-TEST
+criterion: 1.3.1, 3.3.2
+level: A
+title: Info and Relationships, Labels or Instructions
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: page-structure, error-handling
+description: Cognitive accessibility best practices
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Cognitive Accessibility Compliant (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Clear, structured instructions */
+        .good-instructions {
+            background-color: #e3f2fd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #1a78c2;
+            /* GUT: Klare Struktur mit Listen und Hervorhebungen */
+        }
+        
+        .good-instructions h4 {
+            color: #0d47a1; /* Changed from #1976d2 - now 5.1:1 ratio (PASSES WCAG AA) */
+            margin-top: 0;
+        }
+        
+        .good-instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .good-instructions li {
+            margin: 8px 0;
+        }
+        
+        .good-password-checker {
+            background-color: #f1f8e9;
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .requirement-status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .requirement-status.valid {
+            background-color: #327d36; /* Changed from #327d36 - now 4.68:1 ratio (PASSES WCAG AA) */
+        }
+        
+        .requirement-status.invalid {
+            background-color: #d32f2f; /* Changed from #f44336 - now 4.98:1 ratio (PASSES WCAG AA) */
+        }
+        
+        /* GOOD 2: Multi-step with navigation and memory aids */
+        .good-multi-step {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .good-step-navigation {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            /* GUT: Vollständige Navigation zwischen Schritten */
+        }
+        
+        .step-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .step-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .step-item.completed {
+            background-color: #327d36;
+            color: white;
+        }
+        
+        .step-item.current {
+            background-color: #1a78c2;
+            color: white;
+        }
+        
+        .step-item.future {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+        
+        .step-summary {
+            background-color: #fff3e0;
+            border: 1px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        /* GOOD 3: Timeout with user control */
+        .good-timeout-form {
+            border: 2px solid #a66300;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #fff3e0;
+            position: relative;
+        }
+        
+        .good-timeout-controls {
+            background-color: #e3f2fd;
+            border: 1px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            /* GUT: Vollständige Benutzer-Kontrolle über Zeit */
+        }
+        
+        .timeout-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #bf360c;
+            margin-bottom: 10px;
+        }
+        
+        .timeout-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* GOOD 4: Refresh with user control */
+        .good-refresh-controls {
+            background-color: #e8f5e8;
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            /* GUT: Benutzer kontrolliert alle Aktualisierungen */
+        }
+        
+        .refresh-settings {
+            background-color: #f1f8e9;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border: 1px solid #327d36;
+        }
+        
+        .refresh-option {
+            margin: 10px 0;
+        }
+        
+        .refresh-option input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .manual-refresh-area {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        /* GOOD 5: Consistent navigation with landmarks */
+        .good-navigation {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            /* GUT: Semantische Landmark-Rollen und konsistente Struktur */
+        }
+        
+        .nav-main {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .nav-main a {
+            color: #006ba6;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+        
+        .nav-main a:hover, .nav-main a:focus {
+            background-color: #e3f2fd;
+            border-color: #1a78c2;
+        }
+        
+        .nav-secondary {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .nav-secondary a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .current-location {
+            background-color: #fff3e0;
+            border: 1px solid #a66300;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        /* GOOD 6: Clear error messages with guidance */
+        .good-error-display {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #c62828;
+            display: none;
+            /* GUT: Spezifische, hilfreiche Fehlermeldungen */
+        }
+        
+        .good-error-display.show {
+            display: block;
+        }
+        
+        .error-summary {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .error-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .error-item {
+            background-color: #ffcdd2;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            border-left: 4px solid #f44336;
+        }
+        
+        .error-suggestion {
+            background-color: #e8f5e8;
+            border: 1px solid #327d36;
+            padding: 10px;
+            margin: 10px 0 0 0;
+            border-radius: 4px;
+            color: #2e7d32;
+        }
+        
+        /* GOOD 7: Context changes with user confirmation */
+        .good-context-controls {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .context-warning {
+            background-color: #fff3e0;
+            border: 1px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .confirmation-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .dialog-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+        }
+        
+        /* GOOD 8: Persistent content with user control */
+        .good-notification-area {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .notification-settings {
+            background-color: #f1f8e9;
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .persistent-notification {
+            background-color: #e3f2fd;
+            border: 1px solid #1a78c2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            display: none;
+            position: relative;
+        }
+        
+        .notification-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .notification-controls button {
+            background: #1a78c2;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        /* GOOD 9: Information with clear hierarchy */
+        .good-structured-content {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+            /* GUT: Klare Informationshierarchie mit Priorisierung */
+        }
+        
+        .content-summary {
+            background-color: #e3f2fd;
+            border: 2px solid #1a78c2;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .expandable-section {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .section-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+        }
+        
+        .section-header:hover {
+            background-color: #e9ecef;
+        }
+        
+        .section-content {
+            padding: 15px;
+            display: none;
+            border-top: 1px solid #ddd;
+        }
+        
+        .section-content.expanded {
+            display: block;
+        }
+        
+        /* GOOD 10: Progress indicators for complex tasks */
+        .good-complex-task {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .task-progress {
+            background-color: #f1f8e9;
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #327d36;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .task-checklist {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .task-item {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item.completed {
+            background-color: #e8f5e8;
+            border-left-color: #327d36;
+        }
+        
+        .task-item.current {
+            background-color: #e3f2fd;
+            border-left-color: #1a78c2;
+        }
+        
+        .task-status {
+            float: right;
+            font-weight: bold;
+        }
+        
+        .task-status.completed {
+            color: #327d36;
+        }
+        
+        .task-status.current {
+            color: #16619e; /* Final fix - now 6.15:1 ratio (PASSES WCAG AA) */
+        }
+        
+        .task-status.pending {
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #006ba6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover, button:focus {
+            background-color: #005a87;
+        }
+        
+        button.secondary {
+            background-color: #757575;
+        }
+        
+        button.secondary:hover {
+            background-color: #616161;
+        }
+        
+        button.success {
+            background-color: #327d36;
+        }
+        
+        button.success:hover {
+            background-color: #388e3c;
+        }
+        
+        button.warning {
+            background-color: #a66300;
+        }
+        
+        button.warning:hover {
+            background-color: #bf360c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Cognitive Accessibility Compliant (GOOD)</h1>
+    <p><strong>WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 & 3.3.2 Konform:</strong> Kognitive Zugänglichkeit durch klare Struktur und Benutzer-Kontrolle</p>
+    
+    <!-- GOOD 1: Clear, structured instructions -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Klare, strukturierte Anweisungen</div>
+        <p><strong>Lösung:</strong> Informationen in übersichtlicher Liste mit visueller Unterstützung</p>
+        <div class="interactive-area">
+            <div class="good-instructions">
+                <!-- GUT: Strukturierte, leicht verständliche Anweisungen -->
+                <h4>📋 Passwort-Anforderungen (alle müssen erfüllt sein):</h4>
+                
+                <ul>
+                    <li><strong>Länge:</strong> Mindestens 12 Zeichen</li>
+                    <li><strong>Großbuchstaben:</strong> Mindestens 1 (A-Z)</li>
+                    <li><strong>Kleinbuchstaben:</strong> Mindestens 1 (a-z)</li>
+                    <li><strong>Zahlen:</strong> Mindestens 2 (0-9)</li>
+                    <li><strong>Sonderzeichen:</strong> Mindestens 1 aus: !@#$%^&*()</li>
+                </ul>
+                
+                <h4>🚫 Nicht erlaubt:</h4>
+                <ul>
+                    <li>Ihr Benutzername</li>
+                    <li>Ihr Geburtsdatum</li>
+                    <li>Häufige Wörter (password, 123456, qwerty)</li>
+                    <li>Ihre letzten 5 Passwörter</li>
+                </ul>
+                
+                <h4>ℹ️ Wichtige Hinweise:</h4>
+                <ul>
+                    <li>Passwort muss alle 90 Tage geändert werden</li>
+                    <li>Nach 3 falschen Eingaben: 30 Minuten Sperre</li>
+                    <li>Verwenden Sie einen Passwort-Manager</li>
+                </ul>
+            </div>
+            
+            <form>
+                <div class="form-group">
+                    <label for="goodPassword">Neues Passwort:</label>
+                    <input type="password" id="goodPassword" name="password" oninput="goodCheckPassword()">
+                </div>
+                
+                <!-- GUT: Live-Feedback zu Anforderungen -->
+                <div class="good-password-checker" id="goodPasswordChecker">
+                    <h5>📊 Passwort-Überprüfung:</h5>
+                    <div class="requirement-item">
+                        <div class="requirement-status invalid" id="lengthStatus">✗</div>
+                        <span>Mindestens 12 Zeichen</span>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-status invalid" id="upperStatus">✗</div>
+                        <span>Großbuchstaben (A-Z)</span>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-status invalid" id="lowerStatus">✗</div>
+                        <span>Kleinbuchstaben (a-z)</span>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-status invalid" id="numberStatus">✗</div>
+                        <span>Mindestens 2 Zahlen</span>
+                    </div>
+                    <div class="requirement-item">
+                        <div class="requirement-status invalid" id="specialStatus">✗</div>
+                        <span>Sonderzeichen (!@#$%^&*())</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="goodPasswordConfirm">Passwort bestätigen:</label>
+                    <input type="password" id="goodPasswordConfirm" name="passwordConfirm">
+                </div>
+                
+                <button type="submit">Passwort erstellen</button>
+            </form>
+            <p>✅ Strukturierte Anweisungen mit visueller Bestätigung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Multi-step with navigation and memory aids -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Mehrstufiger Prozess mit Navigation und Gedächtnisstützen</div>
+        <p><strong>Lösung:</strong> Vollständige Navigation zwischen Schritten mit Daten-Übersicht</p>
+        <div class="interactive-area">
+            <div class="good-multi-step">
+                <!-- GUT: Vollständige Schritt-Navigation -->
+                <div class="good-step-navigation">
+                    <h4>📍 Kreditantrag - Schritt 2 von 5</h4>
+                    
+                    <div class="step-breadcrumb" role="navigation" aria-label="Antragsfortschritt">
+                        <a href="#" class="step-item completed" onclick="goodGoToStep(1)">1. Kontakt</a>
+                        <span>→</span>
+                        <span class="step-item current">2. Persönlich</span>
+                        <span>→</span>
+                        <span class="step-item future">3. Finanzen</span>
+                        <span>→</span>
+                        <span class="step-item future">4. Dokumente</span>
+                        <span>→</span>
+                        <span class="step-item future">5. Bestätigung</span>
+                    </div>
+                    
+                    <div class="step-summary">
+                        <h5>📋 Zusammenfassung Ihrer bisherigen Angaben:</h5>
+                        <ul id="goodStepSummary">
+                            <li><strong>Name:</strong> Max Mustermann</li>
+                            <li><strong>E-Mail:</strong> max.mustermann@beispiel.de</li>
+                            <li><strong>Telefon:</strong> +49 123 456789</li>
+                            <li><strong>Referenznummer:</strong> KA-2024-001234</li>
+                        </ul>
+                        <button onclick="goodEditPreviousStep()" class="secondary">✏️ Vorherige Angaben bearbeiten</button>
+                    </div>
+                </div>
+                
+                <form id="goodStepForm">
+                    <h4>Persönliche Daten</h4>
+                    
+                    <div class="form-group">
+                        <label for="goodAddress">Adresse:</label>
+                        <input type="text" id="goodAddress" name="address" placeholder="Straße und Hausnummer">
+                        <small>💡 Diese wird für die Bonitätsprüfung verwendet</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goodPhoneStep2">Telefonnummer bestätigen:</label>
+                        <input type="tel" id="goodPhoneStep2" name="phone" value="+49 123 456789" readonly>
+                        <small>✅ Übernommen aus Schritt 1 - bei Änderung bitte zurück zu Schritt 1</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goodBirthDate">Geburtsdatum:</label>
+                        <input type="date" id="goodBirthDate" name="birthDate">
+                        <small>💡 Erforderlich für Altersverifikation (mindestens 18 Jahre)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goodIncome">Monatliches Nettoeinkommen (EUR):</label>
+                        <input type="number" id="goodIncome" name="income" placeholder="2500">
+                        <small>💡 Wird in Schritt 3 für Kreditberechnung verwendet</small>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button type="button" onclick="goodGoToStep(1)" class="secondary">← Zurück zu Schritt 1</button>
+                        <button type="button" onclick="goodSaveAndContinue()" class="success">Speichern & weiter zu Schritt 3 →</button>
+                    </div>
+                </form>
+            </div>
+            <p>✅ Vollständige Navigation mit Datenübersicht und Bearbeitungsmöglichkeiten</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Timeout with user control -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Timeout mit vollständiger Benutzer-Kontrolle</div>
+        <p><strong>Lösung:</strong> Benutzer kontrolliert Sitzungsdauer mit Verlängerungsoptionen</p>
+        <div class="interactive-area">
+            <div class="good-timeout-form">
+                <!-- GUT: Vollständige Benutzer-Kontrolle über Zeit -->
+                <div class="good-timeout-controls">
+                    <h4>⏰ Sitzungs-Verwaltung</h4>
+                    
+                    <div class="timeout-display">
+                        Verbleibende Zeit: <span id="goodTimeRemaining">unbegrenzt</span>
+                    </div>
+                    
+                    <div class="timeout-buttons">
+                        <button onclick="goodExtendSession()" class="warning">⏰ +15 Minuten</button>
+                        <button onclick="goodExtendSession(30)" class="warning">⏰ +30 Minuten</button>
+                        <button onclick="goodPauseSession()" class="secondary">⏸️ Pausieren</button>
+                        <button onclick="goodAutoSave()" class="success">💾 Zwischenspeichern</button>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <label>
+                            <input type="checkbox" id="goodAutoExtend" checked onchange="goodToggleAutoExtend()">
+                            Automatische Verlängerung bei Aktivität
+                        </label><br>
+                        <label>
+                            <input type="checkbox" id="goodWarningNotifications" checked>
+                            Warnung 5 Minuten vor Ablauf
+                        </label>
+                    </div>
+                </div>
+                
+                <h4>📋 Krankenversicherungsantrag</h4>
+                <form>
+                    <div class="form-group">
+                        <label for="goodMedicalHistory">Krankengeschichte:</label>
+                        <textarea id="goodMedicalHistory" name="medicalHistory" rows="6" placeholder="Nehmen Sie sich die Zeit, die Sie benötigen. Die Sitzung kann jederzeit verlängert werden."></textarea>
+                        <small>💡 Ihre Eingaben werden automatisch alle 30 Sekunden gespeichert</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goodMedications">Aktuelle Medikamente:</label>
+                        <textarea id="goodMedications" name="medications" rows="4" placeholder="Medikamentenname, Dosierung, Häufigkeit..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goodFamilyHistory">Familienanamnese:</label>
+                        <textarea id="goodFamilyHistory" name="familyHistory" rows="4" placeholder="Erbkrankheiten, familiäre Vorbelastungen..."></textarea>
+                    </div>
+                    
+                    <div id="goodAutoSaveStatus" style="background: #e8f5e8; padding: 10px; border-radius: 4px; margin: 15px 0;">
+                        ✅ Automatisch gespeichert um 14:23:45
+                    </div>
+                    
+                    <button type="submit">Antrag absenden</button>
+                    <button type="button" onclick="goodSaveDraft()" class="secondary">Entwurf speichern</button>
+                </form>
+            </div>
+            <p>✅ Vollständige Zeit-Kontrolle mit automatischen Sicherungen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: User-controlled refresh -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Benutzer-kontrollierte Aktualisierung</div>
+        <p><strong>Lösung:</strong> Alle Aktualisierungen unter Benutzer-Kontrolle</p>
+        <div class="interactive-area">
+            <div class="good-refresh-controls">
+                <!-- GUT: Benutzer kontrolliert alle Aktualisierungen -->
+                <div class="refresh-settings">
+                    <h4>⚙️ Aktualisierungs-Einstellungen</h4>
+                    
+                    <div class="refresh-option">
+                        <label>
+                            <input type="radio" name="refreshMode" value="manual" checked onchange="goodSetRefreshMode('manual')">
+                            Nur manuelle Aktualisierung
+                        </label>
+                    </div>
+                    <div class="refresh-option">
+                        <label>
+                            <input type="radio" name="refreshMode" value="ask" onchange="goodSetRefreshMode('ask')">
+                            Nachfragen vor Aktualisierung
+                        </label>
+                    </div>
+                    <div class="refresh-option">
+                        <label>
+                            <input type="radio" name="refreshMode" value="auto" onchange="goodSetRefreshMode('auto')">
+                            Automatisch alle: 
+                            <select id="goodRefreshInterval">
+                                <option value="60">1 Minute</option>
+                                <option value="300">5 Minuten</option>
+                                <option value="600">10 Minuten</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                
+                <h4>📈 Live Börsenkurse</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
+                    <div>
+                        Letzte Aktualisierung: <span id="goodLastUpdate">14:23:45</span>
+                    </div>
+                    <div>
+                        <button onclick="goodManualRefresh()" class="success">🔄 Jetzt aktualisieren</button>
+                        <button onclick="goodPauseUpdates()" class="warning" id="goodPauseButton">⏸️ Updates pausieren</button>
+                    </div>
+                </div>
+                
+                <div class="manual-refresh-area" id="goodStockData">
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <span>AAPL</span>
+                        <span id="goodAaplPrice">$178.45</span>
+                        <span style="color: #327d36;">+2.34%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <span>MSFT</span>
+                        <span id="goodMsftPrice">$412.67</span>
+                        <span style="color: #d32f2f;">-1.23%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                        <span>GOOGL</span>
+                        <span id="goodGooglPrice">$142.89</span>
+                        <span style="color: #327d36;">+0.87%</span>
+                    </div>
+                </div>
+                
+                <p><strong>💡 Konzentration bewahren:</strong> Keine automatischen Unterbrechungen während Sie wichtige Investitionsentscheidungen treffen.</p>
+            </div>
+            <p>✅ Benutzer behält vollständige Kontrolle über alle Inhalts-Aktualisierungen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Consistent navigation with landmarks -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Konsistente Navigation mit Orientierungshilfen</div>
+        <p><strong>Lösung:</strong> Semantische Struktur mit vorhersagbarer Navigation</p>
+        <div class="interactive-area">
+            <!-- GUT: Semantische Landmark-Rollen -->
+            <nav class="good-navigation" role="navigation" aria-label="Hauptnavigation">
+                <div class="nav-main">
+                    <a href="#" onclick="goodNavigate('home')">🏠 Startseite</a>
+                    <a href="#" onclick="goodNavigate('products')">📦 Produkte</a>
+                    <a href="#" onclick="goodNavigate('services')">🛠️ Dienstleistungen</a>
+                    <a href="#" onclick="goodNavigate('about')">ℹ️ Über uns</a>
+                    <a href="#" onclick="goodNavigate('contact')">📞 Kontakt</a>
+                    <a href="#" onclick="goodNavigate('help')">❓ Hilfe</a>
+                    <a href="#" onclick="goodNavigate('account')">👤 Mein Konto</a>
+                </div>
+                
+                <nav class="nav-secondary" role="navigation" aria-label="Benutzer-Navigation">
+                    <a href="#">Einstellungen</a>
+                    <a href="#">Verlauf</a>
+                    <a href="#">Favoriten</a>
+                    <a href="#">Support</a>
+                    <a href="#">Abmelden</a>
+                </nav>
+            </nav>
+            
+            <div class="current-location" role="status" aria-live="polite">
+                <strong>📍 Sie befinden sich hier:</strong> 
+                <span id="goodBreadcrumb">Startseite</span>
+            </div>
+            
+            <main role="main">
+                <section>
+                    <h4 id="goodCurrentSection">Startseite</h4>
+                    <div id="goodSectionContent">
+                        <p>Willkommen auf unserer Homepage. Die Navigation bleibt auf allen Seiten konsistent und vorhersagbar.</p>
+                        
+                        <ul>
+                            <li>🏠 <strong>Startseite:</strong> Übersicht und Neuigkeiten</li>
+                            <li>📦 <strong>Produkte:</strong> Unser Produktkatalog</li>
+                            <li>🛠️ <strong>Dienstleistungen:</strong> Unsere Services</li>
+                            <li>ℹ️ <strong>Über uns:</strong> Unternehmensinformationen</li>
+                            <li>📞 <strong>Kontakt:</strong> Kontaktmöglichkeiten</li>
+                            <li>❓ <strong>Hilfe:</strong> Support und FAQ</li>
+                            <li>👤 <strong>Mein Konto:</strong> Persönlicher Bereich</li>
+                        </ul>
+                    </div>
+                </section>
+            </main>
+            
+            <p>✅ Vorhersagbare Navigation mit semantischen Rollen und Orientierungshilfen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Clear error messages with guidance -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Klare Fehlermeldungen mit Anleitung</div>
+        <p><strong>Lösung:</strong> Spezifische Fehleridentifikation mit Lösungsvorschlägen</p>
+        <div class="interactive-area">
+            <form onsubmit="return goodValidateComplexForm(event)">
+                <div class="form-group">
+                    <label for="goodBankAccount">Bankverbindung:</label>
+                    <input type="text" id="goodBankAccount" name="bankAccount" placeholder="DE89 3704 0044 0532 0130 00">
+                    <small>💡 IBAN (22 Zeichen, beginnt mit DE) oder deutsche Kontonummer</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="goodTaxId">Steuer-ID:</label>
+                    <input type="text" id="goodTaxId" name="taxId" placeholder="12345678901">
+                    <small>💡 Steuerliche Identifikationsnummer (11 Ziffern) oder Umsatzsteuer-ID</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="goodBusinessType">Unternehmensform:</label>
+                    <select id="goodBusinessType" name="businessType">
+                        <option value="">Bitte wählen Sie Ihre Rechtsform</option>
+                        <option value="gmbh">GmbH - Gesellschaft mit beschränkter Haftung</option>
+                        <option value="ag">AG - Aktiengesellschaft</option>
+                        <option value="einzelunternehmen">Einzelunternehmen</option>
+                        <option value="partnership">Personengesellschaft (OHG, KG)</option>
+                    </select>
+                    <small>💡 Diese Information beeinflusst die verfügbaren Kontomodelle</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="goodRevenue">Jahresumsatz (EUR):</label>
+                    <input type="number" id="goodRevenue" name="revenue" placeholder="250000" min="0">
+                    <small>💡 Umsatz der letzten 12 Monate (nicht Gewinn)</small>
+                </div>
+                
+                <!-- GUT: Detaillierte, hilfreiche Fehlermeldungen -->
+                <div id="goodFormError" class="good-error-display">
+                    <div class="error-summary">
+                        🚫 Bitte korrigieren Sie folgende Eingaben:
+                    </div>
+                    <ul class="error-list" id="goodErrorList">
+                        <!-- Spezifische Fehler werden hier eingefügt -->
+                    </ul>
+                </div>
+                
+                <button type="submit">Geschäftskonto eröffnen</button>
+            </form>
+            <p>✅ Präzise Fehlermeldungen mit konkreten Lösungsvorschlägen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Context changes with user confirmation -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Kontextwechsel mit Benutzer-Bestätigung</div>
+        <p><strong>Lösung:</strong> Warnung und Bestätigung vor Interface-Änderungen</p>
+        <div class="interactive-area">
+            <div class="good-context-controls">
+                <h4>🌐 Spracheinstellungen</h4>
+                
+                <div class="context-warning">
+                    ⚠️ <strong>Wichtiger Hinweis:</strong> Das Ändern der Sprache wird die gesamte Seite neu laden. 
+                    Ungespeicherte Änderungen gehen verloren.
+                </div>
+                
+                <!-- GUT: Warnung vor Kontextwechsel -->
+                <label for="goodLanguageSelect">Sprache wählen:</label>
+                <select id="goodLanguageSelect" onchange="goodConfirmLanguageChange(this.value)">
+                    <option value="de" selected>Deutsch</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                    <option value="it">Italiano</option>
+                </select>
+                
+                <div style="margin: 20px 0;">
+                    <h5 id="goodContentTitle">Produktinformationen</h5>
+                    <p id="goodContentText">Dies ist ein wichtiger Text über unser Produkt. Die Informationen hier sind sehr detailliert und erfordern Konzentration beim Lesen. Durch die Bestätigung vor Sprachänderungen können Sie in Ruhe zu Ende lesen.</p>
+                </div>
+                
+                <h4>💰 Währung auswählen</h4>
+                <div class="context-warning">
+                    ℹ️ Die Währungsumstellung erfolgt sofort und betrifft alle Preisanzeigen.
+                </div>
+                
+                <select id="goodCurrencySelect" onchange="goodConfirmCurrencyChange(this.value)">
+                    <option value="eur" selected>EUR (€) - Euro</option>
+                    <option value="usd">USD ($) - US-Dollar</option>
+                    <option value="gbp">GBP (£) - Britisches Pfund</option>
+                    <option value="jpy">JPY (¥) - Japanischer Yen</option>
+                </select>
+                
+                <div style="margin: 20px 0;">
+                    <h5>Preisliste</h5>
+                    <div id="goodPriceDisplay">
+                        <div>Basis-Paket: €49.99</div>
+                        <div>Premium-Paket: €99.99</div>
+                        <div>Enterprise-Paket: €199.99</div>
+                    </div>
+                </div>
+            </div>
+            <p>✅ Benutzer wird vor Interface-Änderungen gewarnt und kann bestätigen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Persistent content with user control -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Beständige Inhalte mit Benutzer-Kontrolle</div>
+        <p><strong>Lösung:</strong> Benachrichtigungen bleiben sichtbar bis Benutzer sie schließt</p>
+        <div class="interactive-area">
+            <div class="good-notification-area">
+                <h4>📢 Statusmeldungen</h4>
+                
+                <div class="notification-settings">
+                    <h5>⚙️ Benachrichtigungs-Einstellungen:</h5>
+                    <label>
+                        <input type="checkbox" id="goodPersistentNotifications" checked onchange="goodTogglePersistent()">
+                        Benachrichtigungen bleiben sichtbar bis manuell geschlossen
+                    </label><br>
+                    <label>
+                        <input type="checkbox" id="goodNotificationSounds" onchange="goodToggleSounds()">
+                        Akustische Signale bei neuen Benachrichtigungen
+                    </label>
+                </div>
+                
+                <p>Klicken Sie auf eine Aktion, um eine Statusmeldung zu sehen:</p>
+                
+                <button onclick="goodShowPersistentNotification('success', 'Datei wurde erfolgreich hochgeladen!')">📁 Datei hochladen</button>
+                <button onclick="goodShowPersistentNotification('warning', 'Achtung: Speicherplatz wird knapp!')">💾 Speicher prüfen</button>
+                <button onclick="goodShowPersistentNotification('error', 'Fehler: Verbindung zur Datenbank verloren!')">🔌 Verbindung testen</button>
+                
+                <!-- GUT: Beständige Benachrichtigungen mit Benutzer-Kontrolle -->
+                <div id="goodPersistentNotification" class="persistent-notification">
+                    <div class="notification-controls">
+                        <button onclick="goodDismissNotification()" title="Schließen">✕</button>
+                        <button onclick="goodSnoozeNotification()" title="5 Min. erinnern">💤</button>
+                    </div>
+                    <div id="goodNotificationContent">Statusmeldung</div>
+                </div>
+                
+                <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                    <h5>📖 Wichtige Dokumentation</h5>
+                    <p>Lesen Sie aufmerksam die folgenden wichtigen Sicherheitshinweise für den Umgang mit den Systemfunktionen. Diese Informationen sind entscheidend für die korrekte Nutzung und bleiben verfügbar, während Sie Benachrichtigungen bearbeiten.</p>
+                </div>
+            </div>
+            <p>✅ Benachrichtigungen bleiben verfügbar bis der Benutzer sie explizit schließt</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Structured information with clear hierarchy -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Strukturierte Informationen mit klarer Hierarchie</div>
+        <p><strong>Lösung:</strong> Informationen in überschaubare Abschnitte gegliedert</p>
+        <div class="interactive-area">
+            <div class="good-structured-content">
+                <!-- GUT: Klare Informationshierarchie -->
+                <div class="content-summary">
+                    <h4>📋 DSGVO-Compliance - Zusammenfassung</h4>
+                    <p><strong>Wichtigste Punkte:</strong></p>
+                    <ul>
+                        <li>🗓️ <strong>Gültig seit:</strong> 25. Mai 2018</li>
+                        <li>💰 <strong>Höchststrafe:</strong> 20 Mio. € oder 4% Jahresumsatz</li>
+                        <li>⏰ <strong>Meldepflicht:</strong> 72 Stunden bei Datenschutzverletzungen</li>
+                        <li>👤 <strong>Betroffenenrechte:</strong> Auskunft, Berichtigung, Löschung</li>
+                        <li>🛡️ <strong>Grundprinzip:</strong> Privacy by Design</li>
+                    </ul>
+                </div>
+                
+                <h4>📚 Detaillierte Informationen (aufklappbar)</h4>
+                
+                <div class="expandable-section">
+                    <div class="section-header" onclick="goodToggleSection(this)" role="button" tabindex="0" aria-expanded="false">
+                        🔧 Technische Umsetzung
+                    </div>
+                    <div class="section-content">
+                        <ul>
+                            <li>Privacy by Design implementieren</li>
+                            <li>Datenschutz-Folgenabschätzungen durchführen</li>
+                            <li>Verzeichnisse von Verarbeitungstätigkeiten führen</li>
+                            <li>Meldeverfahren für Datenschutzverletzungen einrichten</li>
+                            <li>Datenschutzbeauftragte benennen (bei Bedarf)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="expandable-section">
+                    <div class="section-header" onclick="goodToggleSection(this)" role="button" tabindex="0" aria-expanded="false">
+                        ⚖️ Rechtsgrundlagen
+                    </div>
+                    <div class="section-content">
+                        <ul>
+                            <li><strong>Art. 6 (1) a:</strong> Einwilligung</li>
+                            <li><strong>Art. 6 (1) b:</strong> Vertragserfüllung</li>
+                            <li><strong>Art. 6 (1) c:</strong> Rechtliche Verpflichtung</li>
+                            <li><strong>Art. 6 (1) d:</strong> Schutz lebenswichtiger Interessen</li>
+                            <li><strong>Art. 6 (1) e:</strong> Öffentliche Aufgaben</li>
+                            <li><strong>Art. 6 (1) f:</strong> Berechtigte Interessen</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="expandable-section">
+                    <div class="section-header" onclick="goodToggleSection(this)" role="button" tabindex="0" aria-expanded="false">
+                        👥 Betroffenenrechte
+                    </div>
+                    <div class="section-content">
+                        <ul>
+                            <li>Auskunftsrecht (Art. 15)</li>
+                            <li>Berichtigungsrecht (Art. 16)</li>
+                            <li>Löschungsrecht (Art. 17)</li>
+                            <li>Einschränkung der Verarbeitung (Art. 18)</li>
+                            <li>Datenübertragbarkeit (Art. 20)</li>
+                            <li>Widerspruchsrecht (Art. 21)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="expandable-section">
+                    <div class="section-header" onclick="goodToggleSection(this)" role="button" tabindex="0" aria-expanded="false">
+                        🌍 Internationale Übertragungen
+                    </div>
+                    <div class="section-content">
+                        <ul>
+                            <li>Angemessenheitsbeschlüsse der EU-Kommission</li>
+                            <li>Standardvertragsklauseln (SCC)</li>
+                            <li>Binding Corporate Rules (BCR)</li>
+                            <li>Zertifizierungen und Verhaltensregeln</li>
+                            <li>Cloud-Services und Auftragsverarbeitung</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0; text-align: center;">
+                    <button onclick="goodShowAllSections()" class="warning">📖 Alle Abschnitte öffnen</button>
+                    <button onclick="goodHideAllSections()" class="secondary">📁 Alle Abschnitte schließen</button>
+                </div>
+            </div>
+            <p>✅ Informationen in überschaubare, aufklappbare Abschnitte strukturiert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Progress indicators for complex tasks -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Fortschrittsanzeigen für komplexe Aufgaben</div>
+        <p><strong>Lösung:</strong> Klare Orientierung und Fortschritts-Tracking</p>
+        <div class="interactive-area">
+            <div class="good-complex-task">
+                <h4>🔧 Systemkonfiguration</h4>
+                
+                <!-- GUT: Vollständige Fortschrittsanzeige -->
+                <div class="task-progress">
+                    <h5>📊 Konfigurationsfortschritt</h5>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="goodProgressFill" style="width: 0%"></div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 10px 0;">
+                        <strong id="goodProgressText">0 von 8 Aufgaben abgeschlossen (0%)</strong>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; margin: 15px 0;">
+                        <button onclick="goodResetProgress()" class="secondary">🔄 Zurücksetzen</button>
+                        <button onclick="goodShowHelp()" class="warning">❓ Hilfe anzeigen</button>
+                        <button onclick="goodSaveProgress()" class="success">💾 Fortschritt speichern</button>
+                    </div>
+                </div>
+                
+                <ul class="task-checklist" id="goodTaskList">
+                    <li class="task-item current" onclick="goodToggleTaskItem(this, 0)">
+                        <span class="task-status current">🔄</span>
+                        <strong>Datenbank-Verbindung konfigurieren</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            Server: db.example.com, Port: 5432, SSL: aktiviert
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 1)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>E-Mail-Server einrichten</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            SMTP: mail.example.com, IMAP: imap.example.com
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 2)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>Benutzerrechte definieren</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            Admin, Editor, Viewer Rollen mit spezifischen Berechtigungen
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 3)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>Backup-Strategien festlegen</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            Tägliche inkrementelle, wöchentliche vollständige Backups
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 4)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>Sicherheitsrichtlinien implementieren</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            Firewall, Intrusion Detection, Log-Monitoring
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 5)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>Performance-Überwachung aktivieren</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            CPU, Memory, Disk I/O, Network-Monitoring
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 6)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>Compliance-Einstellungen überprüfen</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            DSGVO, SOX, HIPAA Anforderungen validieren
+                        </div>
+                    </li>
+                    <li class="task-item" onclick="goodToggleTaskItem(this, 7)">
+                        <span class="task-status pending">⏳</span>
+                        <strong>Integration-Tests durchführen</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            API-Tests, Datenbank-Tests, E-Mail-Tests
+                        </div>
+                    </li>
+                </ul>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <button onclick="goodCompleteAllTasks()" class="success" id="goodCompleteButton" disabled>✅ Konfiguration abschließen</button>
+                </div>
+            </div>
+            <p>✅ Klare Fortschrittsanzeige mit Orientierung und Validierung</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das zugänglich ist</div>
+        <p><strong>WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 & 3.3.2 Konformität:</strong></p>
+        <ul>
+            <li>✅ Strukturierte Informationen reduzieren kognitive Belastung</li>
+            <li>✅ Gedächtnisstützen unterstützen mehrstufige Prozesse</li>
+            <li>✅ Vorhersagbare Interface-Änderungen mit Benutzer-Kontrolle</li>
+            <li>✅ Flexible Zeitverwaltung ohne Druck</li>
+            <li>✅ Spezifische Fehlermeldungen mit Lösungshilfen</li>
+        </ul>
+        
+        <p><strong>Unterstützte Benutzergruppen:</strong></p>
+        <ul>
+            <li>👥 Kognitive Beeinträchtigungen: Klare Struktur und Orientierung</li>
+            <li>👥 Aufmerksamkeitsdefizite: Kontrollierte, störungsfreie Umgebung</li>
+            <li>👥 Gedächtnisprobleme: Übersichten und Erinnerungshilfen</li>
+            <li>👥 Leseschwäche: Strukturierte, priorisierte Informationen</li>
+            <li>👥 Ältere Benutzer: Ausreichend Zeit und klare Anweisungen</li>
+        </ul>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="goodConfirmationDialog" class="confirmation-dialog">
+        <div class="dialog-content">
+            <h3 id="goodDialogTitle">Bestätigung erforderlich</h3>
+            <p id="goodDialogMessage">Möchten Sie diese Aktion ausführen?</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="goodConfirmAction()" class="success" id="goodConfirmButton">Bestätigen</button>
+                <button onclick="goodCancelAction()" class="secondary">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let goodSessionTime = 0;
+        let goodSessionInterval = null;
+        let goodAutoExtendEnabled = true;
+        let goodRefreshMode = 'manual';
+        let goodRefreshPaused = false;
+        let goodTasksCompleted = 0;
+        let goodCurrentAction = null;
+        let goodPasswordRequirements = {
+            length: false,
+            upper: false,
+            lower: false,
+            numbers: false,
+            special: false
+        };
+        
+        // GOOD 1: Password requirement checker
+        function goodCheckPassword() {
+            const password = document.getElementById('goodPassword').value;
+            
+            // Check requirements
+            goodPasswordRequirements.length = password.length >= 12;
+            goodPasswordRequirements.upper = /[A-Z]/.test(password);
+            goodPasswordRequirements.lower = /[a-z]/.test(password);
+            goodPasswordRequirements.numbers = (password.match(/\d/g) || []).length >= 2;
+            goodPasswordRequirements.special = /[!@#$%^&*()]/.test(password);
+            
+            // Update visual indicators
+            goodUpdateRequirementStatus('lengthStatus', goodPasswordRequirements.length);
+            goodUpdateRequirementStatus('upperStatus', goodPasswordRequirements.upper);
+            goodUpdateRequirementStatus('lowerStatus', goodPasswordRequirements.lower);
+            goodUpdateRequirementStatus('numberStatus', goodPasswordRequirements.numbers);
+            goodUpdateRequirementStatus('specialStatus', goodPasswordRequirements.special);
+            
+            console.log('ACCESSIBILITY SUCCESS: Real-time password validation with clear feedback');
+        }
+        
+        function goodUpdateRequirementStatus(elementId, isValid) {
+            const element = document.getElementById(elementId);
+            if (isValid) {
+                element.className = 'requirement-status valid';
+                element.textContent = '✓';
+            } else {
+                element.className = 'requirement-status invalid';
+                element.textContent = '✗';
+            }
+        }
+        
+        // GOOD 2: Multi-step navigation with memory aids
+        function goodGoToStep(step) {
+            alert(`Navigation zu Schritt ${step}\n\nIhre bisherigen Eingaben bleiben gespeichert und werden in der Übersicht angezeigt.`);
+            console.log('ACCESSIBILITY SUCCESS: Step navigation with data preservation');
+        }
+        
+        function goodSaveAndContinue() {
+            const address = document.getElementById('goodAddress').value;
+            const birthDate = document.getElementById('goodBirthDate').value;
+            const income = document.getElementById('goodIncome').value;
+            
+            if (!address || !birthDate || !income) {
+                alert('Bitte füllen Sie alle Pflichtfelder aus.');
+                return;
+            }
+            
+            // Update summary
+            const summary = document.getElementById('goodStepSummary');
+            summary.innerHTML += `
+                <li><strong>Adresse:</strong> ${address}</li>
+                <li><strong>Geburtsdatum:</strong> ${birthDate}</li>
+                <li><strong>Einkommen:</strong> €${income}/Monat</li>
+            `;
+            
+            alert('✅ Daten gespeichert!\n\nWeiter zu Schritt 3: Finanzielle Angaben\nAlle bisherigen Daten bleiben in der Übersicht verfügbar.');
+            console.log('ACCESSIBILITY SUCCESS: Data saved with comprehensive summary');
+        }
+        
+        function goodEditPreviousStep() {
+            alert('🔄 Zurück zu Schritt 1\n\nSie können alle vorherigen Angaben bearbeiten.\nÄnderungen werden automatisch in der Übersicht aktualisiert.');
+            console.log('ACCESSIBILITY SUCCESS: Easy access to edit previous data');
+        }
+        
+        // GOOD 3: Session timeout with user control
+        function goodExtendSession(minutes = 15) {
+            goodSessionTime += minutes * 60;
+            goodUpdateTimeDisplay();
+            alert(`⏰ Sitzung um ${minutes} Minuten verlängert!\n\nNeue Ablaufzeit: ${Math.floor(goodSessionTime / 60)} Minuten\nSie können jederzeit weitere Verlängerungen anfordern.`);
+            console.log('ACCESSIBILITY SUCCESS: User can extend session time');
+        }
+        
+        function goodPauseSession() {
+            if (goodSessionInterval) {
+                clearInterval(goodSessionInterval);
+                goodSessionInterval = null;
+                document.getElementById('goodTimeRemaining').textContent = 'pausiert';
+                alert('⏸️ Sitzung pausiert!\n\nDie Zeit läuft nicht mehr ab.\nDrücken Sie "Fortsetzen" um die Sitzung fortzusetzen.');
+            } else {
+                goodStartSession();
+                alert('▶️ Sitzung fortgesetzt!\n\nDie Zeit läuft wieder.');
+            }
+            console.log('ACCESSIBILITY SUCCESS: User can pause and resume session');
+        }
+        
+        function goodAutoSave() {
+            const medicalHistory = document.getElementById('goodMedicalHistory').value;
+            const medications = document.getElementById('goodMedications').value;
+            const familyHistory = document.getElementById('goodFamilyHistory').value;
+            
+            // Simulate saving
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('goodAutoSaveStatus').innerHTML = `✅ Manuell gespeichert um ${now}`;
+            
+            alert('💾 Zwischenspeicherung erfolgreich!\n\nAlle Ihre Eingaben wurden gesichert.\nSie können die Sitzung jederzeit verlassen und später fortsetzen.');
+            console.log('ACCESSIBILITY SUCCESS: Manual save option available');
+        }
+        
+        function goodToggleAutoExtend() {
+            goodAutoExtendEnabled = document.getElementById('goodAutoExtend').checked;
+            console.log('ACCESSIBILITY SUCCESS: User controls automatic session extension');
+        }
+        
+        function goodStartSession() {
+            if (!goodSessionTime) goodSessionTime = 20 * 60; // 20 minutes default
+            
+            goodSessionInterval = setInterval(() => {
+                goodSessionTime--;
+                goodUpdateTimeDisplay();
+                
+                if (goodSessionTime === 5 * 60 && document.getElementById('goodWarningNotifications').checked) {
+                    alert('⚠️ Zeitwarnung!\n\n5 Minuten verbleibend.\nMöchten Sie die Sitzung verlängern?');
+                }
+                
+                if (goodSessionTime <= 0) {
+                    clearInterval(goodSessionInterval);
+                    alert('⏰ Sitzung beendet!\n\nIhre Daten wurden automatisch gespeichert.\nSie können jederzeit eine neue Sitzung starten.');
+                }
+            }, 1000);
+        }
+        
+        function goodUpdateTimeDisplay() {
+            const minutes = Math.floor(goodSessionTime / 60);
+            const seconds = goodSessionTime % 60;
+            document.getElementById('goodTimeRemaining').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function goodSaveDraft() {
+            alert('📄 Entwurf gespeichert!\n\nSie können jederzeit zu diesem Punkt zurückkehren.\nEntwürfe werden 30 Tage aufbewahrt.');
+            console.log('ACCESSIBILITY SUCCESS: Draft saving for complex forms');
+        }
+        
+        // GOOD 4: User-controlled refresh
+        function goodSetRefreshMode(mode) {
+            goodRefreshMode = mode;
+            
+            const messages = {
+                'manual': 'Inhalte werden nur auf Ihre Anfrage aktualisiert',
+                'ask': 'Sie werden vor jeder Aktualisierung gefragt',
+                'auto': 'Automatische Aktualisierung nach gewähltem Intervall'
+            };
+            
+            alert(`⚙️ Aktualisierungsmodus geändert!\n\n${messages[mode]}\n\nSie können diese Einstellung jederzeit ändern.`);
+            console.log('ACCESSIBILITY SUCCESS: User controls refresh behavior');
+        }
+        
+        function goodManualRefresh() {
+            // Update prices
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('goodLastUpdate').textContent = now;
+            
+            // Simulate new prices
+            const aaplPrice = (Math.random() * 20 + 170).toFixed(2);
+            const msftPrice = (Math.random() * 30 + 400).toFixed(2);
+            const googlPrice = (Math.random() * 15 + 135).toFixed(2);
+            
+            document.getElementById('goodAaplPrice').textContent = `$${aaplPrice}`;
+            document.getElementById('goodMsftPrice').textContent = `$${msftPrice}`;
+            document.getElementById('goodGooglPrice').textContent = `$${googlPrice}`;
+            
+            alert(`🔄 Daten aktualisiert!\n\nLetzte Aktualisierung: ${now}\nAlle Kurse auf aktuellem Stand.`);
+            console.log('ACCESSIBILITY SUCCESS: Manual refresh under user control');
+        }
+        
+        function goodPauseUpdates() {
+            goodRefreshPaused = !goodRefreshPaused;
+            const button = document.getElementById('goodPauseButton');
+            
+            if (goodRefreshPaused) {
+                button.textContent = '▶️ Updates fortsetzen';
+                button.className = 'success';
+                alert('⏸️ Updates pausiert!\n\nKeine automatischen Aktualisierungen bis Sie sie wieder aktivieren.');
+            } else {
+                button.textContent = '⏸️ Updates pausieren';
+                button.className = 'warning';
+                alert('▶️ Updates fortgesetzt!\n\nAutomatische Aktualisierungen sind wieder aktiv.');
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User can pause/resume updates');
+        }
+        
+        // GOOD 5: Consistent navigation
+        function goodNavigate(section) {
+            const sections = {
+                'home': { title: 'Startseite', content: 'Willkommen auf unserer Homepage. Die Navigation bleibt auf allen Seiten konsistent und vorhersagbar.', breadcrumb: 'Startseite' },
+                'products': { title: 'Produkte', content: 'Unsere umfangreiche Produktpalette mit detaillierten Beschreibungen und Spezifikationen.', breadcrumb: 'Startseite > Produkte' },
+                'services': { title: 'Dienstleistungen', content: 'Professionelle Services und Support für alle Ihre Bedürfnisse.', breadcrumb: 'Startseite > Dienstleistungen' },
+                'about': { title: 'Über uns', content: 'Erfahren Sie mehr über unser Unternehmen, unsere Mission und unser Team.', breadcrumb: 'Startseite > Über uns' },
+                'contact': { title: 'Kontakt', content: 'Verschiedene Möglichkeiten uns zu erreichen - Telefon, E-Mail, Chat oder persönlich.', breadcrumb: 'Startseite > Kontakt' },
+                'help': { title: 'Hilfe', content: 'Umfassendes Support-Center mit FAQ, Tutorials und Live-Support.', breadcrumb: 'Startseite > Hilfe' },
+                'account': { title: 'Mein Konto', content: 'Ihr persönlicher Bereich mit Kontoeinstellungen, Bestellhistorie und Präferenzen.', breadcrumb: 'Startseite > Mein Konto' }
+            };
+            
+            const current = sections[section] || sections['home'];
+            document.getElementById('goodCurrentSection').textContent = current.title;
+            document.getElementById('goodSectionContent').innerHTML = `<p>${current.content}</p>`;
+            document.getElementById('goodBreadcrumb').textContent = current.breadcrumb;
+            
+            console.log('ACCESSIBILITY SUCCESS: Consistent navigation with breadcrumb updates');
+        }
+        
+        // GOOD 6: Clear error messages with guidance
+        function goodValidateComplexForm(event) {
+            event.preventDefault();
+            
+            const bankAccount = document.getElementById('goodBankAccount').value;
+            const taxId = document.getElementById('goodTaxId').value;
+            const businessType = document.getElementById('goodBusinessType').value;
+            const revenue = document.getElementById('goodRevenue').value;
+            
+            const errors = [];
+            
+            // Specific validation with helpful messages
+            if (!bankAccount || bankAccount.length < 15) {
+                errors.push({
+                    field: 'Bankverbindung',
+                    problem: 'IBAN muss 22 Zeichen haben und mit DE beginnen',
+                    solution: 'Beispiel: DE89 3704 0044 0532 0130 00'
+                });
+            }
+            
+            if (!taxId || taxId.length !== 11) {
+                errors.push({
+                    field: 'Steuer-ID',
+                    problem: 'Steuerliche Identifikationsnummer muss 11 Ziffern haben',
+                    solution: 'Finden Sie diese auf Ihrem Steuerbescheid oder fragen Sie beim Bundeszentralamt für Steuern nach'
+                });
+            }
+            
+            if (!businessType) {
+                errors.push({
+                    field: 'Unternehmensform',
+                    problem: 'Bitte wählen Sie Ihre Rechtsform aus',
+                    solution: 'Diese Information bestimmt die verfügbaren Kontomodelle und Konditionen'
+                });
+            }
+            
+            if (!revenue || isNaN(revenue) || revenue < 0) {
+                errors.push({
+                    field: 'Jahresumsatz',
+                    problem: 'Bitte geben Sie einen gültigen Umsatz ein',
+                    solution: 'Tragen Sie den Umsatz (nicht Gewinn) der letzten 12 Monate ein'
+                });
+            }
+            
+            if (errors.length > 0) {
+                goodShowDetailedErrors(errors);
+                console.log('ACCESSIBILITY SUCCESS: Specific error messages with solutions');
+                return false;
+            }
+            
+            alert('✅ Antrag erfolgreich eingereicht!\n\nSie erhalten binnen 2 Werktagen eine Rückmeldung per E-Mail.\nReferenznummer: BK-2024-001234');
+            document.getElementById('goodFormError').classList.remove('show');
+            return false;
+        }
+        
+        function goodShowDetailedErrors(errors) {
+            const errorList = document.getElementById('goodErrorList');
+            errorList.innerHTML = errors.map(error => `
+                <li class="error-item">
+                    <strong>${error.field}:</strong> ${error.problem}
+                    <div class="error-suggestion">
+                        💡 <strong>Lösung:</strong> ${error.solution}
+                    </div>
+                </li>
+            `).join('');
+            
+            document.getElementById('goodFormError').classList.add('show');
+        }
+        
+        // GOOD 7: Context changes with confirmation
+        function goodConfirmLanguageChange(newLanguage) {
+            if (newLanguage === 'de') return; // Already German
+            
+            goodCurrentAction = { type: 'language', value: newLanguage };
+            
+            const languages = { 'en': 'Englisch', 'fr': 'Französisch', 'es': 'Spanisch', 'it': 'Italienisch' };
+            
+            document.getElementById('goodDialogTitle').textContent = 'Sprache ändern';
+            document.getElementById('goodDialogMessage').innerHTML = `
+                Möchten Sie die Sprache zu ${languages[newLanguage]} ändern?<br><br>
+                ⚠️ <strong>Wichtig:</strong> Die Seite wird neu geladen und ungespeicherte Änderungen gehen verloren.
+            `;
+            document.getElementById('goodConfirmButton').textContent = 'Sprache ändern';
+            document.getElementById('goodConfirmationDialog').style.display = 'flex';
+            
+            console.log('ACCESSIBILITY SUCCESS: User confirmation before context change');
+        }
+        
+        function goodConfirmCurrencyChange(newCurrency) {
+            if (newCurrency === 'eur') return; // Already EUR
+            
+            goodCurrentAction = { type: 'currency', value: newCurrency };
+            
+            const currencies = { 'usd': 'US-Dollar', 'gbp': 'Britisches Pfund', 'jpy': 'Japanischer Yen' };
+            
+            document.getElementById('goodDialogTitle').textContent = 'Währung ändern';
+            document.getElementById('goodDialogMessage').innerHTML = `
+                Möchten Sie die Währung zu ${currencies[newCurrency]} ändern?<br><br>
+                ℹ️ Alle Preise werden sofort umgerechnet.
+            `;
+            document.getElementById('goodConfirmButton').textContent = 'Währung ändern';
+            document.getElementById('goodConfirmationDialog').style.display = 'flex';
+            
+            console.log('ACCESSIBILITY SUCCESS: Currency change confirmation');
+        }
+        
+        function goodConfirmAction() {
+            if (goodCurrentAction?.type === 'language') {
+                goodApplyLanguageChange(goodCurrentAction.value);
+            } else if (goodCurrentAction?.type === 'currency') {
+                goodApplyCurrencyChange(goodCurrentAction.value);
+            }
+            goodCancelAction();
+        }
+        
+        function goodCancelAction() {
+            // Reset dropdowns to previous values
+            document.getElementById('goodLanguageSelect').value = 'de';
+            document.getElementById('goodCurrencySelect').value = 'eur';
+            
+            document.getElementById('goodConfirmationDialog').style.display = 'none';
+            goodCurrentAction = null;
+            console.log('ACCESSIBILITY SUCCESS: User can cancel context changes');
+        }
+        
+        function goodApplyLanguageChange(language) {
+            const content = {
+                'en': { title: 'Product Information', text: 'This is important text about our product. The information here is very detailed and requires concentration when reading.' },
+                'fr': { title: 'Informations sur le produit', text: 'Ceci est un texte important sur notre produit. Les informations ici sont très détaillées et nécessitent de la concentration lors de la lecture.' },
+                'es': { title: 'Información del producto', text: 'Este es un texto importante sobre nuestro producto. La información aquí es muy detallada y requiere concentración al leer.' },
+                'it': { title: 'Informazioni sul prodotto', text: 'Questo è un testo importante sul nostro prodotto. Le informazioni qui sono molto dettagliate e richiedono concentrazione durante la lettura.' }
+            };
+            
+            const current = content[language];
+            document.getElementById('goodContentTitle').textContent = current.title;
+            document.getElementById('goodContentText').textContent = current.text;
+            
+            alert(`✅ Sprache geändert!\n\nInhalte werden nun in der gewählten Sprache angezeigt.`);
+        }
+        
+        function goodApplyCurrencyChange(currency) {
+            const rates = {
+                'usd': ['$54.99', '$109.99', '$219.99'],
+                'gbp': ['£44.99', '£89.99', '£179.99'],
+                'jpy': ['¥7,499', '¥14,999', '¥29,999']
+            };
+            
+            const prices = rates[currency];
+            const priceElements = document.querySelectorAll('#goodPriceDisplay div');
+            priceElements[0].textContent = `Basis-Paket: ${prices[0]}`;
+            priceElements[1].textContent = `Premium-Paket: ${prices[1]}`;
+            priceElements[2].textContent = `Enterprise-Paket: ${prices[2]}`;
+            
+            alert(`✅ Währung geändert!\n\nAlle Preise werden nun in der gewählten Währung angezeigt.`);
+        }
+        
+        // GOOD 8: Persistent notifications with user control
+        function goodShowPersistentNotification(type, message) {
+            const notification = document.getElementById('goodPersistentNotification');
+            const content = document.getElementById('goodNotificationContent');
+            
+            notification.className = `persistent-notification ${type}`;
+            content.textContent = message;
+            notification.style.display = 'block';
+            
+            if (document.getElementById('goodNotificationSounds').checked) {
+                // Simulate sound notification
+                console.log('🔊 Notification sound played');
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: Persistent notification with user control');
+        }
+        
+        function goodDismissNotification() {
+            document.getElementById('goodPersistentNotification').style.display = 'none';
+            console.log('ACCESSIBILITY SUCCESS: User can dismiss notifications');
+        }
+        
+        function goodSnoozeNotification() {
+            document.getElementById('goodPersistentNotification').style.display = 'none';
+            alert('💤 Erinnerung in 5 Minuten\n\nDie Benachrichtigung wird in 5 Minuten erneut angezeigt.');
+            
+            setTimeout(() => {
+                document.getElementById('goodPersistentNotification').style.display = 'block';
+                alert('🔔 Erinnerung!\n\nHier ist Ihre zurückgestellte Benachrichtigung.');
+            }, 5000); // 5 seconds for demo
+            
+            console.log('ACCESSIBILITY SUCCESS: User can snooze notifications');
+        }
+        
+        function goodTogglePersistent() {
+            const enabled = document.getElementById('goodPersistentNotifications').checked;
+            console.log(`ACCESSIBILITY SUCCESS: Persistent notifications ${enabled ? 'enabled' : 'disabled'}`);
+        }
+        
+        function goodToggleSounds() {
+            const enabled = document.getElementById('goodNotificationSounds').checked;
+            console.log(`ACCESSIBILITY SUCCESS: Notification sounds ${enabled ? 'enabled' : 'disabled'}`);
+        }
+        
+        // GOOD 9: Structured content with clear hierarchy
+        function goodToggleSection(header) {
+            const content = header.nextElementSibling;
+            const isExpanded = content.classList.contains('expanded');
+            
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('expanded');
+                header.setAttribute('aria-expanded', 'true');
+            }
+            
+            console.log('ACCESSIBILITY SUCCESS: User controls information disclosure');
+        }
+        
+        function goodShowAllSections() {
+            const sections = document.querySelectorAll('.section-content');
+            const headers = document.querySelectorAll('.section-header');
+            
+            sections.forEach(section => section.classList.add('expanded'));
+            headers.forEach(header => header.setAttribute('aria-expanded', 'true'));
+            
+            console.log('ACCESSIBILITY SUCCESS: All sections expanded for comprehensive view');
+        }
+        
+        function goodHideAllSections() {
+            const sections = document.querySelectorAll('.section-content');
+            const headers = document.querySelectorAll('.section-header');
+            
+            sections.forEach(section => section.classList.remove('expanded'));
+            headers.forEach(header => header.setAttribute('aria-expanded', 'false'));
+            
+            console.log('ACCESSIBILITY SUCCESS: All sections collapsed for overview');
+        }
+        
+        // GOOD 10: Progress tracking for complex tasks
+        function goodToggleTaskItem(item, index) {
+            const status = item.querySelector('.task-status');
+            const isCompleted = item.classList.contains('completed');
+            
+            if (isCompleted) {
+                // Uncomplete task
+                item.classList.remove('completed');
+                item.classList.add('current');
+                status.textContent = '🔄';
+                status.className = 'task-status current';
+                goodTasksCompleted--;
+            } else {
+                // Complete task
+                item.classList.remove('current');
+                item.classList.add('completed');
+                status.textContent = '✅';
+                status.className = 'task-status completed';
+                goodTasksCompleted++;
+                
+                // Move to next task
+                const nextItem = document.querySelectorAll('.task-item')[index + 1];
+                if (nextItem && !nextItem.classList.contains('completed')) {
+                    nextItem.classList.add('current');
+                    nextItem.querySelector('.task-status').textContent = '🔄';
+                    nextItem.querySelector('.task-status').className = 'task-status current';
+                }
+            }
+            
+            goodUpdateProgress();
+            console.log('ACCESSIBILITY SUCCESS: Task progress tracked with visual feedback');
+        }
+        
+        function goodUpdateProgress() {
+            const totalTasks = 8;
+            const percentage = Math.round((goodTasksCompleted / totalTasks) * 100);
+            
+            document.getElementById('goodProgressFill').style.width = `${percentage}%`;
+            document.getElementById('goodProgressText').textContent = 
+                `${goodTasksCompleted} von ${totalTasks} Aufgaben abgeschlossen (${percentage}%)`;
+            
+            const completeButton = document.getElementById('goodCompleteButton');
+            if (goodTasksCompleted === totalTasks) {
+                completeButton.disabled = false;
+                completeButton.textContent = '✅ Konfiguration abschließen';
+            } else {
+                completeButton.disabled = true;
+                completeButton.textContent = `⏳ ${totalTasks - goodTasksCompleted} Aufgaben verbleibend`;
+            }
+        }
+        
+        function goodResetProgress() {
+            goodTasksCompleted = 0;
+            const items = document.querySelectorAll('.task-item');
+            items.forEach((item, index) => {
+                item.className = index === 0 ? 'task-item current' : 'task-item';
+                const status = item.querySelector('.task-status');
+                if (index === 0) {
+                    status.textContent = '🔄';
+                    status.className = 'task-status current';
+                } else {
+                    status.textContent = '⏳';
+                    status.className = 'task-status pending';
+                }
+            });
+            goodUpdateProgress();
+            alert('🔄 Fortschritt zurückgesetzt!\n\nSie können von vorne beginnen.');
+            console.log('ACCESSIBILITY SUCCESS: User can reset progress');
+        }
+        
+        function goodShowHelp() {
+            alert('❓ Konfigurationshilfe\n\n• Klicken Sie auf Aufgaben um sie abzuhaken\n• Der Fortschrittsbalken zeigt Ihren Status\n• Alle Aufgaben müssen abgeschlossen sein\n• Sie können jederzeit zurücksetzen\n• Ihr Fortschritt wird automatisch gespeichert');
+            console.log('ACCESSIBILITY SUCCESS: Help available for complex tasks');
+        }
+        
+        function goodSaveProgress() {
+            alert('💾 Fortschritt gespeichert!\n\nIhre Konfiguration wurde gesichert.\nSie können jederzeit fortsetzen.');
+            console.log('ACCESSIBILITY SUCCESS: Progress can be saved and resumed');
+        }
+        
+        function goodCompleteAllTasks() {
+            if (goodTasksCompleted < 8) {
+                alert('⚠️ Nicht alle Aufgaben abgeschlossen!\n\nBitte schließen Sie alle 8 Konfigurationsschritte ab.');
+                return;
+            }
+            
+            alert('🎉 Konfiguration erfolgreich abgeschlossen!\n\nAlle Systemkomponenten sind korrekt eingerichtet.\nIhr System ist jetzt einsatzbereit.');
+            console.log('ACCESSIBILITY SUCCESS: Complex task completed with validation');
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== COGNITIVE ACCESSIBILITY GOOD EXAMPLES LOADED ===');
+            
+            // Start session management
+            goodStartSession();
+            
+            // Initialize auto-save for session timeout demo
+            setInterval(() => {
+                const now = new Date().toLocaleTimeString();
+                document.getElementById('goodAutoSaveStatus').innerHTML = `✅ Automatisch gespeichert um ${now}`;
+            }, 30000);
+            
+            console.log('✅ All cognitive accessibility features active:');
+            console.log('- Structured instructions with visual feedback');
+            console.log('- Multi-step navigation with memory aids');
+            console.log('- User-controlled session timeouts');
+            console.log('- Manual refresh controls');
+            console.log('- Consistent navigation with landmarks');
+            console.log('- Detailed error messages with solutions');
+            console.log('- Context change confirmations');
+            console.log('- Persistent notifications with user control');
+            console.log('- Hierarchical information structure');
+            console.log('- Progress tracking for complex tasks');
+        });
+    </script>
+</body>
+</html>

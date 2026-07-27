@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us — Acme Corp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* Focus-visible styles that work in Windows High Contrast Mode */
+        :focus-visible {
+            outline: 3px solid #1d4ed8;
+            outline-offset: 2px;
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* High contrast / forced colors support */
+        @media (forced-colors: active) {
+            :focus-visible {
+                outline: 3px solid CanvasText;
+            }
+        }
+
+        /* Skip link pattern */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0.5rem;
+            background: #1e293b;
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            font-weight: 600;
+            text-decoration: underline;
+            z-index: 9999;
+            border-radius: 0 0 0.5rem 0.5rem;
+            transition: top 0.2s;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Screen reader only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Scroll padding for skip link */
+        html {
+            scroll-padding-top: 1rem;
+        }
+
+        /* Prevent layout shift with form errors */
+        .error-msg {
+            min-height: 1.25rem;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header class="border-b border-gray-300 bg-gray-50">
+        <nav class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between" aria-label="Main navigation">
+            <a href="/" class="text-xl font-bold text-blue-900 no-underline">Acme Corp</a>
+            <ul class="flex gap-6">
+                <li><a href="/products" class="text-blue-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded px-1">Products</a></li>
+                <li><a href="/about" class="text-blue-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded px-1">About</a></li>
+                <li><a href="/contact" aria-current="page" class="font-semibold text-blue-900 underline hover:decoration-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded px-1">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="max-w-4xl mx-auto px-4 py-8">
+        <div id="app">
+            <h1 class="text-3xl font-bold mb-2">Contact Us</h1>
+            <p class="text-lg text-gray-700 mb-8 max-w-2xl">Fill out the form below and our team will get back to you within one business day.</p>
+
+            <!-- Success state -->
+            <div v-if="submitted" role="status" class="bg-green-50 border-2 border-green-700 rounded-lg p-6 mb-8">
+                <div class="flex gap-3 items-start">
+                    <span class="text-2xl" aria-hidden="true">✓</span>
+                    <div>
+                        <h2 class="text-xl font-bold text-green-900 mb-1">Message sent successfully!</h2>
+                        <p class="text-green-800">Thank you for reaching out, <strong>{{ form.firstName }}</strong>. We&#39;ve received your message and will respond to <strong>{{ form.email }}</strong> shortly.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error summary -->
+            <div
+                v-if="Object.keys(errors).length > 0"
+                ref="errorSummary"
+                tabindex="-1"
+                role="alert"
+                class="bg-red-50 border-2 border-red-800 rounded-lg p-6 mb-8"
+            >
+                <h2 class="text-lg font-bold text-red-900 mb-3">
+                    {{ Object.keys(errors).length === 1 ? '1 error found:' : Object.keys(errors).length + ' errors found:' }}
+                </h2>
+                <ul class="list-disc list-outside ml-5 space-y-1">
+                    <li v-for="(msg, field) in errors" :key="field">
+                        <a :href="'#' + field" class="text-red-900 underline hover:decoration-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2 rounded">{{ msg }}</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Form -->
+            <form novalidate @submit.prevent="handleSubmit" class="space-y-8">
+
+                <!-- Personal Information Group -->
+                <fieldset class="border border-gray-500 rounded-lg p-6">
+                    <legend class="text-xl font-semibold px-2">Personal Information</legend>
+                    <p class="text-sm text-gray-600 mb-4 px-2"><span aria-hidden="true">*</span> <span class="sr-only">(required)</span> indicates required field</p>
+
+                    <div class="space-y-5">
+                        <!-- Name fields -->
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label for="firstName" class="block font-semibold text-gray-900 mb-1">
+                                    First name <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    v-model="form.firstName"
+                                    autocomplete="given-name"
+                                    class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+                                    :class="{ 'ring-2 ring-red-700 border-red-800': errors.firstName, 'border-gray-500': !errors.firstName }"
+                                    :aria-invalid="errors.firstName ? 'true' : undefined"
+                                    :aria-describedby="errors.firstName ? 'firstName-error' : undefined"
+                                    placeholder="e.g. Jane"
+                                />
+                                <p v-if="errors.firstName" id="firstName-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                                    {{ errors.firstName }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label for="lastName" class="block font-semibold text-gray-900 mb-1">
+                                    Last name <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    v-model="form.lastName"
+                                    autocomplete="family-name"
+                                    class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+                                    :class="{ 'ring-2 ring-red-700 border-red-800': errors.lastName, 'border-gray-500': !errors.lastName }"
+                                    :aria-invalid="errors.lastName ? 'true' : undefined"
+                                    :aria-describedby="errors.lastName ? 'lastName-error' : undefined"
+                                    placeholder="e.g. Doe"
+                                />
+                                <p v-if="errors.lastName" id="lastName-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                                    {{ errors.lastName }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block font-semibold text-gray-900 mb-1">
+                                Email address <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                v-model="form.email"
+                                autocomplete="email"
+                                class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+                                :class="{ 'ring-2 ring-red-700 border-red-800': errors.email, 'border-gray-500': !errors.email }"
+                                :aria-invalid="errors.email ? 'true' : undefined"
+                                :aria-describedby="errors.email ? 'email-error' : undefined"
+                                placeholder="e.g. jane.doe@example.com"
+                            />
+                            <p v-if="errors.email" id="email-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                                {{ errors.email }}
+                            </p>
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label for="phone" class="block font-semibold text-gray-900 mb-1">
+                                Phone number <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
+                            </label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                v-model="form.phone"
+                                autocomplete="tel"
+                                class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+                                :class="{ 'ring-2 ring-red-700 border-red-800': errors.phone, 'border-gray-500': !errors.phone }"
+                                :aria-invalid="errors.phone ? 'true' : undefined"
+                                :aria-describedby="errors.phone ? 'phone-error' : undefined"
+                                placeholder="e.g. +1 555-123-4567"
+                            />
+                            <p v-if="errors.phone" id="phone-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                                {{ errors.phone }}
+                            </p>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Company -->
+                <div>
+                    <label for="company" class="block font-semibold text-gray-900 mb-1">
+                        Company name
+                    </label>
+                    <input
+                        type="text"
+                        id="company"
+                        v-model="form.company"
+                        autocomplete="organization"
+                        class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+                        :class="{ 'ring-2 ring-red-700 border-red-800': errors.company, 'border-gray-500': !errors.company }"
+                        :aria-invalid="errors.company ? 'true' : undefined"
+                        :aria-describedby="errors.company ? 'company-error' : undefined"
+                        placeholder="e.g. Acme Corp"
+                    />
+                    <p v-if="errors.company" id="company-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                        {{ errors.company }}
+                    </p>
+                </div>
+
+                <!-- Department dropdown -->
+                <div>
+                    <label for="department" class="block font-semibold text-gray-900 mb-1">
+                        Department <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
+                    </label>
+                    <select
+                        id="department"
+                        v-model="form.department"
+                        class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+                        :class="{ 'ring-2 ring-red-700 border-red-800': errors.department, 'border-gray-500': !errors.department }"
+                        :aria-invalid="errors.department ? 'true' : undefined"
+                        :aria-describedby="errors.department ? 'department-error' : undefined"
+                    >
+                        <option value="">Select a department</option>
+                        <option v-for="dept in departments" :key="dept.value" :value="dept.value">{{ dept.label }}</option>
+                    </select>
+                    <p v-if="errors.department" id="department-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                        {{ errors.department }}
+                    </p>
+                </div>
+
+                <!-- Message -->
+                <div>
+                    <label for="message" class="block font-semibold text-gray-900 mb-1">
+                        Message <span aria-hidden="true">*</span><span class="sr-only">(required)</span>
+                    </label>
+                    <textarea
+                        id="message"
+                        v-model="form.message"
+                        rows="5"
+                        class="w-full border border-gray-500 rounded-md px-3 py-2 bg-white text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700 resize-y"
+                        :class="{ 'ring-2 ring-red-700 border-red-800': errors.message, 'border-gray-500': !errors.message }"
+                        :aria-invalid="errors.message ? 'true' : undefined"
+                        :aria-describedby="errors.message ? 'message-error' : undefined"
+                        placeholder="Describe how we can help you"
+                    ></textarea>
+                    <p v-if="errors.message" id="message-error" class="error-msg text-red-900 text-sm mt-1" role="status">
+                        {{ errors.message }}
+                    </p>
+                </div>
+
+                <!-- Terms checkbox -->
+                <div class="flex items-start gap-3">
+                    <div class="flex items-center mt-0.5">
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            v-model="form.terms"
+                            class="h-5 w-5 border-2 border-gray-500 rounded bg-white text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 cursor-pointer"
+                            :class="{ 'ring-2 ring-red-700 border-red-800': errors.terms, 'border-gray-500': !errors.terms }"
+                            :aria-invalid="errors.terms ? 'true' : undefined"
+                            :aria-describedby="errors.terms ? 'terms-error' : undefined"
+                        />
+                    </div>
+                    <label for="terms" class="font-semibold text-gray-900 cursor-pointer">
+                        I agree to the <a href="/terms" class="text-blue-900 underline hover:decoration-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded" target="_blank" rel="noopener noreferrer">Terms of Service <span class="sr-only">(opens in new tab)</span></a> and <a href="/privacy" class="text-blue-900 underline hover:decoration-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded" target="_blank" rel="noopener noreferrer">Privacy Policy <span class="sr-only">(opens in new tab)</span></a>
+                    </label>
+                </div>
+                <p v-if="errors.terms" id="terms-error" class="text-red-900 text-sm -mt-2" role="status">
+                    {{ errors.terms }}
+                </p>
+
+                <!-- Submit -->
+                <div class="pt-2">
+                    <button
+                        type="submit"
+                        class="inline-flex items-center justify-center px-8 py-3 bg-blue-900 text-white font-bold text-lg rounded-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 transition-colors min-h-11"
+                    >
+                        Send message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-300 bg-gray-50 mt-16">
+        <div class="max-w-4xl mx-auto px-4 py-6 text-center text-gray-700">
+            <p>&copy; 2024 Acme Corp. All rights reserved.</p>
+            <p class="mt-2 text-sm text-gray-600">
+                <a href="/accessibility" class="text-blue-900 underline hover:decoration-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded">Accessibility Statement</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const { createApp, ref, computed, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                const form = ref({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    phone: '',
+                    company: '',
+                    department: '',
+                    message: '',
+                    terms: false
+                });
+
+                const errors = ref({});
+                const submitted = ref(false);
+                const errorSummary = ref(null);
+
+                const departments = [
+                    { value: 'sales', label: 'Sales' },
+                    { value: 'support', label: 'Customer Support' },
+                    { value: 'billing', label: 'Billing & Invoicing' },
+                    { value: 'partnerships', label: 'Partnerships' },
+                    { value: 'careers', label: 'Careers' }
+                ];
+
+                const phoneRegex = /^[\d\s\+\-\(\)]{7,20}$/;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                function validate() {
+                    errors.value = {};
+
+                    // First name
+                    if (!form.value.firstName.trim()) {
+                        errors.value.firstName = 'First name is required.';
+                    } else if (form.value.firstName.trim().length < 2) {
+                        errors.value.firstName = 'First name must be at least 2 characters.';
+                    }
+
+                    // Last name
+                    if (!form.value.lastName.trim()) {
+                        errors.value.lastName = 'Last name is required.';
+                    } else if (form.value.lastName.trim().length < 2) {
+                        errors.value.lastName = 'Last name must be at least 2 characters.';
+                    }
+
+                    // Email
+                    if (!form.value.email.trim()) {
+                        errors.value.email = 'Email address is required.';
+                    } else if (!emailRegex.test(form.value.email.trim())) {
+                        errors.value.email = 'Please enter a valid email address.';
+                    }
+
+                    // Phone
+                    if (!form.value.phone.trim()) {
+                        errors.value.phone = 'Phone number is required.';
+                    } else if (!phoneRegex.test(form.value.phone.trim())) {
+                        errors.value.phone = 'Please enter a valid phone number.';
+                    }
+
+                    // Department
+                    if (!form.value.department) {
+                        errors.value.department = 'Please select a department.';
+                    }
+
+                    // Message
+                    if (!form.value.message.trim()) {
+                        errors.value.message = 'Please enter a message.';
+                    } else if (form.value.message.trim().length < 10) {
+                        errors.value.message = 'Message must be at least 10 characters.';
+                    }
+
+                    // Terms
+                    if (!form.value.terms) {
+                        errors.value.terms = 'You must agree to the terms before submitting.';
+                    }
+
+                    return Object.keys(errors.value).length === 0;
+                }
+
+                async function handleSubmit() {
+                    if (!validate()) {
+                        await nextTick();
+                        errorSummary.value?.focus();
+                        return;
+                    }
+
+                    // Simulate submission
+                    submitted.value = true;
+                    // Scroll to top of success message
+                    document.getElementById('main-content')?.focus();
+                }
+
+                return {
+                    form,
+                    errors,
+                    submitted,
+                    errorSummary,
+                    departments,
+                    handleSubmit
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

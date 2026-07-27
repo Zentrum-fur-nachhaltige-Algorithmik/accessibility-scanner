@@ -1,0 +1,598 @@
+<!-- WCAG-TEST
+criterion: 3.1.2
+level: AA
+title: Language of Parts
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: language-detection
+description: Proper language attribute overrides for foreign language content
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Language Override Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-language-content {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #327d36;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        button {
+            background-color: #327d36;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Language Override Accessible (GOOD)</h1>
+    <p><strong>WCAG 3.1.2 konforme Implementierung:</strong> Korrekte Sprachattribute für alle fremdsprachigen Inhalte</p>
+    
+    <!-- GOOD 1: Correct language attributes -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Korrekte Sprachattribute für fremdsprachige Inhalte</div>
+        <p><strong>Lösung:</strong> Alle Inhalte in anderen Sprachen haben korrekte lang-Attribute</p>
+        <div class="interactive-area">
+            <div class="good-language-content">
+                <h4>Mehrsprachige Zitate mit korrekten Sprachattributen:</h4>
+                
+                <!-- GUT: Englischer Text mit lang="en" -->
+                <blockquote lang="en">
+                    "The only way to do great work is to love what you do." - Steve Jobs
+                </blockquote>
+                
+                <!-- GUT: Französischer Text mit lang="fr" -->
+                <blockquote lang="fr">
+                    "La vie est belle et mérite d'être vécue pleinement." - Anonyme
+                </blockquote>
+                
+                <!-- GUT: Spanischer Text mit lang="es" -->
+                <blockquote lang="es">
+                    "La vida es muy corta para vivirla enojado."
+                </blockquote>
+                
+                <!-- GUT: Italienischer Text mit lang="it" -->
+                <blockquote lang="it">
+                    "Chi dorme non piglia pesci."
+                </blockquote>
+            </div>
+            <p>✅ Screen Reader verwenden korrekte Aussprache für jede Sprache</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Proper language attributes for embedded content -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Korrekte Sprachattribute für eingebettete Inhalte</div>
+        <p><strong>Lösung:</strong> Alle eingebetteten Inhalte haben entsprechende Sprachkennzeichnung</p>
+        <div class="interactive-area">
+            <div class="good-language-content">
+                <h4>Internationale Produktbeschreibungen:</h4>
+                
+                <!-- GUT: Englische Produktbeschreibung mit lang="en" -->
+                <div lang="en">
+                    <h5>Product: Premium Headphones</h5>
+                    <p>High-quality wireless headphones with noise cancellation technology. Perfect for music lovers and professionals.</p>
+                </div>
+                
+                <!-- GUT: Französische Beschreibung mit lang="fr" -->
+                <div lang="fr">
+                    <h5>Produit: Casque Premium</h5>
+                    <p>Casque sans fil de haute qualité avec technologie de réduction de bruit. Parfait pour les mélomanes et les professionnels.</p>
+                </div>
+                
+                <!-- GUT: Gemischter Content mit korrekten Sprachattributen -->
+                <div>
+                    <h5>Reviews / Bewertungen:</h5>
+                    <p><span lang="en">"Excellent sound quality!"</span> - John (English review)</p>
+                    <p><span lang="fr">"Très bon produit, je recommande!"</span> - Marie (French review)</p>
+                    <p>"Hervorragende Klangqualität, bin sehr zufrieden." - Klaus (German review)</p>
+                </div>
+            </div>
+            <p>✅ Screen Reader erkennen jede Sprache korrekt und verwenden richtige Aussprache</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Correct language switching -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Korrekte Sprachumschaltung mit Seitensprache-Update</div>
+        <p><strong>Lösung:</strong> Sprachumschaltung aktualisiert sowohl Inhalte als auch html lang-Attribut</p>
+        <div class="interactive-area">
+            <div id="goodLanguageSwitcher">
+                <a href="#" data-lang="de" onclick="goodSwitchLanguage('de', this)" aria-current="page">Deutsch</a>
+                <a href="#" data-lang="en" onclick="goodSwitchLanguage('en', this)">English</a>
+                <a href="#" data-lang="fr" onclick="goodSwitchLanguage('fr', this)">Français</a>
+                <a href="#" data-lang="es" onclick="goodSwitchLanguage('es', this)">Español</a>
+            </div>
+            
+            <div class="good-language-content" id="goodSwitchedContent">
+                <h4 id="goodContentTitle">Willkommen auf unserer Website</h4>
+                <p id="goodContentText">Dies ist der Hauptinhalt der Seite, der in verschiedenen Sprachen verfügbar ist.</p>
+                <button id="goodContentButton">Mehr erfahren</button>
+            </div>
+            <p>✅ Sowohl Content als auch html lang-Attribut werden korrekt aktualisiert</p>
+            <div class="sr-only" aria-live="polite" id="langChangeAnnouncement"></div>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Auto-generated content with language -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Automatisch generierte Inhalte mit korrekter Sprachkennzeichnung</div>
+        <p><strong>Lösung:</strong> Dynamisch geladene Inhalte erhalten entsprechende lang-Attribute</p>
+        <div class="interactive-area">
+            <button onclick="goodLoadContent('news')">Nachrichten laden</button>
+            <button onclick="goodLoadContent('international')">Internationale News</button>
+            <button onclick="goodLoadContent('mixed')">Gemischte Inhalte</button>
+            
+            <div class="good-language-content" id="goodAutoContent">
+                <p>Klicken Sie auf einen Button, um Inhalte zu laden...</p>
+            </div>
+            <p>✅ Alle geladenen Inhalte haben korrekte Sprachattribute</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Forms with language consideration -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Formularfelder mit korrekter Sprachkennzeichnung</div>
+        <p><strong>Lösung:</strong> Mehrsprachige Formulare mit entsprechenden Sprachattributen</p>
+        <div class="interactive-area">
+            <div class="good-language-content">
+                <h4>Internationales Kontaktformular:</h4>
+                <form>
+                    <!-- GUT: Labels mit korrekten Sprachattributen -->
+                    <div style="margin: 10px 0;">
+                        <label for="goodName">
+                            Name <span lang="en">/ Name</span> <span lang="fr">/ Nom</span> <span lang="es">/ Nombre</span>:
+                        </label>
+                        <input type="text" id="goodName" autocomplete="name" style="width: 100%; padding: 8px; margin-top: 5px;" 
+                               placeholder="Enter your name" lang="en">
+                    </div>
+                    
+                    <div style="margin: 10px 0;">
+                        <label for="goodEmail">
+                            E-Mail <span lang="fr">/ Courriel</span>:
+                        </label>
+                        <input type="email" id="goodEmail" autocomplete="email" style="width: 100%; padding: 8px; margin-top: 5px;" 
+                               placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div style="margin: 10px 0;">
+                        <label for="goodMessage">
+                            Nachricht <span lang="en">/ Message</span> <span lang="es">/ Mensaje</span>:
+                        </label>
+                        <textarea id="goodMessage" rows="4" style="width: 100%; padding: 8px; margin-top: 5px;" 
+                                  placeholder="Schreiben Sie Ihre Nachricht..."></textarea>
+                    </div>
+                    
+                    <div style="margin: 10px 0;">
+                        <label for="goodCountry">
+                            Land <span lang="en">/ Country</span> <span lang="fr">/ Pays</span>:
+                        </label>
+                        <select id="goodCountry" autocomplete="country-name" style="width: 100%; padding: 8px; margin-top: 5px;">
+                            <option lang="en">United States</option>
+                            <option>Deutschland</option>
+                            <option lang="fr">France</option>
+                            <option lang="es">España</option>
+                            <option lang="it">Italia</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit">
+                        Senden <span lang="en">/ Submit</span> <span lang="fr">/ Envoyer</span>
+                    </button>
+                </form>
+            </div>
+            <p>✅ Mehrsprachige Labels und Optionen mit korrekten Sprachattributen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Dynamic content with proper language -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Dynamische Inhalte mit korrekten Sprachattributen</div>
+        <p><strong>Lösung:</strong> AJAX-geladene Inhalte erhalten automatisch korrekte Sprachkennzeichnung</p>
+        <div class="interactive-area">
+            <button onclick="goodLoadDynamicContent('chat')">Chat laden</button>
+            <button onclick="goodLoadDynamicContent('comments')">Kommentare laden</button>
+            <button onclick="goodLoadDynamicContent('reviews')">Bewertungen laden</button>
+            
+            <div class="good-language-content" id="goodDynamicContent">
+                <p>Wählen Sie eine Option zum Laden von Inhalten...</p>
+            </div>
+            <p>✅ Dynamisch geladene mehrsprachige Inhalte mit korrekten Sprachattributen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Code blocks with proper language specification -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Code-Blöcke mit korrekter Sprachspezifikation</div>
+        <p><strong>Lösung:</strong> Programmiercode mit entsprechenden Sprachattributen für Kommentare</p>
+        <div class="interactive-area">
+            <div class="good-language-content">
+                <h4>Code-Beispiele mit korrekten Sprachattributen:</h4>
+                
+                <!-- GUT: Code mit Sprachkennzeichnung für Kommentare -->
+                <h5 lang="en">JavaScript Example:</h5>
+                <pre style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>function calculateSum(a, b) {
+    <span lang="en">// Calculate the sum of two numbers</span>
+    return a + b;
+}
+
+console.log(<span lang="en">"The result is:"</span>, calculateSum(5, 3));</code></pre>
+                
+                <h5 lang="en">SQL Query:</h5>
+                <pre style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto;"><code><span lang="en">-- Select user orders from the last year</span>
+SELECT users.name, orders.total 
+FROM users 
+JOIN orders ON users.id = orders.user_id 
+WHERE orders.date > '2023-01-01';</code></pre>
+                
+                <h5 lang="en">CSS Styles:</h5>
+                <pre style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto;"><code><span lang="en">/* Button styling for accessibility */</span>
+.button {
+    background-color: #327d36;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+}</code></pre>
+            </div>
+            <p>✅ Code-Kommentare haben korrekte Sprachattribute, Code selbst als technischer Inhalt</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Abbreviations with language context -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Abkürzungen mit korrektem Sprachkontext</div>
+        <p><strong>Lösung:</strong> Fremdsprachige Abkürzungen mit entsprechenden Sprachattributen</p>
+        <div class="interactive-area">
+            <div class="good-language-content">
+                <h4>Internationale Abkürzungen mit korrekten Sprachattributen:</h4>
+                <p>
+                    Unser <abbr title="Chief Executive Officer" lang="en">CEO</abbr> arbeitet eng mit der 
+                    <abbr title="Research and Development" lang="en">R&D</abbr> Abteilung zusammen.
+                </p>
+                <p>
+                    Die <abbr title="European Union" lang="en">EU</abbr> und die 
+                    <abbr title="United Nations" lang="en">UN</abbr> haben neue Richtlinien veröffentlicht.
+                </p>
+                <p>
+                    Für <abbr title="Frequently Asked Questions" lang="en">FAQ</abbr> besuchen Sie unsere 
+                    <abbr title="Uniform Resource Locator" lang="en">URL</abbr>.
+                </p>
+                <p>
+                    <!-- GUT: Gemischte Sprachen mit korrekten Attributen -->
+                    <abbr title="Application Programming Interface" lang="en">API</abbr> und 
+                    <abbr title="Structured Query Language" lang="en">SQL</abbr> sind wichtige Technologien.
+                </p>
+            </div>
+            <p>✅ Abkürzungen werden in korrekter Sprache vorgelesen</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 9: Search results with language indication -->
+    <div class="good-section">
+        <div class="good-title">GOOD 9: Suchergebnisse mit korrekter Sprachkennzeichnung</div>
+        <p><strong>Lösung:</strong> Mehrsprachige Suchergebnisse mit entsprechenden Sprachattributen</p>
+        <div class="interactive-area">
+            <input type="search" style="width: 100%; max-width: 300px; padding: 10px; margin-bottom: 10px;" 
+                   placeholder="Suchen Sie international..." onkeyup="goodPerformSearch(this.value)">
+            
+            <div style="border: 1px solid #327d36; background: #f8f9fa; border-radius: 4px; max-height: 200px; overflow-y: auto;" id="goodSearchResults">
+                <div style="padding: 10px;">Geben Sie einen Suchbegriff ein...</div>
+            </div>
+            <p>✅ Suchergebnisse mit korrekten Sprachattributen für jede Sprache</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 10: Media content with language attributes -->
+    <div class="good-section">
+        <div class="good-title">GOOD 10: Medieninhalte mit korrekten Sprachattributen</div>
+        <p><strong>Lösung:</strong> Audio/Video-Inhalte mit korrekten track lang-Attributen</p>
+        <div class="interactive-area">
+            <div class="good-language-content">
+                <h4>Mehrsprachige Videos mit korrekter Sprachkennzeichnung:</h4>
+                
+                <div style="width: 100%; max-width: 400px; height: 200px; background: #e8f5e8; border: 2px solid #327d36; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #666; margin: 10px 0;">
+                    📹 Video: <span lang="en">"International Business Meeting"</span><br>
+                    (Multiple languages with proper tracks)
+                </div>
+                
+                <!-- GUT: Video mit korrekten Sprachattributen für Tracks -->
+                <div>
+                    <h5>Verfügbare Untertitel:</h5>
+                    <ul>
+                        <li><span lang="en">English subtitles</span> (mit <code>lang="en"</code>)</li>
+                        <li>Deutsche Untertitel (mit <code>lang="de"</code>)</li>
+                        <li><span lang="fr">Sous-titres français</span> (mit <code>lang="fr"</code>)</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h5>Audio-Tracks:</h5>
+                    <ul>
+                        <li><span lang="en">Original soundtrack (English)</span></li>
+                        <li><span lang="fr">Piste audio française</span></li>
+                        <li><span lang="es">Narración en español</span></li>
+                    </ul>
+                </div>
+                
+                <button onclick="goodPlayVideo('en')"><span lang="en">Play English Version</span></button>
+                <button onclick="goodPlayVideo('de')">Deutsche Version</button>
+                <button onclick="goodPlayVideo('fr')"><span lang="fr">Version française</span></button>
+            </div>
+            <p>✅ Media-Tracks mit korrekten Sprachattributen - Assistive Technology erkennt Sprache korrekt</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 3.1.2 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Alle fremdsprachigen Inhalte haben korrekte lang-Attribute</li>
+            <li>✅ Screen Reader verwenden richtige Aussprache und Sprachregeln</li>
+            <li>✅ Automatische Übersetzungen funktionieren korrekt</li>
+            <li>✅ Spracherkennungssoftware erkennt Sprachwechsel korrekt</li>
+            <li>✅ Suchmaschinen können Sprachinhalte korrekt zuordnen</li>
+            <li>✅ Dynamische Inhalte behalten Sprachkontext</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Screen Reader-Nutzer: Hören korrekte Aussprache aller Sprachen</li>
+            <li>👥 Mehrsprachige Nutzer: Behalten Sprachkontext bei Navigation</li>
+            <li>👥 Spracherkennungs-Nutzer: Software erkennt Sprachwechsel korrekt</li>
+            <li>👥 Lernende: Können Sprachen korrekt unterscheiden und lernen</li>
+            <li>👥 Internationale Nutzer: Erhalten konsistente Spracherfahrung</li>
+        </ul>
+    </div>
+
+    <script>
+        const goodLanguageContent = {
+            de: {
+                title: "Willkommen auf unserer Website",
+                text: "Dies ist der Hauptinhalt der Seite, der in verschiedenen Sprachen verfügbar ist.",
+                button: "Mehr erfahren"
+            },
+            en: {
+                title: "Welcome to our Website", 
+                text: "This is the main content of the page, available in different languages.",
+                button: "Learn more"
+            },
+            fr: {
+                title: "Bienvenue sur notre site web",
+                text: "Ceci est le contenu principal de la page, disponible en différentes langues.",
+                button: "En savoir plus"
+            },
+            es: {
+                title: "Bienvenido a nuestro sitio web",
+                text: "Este es el contenido principal de la página, disponible en diferentes idiomas.",
+                button: "Saber más"
+            }
+        };
+        
+        // GOOD 3: Correct language switching
+        function goodSwitchLanguage(lang, element) {
+            // Update HTML lang attribute (CORRECT!)
+            document.documentElement.lang = lang;
+            
+            // Update active link
+            document.querySelectorAll('#goodLanguageSwitcher a').forEach(link => {
+                link.removeAttribute('aria-current');
+            });
+            element.setAttribute('aria-current', 'page');
+            
+            // Update content with correct language
+            const content = goodLanguageContent[lang];
+            const titleElement = document.getElementById('goodContentTitle');
+            const textElement = document.getElementById('goodContentText');
+            const buttonElement = document.getElementById('goodContentButton');
+            
+            titleElement.textContent = content.title;
+            textElement.textContent = content.text;
+            buttonElement.textContent = content.button;
+            
+            // Update content language attribute
+            const contentContainer = document.getElementById('goodSwitchedContent');
+            contentContainer.lang = lang;
+            
+            // Announce language change
+            const announcement = document.getElementById('langChangeAnnouncement');
+            const langNames = {
+                'de': 'Deutsch',
+                'en': 'English', 
+                'fr': 'Français',
+                'es': 'Español'
+            };
+            announcement.textContent = `Sprache geändert zu ${langNames[lang]}`;
+            
+            console.log('✅ GOOD: Language changed - both content and HTML lang attribute updated');
+            console.log(`✅ Page language is now: ${lang}`);
+        }
+        
+        // GOOD 4: Auto-generated content with language
+        function goodLoadContent(type) {
+            const content = document.getElementById('goodAutoContent');
+            
+            if (type === 'news') {
+                content.innerHTML = `
+                    <h4>Aktuelle Nachrichten</h4>
+                    <div lang="en">Breaking News: New technology breakthrough announced in Silicon Valley.</div>
+                    <div lang="fr">Dernières nouvelles: Nouvelle percée technologique annoncée en France.</div>
+                    <div lang="es">Noticias: Nuevo avance tecnológico anunciado en España.</div>
+                `;
+            } else if (type === 'international') {
+                content.innerHTML = `
+                    <h4 lang="en">International Updates</h4>
+                    <div lang="en">Global economic summit concluded with positive results.</div>
+                    <div lang="fr">Le sommet économique mondial s'est terminé avec des résultats positifs.</div>
+                    <div>Globaler Wirtschaftsgipfel mit positiven Ergebnissen beendet.</div>
+                `;
+            } else if (type === 'mixed') {
+                content.innerHTML = `
+                    <h4>Gemischte Inhalte</h4>
+                    <div lang="en">Welcome to our international platform!</div>
+                    <div lang="fr">Bienvenue sur notre plateforme internationale!</div>
+                    <div lang="es">¡Bienvenido a nuestra plataforma internacional!</div>
+                    <div>Willkommen auf unserer internationalen Plattform!</div>
+                `;
+            }
+            
+            console.log('✅ GOOD: Loaded multilingual content with correct lang attributes');
+        }
+        
+        // GOOD 6: Dynamic content with proper language
+        function goodLoadDynamicContent(type) {
+            const content = document.getElementById('goodDynamicContent');
+            
+            if (type === 'chat') {
+                content.innerHTML = `
+                    <div><strong>John:</strong> <span lang="en">Hello, how can I help you today?</span></div>
+                    <div><strong>Marie:</strong> <span lang="fr">Bonjour, pouvez-vous m'aider avec ma commande?</span></div>
+                    <div><strong>Klaus:</strong> Hallo, ich habe eine Frage zu meinem Konto.</div>
+                    <div><strong>Carlos:</strong> <span lang="es">Hola, necesito ayuda con el envío.</span></div>
+                `;
+            } else if (type === 'comments') {
+                content.innerHTML = `
+                    <div><strong>User1:</strong> <span lang="en">Great product, highly recommended!</span></div>
+                    <div><strong>Utilisateur2:</strong> <span lang="fr">Excellent produit, je le recommande vivement!</span></div>
+                    <div><strong>Benutzer3:</strong> Tolles Produkt, sehr empfehlenswert!</div>
+                `;
+            } else if (type === 'reviews') {
+                content.innerHTML = `
+                    <div>⭐⭐⭐⭐⭐ <span lang="en">"Amazing quality and fast delivery!"</span> - Jennifer (US)</div>
+                    <div>⭐⭐⭐⭐⭐ <span lang="fr">"Qualité exceptionnelle et livraison rapide!"</span> - Pierre (FR)</div>
+                    <div>⭐⭐⭐⭐⭐ "Erstaunliche Qualität und schnelle Lieferung!" - Anna (DE)</div>
+                `;
+            }
+            
+            console.log('✅ GOOD: Dynamic multilingual content with correct language attributes');
+        }
+        
+        // GOOD 9: Search with language indication
+        function goodPerformSearch(query) {
+            const results = document.getElementById('goodSearchResults');
+            
+            if (query.length < 2) {
+                results.innerHTML = '<div style="padding: 10px;">Geben Sie mindestens 2 Zeichen ein...</div>';
+                return;
+            }
+            
+            // Simulate multilingual search results with lang attributes
+            const searchResults = [
+                { text: 'Product Documentation - English technical manual for developers', lang: 'en' },
+                { text: 'Documentation du produit - Manuel technique français pour développeurs', lang: 'fr' },
+                { text: 'Produktdokumentation - Deutsches technisches Handbuch für Entwickler', lang: 'de' },
+                { text: 'User Guide - Complete English tutorial and FAQ section', lang: 'en' },
+                { text: 'Guide utilisateur - Tutoriel complet en français et section FAQ', lang: 'fr' },
+                { text: 'Benutzerhandbuch - Vollständiges deutsches Tutorial und FAQ-Bereich', lang: 'de' }
+            ];
+            
+            const filteredResults = searchResults.filter(result => 
+                result.text.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (filteredResults.length === 0) {
+                results.innerHTML = `
+                    <div style="padding: 10px;">
+                        Keine Ergebnisse / <span lang="en">No results found</span> / <span lang="fr">Aucun résultat</span>
+                    </div>`;
+            } else {
+                results.innerHTML = filteredResults
+                    .map(result => {
+                        const langAttr = result.lang !== 'de' ? ` lang="${result.lang}"` : '';
+                        return `<div style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;"${langAttr}>${result.text}</div>`;
+                    })
+                    .join('');
+            }
+            
+            console.log('✅ GOOD: Search results with correct language attributes');
+        }
+        
+        // GOOD 10: Media with language attributes
+        function goodPlayVideo(lang) {
+            console.log('✅ GOOD: Playing video with proper language attributes for tracks');
+            
+            const langNames = {
+                'en': 'English',
+                'de': 'German', 
+                'fr': 'French'
+            };
+            
+            alert(`Playing video in ${langNames[lang]}\n\n✅ Benefits:\n✅ Video tracks have correct lang attributes\n✅ Screen readers can determine content language\n✅ Automatic translation services work properly\n✅ Language-specific voice synthesis is used`);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD LANGUAGE OVERRIDE IMPLEMENTATION ===');
+            console.log('✅ All foreign language content has correct lang attributes');
+            console.log('✅ Mixed language content properly marked up');
+            console.log('✅ Language switching updates both content and page language');
+            console.log('✅ Auto-generated content includes language specification');
+            console.log('✅ Multilingual forms have proper language attributes');
+            console.log('✅ Dynamic content maintains language context');
+            console.log('✅ Code blocks have language specification for comments');
+            console.log('✅ Abbreviations include proper language context');
+            console.log('✅ Search results have language indication');
+            console.log('✅ Media content has correct track language attributes');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!-- WCAG-TEST
+criterion: 1.3.3
+level: A
+title: Lange Seite — Truncation-Robustheit (German)
+test_type: bad
+expected_violations: 2
+testable_by: manual
+scanners: structure
+description: Body-HTML über 40.000 Zeichen mit zwei echten 1.3.3-Verstößen — einer vor, einer weit hinter der alten 15.000-Zeichen-Grenze; prüft, dass die Extraktion lange Seiten komprimiert bzw. chunked statt sie abzuschneiden
+-->
+<!--
+  EXTRACTION-COVERAGE FIXTURE.
+
+  LLM scanners used to truncate the extracted page HTML at ~12,000-15,000
+  characters, which silently discarded everything below the fold. They now build
+  a compressed semantic skeleton of the whole page and chunk it when needed
+  (src/llm-page-context.js).
+
+  This file proves that. Its body is over 40,000 characters and contains exactly
+  two genuine WCAG 1.3.3 violations:
+
+    id="seeded-above-cutoff"  — around character    500 of the body markup
+    id="seeded-below-cutoff"  — beyond character 25,000 of the body markup
+
+  A correct implementation reports BOTH. An implementation that blindly
+  truncates reports only the first. Everything else on the page is realistic,
+  violation-free German medical-practice content (service catalogue, FAQ,
+  opening hours per location, team bios). The file doubles as the crash/timeout
+  robustness case for very long pages.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordination Dr. Berger — Leistungen, Standorte und Team (Langseiten-Test)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; color: #1a1a1a; }
+        h2 { margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .leistung, .team-mitglied { border: 1px solid #ddd; border-radius: 4px; padding: 12px 16px; margin: 10px 0; }
+        table { border-collapse: collapse; margin: 10px 0; width: 100%; max-width: 500px; }
+        th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+        .faq dt { font-weight: bold; margin-top: 10px; }
+        .faq dd { margin: 4px 0 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Ordination Dr. Julia Berger — Leistungen, Standorte und Team</h1>
+    <p>Auf dieser Seite finden Sie eine ausführliche Übersicht über unsere Leistungen, häufig gestellte Fragen, die Öffnungszeiten unserer Standorte und eine Vorstellung unseres Teams.</p>
+
+    <section class="violation-section" style="border:2px solid #d32f2f; padding:15px; margin:20px 0; background:#ffebee;">
+        <h2 style="color:#b71c1c;">Befundabholung</h2>
+        <!-- SEEDED-VIOLATION: above-cutoff -->
+        <p id="seeded-above-cutoff"><strong>Wählen Sie den blauen Bereich rechts, um Ihren Befund herunterzuladen.</strong></p>
+        <div style="display:flex; justify-content:flex-end;">
+            <div role="button" tabindex="0" style="width:120px; height:60px; background:#1565c0;"></div>
+        </div>
+        <p>Der Bereich hat keinen sichtbaren Namen, kein Label und keine Textalternative — nur seine Farbe und Position identifizieren ihn (WCAG 1.3.3).</p>
+    </section>
+
+    <h2>Leistungskatalog</h2>
+    <article class="leistung">
+        <h3>Allgemeine Gesundenuntersuchung</h3>
+        <p>Die jährliche Gesundenuntersuchung umfasst eine ausführliche Anamnese, körperliche Untersuchung, Blutabnahme, Harnbefund sowie ein abschließendes Beratungsgespräch. Sie dient der Früherkennung von Risikofaktoren und chronischen Erkrankungen und wird von der ÖGK vollständig übernommen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfberatung und Impfungen</h3>
+        <p>Wir bieten sämtliche empfohlenen Impfungen laut österreichischem Impfplan an, darunter FSME, Grippe, Tetanus, Diphtherie, Keuchhusten und COVID-19. Vor jeder Impfung erfolgt eine individuelle Beratung zu Nutzen und möglichen Nebenwirkungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Blutdruckmessung und Hypertonie-Management</h3>
+        <p>Bei Verdacht auf Bluthochdruck führen wir eine 24-Stunden-Blutdruckmessung durch und erstellen gemeinsam mit Ihnen einen individuellen Therapieplan, der Medikation, Ernährung und Bewegung berücksichtigt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Diabetes-Betreuung</h3>
+        <p>Für Patient:innen mit Diabetes mellitus bieten wir eine strukturierte Langzeitbetreuung inklusive HbA1c-Kontrollen, Schulung zur Blutzuckermessung und Anpassung der Insulin- bzw. Tablettentherapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundversorgung</h3>
+        <p>Kleinere Verletzungen, chronische Wunden und postoperative Nachsorge werden in unserer Ordination fachgerecht versorgt, inklusive steriler Verbandswechsel und Fadenentfernung.</p>
+    </article>
+    <article class="leistung">
+        <h3>Reisemedizinische Beratung</h3>
+        <p>Vor Fernreisen beraten wir Sie zu notwendigen Impfungen, Malariaprophylaxe und allgemeinen Gesundheitsrisiken im Zielland und stellen bei Bedarf ein individuelles Reiseapotheken-Rezept aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Labordiagnostik</h3>
+        <p>Über unser Partnerlabor bieten wir ein breites Spektrum an Blut- und Urinuntersuchungen an, von Routineparametern bis zu spezialisierten Hormon- und Tumormarker-Bestimmungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>EKG und Herzdiagnostik</h3>
+        <p>Ruhe-EKG und Belastungs-EKG stehen direkt in der Ordination zur Verfügung, um Herzrhythmusstörungen und koronare Risikofaktoren frühzeitig zu erkennen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Lungenfunktionstest</h3>
+        <p>Bei Verdacht auf Asthma, COPD oder andere Atemwegserkrankungen führen wir eine Spirometrie durch und besprechen die Ergebnisse ausführlich mit Ihnen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hautkrebs-Vorsorge</h3>
+        <p>Im Rahmen der Hautkrebsvorsorge untersuchen wir Muttermale und auffällige Hautveränderungen mit dem Dermatoskop und überweisen bei Bedarf zeitnah an eine Fachärztin oder einen Facharzt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfpass-Kontrolle</h3>
+        <p>Wir prüfen Ihren Impfpass auf Vollständigkeit und Auffrischungsbedarf und erstellen bei Verlust einen neuen Nachweis anhand vorhandener Unterlagen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundenberatung für Kinder</h3>
+        <p>Für die jüngsten Patient:innen bieten wir Vorsorgeuntersuchungen, Wachstumskontrollen und Beratung zu Ernährung und Entwicklung an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Akutsprechstunde</h3>
+        <p>Für plötzlich auftretende Beschwerden wie Fieber, Infekte oder akute Schmerzen halten wir täglich freie Termine in unserer Akutsprechstunde bereit.</p>
+    </article>
+    <article class="leistung">
+        <h3>Chronikerprogramm Herz-Kreislauf</h3>
+        <p>Patient:innen mit koronarer Herzkrankheit oder Herzinsuffizienz werden im strukturierten Betreuungsprogramm regelmäßig kontrolliert und medikamentös eingestellt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Vorsorgekoloskopie-Zuweisung</h3>
+        <p>Ab dem empfohlenen Alter beraten wir zur Darmkrebsvorsorge und stellen die Zuweisung für eine Vorsorgekoloskopie an ein Kooperationsinstitut aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allergietestung</h3>
+        <p>Bei Verdacht auf Allergien führen wir Pricktests für die häufigsten Allergene durch und besprechen mögliche Vermeidungsstrategien und Therapieoptionen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Raucherentwöhnung</h3>
+        <p>Wir unterstützen Sie mit individueller Beratung, Verhaltensstrategien und bei Bedarf medikamentöser Unterstützung auf dem Weg zum Rauchstopp.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gewichtsmanagement</h3>
+        <p>Bei Übergewicht und Adipositas erstellen wir gemeinsam mit Ihnen einen realistischen Plan zur Gewichtsreduktion, der Ernährung, Bewegung und gegebenenfalls Stoffwechseldiagnostik einschließt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Schlafmedizinische Erstberatung</h3>
+        <p>Bei Schlafstörungen und Verdacht auf Schlafapnoe erheben wir eine ausführliche Schlafanamnese und überweisen bei Bedarf an ein Schlaflabor.</p>
+    </article>
+    <article class="leistung">
+        <h3>Psychosoziale Erstberatung</h3>
+        <p>Bei psychischen Belastungen bieten wir ein vertrauliches Erstgespräch an und vermitteln bei Bedarf weiterführende Betreuung durch Psychotherapie oder Psychiatrie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundheitszeugnisse</h3>
+        <p>Für Führerschein, Sport oder Beruf stellen wir nach entsprechender Untersuchung die erforderlichen ärztlichen Zeugnisse aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hausbesuche</h3>
+        <p>Für Patient:innen, die unsere Ordination aus gesundheitlichen Gründen nicht aufsuchen können, bieten wir nach Vereinbarung Hausbesuche im Einzugsgebiet an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundrose und Hautinfektionen</h3>
+        <p>Bakterielle Hautinfektionen wie Wundrose werden bei uns rasch diagnostiziert und mit geeigneten Antibiotika behandelt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Cholesterin- und Stoffwechselcheck</h3>
+        <p>Wir kontrollieren Ihre Blutfettwerte regelmäßig und beraten zu Ernährung, Bewegung und gegebenenfalls medikamentöser Therapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Osteoporose-Vorsorge</h3>
+        <p>Ab dem empfohlenen Alter oder bei Risikofaktoren beraten wir zur Knochendichtemessung und zu vorbeugenden Maßnahmen gegen Osteoporose.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allgemeine Gesundenuntersuchung (Teil 2)</h3>
+        <p>Die jährliche Gesundenuntersuchung umfasst eine ausführliche Anamnese, körperliche Untersuchung, Blutabnahme, Harnbefund sowie ein abschließendes Beratungsgespräch. Sie dient der Früherkennung von Risikofaktoren und chronischen Erkrankungen und wird von der ÖGK vollständig übernommen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfberatung und Impfungen (Teil 2)</h3>
+        <p>Wir bieten sämtliche empfohlenen Impfungen laut österreichischem Impfplan an, darunter FSME, Grippe, Tetanus, Diphtherie, Keuchhusten und COVID-19. Vor jeder Impfung erfolgt eine individuelle Beratung zu Nutzen und möglichen Nebenwirkungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Blutdruckmessung und Hypertonie-Management (Teil 2)</h3>
+        <p>Bei Verdacht auf Bluthochdruck führen wir eine 24-Stunden-Blutdruckmessung durch und erstellen gemeinsam mit Ihnen einen individuellen Therapieplan, der Medikation, Ernährung und Bewegung berücksichtigt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Diabetes-Betreuung (Teil 2)</h3>
+        <p>Für Patient:innen mit Diabetes mellitus bieten wir eine strukturierte Langzeitbetreuung inklusive HbA1c-Kontrollen, Schulung zur Blutzuckermessung und Anpassung der Insulin- bzw. Tablettentherapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundversorgung (Teil 2)</h3>
+        <p>Kleinere Verletzungen, chronische Wunden und postoperative Nachsorge werden in unserer Ordination fachgerecht versorgt, inklusive steriler Verbandswechsel und Fadenentfernung.</p>
+    </article>
+    <article class="leistung">
+        <h3>Reisemedizinische Beratung (Teil 2)</h3>
+        <p>Vor Fernreisen beraten wir Sie zu notwendigen Impfungen, Malariaprophylaxe und allgemeinen Gesundheitsrisiken im Zielland und stellen bei Bedarf ein individuelles Reiseapotheken-Rezept aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Labordiagnostik (Teil 2)</h3>
+        <p>Über unser Partnerlabor bieten wir ein breites Spektrum an Blut- und Urinuntersuchungen an, von Routineparametern bis zu spezialisierten Hormon- und Tumormarker-Bestimmungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>EKG und Herzdiagnostik (Teil 2)</h3>
+        <p>Ruhe-EKG und Belastungs-EKG stehen direkt in der Ordination zur Verfügung, um Herzrhythmusstörungen und koronare Risikofaktoren frühzeitig zu erkennen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Lungenfunktionstest (Teil 2)</h3>
+        <p>Bei Verdacht auf Asthma, COPD oder andere Atemwegserkrankungen führen wir eine Spirometrie durch und besprechen die Ergebnisse ausführlich mit Ihnen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hautkrebs-Vorsorge (Teil 2)</h3>
+        <p>Im Rahmen der Hautkrebsvorsorge untersuchen wir Muttermale und auffällige Hautveränderungen mit dem Dermatoskop und überweisen bei Bedarf zeitnah an eine Fachärztin oder einen Facharzt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfpass-Kontrolle (Teil 2)</h3>
+        <p>Wir prüfen Ihren Impfpass auf Vollständigkeit und Auffrischungsbedarf und erstellen bei Verlust einen neuen Nachweis anhand vorhandener Unterlagen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundenberatung für Kinder (Teil 2)</h3>
+        <p>Für die jüngsten Patient:innen bieten wir Vorsorgeuntersuchungen, Wachstumskontrollen und Beratung zu Ernährung und Entwicklung an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Akutsprechstunde (Teil 2)</h3>
+        <p>Für plötzlich auftretende Beschwerden wie Fieber, Infekte oder akute Schmerzen halten wir täglich freie Termine in unserer Akutsprechstunde bereit.</p>
+    </article>
+    <article class="leistung">
+        <h3>Chronikerprogramm Herz-Kreislauf (Teil 2)</h3>
+        <p>Patient:innen mit koronarer Herzkrankheit oder Herzinsuffizienz werden im strukturierten Betreuungsprogramm regelmäßig kontrolliert und medikamentös eingestellt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Vorsorgekoloskopie-Zuweisung (Teil 2)</h3>
+        <p>Ab dem empfohlenen Alter beraten wir zur Darmkrebsvorsorge und stellen die Zuweisung für eine Vorsorgekoloskopie an ein Kooperationsinstitut aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allergietestung (Teil 2)</h3>
+        <p>Bei Verdacht auf Allergien führen wir Pricktests für die häufigsten Allergene durch und besprechen mögliche Vermeidungsstrategien und Therapieoptionen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Raucherentwöhnung (Teil 2)</h3>
+        <p>Wir unterstützen Sie mit individueller Beratung, Verhaltensstrategien und bei Bedarf medikamentöser Unterstützung auf dem Weg zum Rauchstopp.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gewichtsmanagement (Teil 2)</h3>
+        <p>Bei Übergewicht und Adipositas erstellen wir gemeinsam mit Ihnen einen realistischen Plan zur Gewichtsreduktion, der Ernährung, Bewegung und gegebenenfalls Stoffwechseldiagnostik einschließt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Schlafmedizinische Erstberatung (Teil 2)</h3>
+        <p>Bei Schlafstörungen und Verdacht auf Schlafapnoe erheben wir eine ausführliche Schlafanamnese und überweisen bei Bedarf an ein Schlaflabor.</p>
+    </article>
+    <article class="leistung">
+        <h3>Psychosoziale Erstberatung (Teil 2)</h3>
+        <p>Bei psychischen Belastungen bieten wir ein vertrauliches Erstgespräch an und vermitteln bei Bedarf weiterführende Betreuung durch Psychotherapie oder Psychiatrie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundheitszeugnisse (Teil 2)</h3>
+        <p>Für Führerschein, Sport oder Beruf stellen wir nach entsprechender Untersuchung die erforderlichen ärztlichen Zeugnisse aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hausbesuche (Teil 2)</h3>
+        <p>Für Patient:innen, die unsere Ordination aus gesundheitlichen Gründen nicht aufsuchen können, bieten wir nach Vereinbarung Hausbesuche im Einzugsgebiet an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundrose und Hautinfektionen (Teil 2)</h3>
+        <p>Bakterielle Hautinfektionen wie Wundrose werden bei uns rasch diagnostiziert und mit geeigneten Antibiotika behandelt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Cholesterin- und Stoffwechselcheck (Teil 2)</h3>
+        <p>Wir kontrollieren Ihre Blutfettwerte regelmäßig und beraten zu Ernährung, Bewegung und gegebenenfalls medikamentöser Therapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Osteoporose-Vorsorge (Teil 2)</h3>
+        <p>Ab dem empfohlenen Alter oder bei Risikofaktoren beraten wir zur Knochendichtemessung und zu vorbeugenden Maßnahmen gegen Osteoporose.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allgemeine Gesundenuntersuchung (Teil 3)</h3>
+        <p>Die jährliche Gesundenuntersuchung umfasst eine ausführliche Anamnese, körperliche Untersuchung, Blutabnahme, Harnbefund sowie ein abschließendes Beratungsgespräch. Sie dient der Früherkennung von Risikofaktoren und chronischen Erkrankungen und wird von der ÖGK vollständig übernommen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfberatung und Impfungen (Teil 3)</h3>
+        <p>Wir bieten sämtliche empfohlenen Impfungen laut österreichischem Impfplan an, darunter FSME, Grippe, Tetanus, Diphtherie, Keuchhusten und COVID-19. Vor jeder Impfung erfolgt eine individuelle Beratung zu Nutzen und möglichen Nebenwirkungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Blutdruckmessung und Hypertonie-Management (Teil 3)</h3>
+        <p>Bei Verdacht auf Bluthochdruck führen wir eine 24-Stunden-Blutdruckmessung durch und erstellen gemeinsam mit Ihnen einen individuellen Therapieplan, der Medikation, Ernährung und Bewegung berücksichtigt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Diabetes-Betreuung (Teil 3)</h3>
+        <p>Für Patient:innen mit Diabetes mellitus bieten wir eine strukturierte Langzeitbetreuung inklusive HbA1c-Kontrollen, Schulung zur Blutzuckermessung und Anpassung der Insulin- bzw. Tablettentherapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundversorgung (Teil 3)</h3>
+        <p>Kleinere Verletzungen, chronische Wunden und postoperative Nachsorge werden in unserer Ordination fachgerecht versorgt, inklusive steriler Verbandswechsel und Fadenentfernung.</p>
+    </article>
+    <article class="leistung">
+        <h3>Reisemedizinische Beratung (Teil 3)</h3>
+        <p>Vor Fernreisen beraten wir Sie zu notwendigen Impfungen, Malariaprophylaxe und allgemeinen Gesundheitsrisiken im Zielland und stellen bei Bedarf ein individuelles Reiseapotheken-Rezept aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Labordiagnostik (Teil 3)</h3>
+        <p>Über unser Partnerlabor bieten wir ein breites Spektrum an Blut- und Urinuntersuchungen an, von Routineparametern bis zu spezialisierten Hormon- und Tumormarker-Bestimmungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>EKG und Herzdiagnostik (Teil 3)</h3>
+        <p>Ruhe-EKG und Belastungs-EKG stehen direkt in der Ordination zur Verfügung, um Herzrhythmusstörungen und koronare Risikofaktoren frühzeitig zu erkennen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Lungenfunktionstest (Teil 3)</h3>
+        <p>Bei Verdacht auf Asthma, COPD oder andere Atemwegserkrankungen führen wir eine Spirometrie durch und besprechen die Ergebnisse ausführlich mit Ihnen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hautkrebs-Vorsorge (Teil 3)</h3>
+        <p>Im Rahmen der Hautkrebsvorsorge untersuchen wir Muttermale und auffällige Hautveränderungen mit dem Dermatoskop und überweisen bei Bedarf zeitnah an eine Fachärztin oder einen Facharzt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfpass-Kontrolle (Teil 3)</h3>
+        <p>Wir prüfen Ihren Impfpass auf Vollständigkeit und Auffrischungsbedarf und erstellen bei Verlust einen neuen Nachweis anhand vorhandener Unterlagen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundenberatung für Kinder (Teil 3)</h3>
+        <p>Für die jüngsten Patient:innen bieten wir Vorsorgeuntersuchungen, Wachstumskontrollen und Beratung zu Ernährung und Entwicklung an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Akutsprechstunde (Teil 3)</h3>
+        <p>Für plötzlich auftretende Beschwerden wie Fieber, Infekte oder akute Schmerzen halten wir täglich freie Termine in unserer Akutsprechstunde bereit.</p>
+    </article>
+    <article class="leistung">
+        <h3>Chronikerprogramm Herz-Kreislauf (Teil 3)</h3>
+        <p>Patient:innen mit koronarer Herzkrankheit oder Herzinsuffizienz werden im strukturierten Betreuungsprogramm regelmäßig kontrolliert und medikamentös eingestellt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Vorsorgekoloskopie-Zuweisung (Teil 3)</h3>
+        <p>Ab dem empfohlenen Alter beraten wir zur Darmkrebsvorsorge und stellen die Zuweisung für eine Vorsorgekoloskopie an ein Kooperationsinstitut aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allergietestung (Teil 3)</h3>
+        <p>Bei Verdacht auf Allergien führen wir Pricktests für die häufigsten Allergene durch und besprechen mögliche Vermeidungsstrategien und Therapieoptionen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Raucherentwöhnung (Teil 3)</h3>
+        <p>Wir unterstützen Sie mit individueller Beratung, Verhaltensstrategien und bei Bedarf medikamentöser Unterstützung auf dem Weg zum Rauchstopp.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gewichtsmanagement (Teil 3)</h3>
+        <p>Bei Übergewicht und Adipositas erstellen wir gemeinsam mit Ihnen einen realistischen Plan zur Gewichtsreduktion, der Ernährung, Bewegung und gegebenenfalls Stoffwechseldiagnostik einschließt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Schlafmedizinische Erstberatung (Teil 3)</h3>
+        <p>Bei Schlafstörungen und Verdacht auf Schlafapnoe erheben wir eine ausführliche Schlafanamnese und überweisen bei Bedarf an ein Schlaflabor.</p>
+    </article>
+    <article class="leistung">
+        <h3>Psychosoziale Erstberatung (Teil 3)</h3>
+        <p>Bei psychischen Belastungen bieten wir ein vertrauliches Erstgespräch an und vermitteln bei Bedarf weiterführende Betreuung durch Psychotherapie oder Psychiatrie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundheitszeugnisse (Teil 3)</h3>
+        <p>Für Führerschein, Sport oder Beruf stellen wir nach entsprechender Untersuchung die erforderlichen ärztlichen Zeugnisse aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hausbesuche (Teil 3)</h3>
+        <p>Für Patient:innen, die unsere Ordination aus gesundheitlichen Gründen nicht aufsuchen können, bieten wir nach Vereinbarung Hausbesuche im Einzugsgebiet an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundrose und Hautinfektionen (Teil 3)</h3>
+        <p>Bakterielle Hautinfektionen wie Wundrose werden bei uns rasch diagnostiziert und mit geeigneten Antibiotika behandelt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Cholesterin- und Stoffwechselcheck (Teil 3)</h3>
+        <p>Wir kontrollieren Ihre Blutfettwerte regelmäßig und beraten zu Ernährung, Bewegung und gegebenenfalls medikamentöser Therapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Osteoporose-Vorsorge (Teil 3)</h3>
+        <p>Ab dem empfohlenen Alter oder bei Risikofaktoren beraten wir zur Knochendichtemessung und zu vorbeugenden Maßnahmen gegen Osteoporose.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allgemeine Gesundenuntersuchung (Teil 4)</h3>
+        <p>Die jährliche Gesundenuntersuchung umfasst eine ausführliche Anamnese, körperliche Untersuchung, Blutabnahme, Harnbefund sowie ein abschließendes Beratungsgespräch. Sie dient der Früherkennung von Risikofaktoren und chronischen Erkrankungen und wird von der ÖGK vollständig übernommen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfberatung und Impfungen (Teil 4)</h3>
+        <p>Wir bieten sämtliche empfohlenen Impfungen laut österreichischem Impfplan an, darunter FSME, Grippe, Tetanus, Diphtherie, Keuchhusten und COVID-19. Vor jeder Impfung erfolgt eine individuelle Beratung zu Nutzen und möglichen Nebenwirkungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Blutdruckmessung und Hypertonie-Management (Teil 4)</h3>
+        <p>Bei Verdacht auf Bluthochdruck führen wir eine 24-Stunden-Blutdruckmessung durch und erstellen gemeinsam mit Ihnen einen individuellen Therapieplan, der Medikation, Ernährung und Bewegung berücksichtigt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Diabetes-Betreuung (Teil 4)</h3>
+        <p>Für Patient:innen mit Diabetes mellitus bieten wir eine strukturierte Langzeitbetreuung inklusive HbA1c-Kontrollen, Schulung zur Blutzuckermessung und Anpassung der Insulin- bzw. Tablettentherapie.</p>
+    </article>
+    <article class="leistung">
+        <h3>Wundversorgung (Teil 4)</h3>
+        <p>Kleinere Verletzungen, chronische Wunden und postoperative Nachsorge werden in unserer Ordination fachgerecht versorgt, inklusive steriler Verbandswechsel und Fadenentfernung.</p>
+    </article>
+    <article class="leistung">
+        <h3>Reisemedizinische Beratung (Teil 4)</h3>
+        <p>Vor Fernreisen beraten wir Sie zu notwendigen Impfungen, Malariaprophylaxe und allgemeinen Gesundheitsrisiken im Zielland und stellen bei Bedarf ein individuelles Reiseapotheken-Rezept aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Labordiagnostik (Teil 4)</h3>
+        <p>Über unser Partnerlabor bieten wir ein breites Spektrum an Blut- und Urinuntersuchungen an, von Routineparametern bis zu spezialisierten Hormon- und Tumormarker-Bestimmungen.</p>
+    </article>
+    <article class="leistung">
+        <h3>EKG und Herzdiagnostik (Teil 4)</h3>
+        <p>Ruhe-EKG und Belastungs-EKG stehen direkt in der Ordination zur Verfügung, um Herzrhythmusstörungen und koronare Risikofaktoren frühzeitig zu erkennen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Lungenfunktionstest (Teil 4)</h3>
+        <p>Bei Verdacht auf Asthma, COPD oder andere Atemwegserkrankungen führen wir eine Spirometrie durch und besprechen die Ergebnisse ausführlich mit Ihnen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Hautkrebs-Vorsorge (Teil 4)</h3>
+        <p>Im Rahmen der Hautkrebsvorsorge untersuchen wir Muttermale und auffällige Hautveränderungen mit dem Dermatoskop und überweisen bei Bedarf zeitnah an eine Fachärztin oder einen Facharzt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Impfpass-Kontrolle (Teil 4)</h3>
+        <p>Wir prüfen Ihren Impfpass auf Vollständigkeit und Auffrischungsbedarf und erstellen bei Verlust einen neuen Nachweis anhand vorhandener Unterlagen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gesundenberatung für Kinder (Teil 4)</h3>
+        <p>Für die jüngsten Patient:innen bieten wir Vorsorgeuntersuchungen, Wachstumskontrollen und Beratung zu Ernährung und Entwicklung an.</p>
+    </article>
+    <article class="leistung">
+        <h3>Akutsprechstunde (Teil 4)</h3>
+        <p>Für plötzlich auftretende Beschwerden wie Fieber, Infekte oder akute Schmerzen halten wir täglich freie Termine in unserer Akutsprechstunde bereit.</p>
+    </article>
+    <article class="leistung">
+        <h3>Chronikerprogramm Herz-Kreislauf (Teil 4)</h3>
+        <p>Patient:innen mit koronarer Herzkrankheit oder Herzinsuffizienz werden im strukturierten Betreuungsprogramm regelmäßig kontrolliert und medikamentös eingestellt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Vorsorgekoloskopie-Zuweisung (Teil 4)</h3>
+        <p>Ab dem empfohlenen Alter beraten wir zur Darmkrebsvorsorge und stellen die Zuweisung für eine Vorsorgekoloskopie an ein Kooperationsinstitut aus.</p>
+    </article>
+    <article class="leistung">
+        <h3>Allergietestung (Teil 4)</h3>
+        <p>Bei Verdacht auf Allergien führen wir Pricktests für die häufigsten Allergene durch und besprechen mögliche Vermeidungsstrategien und Therapieoptionen.</p>
+    </article>
+    <article class="leistung">
+        <h3>Raucherentwöhnung (Teil 4)</h3>
+        <p>Wir unterstützen Sie mit individueller Beratung, Verhaltensstrategien und bei Bedarf medikamentöser Unterstützung auf dem Weg zum Rauchstopp.</p>
+    </article>
+    <article class="leistung">
+        <h3>Gewichtsmanagement (Teil 4)</h3>
+        <p>Bei Übergewicht und Adipositas erstellen wir gemeinsam mit Ihnen einen realistischen Plan zur Gewichtsreduktion, der Ernährung, Bewegung und gegebenenfalls Stoffwechseldiagnostik einschließt.</p>
+    </article>
+    <article class="leistung">
+        <h3>Schlafmedizinische Erstberatung (Teil 4)</h3>
+        <p>Bei Schlafstörungen und Verdacht auf Schlafapnoe erheben wir eine ausführliche Schlafanamnese und überweisen bei Bedarf an ein Schlaflabor.</p>
+    </article>
+    <article class="leistung">
+        <h3>Psychosoziale Erstberatung (Teil 4)</h3>
+        <p>Bei psychischen Belastungen bieten wir ein vertrauliches Erstgespräch an und vermitteln bei Bedarf weiterführende Betreuung durch Psychotherapie oder Psychiatrie.</p>
+    </article>
+
+    <section class="violation-section" style="border:2px solid #d32f2f; padding:15px; margin:20px 0; background:#ffebee;">
+        <h2 style="color:#b71c1c;">Überweisung anfordern</h2>
+        <!-- SEEDED-VIOLATION: below-cutoff -->
+        <p id="seeded-below-cutoff"><strong>Klicken Sie unten auf das runde Symbol, um Ihre Überweisung anzufordern.</strong></p>
+        <div style="display:flex; justify-content:flex-start;">
+            <div role="button" tabindex="0" style="width:64px; height:64px; border-radius:50%; background:#6a1b9a;"></div>
+        </div>
+        <p>Auch dieses Bedienelement trägt keinen Namen, kein Label und keine Textalternative — es wird ausschließlich über seine Form identifiziert (WCAG 1.3.3). Es steht bewusst weit hinter der alten 15.000-Zeichen-Extraktionsgrenze.</p>
+    </section>
+
+    <h2>Häufig gestellte Fragen (FAQ)</h2>
+    <dl class="faq">
+        <dt>Wie bekomme ich einen Termin?</dt>
+        <dd>Termine können telefonisch, per E-Mail oder über unser Online-Terminbuchungsformular vereinbart werden. Akute Beschwerden werden noch am selben Tag behandelt.</dd>
+        <dt>Muss ich meine e-card mitbringen?</dt>
+        <dd>Ja, bitte bringen Sie zu jedem Termin Ihre e-card sowie gegebenenfalls Vorbefunde und Ihren Medikamentenplan mit.</dd>
+        <dt>Behandeln Sie auch Privatpatient:innen?</dt>
+        <dd>Ja, neben Kassenleistungen bieten wir auch Wahlarzt-Leistungen für Selbstzahler:innen und Privatversicherte an.</dd>
+        <dt>Wie lange dauert eine Gesundenuntersuchung?</dt>
+        <dd>Planen Sie für die Gesundenuntersuchung etwa 45 bis 60 Minuten ein, da mehrere Untersuchungsschritte und ein ausführliches Beratungsgespräch enthalten sind.</dd>
+        <dt>Kann ich meinen Befund online abrufen?</dt>
+        <dd>Ja, über unser Patientenportal können Sie Ihre Laborbefunde und den nächsten Termin jederzeit online einsehen.</dd>
+        <dt>Was mache ich bei einem Notfall außerhalb der Ordinationszeiten?</dt>
+        <dd>Bei akuten Notfällen wählen Sie bitte den Notruf 144. Der ärztliche Bereitschaftsdienst ist unter 141 erreichbar.</dd>
+        <dt>Bieten Sie auch Videosprechstunden an?</dt>
+        <dd>Für bestimmte Nachkontrollen und Beratungsgespräche bieten wir auf Anfrage eine Videosprechstunde an.</dd>
+        <dt>Wie oft sollte ich zur Vorsorgeuntersuchung kommen?</dt>
+        <dd>Wir empfehlen eine jährliche Gesundenuntersuchung, auch wenn keine akuten Beschwerden vorliegen.</dd>
+        <dt>Kann ich meinen Hausarzt wechseln und zu Ihnen kommen?</dt>
+        <dd>Ja, ein Wechsel ist jederzeit möglich. Wir kümmern uns gerne um die Anforderung Ihrer bisherigen Krankenunterlagen.</dd>
+        <dt>Gibt es einen Parkplatz bei der Ordination?</dt>
+        <dd>Direkt vor dem Gebäude stehen Kurzparkzonen sowie ein kostenloser Patientenparkplatz im Innenhof zur Verfügung.</dd>
+        <dt>Ist die Ordination barrierefrei zugänglich?</dt>
+        <dd>Ja, die Ordination ist ebenerdig erreichbar und verfügt über eine automatische Eingangstür sowie ein barrierefreies WC.</dd>
+        <dt>Werden Hausbesuche angeboten?</dt>
+        <dd>Für Patient:innen, die die Ordination nicht aufsuchen können, bieten wir nach Terminvereinbarung Hausbesuche an.</dd>
+        <dt>Wie erhalte ich ein Wiederholungsrezept?</dt>
+        <dd>Wiederholungsrezepte können telefonisch angefordert werden und liegen in der Regel am nächsten Werktag zur Abholung bereit.</dd>
+        <dt>Behandeln Sie auch Kinder?</dt>
+        <dd>Ja, wir betreuen Patient:innen jeden Alters, von Säuglingen bis ins hohe Erwachsenenalter.</dd>
+        <dt>Was kostet eine Wahlarzt-Leistung?</dt>
+        <dd>Die Kosten variieren je nach Leistung. Eine Kostenaufstellung erhalten Sie vor der Behandlung, und die ÖGK erstattet einen Teilbetrag rückwirkend.</dd>
+        <dt>Kann ich einen Dolmetscher zum Termin mitbringen?</dt>
+        <dd>Selbstverständlich, Sie können eine Vertrauensperson oder einen Dolmetscher zu jedem Termin mitbringen.</dd>
+        <dt>Wie melde ich mich für die Akutsprechstunde an?</dt>
+        <dd>Für die Akutsprechstunde ist keine Voranmeldung notwendig, wir bitten jedoch um kurze telefonische Ankündigung, wenn möglich.</dd>
+        <dt>Erhalte ich eine Erinnerung an meinen Termin?</dt>
+        <dd>Ja, auf Wunsch senden wir Ihnen am Vortag eine SMS- oder E-Mail-Erinnerung an Ihren vereinbarten Termin.</dd>
+        <dt>Kann ich mehrere Anliegen in einem Termin besprechen?</dt>
+        <dd>Bitte teilen Sie uns bei der Terminvereinbarung mit, wenn Sie mehrere Anliegen besprechen möchten, damit ausreichend Zeit eingeplant wird.</dd>
+        <dt>Was tue ich, wenn ich einen Termin absagen muss?</dt>
+        <dd>Bitte sagen Sie Termine so früh wie möglich telefonisch oder per E-Mail ab, damit der Termin an eine andere Patientin oder einen anderen Patienten vergeben werden kann.</dd>
+        <dt>Bieten Sie auch Reiseimpfungen an?</dt>
+        <dd>Ja, wir beraten reisemedizinisch und verabreichen die empfohlenen Impfungen direkt in der Ordination.</dd>
+        <dt>Kann ich meine Befunde per Post erhalten?</dt>
+        <dd>Auf Wunsch senden wir Ihnen Befunde postalisch zu, sofern keine persönliche Besprechung erforderlich ist.</dd>
+        <dt>Gibt es eine Warteliste für neue Patient:innen?</dt>
+        <dd>Derzeit nehmen wir neue Patient:innen auf, in Zeiten hoher Auslastung kann es jedoch zu einer kurzen Warteliste kommen.</dd>
+        <dt>Wie kann ich Feedback zur Ordination geben?</dt>
+        <dd>Wir freuen uns über Rückmeldungen per E-Mail oder im persönlichen Gespräch mit unserem Team.</dd>
+        <dt>Werden Corona-Tests angeboten?</dt>
+        <dd>PCR- und Antigentests sind nach Terminvereinbarung in unserer Ordination verfügbar.</dd>
+        <dt>Wie bekomme ich einen Termin?</dt>
+        <dd>Termine können telefonisch, per E-Mail oder über unser Online-Terminbuchungsformular vereinbart werden. Akute Beschwerden werden noch am selben Tag behandelt.</dd>
+        <dt>Muss ich meine e-card mitbringen?</dt>
+        <dd>Ja, bitte bringen Sie zu jedem Termin Ihre e-card sowie gegebenenfalls Vorbefunde und Ihren Medikamentenplan mit.</dd>
+        <dt>Behandeln Sie auch Privatpatient:innen?</dt>
+        <dd>Ja, neben Kassenleistungen bieten wir auch Wahlarzt-Leistungen für Selbstzahler:innen und Privatversicherte an.</dd>
+        <dt>Wie lange dauert eine Gesundenuntersuchung?</dt>
+        <dd>Planen Sie für die Gesundenuntersuchung etwa 45 bis 60 Minuten ein, da mehrere Untersuchungsschritte und ein ausführliches Beratungsgespräch enthalten sind.</dd>
+        <dt>Kann ich meinen Befund online abrufen?</dt>
+        <dd>Ja, über unser Patientenportal können Sie Ihre Laborbefunde und den nächsten Termin jederzeit online einsehen.</dd>
+        <dt>Was mache ich bei einem Notfall außerhalb der Ordinationszeiten?</dt>
+        <dd>Bei akuten Notfällen wählen Sie bitte den Notruf 144. Der ärztliche Bereitschaftsdienst ist unter 141 erreichbar.</dd>
+        <dt>Bieten Sie auch Videosprechstunden an?</dt>
+        <dd>Für bestimmte Nachkontrollen und Beratungsgespräche bieten wir auf Anfrage eine Videosprechstunde an.</dd>
+        <dt>Wie oft sollte ich zur Vorsorgeuntersuchung kommen?</dt>
+        <dd>Wir empfehlen eine jährliche Gesundenuntersuchung, auch wenn keine akuten Beschwerden vorliegen.</dd>
+        <dt>Kann ich meinen Hausarzt wechseln und zu Ihnen kommen?</dt>
+        <dd>Ja, ein Wechsel ist jederzeit möglich. Wir kümmern uns gerne um die Anforderung Ihrer bisherigen Krankenunterlagen.</dd>
+        <dt>Gibt es einen Parkplatz bei der Ordination?</dt>
+        <dd>Direkt vor dem Gebäude stehen Kurzparkzonen sowie ein kostenloser Patientenparkplatz im Innenhof zur Verfügung.</dd>
+        <dt>Ist die Ordination barrierefrei zugänglich?</dt>
+        <dd>Ja, die Ordination ist ebenerdig erreichbar und verfügt über eine automatische Eingangstür sowie ein barrierefreies WC.</dd>
+        <dt>Werden Hausbesuche angeboten?</dt>
+        <dd>Für Patient:innen, die die Ordination nicht aufsuchen können, bieten wir nach Terminvereinbarung Hausbesuche an.</dd>
+        <dt>Wie erhalte ich ein Wiederholungsrezept?</dt>
+        <dd>Wiederholungsrezepte können telefonisch angefordert werden und liegen in der Regel am nächsten Werktag zur Abholung bereit.</dd>
+        <dt>Behandeln Sie auch Kinder?</dt>
+        <dd>Ja, wir betreuen Patient:innen jeden Alters, von Säuglingen bis ins hohe Erwachsenenalter.</dd>
+        <dt>Was kostet eine Wahlarzt-Leistung?</dt>
+        <dd>Die Kosten variieren je nach Leistung. Eine Kostenaufstellung erhalten Sie vor der Behandlung, und die ÖGK erstattet einen Teilbetrag rückwirkend.</dd>
+        <dt>Kann ich einen Dolmetscher zum Termin mitbringen?</dt>
+        <dd>Selbstverständlich, Sie können eine Vertrauensperson oder einen Dolmetscher zu jedem Termin mitbringen.</dd>
+        <dt>Wie melde ich mich für die Akutsprechstunde an?</dt>
+        <dd>Für die Akutsprechstunde ist keine Voranmeldung notwendig, wir bitten jedoch um kurze telefonische Ankündigung, wenn möglich.</dd>
+        <dt>Erhalte ich eine Erinnerung an meinen Termin?</dt>
+        <dd>Ja, auf Wunsch senden wir Ihnen am Vortag eine SMS- oder E-Mail-Erinnerung an Ihren vereinbarten Termin.</dd>
+        <dt>Kann ich mehrere Anliegen in einem Termin besprechen?</dt>
+        <dd>Bitte teilen Sie uns bei der Terminvereinbarung mit, wenn Sie mehrere Anliegen besprechen möchten, damit ausreichend Zeit eingeplant wird.</dd>
+        <dt>Was tue ich, wenn ich einen Termin absagen muss?</dt>
+        <dd>Bitte sagen Sie Termine so früh wie möglich telefonisch oder per E-Mail ab, damit der Termin an eine andere Patientin oder einen anderen Patienten vergeben werden kann.</dd>
+        <dt>Bieten Sie auch Reiseimpfungen an?</dt>
+        <dd>Ja, wir beraten reisemedizinisch und verabreichen die empfohlenen Impfungen direkt in der Ordination.</dd>
+        <dt>Kann ich meine Befunde per Post erhalten?</dt>
+        <dd>Auf Wunsch senden wir Ihnen Befunde postalisch zu, sofern keine persönliche Besprechung erforderlich ist.</dd>
+        <dt>Gibt es eine Warteliste für neue Patient:innen?</dt>
+        <dd>Derzeit nehmen wir neue Patient:innen auf, in Zeiten hoher Auslastung kann es jedoch zu einer kurzen Warteliste kommen.</dd>
+        <dt>Wie kann ich Feedback zur Ordination geben?</dt>
+        <dd>Wir freuen uns über Rückmeldungen per E-Mail oder im persönlichen Gespräch mit unserem Team.</dd>
+        <dt>Werden Corona-Tests angeboten?</dt>
+        <dd>PCR- und Antigentests sind nach Terminvereinbarung in unserer Ordination verfügbar.</dd>
+        <dt>Wie bekomme ich einen Termin?</dt>
+        <dd>Termine können telefonisch, per E-Mail oder über unser Online-Terminbuchungsformular vereinbart werden. Akute Beschwerden werden noch am selben Tag behandelt.</dd>
+        <dt>Muss ich meine e-card mitbringen?</dt>
+        <dd>Ja, bitte bringen Sie zu jedem Termin Ihre e-card sowie gegebenenfalls Vorbefunde und Ihren Medikamentenplan mit.</dd>
+        <dt>Behandeln Sie auch Privatpatient:innen?</dt>
+        <dd>Ja, neben Kassenleistungen bieten wir auch Wahlarzt-Leistungen für Selbstzahler:innen und Privatversicherte an.</dd>
+        <dt>Wie lange dauert eine Gesundenuntersuchung?</dt>
+        <dd>Planen Sie für die Gesundenuntersuchung etwa 45 bis 60 Minuten ein, da mehrere Untersuchungsschritte und ein ausführliches Beratungsgespräch enthalten sind.</dd>
+        <dt>Kann ich meinen Befund online abrufen?</dt>
+        <dd>Ja, über unser Patientenportal können Sie Ihre Laborbefunde und den nächsten Termin jederzeit online einsehen.</dd>
+        <dt>Was mache ich bei einem Notfall außerhalb der Ordinationszeiten?</dt>
+        <dd>Bei akuten Notfällen wählen Sie bitte den Notruf 144. Der ärztliche Bereitschaftsdienst ist unter 141 erreichbar.</dd>
+        <dt>Bieten Sie auch Videosprechstunden an?</dt>
+        <dd>Für bestimmte Nachkontrollen und Beratungsgespräche bieten wir auf Anfrage eine Videosprechstunde an.</dd>
+        <dt>Wie oft sollte ich zur Vorsorgeuntersuchung kommen?</dt>
+        <dd>Wir empfehlen eine jährliche Gesundenuntersuchung, auch wenn keine akuten Beschwerden vorliegen.</dd>
+        <dt>Kann ich meinen Hausarzt wechseln und zu Ihnen kommen?</dt>
+        <dd>Ja, ein Wechsel ist jederzeit möglich. Wir kümmern uns gerne um die Anforderung Ihrer bisherigen Krankenunterlagen.</dd>
+        <dt>Gibt es einen Parkplatz bei der Ordination?</dt>
+        <dd>Direkt vor dem Gebäude stehen Kurzparkzonen sowie ein kostenloser Patientenparkplatz im Innenhof zur Verfügung.</dd>
+    </dl>
+
+    <h2>Öffnungszeiten pro Standort</h2>
+    <section class="standort">
+        <h3>Standort Wien Mitte</h3>
+        <p>Landstraßer Hauptstraße 12, 1030 Wien · Telefon: 01 234 56 789</p>
+        <table>
+            <caption>Öffnungszeiten Standort Wien Mitte</caption>
+            <thead><tr><th scope="col">Tag</th><th scope="col">Uhrzeit</th></tr></thead>
+            <tbody>
+                <tr><th scope="row">Montag</th><td>08:00–12:00 und 14:00–17:00</td></tr>
+                <tr><th scope="row">Dienstag</th><td>08:00–12:00</td></tr>
+                <tr><th scope="row">Mittwoch</th><td>08:00–12:00 und 14:00–19:00</td></tr>
+                <tr><th scope="row">Donnerstag</th><td>08:00–12:00</td></tr>
+                <tr><th scope="row">Freitag</th><td>08:00–13:00</td></tr>
+                <tr><th scope="row">Samstag</th><td>geschlossen</td></tr>
+                <tr><th scope="row">Sonntag</th><td>geschlossen</td></tr>
+            </tbody>
+        </table>
+        <p>Der Standort Wien Mitte ist mit den U-Bahn-Linien U3 und U4 sowie mehreren Buslinien direkt erreichbar. Ein Patientenparkplatz befindet sich im Innenhof.</p>
+    </section>
+    <section class="standort">
+        <h3>Standort Wien West</h3>
+        <p>Hütteldorfer Straße 88, 1150 Wien · Telefon: 01 987 65 432</p>
+        <table>
+            <caption>Öffnungszeiten Standort Wien West</caption>
+            <thead><tr><th scope="col">Tag</th><th scope="col">Uhrzeit</th></tr></thead>
+            <tbody>
+                <tr><th scope="row">Montag</th><td>07:30–12:30</td></tr>
+                <tr><th scope="row">Dienstag</th><td>13:00–18:00</td></tr>
+                <tr><th scope="row">Mittwoch</th><td>07:30–12:30</td></tr>
+                <tr><th scope="row">Donnerstag</th><td>13:00–18:00</td></tr>
+                <tr><th scope="row">Freitag</th><td>07:30–12:00</td></tr>
+                <tr><th scope="row">Samstag</th><td>geschlossen</td></tr>
+                <tr><th scope="row">Sonntag</th><td>geschlossen</td></tr>
+            </tbody>
+        </table>
+        <p>Der Standort Wien West liegt in Gehdistanz zur U6-Station Schweglerstraße. Kurzparkzonen befinden sich direkt vor dem Haus.</p>
+    </section>
+    <section class="standort">
+        <h3>Standort Melk</h3>
+        <p>Rathausplatz 4, 3390 Melk · Telefon: 02752 123 45</p>
+        <table>
+            <caption>Öffnungszeiten Standort Melk</caption>
+            <thead><tr><th scope="col">Tag</th><th scope="col">Uhrzeit</th></tr></thead>
+            <tbody>
+                <tr><th scope="row">Montag</th><td>08:00–13:00</td></tr>
+                <tr><th scope="row">Dienstag</th><td>08:00–13:00 und 15:00–18:00</td></tr>
+                <tr><th scope="row">Mittwoch</th><td>geschlossen</td></tr>
+                <tr><th scope="row">Donnerstag</th><td>08:00–13:00</td></tr>
+                <tr><th scope="row">Freitag</th><td>08:00–12:00</td></tr>
+                <tr><th scope="row">Samstag</th><td>geschlossen</td></tr>
+                <tr><th scope="row">Sonntag</th><td>geschlossen</td></tr>
+            </tbody>
+        </table>
+        <p>Der Standort Melk ist direkt am Rathausplatz gelegen, mit ausreichend Gratisparkplätzen in unmittelbarer Nähe.</p>
+    </section>
+
+    <h2>Unser Team</h2>
+    <article class="team-mitglied">
+        <h3>Dr. Julia Berger</h3>
+        <p><em>Fachärztin für Allgemeinmedizin</em></p>
+        <p>Dr. Berger leitet die Ordination seit über zwölf Jahren und hat sich auf die Betreuung chronisch kranker Patient:innen sowie auf Vorsorgemedizin spezialisiert.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Dr. Thomas Aigner</h3>
+        <p><em>Facharzt für Allgemeinmedizin</em></p>
+        <p>Dr. Aigner ist seit fünf Jahren im Team und betreut schwerpunktmäßig Sportmedizin sowie reisemedizinische Beratungen.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>DGKP Sabine Huber</h3>
+        <p><em>Diplomierte Gesundheits- und Krankenpflegerin</em></p>
+        <p>Frau Huber koordiniert die Wundversorgung und begleitet Patient:innen bei chronischen Erkrankungen im Rahmen des Betreuungsprogramms.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Ordinationsassistentin Nina Wolf</h3>
+        <p><em>Ordinationsassistenz</em></p>
+        <p>Frau Wolf ist meist die erste Ansprechperson am Empfang und unterstützt bei der Terminplanung sowie bei administrativen Anliegen.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Ordinationsassistent Markus Steiner</h3>
+        <p><em>Ordinationsassistenz und Labor</em></p>
+        <p>Herr Steiner ist für die Blutabnahmen und die Vorbereitung der Laborproben zuständig.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Dr. Elena Kovač</h3>
+        <p><em>Turnusärztin</em></p>
+        <p>Dr. Kovač absolviert derzeit ihre Basisausbildung in unserer Ordination und unterstützt das Team bei der Patientenbetreuung.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Verwaltung Peter Lechner</h3>
+        <p><em>Praxismanagement</em></p>
+        <p>Herr Lechner verantwortet die Organisation der Ordination, die Abrechnung mit den Krankenkassen sowie die Terminlogistik über alle Standorte hinweg.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>DGKP Anna Frei</h3>
+        <p><em>Diplomierte Gesundheits- und Krankenpflegerin</em></p>
+        <p>Frau Frei betreut schwerpunktmäßig die Impfsprechstunde und die reisemedizinische Beratung.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Ordinationsassistentin Laura Meyer</h3>
+        <p><em>Ordinationsassistenz Standort Melk</em></p>
+        <p>Frau Meyer betreut den Empfang am Standort Melk und unterstützt bei der Terminkoordination zwischen den Standorten.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Dr. Felix Brandner</h3>
+        <p><em>Facharzt für Allgemeinmedizin, Vertretung</em></p>
+        <p>Dr. Brandner vertritt das Team an Urlaubs- und Fortbildungstagen und ist auf Diabetesbetreuung spezialisiert.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>DGKP Christine Bauer</h3>
+        <p><em>Diplomierte Gesundheits- und Krankenpflegerin</em></p>
+        <p>Frau Bauer ist für die EKG- und Lungenfunktionsuntersuchungen sowie die Vorbereitung der Akutsprechstunde zuständig.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Ordinationsassistent David Novak</h3>
+        <p><em>Ordinationsassistenz Standort Wien West</em></p>
+        <p>Herr Novak koordiniert am Standort Wien West die Terminvergabe und die Kommunikation mit dem Labor.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Dr. Sophie Wagner</h3>
+        <p><em>Fachärztin für Allgemeinmedizin, Teilzeit</em></p>
+        <p>Dr. Wagner ist an zwei Tagen pro Woche in der Ordination tätig und betreut schwerpunktmäßig Frauengesundheit im hausärztlichen Kontext.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>Ordinationsassistentin Julia Roth</h3>
+        <p><em>Ordinationsassistenz und Qualitätsmanagement</em></p>
+        <p>Frau Roth verantwortet die interne Qualitätssicherung und die Organisation der Fortbildungen des Teams.</p>
+    </article>
+    <article class="team-mitglied">
+        <h3>DGKP Michael Ecker</h3>
+        <p><em>Diplomierter Gesundheits- und Krankenpfleger</em></p>
+        <p>Herr Ecker unterstützt bei Hausbesuchen und der Betreuung mobilitätseingeschränkter Patient:innen.</p>
+    </article>
+</body>
+</html>

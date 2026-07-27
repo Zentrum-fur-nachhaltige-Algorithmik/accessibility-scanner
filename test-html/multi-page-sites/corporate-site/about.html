@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - TechCorp Solutions</title>
+    <!-- Liberal CSP Policy for testing variation -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Reuse header styles from index.html */
+        .site-header {
+            background: #1a365d;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .main-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .main-nav a:hover,
+        .main-nav a:focus {
+            background-color: #2d3748;
+            outline: 2px solid #63b3ed;
+        }
+        
+        .main-nav a[aria-current="page"] {
+            background-color: #2d3748;
+            font-weight: bold;
+        }
+        
+        /* Page specific styles */
+        .page-header {
+            background: #f7fafc;
+            padding: 3rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .page-header h1 {
+            color: #1a365d;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb a {
+            color: #4a5568;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .content {
+            padding: 3rem 0;
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section h2 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .team-member {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .team-member img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            border: 3px solid #e2e8f0;
+        }
+        
+        .team-member h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .team-member .role {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+        
+        /* Intentional accessibility issues for testing */
+        .bad-contrast {
+            color: #ddd;
+            background: #fff;
+        }
+        
+        .missing-alt img {
+            /* Images without alt text for testing */
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-nav {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-nav a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-nav a:hover,
+        .footer-nav a:focus {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 999;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo" aria-label="TechCorp Solutions Homepage">TechCorp Solutions</a>
+                
+                <!-- Main Navigation -->
+                <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html" aria-current="page">About</a></li>
+                        <li><a href="products/index.html">Products</a></li>
+                        <li><a href="support/help.html">Support</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="index.html">Home</a> &gt; About
+            </nav>
+            <h1>About TechCorp Solutions</h1>
+            <p>Learn about our company history, mission, and the team that makes it all possible.</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <div class="content">
+            <div class="container">
+                <section class="section">
+                    <h2>Our Story</h2>
+                    <p>Founded in 2009, TechCorp Solutions began as a small technology consultancy with a big vision: to help businesses harness the power of technology to achieve their goals. Over the years, we've grown from a team of 3 to over 150 professionals, but our core mission remains the same.</p>
+                    
+                    <p>We believe that technology should empower, not complicate. That's why we focus on delivering solutions that are not only cutting-edge but also practical and user-friendly.</p>
+                </section>
+                
+                <section class="section">
+                    <h2>Our Mission</h2>
+                    <p class="bad-contrast">To provide innovative technology solutions that drive business growth and transformation while maintaining the highest standards of security and reliability.</p>
+                </section>
+                
+                <section class="section">
+                    <h2>Leadership Team</h2>
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <!-- Intentionally missing alt text for testing -->
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ECEO%3C/text%3E%3C/svg%3E" class="missing-alt">
+                            <h3>Sarah Johnson</h3>
+                            <div class="role">Chief Executive Officer</div>
+                            <p>15+ years experience in enterprise technology and business transformation.</p>
+                        </div>
+                        
+                        <div class="team-member">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ECTO%3C/text%3E%3C/svg%3E" alt="Portrait photo of Michael Chen">
+                            <h3>Michael Chen</h3>
+                            <div class="role">Chief Technology Officer</div>
+                            <p>Expert in cloud architecture and cybersecurity with 12+ years at Fortune 500 companies.</p>
+                        </div>
+                        
+                        <div class="team-member">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3ECOO%3C/text%3E%3C/svg%3E" alt="Portrait photo of David Rodriguez">
+                            <h3>David Rodriguez</h3>
+                            <div class="role">Chief Operating Officer</div>
+                            <p>Operations and project management specialist focused on delivering exceptional client experiences.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="section">
+                    <h2>Our Values</h2>
+                    <ul>
+                        <li><strong>Innovation:</strong> We continuously explore new technologies and methodologies</li>
+                        <li><strong>Reliability:</strong> Our solutions are built to last and perform under pressure</li>
+                        <li><strong>Partnership:</strong> We work alongside our clients as trusted advisors</li>
+                        <li><strong>Excellence:</strong> We maintain the highest standards in everything we do</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="support/help.html">Help</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+            </nav>
+            <p>&copy; 2024 TechCorp Solutions. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

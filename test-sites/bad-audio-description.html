@@ -1,0 +1,75 @@
+<!-- WCAG-TEST
+criterion: 1.2.5
+level: AA
+title: Audio Description (Prerecorded)
+test_type: bad
+expected_violations: 4
+testable_by: regex
+scanners: media-alternatives
+description: Prerecorded video content lacking audio descriptions for visual-only information
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad: Audio Description (Prerecorded) - WCAG 1.2.5</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; background: #f5f5f5; color: #333; }
+        h1 { color: #1a1a1a; }
+        .video-section { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; max-width: 800px; }
+        .video-section h2 { margin-top: 0; }
+        .video-placeholder { background: #1a1a2e; color: #eee; height: 300px; display: flex; align-items: center; justify-content: center; border-radius: 4px; text-align: center; padding: 1rem; }
+        .controls { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+        .controls button { padding: 0.4rem 1rem; border: 1px solid #999; background: #eee; border-radius: 4px; cursor: pointer; }
+        .description { font-size: 0.9rem; color: #555; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <h1>Training &amp; Education Videos</h1>
+    <p>Browse our library of instructional content.</p>
+
+    <!-- Violation 1: Tutorial video with on-screen visual demos, no audio description -->
+    <div class="video-section">
+        <h2>Software Installation Tutorial</h2>
+        <video width="100%" height="300" controls>
+            <source src="install-tutorial.mp4" type="video/mp4">
+            <track kind="captions" src="install-captions.vtt" srclang="en" label="English">
+            <!-- No <track kind="descriptions"> for visual content like mouse movements, menu clicks, dialog boxes -->
+        </video>
+        <p class="description">This video shows step-by-step how to install and configure the software. The narrator says "click here" and "as you can see" without describing what is shown on screen.</p>
+    </div>
+
+    <!-- Violation 2: Chart/graph presentation video with no audio description of visual data -->
+    <div class="video-section">
+        <h2>Q1 2026 Revenue Analysis</h2>
+        <video width="100%" height="300" controls>
+            <source src="revenue-analysis.mp4" type="video/mp4">
+            <track kind="captions" src="revenue-captions.vtt" srclang="en" label="English">
+            <!-- No audio description track - charts, graphs, and on-screen numbers are never described -->
+        </video>
+        <p class="description">The presenter references bar charts, pie charts, and trend lines on screen. The audio only says "as you can see from the chart" and "these numbers speak for themselves" without stating actual values or describing visual data.</p>
+    </div>
+
+    <!-- Violation 3: Safety training with visual-only demonstrations -->
+    <div class="video-section">
+        <h2>Workplace Safety: Fire Extinguisher Training</h2>
+        <video width="100%" height="300" controls>
+            <source src="fire-safety.mp4" type="video/mp4">
+            <!-- No captions AND no audio description - visual demo of extinguisher technique without narration -->
+        </video>
+        <p class="description">This training video demonstrates the PASS technique (Pull, Aim, Squeeze, Sweep) using only visual demonstration. The instructor silently performs each step on camera without verbal explanation or audio description.</p>
+    </div>
+
+    <!-- Violation 4: Documentary with significant visual storytelling -->
+    <div class="video-section">
+        <h2>Company History Documentary</h2>
+        <video width="100%" height="300" controls>
+            <source src="company-history.mp4" type="video/mp4">
+            <track kind="captions" src="history-captions.vtt" srclang="en" label="English">
+            <!-- Historical photos, building shots, product images shown without description -->
+        </video>
+        <p class="description">Features archival photographs, product evolution montages, and building construction timelapses with background music. Visual content conveys key narrative information not available in the audio track.</p>
+    </div>
+</body>
+</html>

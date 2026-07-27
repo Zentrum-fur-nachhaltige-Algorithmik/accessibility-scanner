@@ -1,0 +1,325 @@
+<!-- WCAG-TEST
+criterion: 2.5.8
+level: AA
+title: Target Size (Minimum)
+test_type: bad
+expected_violations: 5
+testable_by: dom
+scanners: target-size
+description: Interactive targets smaller than 24x24 CSS pixels
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Target Size Minimum - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* VIOLATION 1: Tiny icon buttons */
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 0;
+            margin: 2px;
+        }
+
+        /* VIOLATION 2: Small inline links with tight spacing */
+        .tag-cloud a {
+            display: inline-block;
+            font-size: 11px;
+            padding: 1px 4px;
+            margin: 1px;
+            background: #e8eaf6;
+            color: #283593;
+            text-decoration: none;
+            border-radius: 2px;
+            line-height: 1.1;
+            /* Results in targets well under 24x24px */
+        }
+
+        /* VIOLATION 3: Tiny checkboxes and radio buttons */
+        .small-checkbox {
+            width: 12px;
+            height: 12px;
+            margin: 0;
+            cursor: pointer;
+        }
+        .small-radio {
+            width: 12px;
+            height: 12px;
+            margin: 0;
+            cursor: pointer;
+        }
+        .filter-list label {
+            display: block;
+            font-size: 12px;
+            margin: 2px 0;
+            cursor: pointer;
+        }
+
+        /* VIOLATION 4: Undersized action buttons */
+        .tiny-action-btn {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            line-height: 1;
+            /* Total size approximately 18x14px */
+        }
+
+        /* VIOLATION 5: Small close/dismiss buttons */
+        .close-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            background: transparent;
+            border: 1px solid #999;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 8px;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .notification {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff3e0;
+            border: 1px solid #ffb74d;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 4px;
+        }
+        .notification span {
+            font-size: 14px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 2px;
+            padding: 5px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            font-size: 13px;
+            text-align: left;
+        }
+        .data-table th {
+            background: #f5f5f5;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 2px;
+            margin: 10px 0;
+        }
+        .pagination a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            text-decoration: none;
+            background: #e3f2fd;
+            color: #1565c0;
+            border-radius: 2px;
+        }
+        .pagination a.active {
+            background: #1565c0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dashboard</h1>
+
+    <!-- VIOLATION 1: Tiny icon buttons in toolbar -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 1: Icon Buttons at 16x16px</div>
+        <p>Toolbar buttons are only 16x16 pixels, far below the 24x24 minimum.</p>
+    </div>
+
+    <h2>Text Editor</h2>
+    <div class="toolbar">
+        <button class="icon-btn" title="Bold"><b>B</b></button>
+        <button class="icon-btn" title="Italic"><i>I</i></button>
+        <button class="icon-btn" title="Underline"><u>U</u></button>
+        <button class="icon-btn" title="Strikethrough"><s>S</s></button>
+        <button class="icon-btn" title="Link">&#128279;</button>
+        <button class="icon-btn" title="Image">&#128247;</button>
+        <button class="icon-btn" title="List">&#8801;</button>
+        <button class="icon-btn" title="Code">&lt;/&gt;</button>
+    </div>
+
+    <!-- VIOLATION 2: Small inline tag links -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 2: Tiny Inline Links with No Spacing</div>
+        <p>Tag links are approximately 14x14px with 1px margin, making them difficult to tap.</p>
+    </div>
+
+    <h2>Popular Tags</h2>
+    <div class="tag-cloud">
+        <a href="#js">JavaScript</a>
+        <a href="#py">Python</a>
+        <a href="#rs">Rust</a>
+        <a href="#go">Go</a>
+        <a href="#ts">TypeScript</a>
+        <a href="#rb">Ruby</a>
+        <a href="#java">Java</a>
+        <a href="#cpp">C++</a>
+        <a href="#swift">Swift</a>
+        <a href="#kotlin">Kotlin</a>
+        <a href="#php">PHP</a>
+        <a href="#scala">Scala</a>
+        <a href="#dart">Dart</a>
+        <a href="#elixir">Elixir</a>
+    </div>
+
+    <!-- VIOLATION 3: Small checkboxes -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 3: 12x12px Checkboxes and Radios</div>
+        <p>Custom-sized checkboxes and radio buttons at 12x12 pixels with minimal label spacing.</p>
+    </div>
+
+    <h2>Filter Options</h2>
+    <div class="filter-list">
+        <label><input type="checkbox" class="small-checkbox"> Active</label>
+        <label><input type="checkbox" class="small-checkbox"> Pending</label>
+        <label><input type="checkbox" class="small-checkbox"> Closed</label>
+        <label><input type="checkbox" class="small-checkbox"> Archived</label>
+    </div>
+    <h3>Sort By</h3>
+    <div class="filter-list">
+        <label><input type="radio" name="sort" class="small-radio"> Date</label>
+        <label><input type="radio" name="sort" class="small-radio"> Name</label>
+        <label><input type="radio" name="sort" class="small-radio"> Priority</label>
+    </div>
+
+    <!-- VIOLATION 4: Tiny action buttons in table -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 4: Undersized Action Buttons</div>
+        <p>Action buttons in the table are approximately 18x14px with minimal padding.</p>
+    </div>
+
+    <h2>User Management</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Alice Johnson</td>
+                <td>alice@example.com</td>
+                <td>Admin</td>
+                <td>
+                    <button class="tiny-action-btn">Edit</button>
+                    <button class="tiny-action-btn">Del</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Bob Smith</td>
+                <td>bob@example.com</td>
+                <td>User</td>
+                <td>
+                    <button class="tiny-action-btn">Edit</button>
+                    <button class="tiny-action-btn">Del</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Carol Lee</td>
+                <td>carol@example.com</td>
+                <td>Moderator</td>
+                <td>
+                    <button class="tiny-action-btn">Edit</button>
+                    <button class="tiny-action-btn">Del</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Also includes undersized pagination -->
+    <nav aria-label="Pagination">
+        <div class="pagination">
+            <a href="#p1" class="active">1</a>
+            <a href="#p2">2</a>
+            <a href="#p3">3</a>
+            <a href="#p4">4</a>
+            <a href="#p5">5</a>
+        </div>
+    </nav>
+
+    <!-- VIOLATION 5: Tiny close buttons on notifications -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 5: 14x14px Close Buttons</div>
+        <p>Notification dismiss buttons are only 14x14 pixels.</p>
+    </div>
+
+    <h2>Notifications</h2>
+    <div class="notification">
+        <span>Your profile was updated successfully.</span>
+        <button class="close-btn" aria-label="Dismiss">&times;</button>
+    </div>
+    <div class="notification">
+        <span>New comment on your post.</span>
+        <button class="close-btn" aria-label="Dismiss">&times;</button>
+    </div>
+    <div class="notification">
+        <span>Server maintenance scheduled for tonight.</span>
+        <button class="close-btn" aria-label="Dismiss">&times;</button>
+    </div>
+
+</body>
+</html>

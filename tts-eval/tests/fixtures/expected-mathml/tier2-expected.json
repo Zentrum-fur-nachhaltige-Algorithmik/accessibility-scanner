@@ -1,0 +1,9 @@
+{
+  "formulas": [
+    { "latex": "\\frac{a}{b}", "shouldConvert": true, "tier": 2 },
+    { "latex": "\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}", "shouldConvert": true, "tier": 2 },
+    { "latex": "\\int_0^1 x^2 \\, dx = \\frac{1}{3}", "shouldConvert": true, "tier": 2 },
+    { "latex": "\\frac{d}{dx} \\left( x^n \\right) = nx^{n-1}", "shouldConvert": true, "tier": 2 },
+    { "latex": "\\prod_{k=1}^{n} k = n!", "shouldConvert": true, "tier": 2 }
+  ]
+}

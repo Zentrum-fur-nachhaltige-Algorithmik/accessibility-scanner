@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sales Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #1b2a4a;
+      --focus-color: #1b2a4a;
+      --link-color: #0056b3;
+      --link-underline: underline;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    a {
+      color: var(--link-color);
+      text-decoration: var(--link-underline);
+    }
+
+    a:hover {
+      text-decoration: underline;
+      color: #003d82;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus-color);
+      outline-offset: 2px;
+    }
+
+    /* Disable default bootstrap focus outline for elements we handle */
+    button:focus,
+    a:focus {
+      outline: none;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--focus-color);
+      outline-offset: 2px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--primary-color);
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 100;
+    }
+
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid white;
+      outline-offset: 2px;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1.5rem 0;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    main {
+      padding: 0 1rem;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 0.5rem 0;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0;
+    }
+
+    .stat-change {
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    .stat-change.positive {
+      color: #28a745;
+    }
+
+    .stat-change.negative {
+      color: #dc3545;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    caption {
+      caption-side: top;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    thead th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    thead th button {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    thead th button:hover,
+    thead th button:focus-visible {
+      text-decoration: underline;
+    }
+
+    tbody td {
+      padding: 1rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    tbody tr:focus-within {
+      background-color: #e7f3ff;
+    }
+
+    .sort-indicator {
+      margin-left: 0.5rem;
+      font-size: 0.75rem;
+      display: inline-block;
+      width: 1rem;
+      text-align: center;
+    }
+
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    [role="dialog"] {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1050;
+    }
+
+    [role="dialog"] h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary-color);
+    }
+
+    .dialog-close-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+      padding: 0.25rem 0.75rem;
+    }
+
+    .dialog-close-button:hover,
+    .dialog-close-button:focus-visible {
+      color: var(--primary-color);
+    }
+
+    .dialog-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .dialog-field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .dialog-field p {
+      margin: 0;
+      color: #555;
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .dialog-actions button {
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #0f1a2f;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+
+    .btn-view {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .btn-view:hover {
+      background-color: #0f1a2f;
+    }
+
+    nav[aria-label="Pagination"] {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    nav[aria-label="Pagination"] ul {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      gap: 0.5rem;
+    }
+
+    nav[aria-label="Pagination"] a {
+      display: inline-block;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--link-color);
+      min-width: 2.5rem;
+      text-align: center;
+    }
+
+    nav[aria-label="Pagination"] a:hover {
+      background-color: #f8f9fa;
+      border-color: var(--link-color);
+    }
+
+    nav[aria-label="Pagination"] a[aria-current="page"] {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .live-region {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    .backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+    }
+
+    .backdrop.visible {
+      display: block;
+    }
+
+    [role="dialog"].hidden {
+      display: none;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      padding: 2rem 1rem;
+      margin-top: 3rem;
+      border-top: 1px solid #dee2e6;
+      color: #666;
+      font-size: 0.875rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stat-card {
+        margin-bottom: 1rem;
+      }
+
+      tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      thead th {
+        padding: 0.75rem 0.5rem;
+      }
+
+      .btn-view {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+
+      [role="dialog"] {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header role="banner">
+    <div class="container-fluid">
+      <h1>Sales Dashboard</h1>
+      <p class="mt-2 mb-0" style="color: rgba(255, 255, 255, 0.8); font-size: 0.95rem;">
+        Q1 2026 Performance Overview
+      </p>
+    </div>
+  </header>
+
+  <main id="main-content" class="container-fluid">
+    <!-- Summary Statistics Section -->
+    <section aria-label="Summary Statistics">
+      <h2 class="visually-hidden">Key Metrics Summary</h2>
+      <div class="row">
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card">
+            <p class="stat-label">Total Revenue</p>
+            <p class="stat-value">$1,245,320</p>
+            <p class="stat-change positive" aria-label="increase of 12.5 percent">▲ +12.5%</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card">
+            <p class="stat-label">Active Customers</p>
+            <p class="stat-value">8,432</p>
+            <p class="stat-change positive" aria-label="increase of 8.2 percent">▲ +8.2%</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card">
+            <p class="stat-label">Conversion Rate</p>
+            <p class="stat-value">4.82%</p>
+            <p class="stat-change negative" aria-label="decrease of 1.1 percent">▼ -1.1%</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card">
+            <p class="stat-label">Avg Order Value</p>
+            <p class="stat-value">$287.50</p>
+            <p class="stat-change positive" aria-label="increase of 5.3 percent">▲ +5.3%</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Region for announcements -->
+    <div role="status" aria-live="polite" aria-atomic="true" class="live-region" id="sort-status"></div>
+
+    <!-- Data Table Section -->
+    <section aria-label="Sales Data">
+      <h2 class="mb-3 mt-4" style="font-size: 1.25rem; color: #1b2a4a;">Recent Sales</h2>
+
+      <table>
+        <caption>Recent sales transactions — page 1 of 3</caption>
+        <thead>
+          <tr>
+            <th scope="col" aria-sort="none">
+              <button type="button" onclick="sortTable(this, 'customer')">
+                Customer
+                <span class="sort-indicator" aria-hidden="true">↕</span>
+              </button>
+            </th>
+            <th scope="col" aria-sort="none">
+              <button type="button" onclick="sortTable(this, 'product')">
+                Product
+                <span class="sort-indicator" aria-hidden="true">↕</span>
+              </button>
+            </th>
+            <th scope="col" aria-sort="descending">
+              <button type="button" onclick="sortTable(this, 'amount')">
+                Amount
+                <span class="sort-indicator" aria-hidden="true">▼</span>
+              </button>
+            </th>
+            <th scope="col" aria-sort="none">
+              <button type="button" onclick="sortTable(this, 'date')">
+                Date
+                <span class="sort-indicator" aria-hidden="true">↕</span>
+              </button>
+            </th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sarah Mitchell</td>
+            <td>Premium Analytics Suite</td>
+            <td>$450.00</td>
+            <td>2026-03-28</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'Sarah Mitchell', 'Premium Analytics Suite', '$450.00', '2026-03-28', 'Status: Completed')" aria-label="View details for Sarah Mitchell, Premium Analytics Suite">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>James Cooper</td>
+            <td>Enterprise Support Plan</td>
+            <td>$1,200.00</td>
+            <td>2026-03-27</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'James Cooper', 'Enterprise Support Plan', '$1,200.00', '2026-03-27', 'Status: Processing')" aria-label="View details for James Cooper, Enterprise Support Plan">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Emily Rodriguez</td>
+            <td>Starter Package</td>
+            <td>$99.99</td>
+            <td>2026-03-26</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'Emily Rodriguez', 'Starter Package', '$99.99', '2026-03-26', 'Status: Completed')" aria-label="View details for Emily Rodriguez, Starter Package">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Michael Chen</td>
+            <td>Professional Toolkit</td>
+            <td>$599.00</td>
+            <td>2026-03-25</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'Michael Chen', 'Professional Toolkit', '$599.00', '2026-03-25', 'Status: Completed')" aria-label="View details for Michael Chen, Professional Toolkit">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Jessica Walker</td>
+            <td>Team Collaboration Bundle</td>
+            <td>$350.00</td>
+            <td>2026-03-24</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'Jessica Walker', 'Team Collaboration Bundle', '$350.00', '2026-03-24', 'Status: Completed')" aria-label="View details for Jessica Walker, Team Collaboration Bundle">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>David Anderson</td>
+            <td>API Access License</td>
+            <td>$250.00</td>
+            <td>2026-03-23</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'David Anderson', 'API Access License', '$250.00', '2026-03-23', 'Status: Pending')" aria-label="View details for David Anderson, API Access License">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Amanda Thompson</td>
+            <td>Custom Integration Service</td>
+            <td>$2,500.00</td>
+            <td>2026-03-22</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'Amanda Thompson', 'Custom Integration Service', '$2,500.00', '2026-03-22', 'Status: In Progress')" aria-label="View details for Amanda Thompson, Custom Integration Service">
+                View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Robert Martinez</td>
+            <td>Premium Analytics Suite</td>
+            <td>$450.00</td>
+            <td>2026-03-21</td>
+            <td>
+              <button type="button" class="btn-view" onclick="openDetailsDialog(this, 'Robert Martinez', 'Premium Analytics Suite', '$450.00', '2026-03-21', 'Status: Completed')" aria-label="View details for Robert Martinez, Premium Analytics Suite">
+                View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination Controls -->
+      <nav aria-label="Pagination">
+        <ul>
+          <li><a href="#" onclick="goToPage(event, 1)" aria-label="Go to page 1">1</a></li>
+          <li><a href="#" onclick="goToPage(event, 2)" aria-current="page" aria-label="Page 2, current page">2</a></li>
+          <li><a href="#" onclick="goToPage(event, 3)" aria-label="Go to page 3">3</a></li>
+          <li><a href="#" onclick="goToPage(event, 3)" aria-label="Next page">Next →</a></li>
+        </ul>
+      </nav>
+    </section>
+
+    <!-- Details Modal -->
+    <div class="backdrop" id="modal-backdrop"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="dialog-title" id="details-dialog" class="hidden">
+      <button type="button" class="dialog-close-button" onclick="closeDetailsDialog()" aria-label="Close details dialog">
+        ✕
+      </button>
+      <h2 id="dialog-title">Transaction Details</h2>
+      <div class="dialog-field">
+        <label>Customer</label>
+        <p id="detail-customer">—</p>
+      </div>
+      <div class="dialog-field">
+        <label>Product</label>
+        <p id="detail-product">—</p>
+      </div>
+      <div class="dialog-field">
+        <label>Amount</label>
+        <p id="detail-amount">—</p>
+      </div>
+      <div class="dialog-field">
+        <label>Date</label>
+        <p id="detail-date">—</p>
+      </div>
+      <div class="dialog-field">
+        <label>Status</label>
+        <p id="detail-status">—</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-secondary" onclick="closeDetailsDialog()">Close</button>
+        <button type="button" class="btn-primary" onclick="handleExportDialog()">Export as PDF</button>
+      </div>
+    </div>
+  </main>
+
+  <footer role="contentinfo">
+    <div class="container-fluid">
+      <p>&copy; 2026 Sales Analytics Platform. All rights reserved.</p>
+      <p>
+        <a href="#main-content">Back to top</a> |
+        <a href="#">Privacy Policy</a> |
+        <a href="#">Contact Support</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Dialog state
+    let currentTriggerElement = null;
+
+    // Open details dialog
+    function openDetailsDialog(triggerButton, customer, product, amount, date, status) {
+      const dialog = document.getElementById('details-dialog');
+      const backdrop = document.getElementById('modal-backdrop');
+
+      // Store the trigger element for focus management
+      currentTriggerElement = triggerButton;
+
+      // Populate dialog content
+      document.getElementById('detail-customer').textContent = customer;
+      document.getElementById('detail-product').textContent = product;
+      document.getElementById('detail-amount').textContent = amount;
+      document.getElementById('detail-date').textContent = date;
+      document.getElementById('detail-status').textContent = status;
+
+      // Show dialog and backdrop
+      dialog.classList.remove('hidden');
+      backdrop.classList.add('visible');
+
+      // Focus first focusable element in dialog
+      const firstFocusable = dialog.querySelector('button, [href], input, select, textarea');
+      if (firstFocusable) {
+        setTimeout(() => firstFocusable.focus(), 0);
+      }
+
+      // Add escape and focus trap listeners
+      dialog.addEventListener('keydown', handleDialogKeydown);
+    }
+
+    // Close details dialog
+    function closeDetailsDialog() {
+      const dialog = document.getElementById('details-dialog');
+      const backdrop = document.getElementById('modal-backdrop');
+
+      dialog.classList.add('hidden');
+      backdrop.classList.remove('visible');
+      dialog.removeEventListener('keydown', handleDialogKeydown);
+
+      // Return focus to trigger element
+      if (currentTriggerElement) {
+        currentTriggerElement.focus();
+      }
+    }
+
+    // Handle dialog keyboard interactions
+    function handleDialogKeydown(e) {
+      if (e.key === 'Escape') {
+        closeDetailsDialog();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const dialog = e.currentTarget;
+      const focusable = [...dialog.querySelectorAll(
+        'button, [href], input, select, textarea'
+      )];
+
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const activeElement = document.activeElement;
+
+      if (e.shiftKey && activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    // Handle export action
+    function handleExportDialog() {
+      const customer = document.getElementById('detail-customer').textContent;
+      const statusRegion = document.getElementById('sort-status');
+      statusRegion.textContent = `PDF export initiated for ${customer}. Download will begin shortly.`;
+      setTimeout(() => {
+        statusRegion.textContent = '';
+      }, 5000);
+    }
+
+    // Sort table
+    function sortTable(button, column) {
+      const header = button.parentElement;
+      const currentSort = header.getAttribute('aria-sort');
+      let newSort = 'ascending';
+
+      // Determine new sort direction
+      if (currentSort === 'ascending') {
+        newSort = 'descending';
+      } else if (currentSort === 'descending') {
+        newSort = 'none';
+      }
+
+      // Reset all other headers
+      const allHeaders = document.querySelectorAll('thead th');
+      allHeaders.forEach(th => {
+        if (th !== header) {
+          th.setAttribute('aria-sort', 'none');
+          const indicator = th.querySelector('.sort-indicator');
+          if (indicator) indicator.textContent = '↕';
+        }
+      });
+
+      // Update current header
+      header.setAttribute('aria-sort', newSort);
+      const indicator = header.querySelector('.sort-indicator');
+      if (indicator) {
+        if (newSort === 'ascending') {
+          indicator.textContent = '▲';
+        } else if (newSort === 'descending') {
+          indicator.textContent = '▼';
+        } else {
+          indicator.textContent = '↕';
+        }
+      }
+
+      // Announce sort change
+      const statusRegion = document.getElementById('sort-status');
+      if (newSort === 'none') {
+        statusRegion.textContent = `Sorting cleared for ${column} column`;
+      } else {
+        statusRegion.textContent = `Table sorted by ${column}, ${newSort}`;
+      }
+    }
+
+    // Navigate pagination
+    function goToPage(event, pageNumber) {
+      event.preventDefault();
+
+      // Update current page indicator
+      const links = document.querySelectorAll('nav[aria-label="Pagination"] a');
+      links.forEach(link => {
+        if (link.getAttribute('aria-current') === 'page') {
+          link.removeAttribute('aria-current');
+          link.setAttribute('aria-label', `Go to page ${link.textContent.trim()}`);
+        }
+      });
+
+      // Update clicked link
+      const currentLink = event.target;
+      if (currentLink.textContent.trim() === pageNumber.toString()) {
+        currentLink.setAttribute('aria-current', 'page');
+        currentLink.setAttribute('aria-label', `Page ${pageNumber}, current page`);
+
+        // Announce page change
+        const statusRegion = document.getElementById('sort-status');
+        statusRegion.textContent = `Navigated to page ${pageNumber}`;
+      }
+    }
+
+    // Prevent default backdrop click if needed (optional enhancement)
+    document.getElementById('modal-backdrop').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDetailsDialog();
+      }
+    });
+  </script>
+</body>
+</html>

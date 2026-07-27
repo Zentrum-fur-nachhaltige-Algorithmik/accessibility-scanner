@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - TechCorp Solutions</title>
+    <!-- Strict CSP Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none';">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Header styles */
+        .site-header {
+            background: #1a365d;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .main-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .main-nav a:hover,
+        .main-nav a:focus {
+            background-color: #2d3748;
+            outline: 2px solid #63b3ed;
+        }
+        
+        /* Page header */
+        .page-header {
+            background: #f7fafc;
+            padding: 3rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .page-header h1 {
+            color: #1a365d;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb a {
+            color: #4a5568;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Content */
+        .content {
+            padding: 3rem 0;
+        }
+        
+        .faq-layout {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 3rem;
+        }
+        
+        /* Category sidebar */
+        .faq-categories {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+        
+        .faq-categories h3 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .category-list {
+            list-style: none;
+        }
+        
+        .category-list li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .category-list a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            display: block;
+            transition: color 0.3s;
+        }
+        
+        .category-list a:hover,
+        .category-list a:focus {
+            color: #3182ce;
+            text-decoration: underline;
+        }
+        
+        .category-list a.active {
+            color: #3182ce;
+            font-weight: 600;
+        }
+        
+        /* FAQ sections */
+        .faq-main h2 {
+            color: #1a365d;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        
+        .faq-section {
+            margin-bottom: 3rem;
+        }
+        
+        .faq-section h3 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .faq-list {
+            margin-top: 1rem;
+        }
+        
+        .faq-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            background: #f7fafc;
+            padding: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .faq-question::after {
+            content: "+";
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #3182ce;
+        }
+        
+        .faq-question:hover {
+            background: #edf2f7;
+        }
+        
+        .faq-answer {
+            padding: 1.5rem;
+            background: white;
+        }
+        
+        .faq-answer ul, .faq-answer ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        .faq-answer li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Search functionality */
+        .faq-search {
+            margin-bottom: 2rem;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+        
+        /* Accessibility issues for testing */
+        .warning-box {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            color: #2d3748;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .warning-box.bad-color {
+            color: #fed7d7; /* Very poor contrast */
+        }
+        
+        /* Missing focus indicators */
+        .bad-link {
+            color: #3182ce;
+            text-decoration: none;
+        }
+        
+        .bad-link:focus {
+            outline: none; /* Intentional accessibility issue */
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-nav {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-nav a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-nav a:hover,
+        .footer-nav a:focus {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 999;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .faq-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="container">
+            <div class="header-content">
+                <a href="../index.html" class="logo" aria-label="TechCorp Solutions Homepage">TechCorp Solutions</a>
+                
+                <!-- Main Navigation -->
+                <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../about.html">About</a></li>
+                        <li><a href="../products/index.html">Products</a></li>
+                        <li><a href="help.html">Support</a></li>
+                        <li><a href="../contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="../index.html">Home</a> &gt; 
+                <a href="help.html">Support</a> &gt; 
+                FAQ
+            </nav>
+            <h1>Frequently Asked Questions</h1>
+            <p>Find quick answers to the most common questions about our products and services.</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <div class="content">
+            <div class="container">
+                <div class="faq-layout">
+                    <!-- FAQ Categories Sidebar -->
+                    <aside class="faq-categories">
+                        <h3>FAQ Categories</h3>
+                        <ul class="category-list">
+                            <li><a href="#general" class="active">General Questions</a></li>
+                            <li><a href="#products">Product Information</a></li>
+                            <li><a href="#billing">Billing & Payments</a></li>
+                            <li><a href="#technical">Technical Support</a></li>
+                            <li><a href="#security">Security & Privacy</a></li>
+                            <li><a href="#implementation">Implementation</a></li>
+                        </ul>
+                        
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+                            <h4>Still Need Help?</h4>
+                            <p style="margin: 1rem 0; font-size: 0.9rem;">Can't find the answer you're looking for?</p>
+                            <!-- Intentional accessibility issue: link without focus indicator -->
+                            <a href="../contact.html" class="bad-link">Contact our support team</a>
+                        </div>
+                    </aside>
+                    
+                    <!-- FAQ Main Content -->
+                    <div class="faq-main">
+                        <!-- Search -->
+                        <div class="faq-search">
+                            <div class="search-box">
+                                <span class="search-icon">🔍</span>
+                                <input type="search" placeholder="Search FAQ..." aria-label="Search frequently asked questions">
+                            </div>
+                        </div>
+                        
+                        <h2>Frequently Asked Questions</h2>
+                        
+                        <!-- Intentional accessibility issue: poor contrast warning -->
+                        <div class="warning-box bad-color">
+                            <strong>Notice:</strong> This FAQ section is updated regularly. Last updated: Today
+                        </div>
+                        
+                        <!-- General Questions -->
+                        <section class="faq-section" id="general">
+                            <h3>General Questions</h3>
+                            <div class="faq-list">
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        What is TechCorp Solutions?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>TechCorp Solutions is a leading technology consulting company that provides enterprise-grade cloud migration, cybersecurity, and software development services. Founded in 2009, we've helped over 500 organizations transform their technology infrastructure and achieve their digital transformation goals.</p>
+                                        <p>Our services include:</p>
+                                        <ul>
+                                            <li>Cloud migration and management</li>
+                                            <li>Cybersecurity solutions</li>
+                                            <li>Custom software development</li>
+                                            <li>Data analytics and business intelligence</li>
+                                            <li>Technology consulting and strategy</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        How do I get started with TechCorp?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>Getting started with TechCorp is simple:</p>
+                                        <ol>
+                                            <li><strong>Initial Consultation:</strong> Schedule a free 60-minute consultation to discuss your needs</li>
+                                            <li><strong>Assessment:</strong> Our team conducts a comprehensive assessment of your current infrastructure</li>
+                                            <li><strong>Proposal:</strong> We provide a detailed proposal with timelines and pricing</li>
+                                            <li><strong>Implementation:</strong> Upon approval, we begin implementation with minimal disruption to your operations</li>
+                                        </ol>
+                                        <p>Contact our sales team at +1 (555) 123-4567 or email sales@techcorp.com to schedule your consultation.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        What industries do you serve?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>We serve clients across various industries including:</p>
+                                        <ul>
+                                            <li><strong>Healthcare:</strong> HIPAA-compliant solutions and patient data management</li>
+                                            <li><strong>Financial Services:</strong> Banking, insurance, and fintech solutions</li>
+                                            <li><strong>Government:</strong> Federal, state, and local government agencies</li>
+                                            <li><strong>Education:</strong> Universities, school districts, and educational technology</li>
+                                            <li><strong>Manufacturing:</strong> Industrial IoT, supply chain, and production systems</li>
+                                            <li><strong>Retail & E-commerce:</strong> Customer experience and inventory management</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Product Information -->
+                        <section class="faq-section" id="products">
+                            <h3>Product Information</h3>
+                            <div class="faq-list">
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        What's included in CloudMigrate Pro?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>CloudMigrate Pro includes:</p>
+                                        <ul>
+                                            <li>Automated infrastructure assessment and discovery</li>
+                                            <li>Migration planning and strategy development</li>
+                                            <li>Zero-downtime migration execution</li>
+                                            <li>Cost optimization recommendations</li>
+                                            <li>Security and compliance auditing</li>
+                                            <li>24/7 migration support during the process</li>
+                                            <li>Post-migration optimization and monitoring</li>
+                                            <li>Documentation and knowledge transfer</li>
+                                        </ul>
+                                        <p>The service starts at $5,000/month for basic infrastructure, with custom pricing for enterprise deployments.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        How does SecureShield Enterprise protect against ransomware?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>SecureShield Enterprise uses multiple layers of protection against ransomware:</p>
+                                        <ul>
+                                            <li><strong>Behavioral Analysis:</strong> AI monitors file system behavior to detect encryption activities</li>
+                                            <li><strong>Real-time Blocking:</strong> Automatically quarantines suspicious processes and files</li>
+                                            <li><strong>Backup Protection:</strong> Immutable backups that can't be encrypted by ransomware</li>
+                                            <li><strong>Network Segmentation:</strong> Prevents lateral movement across your network</li>
+                                            <li><strong>Email Security:</strong> Advanced phishing protection to prevent initial infection</li>
+                                            <li><strong>Incident Response:</strong> 24/7 security team ready to respond to active threats</li>
+                                        </ul>
+                                        <p>Our platform has a 99.8% success rate in preventing ransomware attacks from causing data loss.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Billing & Payments -->
+                        <section class="faq-section" id="billing">
+                            <h3>Billing & Payments</h3>
+                            <div class="faq-list">
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        What payment methods do you accept?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>We accept the following payment methods:</p>
+                                        <ul>
+                                            <li>Corporate credit cards (Visa, MasterCard, American Express)</li>
+                                            <li>ACH bank transfers (US customers)</li>
+                                            <li>Wire transfers (international customers)</li>
+                                            <li>Purchase orders (for established customers)</li>
+                                        </ul>
+                                        <p>All payments are processed securely through our PCI-compliant payment system.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        Can I get a refund if I'm not satisfied?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>Yes, we offer a satisfaction guarantee:</p>
+                                        <ul>
+                                            <li><strong>30-day money-back guarantee</strong> for new customers</li>
+                                            <li><strong>Pro-rated refunds</strong> for annual subscriptions if cancelled within 90 days</li>
+                                            <li><strong>Service credits</strong> for any downtime exceeding our SLA commitments</li>
+                                        </ul>
+                                        <p>To request a refund, contact our billing team at billing@techcorp.com with your account details and reason for the refund request.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Technical Support -->
+                        <section class="faq-section" id="technical">
+                            <h3>Technical Support</h3>
+                            <div class="faq-list">
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        What are your support hours?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>Our support hours vary by service level:</p>
+                                        <ul>
+                                            <li><strong>Enterprise customers:</strong> 24/7/365 support via phone, email, and chat</li>
+                                            <li><strong>Professional customers:</strong> Business hours (6 AM - 6 PM PST) + emergency hotline</li>
+                                            <li><strong>Standard customers:</strong> Business hours support with email response within 24 hours</li>
+                                        </ul>
+                                        <p>Emergency support is always available for critical security incidents regardless of service level.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        How do I report a security incident?
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>For security incidents, contact us immediately:</p>
+                                        <ul>
+                                            <li><strong>Emergency Hotline:</strong> +1 (555) 999-HELP</li>
+                                            <li><strong>Security Email:</strong> security@techcorp.com</li>
+                                            <li><strong>Online Portal:</strong> Login to your dashboard and create a "Critical" ticket</li>
+                                        </ul>
+                                        <p>Our security operations center (SOC) monitors all channels 24/7 and will respond to critical incidents within 15 minutes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="help.html">Help</a>
+                <a href="../privacy.html">Privacy Policy</a>
+                <a href="../terms.html">Terms of Service</a>
+            </nav>
+            <p>&copy; 2024 TechCorp Solutions. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

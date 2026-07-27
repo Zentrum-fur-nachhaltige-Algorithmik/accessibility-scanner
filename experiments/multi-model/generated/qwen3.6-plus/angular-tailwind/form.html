@@ -3,325 +3,307 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Us — Acme Corp</title>
+  <meta name="description" content="Contact and registration form — reach out to our team or create an account.">
+  <title>Contact & Registration — Accessible Forms</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Skip link */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0;
+      margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
     .skip-link {
-      position: absolute;
-      top: -100%;
-      left: 0;
-      background: #1d4ed8;
-      color: #ffffff;
-      padding: 0.75rem 1.5rem;
-      z-index: 100;
-      font-weight: 600;
-      text-decoration: underline;
+      position: absolute; top: -100%; left: 0; padding: 0.75rem 1.5rem;
+      background: #1b2a4a; color: #fff; font-weight: 600; z-index: 100;
+      transition: top 0.2s;
     }
     .skip-link:focus {
       top: 0;
-      outline: 3px solid #0f172a;
-      outline-offset: 2px;
     }
-
-    /* Screen reader only */
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+    .error-message {
+      display: none;
     }
-
-    /* Focus indicators - works in High Contrast Mode */
+    .error-visible {
+      display: block;
+    }
+    .error-text {
+      color: #991b1b;
+    }
+    .success-text {
+      color: #065f46;
+    }
     :focus-visible {
-      outline: 3px solid #1d4ed8;
+      outline: 3px solid #1b2a4a;
       outline-offset: 2px;
     }
-
-    /* Custom focus for checkboxes/radios */
-    input[type="checkbox"]:focus-visible {
-      outline: 3px solid #1d4ed8;
-      outline-offset: 2px;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
-
-    /* Form error styles */
-    .input-error {
-      border-color: #b91c1c;
-    }
-    .input-error:focus-visible {
-      outline-color: #b91c1c;
-    }
-
-    /* Required indicator */
-    .required-star::after {
-      content: " *";
-      color: #b91c1c;
-    }
-
-    /* Smooth scroll padding for fixed header */
-    html {
-      scroll-padding-top: 80px;
-    }
-
-    /* High Contrast Mode support */
     @media (forced-colors: active) {
       :focus-visible {
         outline: 3px solid LinkText;
       }
     }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* Touch targets - minimum 44x44 */
-    .touch-target {
-      min-height: 44px;
-      min-width: 44px;
-    }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased">
-
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
   <!-- Skip Link -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Header -->
-  <header class="bg-white border-b border-gray-300 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <a href="/" class="text-xl font-bold text-gray-900 no-underline">Acme Corp</a>
-        <nav aria-label="Main navigation">
-          <ul class="flex gap-6">
-            <li><a href="/" class="text-gray-700 hover:text-gray-900 py-2 no-underline" style="color: #374151;">Home</a></li>
-            <li><a href="/products" class="text-gray-700 hover:text-gray-900 py-2 no-underline" style="color: #374151;">Products</a></li>
-            <li><a href="/contact" class="text-gray-900 font-semibold py-2 no-underline" aria-current="page">Contact</a></li>
-          </ul>
-        </nav>
-      </div>
+  <header class="bg-white border-b border-gray-300">
+    <div class="max-w-4xl mx-auto px-4 py-4">
+      <nav aria-label="Main navigation">
+        <ul class="flex gap-6 text-base">
+          <li><a href="/home" class="text-gray-800 hover:underline focus:underline">Home</a></li>
+          <li><a href="/products" class="text-gray-800 hover:underline focus:underline">Products</a></li>
+          <li><a href="/contact" aria-current="page" class="text-gray-800 underline font-semibold">Contact</a></li>
+          <li><a href="/about" class="text-gray-800 hover:underline focus:underline">About</a></li>
+        </ul>
+      </nav>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main id="main-content" tabindex="-1" class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-    
-    <!-- Page Title -->
-    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4" style="color: #111827;">Contact Us</h1>
-    <p class="text-lg text-gray-700 mb-8" style="color: #374151;">Fill out the form below and our team will get back to you within 2 business days.</p>
+  <!-- Main -->
+  <main id="main-content" tabindex="-1" class="flex-1">
+    <div class="max-w-3xl mx-auto px-4 py-8 md:py-12">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Contact & Registration</h1>
+      <p class="text-gray-700 mb-8">Fill out the form below to create an account or send us a message. Fields marked with <span aria-hidden="true">*</span> are required. We will respond within 2 business days.</p>
 
-    <!-- Success Message (hidden by default) -->
-    <div id="form-success" role="status" aria-live="polite" class="hidden mb-8 p-6 bg-green-50 border-2 border-green-700 rounded-lg" style="background-color: #d1fae5; border-color: #065f46;">
-      <div class="flex items-start gap-3">
-        <span aria-hidden="true" class="text-2xl">✓</span>
-        <div>
-          <h2 class="text-lg font-semibold text-green-900 mb-1" style="color: #065f46; display: block;">Message Sent Successfully</h2>
-          <p class="text-green-800" style="color: #065f46;">Thank you for contacting us. We have received your message and will respond shortly. A confirmation has been sent to your email.</p>
+      <!-- Error Summary (shown after validation fails) -->
+      <div role="alert" tabindex="-1" id="error-summary" class="hidden bg-red-50 border-2 border-red-700 rounded-lg p-4 mb-6" aria-live="off">
+        <h2 class="text-lg font-semibold text-red-800 mb-2">
+          <span aria-hidden="true">&#9888;</span> Please correct <span id="error-count">0</span> error<span id="error-plural">s</span> below:
+        </h2>
+        <ul id="error-list" class="space-y-1 list-disc list-inside text-red-800 text-sm">
+        </ul>
+      </div>
+
+      <!-- Success Message (shown after successful submission) -->
+      <div id="success-message" class="hidden bg-green-50 border-2 border-green-700 rounded-lg p-4 mb-6" role="status" aria-live="polite">
+        <p class="text-lg font-semibold text-green-800 mb-1">
+          <span aria-hidden="true">&#10003;</span> Your form was submitted successfully!
+        </p>
+        <p class="text-green-700 text-sm">Thank you for your interest. We will be in touch at the email address you provided.</p>
+        <button type="button" id="new-form-btn" class="mt-3 text-green-800 underline hover:no-underline font-semibold">Submit another form</button>
+      </div>
+
+      <!-- Form -->
+      <form id="contact-form" novalidation="true" method="post" action="#" class="bg-white rounded-lg border border-gray-300 p-6 md:p-8">
+        
+        <!-- Personal Information Group -->
+        <fieldset class="mb-6 pb-6 border-b border-gray-300">
+          <legend class="text-lg font-semibold text-gray-900 mb-4 px-0">Personal Information <span class="text-gray-700 font-normal text-sm">(required fields marked with *)</span></legend>
+          
+          <div class="grid md:grid-cols-2 gap-5">
+            <!-- Full Name -->
+            <div class="form-group">
+              <label for="full-name" class="block text-sm font-medium text-gray-900 mb-1">
+                Full Name <span aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <input
+                type="text"
+                id="full-name"
+                name="fullName"
+                autocomplete="name"
+                required
+                aria-required="true"
+                placeholder="e.g. Maria Gonzalez"
+                class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-gray-900 placeholder-gray-600 text-base focus:ring-blue-600 focus:border-blue-600"
+                aria-describedby="name-error"
+              >
+              <p id="name-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label for="email" class="block text-sm font-medium text-gray-900 mb-1">
+                Email Address <span aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                autocomplete="email"
+                required
+                aria-required="true"
+                placeholder="e.g. maria@example.com"
+                class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-gray-900 placeholder-gray-600 text-base focus:ring-blue-600 focus:border-blue-600"
+                aria-describedby="email-hint email-error"
+              >
+              <p id="email-hint" class="text-sm mt-1 text-gray-600">We&rsquo;ll never share your email.</p>
+              <p id="email-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+              <label for="phone" class="block text-sm font-medium text-gray-900 mb-1">
+                Phone Number <span class="text-gray-600 font-normal text-sm">(optional)</span>
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                autocomplete="tel"
+                placeholder="e.g. +1 555 123 4567"
+                class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-gray-900 placeholder-gray-600 text-base focus:ring-blue-600 focus:border-blue-600"
+                aria-describedby="phone-error"
+              >
+              <p id="phone-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+            </div>
+
+            <!-- Company -->
+            <div class="form-group">
+              <label for="company" class="block text-sm font-medium text-gray-900 mb-1">
+                Company <span class="text-gray-600 font-normal text-sm">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                autocomplete="organization"
+                placeholder="e.g. Acme Corporation"
+                class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-gray-900 placeholder-gray-600 text-base focus:ring-blue-600 focus:border-blue-600"
+                aria-describedby="company-error"
+              >
+              <p id="company-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Inquiry Details Group -->
+        <fieldset class="mb-6 pb-6 border-b border-gray-300">
+          <legend class="text-lg font-semibold text-gray-900 mb-4 px-0">Inquiry Details</legend>
+
+          <div class="grid md:grid-cols-2 gap-5">
+            <!-- Department Dropdown -->
+            <div class="form-group">
+              <label for="department" class="block text-sm font-medium text-gray-900 mb-1">
+                Department <span aria-hidden="true">*</span>
+                <span class="sr-only">(required)</span>
+              </label>
+              <select
+                id="department"
+                name="department"
+                required
+                aria-required="true"
+                class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-base text-gray-900 focus:ring-blue-600 focus:border-blue-600"
+                aria-describedby="department-error"
+              >
+                <option value="">Select a department&#8230;</option>
+                <option value="sales">Sales & Pricing</option>
+                <option value="support">Technical Support</option>
+                <option value="billing">Billing & Payments</option>
+                <option value="partnerships">Partnerships & Enterprise</option>
+                <option value="other">Other</option>
+              </select>
+              <p id="department-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+            </div>
+
+            <!-- Priority Level -->
+            <div class="form-group">
+              <label for="priority" class="block text-sm font-medium text-gray-900 mb-1">
+                Priority Level <span class="text-gray-600 font-normal text-sm">(optional)</span>
+              </label>
+              <select
+                id="priority"
+                name="priority"
+                class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-base text-gray-900 focus:ring-blue-600 focus:border-blue-600"
+                aria-describedby="priority-error"
+              >
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+              <p id="priority-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Message Section -->
+        <fieldset class="mb-6">
+          <legend class="text-lg font-semibold text-gray-900 mb-4 px-0">
+            Your Message <span class="text-gray-600 font-normal text-sm">required</span>
+          </legend>
+          <div class="form-group">
+            <label for="message" class="block text-sm font-medium text-gray-900 mb-1">
+              Message <span aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              required
+              aria-required="true"
+              placeholder="Describe your inquiry in detail&#8230;"
+              class="block w-full rounded-md border border-gray-500 bg-white px-3 py-2 text-gray-900 placeholder-gray-600 text-base resize-y focus:ring-blue-600 focus:border-blue-600"
+              aria-describedby="message-hint message-error"
+            ></textarea>
+            <p id="message-hint" class="text-sm mt-1 text-gray-600">Minimum 10 characters.</p>
+            <p id="message-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
+          </div>
+        </fieldset>
+
+        <!-- Terms Checkbox -->
+        <div class="mb-6 pb-6 border-b border-gray-300 form-group">
+          <div class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="terms"
+              name="terms"
+              required
+              aria-required="true"
+              class="mt-1 w-5 h-5 border-2 border-gray-500 rounded cursor-pointer focus:ring-blue-600 focus:ring-offset-0 accent-blue-600"
+              aria-describedby="terms-hint terms-error"
+            >
+            <label for="terms" class="text-sm text-gray-800 leading-relaxed cursor-pointer">
+              I agree to the <a href="/terms" class="text-blue-700 underline hover:no-underline focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded-sm">Terms of Service</a> and <a href="/privacy" class="text-blue-700 underline hover:no-underline focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded-sm">Privacy Policy</a> <span aria-hidden="true">*</span>
+              <span class="sr-only">(required)</span>
+            </label>
+          </div>
+          <p id="terms-hint" class="text-sm mt-1 text-gray-600">You must accept the terms to submit this form.</p>
+          <p id="terms-error" class="error-message text-sm mt-1 text-red-800" role="alert"></p>
         </div>
-      </div>
-    </div>
 
-    <!-- Form -->
-    <form id="contact-form" novalidate class="space-y-6" aria-labelledby="form-title">
-      <h2 id="form-title" class="sr-only">Contact Form</h2>
-
-      <div role="alert" id="form-error-summary" class="hidden p-4 mb-6 bg-red-50 border-2 border-red-700 rounded-lg" style="background-color: #fef2f2; border-color: #b91c1c;">
-        <h3 class="font-semibold text-red-900 mb-2" style="color: #991b1b; display: block;">Please correct the following errors:</h3>
-        <ul id="error-list" class="list-disc list-inside text-red-800 space-y-1" style="color: #b91c1c;"></ul>
-      </div>
-
-      <!-- Name -->
-      <div class="space-y-2">
-        <label for="name" id="name-label" class="block text-sm font-semibold text-gray-800" style="color: #1f2937;">
-          <span class="required-star">Full Name</span>
-          <span class="sr-only">(required)</span>
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          autocomplete="name"
-          required
-          aria-required="true"
-          aria-describedby="name-hint name-error"
-          class="w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-gray-900 bg-white touch-target"
-          style="border-color: #4b5563; font-size: 1rem;"
-        >
-        <p id="name-hint" class="text-sm text-gray-600" style="color: #4b5563;">Enter your first and last name.</p>
-        <p id="name-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </div>
-
-      <!-- Email -->
-      <div class="space-y-2">
-        <label for="email" id="email-label" class="block text-sm font-semibold text-gray-800" style="color: #1f2937;">
-          <span class="required-star">Email Address</span>
-          <span class="sr-only">(required)</span>
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          autocomplete="email"
-          required
-          aria-required="true"
-          aria-describedby="email-hint email-error"
-          class="w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-gray-900 bg-white touch-target"
-          style="border-color: #4b5563; font-size: 1rem;"
-        >
-        <p id="email-hint" class="text-sm text-gray-600" style="color: #4b5563;">We'll use this to reply to your message.</p>
-        <p id="email-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </div>
-
-      <!-- Phone -->
-      <div class="space-y-2">
-        <label for="phone" id="phone-label" class="block text-sm font-semibold text-gray-800" style="color: #1f2937;">Phone Number</label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          autocomplete="tel"
-          aria-describedby="phone-hint phone-error"
-          class="w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-gray-900 bg-white touch-target"
-          style="border-color: #4b5563; font-size: 1rem;"
-        >
-        <p id="phone-hint" class="text-sm text-gray-600" style="color: #4b5563;">Optional. Include country code if outside the US.</p>
-        <p id="phone-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </div>
-
-      <!-- Company -->
-      <div class="space-y-2">
-        <label for="company" id="company-label" class="block text-sm font-semibold text-gray-800" style="color: #1f2937;">Company</label>
-        <input
-          type="text"
-          id="company"
-          name="company"
-          autocomplete="organization"
-          aria-describedby="company-hint company-error"
-          class="w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-gray-900 bg-white touch-target"
-          style="border-color: #4b5563; font-size: 1rem;"
-        >
-        <p id="company-hint" class="text-sm text-gray-600" style="color: #4b5563;">Optional.</p>
-        <p id="company-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </div>
-
-      <!-- Department Dropdown -->
-      <div class="space-y-2">
-        <label for="department" id="department-label" class="block text-sm font-semibold text-gray-800" style="color: #1f2937;">
-          <span class="required-star">Department</span>
-          <span class="sr-only">(required)</span>
-        </label>
-        <select
-          id="department"
-          name="department"
-          required
-          aria-required="true"
-          aria-describedby="department-error"
-          class="w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-gray-900 bg-white touch-target appearance-none"
-          style="border-color: #4b5563; font-size: 1rem; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23374151%22%3E%3Cpath%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px 20px; padding-right: 48px;"
-        >
-          <option value="">Select a department</option>
-          <option value="sales">Sales</option>
-          <option value="support">Technical Support</option>
-          <option value="billing">Billing &amp; Accounts</option>
-          <option value="partnerships">Partnerships</option>
-          <option value="general">General Inquiry</option>
-        </select>
-        <p id="department-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </div>
-
-      <!-- Message Textarea -->
-      <div class="space-y-2">
-        <label for="message" id="message-label" class="block text-sm font-semibold text-gray-800" style="color: #1f2937;">
-          <span class="required-star">Message</span>
-          <span class="sr-only">(required)</span>
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          rows="5"
-          required
-          aria-required="true"
-          aria-describedby="message-hint message-error"
-          class="w-full px-4 py-3 border-2 border-gray-400 rounded-lg text-gray-900 bg-white touch-target resize-y"
-          style="border-color: #4b5563; font-size: 1rem; min-height: 120px;"
-        ></textarea>
-        <p id="message-hint" class="text-sm text-gray-600" style="color: #4b5563;">Please describe your inquiry in detail.</p>
-        <p id="message-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </div>
-
-      <!-- Terms Checkbox -->
-      <fieldset class border-0 p-0 m-0 space-y-3">
-        <legend class="sr-only">Terms and Privacy Agreement</legend>
-        <div class="flex items-start gap-3 touch-target items-center" style="min-height: 44px;">
-          <input
-            type="checkbox"
-            id="terms"
-            name="terms"
-            required
-            aria-required="true"
-            aria-describedby="terms-error"
-            class="mt-1 w-5 h-5 border-2 border-gray-400 rounded"
-            style="border-color: #4b5563; accent-color: #1d4ed8;"
+        <!-- Submit Button -->
+        <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <button
+            type="submit"
+            id="submit-btn"
+            class="bg-blue-700 hover:bg-blue-800 text-white font-semibold text-base px-6 py-3 rounded-md focus:ring-blue-600 focus:ring-offset-2 min-w-[8rem] min-h-[44px]"
           >
-          <label for="terms" class="text-sm text-gray-800" style="color: #1f2937;">
-            <span class="required-star">I agree to the</span>
-            <span class="sr-only">(required)</span>
-            <a href="/terms" target="_blank" class="text-blue-800 underline" style="color: #1d4ed8;">Terms of Service</a> and
-            <a href="/privacy" target="_blank" class="text-blue-800 underline" style="color: #1d4ed8;">Privacy Policy</a>
-            <span aria-hidden="true">*</span>
-          </label>
+            Submit Form
+          </button>
+          <button
+            type="button"
+            class="text-blue-700 hover:underline font-semibold text-base min-h-[44px] px-2"
+            onclick="document.getElementById('contact-form').reset(); clearAllErrors();"
+          >
+            Reset Form
+          </button>
         </div>
-        <p id="terms-error" role="alert" class="hidden text-sm font-medium" style="color: #b91c1c;"></p>
-      </fieldset>
-
-      <!-- Submit -->
-      <div class="pt-4">
-        <button
-          type="submit"
-          id="submit-btn"
-          class="w-full sm:w-auto px-8 py-3 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 touch-target"
-          style="background-color: #1d4ed8; color: #ffffff; min-height: 48px;"
-        >
-          Send Message
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </main>
 
   <!-- Footer -->
-  <footer class="bg-gray-100 border-t border-gray-300 mt-16" style="background-color: #f3f4f6; border-color: #9ca3af;">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="grid gap-6 sm:grid-cols-3">
-        <div>
-          <h3 class="text-sm font-semibold text-gray-800 mb-2" style="color: #1f2937;">Acme Corp</h3>
-          <p class="text-sm text-gray-700" style="color: #374151;">Building accessible products for everyone.</p>
-        </div>
-        <div>
-          <h3 class="text-sm font-semibold text-gray-800 mb-2" style="color: #1f2937;">Contact</h3>
-          <address class="not-italic text-sm text-gray-700" style="color: #374151;">
-            <p>123 Accessible Street</p>
-            <p>San Francisco, CA 94102</p>
-            <p><a href="tel:+14155550199" class="text-blue-800 underline" style="color: #1d4ed8;">(415) 555-0199</a></p>
-          </address>
-        </div>
-        <nav aria-label="Footer navigation">
-          <h3 class="text-sm font-semibold text-gray-800 mb-2" style="color: #1f2937;">Legal</h3>
-          <ul class="space-y-1">
-            <li><a href="/terms" class="text-sm text-blue-800 underline" style="color: #1d4ed8;">Terms of Service</a></li>
-            <li><a href="/privacy" class="text-sm text-blue-800 underline" style="color: #1d4ed8;">Privacy Policy</a></li>
-            <li><a href="/accessibility" class="text-sm text-blue-800 underline" style="color: #1d4ed8;">Accessibility Statement</a></li>
-          </ul>
-        </nav>
-      </div>
-      <p class="mt-6 pt-6 border-t text-sm text-gray-600" style="border-color: #9ca3af; color: #4b5563;">&copy; 2024 Acme Corp. All rights reserved.</p>
+  <footer class="bg-white border-t border-gray-300 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+      <nav aria-label="Footer navigation">
+        <ul class="flex flex-wrap gap-4 text-sm">
+          <li><a href="/privacy" class="text-gray-700 hover:underline focus:underline">Privacy Policy</a></li>
+          <li><a href="/terms" class="text-gray-700 hover:underline focus:underline">Terms of Service</a></li>
+          <li><a href="/accessibility" class="text-gray-700 hover:underline focus:underline">Accessibility Statement</a></li>
+        </ul>
+      </nav>
+      <p class="text-sm text-gray-600 mt-4">&copy; 2025 Accessible Forms Demo. All rights reserved.</p>
     </div>
   </footer>
 
@@ -329,237 +311,190 @@
     (function() {
       'use strict';
 
-      // Form controller - Angular-like pattern
-      const FormController = {
-        state: {
-          submitted: false,
-          errors: {},
-          touched: {}
-        },
+      const form = document.getElementById('contact-form');
+      const errorSummary = document.getElementById('error-summary');
+      const errorList = document.getElementById('error-list');
+      const errorCount = document.getElementById('error-count');
+      const errorPlural = document.getElementById('error-plural');
+      const successMessage = document.getElementById('success-message');
+      const newFormBtn = document.getElementById('new-form-btn');
 
-        validators: {
-          name: function(value) {
-            if (!value || value.trim().length === 0) return 'Please enter your full name.';
-            if (value.trim().length < 2) return 'Name must be at least 2 characters.';
+      const fields = {
+        fullName: {
+          el: document.getElementById('full-name'),
+          errorEl: document.getElementById('name-error'),
+          validate: function(value) {
+            if (!value.trim()) return 'Full name is required.';
+            if (value.trim().length < 2) return 'Full name must be at least 2 characters.';
             return '';
-          },
-          email: function(value) {
-            if (!value || value.trim().length === 0) return 'Please enter your email address.';
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value.trim())) return 'Please enter a valid email address.';
+          }
+        },
+        email: {
+          el: document.getElementById('email'),
+          errorEl: document.getElementById('email-error'),
+          validate: function(value) {
+            if (!value.trim()) return 'Email address is required.';
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(value.trim())) return 'Please enter a valid email address.';
             return '';
-          },
-          phone: function(value) {
-            if (!value || value.trim().length === 0) return '';
-            var phoneRegex = /^[\d\s\-\+\(\)]{7,20}$/;
-            if (!phoneRegex.test(value.trim())) return 'Please enter a valid phone number.';
+          }
+        },
+        phone: {
+          el: document.getElementById('phone'),
+          errorEl: document.getElementById('phone-error'),
+          validate: function(value) {
+            if (value.trim() && !/^[\d\s\+\-\(\)]{7,}$/.test(value.trim())) {
+              return 'Please enter a valid phone number.';
+            }
             return '';
-          },
-          company: function(value) {
+          }
+        },
+        company: {
+          el: document.getElementById('company'),
+          errorEl: document.getElementById('company-error'),
+          validate: function() { return ''; }
+        },
+        department: {
+          el: document.getElementById('department'),
+          errorEl: document.getElementById('department-error'),
+          validate: function(value) {
+            if (!value) return 'Please select a department.';
             return '';
-          },
-          department: function(value) {
-            if (!value || value.length === 0) return 'Please select a department.';
-            return '';
-          },
-          message: function(value) {
-            if (!value || value.trim().length === 0) return 'Please enter your message.';
+          }
+        },
+        message: {
+          el: document.getElementById('message'),
+          errorEl: document.getElementById('message-error'),
+          validate: function(value) {
+            if (!value.trim()) return 'Message is required.';
             if (value.trim().length < 10) return 'Message must be at least 10 characters.';
             return '';
-          },
-          terms: function(checked) {
-            if (!checked) return 'You must agree to the Terms of Service and Privacy Policy.';
+          }
+        },
+        terms: {
+          el: document.getElementById('terms'),
+          errorEl: document.getElementById('terms-error'),
+          validate: function(value) {
+            if (!value) return 'You must agree to the terms.';
             return '';
-          }
-        },
-
-        validateField: function(fieldName, value) {
-          var error = '';
-          if (this.validators[fieldName]) {
-            error = this.validators[fieldName](value);
-          }
-          if (error) {
-            this.state.errors[fieldName] = error;
-          } else {
-            delete this.state.errors[fieldName];
-          }
-          this.renderFieldState(fieldName, error);
-          return !error;
-        },
-
-        renderFieldState: function(fieldName, errorMessage) {
-          var field = document.getElementById(fieldName);
-          var errorEl = document.getElementById(fieldName + '-error');
-          if (!field || !errorEl) return;
-
-          if (errorMessage) {
-            field.classList.add('input-error');
-            field.setAttribute('aria-invalid', 'true');
-            errorEl.textContent = errorMessage;
-            errorEl.classList.remove('hidden');
-          } else {
-            field.classList.remove('input-error');
-            field.removeAttribute('aria-invalid');
-            errorEl.textContent = '';
-            errorEl.classList.add('hidden');
-          }
-        },
-
-        validateAll: function(formEl) {
-          var isValid = true;
-          var firstErrorField = null;
-
-          this.validateField('name', document.getElementById('name').value);
-          this.validateField('email', document.getElementById('email').value);
-          this.validateField('phone', document.getElementById('phone').value);
-          this.validateField('company', document.getElementById('company').value);
-          this.validateField('department', document.getElementById('department').value);
-          this.validateField('message', document.getElementById('message').value);
-          this.validateField('terms', document.getElementById('terms').checked);
-
-          for (var field in this.state.errors) {
-            if (this.state.errors.hasOwnProperty(field)) {
-              isValid = false;
-              if (!firstErrorField) {
-                firstErrorField = document.getElementById(field);
-              }
-            }
-          }
-
-          this.renderErrorSummary();
-
-          if (!isValid && firstErrorField) {
-            firstErrorField.focus();
-          }
-
-          return isValid;
-        },
-
-        renderErrorSummary: function() {
-          var summaryEl = document.getElementById('form-error-summary');
-          var errorList = document.getElementById('error-list');
-          var errorKeys = Object.keys(this.state.errors);
-
-          if (errorKeys.length === 0) {
-            summaryEl.classList.add('hidden');
-            return;
-          }
-
-          summaryEl.classList.remove('hidden');
-          errorList.innerHTML = '';
-
-          var labels = {
-            name: 'Full Name',
-            email: 'Email Address',
-            phone: 'Phone Number',
-            company: 'Company',
-            department: 'Department',
-            message: 'Message',
-            terms: 'Terms Agreement'
-          };
-
-          for (var i = 0; i < errorKeys.length; i++) {
-            var field = errorKeys[i];
-            var li = document.createElement('li');
-            a.href = '#' + field;
-            li.textContent = this.state.errors[field];
-            li.setAttribute('data-field', field);
-          }
-
-          summaryEl.setAttribute('aria-label', 'Form submission errors');
-        },
-
-        showSuccess: function() {
-          var successEl = document.getElementById('form-success');
-          successEl.classList.remove('hidden');
-          successEl.focus();
-          successEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        },
-
-        reset: function() {
-          this.state.errors = {};
-          this.state.submitted = false;
-
-          var formEl = document.getElementById('contact-form');
-          formEl.reset();
-
-          var fields = ['name', 'email', 'phone', 'company', 'department', 'message', 'terms'];
-          for (var i = 0; i < fields.length; i++) {
-            this.removeFieldState(fields[i]);
-          }
-
-          document.getElementById('form-error-summary').classList.add('hidden');
-          document.getElementById('error-list').innerHTML = '';
-          successEl.classList.add('hidden');
-        },
-
-        removeFieldState: function(fieldName) {
-          var field = document.getElementById(fieldName);
-          var errorEl = document.getElementById(fieldName + '-error');
-          if (field) {
-            field.classList.remove('input-error');
-            field.removeAttribute('aria-invalid');
-          }
-          if (errorEl) {
-            errorEl.textContent = '';
-            errorEl.classList.add('hidden');
           }
         }
       };
 
-      // Initialize form event
-      var formEl = document.getElementById('contact-form');
-      var submitBtn = document.getElementById('submit-btn');
-
-      formEl.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        FormController.state.submitted = true;
-        var isValid = FormController.validateAll(formEl);
-
-        if (isValid) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Sending...';
-
-          // Simulate async submission
-          setTimeout(function() {
-            FormController.showSuccess();
-            formEl.reset();
-            var fields = ['name', 'email', 'phone', 'company', 'department', 'message', 'terms'];
-            for (var i = 0; i < fields.length; i++) {
-              FormController.removeFieldState(fields[i]);
-            }
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Message';
-            document.getElementById('form-error-summary').classList.add('hidden');
-          }, 800);
+      function showFieldError(fieldName, errorMessage) {
+        var field = fields[fieldName];
+        if (!field) return;
+        field.errorEl.textContent = errorMessage;
+        field.errorEl.classList.add('error-visible');
+        if (field.type !== 'submit') {
+          field.el.setAttribute('aria-invalid', 'true');
+        } else {
+          field.el.setAttribute('aria-invalid', 'true');
         }
-      });
-
-      // Real-time validation on blur
-      var inputFields = ['name', 'email', 'phone', 'company', 'department', 'message'];
-      for (var i = 0; i < inputFields.length; i++) {
-        (function(fieldName) {
-          var field = document.getElementById(fieldName);
-          field.addEventListener('blur', function() {
-            if (FormController.state.submitted || field.value.length > 0) {
-              FormController.validateField(fieldName, field.value);
-            }
-          });
-          field.addEventListener('input', function() {
-            if (FormController.state.submitted && FormController.state.errors[fieldName]) {
-              FormController.validateField(fieldName, field.value);
-            }
-          });
-        })(inputFields[i]);
       }
 
-      // Terms checkbox
-      var termsCheckbox = document.getElementById('terms');
-      termsCheckbox.addEventListener('change', function() {
-        if (FormController.state.submitted) {
-          FormController.validateField('terms', this.checked);
+      function clearFieldError(fieldName) {
+        var field = fields[fieldName];
+        if (!field) return;
+        field.errorEl.textContent = '';
+        field.errorEl.classList.remove('error-visible');
+        field.el.removeAttribute('aria-invalid');
+      }
+
+      window.clearAllErrors = function() {
+        Object.keys(fields).forEach(function(key) {
+          clearFieldError(key);
+        });
+        hideErrorSummary();
+      };
+
+      function showErrorSummary(errors) {
+        errorCount.textContent = errors.length;
+        errorPlural.textContent = errors.length === 1 ? '' : 's';
+        errorList.innerHTML = '';
+        errors.forEach(function(err) {
+          var li = document.createElement('li');
+          var link = document.createElement('a');
+          link.href = '#' + err.fieldId;
+          link.textContent = err.message;
+          link.className = 'underline hover:no-underline';
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById(err.fieldId).focus();
+          });
+          li.appendChild(link);
+          errorList.appendChild(li);
+        });
+        errorSummary.classList.remove('hidden');
+        errorSummary.focus();
+      }
+
+      function hideErrorSummary() {
+        errorSummary.classList.add('hidden');
+        errorList.innerHTML = '';
+      }
+
+      // Real-time validation on blur
+      Object.keys(fields).forEach(function(key) {
+        var field = fields[key];
+        var eventType = (field.el.type === 'checkbox' || field.el.tagName === 'SELECT') ? 'change' : 'blur';
+        field.el.addEventListener(eventType, function() {
+          var value = field.el.type === 'checkbox' ? field.el.checked : field.el.value;
+          var error = field.validate(value);
+          if (error) {
+            showFieldError(key, error);
+          } else {
+            clearFieldError(key);
+          }
+        });
+      });
+
+      // Form submission
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        hideErrorSummary();
+        clearAllErrors();
+
+        var errors = [];
+        Object.keys(fields).forEach(function(key) {
+          var field = fields[key];
+          var value = field.el.type === 'checkbox' ? field.el.checked : field.el.value;
+          var error = field.validate(value);
+          if (error) {
+            showFieldError(key, error);
+            errors.push({ fieldId: field.el.id, message: error });
+          }
+        });
+
+        if (errors.length > 0) {
+          showErrorSummary(errors);
+          errors[0].fieldEl = document.getElementById(errors[0].fieldId);
+          document.getElementById(errors[0].fieldId).focus();
+          return;
         }
+
+        // Simulate successful submission
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('submit-btn').textContent = 'Submitting…';
+        
+        setTimeout(function() {
+          form.classList.add('hidden');
+          errorSummary.classList.add('hidden');
+          successMessage.classList.remove('hidden');
+          successMessage.focus();
+        }, 1500);
+      });
+
+      // Reset form
+      newFormBtn.addEventListener('click', function() {
+        successMessage.classList.add('hidden');
+        form.classList.remove('hidden');
+        form.reset();
+        hideErrorSummary();
+        clearAllErrors();
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('submit-btn').textContent = 'Submit Form';
+        form.focus();
       });
     })();
   </script>

@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6E Test: Dynamic Content & SPA Accessibility - Good and Bad Examples</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .test-good {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .test-bad {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        
+        .spa-info {
+            background-color: #e7f3ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        /* Navigation styles */
+        .spa-nav {
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .spa-nav a {
+            display: inline-block;
+            padding: 10px 16px;
+            margin: 0 8px 8px 0;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: 2px solid #007bff;
+        }
+        
+        .spa-nav a:hover, .spa-nav a.active {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .spa-nav a:focus {
+            outline: 3px solid #ffc107;
+            outline-offset: 2px;
+        }
+        
+        /* Page content area */
+        .page-content {
+            min-height: 200px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: white;
+        }
+        
+        /* Button styles */
+        .btn {
+            padding: 10px 16px;
+            margin: 5px;
+            border: 2px solid #007bff;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .btn:focus {
+            outline: 3px solid #ffc107;
+            outline-offset: 2px;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 8px 12px;
+            border: 2px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        
+        /* Live region styles */
+        .live-region {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+        
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .status-info {
+            background-color: #cce7ff;
+            border-color: #b3d7ff;
+            color: #004085;
+        }
+        
+        /* Loading states */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .modal-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+        
+        /* Search results */
+        .search-container {
+            margin: 20px 0;
+        }
+        
+        .search-results {
+            margin-top: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .search-result-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Counter styles */
+        .counter {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        /* Dynamic content area */
+        .dynamic-content {
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 100px;
+            background: #f8f9fa;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Infinite scroll container */
+        .infinite-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+        }
+        
+        .scroll-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="spa-info">
+        <h1>⚡ Phase 6E: Dynamic Content & SPA Accessibility Test</h1>
+        <p><strong>WCAG Criteria:</strong> 2.4.3 (Focus Order), 3.2.1 (On Focus), 3.2.2 (On Input), 4.1.3 (Status Messages)</p>
+        <p><strong>Purpose:</strong> Test dynamic content updates, SPA navigation, and modern web app accessibility</p>
+        <p><strong>Focus Areas:</strong> Route changes, live regions, loading states, focus management, form validation</p>
+        <p><strong>Testing:</strong> Use screen readers (NVDA, JAWS, VoiceOver) and keyboard navigation</p>
+        <p><strong>SPA Features:</strong> Client-side routing, dynamic content, modal dialogs, infinite scroll</p>
+    </div>
+
+    <!-- Live regions for announcements -->
+    <div id="live-region-polite" aria-live="polite" class="live-region"></div>
+    <div id="live-region-assertive" aria-live="assertive" class="live-region"></div>
+    <div id="status-region" role="status" class="live-region"></div>
+
+    <!-- GOOD EXAMPLE: Proper SPA navigation with accessibility -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Accessible SPA Navigation</h2>
+        <p><strong>Features:</strong> Proper focus management, page title updates, route announcements</p>
+        
+        <nav class="spa-nav" aria-label="Main navigation">
+            <a href="#home" data-route="home" class="active" aria-current="page">Home</a>
+            <a href="#products" data-route="products">Products</a>
+            <a href="#services" data-route="services">Services</a>
+            <a href="#contact" data-route="contact">Contact</a>
+        </nav>
+        
+        <main id="main-content" tabindex="-1">
+            <div id="page-content" class="page-content">
+                <h1 id="page-title">Home Page</h1>
+                <p id="page-description">Welcome to our accessible single page application. This content updates dynamically while maintaining proper accessibility.</p>
+                <button class="btn" onclick="simulatePageUpdate()">Load Dynamic Content</button>
+            </div>
+        </main>
+        
+        <p><em>✅ Navigation updates page title, manages focus, and announces route changes</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: SPA navigation without accessibility -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Inaccessible SPA Navigation</h2>
+        <p><strong>Issues:</strong> No focus management, missing announcements, poor keyboard support</p>
+        
+        <div class="spa-nav">
+            <div onclick="badNavigation('home')" style="cursor: pointer; display: inline-block; padding: 10px 16px; margin: 0 8px 8px 0; background: #007bff; color: white; border-radius: 4px;">Home</div>
+            <div onclick="badNavigation('products')" style="cursor: pointer; display: inline-block; padding: 10px 16px; margin: 0 8px 8px 0; background: #6c757d; color: white; border-radius: 4px;">Products</div>
+            <div onclick="badNavigation('services')" style="cursor: pointer; display: inline-block; padding: 10px 16px; margin: 0 8px 8px 0; background: #6c757d; color: white; border-radius: 4px;">Services</div>
+        </div>
+        
+        <div id="bad-content" class="page-content">
+            <div>Home Content</div>
+            <p>This navigation doesn't update page titles, manage focus, or announce changes.</p>
+        </div>
+        
+        <p><em>❌ No keyboard access, focus management, or screen reader announcements</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Accessible dynamic content with live regions -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Dynamic Content with Live Regions</h2>
+        <p><strong>Features:</strong> Proper aria-live regions, loading states, status announcements</p>
+        
+        <div>
+            <button class="btn" onclick="loadGoodDynamicContent()">Load Content</button>
+            <button class="btn btn-secondary" onclick="clearGoodDynamicContent()">Clear Content</button>
+            <span id="good-counter" class="counter" aria-live="polite">0</span> items loaded
+        </div>
+        
+        <div id="good-dynamic-content" class="dynamic-content" aria-live="polite">
+            <p>Dynamic content will appear here with proper announcements.</p>
+        </div>
+        
+        <div id="good-loading" class="loading-container hidden" aria-live="polite" aria-label="Loading content">
+            <div class="loading" aria-hidden="true"></div>
+            <p>Loading new content...</p>
+        </div>
+        
+        <p><em>✅ Content updates are announced via aria-live regions</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Dynamic content without live regions -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Dynamic Content Without Live Regions</h2>
+        <p><strong>Issues:</strong> No announcements, silent loading states, missing status updates</p>
+        
+        <div>
+            <button class="btn" onclick="loadBadDynamicContent()">Load Content</button>
+            <button class="btn btn-secondary" onclick="clearBadDynamicContent()">Clear Content</button>
+            <span id="bad-counter" class="counter">0</span> items loaded
+        </div>
+        
+        <div id="bad-dynamic-content" class="dynamic-content">
+            <p>Dynamic content will appear here silently.</p>
+        </div>
+        
+        <div id="bad-loading" class="loading-container hidden">
+            <div class="loading"></div>
+            <p>Loading...</p>
+        </div>
+        
+        <p><em>❌ Content updates happen silently without screen reader announcements</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Accessible form with proper validation -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Form with Accessible Validation</h2>
+        <p><strong>Features:</strong> Live region announcements, proper error states, success messages</p>
+        
+        <form id="good-form" onsubmit="return handleGoodFormSubmit(event)">
+            <div class="form-group">
+                <label for="good-email" class="form-label">Email Address</label>
+                <input type="email" id="good-email" class="form-input" aria-describedby="good-email-error" required>
+                <div id="good-email-error" class="status-message status-error hidden" aria-live="assertive"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="good-message" class="form-label">Message</label>
+                <textarea id="good-message" class="form-input" rows="3" aria-describedby="good-message-error" required></textarea>
+                <div id="good-message-error" class="status-message status-error hidden" aria-live="assertive"></div>
+            </div>
+            
+            <button type="submit" class="btn">Submit Message</button>
+            
+            <div id="good-form-success" class="status-message status-success hidden" aria-live="polite"></div>
+        </form>
+        
+        <p><em>✅ Form validation errors and success messages are announced via live regions</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Form without accessible validation -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Form Without Accessible Validation</h2>
+        <p><strong>Issues:</strong> Silent validation, no live regions, poor error indication</p>
+        
+        <form id="bad-form" onsubmit="return handleBadFormSubmit(event)">
+            <div class="form-group">
+                <label for="bad-email" class="form-label">Email Address</label>
+                <input type="email" id="bad-email" class="form-input" required>
+                <div id="bad-email-error" class="status-message status-error hidden"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bad-message" class="form-label">Message</label>
+                <textarea id="bad-message" class="form-input" rows="3" required></textarea>
+                <div id="bad-message-error" class="status-message status-error hidden"></div>
+            </div>
+            
+            <button type="submit" class="btn">Submit Message</button>
+            
+            <div id="bad-form-success" class="status-message status-success hidden"></div>
+        </form>
+        
+        <p><em>❌ Form validation happens silently without screen reader announcements</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Accessible modal dialog -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Accessible Modal Dialog</h2>
+        <p><strong>Features:</strong> Proper focus management, ARIA attributes, keyboard support</p>
+        
+        <button class="btn" onclick="openGoodModal()">Open Settings Dialog</button>
+        
+        <div id="good-modal-overlay" class="modal-overlay">
+            <div 
+                id="good-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="good-modal-title"
+                aria-describedby="good-modal-desc"
+                class="modal"
+            >
+                <button class="modal-close" onclick="closeGoodModal()" aria-label="Close dialog">&times;</button>
+                <div id="good-modal-title" class="modal-header">Settings</div>
+                <div id="good-modal-desc">
+                    <p>Configure your preferences:</p>
+                    <div class="form-group">
+                        <label for="notifications">
+                            <input type="checkbox" id="notifications"> Email notifications
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="theme" class="form-label">Theme:</label>
+                        <select id="theme" class="form-input">
+                            <option>Light</option>
+                            <option>Dark</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="closeGoodModal()">Save</button>
+                    <button class="btn btn-secondary" onclick="closeGoodModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <p><em>✅ Modal manages focus, has proper ARIA attributes, and supports keyboard navigation</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Modal without proper accessibility -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Modal Without Proper Accessibility</h2>
+        <p><strong>Issues:</strong> No focus management, missing ARIA, poor keyboard support</p>
+        
+        <button class="btn" onclick="openBadModal()">Open Modal</button>
+        
+        <div id="bad-modal-overlay" class="modal-overlay">
+            <div id="bad-modal" class="modal">
+                <div class="modal-header">Settings</div>
+                <div>
+                    <p>Configure your preferences:</p>
+                    <div class="form-group">
+                        <label for="bad-notifications">
+                            <input type="checkbox" id="bad-notifications"> Email notifications
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="closeBadModal()">Save</button>
+                    <button class="btn btn-secondary" onclick="closeBadModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+        
+        <p><em>❌ Modal lacks proper focus management and ARIA attributes</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Accessible search with live results -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Search with Live Result Announcements</h2>
+        <p><strong>Features:</strong> Result count announcements, live region updates, keyboard navigation</p>
+        
+        <div class="search-container">
+            <label for="good-search" class="form-label">Search Products:</label>
+            <input 
+                type="search" 
+                id="good-search" 
+                class="form-input" 
+                placeholder="Type to search..."
+                oninput="performGoodSearch(this.value)"
+                aria-describedby="good-search-status"
+            >
+            <div id="good-search-status" aria-live="polite" class="live-region"></div>
+            
+            <div id="good-search-results" class="search-results" aria-live="polite">
+                <div class="search-result-item">Type to see search results...</div>
+            </div>
+        </div>
+        
+        <p><em>✅ Search results and count are announced via live regions</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Search without accessibility -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Search Without Live Announcements</h2>
+        <p><strong>Issues:</strong> Silent result updates, no count information, poor feedback</p>
+        
+        <div class="search-container">
+            <label for="bad-search" class="form-label">Search Products:</label>
+            <input 
+                type="search" 
+                id="bad-search" 
+                class="form-input" 
+                placeholder="Type to search..."
+                oninput="performBadSearch(this.value)"
+            >
+            
+            <div id="bad-search-results" class="search-results">
+                <div class="search-result-item">Type to see search results...</div>
+            </div>
+        </div>
+        
+        <p><em>❌ Search updates happen silently without any announcements</em></p>
+    </div>
+
+    <!-- GOOD EXAMPLE: Accessible infinite scroll -->
+    <div class="test-section test-good">
+        <h2>✅ GOOD: Infinite Scroll with Announcements</h2>
+        <p><strong>Features:</strong> Loading announcements, content count updates, keyboard access</p>
+        
+        <div>
+            <button class="btn" onclick="loadMoreGoodItems()">Load More Items</button>
+            <div id="good-scroll-status" aria-live="polite" class="live-region"></div>
+        </div>
+        
+        <div id="good-infinite-scroll" class="infinite-scroll" aria-label="Product list">
+            <div class="scroll-item" tabindex="0">Product 1 - High quality item</div>
+            <div class="scroll-item" tabindex="0">Product 2 - Premium service</div>
+            <div class="scroll-item" tabindex="0">Product 3 - Best value option</div>
+        </div>
+        
+        <p><em>✅ New content loading is announced and items are keyboard accessible</em></p>
+    </div>
+
+    <!-- BAD EXAMPLE: Infinite scroll without accessibility -->
+    <div class="test-section test-bad">
+        <h2>❌ BAD: Infinite Scroll Without Announcements</h2>
+        <p><strong>Issues:</strong> Silent loading, no keyboard access, missing status updates</p>
+        
+        <div>
+            <button class="btn" onclick="loadMoreBadItems()">Load More Items</button>
+        </div>
+        
+        <div id="bad-infinite-scroll" class="infinite-scroll">
+            <div class="scroll-item">Product 1 - High quality item</div>
+            <div class="scroll-item">Product 2 - Premium service</div>
+            <div class="scroll-item">Product 3 - Best value option</div>
+        </div>
+        
+        <p><em>❌ Content loads silently and items are not keyboard accessible</em></p>
+    </div>
+
+    <script>
+        // Global variables
+        let currentRoute = 'home';
+        let goodCounter = 0;
+        let badCounter = 0;
+        let goodSearchTimeout;
+        let badSearchTimeout;
+        
+        // Utility functions
+        function announceToScreenReader(message, priority = 'polite') {
+            const liveRegion = document.getElementById(priority === 'assertive' ? 'live-region-assertive' : 'live-region-polite');
+            liveRegion.textContent = message;
+            
+            // Clear after announcement to allow for repeated messages
+            setTimeout(() => {
+                liveRegion.textContent = '';
+            }, 1000);
+        }
+        
+        function updatePageTitle(title) {
+            document.title = `${title} - Phase 6E Test: Dynamic Content & SPA Accessibility`;
+        }
+        
+        // GOOD SPA Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click listeners to good navigation
+            document.querySelectorAll('[data-route]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const route = this.getAttribute('data-route');
+                    navigateToRoute(route);
+                });
+            });
+        });
+        
+        function navigateToRoute(route) {
+            // Update URL without page reload (simulated)
+            window.history.pushState({route: route}, '', `#${route}`);
+            
+            // Update active navigation
+            document.querySelectorAll('[data-route]').forEach(link => {
+                link.classList.remove('active');
+                link.removeAttribute('aria-current');
+            });
+            
+            const activeLink = document.querySelector(`[data-route="${route}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+                activeLink.setAttribute('aria-current', 'page');
+            }
+            
+            // Update page content
+            const content = getRouteContent(route);
+            document.getElementById('page-title').textContent = content.title;
+            document.getElementById('page-description').textContent = content.description;
+            
+            // Update page title
+            updatePageTitle(content.title);
+            
+            // Manage focus - move to main content
+            const mainContent = document.getElementById('main-content');
+            mainContent.focus();
+            
+            // Announce route change
+            announceToScreenReader(`Navigated to ${content.title} page`);
+            
+            currentRoute = route;
+        }
+        
+        function getRouteContent(route) {
+            const routes = {
+                home: {
+                    title: 'Home Page',
+                    description: 'Welcome to our accessible single page application. This content updates dynamically while maintaining proper accessibility.'
+                },
+                products: {
+                    title: 'Products',
+                    description: 'Browse our comprehensive product catalog with full accessibility features.'
+                },
+                services: {
+                    title: 'Services',
+                    description: 'Discover our professional services designed with accessibility in mind.'
+                },
+                contact: {
+                    title: 'Contact Us',
+                    description: 'Get in touch with our team using our accessible contact forms.'
+                }
+            };
+            
+            return routes[route] || routes.home;
+        }
+        
+        // BAD SPA Navigation
+        function badNavigation(route) {
+            // Update content without proper accessibility
+            const badContent = document.getElementById('bad-content');
+            badContent.innerHTML = `<div>${route.charAt(0).toUpperCase() + route.slice(1)} Content</div><p>This content was updated without proper accessibility consideration.</p>`;
+            
+            // No focus management, no announcements, no title updates
+        }
+        
+        // Simulate page update
+        function simulatePageUpdate() {
+            const content = document.getElementById('page-description');
+            content.textContent = 'Content has been dynamically updated with proper accessibility announcements.';
+            announceToScreenReader('Page content has been updated');
+        }
+        
+        // GOOD Dynamic Content
+        function loadGoodDynamicContent() {
+            const container = document.getElementById('good-dynamic-content');
+            const loading = document.getElementById('good-loading');
+            const counter = document.getElementById('good-counter');
+            
+            // Show loading state
+            loading.classList.remove('hidden');
+            container.textContent = '';
+            
+            // Announce loading
+            announceToScreenReader('Loading new content, please wait');
+            
+            setTimeout(() => {
+                // Hide loading
+                loading.classList.add('hidden');
+                
+                // Add new content
+                goodCounter += 3;
+                container.innerHTML = `
+                    <h3>Dynamically Loaded Content</h3>
+                    <p>This content was loaded dynamically and announced to screen readers.</p>
+                    <ul>
+                        <li>Item ${goodCounter - 2}</li>
+                        <li>Item ${goodCounter - 1}</li>
+                        <li>Item ${goodCounter}</li>
+                    </ul>
+                `;
+                
+                // Update counter
+                counter.textContent = goodCounter;
+                
+                // Announce completion
+                announceToScreenReader(`Content loaded successfully. ${goodCounter} items now available.`);
+            }, 2000);
+        }
+        
+        function clearGoodDynamicContent() {
+            const container = document.getElementById('good-dynamic-content');
+            const counter = document.getElementById('good-counter');
+            
+            container.innerHTML = '<p>Dynamic content will appear here with proper announcements.</p>';
+            goodCounter = 0;
+            counter.textContent = goodCounter;
+            
+            announceToScreenReader('Content cleared');
+        }
+        
+        // BAD Dynamic Content
+        function loadBadDynamicContent() {
+            const container = document.getElementById('bad-dynamic-content');
+            const loading = document.getElementById('bad-loading');
+            const counter = document.getElementById('bad-counter');
+            
+            // Show loading state (silently)
+            loading.classList.remove('hidden');
+            container.textContent = '';
+            
+            setTimeout(() => {
+                // Hide loading
+                loading.classList.add('hidden');
+                
+                // Add new content (silently)
+                badCounter += 3;
+                container.innerHTML = `
+                    <h3>Dynamically Loaded Content</h3>
+                    <p>This content was loaded dynamically but not announced to screen readers.</p>
+                    <ul>
+                        <li>Item ${badCounter - 2}</li>
+                        <li>Item ${badCounter - 1}</li>
+                        <li>Item ${badCounter}</li>
+                    </ul>
+                `;
+                
+                // Update counter (silently)
+                counter.textContent = badCounter;
+                
+                // No announcements
+            }, 2000);
+        }
+        
+        function clearBadDynamicContent() {
+            const container = document.getElementById('bad-dynamic-content');
+            const counter = document.getElementById('bad-counter');
+            
+            container.innerHTML = '<p>Dynamic content will appear here silently.</p>';
+            badCounter = 0;
+            counter.textContent = badCounter;
+            
+            // No announcements
+        }
+        
+        // GOOD Form Validation
+        function handleGoodFormSubmit(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('good-email');
+            const message = document.getElementById('good-message');
+            const emailError = document.getElementById('good-email-error');
+            const messageError = document.getElementById('good-message-error');
+            const success = document.getElementById('good-form-success');
+            
+            // Clear previous errors
+            emailError.classList.add('hidden');
+            messageError.classList.add('hidden');
+            success.classList.add('hidden');
+            
+            let hasErrors = false;
+            
+            // Validate email
+            if (!email.value || !email.value.includes('@')) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.classList.remove('hidden');
+                hasErrors = true;
+            }
+            
+            // Validate message
+            if (!message.value || message.value.length < 10) {
+                messageError.textContent = 'Message must be at least 10 characters long';
+                messageError.classList.remove('hidden');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
+                // Focus first error
+                if (!email.value || !email.value.includes('@')) {
+                    email.focus();
+                } else {
+                    message.focus();
+                }
+                
+                announceToScreenReader('Form contains errors. Please review and correct.', 'assertive');
+            } else {
+                // Show success
+                success.textContent = 'Message sent successfully! Thank you for your feedback.';
+                success.classList.remove('hidden');
+                
+                // Clear form
+                email.value = '';
+                message.value = '';
+                
+                announceToScreenReader('Message sent successfully!', 'polite');
+            }
+            
+            return false;
+        }
+        
+        // BAD Form Validation
+        function handleBadFormSubmit(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('bad-email');
+            const message = document.getElementById('bad-message');
+            const emailError = document.getElementById('bad-email-error');
+            const messageError = document.getElementById('bad-message-error');
+            const success = document.getElementById('bad-form-success');
+            
+            // Clear previous errors (silently)
+            emailError.classList.add('hidden');
+            messageError.classList.add('hidden');
+            success.classList.add('hidden');
+            
+            let hasErrors = false;
+            
+            // Validate email (silently)
+            if (!email.value || !email.value.includes('@')) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.classList.remove('hidden');
+                hasErrors = true;
+            }
+            
+            // Validate message (silently)
+            if (!message.value || message.value.length < 10) {
+                messageError.textContent = 'Message must be at least 10 characters long';
+                messageError.classList.remove('hidden');
+                hasErrors = true;
+            }
+            
+            if (!hasErrors) {
+                // Show success (silently)
+                success.textContent = 'Message sent successfully!';
+                success.classList.remove('hidden');
+                
+                // Clear form
+                email.value = '';
+                message.value = '';
+            }
+            
+            // No announcements or focus management
+            return false;
+        }
+        
+        // GOOD Modal Management
+        function openGoodModal() {
+            const overlay = document.getElementById('good-modal-overlay');
+            const modal = document.getElementById('good-modal');
+            
+            overlay.style.display = 'flex';
+            
+            // Focus the modal
+            modal.focus();
+            
+            // Announce modal opening
+            announceToScreenReader('Settings dialog opened');
+            
+            // Trap focus within modal (simplified)
+            const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            
+            modal.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstElement) {
+                            lastElement.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === lastElement) {
+                            firstElement.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+                
+                if (e.key === 'Escape') {
+                    closeGoodModal();
+                }
+            });
+        }
+        
+        function closeGoodModal() {
+            const overlay = document.getElementById('good-modal-overlay');
+            overlay.style.display = 'none';
+            
+            // Return focus to trigger button
+            document.querySelector('[onclick="openGoodModal()"]').focus();
+            
+            // Announce modal closing
+            announceToScreenReader('Settings dialog closed');
+        }
+        
+        // BAD Modal Management
+        function openBadModal() {
+            const overlay = document.getElementById('bad-modal-overlay');
+            overlay.style.display = 'flex';
+            
+            // No focus management, no announcements
+        }
+        
+        function closeBadModal() {
+            const overlay = document.getElementById('bad-modal-overlay');
+            overlay.style.display = 'none';
+            
+            // No focus management, no announcements
+        }
+        
+        // GOOD Search
+        function performGoodSearch(query) {
+            const results = document.getElementById('good-search-results');
+            const status = document.getElementById('good-search-status');
+            
+            clearTimeout(goodSearchTimeout);
+            
+            if (query.length === 0) {
+                results.innerHTML = '<div class="search-result-item">Type to see search results...</div>';
+                status.textContent = '';
+                return;
+            }
+            
+            // Show loading
+            results.innerHTML = '<div class="search-result-item">Searching...</div>';
+            status.textContent = 'Searching for products...';
+            
+            goodSearchTimeout = setTimeout(() => {
+                // Simulate search results
+                const mockResults = [
+                    'Premium Laptop Computer',
+                    'Wireless Bluetooth Headphones',
+                    'Professional Camera Kit',
+                    'Smart Home Assistant',
+                    'Ergonomic Office Chair'
+                ].filter(item => item.toLowerCase().includes(query.toLowerCase()));
+                
+                if (mockResults.length > 0) {
+                    results.innerHTML = mockResults.map(item => 
+                        `<div class="search-result-item" tabindex="0">${item}</div>`
+                    ).join('');
+                    
+                    status.textContent = `${mockResults.length} result${mockResults.length !== 1 ? 's' : ''} found for "${query}"`;
+                } else {
+                    results.innerHTML = '<div class="search-result-item">No results found</div>';
+                    status.textContent = `No results found for "${query}"`;
+                }
+            }, 500);
+        }
+        
+        // BAD Search
+        function performBadSearch(query) {
+            const results = document.getElementById('bad-search-results');
+            
+            clearTimeout(badSearchTimeout);
+            
+            if (query.length === 0) {
+                results.innerHTML = '<div class="search-result-item">Type to see search results...</div>';
+                return;
+            }
+            
+            // Show loading (silently)
+            results.innerHTML = '<div class="search-result-item">Searching...</div>';
+            
+            badSearchTimeout = setTimeout(() => {
+                // Simulate search results (silently)
+                const mockResults = [
+                    'Premium Laptop Computer',
+                    'Wireless Bluetooth Headphones',
+                    'Professional Camera Kit',
+                    'Smart Home Assistant',
+                    'Ergonomic Office Chair'
+                ].filter(item => item.toLowerCase().includes(query.toLowerCase()));
+                
+                if (mockResults.length > 0) {
+                    results.innerHTML = mockResults.map(item => 
+                        `<div class="search-result-item">${item}</div>`
+                    ).join('');
+                } else {
+                    results.innerHTML = '<div class="search-result-item">No results found</div>';
+                }
+                
+                // No announcements, no status updates
+            }, 500);
+        }
+        
+        // GOOD Infinite Scroll
+        function loadMoreGoodItems() {
+            const container = document.getElementById('good-infinite-scroll');
+            const status = document.getElementById('good-scroll-status');
+            
+            status.textContent = 'Loading more items...';
+            
+            setTimeout(() => {
+                const currentCount = container.children.length;
+                const newItems = [];
+                
+                for (let i = 1; i <= 3; i++) {
+                    const newItem = document.createElement('div');
+                    newItem.className = 'scroll-item';
+                    newItem.tabIndex = 0;
+                    newItem.textContent = `Product ${currentCount + i} - Newly loaded item`;
+                    newItems.push(newItem);
+                }
+                
+                newItems.forEach(item => container.appendChild(item));
+                
+                status.textContent = `3 new items loaded. Total: ${container.children.length} items.`;
+                
+                // Focus first new item
+                newItems[0].focus();
+            }, 1000);
+        }
+        
+        // BAD Infinite Scroll
+        function loadMoreBadItems() {
+            const container = document.getElementById('bad-infinite-scroll');
+            
+            setTimeout(() => {
+                const currentCount = container.children.length;
+                
+                for (let i = 1; i <= 3; i++) {
+                    const newItem = document.createElement('div');
+                    newItem.className = 'scroll-item';
+                    newItem.textContent = `Product ${currentCount + i} - Newly loaded item`;
+                    container.appendChild(newItem);
+                }
+                
+                // No announcements, no focus management
+            }, 1000);
+        }
+        
+        // Keyboard event handlers
+        document.addEventListener('keydown', function(e) {
+            // Global keyboard shortcuts
+            if (e.key === 'Escape') {
+                // Close any open modals
+                closeGoodModal();
+                closeBadModal();
+            }
+        });
+        
+        // Simulate browser back/forward buttons
+        window.addEventListener('popstate', function(e) {
+            if (e.state && e.state.route) {
+                navigateToRoute(e.state.route);
+            }
+        });
+    </script>
+</body>
+</html>

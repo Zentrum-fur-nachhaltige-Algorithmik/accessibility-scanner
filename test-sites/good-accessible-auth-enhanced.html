@@ -1,0 +1,67 @@
+<!-- WCAG-TEST
+criterion: 3.3.9
+level: AAA
+title: Accessible Authentication (Enhanced)
+test_type: good
+expected_violations: 0
+testable_by: llm
+scanners: llm-auth-scanner
+description: Authentication without any cognitive function tests
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Accessible Authentication (Enhanced) - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .compliant-section { border: 2px solid #2e7d32; margin: 20px 0; padding: 15px; background-color: #e8f5e9; }
+        .compliant-title { color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        .auth-form { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0; }
+        input[type="text"], input[type="password"], input[type="email"] {
+            padding: 8px; width: 280px; border: 1px solid #666; display: block; margin: 5px 0;
+        }
+        button { padding: 10px 20px; cursor: pointer; margin: 5px 0; background: #2e7d32; color: #fff; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Good Accessible Authentication Enhanced (3.3.9 AAA)</h1>
+
+    <!-- Compliant 1: Standard password login with paste allowed -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Password login with copy-paste enabled</h2>
+        <div class="auth-form">
+            <label for="email1">Email:</label>
+            <input type="email" id="email1" autocomplete="email">
+            <label for="pass1">Password:</label>
+            <input type="password" id="pass1" autocomplete="current-password">
+            <p style="font-size:0.85em;color:#555;">You can paste your password from a password manager.</p>
+            <button type="submit">Log In</button>
+        </div>
+    </div>
+
+    <!-- Compliant 2: Passkey / biometric authentication -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Passkey and biometric authentication</h2>
+        <div class="auth-form">
+            <p>Sign in with your device's built-in security:</p>
+            <button type="button" style="font-size:1.1em; padding:12px 30px;">Sign in with Passkey</button>
+            <p style="font-size:0.85em;color:#555;">Uses your device fingerprint, face recognition, or security key. No puzzles or memory tests required.</p>
+        </div>
+    </div>
+
+    <!-- Compliant 3: Magic link (no cognitive test) -->
+    <div class="compliant-section">
+        <h2 class="compliant-title">Compliant: Magic link login (no memorization needed)</h2>
+        <div class="auth-form">
+            <label for="email3">Email address:</label>
+            <input type="email" id="email3" autocomplete="email">
+            <button type="submit">Send Login Link</button>
+            <p style="font-size:0.85em;color:#555;">We will email you a link. Click it to sign in — no codes to remember or type.</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -5,73 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Us — Acme Corp</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              600: '#1d4ed8',
-              700: '#1e3a8a',
-              800: '#1e2a5e',
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
     html {
-      scroll-padding-top: 1rem;
-      scroll-behavior: smooth;
-    }
-
-    :focus-visible {
-      outline: 3px solid #1d4ed8;
-      outline-offset: 2px;
+      scroll-padding-top: 72px;
     }
 
     .skip-link {
       position: absolute;
       top: -100%;
-      left: 1rem;
+      left: 16px;
       z-index: 100;
-      padding: 0.75rem 1.5rem;
-      background: #1d4ed8;
+      padding: 8px 16px;
+      background: #1e3a5f;
       color: #fff;
       font-weight: 700;
-      border-radius: 0 0 0.5rem 0.5rem;
+      border-radius: 0 0 8px 8px;
       text-decoration: none;
-      transition: top 0.15s;
     }
     .skip-link:focus {
       top: 0;
     }
 
-    @media (forced-colors: active) {
-      :focus-visible {
-        outline: 3px solid LinkText;
-      }
-      input, select, textarea {
-        border: 1px solid CanvasText;
-      }
+    *:focus-visible {
+      outline: 3px solid #1b2a4a !important;
+      outline-offset: 2px !important;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -82,27 +42,36 @@
       }
     }
 
-    .form-wrapper {
-      min-height: auto;
-      overflow: visible;
+    @media (forced-colors: active) {
+      *:focus-visible {
+        outline: 3px solid LinkText !important;
+      }
+      .icon-indicator {
+        forced-color-adjust: auto;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      *:focus-visible {
+        outline: 3px solid #000 !important;
+        outline-offset: 2px !important;
+      }
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-900 min-h-screen">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+    const { useState, useRef } = React;
 
     function App() {
       return (
         <React.Fragment>
           <SkipLink />
           <Header />
-          <main id="main-content" tabIndex={-1} className="flex-1">
-            <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-              <ContactForm />
-            </div>
+          <main id="main-content" tabIndex={-1}>
+            <ContactForm />
           </main>
           <Footer />
         </React.Fragment>
@@ -117,32 +86,28 @@
 
     function Header() {
       return (
-        <header className="bg-white border-b border-gray-400">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <a href="/" className="text-xl font-bold text-brand-700" aria-label="Acme Corp home">
-                Acme Corp
-              </a>
-              <nav aria-label="Main navigation">
-                <ul className="flex gap-6 text-sm font-medium">
-                  <li>
-                    <a href="/" className="text-gray-700 hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">
-                      Home
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/about" className="text-gray-700 hover:text-brand-600 underline decoration-transparent hover:decoration-brand-600 underline-offset-4 transition-colors">
-                      About
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/contact" aria-current="page" className="text-brand-600 underline decoration-brand-600 underline-offset-4">
-                      Contact
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+        <header className="bg-white border-b border-gray-500 sticky top-0 z-50">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+            <span className="text-xl font-bold text-gray-900" aria-hidden="true">ACME</span>
+            <nav aria-label="Main navigation">
+              <ul className="flex gap-6 text-sm" role="list">
+                <li>
+                  <a href="/" className="text-gray-700 hover:text-gray-900 underline decoration-1 underline-offset-4 hover:decoration-2 focus-visible:underline">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="/about" className="text-gray-700 hover:text-gray-900 underline decoration-1 underline-offset-4 hover:decoration-2 focus-visible:underline">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="/contact" aria-current="page" className="text-gray-900 font-semibold underline decoration-2 underline-offset-4">
+                    Contact
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </header>
       );
@@ -150,121 +115,64 @@
 
     function Footer() {
       return (
-        <footer className="bg-white border-t border-gray-400 mt-auto">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <p className="text-sm text-gray-600">&copy; {new Date().getFullYear()} Acme Corp. All rights reserved.</p>
+        <footer className="border-t border-gray-500 mt-12">
+          <div className="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-gray-600">
+            <p>&copy; 2025 Acme Corp. All rights reserved.</p>
           </div>
         </footer>
       );
     }
 
     function ContactForm() {
-      const [formData, setFormData] = useState({
+      const emptyForm = {
         name: '',
         email: '',
         phone: '',
         company: '',
         department: '',
         message: '',
-        terms: false,
-      });
-
-      const [errors, setErrors] = useState({});
-      const [submitted, setSubmitted] = useState(false);
-      const [touched, setTouched] = useState({});
-      const errorSummaryRef = useRef(null);
-      const firstInputRef = useRef(null);
-
-      const departments = [
-        { value: '', label: 'Select a department' },
-        { value: 'sales', label: 'Sales' },
-        { value: 'support', label: 'Customer Support' },
-        { value: 'billing', label: 'Billing' },
-        { value: 'hr', label: 'Human Resources' },
-        { value: 'other', label: 'Other' },
-      ];
-
-      const fieldLabels = {
-        name: 'Full name',
-        email: 'Email address',
-        phone: 'Phone number',
-        department: 'Department',
-        message: 'Message',
-        terms: 'Terms and conditions',
+        terms: false
       };
 
-      useEffect(() => {
-        if (!submitted && firstInputRef.current) {
-          firstInputRef.current.focus();
-        }
-      }, [submitted]);
+      const [formData, setFormData] = useState(emptyForm);
+      const [errors, setErrors] = useState({});
+      const [submitted, setSubmitted] = useState(false);
+      const errorSummaryRef = useRef(null);
+      const successRef = useRef(null);
+
+      const errorCount = Object.keys(errors).length;
+      const errorFieldIds = Object.keys(errors);
 
       function validate(data) {
-        const newErrors = {};
-
-        if (!data.name.trim()) {
-          newErrors.name = 'Full name is required.';
-        } else if (data.name.trim().length < 2) {
-          newErrors.name = 'Name must be at least 2 characters.';
-        }
-
+        const errs = {};
+        if (!data.name.trim()) errs.name = 'Full name is required';
         if (!data.email.trim()) {
-          newErrors.email = 'Email address is required.';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
-          newErrors.email = 'Please enter a valid email address.';
+          errs.email = 'Email address is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+          errs.email = 'Please enter a valid email address';
         }
-
-        if (data.phone.trim() && !/^[\d\s\-+().]{7,20}$/.test(data.phone.trim())) {
-          newErrors.phone = 'Please enter a valid phone number.';
+        if (!data.phone.trim()) {
+          errs.phone = 'Phone number is required';
+        } else if (!/^[+\d\s()\-]{7,}$/.test(data.phone.replace(/\s/g, ''))) {
+          errs.phone = 'Please enter a valid phone number';
         }
-
-        if (!data.department) {
-          newErrors.department = 'Please select a department.';
-        }
-
-        if (!data.message.trim()) {
-          newErrors.message = 'Message is required.';
-        } else if (data.message.trim().length < 10) {
-          newErrors.message = 'Message must be at least 10 characters.';
-        }
-
-        if (!data.terms) {
-          newErrors.terms = 'You must agree to the terms and conditions.';
-        }
-
-        return newErrors;
+        if (!data.company.trim()) errs.company = 'Company name is required';
+        if (!data.department) errs.department = 'Please select a department';
+        if (!data.message.trim()) errs.message = 'Message is required';
+        if (!data.terms) errs.terms = 'You must agree to the terms and conditions';
+        return errs;
       }
 
       function handleChange(e) {
         const { name, value, type, checked } = e.target;
-        const newData = {
-          ...formData,
-          [name]: type === 'checkbox' ? checked : value,
-        };
-        setFormData(newData);
-
+        const newValue = type === 'checkbox' ? checked : value;
+        setFormData(prev => ({ ...prev, [name]: newValue }));
         if (errors[name]) {
-          const newErrors = { ...errors };
-          delete newErrors[name];
-          setErrors(newErrors);
-        }
-      }
-
-      function handleBlur(e) {
-        const { name } = e.target;
-        setTouched(prev => ({ ...prev, [name]: true }));
-
-        if (Object.keys(errors).length > 0 || touched[name]) {
-          const fieldErrors = validate(formData);
-          if (fieldErrors[name]) {
-            setErrors(prev => ({ ...prev, [name]: fieldErrors[name] }));
-          } else {
-            setErrors(prev => {
-              const next = { ...prev };
-              delete next[name];
-              return next;
-            });
-          }
+          setErrors(prev => {
+            const next = { ...prev };
+            delete next[name];
+            return next;
+          });
         }
       }
 
@@ -274,15 +182,7 @@
 
         if (Object.keys(newErrors).length > 0) {
           setErrors(newErrors);
-          setTouched({
-            name: true,
-            email: true,
-            phone: true,
-            company: true,
-            department: true,
-            message: true,
-            terms: true,
-          });
+          setSubmitted(false);
           requestAnimationFrame(() => {
             errorSummaryRef.current?.focus();
           });
@@ -291,323 +191,267 @@
 
         setErrors({});
         setSubmitted(true);
+        setFormData(emptyForm);
+        requestAnimationFrame(() => {
+          successRef.current?.focus();
+        });
       }
 
-      function getDescribedBy(fieldName) {
-        const parts = [];
-        if (fieldName === 'phone') parts.push('phone-hint');
-        if (fieldName === 'message') parts.push('message-hint');
-        if (errors[fieldName]) parts.push(fieldName + '-error');
-        return parts.length > 0 ? parts.join(' ') : undefined;
-      }
-
-      function focusField(fieldId) {
-        const el = document.getElementById(fieldId);
-        if (el) {
-          el.focus();
-          el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }
-      }
-
-      function inputClasses(fieldName) {
-        const base = 'w-full px-4 py-2.5 rounded-lg border text-gray-800 placeholder:text-gray-600 bg-white';
+      function fieldClass(fieldName) {
+        const base = 'w-full px-3 py-2 rounded-md border text-gray-900 bg-white placeholder-gray-600 focus:ring-2';
         if (errors[fieldName]) {
-          return base + ' border-red-700 focus:ring-2 focus:ring-red-600 focus:border-red-700';
+          return base + ' border-red-700 focus:ring-red-600 focus:border-red-600';
         }
-        return base + ' border-gray-400 focus:ring-2 focus:ring-brand-600 focus:border-brand-600';
+        return base + ' border-gray-500 focus:ring-blue-600 focus:border-blue-600';
       }
 
-      function ErrorText({ id, message }) {
-        return (
-          <p id={id} className="mt-1.5 text-sm text-red-800 flex items-start gap-1">
-            <span aria-hidden="true" className="flex-shrink-0">&#10005;</span>
-            <span>{message}</span>
-          </p>
-        );
+      function renderError(id, message) {
+        if (!message) return null;
+        return <p id={id} className="mt-1 text-sm text-red-800">{message}</p>;
       }
 
-      if (submitted) {
-        return (
-          <React.Fragment>
-            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
-              Form submitted successfully. Thank you for contacting us.
-            </div>
-            <div className="bg-white rounded-lg border border-gray-400 p-8 sm:p-10 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center" aria-hidden="true">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#065f46" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank you for contacting us</h2>
-              <p className="text-gray-600 mb-4 max-w-md mx-auto">
-                We have received your message and will respond within 1 to 2 business days.
-              </p>
-              <p className="text-sm text-gray-600 mb-8">
-                A confirmation has been sent to <strong>{formData.email}</strong>.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSubmitted(false);
-                  setFormData({
-                    name: '',
-                    email: '',
-                    phone: '',
-                    company: '',
-                    department: '',
-                    message: '',
-                    terms: false,
-                  });
-                  setTouched({});
-                  setErrors({});
-                }}
-                className="inline-flex items-center px-8 py-3 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 active:bg-brand-800 transition-colors"
-              >
-                Send another message
-              </button>
-            </div>
-          </React.Fragment>
-        );
-      }
-
-      const errorCount = Object.keys(errors).length;
+      const labelClass = 'block text-sm font-medium text-gray-900 mb-1';
+      const req = (
+        <React.Fragment>
+          <span aria-hidden="true">*</span>
+          <span className="sr-only"> (required)</span>
+        </React.Fragment>
+      );
 
       return (
-        <div className="form-wrapper">
+        <div className="max-w-2xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
-          <p className="text-gray-600 mb-8 max-w-lg">
-            Fill out the form below and a member of our team will respond promptly.
+          <p className="text-gray-700 mb-8 max-w-prose">
+            Fill out the form below and we will get back to you within one business day.
+            Fields marked with an asterisk are required.
           </p>
+
+          {submitted && (
+            <div
+              ref={successRef}
+              tabIndex={-1}
+              role="status"
+              className="mb-6 p-4 rounded-md border border-green-700 bg-green-50 text-green-800"
+            >
+              <div className="flex items-center gap-2">
+                <svg aria-hidden="true" className="w-5 h-5 icon-indicator" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-semibold">Thank you!</span>
+              </div>
+              <p className="mt-1">
+                Your message has been sent successfully. We will respond within one business day.
+              </p>
+            </div>
+          )}
 
           {errorCount > 0 && (
             <div
               ref={errorSummaryRef}
               tabIndex={-1}
               role="alert"
-              className="bg-red-50 border-2 border-red-700 rounded-lg p-4 mb-6"
+              className="mb-6 p-4 rounded-md border border-red-700 bg-red-50 text-red-800"
             >
-              <h2 className="text-lg font-bold text-red-800 flex items-center gap-2">
-                <span aria-hidden="true">&#9888;</span>
-                There {errorCount === 1 ? 'is' : 'are'} {errorCount} error{errorCount > 1 ? 's' : ''} in this form
+              <h2 className="font-semibold flex items-center gap-2">
+                <svg aria-hidden="true" className="w-5 h-5 icon-indicator" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {errorCount} {errorCount === 1 ? 'error' : 'errors'} found
               </h2>
-              <ul className="mt-2 space-y-1 text-sm">
-                {Object.entries(errors).map(function(entry) {
-                  var field = entry[0];
-                  var msg = entry[1];
-                  return (
-                    <li key={field}>
-                      <button
-                        type="button"
-                        onClick={function() { focusField(field); }}
-                        className="text-red-800 underline hover:no-underline text-left"
-                      >
-                        {fieldLabels[field] || field}: {msg}
-                      </button>
-                    </li>
-                  );
-                })}
+              <ul className="mt-2 list-disc list-inside">
+                {errorFieldIds.map(field => (
+                  <li key={field}>
+                    <a href={`#${field}`} className="underline hover:no-underline focus-visible:underline">
+                      {errors[field]}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-6" noValidate>
-            {/* Full Name */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-1.5">
-                Full name
-                <span aria-hidden="true" className="text-red-700 ml-0.5">*</span>
-                <span className="sr-only"> (required)</span>
-              </label>
-              <input
-                ref={firstInputRef}
-                type="text"
-                id="name"
-                name="name"
-                autoComplete="name"
-                aria-required="true"
-                aria-invalid={!!errors.name || undefined}
-                aria-describedby={getDescribedBy('name')}
-                value={formData.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={inputClasses('name')}
-                placeholder="Jane Doe"
-              />
-              {errors.name && <ErrorText id="name-error" message={errors.name} />}
-            </div>
+          <form onSubmit={handleSubmit} noValidate>
+            <fieldset className="mb-6 border border-gray-500 rounded-md p-4 sm:p-6">
+              <legend className="text-sm font-semibold text-gray-900 px-1">
+                Personal Information
+              </legend>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="name" className={labelClass}>
+                    Full Name{req}
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    autoComplete="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    aria-required="true"
+                    aria-invalid={errors.name ? "true" : undefined}
+                    aria-describedby={errors.name ? "name-error" : undefined}
+                    className={fieldClass('name')}
+                    placeholder="Jane Doe"
+                  />
+                  {renderError('name-error', errors.name)}
+                </div>
 
-            {/* Email & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-1.5">
-                  Email address
-                  <span aria-hidden="true" className="text-red-700 ml-0.5">*</span>
-                  <span className="sr-only"> (required)</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  autoComplete="email"
-                  aria-required="true"
-                  aria-invalid={!!errors.email || undefined}
-                  aria-describedby={getDescribedBy('email')}
-                  value={formData.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputClasses('email')}
-                  placeholder="jane@example.com"
-                />
-                {errors.email && <ErrorText id="email-error" message={errors.email} />}
+                <div>
+                  <label htmlFor="email" className={labelClass}>
+                    Email Address{req}
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    autoComplete="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    aria-required="true"
+                    aria-invalid={errors.email ? "true" : undefined}
+                    aria-describedby={errors.email ? "email-error" : undefined}
+                    className={fieldClass('email')}
+                    placeholder="jane@example.com"
+                  />
+                  {renderError('email-error', errors.email)}
+                </div>
+
+                <div>
+                  <label htmlFor="phone" className={labelClass}>
+                    Phone Number{req}
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    autoComplete="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    aria-required="true"
+                    aria-invalid={errors.phone ? "true" : undefined}
+                    aria-describedby={errors.phone ? "phone-error" : undefined}
+                    className={fieldClass('phone')}
+                    placeholder="(555) 123-4567"
+                  />
+                  {renderError('phone-error', errors.phone)}
+                </div>
               </div>
+            </fieldset>
 
-              <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-1.5">
-                  Phone number
-                  <span className="text-gray-600 font-normal ml-1 text-xs">(optional)</span>
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  aria-describedby={getDescribedBy('phone')}
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputClasses('phone')}
-                  placeholder="(555) 123-4567"
-                />
-                <p id="phone-hint" className="mt-1.5 text-sm text-gray-600">
-                  Include country code if outside the US.
-                </p>
-                {errors.phone && <ErrorText id="phone-error" message={errors.phone} />}
+            <fieldset className="mb-6 border border-gray-500 rounded-md p-4 sm:p-6">
+              <legend className="text-sm font-semibold text-gray-900 px-1">
+                Company Information
+              </legend>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="company" className={labelClass}>
+                    Company Name{req}
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    autoComplete="organization"
+                    value={formData.company}
+                    onChange={handleChange}
+                    aria-required="true"
+                    aria-invalid={errors.company ? "true" : undefined}
+                    aria-describedby={errors.company ? "company-error" : undefined}
+                    className={fieldClass('company')}
+                    placeholder="Acme Corp"
+                  />
+                  {renderError('company-error', errors.company)}
+                </div>
+
+                <div>
+                  <label htmlFor="department" className={labelClass}>
+                    Department{req}
+                  </label>
+                  <select
+                    id="department"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    aria-required="true"
+                    aria-invalid={errors.department ? "true" : undefined}
+                    aria-describedby={errors.department ? "department-error" : undefined}
+                    className={fieldClass('department')}
+                  >
+                    <option value="">Select a department</option>
+                    <option value="sales">Sales</option>
+                    <option value="support">Customer Support</option>
+                    <option value="engineering">Engineering</option>
+                    <option value="partnerships">Partnerships</option>
+                    <option value="hr">Human Resources</option>
+                    <option value="other">Other</option>
+                  </select>
+                  {renderError('department-error', errors.department)}
+                </div>
               </div>
-            </div>
+            </fieldset>
 
-            {/* Company & Department */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="company" className="block text-sm font-semibold text-gray-800 mb-1.5">
-                  Company
-                  <span className="text-gray-600 font-normal ml-1 text-xs">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  autoComplete="organization"
-                  value={formData.company}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputClasses('company')}
-                  placeholder="Acme Inc."
-                />
-              </div>
-
-              <div>
-                <label htmlFor="department" className="block text-sm font-semibold text-gray-800 mb-1.5">
-                  Department
-                  <span aria-hidden="true" className="text-red-700 ml-0.5">*</span>
-                  <span className="sr-only"> (required)</span>
-                </label>
-                <select
-                  id="department"
-                  name="department"
-                  aria-required="true"
-                  aria-invalid={!!errors.department || undefined}
-                  aria-describedby={errors.department ? 'department-error' : undefined}
-                  value={formData.department}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputClasses('department')}
-                >
-                  {departments.map(function(dept) {
-                    return (
-                      <option key={dept.value} value={dept.value}>
-                        {dept.label}
-                      </option>
-                    );
-                  })}
-                </select>
-                {errors.department && <ErrorText id="department-error" message={errors.department} />}
-              </div>
-            </div>
-
-            {/* Message */}
-            <div>
-              <label htmlFor="message" className="block text-sm font-semibold text-gray-800 mb-1.5">
-                Message
-                <span aria-hidden="true" className="text-red-700 ml-0.5">*</span>
-                <span className="sr-only"> (required)</span>
+            <div className="mb-6">
+              <label htmlFor="message" className={labelClass}>
+                Message{req}
               </label>
               <textarea
                 id="message"
                 name="message"
                 rows={5}
-                aria-required="true"
-                aria-invalid={!!errors.message || undefined}
-                aria-describedby={getDescribedBy('message')}
                 value={formData.message}
                 onChange={handleChange}
-                onBlur={handleBlur}
-                className={inputClasses('message') + ' resize-y min-h-[120px]'}
+                aria-required="true"
+                aria-invalid={errors.message ? "true" : undefined}
+                aria-describedby={errors.message ? "message-error" : undefined}
+                className={fieldClass('message')}
                 placeholder="Tell us how we can help you..."
               />
-              <p id="message-hint" className="mt-1.5 text-sm text-gray-600">Minimum 10 characters</p>
-              {errors.message && <ErrorText id="message-error" message={errors.message} />}
+              {renderError('message-error', errors.message)}
             </div>
 
-            {/* Terms Checkbox */}
-            <div>
+            <div className="mb-8">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="terms"
                   name="terms"
-                  aria-required="true"
-                  aria-invalid={!!errors.terms || undefined}
-                  aria-describedby={errors.terms ? 'terms-error' : undefined}
                   checked={formData.terms}
                   onChange={handleChange}
-                  onBlur={handleBlur}
-                  className="mt-0.5 w-5 h-5 rounded border-gray-400 text-brand-600 focus:ring-2 focus:ring-brand-600 flex-shrink-0 cursor-pointer"
+                  aria-required="true"
+                  aria-invalid={errors.terms ? "true" : undefined}
+                  aria-describedby={errors.terms ? "terms-error" : undefined}
+                  className="mt-0.5 w-6 h-6 rounded border-gray-500 text-blue-600 focus:ring-2 focus:ring-blue-600 cursor-pointer"
                 />
-                <label htmlFor="terms" className="text-sm text-gray-700 cursor-pointer leading-relaxed">
+                <label htmlFor="terms" className="text-sm text-gray-700 cursor-pointer">
                   I agree to the{' '}
-                  <a href="/terms" className="text-brand-600 underline hover:no-underline" target="_blank" rel="noopener noreferrer">
+                  <a href="/terms" className="underline text-gray-900 hover:no-underline focus-visible:underline">
                     Terms and Conditions
                   </a>
                   {' '}and{' '}
-                  <a href="/privacy" className="text-brand-600 underline hover:no-underline" target="_blank" rel="noopener noreferrer">
+                  <a href="/privacy" className="underline text-gray-900 hover:no-underline focus-visible:underline">
                     Privacy Policy
                   </a>
-                  <span aria-hidden="true" className="text-red-700 ml-0.5">*</span>
-                  <span className="sr-only"> (required)</span>
+                  {req}
                 </label>
               </div>
               {errors.terms && (
-                <ErrorText id="terms-error" message={errors.terms} />
+                <p id="terms-error" className="mt-1 text-sm text-red-800 ml-9">{errors.terms}</p>
               )}
             </div>
 
-            {/* Submit */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-8 py-3 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 active:bg-brand-800 transition-colors text-base min-h-[44px]"
-              >
-                Send message
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-8 py-3 bg-blue-700 hover:bg-blue-800 active:bg-blue-900 text-white font-semibold rounded-md focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
+              Send Message
+            </button>
           </form>
         </div>
       );
     }
 
-    var root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(App));
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
   </script>
 </body>
 </html>

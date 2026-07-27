@@ -1,0 +1,104 @@
+<!-- WCAG-TEST
+criterion: 2.2.3, 2.2.4, 2.2.5, 2.2.6
+level: AAA
+title: Timing AAA (No Timing, Interruptions, Re-authentication, Timeouts)
+test_type: bad
+expected_violations: 6
+testable_by: llm
+scanners: llm-behavioral-scanner
+description: Timed interactions, forced interruptions, data loss on re-auth, no timeout warnings
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Timing AAA - Accessibility Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #d32f2f; font-weight: bold; margin-bottom: 10px; }
+        .timer { font-size: 1.5em; color: #d32f2f; font-weight: bold; font-family: monospace; }
+        .notification { background: #ff9800; color: #fff; padding: 12px 20px; border-radius: 4px; margin: 8px 0; }
+        input, textarea, select { padding: 8px; margin: 4px 0; display: block; width: 100%; max-width: 400px; border: 1px solid #ccc; }
+        button { padding: 8px 16px; margin: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Bad Timing AAA (2.2.3, 2.2.4, 2.2.5, 2.2.6)</h1>
+
+    <!-- Violation 1 (2.2.3): Timed quiz with no untimed option -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 1 (2.2.3): Timed quiz — no untimed alternative</div>
+        <p>Complete this certification quiz within the time limit:</p>
+        <div class="timer">Time remaining: 04:58</div>
+        <div style="margin:15px 0;">
+            <p><strong>Question 1:</strong> What does WCAG stand for?</p>
+            <label><input type="radio" name="q1" value="a"> Web Content Accessibility Guidelines</label><br>
+            <label><input type="radio" name="q1" value="b"> Web Compliance Assessment Guide</label><br>
+            <label><input type="radio" name="q1" value="c"> Website Content Analysis Group</label>
+        </div>
+        <p style="color:#d32f2f; font-size:0.85em;">Warning: Quiz auto-submits when timer reaches zero. No option to disable the time limit.</p>
+    </div>
+
+    <!-- Violation 2 (2.2.4): Non-essential interrupting notifications -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 2 (2.2.4): Non-essential interruptions cannot be postponed</div>
+        <p>Fill out this form (you will be interrupted):</p>
+        <label for="fname">First Name:</label>
+        <input type="text" id="fname">
+        <label for="lname">Last Name:</label>
+        <input type="text" id="lname">
+        <div class="notification">New promotional offer: 20% off all products! This notification cannot be dismissed or postponed.</div>
+        <div class="notification">Trending now: 5 articles you might like! Auto-displayed, no user control.</div>
+        <div class="notification">Your friend just posted a photo! This interrupts your current task.</div>
+        <p style="color:#999; font-size:0.85em;">These non-essential notifications appear automatically and cannot be suppressed or deferred.</p>
+    </div>
+
+    <!-- Violation 3 (2.2.5): Session timeout loses form data -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 3 (2.2.5): Re-authentication loses all form data</div>
+        <p>Complete this lengthy application form:</p>
+        <label for="app-name">Full Name:</label>
+        <input type="text" id="app-name" value="Jane Doe">
+        <label for="app-addr">Address:</label>
+        <textarea id="app-addr" rows="2">123 Main Street, Anytown, ST 12345</textarea>
+        <label for="app-essay">Personal Statement (500 words):</label>
+        <textarea id="app-essay" rows="4">I have spent the past three years working in accessibility consulting...</textarea>
+        <div style="background:#ffcdd2; padding:10px; margin:10px 0; border-radius:4px;">
+            <strong>Session Expired.</strong> You must log in again. All form data entered above will be lost.
+            <br><button>Re-authenticate</button>
+        </div>
+    </div>
+
+    <!-- Violation 4 (2.2.6): No timeout warning -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 4 (2.2.6): No warning about upcoming timeout</div>
+        <p>You are filling out a tax return form. The session will expire in 2 minutes but there is no warning displayed until it expires:</p>
+        <label for="ssn">Tax ID:</label>
+        <input type="text" id="ssn" placeholder="XXX-XX-XXXX">
+        <label for="income">Annual Income:</label>
+        <input type="text" id="income" placeholder="$0.00">
+        <p style="color:#999; font-size:0.85em;">Session timeout is set to 15 minutes. No warning is displayed before expiration. No option to save progress.</p>
+    </div>
+
+    <!-- Violation 5 (2.2.3): Auto-advancing slideshow with no stop -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 5 (2.2.3): Auto-advancing content with no pause</div>
+        <div style="background:#333; color:#fff; padding:30px; text-align:center; margin:10px 0;">
+            <p style="font-size:1.2em;">Slide 3 of 10: Important Safety Information</p>
+            <p>Each slide displays for exactly 8 seconds before auto-advancing.</p>
+            <p>There is no pause, stop, or manual navigation control.</p>
+        </div>
+    </div>
+
+    <!-- Violation 6 (2.2.4): Auto-updating stock ticker disrupts reading -->
+    <div class="violation-section">
+        <div class="violation-title">Violation 6 (2.2.4): Auto-updating content interrupts reading</div>
+        <div style="background:#1a237e; color:#4CAF50; padding:10px; font-family:monospace; overflow:hidden;">
+            AAPL +2.3% | GOOGL -0.5% | MSFT +1.1% | AMZN +0.8% — auto-refreshes every 3 seconds, shifts page layout, no pause control
+        </div>
+        <p>The stock ticker above auto-updates, causing layout shifts and interrupting screen reader users. No mechanism to pause or control update frequency.</p>
+    </div>
+</body>
+</html>

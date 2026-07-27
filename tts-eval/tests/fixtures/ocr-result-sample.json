@@ -1,0 +1,13 @@
+{
+  "arxivId": "test-paper",
+  "pages": [
+    {
+      "pageIndex": 0,
+      "markdown": "# Test Paper\n\nWe study the equation $x + y = z$ and show that\n\n$$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$\n\nThis is a well-known result."
+    },
+    {
+      "pageIndex": 1,
+      "markdown": "## Section 2\n\nLet $\\alpha > 0$ and consider $f(x) = \\frac{1}{x}$.\n\nThe integral\n\n$$\\int_0^1 x^2 \\, dx = \\frac{1}{3}$$\n\nis elementary."
+    }
+  ]
+}

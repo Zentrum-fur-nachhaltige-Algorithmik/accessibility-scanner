@@ -3,27 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Us - Accessible Form</title>
+  <title>Contact Us</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :focus-visible {
-      outline: 3px solid #1b2a4a;
-      outline-offset: 2px;
-    }
-    .skip-link {
-      position: absolute;
-      left: 0;
-      top: -40px;
-      background: #000;
-      color: #fff;
-      padding: 8px 16px;
-      text-decoration: none;
-      z-index: 100;
-      transition: top 0.3s;
-    }
-    .skip-link:focus {
-      top: 0;
-    }
     .sr-only {
       position: absolute;
       width: 1px;
@@ -35,337 +17,356 @@
       white-space: nowrap;
       border: 0;
     }
-    [aria-invalid="true"] {
-      border-color: #b91c1c !important;
+    
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #000;
+      color: #fff;
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 100;
+      border-radius: 0 0 4px 0;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+      outline: 3px solid #fff;
+      outline-offset: 2px;
+    }
+    
+    :focus-visible {
+      outline: 3px solid #1b2a4a;
+      outline-offset: 2px;
+    }
+    
+    @media (forced-colors: active) {
+      :focus-visible {
+        outline: 3px solid LinkText;
+      }
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
-
   <a href="#main-content" class="skip-link">Skip to main content</a>
-
-  <header class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  
+  <header class="bg-white border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 py-4">
       <nav aria-label="Main navigation">
-        <div class="text-xl font-bold text-gray-900">Company Name</div>
+        <a href="/" class="text-xl font-bold text-gray-900 underline hover:text-gray-700">Company Name</a>
       </nav>
     </div>
   </header>
 
-  <main id="main-content" class="flex-grow w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8" tabindex="-1">
+  <main id="main-content" class="flex-grow max-w-2xl mx-auto px-4 py-8 w-full" tabindex="-1">
     <h1 class="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
-    <p class="text-gray-700 mb-6">Fields marked with an asterisk (<span class="text-red-700" aria-hidden="true">*</span>) are required.</p>
+    <p class="text-gray-600 mb-8 text-lg">Fill out the form below and we'll get back to you within 24 hours.</p>
 
-    <div id="success-banner" role="status" tabindex="-1" class="hidden mb-6 p-4 bg-green-50 border border-green-300 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600">
-      <div class="flex items-start">
-        <div class="flex-shrink-0">
-          <svg class="h-5 w-5 text-green-700" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-          </svg>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-green-900">Thank you! Your message has been sent successfully. We will respond within 2 business days.</p>
-        </div>
-      </div>
+    <div id="error-summary" role="alert" tabindex="-1" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+      <h2 class="text-lg font-semibold text-red-700 mb-2">Please correct the following errors:</h2>
+      <ul class="list-disc list-inside text-red-700 space-y-1" id="error-list"></ul>
     </div>
 
-    <div id="error-summary" role="alert" aria-live="assertive" tabindex="-1" class="hidden mb-6 p-4 bg-red-50 border border-red-300 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600">
-      <h2 class="text-lg font-semibold text-red-900 mb-2">There were errors with your submission</h2>
-      <ul id="error-list" class="list-disc list-inside text-sm text-red-800"></ul>
+    <div id="success-message" role="status" tabindex="-1" class="hidden mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+      <h2 class="text-lg font-semibold text-green-800 mb-1">Thank you!</h2>
+      <p class="text-green-800">Your message has been sent successfully. We'll be in touch soon.</p>
     </div>
 
     <form id="contact-form" novalidate class="space-y-6">
-      <div class="space-y-6">
-        <div>
-          <label for="full-name" class="block text-sm font-medium text-gray-900">
-            Full Name <span class="text-red-700" aria-hidden="true">*</span>
-            <span class="sr-only">(required)</span>
-          </label>
-          <input 
-            type="text" 
-            id="full-name" 
-            name="fullName"
-            autocomplete="name"
-            aria-required="true"
-            aria-describedby="name-hint name-error"
-            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
-          >
-          <p id="name-hint" class="mt-1 text-sm text-gray-600">Please enter your first and last name.</p>
-          <p id="name-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
-        </div>
+      <div class="form-group">
+        <label for="name" class="block text-sm font-semibold text-gray-900 mb-2">
+          Full Name
+          <span aria-hidden="true" class="text-red-700 ml-1">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          autocomplete="name"
+          aria-required="true"
+          aria-describedby="name-hint name-error"
+          class="w-full px-4 py-3 border border-gray-500 rounded-md focus:ring-blue-600 focus:border-blue-600 placeholder-gray-600 text-gray-900 bg-white"
+          placeholder="Jane Doe"
+        >
+        <p id="name-hint" class="mt-2 text-sm text-gray-600">Please enter your first and last name.</p>
+        <p id="name-error" class="mt-2 text-sm text-red-700 hidden"></p>
+      </div>
 
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-900">
-            Email Address <span class="text-red-700" aria-hidden="true">*</span>
-            <span class="sr-only">(required)</span>
-          </label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email"
-            autocomplete="email"
-            aria-required="true"
-            aria-describedby="email-error"
-            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
-          >
-          <p id="email-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
-        </div>
+      <div class="form-group">
+        <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">
+          Email Address
+          <span aria-hidden="true" class="text-red-700 ml-1">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          autocomplete="email"
+          aria-required="true"
+          aria-describedby="email-hint email-error"
+          class="w-full px-4 py-3 border border-gray-500 rounded-md focus:ring-blue-600 focus:border-blue-600 placeholder-gray-600 text-gray-900 bg-white"
+          placeholder="jane@example.com"
+        >
+        <p id="email-hint" class="mt-2 text-sm text-gray-600">We'll never share your email with anyone else.</p>
+        <p id="email-error" class="mt-2 text-sm text-red-700 hidden"></p>
+      </div>
 
-        <div>
-          <label for="phone" class="block text-sm font-medium text-gray-900">Phone Number</label>
-          <input 
-            type="tel" 
-            id="phone" 
-            name="phone"
-            autocomplete="tel"
-            aria-describedby="phone-error"
-            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
-          >
-          <p id="phone-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
-          <p class="mt-1 text-sm text-gray-600">Optional. Include area code.</p>
-        </div>
+      <div class="form-group">
+        <label for="phone" class="block text-sm font-semibold text-gray-900 mb-2">
+          Phone Number
+          <span aria-hidden="true" class="text-red-700 ml-1">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <input 
+          type="tel" 
+          id="phone" 
+          name="phone" 
+          autocomplete="tel"
+          aria-required="true"
+          aria-describedby="phone-hint phone-error"
+          class="w-full px-4 py-3 border border-gray-500 rounded-md focus:ring-blue-600 focus:border-blue-600 placeholder-gray-600 text-gray-900 bg-white"
+          placeholder="(555) 123-4567"
+        >
+        <p id="phone-hint" class="mt-2 text-sm text-gray-600">Include area code.</p>
+        <p id="phone-error" class="mt-2 text-sm text-red-700 hidden"></p>
+      </div>
 
-        <div>
-          <label for="company" class="block text-sm font-medium text-gray-900">Company</label>
-          <input 
-            type="text" 
-            id="company" 
-            name="company"
-            autocomplete="organization"
-            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
-          >
-        </div>
+      <div class="form-group">
+        <label for="company" class="block text-sm font-semibold text-gray-900 mb-2">
+          Company
+          <span class="sr-only">(optional)</span>
+        </label>
+        <input 
+          type="text" 
+          id="company" 
+          name="company" 
+          autocomplete="organization"
+          aria-describedby="company-hint"
+          class="w-full px-4 py-3 border border-gray-500 rounded-md focus:ring-blue-600 focus:border-blue-600 placeholder-gray-600 text-gray-900 bg-white"
+          placeholder="Acme Inc."
+        >
+        <p id="company-hint" class="mt-2 text-sm text-gray-600">Optional</p>
+      </div>
 
-        <div>
-          <label for="department" class="block text-sm font-medium text-gray-900">
-            Department <span class="text-red-700" aria-hidden="true">*</span>
-            <span class="sr-only">(required)</span>
-          </label>
-          <select 
-            id="department" 
-            name="department"
-            aria-required="true"
-            aria-describedby="department-error"
-            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border bg-white"
-          >
-            <option value="">Select a department</option>
-            <option value="sales">Sales</option>
-            <option value="support">Customer Support</option>
-            <option value="technical">Technical Support</option>
-            <option value="billing">Billing</option>
-            <option value="other">Other</option>
-          </select>
-          <p id="department-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
-        </div>
+      <div class="form-group">
+        <label for="department" class="block text-sm font-semibold text-gray-900 mb-2">
+          Department
+          <span aria-hidden="true" class="text-red-700 ml-1">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <select 
+          id="department" 
+          name="department" 
+          aria-required="true"
+          aria-describedby="department-error"
+          class="w-full px-4 py-3 border border-gray-500 rounded-md focus:ring-blue-600 focus:border-blue-600 text-gray-900 bg-white"
+        >
+          <option value="" disabled selected>Select a department</option>
+          <option value="sales">Sales</option>
+          <option value="support">Customer Support</option>
+          <option value="billing">Billing</option>
+          <option value="general">General Inquiry</option>
+        </select>
+        <p id="department-error" class="mt-2 text-sm text-red-700 hidden"></p>
+      </div>
 
-        <div>
-          <label for="message" class="block text-sm font-medium text-gray-900">
-            Message <span class="text-red-700" aria-hidden="true">*</span>
-            <span class="sr-only">(required)</span>
-          </label>
-          <textarea 
-            id="message" 
-            name="message"
-            rows="5"
-            aria-required="true"
-            aria-describedby="message-error"
-            class="mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-blue-600 focus:ring-blue-600 sm:text-sm p-2.5 border"
-          ></textarea>
-          <p id="message-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
-        </div>
+      <div class="form-group">
+        <label for="message" class="block text-sm font-semibold text-gray-900 mb-2">
+          Message
+          <span aria-hidden="true" class="text-red-700 ml-1">*</span>
+          <span class="sr-only">(required)</span>
+        </label>
+        <textarea 
+          id="message" 
+          name="message" 
+          rows="5" 
+          aria-required="true"
+          aria-describedby="message-hint message-error"
+          class="w-full px-4 py-3 border border-gray-500 rounded-md focus:ring-blue-600 focus:border-blue-600 placeholder-gray-600 text-gray-900 bg-white resize-vertical"
+          placeholder="How can we help you?"
+        ></textarea>
+        <p id="message-hint" class="mt-2 text-sm text-gray-600">Maximum 500 characters.</p>
+        <p id="message-error" class="mt-2 text-sm text-red-700 hidden"></p>
+      </div>
 
+      <div class="form-group">
         <div class="flex items-start">
-          <div class="flex items-center h-5">
+          <div class="flex items-center h-6">
             <input 
               type="checkbox" 
               id="terms" 
-              name="terms"
+              name="terms" 
               aria-required="true"
               aria-describedby="terms-error"
-              class="h-4 w-4 text-blue-700 border-gray-500 rounded focus:ring-blue-600"
+              class="w-5 h-5 border border-gray-500 rounded focus:ring-blue-600 text-blue-600 bg-white cursor-pointer"
             >
           </div>
           <div class="ml-3">
-            <label for="terms" class="block text-sm font-medium text-gray-900">
-              I agree to the Terms and Conditions <span class="text-red-700" aria-hidden="true">*</span>
+            <label for="terms" class="text-sm font-semibold text-gray-900 cursor-pointer">
+              I agree to the Terms and Conditions
+              <span aria-hidden="true" class="text-red-700 ml-1">*</span>
               <span class="sr-only">(required)</span>
             </label>
-            <p class="text-sm text-gray-600">By checking this box, you agree to our privacy policy and terms of service.</p>
-            <p id="terms-error" class="mt-1 text-sm text-red-700 hidden" role="alert"></p>
+            <p class="text-sm text-gray-600 mt-1">By checking this box, you agree to our <button type="button" class="underline text-blue-700 hover:text-blue-800 bg-transparent border-0 p-0 cursor-pointer font-medium">Privacy Policy</button>.</p>
+            <p id="terms-error" class="mt-2 text-sm text-red-700 hidden"></p>
           </div>
         </div>
       </div>
 
-      <div class="pt-2">
+      <div class="form-group pt-4">
         <button 
           type="submit" 
-          class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-700 min-h-[48px]"
+          class="w-full sm:w-auto px-8 py-3 bg-blue-700 text-white font-semibold rounded-md hover:bg-blue-800 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none min-h-[48px] min-w-[48px] text-base"
         >
-          Submit Request
+          Send Message
         </button>
       </div>
     </form>
   </main>
 
   <footer class="bg-gray-100 border-t border-gray-200 mt-auto">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <p class="text-center text-sm text-gray-700">&copy; 2024 Company Name. All rights reserved.</p>
+    <div class="max-w-4xl mx-auto px-4 py-6">
+      <p class="text-gray-600 text-sm">&copy; 2024 Company Name. All rights reserved.</p>
     </div>
   </footer>
 
   <script>
-    const form = document.getElementById('contact-form');
-    const errorSummary = document.getElementById('error-summary');
-    const errorList = document.getElementById('error-list');
-    const successBanner = document.getElementById('success-banner');
-    
-    const fields = {
-      fullName: { 
-        el: document.getElementById('full-name'), 
-        errorEl: document.getElementById('name-error'), 
-        label: 'Full Name',
-        validate: (v) => v.trim() ? '' : 'Full Name is required'
-      },
-      email: { 
-        el: document.getElementById('email'), 
-        errorEl: document.getElementById('email-error'), 
-        label: 'Email Address',
-        validate: (v) => {
-          if (!v.trim()) return 'Email Address is required';
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Please enter a valid email address';
-          return '';
-        }
-      },
-      phone: { 
-        el: document.getElementById('phone'), 
-        errorEl: document.getElementById('phone-error'), 
-        label: 'Phone Number',
-        required: false,
-        validate: (v) => {
-          if (!v.trim()) return '';
-          const cleaned = v.replace(/[\s\-\(\)\.]/g, '');
-          if (cleaned.length < 10) return 'Please enter a valid phone number with at least 10 digits';
-          return '';
-        }
-      },
-      company: { 
-        el: document.getElementById('company'), 
-        errorEl: null, 
-        label: 'Company',
-        required: false,
-        validate: () => ''
-      },
-      department: { 
-        el: document.getElementById('department'), 
-        errorEl: document.getElementById('department-error'), 
-        label: 'Department',
-        validate: (v) => v ? '' : 'Please select a department'
-      },
-      message: { 
-        el: document.getElementById('message'), 
-        errorEl: document.getElementById('message-error'), 
-        label: 'Message',
-        validate: (v) => v.trim() ? '' : 'Message is required'
-      },
-      terms: { 
-        el: document.getElementById('terms'), 
-        errorEl: document.getElementById('terms-error'), 
-        label: 'Terms and Conditions',
-        validate: (v) => v ? '' : 'You must agree to the Terms and Conditions'
-      }
-    };
-
-    function showFieldError(fieldKey, message) {
-      const field = fields[fieldKey];
-      if (field.errorEl) {
-        field.errorEl.textContent = message;
-        field.errorEl.classList.remove('hidden');
-      }
-      field.el.setAttribute('aria-invalid', 'true');
-      field.el.classList.add('border-red-600');
-      field.el.classList.remove('border-gray-500');
-    }
-
-    function clearFieldError(fieldKey) {
-      const field = fields[fieldKey];
-      if (field.errorEl) {
-        field.errorEl.textContent = '';
-        field.errorEl.classList.add('hidden');
-      }
-      field.el.removeAttribute('aria-invalid');
-      field.el.classList.remove('border-red-600');
-      field.el.classList.add('border-gray-500');
-    }
-
-    function validateField(fieldKey) {
-      const field = fields[fieldKey];
-      const value = fieldKey === 'terms' ? field.el.checked : field.el.value;
-      const error = field.validate(value);
+    (function() {
+      const form = document.getElementById('contact-form');
+      const errorSummary = document.getElementById('error-summary');
+      const errorList = document.getElementById('error-list');
+      const successMessage = document.getElementById('success-message');
       
-      if (error) {
-        showFieldError(fieldKey, error);
-        return false;
-      } else {
-        clearFieldError(fieldKey);
-        return true;
-      }
-    }
-
-    Object.keys(fields).forEach(key => {
-      const field = fields[key];
-      field.el.addEventListener('blur', () => validateField(key));
-      field.el.addEventListener('input', () => {
-        if (field.el.getAttribute('aria-invalid') === 'true') {
-          validateField(key);
+      const validators = {
+        name: {
+          validate: (val) => val.trim().length > 0 || 'Please enter your name'
+        },
+        email: {
+          validate: (val) => {
+            if (!val.trim()) return 'Please enter your email address';
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Please enter a valid email address';
+          }
+        },
+        phone: {
+          validate: (val) => {
+            if (!val.trim()) return 'Please enter your phone number';
+            return /^[\d\s\-\+\(\)]{10,}$/.test(val) || 'Please enter a valid phone number with at least 10 digits';
+          }
+        },
+        department: {
+          validate: (val) => val !== '' || 'Please select a department'
+        },
+        message: {
+          validate: (val) => {
+            if (!val.trim()) return 'Please enter a message';
+            return val.length <= 500 || 'Message must be less than 500 characters';
+          }
+        },
+        terms: {
+          validate: (checked) => checked === true || 'You must agree to the Terms and Conditions'
         }
-      });
-      if (key === 'terms') {
-        field.el.addEventListener('change', () => validateField(key));
-      }
-    });
+      };
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      errorSummary.classList.add('hidden');
-      errorList.innerHTML = '';
-      successBanner.classList.add('hidden');
-      
-      const errors = [];
-      let firstErrorKey = null;
-
-      Object.keys(fields).forEach(key => {
-        const isValid = validateField(key);
+      function validateField(name) {
+        const element = document.getElementById(name);
+        const errorElement = document.getElementById(name + '-error');
+        const value = element.type === 'checkbox' ? element.checked : element.value;
+        
+        const result = validators[name].validate(value);
+        const isValid = result === true;
+        
         if (!isValid) {
-          const field = fields[key];
-          const errorMsg = field.errorEl ? field.errorEl.textContent : `${field.label} is required`;
-          errors.push(`${field.label}: ${errorMsg}`);
-          if (!firstErrorKey) firstErrorKey = key;
+          errorElement.textContent = result;
+          errorElement.classList.remove('hidden');
+          element.setAttribute('aria-invalid', 'true');
+          return false;
+        } else {
+          errorElement.classList.add('hidden');
+          errorElement.textContent = '';
+          element.removeAttribute('aria-invalid');
+          return true;
         }
-      });
+      }
 
-      if (errors.length > 0) {
-        errors.forEach(error => {
-          const li = document.createElement('li');
-          li.textContent = error;
-          errorList.appendChild(li);
+      function validateAll() {
+        let hasErrors = false;
+        const errors = [];
+        
+        Object.keys(validators).forEach(name => {
+          const isValid = validateField(name);
+          if (!isValid) {
+            hasErrors = true;
+            const label = document.querySelector('label[for="' + name + '"]');
+            let labelText = name;
+            if (label) {
+              labelText = label.childNodes[0].textContent.trim();
+            }
+            const errorMsg = document.getElementById(name + '-error').textContent;
+            errors.push({ name, label: labelText, message: errorMsg });
+          }
         });
         
-        errorSummary.classList.remove('hidden');
-        errorSummary.focus();
-        
-        if (firstErrorKey) {
-          setTimeout(() => fields[firstErrorKey].el.focus(), 100);
+        if (hasErrors) {
+          errorList.innerHTML = '';
+          errors.forEach(err => {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = '#' + err.name;
+            link.textContent = err.label + ': ' + err.message;
+            link.className = 'underline hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-700 rounded';
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              document.getElementById(err.name).focus();
+            });
+            li.appendChild(link);
+            errorList.appendChild(li);
+          });
+          
+          errorSummary.classList.remove('hidden');
+          errorSummary.focus();
+        } else {
+          errorSummary.classList.add('hidden');
         }
-      } else {
-        successBanner.classList.remove('hidden');
-        successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => successBanner.focus(), 100);
         
-        form.reset();
-        Object.keys(fields).forEach(key => clearFieldError(key));
+        return !hasErrors;
       }
-    });
+
+      Object.keys(validators).forEach(name => {
+        const element = document.getElementById(name);
+        if (element) {
+          element.addEventListener('blur', () => validateField(name));
+          
+          const eventType = element.type === 'checkbox' ? 'change' : 'input';
+          element.addEventListener(eventType, () => {
+            const errorElement = document.getElementById(name + '-error');
+            if (!errorElement.classList.contains('hidden')) {
+              validateField(name);
+            }
+          });
+        }
+      });
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        if (validateAll()) {
+          form.classList.add('hidden');
+          successMessage.classList.remove('hidden');
+          successMessage.focus();
+        }
+      });
+    })();
   </script>
 </body>
 </html>

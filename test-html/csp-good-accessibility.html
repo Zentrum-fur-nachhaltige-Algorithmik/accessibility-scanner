@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Accessibility - CSP Mitigation Test</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; object-src 'none';">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input, textarea { padding: 8px; margin: 5px; }
+        .skip-link { position: absolute; top: -40px; left: 6px; background: #000; color: #fff; padding: 8px; }
+        .skip-link:focus { top: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Skip Navigation -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+        
+        <header>
+            <h1>CSP Mitigation Test - Good Accessibility</h1>
+            <nav role="navigation" aria-label="Main navigation">
+                <ul>
+                    <li><a href="#section1">Section 1</a></li>
+                    <li><a href="#section2">Section 2</a></li>
+                    <li><a href="#section3">Section 3</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main id="main-content">
+            <div class="section" id="section1">
+                <h2>Section 1: Form Elements</h2>
+                
+                <!-- Good: All form elements have proper labels -->
+                <form>
+                    <label for="name">Full Name (required):</label>
+                    <input type="text" id="name" name="name" required aria-describedby="name-help">
+                    <div id="name-help">Please enter your first and last name</div>
+                    
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email">
+                    
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4" cols="50"></textarea>
+                    
+                    <button type="submit">Submit Form</button>
+                </form>
+            </div>
+            
+            <div class="section" id="section2">
+                <h2>Section 2: Interactive Elements</h2>
+                
+                <!-- Good: All buttons have accessible names -->
+                <button type="button">Save Changes</button>
+                <button type="button" aria-label="Close dialog">×</button>
+                
+                <!-- Good: Links have descriptive text -->
+                <p>
+                    <a href="https://example.com/report.pdf">Download Annual Report (PDF, 2MB)</a>
+                </p>
+                
+                <!-- Good: Images have alt text -->
+                <img src="chart.png" alt="Sales increased 25% from Q1 to Q2" width="400" height="300">
+            </div>
+            
+            <div class="section" id="section3">
+                <h2>Section 3: Media and Content</h2>
+                
+                <!-- Good: Video with captions -->
+                <video controls width="400" height="300">
+                    <source src="presentation.mp4" type="video/mp4">
+                    <track kind="captions" src="captions.vtt" srclang="en" label="English">
+                    <track kind="descriptions" src="descriptions.vtt" srclang="en" label="English descriptions">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <!-- Good: Audio with transcript -->
+                <audio controls>
+                    <source src="podcast.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <p><a href="podcast-transcript.txt">Podcast Transcript</a></p>
+                
+                <!-- Good: SVG with accessible name -->
+                <svg width="200" height="100" role="img" aria-labelledby="chart-title">
+                    <title id="chart-title">Monthly Sales Chart</title>
+                    <desc>Bar chart showing sales increasing from January to March</desc>
+                    <rect x="10" y="50" width="40" height="40" fill="blue"/>
+                    <rect x="60" y="30" width="40" height="60" fill="blue"/>
+                    <rect x="110" y="10" width="40" height="80" fill="blue"/>
+                </svg>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 CSP Mitigation Test. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

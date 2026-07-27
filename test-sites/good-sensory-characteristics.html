@@ -1,0 +1,116 @@
+<!-- WCAG-TEST
+criterion: 1.3.3
+level: A
+title: Sensory Characteristics
+test_type: good
+expected_violations: 0
+testable_by: manual
+scanners: structure
+description: Instructions provide text labels alongside any visual references to shape, color, size, or location
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Accessible Instructions with Multiple Cues (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .form-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error-msg {
+            color: #dc3545;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .error-msg::before {
+            content: "\26A0";
+            font-size: 1.1em;
+        }
+        .success-msg {
+            color: #155724;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .success-msg::before {
+            content: "\2713";
+            font-size: 1.1em;
+        }
+        .submit-btn {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .cancel-btn {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Accessible Instructions with Multiple Cues (GOOD)</h1>
+    <p>This page demonstrates WCAG 1.3.3 compliance: instructions never rely solely on sensory characteristics.</p>
+
+    <!-- Pattern 1: Text labels alongside visual references -->
+    <h2>Pattern 1: Buttons Identified by Name and Visual Cue</h2>
+    <div class="form-section">
+        <p>To submit your application, click the <strong>"Submit"</strong> button (round, green). To go back without saving, click the <strong>"Cancel"</strong> button (gray, rectangular).</p>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 10px;">
+            <button class="submit-btn">Submit</button>
+            <button class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Pattern 2: Error and success indicated by text + icon + color -->
+    <h2>Pattern 2: Form Validation with Text, Icon, and Color</h2>
+    <div class="form-section">
+        <p>Fields marked with a warning icon and "Error" label need correction. A checkmark and "Valid" label confirm accepted input.</p>
+        <form>
+            <div style="margin-bottom: 10px;">
+                <label for="name-field">Full Name (required):</label><br>
+                <input id="name-field" type="text" value="" aria-describedby="name-error" aria-invalid="true">
+                <span class="error-msg" id="name-error" role="alert">Error: Full name is required.</span>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="email-field">Email Address (required):</label><br>
+                <input id="email-field" type="email" value="user@example.com" aria-describedby="email-ok">
+                <span class="success-msg" id="email-ok">Valid: Email address accepted.</span>
+            </div>
+        </form>
+    </div>
+
+    <!-- Pattern 3: Location references include element names -->
+    <h2>Pattern 3: Navigation References Include Element Names</h2>
+    <div class="form-section">
+        <p>To manage your account, use the <strong>"Account Settings"</strong> link in the navigation menu. For quick actions, open the <strong>"Quick Actions"</strong> panel. Your profile summary appears in the <strong>"Profile"</strong> section at the top of the dashboard.</p>
+        <nav aria-label="Account navigation">
+            <ul>
+                <li><a href="#">Account Settings</a></li>
+                <li><a href="#">Billing</a></li>
+                <li><a href="#">Notifications</a></li>
+            </ul>
+        </nav>
+    </div>
+
+</body>
+</html>

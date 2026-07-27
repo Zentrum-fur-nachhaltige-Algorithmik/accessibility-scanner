@@ -1,0 +1,650 @@
+<!-- WCAG-TEST
+criterion: 4.1.2, 1.3.1
+level: A
+title: Name, Role, Value, Info and Relationships
+test_type: bad
+expected_violations: 5
+testable_by: regex
+scanners: page-structure
+description: Incorrect ARIA implementation in complex widgets
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Komplexe ARIA-Widgets Verletzungen (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .widget-container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f9f9f9;
+        }
+        
+        /* Tree View Styles */
+        .bad-tree {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .bad-tree-item {
+            padding: 5px 0;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        
+        .bad-tree-item:before {
+            content: "▶ ";
+            margin-right: 5px;
+        }
+        
+        .bad-tree-item.expanded:before {
+            content: "▼ ";
+        }
+        
+        /* Data Grid Styles */
+        .bad-grid {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .bad-grid th, .bad-grid td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .bad-grid th {
+            background-color: #f2f2f2;
+        }
+        
+        .bad-grid tr.selected {
+            background-color: #e3f2fd;
+        }
+        
+        /* Combobox Styles */
+        .bad-combobox {
+            position: relative;
+            display: inline-block;
+            width: 200px;
+        }
+        
+        .bad-combobox-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .bad-combobox-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .bad-combobox-option {
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .bad-combobox-option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .bad-combobox-option.selected {
+            background-color: #e3f2fd;
+        }
+        
+        /* Tab Styles */
+        .bad-tabs {
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .bad-tab {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 2px;
+            cursor: pointer;
+        }
+        
+        .bad-tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .bad-tabpanel {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            display: none;
+        }
+        
+        .bad-tabpanel.active {
+            display: block;
+        }
+        
+        /* Accordion Styles */
+        .bad-accordion {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        
+        .bad-accordion-header {
+            background: #f0f0f0;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .bad-accordion-content {
+            padding: 15px;
+            display: none;
+        }
+        
+        .bad-accordion-content.expanded {
+            display: block;
+        }
+        
+        /* Dialog Styles */
+        .bad-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .bad-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 300px;
+        }
+        
+        /* Menu Styles */
+        .bad-menubar {
+            background: #f0f0f0;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            border: 1px solid #ccc;
+        }
+        
+        .bad-menuitem {
+            display: inline-block;
+            padding: 10px 15px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .bad-menuitem:hover {
+            background: #e0e0e0;
+        }
+        
+        .bad-submenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #ccc;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            min-width: 150px;
+            display: none;
+        }
+        
+        .bad-submenu li {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        
+        .bad-submenu li:hover {
+            background: #f0f0f0;
+        }
+        
+        /* Listbox Styles */
+        .bad-listbox {
+            border: 1px solid #ccc;
+            height: 150px;
+            overflow-y: auto;
+            background: white;
+        }
+        
+        .bad-listbox-option {
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .bad-listbox-option:hover {
+            background: #f0f0f0;
+        }
+        
+        .bad-listbox-option.selected {
+            background: #e3f2fd;
+        }
+        
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007cba;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Komplexe ARIA-Widgets Verletzungen (BAD)</h1>
+    <p><strong>WCAG 4.1.2 Verletzungen:</strong> Unvollständige oder falsche ARIA-Implementierungen</p>
+    
+    <!-- VIOLATION 1: Tree View ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Tree View ohne korrekte ARIA-Attribute</div>
+        <p><strong>Problem:</strong> Tree-Struktur ohne aria-expanded, aria-selected, aria-level</p>
+        <div class="widget-container">
+            <h4>Datei-Explorer (Schlechte Tree-Implementierung)</h4>
+            <!-- SCHLECHT: role="tree" ohne aria-expanded, aria-selected -->
+            <ul class="bad-tree" role="tree">
+                <li class="bad-tree-item" onclick="toggleBadTreeItem(this)">
+                    📁 Dokumente
+                    <!-- SCHLECHT: Keine aria-expanded, aria-selected, aria-level -->
+                    <ul class="bad-tree" style="display: none;">
+                        <li class="bad-tree-item">📄 Bericht.pdf</li>
+                        <li class="bad-tree-item">📄 Präsentation.pptx</li>
+                    </ul>
+                </li>
+                <li class="bad-tree-item" onclick="toggleBadTreeItem(this)">
+                    📁 Bilder
+                    <ul class="bad-tree" style="display: none;">
+                        <li class="bad-tree-item">🖼️ Urlaub.jpg</li>
+                        <li class="bad-tree-item">🖼️ Familie.png</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Data Grid ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Data Grid ohne ARIA-Grid-Attribute</div>
+        <p><strong>Problem:</strong> Tabelle als Grid ohne aria-rowindex, aria-colindex, aria-rowcount</p>
+        <div class="widget-container">
+            <h4>Benutzerliste (Schlechte Grid-Implementierung)</h4>
+            <!-- SCHLECHT: role="grid" ohne aria-rowcount, aria-colcount -->
+            <table class="bad-grid" role="grid">
+                <thead>
+                    <tr role="row">
+                        <!-- SCHLECHT: Keine aria-colindex -->
+                        <th role="columnheader">Name</th>
+                        <th role="columnheader">E-Mail</th>
+                        <th role="columnheader">Rolle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- SCHLECHT: Keine aria-rowindex -->
+                    <tr role="row" onclick="selectBadGridRow(this)">
+                        <td role="gridcell">Max Mustermann</td>
+                        <td role="gridcell">max@beispiel.de</td>
+                        <td role="gridcell">Admin</td>
+                    </tr>
+                    <tr role="row" onclick="selectBadGridRow(this)">
+                        <td role="gridcell">Anna Schmidt</td>
+                        <td role="gridcell">anna@beispiel.de</td>
+                        <td role="gridcell">Benutzer</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Combobox ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Combobox ohne aria-expanded, aria-controls</div>
+        <p><strong>Problem:</strong> Combobox ohne Verknüpfung zur Dropdown-Liste</p>
+        <div class="widget-container">
+            <h4>Länderauswahl (Schlechte Combobox-Implementierung)</h4>
+            <label for="bad-country-combo">Land auswählen:</label>
+            <!-- SCHLECHT: role="combobox" ohne aria-expanded, aria-controls, aria-autocomplete -->
+            <div class="bad-combobox" role="combobox">
+                <input type="text" class="bad-combobox-input" id="bad-country-combo" 
+                       onclick="toggleBadCombobox(this)" readonly>
+                <!-- SCHLECHT: Dropdown ohne id, aria-labelledby -->
+                <div class="bad-combobox-dropdown">
+                    <div class="bad-combobox-option" onclick="selectBadComboOption(this)">Deutschland</div>
+                    <div class="bad-combobox-option" onclick="selectBadComboOption(this)">Österreich</div>
+                    <div class="bad-combobox-option" onclick="selectBadComboOption(this)">Schweiz</div>
+                    <div class="bad-combobox-option" onclick="selectBadComboOption(this)">Frankreich</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Tabs ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Tabs ohne aria-controls, aria-selected</div>
+        <p><strong>Problem:</strong> Tab-Navigation ohne korrekte Panel-Verknüpfung</p>
+        <div class="widget-container">
+            <h4>Einstellungen (Schlechte Tab-Implementierung)</h4>
+            <!-- SCHLECHT: Tabs ohne aria-selected, aria-controls -->
+            <div class="bad-tabs" role="tablist">
+                <div class="bad-tab active" role="tab" onclick="switchBadTab(this, 0)">Allgemein</div>
+                <div class="bad-tab" role="tab" onclick="switchBadTab(this, 1)">Sicherheit</div>
+                <div class="bad-tab" role="tab" onclick="switchBadTab(this, 2)">Benachrichtigungen</div>
+            </div>
+            <!-- SCHLECHT: Tabpanels ohne aria-labelledby -->
+            <div class="bad-tabpanel active" role="tabpanel">
+                <h5>Allgemeine Einstellungen</h5>
+                <p>Hier können Sie allgemeine Einstellungen konfigurieren.</p>
+            </div>
+            <div class="bad-tabpanel" role="tabpanel">
+                <h5>Sicherheitseinstellungen</h5>
+                <p>Hier können Sie Sicherheitsoptionen verwalten.</p>
+            </div>
+            <div class="bad-tabpanel" role="tabpanel">
+                <h5>Benachrichtigungseinstellungen</h5>
+                <p>Hier können Sie Benachrichtigungen konfigurieren.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Accordion ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Accordion ohne aria-expanded, aria-controls</div>
+        <p><strong>Problem:</strong> Accordion-Sections ohne Status-Information</p>
+        <div class="widget-container">
+            <h4>FAQ (Schlechte Accordion-Implementierung)</h4>
+            <!-- SCHLECHT: Accordion ohne aria-expanded -->
+            <div class="bad-accordion">
+                <div class="bad-accordion-header" onclick="toggleBadAccordion(this)">
+                    Wie erstelle ich ein Konto?
+                </div>
+                <!-- SCHLECHT: Content ohne aria-labelledby -->
+                <div class="bad-accordion-content">
+                    <p>Klicken Sie auf "Registrieren" und füllen Sie das Formular aus.</p>
+                </div>
+            </div>
+            <div class="bad-accordion">
+                <div class="bad-accordion-header" onclick="toggleBadAccordion(this)">
+                    Wie setze ich mein Passwort zurück?
+                </div>
+                <div class="bad-accordion-content">
+                    <p>Verwenden Sie die "Passwort vergessen" Funktion auf der Login-Seite.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Dialog ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Dialog ohne aria-labelledby, aria-modal</div>
+        <p><strong>Problem:</strong> Modal-Dialog ohne korrekte Zugänglichkeits-Attribute</p>
+        <div class="widget-container">
+            <h4>Bestätigungsdialog (Schlechte Dialog-Implementierung)</h4>
+            <button onclick="openBadDialog()">Dialog öffnen</button>
+            <!-- SCHLECHT: Dialog-Overlay ohne aria-modal, aria-labelledby -->
+            <div class="bad-dialog-overlay" id="bad-dialog-overlay" onclick="closeBadDialog()">
+                <div class="bad-dialog" role="dialog" onclick="event.stopPropagation()">
+                    <h3>Bestätigung erforderlich</h3>
+                    <p>Möchten Sie diesen Vorgang wirklich ausführen?</p>
+                    <button onclick="closeBadDialog()">Abbrechen</button>
+                    <button onclick="confirmBadDialog()">Bestätigen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 7: Menu ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Menu ohne aria-haspopup, aria-expanded</div>
+        <p><strong>Problem:</strong> Dropdown-Menu ohne Submenu-Status</p>
+        <div class="widget-container">
+            <h4>Hauptmenü (Schlechte Menu-Implementierung)</h4>
+            <!-- SCHLECHT: Menubar ohne aria-haspopup -->
+            <ul class="bad-menubar" role="menubar">
+                <li class="bad-menuitem" role="menuitem" onmouseover="showBadSubmenu(this)">
+                    Datei
+                    <!-- SCHLECHT: Submenu ohne aria-labelledby -->
+                    <ul class="bad-submenu">
+                        <li role="menuitem">Neu</li>
+                        <li role="menuitem">Öffnen</li>
+                        <li role="menuitem">Speichern</li>
+                    </ul>
+                </li>
+                <li class="bad-menuitem" role="menuitem" onmouseover="showBadSubmenu(this)">
+                    Bearbeiten
+                    <ul class="bad-submenu">
+                        <li role="menuitem">Kopieren</li>
+                        <li role="menuitem">Einfügen</li>
+                        <li role="menuitem">Löschen</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 8: Listbox ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Listbox ohne aria-selected, aria-activedescendant</div>
+        <p><strong>Problem:</strong> Multi-Select-Liste ohne Auswahl-Status</p>
+        <div class="widget-container">
+            <h4>Kategorieauswahl (Schlechte Listbox-Implementierung)</h4>
+            <label for="bad-category-list">Kategorien auswählen (Mehrfachauswahl):</label>
+            <!-- SCHLECHT: Listbox ohne aria-multiselectable, aria-activedescendant -->
+            <div class="bad-listbox" role="listbox" id="bad-category-list">
+                <!-- SCHLECHT: Optionen ohne aria-selected -->
+                <div class="bad-listbox-option" role="option" onclick="toggleBadListboxOption(this)">
+                    Technologie
+                </div>
+                <div class="bad-listbox-option" role="option" onclick="toggleBadListboxOption(this)">
+                    Design
+                </div>
+                <div class="bad-listbox-option" role="option" onclick="toggleBadListboxOption(this)">
+                    Marketing
+                </div>
+                <div class="bad-listbox-option" role="option" onclick="toggleBadListboxOption(this)">
+                    Vertrieb
+                </div>
+                <div class="bad-listbox-option" role="option" onclick="toggleBadListboxOption(this)">
+                    Support
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 9: Slider ohne korrekte ARIA -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 9: Custom Slider ohne aria-valuemin, aria-valuemax, aria-valuenow</div>
+        <p><strong>Problem:</strong> Range-Slider ohne Wert-Information</p>
+        <div class="widget-container">
+            <h4>Lautstärke (Schlechte Slider-Implementierung)</h4>
+            <label for="bad-volume-slider">Lautstärke:</label>
+            <!-- SCHLECHT: Slider ohne aria-valuemin, aria-valuemax, aria-valuenow -->
+            <div id="bad-volume-slider" role="slider" style="width: 200px; height: 20px; background: #ddd; position: relative; cursor: pointer;" onclick="setBadSliderValue(event, this)">
+                <div style="width: 50%; height: 100%; background: #007cba;"></div>
+            </div>
+            <span id="bad-volume-display">50%</span>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Testhilfe: ARIA-Attribute-Checks</div>
+        <p><strong>Erwartete Scanner-Erkennungen:</strong></p>
+        <ul>
+            <li>✗ Tree ohne aria-expanded, aria-selected, aria-level</li>
+            <li>✗ Grid ohne aria-rowindex, aria-colindex, aria-rowcount</li>
+            <li>✗ Combobox ohne aria-expanded, aria-controls</li>
+            <li>✗ Tabs ohne aria-selected, aria-controls</li>
+            <li>✗ Accordion ohne aria-expanded</li>
+            <li>✗ Dialog ohne aria-modal, aria-labelledby</li>
+            <li>✗ Menu ohne aria-haspopup</li>
+            <li>✗ Listbox ohne aria-selected</li>
+            <li>✗ Slider ohne aria-valuemin/max/now</li>
+        </ul>
+    </div>
+
+    <script>
+        // VIOLATION 1: Tree View - schlechte Implementierung
+        function toggleBadTreeItem(item) {
+            const subTree = item.querySelector('ul');
+            if (subTree) {
+                const isExpanded = subTree.style.display !== 'none';
+                subTree.style.display = isExpanded ? 'none' : 'block';
+                item.classList.toggle('expanded', !isExpanded);
+                // SCHLECHT: Keine aria-expanded Aktualisierung
+            }
+        }
+        
+        // VIOLATION 2: Data Grid - schlechte Implementierung
+        function selectBadGridRow(row) {
+            // Entferne Auswahl von anderen Zeilen
+            document.querySelectorAll('.bad-grid tr.selected').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+            // SCHLECHT: Keine aria-selected Aktualisierung
+        }
+        
+        // VIOLATION 3: Combobox - schlechte Implementierung
+        function toggleBadCombobox(input) {
+            const dropdown = input.nextElementSibling;
+            const isOpen = dropdown.style.display === 'block';
+            dropdown.style.display = isOpen ? 'none' : 'block';
+            // SCHLECHT: Keine aria-expanded Aktualisierung
+        }
+        
+        function selectBadComboOption(option) {
+            const input = option.closest('.bad-combobox').querySelector('input');
+            input.value = option.textContent;
+            option.closest('.bad-combobox-dropdown').style.display = 'none';
+            // SCHLECHT: Keine aria-selected Aktualisierung
+        }
+        
+        // VIOLATION 4: Tabs - schlechte Implementierung
+        function switchBadTab(tab, index) {
+            // Entferne aktive Klasse von allen Tabs
+            document.querySelectorAll('.bad-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.bad-tabpanel').forEach(p => p.classList.remove('active'));
+            
+            // Aktiviere gewählten Tab
+            tab.classList.add('active');
+            document.querySelectorAll('.bad-tabpanel')[index].classList.add('active');
+            // SCHLECHT: Keine aria-selected Aktualisierung
+        }
+        
+        // VIOLATION 5: Accordion - schlechte Implementierung
+        function toggleBadAccordion(header) {
+            const content = header.nextElementSibling;
+            const isExpanded = content.classList.contains('expanded');
+            content.classList.toggle('expanded');
+            // SCHLECHT: Keine aria-expanded Aktualisierung
+        }
+        
+        // VIOLATION 6: Dialog - schlechte Implementierung
+        function openBadDialog() {
+            document.getElementById('bad-dialog-overlay').style.display = 'block';
+            // SCHLECHT: Kein Focus-Management, keine Escape-Behandlung
+        }
+        
+        function closeBadDialog() {
+            document.getElementById('bad-dialog-overlay').style.display = 'none';
+            // SCHLECHT: Kein Focus-Return
+        }
+        
+        function confirmBadDialog() {
+            alert('Bestätigt!');
+            closeBadDialog();
+        }
+        
+        // VIOLATION 7: Menu - schlechte Implementierung
+        function showBadSubmenu(menuitem) {
+            // Verstecke alle anderen Submenus
+            document.querySelectorAll('.bad-submenu').forEach(s => s.style.display = 'none');
+            const submenu = menuitem.querySelector('.bad-submenu');
+            if (submenu) {
+                submenu.style.display = 'block';
+                // SCHLECHT: Keine aria-expanded Aktualisierung
+            }
+        }
+        
+        // VIOLATION 8: Listbox - schlechte Implementierung
+        function toggleBadListboxOption(option) {
+            option.classList.toggle('selected');
+            // SCHLECHT: Keine aria-selected Aktualisierung
+        }
+        
+        // VIOLATION 9: Slider - schlechte Implementierung
+        function setBadSliderValue(event, slider) {
+            const rect = slider.getBoundingClientRect();
+            const percent = Math.round(((event.clientX - rect.left) / rect.width) * 100);
+            const bar = slider.querySelector('div');
+            bar.style.width = percent + '%';
+            document.getElementById('bad-volume-display').textContent = percent + '%';
+            // SCHLECHT: Keine aria-valuenow Aktualisierung
+        }
+        
+        // Event-Listener für schlechte Keyboard-Behandlung
+        document.addEventListener('keydown', function(e) {
+            // SCHLECHT: Keine Keyboard-Navigation für ARIA-Widgets implementiert
+            if (e.key === 'Escape') {
+                // Sollte Dialogs schließen, tut es aber nicht richtig
+            }
+            if (e.key === 'Tab') {
+                // Sollte Focus-Management für Widgets haben, hat es aber nicht
+            }
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                // Sollte Navigation in Lists/Trees ermöglichen, tut es aber nicht
+            }
+        });
+        
+        // Verstecke Submenus beim Verlassen
+        document.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.bad-submenu').forEach(s => s.style.display = 'none');
+        });
+    </script>
+</body>
+</html>

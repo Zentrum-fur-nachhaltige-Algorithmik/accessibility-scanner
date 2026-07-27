@@ -1,0 +1,14 @@
+{
+  "arxivId": "2303.16681",
+  "title": "Spectral Theory Paper",
+  "mainTexFile": "/mnt/c/Users/T14/Desktop/accessability/tts-eval/data/arxiv_papers/2303.16681/source/osc-arxiv.tex",
+  "texFiles": [
+    "/mnt/c/Users/T14/Desktop/accessability/tts-eval/data/arxiv_papers/2303.16681/source/osc-arxiv.tex"
+  ],
+  "formulaCounts": {
+    "displayCount": 17,
+    "inlineCount": 773,
+    "total": 790
+  },
+  "downloadedAt": "2026-02-27T11:09:23.519Z"
+}

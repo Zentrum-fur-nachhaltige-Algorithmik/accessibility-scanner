@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ShopCorp</title>
+    <!-- Moderate CSP Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline';">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f7fafc;
+        }
+        
+        /* Simplified header for login page */
+        .site-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e53e3e;
+            text-decoration: none;
+        }
+        
+        .header-links a {
+            color: #4a5568;
+            text-decoration: none;
+            margin-left: 2rem;
+        }
+        
+        .header-links a:hover,
+        .header-links a:focus {
+            color: #e53e3e;
+            text-decoration: underline;
+        }
+        
+        /* Main Content */
+        .login-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            color: #1a365d;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: #666;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+        }
+        
+        .required {
+            color: #e53e3e;
+        }
+        
+        .form-help {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+        
+        /* Buttons */
+        .login-button {
+            width: 100%;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .login-button:hover,
+        .login-button:focus {
+            background: #c53030;
+            outline: 2px solid #fed7d7;
+        }
+        
+        .google-login {
+            width: 100%;
+            background: white;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .google-login:hover,
+        .google-login:focus {
+            background: #f7fafc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google-icon {
+            margin-right: 0.5rem;
+        }
+        
+        /* Links and additional content */
+        .form-links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        
+        .form-links a {
+            color: #e53e3e;
+            text-decoration: none;
+        }
+        
+        .form-links a:hover,
+        .form-links a:focus {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #666;
+        }
+        
+        .signup-prompt {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .signup-prompt a {
+            color: #e53e3e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .signup-prompt a:hover,
+        .signup-prompt a:focus {
+            text-decoration: underline;
+        }
+        
+        /* Accessibility Issues for Testing */
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #fc8181;
+        }
+        
+        .error-message.bad-contrast {
+            color: #fed7d7; /* Very poor contrast */
+        }
+        
+        /* Missing form validation indicators */
+        .form-group.invalid input {
+            border-color: #e53e3e;
+        }
+        
+        .form-group.invalid .error-text {
+            color: #e53e3e;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-links a:hover,
+        .footer-links a:focus {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 999;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+        }
+    </style>
+    <script>
+        // Simple form validation and interaction
+        function validateForm() {
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            let isValid = true;
+            
+            // Clear previous errors
+            clearErrors();
+            
+            // Email validation
+            if (!email.value.trim()) {
+                showError('email', 'Email is required');
+                isValid = false;
+            } else if (!isValidEmail(email.value)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            // Password validation
+            if (!password.value.trim()) {
+                showError('password', 'Password is required');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const formGroup = field.closest('.form-group');
+            formGroup.classList.add('invalid');
+            
+            let errorElement = formGroup.querySelector('.error-text');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-text';
+                formGroup.appendChild(errorElement);
+            }
+            errorElement.textContent = message;
+        }
+        
+        function clearErrors() {
+            document.querySelectorAll('.form-group.invalid').forEach(group => {
+                group.classList.remove('invalid');
+                const errorElement = group.querySelector('.error-text');
+                if (errorElement) {
+                    errorElement.remove();
+                }
+            });
+        }
+        
+        // Handle form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            if (validateForm()) {
+                // Simulate login process
+                const button = document.querySelector('.login-button');
+                button.textContent = 'Signing In...';
+                button.disabled = true;
+                
+                setTimeout(() => {
+                    // Simulate successful login redirect
+                    window.location.href = 'account/profile.html';
+                }, 1500);
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo" aria-label="ShopCorp Homepage">ShopCorp</a>
+                <div class="header-links">
+                    <a href="index.html">← Back to Shopping</a>
+                    <a href="#">Need Help?</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to your ShopCorp account</p>
+                </div>
+                
+                <!-- Sample error message with poor contrast -->
+                <div class="error-message bad-contrast" style="display: none;" id="general-error">
+                    Invalid login credentials. Please try again.
+                </div>
+                
+                <form onsubmit="handleLogin(event)" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="required" aria-label="required">*</span></label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            aria-describedby="email-help"
+                            autocomplete="email"
+                        >
+                        <div id="email-help" class="form-help">We'll never share your email with anyone else</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password <span class="required" aria-label="required">*</span></label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Keep me signed in</label>
+                    </div>
+                    
+                    <button type="submit" class="login-button">Sign In</button>
+                    
+                    <div class="form-links">
+                        <a href="#">Forgot your password?</a>
+                    </div>
+                </form>
+                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                
+                <!-- Intentional accessibility issue: button without proper role -->
+                <div class="google-login" onclick="alert('Google login not implemented')" style="cursor: pointer;">
+                    <span class="google-icon">🔍</span>
+                    Continue with Google
+                </div>
+                
+                <div class="signup-prompt">
+                    <p>Don't have an account? <a href="#">Create one here</a></p>
+                </div>
+                
+                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.9rem; color: #666; text-align: center;">
+                    <p>By signing in, you agree to our <a href="#" style="color: #e53e3e;">Terms of Service</a> and <a href="#" style="color: #e53e3e;">Privacy Policy</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">Help</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+            </div>
+            <p style="margin-top: 1rem;">&copy; 2024 ShopCorp. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact Us — Accessible Registration Form</title>
+  <title>Contact Us — Acme Corp</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .sr-only {
@@ -18,246 +18,237 @@
     html {
       scroll-padding-top: 60px;
     }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans leading-relaxed">
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
 
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:p-4 focus:text-blue-700 focus:border-2 focus:border-blue-700 focus:rounded">
-    Skip to main content
-  </a>
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:p-4 focus:border-2 focus:border-blue-600 focus:text-blue-600">Skip to main content</a>
 
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
     <nav class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between" aria-label="Main navigation">
-      <div class="font-bold text-xl tracking-tight">Company<span class="text-blue-600">Logo</span></div>
-      <ul class="flex gap-6 text-sm font-medium">
-        <li><a href="/" class="hover:text-blue-600 transition-colors">Home</a></li>
-        <li><a href="/about" class="hover:text-blue-600 transition-colors">About</a></li>
-        <li><a href="/contact" class="text-blue-600 underline underline-offset-4" aria-current="page">Contact</a></li>
+      <div class="text-xl font-bold">Acme Corp</div>
+      <ul class="flex gap-6">
+        <li><a href="/" class="hover:underline font-medium text-gray-600 hover:text-gray-900">Home</a></li>
+        <li><a href="/about" class="hover:underline font-medium text-gray-600 hover:text-gray-900">About</a></li>
+        <li><a href="/contact" class="underline font-bold text-blue-700" aria-current="page">Contact</a></li>
       </ul>
     </nav>
   </header>
 
-  <main id="main-content" tabindex="-1" class="max-w-2xl mx-auto px-4 py-12">
+  <main id="main-content" tabindex="-1" class="flex-grow max-w-4xl mx-auto w-full px-4 py-12">
     <header class="mb-8">
-      <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Contact Us</h1>
-      <p class="text-slate-600">Fill out the form below and our team will get back to you within 24 hours.</p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl mb-2">Get in Touch</h1>
+      <p class="text-lg text-gray-600">Please fill out the form below and our team will get back to you within 24 hours.</p>
     </header>
 
-    <div id="form-container">
-      <form id="registration-form" novalidate class="space-y-6 bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+    <!-- Error Summary (Initially Hidden) -->
+    <div id="error-summary" role="alert" tabindex="-1" hidden class="mb-8 p-4 border-l-4 border-red-700 bg-red-50 text-red-900">
+      <h2 class="text-lg font-bold mb-2">There are <span id="error-count">0</span> errors in your submission:</h2>
+      <ul id="error-list" class="list-disc list-inside space-y-1"></ul>
+    </div>
+
+    <!-- Success Message (Initially Hidden) -->
+    <div id="success-msg" role="status" aria-live="polite" hidden class="mb-8 p-4 border-l-4 border-green-700 bg-green-50 text-green-900">
+      <p class="font-bold text-lg">✓ Message sent successfully!</p>
+      <p>We have received your request and will contact you shortly.</p>
+    </div>
+
+    <form id="contact-form" novalidate class="space-y-8">
+      <!-- Group 1: Personal Information -->
+      <fieldset class="border border-gray-300 p-6 rounded-lg bg-white">
+        <legend class="px-2 font-semibold text-lg text-gray-700">Personal Information</legend>
         
-        <!-- Name -->
-        <div class="form-group">
-          <label for="full-name" class="block text-sm font-semibold text-slate-700 mb-1">
-            Full Name <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
-          </label>
-          <input type="text" id="full-name" name="fullName" autocomplete="name" required 
-            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-            aria-required="true">
-          <p id="name-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please enter your full name.</p>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div class="flex flex-col gap-2">
+            <label for="full-name" class="font-medium text-gray-700">
+              Full Name <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+            </label>
+            <input type="text" id="full-name" name="fullName" autocomplete="name" required
+              class="border-gray-500 p-2 rounded focus:ring-blue-600 border focus:border-blue-600 transition-colors">
+            <p id="err-full-name" class="text-sm text-red-700 hidden">Please enter your full name.</p>
+          </div>
 
-        <!-- Email -->
-        <div class="form-group">
-          <label for="email" class="block text-sm font-semibold text-slate-700 mb-1">
-            Email Address <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
-          </label>
-          <input type="email" id="email" name="email" autocomplete="email" required 
-            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-            aria-required="true">
-          <p id="email-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please enter a valid email address.</p>
-        </div>
+          <div class="flex flex-col gap-2">
+            <label for="email" class="font-medium text-gray-700">
+              Email Address <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+            </label>
+            <input type="email" id="email" name="email" autocomplete="email" required
+              class="border-gray-500 p-2 rounded focus:ring-blue-600 border focus:border-blue-600 transition-colors">
+            <p id="err-email" class="text-sm text-red-700 hidden">Please enter a valid email address.</p>
+          </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Phone -->
-          <div class="form-group">
-            <label for="phone" class="block text-sm font-semibold text-slate-700 mb-1">
+          <div class="flex flex-col gap-2">
+            <label for="phone" class="font-medium text-gray-700">
               Phone Number
             </label>
-            <input type="tel" id="phone" name="phone" autocomplete="tel" 
-              class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            <input type="tel" id="phone" name="phone" autocomplete="tel"
+              class="border-gray-500 p-2 rounded focus:ring-blue-600 border focus:border-blue-600 transition-colors">
+            <p id="err-phone" class="text-sm text-red-700 hidden">Please enter a valid phone number.</p>
           </div>
 
-          <!-- Company -->
-          <div class="form-group">
-            <label for="company" class="block text-sm font-semibold text-slate-700 mb-1">
+          <div class="flex flex-col gap-2">
+            <label for="company" class="font-medium text-gray-700">
               Company
             </label>
-            <input type="text" id="company" name="company" autocomplete="organization" 
-              class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            <input type="text" id="company" name="company" autocomplete="organization"
+              class="border-gray-500 p-2 rounded focus:ring-blue-600 border focus:border-blue-600 transition-colors">
           </div>
         </div>
+      </fieldset>
 
-        <!-- Department Dropdown -->
-        <div class="form-group">
-          <label for="department" class="block text-sm font-semibold text-slate-700 mb-1">
-            Department <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
-          </label>
-          <select id="department" name="department" required 
-            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all bg-white"
-            aria-required="true">
-            <option value="">Select a department...</option>
-            <option value="sales">Sales</option>
-            <option value="support">Technical Support</option>
-            <option value="billing">Billing</option>
-            <option value="other">Other</option>
-          </select>
-          <p id="dept-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please select a department.</p>
-        </div>
-
-        <!-- Message -->
-        <div class="form-group">
-          <label for="message" class="block text-sm font-semibold text-slate-700 mb-1">
-            Message <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
-          </label>
-          <textarea id="message" name="message" rows="4" required 
-            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-            aria-required="true"></textarea>
-          <p id="message-error" class="mt-1 text-sm text-red-600 hidden" role="alert">Please enter your message.</p>
-        </div>
-
-        <!-- Terms Checkbox -->
-        <div class="flex items-start gap-3">
-          <div class="flex items-center h-5">
-            <input id="terms" name="terms" type="checkbox" required 
-              class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 outline-none"
-              aria-required="true">
+      <!-- Group 2: Request Details -->
+      <fieldset class="border border-gray-300 p-6 rounded-lg bg-white">
+        <legend class="px-2 font-semibold text-lg text-gray-700">Request Details</legend>
+        
+        <div class="grid grid-cols-1 gap-6 mt-4">
+          <div class="flex flex-col gap-2">
+            <label for="department" class="font-medium text-gray-700">
+              Department <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+            </label>
+            <select id="department" name="department" required
+              class="border-gray-500 p-2 rounded focus:ring-blue-600 border focus:border-blue-600 transition-colors bg-white">
+              <option value="">Select a department...</option>
+              <option value="sales">Sales</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing</option>
+              <option value="other">Other</option>
+            </select>
+            <p id="err-department" class="text-sm text-red-700 hidden">Please select a department.</p>
           </div>
-          <label for="terms" class="text-sm text-slate-600">
-            I agree to the <a href="/terms" class="text-blue-600 underline hover:text-blue-800">Terms of Service</a> and <a href="/privacy" class="text-blue-600 underline hover:text-blue-800">Privacy Policy</a>.
-          </label>
-        </div>
-        <p id="terms-error" class="mt-1 text-sm text-red-600 hidden" role="alert">You must agree to the terms to proceed.</p>
 
-        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all shadow-md">
-          Submit Request
+          <div class="flex flex-col gap-2">
+            <label for="message" class="font-medium text-gray-700">
+              Message <span aria-hidden="true" class="text-red-600">*</span><span class="sr-only">(required)</span>
+            </label>
+            <textarea id="message" name="message" rows="5" required
+              class="border-gray-500 p-2 rounded focus:ring-blue-600 border focus:border-blue-600 transition-colors"></textarea>
+            <p id="err-message" class="text-sm text-red-700 hidden">Please enter your message.</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Group 3: Consent -->
+      <div class="flex items-start gap-3 p-2">
+        <input type="checkbox" id="terms" name="terms" required class="mt-1 w-4 h-4 text-blue-600 border-gray-500 rounded focus:ring-blue-600">
+        <label for="terms" class="text-gray-700 leading-tight">
+          I agree to the <a href="/terms" class="underline text-blue-700 hover:text-blue-900">Terms of Service</a> and <a href="/privacy" class="underline text-blue-700 hover:text-blue-900">Privacy Policy</a>. <span class="text-red-600" aria-hidden="true">*</span><span class="sr-only">(required)</span>
+        </label>
+      </div>
+      <p id="err-terms" class="text-sm text-red-700 hidden ml-7">You must agree to the terms to proceed.</p>
+
+      <div class="pt-4">
+        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-blue-700 text-white font-bold rounded shadow-md hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 transition-all">
+          Send Message
         </button>
-      </form>
-    </div>
-
-    <!-- Success State -->
-    <div id="success-message" hidden class="text-center py-12 bg-white p-8 rounded-xl shadow-sm border border-green-200" role="status" aria-live="polite">
-      <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">✓</div>
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Request Received!</h2>
-      <p class="text-slate-600 mb-6">Thank you for reaching out. We've sent a confirmation email to your address.</p>
-      <button onclick="location.reload()" class="px-6 py-2 bg-slate-800 text-white rounded-md hover:bg-slate-900 focus:ring-4 focus:ring-slate-300 transition-all">
-        Send another message
-      </button>
-    </div>
+      </div>
+    </form>
   </main>
 
-  <footer class="bg-white border-t border-slate-200 mt-12 py-8">
-    <div class="max-w-4xl mx-auto px-4 text-center text-sm text-slate-500">
-      <p>&copy; 2024 Accessible Company Inc. All rights reserved.</p>
+  <footer class="bg-gray-100 border-t border-gray-200 py-8 mt-12">
+    <div class="max-w-4xl mx-auto px-4 text-center text-gray-600 text-sm">
+      <p>&copy; 2024 Acme Corporation. All rights reserved.</p>
+      <nav class="mt-2" aria-label="Footer navigation">
+        <ul class="flex justify-center gap-4">
+          <li><a href="/privacy" class="hover:underline">Privacy Policy</a></li>
+          <li><a href="/terms" class="hover:underline">Terms of Use</a></li>
+        </ul>
+      </nav>
     </div>
   </footer>
 
   <script>
     (function() {
-      const form = document.getElementById('registration-form');
-      const formContainer = document.getElementById('form-container');
-      const successMessage = document.getElementById('success-message');
+      const form = document.getElementById('contact-form');
+      const errorSummary = document.getElementById('error-summary');
+      const errorList = document.getElementById('error-list');
+      const errorCount = document.getElementById('error-count');
+      const successMsg = document.getElementById('success-msg');
 
-      const fields = {
-        fullName: { input: document.getElementById('full-name'), error: document.getElementById('name-error') },
-        email: { input: document.getElementById('email'), error: document.getElementById('email-error') },
-        department: { input: document.getElementById('department'), error: document.getElementById('dept-error') },
-        message: { input: document.getElementById('message'), error: document.getElementById('message-error') },
-        terms: { input: document.getElementById('terms'), error: document.getElementById('terms-error') }
-      };
-
-      function validateEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      }
-
-      function setError(fieldKey, isInvalid) {
-        const field = fields[fieldKey];
-        if (isInvalid) {
-          field.input.classList.add('border-red-500');
-          field.input.setAttribute('aria-invalid', 'true');
-          field.input.setAttribute('aria-describedby', field.error.id);
-          field.error.classList.remove('hidden');
-        } else {
-          field.input.classList.remove('border-red-500');
-          field.input.removeAttribute('aria-invalid');
-          field.input.removeAttribute('aria-describedby');
-          field.error.classList.add('hidden');
-        }
-      }
+      const fields = [
+        { id: 'full-name', name: 'Full Name', required: true },
+        { id: 'email', name: 'Email Address', required: true, type: 'email' },
+        { id: 'phone', name: 'Phone Number', required: false, type: 'tel' },
+        { id: 'department', name: 'Department', required: true },
+        { id: 'message', name: 'Message', required: true },
+        { id: 'terms', name: 'Terms Agreement', required: true, type: 'checkbox' }
+      ];
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        let isValid = true;
+        
+        // Reset states
+        errorSummary.hidden = true;
+        successMsg.hidden = true;
+        errorList.innerHTML = '';
+        
+        let errors = [];
 
-        // Validation Logic
-        if (!fields.fullName.input.value.trim()) {
-          setError('fullName', true);
-          isValid = false;
-        } else {
-          setError('fullName', false);
-        }
+        fields.forEach(field => {
+          const input = document.getElementById(field.id);
+          const errorEl = document.getElementById(`err-${field.id}`);
+          let isValid = true;
+          let message = '';
 
-        if (!validateEmail(fields.email.input.value)) {
-          setError('email', true);
-          isValid = false;
-        } else {
-          setError('email', false);
-        }
+          // Basic required check
+          if (field.required) {
+            if (field.type === 'checkbox') {
+              if (!input.checked) isValid = false;
+            } else if (!input.value.trim()) {
+              isValid = false;
+            }
+          }
 
-        if (!fields.department.input.value) {
-          setError('department', true);
-          isValid = false;
-        } else {
-          setError('department', false);
-        }
+          // Type-specific validation
+          if (isValid && field.type === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(input.value)) isValid = false;
+          }
 
-        if (!fields.message.input.value.trim()) {
-          setError('message', true);
-          isValid = false;
-        } else {
-          setError('message', false);
-        }
-
-        if (!fields.terms.input.checked) {
-          setError('terms', true);
-          isValid = false;
-        } else {
-          setError('terms', false);
-        }
-
-        if (isValid) {
-          // Simulate API Call
-          const submitBtn = form.querySelector('button[type="submit"]');
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Sending...';
-
-          setTimeout(() => {
-            formContainer.hidden = true;
-            successMessage.hidden = false;
-            successMessage.focus();
-            window.scrollTo(0, 0);
-          }, 1000);
-        } else {
-          // Focus first error
-          const firstError = Object.values(fields).find(f => f.error.classList.contains('hidden') === false);
-          if (firstError) firstError.input.focus();
-        }
-      });
-
-      // Clear error on input
-      Object.keys(fields).forEach(key => {
-        fields[key].input.addEventListener('input', () => {
-          if (fields[key].input.getAttribute('aria-invalid') === 'true') {
-            setError(key, false);
+          if (!isValid) {
+            message = `${field.name} ${field.required ? 'is required' : 'is invalid'}.`;
+            if (field.type === 'email' && input.value) message = 'Please enter a valid email address.';
+            
+            // Update Input State
+            input.setAttribute('aria-invalid', 'true');
+            input.setAttribute('aria-describedby', `err-${field.id}`);
+            if (errorEl) {
+              errorEl.classList.remove('hidden');
+              errorEl.textContent = message;
+            }
+            
+            errors.push({ id: field.id, message: message });
+          } else {
+            // Clear Invalid state
+            input.removeAttribute('aria-invalid');
+            input.removeAttribute('aria-describedby');
+            if (errorEl) errorEl.classList.add('hidden');
           }
         });
+
+        if (errors.length > 0) {
+          errorCount.textContent = errors.length;
+          errors.forEach(err => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${err.id}`;
+            a.className = 'text-red-800 underline hover:text-red-600';
+            a.textContent = err.message;
+            a.onclick = (e) => {
+              e.preventDefault();
+              document.getElementById(err.id).focus();
+            };
+            li.appendChild(a);
+            errorList.appendChild(li);
+          });
+          
+          errorSummary.hidden = false;
+          errorSummary.focus();
+        } else {
+          successMsg.hidden = false;
+          successMsg.focus();
+          form.reset();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       });
     })();
   </script>

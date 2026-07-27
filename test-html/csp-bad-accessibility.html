@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Accessibility - CSP Mitigation Test</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; object-src 'none';">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input, textarea { padding: 8px; margin: 5px; }
+        .clickable { background: #007cba; color: white; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Missing skip navigation -->
+        
+        <header>
+            <h1>CSP Mitigation Test - Bad Accessibility</h1>
+            <!-- Navigation without proper markup -->
+            <div>
+                <a>Home</a>
+                <a>About</a>
+                <a>Contact</a>
+            </div>
+        </header>
+        
+        <main>
+            <div class="section">
+                <h2>Section 1: Form Problems</h2>
+                
+                <!-- Bad: Form elements without labels -->
+                <form>
+                    <input type="text" placeholder="Enter your name">
+                    <input type="email" placeholder="Email">
+                    <textarea placeholder="Your message"></textarea>
+                    
+                    <!-- Bad: Button without text -->
+                    <button type="submit"></button>
+                    
+                    <!-- Bad: Generic link text -->
+                    <a href="document.pdf">Click here</a>
+                </form>
+            </div>
+            
+            <div class="section">
+                <h2>Section 2: Interactive Problems</h2>
+                
+                <!-- Bad: Div acting as button without accessibility -->
+                <div class="clickable" onclick="alert('clicked')">Save</div>
+                
+                <!-- Bad: Link without href -->
+                <a>Contact Us</a>
+                
+                <!-- Bad: Empty button -->
+                <button></button>
+                
+                <!-- Bad: Image without alt text -->
+                <img src="important-chart.png" width="400" height="300">
+                
+                <!-- Bad: Image with bad alt text -->
+                <img src="photo.jpg" alt="IMG_1234.jpg" width="200" height="150">
+            </div>
+            
+            <div class="section">
+                <h2>Section 3: Media Problems</h2>
+                
+                <!-- Bad: Video without captions -->
+                <video controls width="400" height="300">
+                    <source src="presentation.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <!-- Bad: Audio without transcript -->
+                <audio controls>
+                    <source src="podcast.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                
+                <!-- Bad: Autoplay audio -->
+                <audio autoplay>
+                    <source src="background-music.mp3" type="audio/mpeg">
+                </audio>
+                
+                <!-- Bad: SVG without accessible name -->
+                <svg width="200" height="100">
+                    <rect x="10" y="50" width="40" height="40" fill="blue"/>
+                    <rect x="60" y="30" width="40" height="60" fill="blue"/>
+                    <rect x="110" y="10" width="40" height="80" fill="blue"/>
+                </svg>
+                
+                <!-- Bad: Canvas without fallback -->
+                <canvas width="300" height="200" id="chart"></canvas>
+                
+                <!-- Bad: Object without title -->
+                <object data="document.pdf" type="application/pdf" width="300" height="400"></object>
+            </div>
+            
+            <!-- Bad: Duplicate IDs -->
+            <div id="duplicate">First element</div>
+            <div id="duplicate">Second element</div>
+            
+            <!-- Bad: ARIA issues -->
+            <div role="button" aria-pressed="maybe">Invalid ARIA</div>
+            <div role="textbox" aria-required="yes">Invalid boolean</div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 CSP Mitigation Test</p>
+        </footer>
+    </div>
+    
+    <script>
+        // This script won't run due to CSP, but shows script blocking
+        console.log('This script is blocked by CSP');
+    </script>
+</body>
+</html>

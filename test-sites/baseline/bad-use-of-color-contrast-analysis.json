@@ -1,0 +1,10 @@
+{
+  "testCase": "bad-use-of-color",
+  "timestamp": "2025-07-11T08:22:20.500Z",
+  "contrastResults": [],
+  "summary": {
+    "totalElements": 0,
+    "passingElements": 0,
+    "failingElements": 0
+  }
+}

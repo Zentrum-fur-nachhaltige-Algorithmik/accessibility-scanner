@@ -1,0 +1,274 @@
+Test plan: 140 tests across 18 scanners
+
+
+--- screen-reader (22 tests) ---
+  PASS [TRUE-POS] bad-aria-role-override.html: 3 violations
+  FAIL [TRUE-POS] bad-aria-state-updates.html: 0 violations
+  FAIL [TRUE-POS] bad-beeproduced-real-issues.html: 0 violations
+  FAIL [TRUE-POS] bad-cognitive-accessibility.html: 0 violations
+  FAIL [TRUE-POS] bad-complex-aria.html: 0 violations
+  PASS [TRUE-POS] bad-complex-data-tables.html: 4 violations
+  FAIL [TRUE-POS] bad-form-grouping.html: 0 violations
+  FAIL [TRUE-POS] bad-form-labels.html: 0 violations
+  FAIL [TRUE-POS] bad-icon-accessibility.html: 0 violations
+  FAIL [TRUE-POS] bad-landmarks.html: 0 violations
+  FAIL [TRUE-POS] bad-status-messages.html: 0 violations
+  PASS [FALSE-POS] good-accessibility.html: 0 false positives
+  PASS [FALSE-POS] good-aria-role-override.html: 0 false positives
+  PASS [FALSE-POS] good-aria-state-updates.html: 0 false positives
+  FAIL [FALSE-POS] good-bootstrap-patterns.html: 2 false positives
+    - [9.4.1.2] invalid-aria-reference: Name, Role, Value - aria-labelledby references non-existent element "faq-1-btn"
+    - [9.4.1.2] invalid-aria-reference: Name, Role, Value - aria-labelledby references non-existent element "faq-2-btn"
+  PASS [FALSE-POS] good-cognitive-accessibility.html: 0 false positives
+  PASS [FALSE-POS] good-complex-data-tables.html: 0 false positives
+  PASS [FALSE-POS] good-form-grouping.html: 0 false positives
+  PASS [FALSE-POS] good-hidden-modal.html: 0 false positives
+  PASS [FALSE-POS] good-js-validation.html: 0 false positives
+  PASS [FALSE-POS] good-landmarks.html: 0 false positives
+  PASS [FALSE-POS] good-redundant-aria.html: 0 false positives
+
+--- html-validation (13 tests) ---
+  PASS [TRUE-POS] bad-aria-role-override.html: 6 violations
+  FAIL [TRUE-POS] bad-aria-state-updates.html: 0 violations
+  PASS [TRUE-POS] bad-beeproduced-real-issues.html: 4 violations
+  FAIL [TRUE-POS] bad-complex-aria.html: 0 violations
+  PASS [TRUE-POS] bad-html-validation.html: 22 violations
+  PASS [TRUE-POS] bad-icon-accessibility.html: 3 violations
+  PASS [FALSE-POS] good-accessibility.html: 0 false positives
+  FAIL [FALSE-POS] good-aria-role-override.html: 1 false positives
+    - [4.1.2] label: Form control has no associated label
+  PASS [FALSE-POS] good-aria-state-updates.html: 0 false positives
+  FAIL [FALSE-POS] good-bootstrap-patterns.html: 2 false positives
+    - [4.1.2] aria-labelledby: aria-labelledby references non-existent element with id="faq-1-btn"
+    - [4.1.2] aria-labelledby: aria-labelledby references non-existent element with id="faq-2-btn"
+  PASS [FALSE-POS] good-hidden-modal.html: 0 false positives
+  PASS [FALSE-POS] good-js-validation.html: 0 false positives
+  PASS [FALSE-POS] good-redundant-aria.html: 0 false positives
+
+--- advanced-aria (21 tests) ---
+  PASS [TRUE-POS] bad-aria-role-override.html: 10 violations
+  FAIL [TRUE-POS] bad-aria-state-updates.html: 0 violations
+  PASS [TRUE-POS] bad-beeproduced-real-issues.html: 2 violations
+  FAIL [TRUE-POS] bad-cognitive-accessibility.html: 0 violations
+  PASS [TRUE-POS] bad-complex-aria.html: 16 violations
+  FAIL [TRUE-POS] bad-complex-data-tables.html: 0 violations
+  FAIL [TRUE-POS] bad-form-grouping.html: 0 violations
+  FAIL [TRUE-POS] bad-form-labels.html: 0 violations
+  FAIL [TRUE-POS] bad-icon-accessibility.html: 0 violations
+  FAIL [TRUE-POS] bad-landmarks.html: 0 violations
+  PASS [FALSE-POS] good-accessibility.html: 0 false positives
+  FAIL [FALSE-POS] good-aria-role-override.html: 2 false positives
+    - [undefined] undefined: Data grid row lacks row header cells
+    - [undefined] undefined: Interactive grid cell lacks tabindex
+  PASS [FALSE-POS] good-aria-state-updates.html: 0 false positives
+  FAIL [FALSE-POS] good-bootstrap-patterns.html: 1 false positives
+    - [undefined] undefined: Accordion panel lacks aria-labelledby reference
+  FAIL [FALSE-POS] good-cognitive-accessibility.html: 4 false positives
+    - [undefined] undefined: Accordion button lacks aria-controls reference
+    - [undefined] undefined: Accordion button lacks aria-controls reference
+    - [undefined] undefined: Accordion button lacks aria-controls reference
+  PASS [FALSE-POS] good-complex-data-tables.html: 0 false positives
+  PASS [FALSE-POS] good-form-grouping.html: 0 false positives
+  PASS [FALSE-POS] good-hidden-modal.html: 0 false positives
+  PASS [FALSE-POS] good-js-validation.html: 0 false positives
+  PASS [FALSE-POS] good-landmarks.html: 0 false positives
+  PASS [FALSE-POS] good-redundant-aria.html: 0 false positives
+
+--- status-messages (6 tests) ---
+  PASS [TRUE-POS] bad-aria-state-updates.html: 1 violations
+  FAIL [TRUE-POS] bad-form-errors.html: 0 violations
+  FAIL [TRUE-POS] bad-status-messages.html: 0 violations
+  PASS [FALSE-POS] good-aria-state-updates.html: 0 false positives
+  PASS [FALSE-POS] good-form-errors.html: 0 false positives
+  PASS [FALSE-POS] good-js-validation.html: 0 false positives
+
+--- media-accessibility (4 tests) ---
+  PASS [TRUE-POS] bad-audio-description.html: 1 violations
+  PASS [TRUE-POS] bad-media-alternatives.html: 10 violations
+  PASS [FALSE-POS] good-audio-description.html: 0 false positives
+  PASS [FALSE-POS] good-media-alternatives.html: 0 false positives
+
+--- predictable-navigation (8 tests) ---
+  PASS [TRUE-POS] bad-auto-submitting-form.html: 18 violations
+  PASS [TRUE-POS] bad-consistent-identification.html: 1 violations
+  PASS [TRUE-POS] bad-consistent-navigation.html: 1 violations
+  PASS [TRUE-POS] bad-context-change.html: 6 violations
+  PASS [FALSE-POS] good-auto-submitting-form.html: 0 false positives
+  PASS [FALSE-POS] good-consistent-identification.html: 0 false positives
+  PASS [FALSE-POS] good-consistent-navigation.html: 0 false positives
+  PASS [FALSE-POS] good-context-change.html: 0 false positives
+
+--- input-purpose (2 tests) ---
+  PASS [TRUE-POS] bad-autocomplete.html: 21 violations
+  PASS [FALSE-POS] good-autocomplete.html: 0 false positives
+
+--- error-handling (11 tests) ---
+  PASS [TRUE-POS] bad-beeproduced-real-issues.html: 5 violations
+  PASS [TRUE-POS] bad-cognitive-accessibility.html: 1 violations
+  PASS [TRUE-POS] bad-error-prevention.html: 2 violations
+  PASS [TRUE-POS] bad-form-errors.html: 16 violations
+  PASS [TRUE-POS] bad-form-grouping.html: 6 violations
+  PASS [TRUE-POS] bad-form-labels.html: 23 violations
+  FAIL [FALSE-POS] good-cognitive-accessibility.html: 2 false positives
+    - [9.3.3.2] field-no-label: Form field lacks accessible label
+    - [9.3.3.2] field-no-label: Form field lacks accessible label
+  PASS [FALSE-POS] good-error-prevention.html: 0 false positives
+  PASS [FALSE-POS] good-form-errors.html: 0 false positives
+  PASS [FALSE-POS] good-form-grouping.html: 0 false positives
+  PASS [FALSE-POS] good-js-validation.html: 0 false positives
+
+--- page-structure (20 tests) ---
+  FAIL [TRUE-POS] bad-beeproduced-real-issues.html: 0 violations
+  FAIL [TRUE-POS] bad-cognitive-accessibility.html: 0 violations
+  FAIL [TRUE-POS] bad-complex-aria.html: 0 violations
+  FAIL [TRUE-POS] bad-complex-data-tables.html: 0 violations
+  FAIL [TRUE-POS] bad-form-grouping.html: 0 violations
+  FAIL [TRUE-POS] bad-form-labels.html: 0 violations
+  PASS [TRUE-POS] bad-headings-labels.html: 1 violations
+  FAIL [TRUE-POS] bad-landmarks.html: 0 violations
+  PASS [TRUE-POS] bad-page-titled.html: 1 violations
+  FAIL [TRUE-POS] bad-skip-links.html: 0 violations
+  PASS [FALSE-POS] good-accessibility.html: 0 false positives
+  PASS [FALSE-POS] good-cognitive-accessibility.html: 0 false positives
+  PASS [FALSE-POS] good-complex-data-tables.html: 0 false positives
+  PASS [FALSE-POS] good-form-grouping.html: 0 false positives
+  PASS [FALSE-POS] good-headings-labels.html: 0 false positives
+  PASS [FALSE-POS] good-hidden-modal.html: 0 false positives
+  PASS [FALSE-POS] good-landmarks.html: 0 false positives
+  PASS [FALSE-POS] good-page-titled.html: 0 false positives
+  PASS [FALSE-POS] good-redundant-aria.html: 0 false positives
+  PASS [FALSE-POS] good-skip-links.html: 0 false positives
+
+--- color-contrast (5 tests) ---
+  PASS [TRUE-POS] bad-color-contrast.html: 22 violations
+  PASS [TRUE-POS] bad-focus-visible.html: 23 violations
+  PASS [FALSE-POS] good-bootstrap-patterns.html: 0 false positives
+  PASS [FALSE-POS] good-color-contrast.html: 0 false positives
+  PASS [FALSE-POS] good-contrast-enhanced.html: 0 false positives
+
+--- advanced-contrast (7 tests) ---
+  FAIL [TRUE-POS] bad-color-contrast.html: 0 violations
+  FAIL [TRUE-POS] bad-focus-visible.html: 0 violations
+  PASS [TRUE-POS] bad-nontext-contrast.html: 27 violations
+  PASS [FALSE-POS] good-bootstrap-patterns.html: 0 false positives
+  PASS [FALSE-POS] good-color-contrast.html: 0 false positives
+  PASS [FALSE-POS] good-contrast-enhanced.html: 0 false positives
+  PASS [FALSE-POS] good-nontext-contrast.html: 0 false positives
+
+--- use-of-color (3 tests) ---
+  PASS [TRUE-POS] bad-css-background-info.html: 1 violations
+  FAIL [TRUE-POS] bad-use-of-color.html: 0 violations
+  FAIL [FALSE-POS] good-css-background-accessible.html: 2 false positives
+    - [undefined] chart-color-only: Chart or graph may rely only on color to distinguish data
+    - [undefined] chart-color-only: Chart or graph may rely only on color to distinguish data
+
+--- images-of-text (4 tests) ---
+  PASS [TRUE-POS] bad-images-of-text-no-exception.html: 5 violations
+  FAIL [TRUE-POS] bad-images-of-text.html: 0 violations
+  PASS [FALSE-POS] good-images-of-text-no-exception.html: 0 false positives
+  PASS [FALSE-POS] good-images-of-text.html: 0 false positives
+
+--- label-in-name (3 tests) ---
+  FAIL [TRUE-POS] bad-input-modalities.html: 0 violations
+  PASS [TRUE-POS] bad-label-in-name.html: 19 violations
+  FAIL [FALSE-POS] good-label-in-name.html: 11 false positives
+    - [undefined] undefined: Button visible text is not contained in accessible name
+    - [undefined] undefined: Button visible text is not contained in accessible name
+    - [undefined] undefined: Button visible text is not contained in accessible name
+
+--- language-detection (5 tests) ---
+  FAIL [TRUE-POS] bad-language-override.html: 0 violations
+  PASS [TRUE-POS] bad-language.html: 2 violations
+  PASS [FALSE-POS] good-accessibility.html: 0 false positives
+  PASS [FALSE-POS] good-language-override.html: 0 false positives
+  PASS [FALSE-POS] good-language.html: 0 false positives
+
+--- nontext-contrast (2 tests) ---
+  PASS [TRUE-POS] bad-nontext-contrast.html: 30 violations
+  PASS [FALSE-POS] good-nontext-contrast.html: 0 false positives
+
+--- orientation (2 tests) ---
+  PASS [TRUE-POS] bad-orientation.html: 5 violations
+  PASS [FALSE-POS] good-orientation.html: 0 false positives
+
+--- timing-controls (2 tests) ---
+  PASS [TRUE-POS] bad-timing-controls.html: 15 violations
+  FAIL [FALSE-POS] good-timing-controls.html: 2 false positives
+    - [9.2.2.1] timeout-no-data-preservation: Forms present but no data preservation mechanism detected for timeouts
+    - [9.2.2.2] auto-update-no-controls: Auto-updating content lacks pause or stop controls
+
+=== SUMMARY ===
+Total: 140 | Passed: 96 | Failed: 44 | Errored: 0
+
+Failures:
+  screen-reader / bad-aria-state-updates.html [TRUE-POS]: 0 violations
+  screen-reader / bad-beeproduced-real-issues.html [TRUE-POS]: 0 violations
+  screen-reader / bad-cognitive-accessibility.html [TRUE-POS]: 0 violations
+  screen-reader / bad-complex-aria.html [TRUE-POS]: 0 violations
+  screen-reader / bad-form-grouping.html [TRUE-POS]: 0 violations
+  screen-reader / bad-form-labels.html [TRUE-POS]: 0 violations
+  screen-reader / bad-icon-accessibility.html [TRUE-POS]: 0 violations
+  screen-reader / bad-landmarks.html [TRUE-POS]: 0 violations
+  screen-reader / bad-status-messages.html [TRUE-POS]: 0 violations
+  screen-reader / good-bootstrap-patterns.html [FALSE-POS]: 2 false positives
+  html-validation / bad-aria-state-updates.html [TRUE-POS]: 0 violations
+  html-validation / bad-complex-aria.html [TRUE-POS]: 0 violations
+  html-validation / good-aria-role-override.html [FALSE-POS]: 1 false positives
+  html-validation / good-bootstrap-patterns.html [FALSE-POS]: 2 false positives
+  advanced-aria / bad-aria-state-updates.html [TRUE-POS]: 0 violations
+  advanced-aria / bad-cognitive-accessibility.html [TRUE-POS]: 0 violations
+  advanced-aria / bad-complex-data-tables.html [TRUE-POS]: 0 violations
+  advanced-aria / bad-form-grouping.html [TRUE-POS]: 0 violations
+  advanced-aria / bad-form-labels.html [TRUE-POS]: 0 violations
+  advanced-aria / bad-icon-accessibility.html [TRUE-POS]: 0 violations
+  advanced-aria / bad-landmarks.html [TRUE-POS]: 0 violations
+  advanced-aria / good-aria-role-override.html [FALSE-POS]: 2 false positives
+  advanced-aria / good-bootstrap-patterns.html [FALSE-POS]: 1 false positives
+  advanced-aria / good-cognitive-accessibility.html [FALSE-POS]: 4 false positives
+  status-messages / bad-form-errors.html [TRUE-POS]: 0 violations
+  status-messages / bad-status-messages.html [TRUE-POS]: 0 violations
+  error-handling / good-cognitive-accessibility.html [FALSE-POS]: 2 false positives
+  page-structure / bad-beeproduced-real-issues.html [TRUE-POS]: 0 violations
+  page-structure / bad-cognitive-accessibility.html [TRUE-POS]: 0 violations
+  page-structure / bad-complex-aria.html [TRUE-POS]: 0 violations
+  page-structure / bad-complex-data-tables.html [TRUE-POS]: 0 violations
+  page-structure / bad-form-grouping.html [TRUE-POS]: 0 violations
+  page-structure / bad-form-labels.html [TRUE-POS]: 0 violations
+  page-structure / bad-landmarks.html [TRUE-POS]: 0 violations
+  page-structure / bad-skip-links.html [TRUE-POS]: 0 violations
+  advanced-contrast / bad-color-contrast.html [TRUE-POS]: 0 violations
+  advanced-contrast / bad-focus-visible.html [TRUE-POS]: 0 violations
+  use-of-color / bad-use-of-color.html [TRUE-POS]: 0 violations
+  use-of-color / good-css-background-accessible.html [FALSE-POS]: 2 false positives
+  images-of-text / bad-images-of-text.html [TRUE-POS]: 0 violations
+  label-in-name / bad-input-modalities.html [TRUE-POS]: 0 violations
+  label-in-name / good-label-in-name.html [FALSE-POS]: 11 false positives
+  language-detection / bad-language-override.html [TRUE-POS]: 0 violations
+  timing-controls / good-timing-controls.html [FALSE-POS]: 2 false positives
+
+Per-scanner:
+  color-contrast: bad 2/2 detected, good 3/3 clean
+  use-of-color: bad 1/2 detected, good 0/1 clean
+  images-of-text: bad 1/2 detected, good 2/2 clean
+  advanced-contrast: bad 1/3 detected, good 4/4 clean
+  nontext-contrast: bad 1/1 detected, good 1/1 clean
+  screen-reader: bad 2/11 detected, good 10/11 clean
+  media-accessibility: bad 2/2 detected, good 2/2 clean
+  orientation: bad 1/1 detected, good 1/1 clean
+  input-purpose: bad 1/1 detected, good 1/1 clean
+  language-detection: bad 1/2 detected, good 3/3 clean
+  predictable-navigation: bad 4/4 detected, good 4/4 clean
+  error-handling: bad 6/6 detected, good 4/5 clean
+  html-validation: bad 4/6 detected, good 5/7 clean
+  page-structure: bad 2/10 detected, good 10/10 clean
+  label-in-name: bad 1/2 detected, good 0/1 clean
+  status-messages: bad 1/3 detected, good 3/3 clean
+  advanced-aria: bad 3/10 detected, good 8/11 clean
+  timing-controls: bad 1/1 detected, good 0/1 clean
+
+Criteria with NO scanner detecting their bad file(s) (truePositive=false):
+  1.4.5 (scanners: images-of-text; bad files: bad-images-of-text.html)
+  2.4.1 (scanners: page-structure; bad files: bad-beeproduced-real-issues.html, bad-landmarks.html, bad-skip-links.html)
+  3.2.1 (scanners: predictable-navigation; bad files: bad-context-change.html)
+
+JSON summary written to docs/sprints/p2-quality/raw/harness-concurrent.json

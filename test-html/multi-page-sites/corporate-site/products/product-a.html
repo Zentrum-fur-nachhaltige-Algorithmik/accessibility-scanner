@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudMigrate Pro - TechCorp Solutions</title>
+    <!-- Strict CSP Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none';">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Header styles */
+        .site-header {
+            background: #1a365d;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .main-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .main-nav a:hover,
+        .main-nav a:focus {
+            background-color: #2d3748;
+            outline: 2px solid #63b3ed;
+        }
+        
+        /* Product header */
+        .product-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+        
+        .product-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .product-hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Content */
+        .content {
+            padding: 3rem 0;
+        }
+        
+        .product-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        
+        .product-details h2 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .product-details h3 {
+            color: #2d3748;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.5rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-item {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #3182ce;
+        }
+        
+        .feature-item h4 {
+            color: #1a365d;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Sidebar */
+        .product-sidebar {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-card h3 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+        }
+        
+        .price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3182ce;
+            margin-bottom: 1rem;
+        }
+        
+        .price-note {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-button {
+            display: block;
+            background: #3182ce;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-button:hover,
+        .cta-button:focus {
+            background: #2c5282;
+            outline: 2px solid #bee3f8;
+        }
+        
+        .cta-secondary {
+            display: block;
+            background: transparent;
+            color: #3182ce;
+            padding: 0.75rem 2rem;
+            text-decoration: none;
+            border: 2px solid #3182ce;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .cta-secondary:hover,
+        .cta-secondary:focus {
+            background: #3182ce;
+            color: white;
+        }
+        
+        .contact-info {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .contact-info h4 {
+            color: #1a365d;
+            margin-bottom: 1rem;
+        }
+        
+        /* Accessibility issues for testing */
+        .testimonial {
+            background: #edf2f7;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        
+        /* Missing focus indicators for testing */
+        .bad-button {
+            background: #e53e3e;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .bad-button:focus {
+            outline: none; /* Intentional accessibility issue */
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-nav {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-nav a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        
+        .footer-nav a:hover,
+        .footer-nav a:focus {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 999;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .product-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="site-header" role="banner">
+        <div class="container">
+            <div class="header-content">
+                <a href="../index.html" class="logo" aria-label="TechCorp Solutions Homepage">TechCorp Solutions</a>
+                
+                <!-- Main Navigation -->
+                <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                    <ul>
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="../about.html">About</a></li>
+                        <li><a href="index.html">Products</a></li>
+                        <li><a href="../support/help.html">Support</a></li>
+                        <li><a href="../contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Product Hero -->
+    <div class="product-hero">
+        <div class="container">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="../index.html">Home</a> &gt; 
+                <a href="index.html">Products</a> &gt; 
+                CloudMigrate Pro
+            </nav>
+            <h1>CloudMigrate Pro</h1>
+            <div class="subtitle">Enterprise Cloud Migration Platform</div>
+            <p>Seamlessly migrate your entire infrastructure to the cloud with zero downtime and maximum security.</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <div class="content">
+            <div class="container">
+                <div class="product-layout">
+                    <!-- Product Details -->
+                    <div class="product-details">
+                        <section>
+                            <h2>Overview</h2>
+                            <p>CloudMigrate Pro is our flagship cloud migration platform designed for enterprises that need to move complex infrastructures to the cloud without disrupting business operations. With automated assessment tools, strategic migration planning, and 24/7 support, we ensure your migration is smooth, secure, and optimized for cost-effectiveness.</p>
+                            
+                            <p>Our platform has successfully migrated over 500 enterprise infrastructures, managing everything from simple web applications to complex multi-tier systems with databases, legacy applications, and compliance requirements.</p>
+                        </section>
+                        
+                        <section>
+                            <h3>Key Features</h3>
+                            <div class="features-grid">
+                                <div class="feature-item">
+                                    <h4>Automated Assessment</h4>
+                                    <p>AI-powered analysis of your current infrastructure to identify optimal migration strategies and potential cost savings.</p>
+                                </div>
+                                
+                                <div class="feature-item">
+                                    <h4>Zero-Downtime Migration</h4>
+                                    <p>Advanced replication and staging techniques ensure your services remain available throughout the migration process.</p>
+                                </div>
+                                
+                                <div class="feature-item">
+                                    <h4>Security & Compliance</h4>
+                                    <p>Built-in security auditing and compliance checks for GDPR, HIPAA, SOC 2, and other regulatory requirements.</p>
+                                </div>
+                                
+                                <div class="feature-item">
+                                    <h4>Cost Optimization</h4>
+                                    <p>Intelligent resource sizing and placement recommendations to minimize cloud costs while maximizing performance.</p>
+                                </div>
+                                
+                                <div class="feature-item">
+                                    <h4>Multi-Cloud Support</h4>
+                                    <p>Migrate to AWS, Azure, Google Cloud, or hybrid configurations based on your specific requirements.</p>
+                                </div>
+                                
+                                <div class="feature-item">
+                                    <h4>24/7 Expert Support</h4>
+                                    <p>Dedicated migration specialists available around the clock to ensure your project stays on track.</p>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <section>
+                            <h3>Migration Process</h3>
+                            <ol>
+                                <li><strong>Discovery & Assessment:</strong> Comprehensive analysis of your current infrastructure, applications, and dependencies.</li>
+                                <li><strong>Strategy & Planning:</strong> Custom migration roadmap with timelines, risk assessment, and resource requirements.</li>
+                                <li><strong>Preparation & Testing:</strong> Set up target cloud environment and conduct thorough testing of migration procedures.</li>
+                                <li><strong>Migration Execution:</strong> Gradual migration of services with continuous monitoring and validation.</li>
+                                <li><strong>Optimization & Support:</strong> Post-migration optimization and ongoing support to ensure optimal performance.</li>
+                            </ol>
+                        </section>
+                        
+                        <div class="testimonial">
+                            "CloudMigrate Pro reduced our migration timeline from 18 months to 6 months, and we achieved 40% cost savings in our first year. The zero-downtime promise was delivered exactly as promised."
+                            <div class="testimonial-author">— Jennifer Walsh, CTO at GlobalTech Industries</div>
+                        </div>
+                        
+                        <section>
+                            <h3>Technical Specifications</h3>
+                            <ul>
+                                <li>Supports Windows, Linux, and Unix environments</li>
+                                <li>Database migration for SQL Server, Oracle, MySQL, PostgreSQL</li>
+                                <li>Application containerization and microservices architecture</li>
+                                <li>Network configuration and security group setup</li>
+                                <li>Backup and disaster recovery implementation</li>
+                                <li>Performance monitoring and alerting setup</li>
+                            </ul>
+                        </section>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <aside class="product-sidebar">
+                        <div class="pricing-card">
+                            <h3>CloudMigrate Pro</h3>
+                            <div class="price">$5,000<span style="font-size: 1rem; font-weight: normal;">/month</span></div>
+                            <div class="price-note">Starting price for basic infrastructure. Custom pricing available for enterprise deployments.</div>
+                            
+                            <a href="../contact.html" class="cta-button">Get Started</a>
+                            <!-- Intentional accessibility issue: button without focus indicator -->
+                            <button class="bad-button" style="width: 100%; margin-bottom: 1rem;">Request Demo</button>
+                            <a href="#" class="cta-secondary">Download Datasheet</a>
+                        </div>
+                        
+                        <div class="contact-info">
+                            <h4>Need Help Choosing?</h4>
+                            <p>Our solutions specialists can help you determine the best migration strategy for your specific requirements.</p>
+                            
+                            <p><strong>Phone:</strong> +1 (555) 123-4567<br>
+                            <strong>Email:</strong> solutions@techcorp.com</p>
+                            
+                            <p><strong>Migration Consultation:</strong><br>
+                            Schedule a free 60-minute consultation to discuss your migration goals and challenges.</p>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+                            <h4>Related Products</h4>
+                            <ul style="list-style: none;">
+                                <li style="margin-bottom: 0.5rem;"><a href="product-b.html" style="color: #3182ce; text-decoration: none;">SecureShield Enterprise</a></li>
+                                <li style="margin-bottom: 0.5rem;"><a href="#" style="color: #3182ce; text-decoration: none;">DevAccelerator Suite</a></li>
+                                <li><a href="#" style="color: #3182ce; text-decoration: none;">DataInsight Analytics</a></li>
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <nav class="footer-nav" aria-label="Footer navigation">
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../support/help.html">Help</a>
+                <a href="../privacy.html">Privacy Policy</a>
+                <a href="../terms.html">Terms of Service</a>
+            </nav>
+            <p>&copy; 2024 TechCorp Solutions. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

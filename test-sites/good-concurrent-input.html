@@ -1,0 +1,1227 @@
+<!-- WCAG-TEST
+criterion: 2.5.6
+level: AAA
+title: Concurrent Input Mechanisms
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: Support for concurrent input modalities
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Concurrent Input Mechanisms Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        /* GOOD 1: Proper pointer cancel support */
+        .good-cancel-button {
+            background-color: #327d36;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+            /* GUT: Pointer Cancel funktioniert korrekt */
+        }
+        
+        .good-cancel-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-cancel-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-cancel-button.active {
+            background-color: #ff5722;
+            transform: scale(0.95);
+        }
+        
+        /* GOOD 2: Touch gestures with button alternatives */
+        .good-swipe-container {
+            width: 300px;
+            height: 200px;
+            border: 2px solid #327d36;
+            background: linear-gradient(45deg, #e8f5e8, #f1f8e9);
+            position: relative;
+            margin: 15px 0;
+            border-radius: 8px;
+            /* GUT: Swipe UND Button-Navigation */
+        }
+        
+        .good-swipe-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .good-navigation-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+        
+        .good-nav-button {
+            background-color: #327d36;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .good-nav-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-nav-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-nav-button:disabled {
+            background-color: #666666;
+            cursor: not-allowed;
+        }
+        
+        .good-indicator-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .good-indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .good-indicator-dot.active {
+            background-color: #327d36;
+        }
+        
+        .good-indicator-dot:hover {
+            background-color: #66bb6a;
+        }
+        
+        .good-indicator-dot:focus {
+            outline: 2px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* GOOD 3: Drag and drop with keyboard alternatives */
+        .good-drag-container {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .good-drag-source {
+            width: 200px;
+            min-height: 150px;
+            border: 2px solid #327d36;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .good-draggable-item {
+            background-color: #327d36;
+            color: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            cursor: move;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* GUT: Drag UND Button-Alternativen */
+        }
+        
+        .good-move-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .good-move-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .good-move-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .good-move-btn:focus {
+            outline: 2px solid #ff9800;
+            outline-offset: 1px;
+        }
+        
+        .good-drop-zone {
+            width: 200px;
+            min-height: 150px;
+            border: 2px dashed #327d36;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .good-drop-zone.drag-over {
+            border-color: #2e7d32;
+            background-color: #e8f5e8;
+        }
+        
+        /* GOOD 4: Multi-touch with single pointer alternatives */
+        .good-zoom-container {
+            width: 300px;
+            border: 2px solid #327d36;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .good-zoom-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: #e8f5e8;
+            border-bottom: 1px solid #327d36;
+        }
+        
+        .good-zoom-btn {
+            background-color: #327d36;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 40px;
+        }
+        
+        .good-zoom-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .good-zoom-btn:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-zoom-display {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .good-zoomable-content {
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e8f5e8"/><circle cx="50" cy="50" r="20" fill="%234caf50"/><text x="50" y="55" text-anchor="middle" font-size="8" fill="white">ZOOM</text></svg>') center/cover;
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+        
+        /* GOOD 5: Long press with right-click alternatives */
+        .good-context-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .good-context-item {
+            background-color: #f8f9fa;
+            border: 2px solid #327d36;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            /* GUT: Long Press UND Rechtsklick UND Menü-Button */
+        }
+        
+        .good-context-item:hover {
+            background-color: #e8f5e8;
+        }
+        
+        .good-context-item:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-context-menu-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #327d36;
+            color: white;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .good-context-menu-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .good-context-menu-btn:focus {
+            outline: 2px solid #ff9800;
+            outline-offset: 1px;
+        }
+        
+        /* GOOD 6: Motion with button alternatives */
+        .good-refresh-container {
+            width: 250px;
+            border: 2px solid #327d36;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            /* GUT: Shake UND Refresh-Button */
+        }
+        
+        .good-refresh-content {
+            text-align: center;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .good-refresh-btn {
+            background-color: #327d36;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .good-refresh-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .good-refresh-btn:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-refresh-btn.refreshing {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* GOOD 7: Voice with visual alternatives */
+        .good-voice-container {
+            border: 2px solid #327d36;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
+            /* GUT: Voice UND visuelle Button-Navigation */
+        }
+        
+        .good-voice-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .good-voice-nav-btn {
+            background-color: #327d36;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .good-voice-nav-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .good-voice-nav-btn:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-voice-button {
+            background-color: #1a78c2; /* Fixed for WCAG AA compliance */
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .good-voice-button:hover {
+            background-color: #16619e; /* Darker blue for hover */
+        }
+        
+        .good-voice-button:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        .good-voice-button.listening {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* GOOD 8: Accessible file management */
+        .good-file-container {
+            margin: 15px 0;
+        }
+        
+        .good-file-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 2px solid #327d36;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            font-size: 14px;
+        }
+        
+        .good-file-input:focus {
+            outline: 3px solid #ff9800;
+            outline-offset: 2px;
+        }
+        
+        /* Screen reader support */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        button {
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Concurrent Input Mechanisms Accessible (GOOD)</h1>
+    <p><strong>WCAG 2.5.6 konforme Implementierung:</strong> Alle Eingabemethoden haben zugängliche Alternativen für verschiedene Modalitäten</p>
+    
+    <!-- GOOD 1: Proper pointer cancel support -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Pointer Cancel funktioniert korrekt</div>
+        <p><strong>Lösung:</strong> Nutzer können Aktionen durch Wegziehen des Pointers abbrechen</p>
+        <div class="interactive-area">
+            <button class="good-cancel-button" 
+                    onmousedown="goodStartAction(this)" 
+                    onmouseup="goodCompleteAction(this)" 
+                    onmouseleave="goodCancelAction(this)"
+                    ontouchstart="goodStartTouch(this)" 
+                    ontouchend="goodCompleteTouch(this)"
+                    ontouchcancel="goodCancelTouch(this)">
+                Sichere Aktion (abbrechbar)
+            </button>
+            <button class="good-cancel-button" 
+                    onmousedown="goodStartAction(this)" 
+                    onmouseup="goodCompleteAction(this)" 
+                    onmouseleave="goodCancelAction(this)">
+                Löschvorgang (Abbruch möglich)
+            </button>
+            <p>✅ Aktionen können durch Wegziehen vor mouseup/touchend abgebrochen werden</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Touch gestures with button alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Touch Gestures mit Button-Alternativen</div>
+        <p><strong>Lösung:</strong> Swipe-Navigation UND Buttons UND Tastatursteuerung verfügbar</p>
+        <div class="interactive-area">
+            <div class="good-navigation-controls">
+                <button class="good-nav-button" onclick="goodPreviousImage()" id="goodPrevBtn">
+                    ← Zurück
+                </button>
+                <span>Bild <span id="goodCurrentImage">1</span> von 5</span>
+                <button class="good-nav-button" onclick="goodNextImage()" id="goodNextBtn">
+                    Weiter →
+                </button>
+            </div>
+            
+            <div class="good-swipe-container" 
+                 ontouchstart="goodSwipeStart(event)" 
+                 ontouchmove="goodSwipeMove(event)" 
+                 ontouchend="goodSwipeEnd(event)"
+                 tabindex="0"
+                 onkeydown="goodImageKeydown(event)"
+                 aria-label="Bildergalerie, verwenden Sie Pfeiltasten oder Swipe zum Navigieren">
+                <div class="good-swipe-content">
+                    <h4>Bildergalerie</h4>
+                    <p>Swipe, Buttons oder Pfeiltasten</p>
+                </div>
+            </div>
+            
+            <div class="good-indicator-container">
+                <button class="good-indicator-dot active" onclick="goodGoToImage(0)" aria-label="Zu Bild 1"></button>
+                <button class="good-indicator-dot" onclick="goodGoToImage(1)" aria-label="Zu Bild 2"></button>
+                <button class="good-indicator-dot" onclick="goodGoToImage(2)" aria-label="Zu Bild 3"></button>
+                <button class="good-indicator-dot" onclick="goodGoToImage(3)" aria-label="Zu Bild 4"></button>
+                <button class="good-indicator-dot" onclick="goodGoToImage(4)" aria-label="Zu Bild 5"></button>
+            </div>
+            <p>✅ Navigation via Swipe UND Buttons UND Pfeiltasten UND direkte Auswahl</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Drag and drop with keyboard alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Drag & Drop mit vollständigen Tastaturalternativen</div>
+        <p><strong>Lösung:</strong> Drag & Drop UND Move-Buttons UND Tastatursteuerung verfügbar</p>
+        <div class="interactive-area">
+            <div class="good-drag-container">
+                <div class="good-drag-source">
+                    <h5>Verfügbare Tasks:</h5>
+                    <div class="good-draggable-item" 
+                         draggable="true" 
+                         ondragstart="goodDragStart(event)"
+                         tabindex="0"
+                         onkeydown="goodItemKeydown(event)"
+                         role="listitem"
+                         aria-describedby="move-instructions">
+                        <span>Task 1</span>
+                        <div class="good-move-buttons">
+                            <button class="good-move-btn" onclick="goodMoveItem(this, 'completed')" aria-label="Task 1 als erledigt markieren">
+                                →
+                            </button>
+                        </div>
+                    </div>
+                    <div class="good-draggable-item" 
+                         draggable="true" 
+                         ondragstart="goodDragStart(event)"
+                         tabindex="0"
+                         onkeydown="goodItemKeydown(event)"
+                         role="listitem">
+                        <span>Task 2</span>
+                        <div class="good-move-buttons">
+                            <button class="good-move-btn" onclick="goodMoveItem(this, 'completed')" aria-label="Task 2 als erledigt markieren">
+                                →
+                            </button>
+                        </div>
+                    </div>
+                    <div class="good-draggable-item" 
+                         draggable="true" 
+                         ondragstart="goodDragStart(event)"
+                         tabindex="0"
+                         onkeydown="goodItemKeydown(event)"
+                         role="listitem">
+                        <span>Task 3</span>
+                        <div class="good-move-buttons">
+                            <button class="good-move-btn" onclick="goodMoveItem(this, 'completed')" aria-label="Task 3 als erledigt markieren">
+                                →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="good-drop-zone" 
+                     ondragover="goodDragOver(event)" 
+                     ondrop="goodDrop(event)"
+                     ondragenter="goodDragEnter(event)"
+                     ondragleave="goodDragLeave(event)"
+                     role="region"
+                     aria-label="Erledigte Tasks">
+                    <h5>Erledigt:</h5>
+                    <div id="goodCompletedItems"></div>
+                </div>
+            </div>
+            <div id="move-instructions" class="sr-only">
+                Verwenden Sie Drag & Drop, die Pfeil-Buttons oder Space zum Verschieben
+            </div>
+            <p>✅ Task-Management via Drag & Drop UND Move-Buttons UND Tastatur (Space/Enter)</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Multi-touch with single pointer alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Pinch-to-Zoom mit Single-Pointer Alternativen</div>
+        <p><strong>Lösung:</strong> Pinch-Zoom UND +/- Buttons UND Mausrad UND Tastaturkürzel</p>
+        <div class="interactive-area">
+            <div class="good-zoom-container">
+                <div class="good-zoom-controls">
+                    <button class="good-zoom-btn" onclick="goodZoomOut()" id="goodZoomOutBtn" aria-label="Herauszoomen">
+                        −
+                    </button>
+                    <span id="goodZoomLevel">100%</span>
+                    <button class="good-zoom-btn" onclick="goodZoomIn()" id="goodZoomInBtn" aria-label="Hineinzoomen">
+                        +
+                    </button>
+                    <button class="good-zoom-btn" onclick="goodZoomReset()" aria-label="Zoom zurücksetzen">
+                        Reset
+                    </button>
+                </div>
+                <div class="good-zoom-display" 
+                     ontouchstart="goodPinchStart(event)" 
+                     ontouchmove="goodPinchMove(event)" 
+                     ontouchend="goodPinchEnd(event)"
+                     onwheel="goodWheelZoom(event)"
+                     tabindex="0"
+                     onkeydown="goodZoomKeydown(event)"
+                     aria-label="Zoombarer Inhalt, verwenden Sie +/- Tasten, Mausrad oder Pinch-Geste">
+                    <div class="good-zoomable-content" id="goodZoomContent"></div>
+                </div>
+            </div>
+            <p>✅ Zoom via Pinch UND +/- Buttons UND Mausrad UND Tastatur (+/- Tasten)</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Long press with accessible alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Long Press mit Rechtsklick- und Tastaturalternativen</div>
+        <p><strong>Lösung:</strong> Long Press UND Rechtsklick UND Menü-Button UND Tastaturkürzel</p>
+        <div class="interactive-area">
+            <div class="good-context-items">
+                <div class="good-context-item" 
+                     ontouchstart="goodLongPressStart(event, this)" 
+                     ontouchend="goodLongPressEnd(this)"
+                     oncontextmenu="goodShowContextMenu(event, this)"
+                     tabindex="0"
+                     onkeydown="goodContextKeydown(event, this)"
+                     role="button"
+                     aria-label="Datei 1.pdf, Context-Menü verfügbar">
+                    <button class="good-context-menu-btn" onclick="goodShowContextMenu(event, this.parentElement)" aria-label="Menü öffnen">
+                        ⋮
+                    </button>
+                    <p>Datei 1.pdf</p>
+                    <small>Rechtsklick, Long Press, Menü-Button oder Menü-Taste</small>
+                </div>
+                <div class="good-context-item" 
+                     ontouchstart="goodLongPressStart(event, this)" 
+                     ontouchend="goodLongPressEnd(this)"
+                     oncontextmenu="goodShowContextMenu(event, this)"
+                     tabindex="0"
+                     onkeydown="goodContextKeydown(event, this)"
+                     role="button"
+                     aria-label="Bild.jpg, Context-Menü verfügbar">
+                    <button class="good-context-menu-btn" onclick="goodShowContextMenu(event, this.parentElement)" aria-label="Menü öffnen">
+                        ⋮
+                    </button>
+                    <p>Bild.jpg</p>
+                    <small>Mehrere Zugriffsmethoden</small>
+                </div>
+                <div class="good-context-item" 
+                     ontouchstart="goodLongPressStart(event, this)" 
+                     ontouchend="goodLongPressEnd(this)"
+                     oncontextmenu="goodShowContextMenu(event, this)"
+                     tabindex="0"
+                     onkeydown="goodContextKeydown(event, this)"
+                     role="button"
+                     aria-label="Video.mp4, Context-Menü verfügbar">
+                    <button class="good-context-menu-btn" onclick="goodShowContextMenu(event, this.parentElement)" aria-label="Menü öffnen">
+                        ⋮
+                    </button>
+                    <p>Video.mp4</p>
+                    <small>Vollständig zugänglich</small>
+                </div>
+            </div>
+            <p>✅ Context Menu via Long Press UND Rechtsklick UND Menü-Button UND Menü-Taste (Kontext/Apps-Taste)</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Motion with button alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Shake-to-Refresh mit Button-Alternative</div>
+        <p><strong>Lösung:</strong> Shake-Geste UND Refresh-Button UND F5-Taste verfügbar</p>
+        <div class="interactive-area">
+            <div class="good-refresh-container" 
+                 tabindex="0" 
+                 onkeydown="goodRefreshKeydown(event)"
+                 aria-label="Nachrichten-Bereich, F5 zum Aktualisieren">
+                <div class="good-refresh-content">
+                    <h5>Nachrichten</h5>
+                    <p>Letzte Aktualisierung: <span id="goodLastUpdate">Nie</span></p>
+                </div>
+                <button class="good-refresh-btn" onclick="goodRefresh()" id="goodRefreshButton">
+                    <span>🔄</span>
+                    Aktualisieren
+                </button>
+            </div>
+            <p>✅ Refresh via Shake-Geste UND Button UND F5-Taste</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 7: Voice with visual alternatives -->
+    <div class="good-section">
+        <div class="good-title">GOOD 7: Voice Commands mit vollständigen visuellen Alternativen</div>
+        <p><strong>Lösung:</strong> Voice Commands UND visuelle Buttons UND Tastaturkürzel verfügbar</p>
+        <div class="interactive-area">
+            <div class="good-voice-container">
+                <h5>Navigation (Multi-Modal)</h5>
+                <div class="good-voice-controls">
+                    <button class="good-voice-nav-btn" onclick="goodVoiceNavigate('home')" accesskey="h">
+                        🏠 Home (Alt+H)
+                    </button>
+                    <button class="good-voice-nav-btn" onclick="goodVoiceNavigate('back')" accesskey="b">
+                        ← Zurück (Alt+B)
+                    </button>
+                    <button class="good-voice-nav-btn" onclick="goodVoiceNavigate('next')" accesskey="n">
+                        Weiter → (Alt+N)
+                    </button>
+                    <button class="good-voice-nav-btn" onclick="goodVoiceNavigate('search')" accesskey="s">
+                        🔍 Suchen (Alt+S)
+                    </button>
+                </div>
+                <div style="text-align: center;">
+                    <button class="good-voice-button" onclick="goodStartVoice()" id="goodVoiceBtn">
+                        <span>🎤</span>
+                        <span>Voice optional verfügbar</span>
+                    </button>
+                </div>
+                <div id="goodVoiceStatus">Alle Funktionen auch visuell verfügbar</div>
+            </div>
+            <p>✅ Navigation via Voice Commands UND Buttons UND Tastaturkürzel (Alt+Buchstabe)</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 8: Accessible file management -->
+    <div class="good-section">
+        <div class="good-title">GOOD 8: Vollständig zugängliche Datei-Verwaltung</div>
+        <p><strong>Lösung:</strong> Native File Input mit vollständiger Tastatur- und Assistive Technology-Unterstützung</p>
+        <div class="interactive-area">
+            <div class="good-file-container">
+                <label for="goodFileInput">Dokument hochladen:</label>
+                <input 
+                    type="file" 
+                    id="goodFileInput" 
+                    class="good-file-input" 
+                    accept=".pdf,.doc,.docx,.txt"
+                    onchange="goodFileChange(this)"
+                    onkeydown="goodFileKeydown(event)"
+                    multiple
+                    aria-describedby="file-help"
+                >
+                <div id="file-help" style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Unterstützt: PDF, DOC, DOCX, TXT. Mehrfachauswahl möglich. Enter zum Öffnen.
+                </div>
+                <div id="goodFileStatus" aria-live="polite"></div>
+            </div>
+            <p>✅ File Upload via native Input mit voller Tastatur-, Maus- und Assistive Technology-Unterstützung</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 2.5.6 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Pointer Cancel funktioniert durch Wegziehen vor Release</li>
+            <li>✅ Touch-Gesten haben Button- und Tastaturalternativen</li>
+            <li>✅ Drag & Drop hat vollständige Tastatur- und Button-Alternativen</li>
+            <li>✅ Multi-Touch hat Single-Pointer und Tastaturalternativen</li>
+            <li>✅ Alle spezialisierten Eingabemethoden haben Standard-Alternativen</li>
+            <li>✅ Motion-based Input hat statische Button-Alternativen</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Motorische Einschränkungen: Können alternative Eingabemethoden wählen</li>
+            <li>👥 Assistive Technology: Funktioniert mit allen Standard-Eingabemodalitäten</li>
+            <li>👥 Tremor/Parkinson: Können präziseste verfügbare Methode verwenden</li>
+            <li>👥 Amputierte: Haben immer Single-Pointer oder Tastaturalternativen</li>
+            <li>👥 Temporäre Beeinträchtigungen: Können auf verfügbare Modalitäten ausweichen</li>
+        </ul>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        let goodCurrentImageIndex = 0;
+        let goodSwipeStartX = 0;
+        let goodDraggedElement = null;
+        let goodZoomLevel = 1;
+        let goodPinchStartDistance = 0;
+        let goodLongPressTimer = null;
+        let goodVoiceListening = false;
+        let goodActionStarted = false;
+        
+        // GOOD 1: Proper pointer cancel support
+        function goodStartAction(button) {
+            goodActionStarted = true;
+            button.classList.add('active');
+            console.log('✅ GOOD: Action started with cancel option');
+        }
+        
+        function goodCompleteAction(button) {
+            if (goodActionStarted) {
+                button.classList.remove('active');
+                goodActionStarted = false;
+                console.log('✅ GOOD: Action completed successfully');
+                announceToScreenReader('Aktion ausgeführt');
+                alert('Aktion erfolgreich ausgeführt');
+            }
+        }
+        
+        function goodCancelAction(button) {
+            if (goodActionStarted) {
+                button.classList.remove('active');
+                goodActionStarted = false;
+                console.log('✅ GOOD: Action cancelled via pointer leave');
+                announceToScreenReader('Aktion abgebrochen');
+            }
+        }
+        
+        function goodStartTouch(button) {
+            goodStartAction(button);
+        }
+        
+        function goodCompleteTouch(button) {
+            goodCompleteAction(button);
+        }
+        
+        function goodCancelTouch(button) {
+            goodCancelAction(button);
+        }
+        
+        // GOOD 2: Accessible image navigation
+        function goodUpdateImageDisplay() {
+            document.getElementById('goodCurrentImage').textContent = goodCurrentImageIndex + 1;
+            
+            // Update button states
+            document.getElementById('goodPrevBtn').disabled = goodCurrentImageIndex === 0;
+            document.getElementById('goodNextBtn').disabled = goodCurrentImageIndex === 4;
+            
+            // Update indicators
+            document.querySelectorAll('.good-indicator-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === goodCurrentImageIndex);
+            });
+            
+            announceToScreenReader(`Bild ${goodCurrentImageIndex + 1} von 5`);
+        }
+        
+        function goodPreviousImage() {
+            if (goodCurrentImageIndex > 0) {
+                goodCurrentImageIndex--;
+                goodUpdateImageDisplay();
+                console.log('✅ GOOD: Previous image via button');
+            }
+        }
+        
+        function goodNextImage() {
+            if (goodCurrentImageIndex < 4) {
+                goodCurrentImageIndex++;
+                goodUpdateImageDisplay();
+                console.log('✅ GOOD: Next image via button');
+            }
+        }
+        
+        function goodGoToImage(index) {
+            goodCurrentImageIndex = index;
+            goodUpdateImageDisplay();
+            console.log('✅ GOOD: Direct image navigation via indicator');
+        }
+        
+        function goodImageKeydown(event) {
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                goodPreviousImage();
+                console.log('✅ GOOD: Image navigation via left arrow key');
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                goodNextImage();
+                console.log('✅ GOOD: Image navigation via right arrow key');
+            }
+        }
+        
+        // Touch swipe support
+        function goodSwipeStart(event) {
+            goodSwipeStartX = event.touches[0].clientX;
+        }
+        
+        function goodSwipeMove(event) {
+            event.preventDefault();
+        }
+        
+        function goodSwipeEnd(event) {
+            const swipeEndX = event.changedTouches[0].clientX;
+            const swipeDistance = swipeEndX - goodSwipeStartX;
+            
+            if (Math.abs(swipeDistance) > 50) {
+                if (swipeDistance > 0) {
+                    goodPreviousImage();
+                    console.log('✅ GOOD: Image navigation via swipe right');
+                } else {
+                    goodNextImage();
+                    console.log('✅ GOOD: Image navigation via swipe left');
+                }
+            }
+        }
+        
+        // GOOD 3: Accessible drag and drop
+        function goodDragStart(event) {
+            goodDraggedElement = event.target;
+            console.log('✅ GOOD: Drag started with keyboard alternative available');
+        }
+        
+        function goodDragOver(event) {
+            event.preventDefault();
+        }
+        
+        function goodDragEnter(event) {
+            event.target.classList.add('drag-over');
+        }
+        
+        function goodDragLeave(event) {
+            event.target.classList.remove('drag-over');
+        }
+        
+        function goodDrop(event) {
+            event.preventDefault();
+            event.target.classList.remove('drag-over');
+            
+            if (goodDraggedElement) {
+                goodMoveItemToCompleted(goodDraggedElement);
+                console.log('✅ GOOD: Item moved via drag and drop');
+            }
+        }
+        
+        function goodMoveItem(button, destination) {
+            const item = button.closest('.good-draggable-item');
+            goodMoveItemToCompleted(item);
+            console.log('✅ GOOD: Item moved via button alternative');
+        }
+        
+        function goodMoveItemToCompleted(item) {
+            const completedItems = document.getElementById('goodCompletedItems');
+            const newItem = document.createElement('div');
+            const itemText = item.querySelector('span').textContent;
+            
+            newItem.textContent = itemText;
+            newItem.style.cssText = 'background: #327d36; color: white; padding: 5px; margin: 2px 0; border-radius: 3px; font-size: 12px;';
+            completedItems.appendChild(newItem);
+            
+            item.remove();
+            goodDraggedElement = null;
+            
+            announceToScreenReader(`${itemText} als erledigt markiert`);
+        }
+        
+        function goodItemKeydown(event) {
+            if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                goodMoveItemToCompleted(event.target);
+                console.log('✅ GOOD: Item moved via keyboard (Space/Enter)');
+            }
+        }
+        
+        // GOOD 4: Accessible zoom functionality
+        function goodUpdateZoomDisplay() {
+            const zoomContent = document.getElementById('goodZoomContent');
+            const zoomLevelDisplay = document.getElementById('goodZoomLevel');
+            
+            zoomContent.style.transform = `scale(${goodZoomLevel})`;
+            zoomLevelDisplay.textContent = Math.round(goodZoomLevel * 100) + '%';
+            
+            // Update button states
+            document.getElementById('goodZoomOutBtn').disabled = goodZoomLevel <= 0.5;
+            document.getElementById('goodZoomInBtn').disabled = goodZoomLevel >= 3;
+            
+            announceToScreenReader(`Zoom: ${Math.round(goodZoomLevel * 100)}%`);
+        }
+        
+        function goodZoomIn() {
+            if (goodZoomLevel < 3) {
+                goodZoomLevel = Math.min(3, goodZoomLevel + 0.25);
+                goodUpdateZoomDisplay();
+                console.log('✅ GOOD: Zoom in via button');
+            }
+        }
+        
+        function goodZoomOut() {
+            if (goodZoomLevel > 0.5) {
+                goodZoomLevel = Math.max(0.5, goodZoomLevel - 0.25);
+                goodUpdateZoomDisplay();
+                console.log('✅ GOOD: Zoom out via button');
+            }
+        }
+        
+        function goodZoomReset() {
+            goodZoomLevel = 1;
+            goodUpdateZoomDisplay();
+            console.log('✅ GOOD: Zoom reset via button');
+        }
+        
+        function goodWheelZoom(event) {
+            event.preventDefault();
+            if (event.deltaY < 0) {
+                goodZoomIn();
+                console.log('✅ GOOD: Zoom in via mouse wheel');
+            } else {
+                goodZoomOut();
+                console.log('✅ GOOD: Zoom out via mouse wheel');
+            }
+        }
+        
+        function goodZoomKeydown(event) {
+            if (event.key === '+' || event.key === '=') {
+                event.preventDefault();
+                goodZoomIn();
+                console.log('✅ GOOD: Zoom in via + key');
+            } else if (event.key === '-') {
+                event.preventDefault();
+                goodZoomOut();
+                console.log('✅ GOOD: Zoom out via - key');
+            } else if (event.key === '0') {
+                event.preventDefault();
+                goodZoomReset();
+                console.log('✅ GOOD: Zoom reset via 0 key');
+            }
+        }
+        
+        // Pinch zoom support
+        function goodPinchStart(event) {
+            if (event.touches.length === 2) {
+                const distance = Math.hypot(
+                    event.touches[0].pageX - event.touches[1].pageX,
+                    event.touches[0].pageY - event.touches[1].pageY
+                );
+                goodPinchStartDistance = distance;
+                console.log('✅ GOOD: Pinch zoom started with button alternatives available');
+            }
+        }
+        
+        function goodPinchMove(event) {
+            if (event.touches.length === 2) {
+                event.preventDefault();
+                const distance = Math.hypot(
+                    event.touches[0].pageX - event.touches[1].pageX,
+                    event.touches[0].pageY - event.touches[1].pageY
+                );
+                const scale = distance / goodPinchStartDistance;
+                const newZoom = Math.max(0.5, Math.min(3, goodZoomLevel * scale));
+                
+                if (newZoom !== goodZoomLevel) {
+                    goodZoomLevel = newZoom;
+                    goodUpdateZoomDisplay();
+                    console.log('✅ GOOD: Zoom via pinch gesture');
+                }
+                
+                goodPinchStartDistance = distance;
+            }
+        }
+        
+        function goodPinchEnd(event) {
+            console.log('✅ GOOD: Pinch zoom ended, button alternatives remain available');
+        }
+        
+        // GOOD 5: Accessible context menu
+        function goodLongPressStart(event, element) {
+            goodLongPressTimer = setTimeout(() => {
+                goodShowContextMenu(event, element);
+                console.log('✅ GOOD: Context menu via long press with alternatives available');
+            }, 800);
+        }
+        
+        function goodLongPressEnd(element) {
+            if (goodLongPressTimer) {
+                clearTimeout(goodLongPressTimer);
+                goodLongPressTimer = null;
+            }
+        }
+        
+        function goodShowContextMenu(event, element) {
+            event.preventDefault();
+            const fileName = element.querySelector('p').textContent;
+            console.log('✅ GOOD: Context menu accessible via multiple methods');
+            announceToScreenReader(`Context-Menü für ${fileName} geöffnet`);
+            alert(`Context Menu für ${fileName}\n\n- Öffnen\n- Umbenennen\n- Löschen\n- Eigenschaften\n\n(Verfügbar via Rechtsklick, Long Press, Menü-Button oder Menü-Taste)`);
+        }
+        
+        function goodContextKeydown(event, element) {
+            if (event.key === 'ContextMenu' || event.key === 'F10' && event.shiftKey) {
+                goodShowContextMenu(event, element);
+                console.log('✅ GOOD: Context menu via keyboard (Menu key or Shift+F10)');
+            }
+        }
+        
+        // GOOD 6: Accessible refresh functionality
+        function goodRefresh() {
+            const button = document.getElementById('goodRefreshButton');
+            const updateDisplay = document.getElementById('goodLastUpdate');
+            
+            button.classList.add('refreshing');
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.classList.remove('refreshing');
+                button.disabled = false;
+                const now = new Date().toLocaleTimeString();
+                updateDisplay.textContent = now;
+                announceToScreenReader('Seite aktualisiert');
+                console.log('✅ GOOD: Refresh via button with shake alternative available');
+            }, 1000);
+        }
+        
+        function goodRefreshKeydown(event) {
+            if (event.key === 'F5') {
+                event.preventDefault();
+                goodRefresh();
+                console.log('✅ GOOD: Refresh via F5 key');
+            }
+        }
+        
+        // GOOD 7: Accessible voice navigation
+        function goodVoiceNavigate(section) {
+            console.log('✅ GOOD: Navigation via button with voice alternative');
+            announceToScreenReader(`Navigation zu ${section}`);
+            alert(`Navigation zu: ${section}\n(Verfügbar via Button, Tastaturkürzel oder Voice Command)`);
+        }
+        
+        function goodStartVoice() {
+            const button = document.getElementById('goodVoiceBtn');
+            const status = document.getElementById('goodVoiceStatus');
+            
+            if (!goodVoiceListening) {
+                goodVoiceListening = true;
+                button.classList.add('listening');
+                status.textContent = 'Voice-Eingabe aktiv (alle Funktionen auch visuell verfügbar)';
+                
+                setTimeout(() => {
+                    goodVoiceListening = false;
+                    button.classList.remove('listening');
+                    status.textContent = 'Voice-Befehl: "Nächste Seite" erkannt (Button-Alternative verfügbar)';
+                    goodVoiceNavigate('nächste Seite');
+                    console.log('✅ GOOD: Voice navigation with visual alternatives');
+                }, 3000);
+            }
+        }
+        
+        // GOOD 8: Accessible file management
+        function goodFileKeydown(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                console.log('✅ GOOD: File input accessible via Enter/Space');
+            }
+        }
+        
+        function goodFileChange(input) {
+            const status = document.getElementById('goodFileStatus');
+            if (input.files.length > 0) {
+                const fileNames = Array.from(input.files).map(file => file.name).join(', ');
+                status.textContent = `${input.files.length} Datei(en) ausgewählt: ${fileNames}`;
+                announceToScreenReader(`${input.files.length} Dateien ausgewählt`);
+                console.log('✅ GOOD: File selection with full accessibility support');
+            } else {
+                status.textContent = 'Keine Dateien ausgewählt';
+                announceToScreenReader('Dateiauswahl aufgehoben');
+            }
+        }
+        
+        // Helper function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            goodUpdateImageDisplay();
+            goodUpdateZoomDisplay();
+            
+            console.log('=== GOOD CONCURRENT INPUT MECHANISMS IMPLEMENTATION ===');
+            console.log('✅ Pointer cancel works correctly');
+            console.log('✅ Touch gestures have button and keyboard alternatives');
+            console.log('✅ Drag & drop has full keyboard and button alternatives');
+            console.log('✅ Multi-touch has single-pointer alternatives');
+            console.log('✅ Long press has right-click and menu key alternatives');
+            console.log('✅ Motion-based input has static button alternatives');
+            console.log('✅ Voice commands have visual button alternatives');
+            console.log('✅ All specialized input methods have standard alternatives');
+        });
+    </script>
+</body>
+</html>

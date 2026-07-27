@@ -1,0 +1,620 @@
+<!-- WCAG-TEST
+criterion: 3.2.1, 3.2.2
+level: A
+title: On Focus, On Input
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: predictable-navigation, error-handling
+description: Appropriate context change handling with user control
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Context Change Accessible (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .good-section {
+            border: 2px solid #327d36;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-title {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .interactive-area {
+            border: 1px solid #327d36;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f1f8e9;
+        }
+        
+        .good-form {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #327d36;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .good-navigation {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        
+        .good-navigation ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .good-navigation li {
+            margin: 0;
+        }
+        
+        .good-navigation a {
+            color: #2e7d32;
+            text-decoration: none;
+            padding: 8px 12px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            display: block;
+        }
+        
+        .good-navigation a:hover {
+            background-color: #327d36;
+            color: white;
+        }
+        
+        .good-navigation a:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-select {
+            padding: 8px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            background-color: white;
+            margin: 5px;
+        }
+        
+        .good-select:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-button {
+            background-color: #327d36;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        
+        .good-button:hover {
+            background-color: #45a049;
+        }
+        
+        .good-button:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .good-button:disabled {
+            background-color: #666666;
+            cursor: not-allowed;
+        }
+        
+        .good-input {
+            padding: 8px;
+            border: 1px solid #327d36;
+            border-radius: 4px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .good-input:focus {
+            outline: 3px solid #a66300;
+            outline-offset: 2px;
+        }
+        
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status-info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        
+        .status-success {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #327d36;
+        }
+        
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .timeout-container {
+            border: 2px solid #a66300;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #fff8e1;
+            border-radius: 4px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Context Change Accessible (GOOD)</h1>
+    <p><strong>WCAG 3.2.1 & 3.2.2 konforme Implementierung:</strong> Vorhersagbare Navigation ohne unerwartete Kontextwechsel</p>
+    
+    <!-- GOOD 1: Navigation with confirmation for major changes -->
+    <div class="good-section">
+        <div class="good-title">GOOD 1: Navigation mit Bestätigung für größere Änderungen</div>
+        <p><strong>Lösung:</strong> Dropdown-Navigation erfordert explizite Bestätigung</p>
+        <div class="interactive-area">
+            <div class="good-navigation">
+                <h4>Hauptnavigation (mit Bestätigung)</h4>
+                <label for="goodNavSelect">Bereich auswählen:</label>
+                <select id="goodNavSelect" class="good-select" onchange="goodHandleNavigation(this)">
+                    <option value="">Bitte wählen...</option>
+                    <option value="products">Produkte</option>
+                    <option value="services">Dienstleistungen</option>
+                    <option value="support">Support</option>
+                    <option value="contact">Kontakt</option>
+                </select>
+                <button type="button" class="good-button" onclick="goodConfirmNavigation()">
+                    Navigation bestätigen
+                </button>
+                <div id="goodNavStatus"></div>
+            </div>
+            <p>✅ Navigation erfolgt erst nach expliziter Bestätigung</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 2: Form controls with explicit submission -->
+    <div class="good-section">
+        <div class="good-title">GOOD 2: Formularelemente mit expliziter Übermittlung</div>
+        <p><strong>Lösung:</strong> Radio Buttons und Checkboxes ändern nicht automatisch den Kontext</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <fieldset>
+                    <legend>Präferenzen (explizite Übermittlung):</legend>
+                    <div style="margin: 10px 0;">
+                        <label>
+                            <input type="radio" name="goodTheme" value="light"> Helles Theme
+                        </label>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <label>
+                            <input type="radio" name="goodTheme" value="dark"> Dunkles Theme
+                        </label>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <label>
+                            <input type="radio" name="goodTheme" value="auto"> Automatisch
+                        </label>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <label>
+                            <input type="checkbox" name="goodNotifications" value="email"> E-Mail-Benachrichtigungen
+                        </label>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <label>
+                            <input type="checkbox" name="goodNotifications" value="sms"> SMS-Benachrichtigungen
+                        </label>
+                    </div>
+                    <button type="button" class="good-button" onclick="goodApplySettings()">
+                        Einstellungen anwenden
+                    </button>
+                </fieldset>
+                <div id="goodSettingsStatus"></div>
+            </form>
+            <p>✅ Einstellungen werden erst nach Bestätigung angewendet</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 3: Input fields with predictable focus behavior -->
+    <div class="good-section">
+        <div class="good-title">GOOD 3: Eingabefelder mit vorhersagbarem Fokusverhalten</div>
+        <p><strong>Lösung:</strong> Fokus bleibt stabil, keine unerwarteten Kontextwechsel</p>
+        <div class="interactive-area">
+            <form class="good-form">
+                <h4>Benutzeranmeldung (stabiler Fokus):</h4>
+                <div style="margin: 10px 0;">
+                    <label for="goodUsername">Benutzername:</label>
+                    <input type="text" id="goodUsername" class="good-input" 
+                           onfocus="goodHandleFocus('username')" 
+                           onblur="goodHandleBlur('username')"
+                           placeholder="Geben Sie Ihren Benutzernamen ein">
+                </div>
+                <div style="margin: 10px 0;">
+                    <label for="goodPassword">Passwort:</label>
+                    <input type="password" id="goodPassword" class="good-input"
+                           onfocus="goodHandleFocus('password')"
+                           onblur="goodHandleBlur('password')"
+                           placeholder="Geben Sie Ihr Passwort ein">
+                </div>
+                <button type="button" class="good-button" onclick="goodLogin()">
+                    Anmelden
+                </button>
+                <div id="goodLoginStatus"></div>
+            </form>
+            <p>✅ Fokus wird nicht automatisch bewegt, keine unerwarteten Popups</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 4: Buttons with clear, descriptive actions -->
+    <div class="good-section">
+        <div class="good-title">GOOD 4: Buttons mit klaren, beschreibenden Aktionen</div>
+        <p><strong>Lösung:</strong> Button-Labels beschreiben genau was passiert</p>
+        <div class="interactive-area">
+            <div style="margin: 15px 0;">
+                <h4>Klare Button-Beschriftungen:</h4>
+                <button type="button" class="good-button" onclick="goodShowMore()">
+                    Mehr Informationen anzeigen
+                </button>
+                <button type="button" class="good-button" onclick="goodOpenModal()">
+                    Dialog zur Produktauswahl öffnen
+                </button>
+                <button type="button" class="good-button" onclick="goodDownloadFile()">
+                    PDF-Broschüre herunterladen (2.1 MB)
+                </button>
+                <button type="button" class="good-button" onclick="goodExternalLink()">
+                    Zur Partner-Website wechseln (öffnet neues Fenster)
+                </button>
+                <div id="goodActionStatus"></div>
+            </div>
+            <p>✅ Nutzer wissen vorher, was bei Button-Klick passiert</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 5: Content updates with user control -->
+    <div class="good-section">
+        <div class="good-title">GOOD 5: Content-Updates mit Benutzerkontrolle</div>
+        <p><strong>Lösung:</strong> Automatische Updates können pausiert und kontrolliert werden</p>
+        <div class="interactive-area">
+            <div style="margin: 15px 0;">
+                <h4>Live-Ticker (benutzergesteuert):</h4>
+                <div id="goodLiveTicker" class="status-info" style="min-height: 60px;">
+                    <p>Live-Updates werden hier angezeigt...</p>
+                </div>
+                <div style="margin: 10px 0;">
+                    <button type="button" class="good-button" id="goodToggleUpdates" onclick="goodToggleLiveUpdates()">
+                        Live-Updates starten
+                    </button>
+                    <button type="button" class="good-button" onclick="goodManualUpdate()">
+                        Manuell aktualisieren
+                    </button>
+                    <button type="button" class="good-button" onclick="goodClearTicker()">
+                        Ticker leeren
+                    </button>
+                </div>
+                <div id="goodTickerStatus"></div>
+            </div>
+            <p>✅ Benutzer haben vollständige Kontrolle über automatische Updates</p>
+        </div>
+    </div>
+    
+    <!-- GOOD 6: Session timeouts with advance warning -->
+    <div class="good-section">
+        <div class="good-title">GOOD 6: Session-Timeouts mit Vorwarnung</div>
+        <p><strong>Lösung:</strong> Nutzer werden vor Session-Ablauf gewarnt und können verlängern</p>
+        <div class="interactive-area">
+            <div class="timeout-container">
+                <h4>Session-Management:</h4>
+                <p>Ihre Session ist aktiv. Sie werden 2 Minuten vor Ablauf gewarnt.</p>
+                <div id="goodSessionTimer">Session läuft noch: <span id="goodTimeRemaining">15:00</span> Minuten</div>
+                <div style="margin: 15px 0;">
+                    <button type="button" class="good-button" onclick="goodExtendSession()">
+                        Session um 15 Minuten verlängern
+                    </button>
+                    <button type="button" class="good-button" onclick="goodStartTimeoutDemo()">
+                        Timeout-Warnung simulieren
+                    </button>
+                </div>
+                <div id="goodSessionStatus"></div>
+            </div>
+            <p>✅ Nutzer haben immer Kontrolle über Session-Verlängerung</p>
+        </div>
+    </div>
+
+    <div class="good-section">
+        <div class="good-title">Warum das korrekt ist</div>
+        <p><strong>WCAG 3.2.1 & 3.2.2 konforme Implementierung:</strong></p>
+        <ul>
+            <li>✅ Keine unerwarteten Kontextwechsel bei Fokuserhalt</li>
+            <li>✅ Formularelemente ändern Kontext nur nach expliziter Aktion</li>
+            <li>✅ Navigation erfordert bewusste Bestätigung</li>
+            <li>✅ Button-Labels beschreiben eindeutig die resultierenden Aktionen</li>
+            <li>✅ Automatische Updates können pausiert und kontrolliert werden</li>
+            <li>✅ Session-Timeouts werden rechtzeitig angekündigt</li>
+        </ul>
+        
+        <p><strong>Verbesserte Zugänglichkeit für:</strong></p>
+        <ul>
+            <li>👥 Screen Reader-Nutzer: Erleben vorhersagbare Navigation ohne Verwirrung</li>
+            <li>👥 Keyboard-Nutzer: Behalten Fokuskontrolle ohne unerwartete Sprünge</li>
+            <li>👥 Kognitive Beeinträchtigungen: Verstehen klare Aktionsmuster ohne Überraschungen</li>
+            <li>👥 ADHS-Betroffene: Werden nicht durch unvorhersagbare Änderungen abgelenkt</li>
+            <li>👥 Ältere Nutzer: Haben Zeit für bewusste Entscheidungen</li>
+        </ul>
+    </div>
+
+    <!-- Screen reader announcements -->
+    <div class="sr-only" aria-live="polite" id="goodAnnouncements"></div>
+
+    <script>
+        let goodSelectedNavigation = '';
+        let goodLiveUpdatesActive = false;
+        let goodSessionTime = 900; // 15 minutes
+        let goodSessionTimer = null;
+        let goodTickerInterval = null;
+        let goodTickerCount = 0;
+        
+        // Helper function for screen reader announcements
+        function announceToScreenReader(message) {
+            const announcement = document.getElementById('goodAnnouncements');
+            if (announcement) {
+                announcement.textContent = message;
+                setTimeout(() => {
+                    announcement.textContent = '';
+                }, 1000);
+            }
+        }
+        
+        // GOOD 1: Navigation with confirmation
+        function goodHandleNavigation(select) {
+            goodSelectedNavigation = select.value;
+            const status = document.getElementById('goodNavStatus');
+            
+            if (goodSelectedNavigation) {
+                status.innerHTML = '<div class="status-info">📋 Bereit zur Navigation zu: ' + goodSelectedNavigation + '</div>';
+                console.log('✅ GOOD: Navigation option selected but not executed');
+            } else {
+                status.innerHTML = '';
+            }
+        }
+        
+        function goodConfirmNavigation() {
+            const status = document.getElementById('goodNavStatus');
+            
+            if (goodSelectedNavigation) {
+                status.innerHTML = '<div class="status-success">✅ Navigation zu "' + goodSelectedNavigation + '" bestätigt!</div>';
+                announceToScreenReader('Navigation zu ' + goodSelectedNavigation + ' bestätigt');
+                console.log('✅ GOOD: Navigation confirmed by explicit user action');
+                
+                // Reset selection
+                document.getElementById('goodNavSelect').value = '';
+                goodSelectedNavigation = '';
+            } else {
+                status.innerHTML = '<div class="status-warning">⚠️ Bitte wählen Sie zuerst ein Navigationsziel aus</div>';
+                announceToScreenReader('Bitte wählen Sie ein Navigationsziel aus');
+            }
+        }
+        
+        // GOOD 2: Form controls with explicit submission
+        function goodApplySettings() {
+            const theme = document.querySelector('input[name="goodTheme"]:checked');
+            const notifications = document.querySelectorAll('input[name="goodNotifications"]:checked');
+            const status = document.getElementById('goodSettingsStatus');
+            
+            const themeValue = theme ? theme.value : 'nicht ausgewählt';
+            const notificationValues = Array.from(notifications).map(cb => cb.value);
+            
+            status.innerHTML = '<div class="status-success">✅ Einstellungen angewendet!<br>Theme: ' + themeValue + '<br>Benachrichtigungen: ' + (notificationValues.length > 0 ? notificationValues.join(', ') : 'keine') + '</div>';
+            announceToScreenReader('Einstellungen erfolgreich angewendet');
+            console.log('✅ GOOD: Settings applied only after explicit confirmation');
+        }
+        
+        // GOOD 3: Input fields with predictable focus behavior
+        function goodHandleFocus(field) {
+            console.log('✅ GOOD: Focus received on ' + field + ' - no automatic context changes');
+        }
+        
+        function goodHandleBlur(field) {
+            console.log('✅ GOOD: Focus left ' + field + ' - no automatic form submission');
+        }
+        
+        function goodLogin() {
+            const username = document.getElementById('goodUsername').value;
+            const password = document.getElementById('goodPassword').value;
+            const status = document.getElementById('goodLoginStatus');
+            
+            if (username && password) {
+                status.innerHTML = '<div class="status-success">✅ Anmeldung erfolgreich!</div>';
+                announceToScreenReader('Anmeldung erfolgreich');
+                console.log('✅ GOOD: Login submitted only after explicit button click');
+            } else {
+                status.innerHTML = '<div class="status-warning">⚠️ Bitte füllen Sie alle Felder aus</div>';
+                announceToScreenReader('Bitte füllen Sie alle Felder aus');
+            }
+        }
+        
+        // GOOD 4: Buttons with clear, descriptive actions
+        function goodShowMore() {
+            const status = document.getElementById('goodActionStatus');
+            status.innerHTML = '<div class="status-success">✅ Zusätzliche Informationen werden angezeigt</div>';
+            announceToScreenReader('Zusätzliche Informationen angezeigt');
+            console.log('✅ GOOD: Action clearly described in button label');
+        }
+        
+        function goodOpenModal() {
+            const status = document.getElementById('goodActionStatus');
+            status.innerHTML = '<div class="status-info">📋 Produktauswahl-Dialog geöffnet</div>';
+            announceToScreenReader('Produktauswahl Dialog geöffnet');
+            console.log('✅ GOOD: Modal purpose was clear from button text');
+        }
+        
+        function goodDownloadFile() {
+            const status = document.getElementById('goodActionStatus');
+            status.innerHTML = '<div class="status-success">📥 PDF-Download gestartet (2.1 MB)</div>';
+            announceToScreenReader('PDF Download gestartet');
+            console.log('✅ GOOD: File size and type were indicated in button');
+        }
+        
+        function goodExternalLink() {
+            const status = document.getElementById('goodActionStatus');
+            status.innerHTML = '<div class="status-info">🔗 Partner-Website wird in neuem Fenster geöffnet</div>';
+            announceToScreenReader('Partner Website wird in neuem Fenster geöffnet');
+            console.log('✅ GOOD: External link behavior was clearly indicated');
+        }
+        
+        // GOOD 5: Content updates with user control
+        function goodToggleLiveUpdates() {
+            const button = document.getElementById('goodToggleUpdates');
+            const status = document.getElementById('goodTickerStatus');
+            
+            if (goodLiveUpdatesActive) {
+                clearInterval(goodTickerInterval);
+                goodLiveUpdatesActive = false;
+                button.textContent = 'Live-Updates starten';
+                status.innerHTML = '<div class="status-info">⏸️ Live-Updates pausiert</div>';
+                announceToScreenReader('Live Updates pausiert');
+                console.log('✅ GOOD: Live updates stopped by user control');
+            } else {
+                goodLiveUpdatesActive = true;
+                button.textContent = 'Live-Updates pausieren';
+                status.innerHTML = '<div class="status-success">▶️ Live-Updates aktiviert</div>';
+                announceToScreenReader('Live Updates aktiviert');
+                console.log('✅ GOOD: Live updates started by user control');
+                
+                goodTickerInterval = setInterval(() => {
+                    goodTickerCount++;
+                    const ticker = document.getElementById('goodLiveTicker');
+                    ticker.innerHTML = '<p>Update #' + goodTickerCount + ': Neue Meldung um ' + new Date().toLocaleTimeString() + '</p>';
+                }, 3000);
+            }
+        }
+        
+        function goodManualUpdate() {
+            goodTickerCount++;
+            const ticker = document.getElementById('goodLiveTicker');
+            const status = document.getElementById('goodTickerStatus');
+            
+            ticker.innerHTML = '<p>Manuelles Update #' + goodTickerCount + ': Aktualisierung um ' + new Date().toLocaleTimeString() + '</p>';
+            status.innerHTML = '<div class="status-success">🔄 Manuell aktualisiert</div>';
+            announceToScreenReader('Ticker manuell aktualisiert');
+            console.log('✅ GOOD: Manual update performed by user request');
+        }
+        
+        function goodClearTicker() {
+            const ticker = document.getElementById('goodLiveTicker');
+            const status = document.getElementById('goodTickerStatus');
+            
+            ticker.innerHTML = '<p>Ticker geleert - bereit für neue Updates</p>';
+            status.innerHTML = '<div class="status-info">🗑️ Ticker geleert</div>';
+            goodTickerCount = 0;
+            announceToScreenReader('Ticker geleert');
+            console.log('✅ GOOD: Ticker cleared by user action');
+        }
+        
+        // GOOD 6: Session timeouts with advance warning
+        function goodExtendSession() {
+            goodSessionTime = 900; // Reset to 15 minutes
+            const status = document.getElementById('goodSessionStatus');
+            status.innerHTML = '<div class="status-success">✅ Session um 15 Minuten verlängert</div>';
+            announceToScreenReader('Session verlängert');
+            console.log('✅ GOOD: Session extended by user choice');
+            goodUpdateTimer();
+        }
+        
+        function goodStartTimeoutDemo() {
+            goodSessionTime = 130; // 2 minutes 10 seconds for demo
+            const status = document.getElementById('goodSessionStatus');
+            status.innerHTML = '<div class="status-warning">⚠️ Demo gestartet: Sie erhalten in 10 Sekunden eine Warnung</div>';
+            announceToScreenReader('Timeout Demo gestartet');
+            console.log('✅ GOOD: Timeout warning demo initiated');
+        }
+        
+        function goodUpdateTimer() {
+            const minutes = Math.floor(goodSessionTime / 60);
+            const seconds = goodSessionTime % 60;
+            const timeDisplay = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            
+            document.getElementById('goodTimeRemaining').textContent = timeDisplay;
+            
+            // Warning at 2 minutes
+            if (goodSessionTime === 120) {
+                const status = document.getElementById('goodSessionStatus');
+                status.innerHTML = '<div class="status-warning">⚠️ Warnung: Ihre Session läuft in 2 Minuten ab. Möchten Sie sie verlängern?</div>';
+                announceToScreenReader('Warnung: Session läuft in 2 Minuten ab');
+                console.log('✅ GOOD: Session timeout warning given with 2 minutes notice');
+            }
+            
+            if (goodSessionTime <= 0) {
+                clearInterval(goodSessionTimer);
+                const status = document.getElementById('goodSessionStatus');
+                status.innerHTML = '<div class="status-warning">⏰ Session abgelaufen. Sie würden zur Anmeldeseite weitergeleitet.</div>';
+                announceToScreenReader('Session abgelaufen');
+                console.log('✅ GOOD: Session timeout occurred after proper warning');
+                return;
+            }
+            
+            goodSessionTime--;
+        }
+        
+        // Initialize good context change implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== GOOD CONTEXT CHANGE IMPLEMENTATION ===');
+            console.log('✅ Navigation requires explicit confirmation');
+            console.log('✅ Form controls do not automatically change context');
+            console.log('✅ Input fields maintain predictable focus behavior');
+            console.log('✅ Button labels clearly describe resulting actions');
+            console.log('✅ Content updates are user-controlled');
+            console.log('✅ Session timeouts provide advance warning');
+            
+            // Start session timer
+            goodSessionTimer = setInterval(goodUpdateTimer, 1000);
+            
+            announceToScreenReader('Vorhersagbare Navigation geladen');
+        });
+    </script>
+</body>
+</html>

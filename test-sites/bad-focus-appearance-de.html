@@ -1,0 +1,66 @@
+<!-- WCAG-TEST
+criterion: 2.4.13
+level: AAA
+title: Fokus-Erscheinungsbild — Terminbuchung (German)
+test_type: bad
+expected_violations: 3
+testable_by: llm
+scanners: llm-focus-appearance-scanner
+description: Global entfernte Fokusanzeige und kaum sichtbarer Fokusring auf Termin-Buttons
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminbuchung — Ordination Dr. Berger (Test: schlecht)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        .violation-section { border: 2px solid #d32f2f; margin: 20px 0; padding: 15px; background-color: #ffebee; }
+        .violation-title { color: #b71c1c; font-weight: bold; margin-bottom: 10px; }
+
+        /* VIOLATION: global focus indicator removed for the entire page */
+        *:focus { outline: none; }
+
+        /* VIOLATION: focus ring barely visible — 1px light-grey on white */
+        .termin-btn {
+            padding: 12px 24px; border: 2px solid #333; background: #f0f0f0; cursor: pointer; font-size: 1rem; margin: 6px;
+        }
+        .termin-btn:focus {
+            outline: 1px solid #e0e0e0;
+            outline-offset: 0;
+        }
+
+        nav a { padding: 8px 12px; display: inline-block; color: #0066cc; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Terminbuchung (2.4.13 AAA — schlecht)</h1>
+
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 1: Globale Regel entfernt jede Fokusanzeige</div>
+        <p>Die Regel <code>*:focus { outline: none; }</code> entfernt die Fokusanzeige für sämtliche Elemente
+           auf dieser Seite, einschließlich der Navigationslinks:</p>
+        <nav>
+            <a href="#termin">Termin buchen</a>
+            <a href="#leistungen">Leistungen</a>
+            <a href="#kontakt">Kontakt</a>
+        </nav>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 2: Fokusring auf Termin-Buttons kaum sichtbar (1px hellgrau)</div>
+        <p>Die folgenden Buttons zeigen bei Fokus nur einen 1px hellgrauen Rahmen — deutlich unter dem
+           3:1-Kontrastminimum:</p>
+        <button class="termin-btn">Termin Vorsorgeuntersuchung</button>
+        <button class="termin-btn">Termin Akutsprechstunde</button>
+        <button class="termin-btn">Termin Impfung</button>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-title">Verstoß 3: Kein Fokusindikator auf Formularfeldern</div>
+        <label for="wunschdatum">Wunschtermin (Datum)</label>
+        <input type="text" id="wunschdatum" style="padding:8px; width:250px; border:1px solid #ccc;">
+    </div>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!-- WCAG-TEST
+criterion: 4.1.3
+level: AA
+title: Status Messages
+test_type: bad
+expected_violations: 5
+testable_by: regex
+scanners: page-structure
+description: Status messages not announced to screen readers
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Status-Nachrichten Verletzungen (BAD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+        
+        .violation-section {
+            border: 2px solid #ff0000;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fff5f5;
+        }
+        
+        .violation-title {
+            color: #ff0000;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .status-container {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+            min-height: 50px;
+        }
+        
+        .form-container {
+            border: 1px solid #007cba;
+            padding: 20px;
+            margin: 15px 0;
+            background-color: #f0f8ff;
+        }
+        
+        .button-group {
+            margin: 15px 0;
+        }
+        
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007cba;
+            color: white;
+        }
+        
+        input, textarea {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        .success-message {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        
+        .warning-message {
+            color: #f57c00;
+            font-weight: bold;
+        }
+        
+        .info-message {
+            color: #1976d2;
+            font-weight: bold;
+        }
+        
+        .loading-indicator {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .progress-container {
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+            height: 20px;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            background: #007cba;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test: Status-Nachrichten Verletzungen (BAD)</h1>
+    <p><strong>WCAG 4.1.3 Verletzungen:</strong> Status-Updates ohne Screen-Reader-Ankündigungen</p>
+    
+    <!-- VIOLATION 1: Stille Status-Updates -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 1: Stille Status-Updates (Keine aria-live)</div>
+        <p><strong>Problem:</strong> Wichtige Status-Änderungen werden dem Screen-Reader nicht mitgeteilt</p>
+        <div class="button-group">
+            <button onclick="silentStatusUpdate()">Status still ändern</button>
+            <button onclick="silentErrorUpdate()">Fehler still anzeigen</button>
+            <button onclick="silentSuccessUpdate()">Erfolg still anzeigen</button>
+        </div>
+        <!-- SCHLECHT: Kein aria-live Attribut -->
+        <div id="silent-status" class="status-container">
+            Status erscheint hier...
+        </div>
+    </div>
+    
+    <!-- VIOLATION 2: Versteckte Status-Updates -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 2: Versteckte Status-Updates</div>
+        <p><strong>Problem:</strong> Status-Nachrichten werden nur visuell geändert, aber sind für Screen-Reader versteckt</p>
+        <div class="button-group">
+            <button onclick="hiddenStatusUpdate()">Versteckten Status ändern</button>
+            <button onclick="toggleHiddenMessage()">Versteckte Nachricht umschalten</button>
+        </div>
+        <!-- SCHLECHT: Status wird ein-/ausgeblendet ohne Ankündigung -->
+        <div id="hidden-status" class="status-container hidden">
+            Diese wichtige Nachricht ist versteckt!
+        </div>
+    </div>
+    
+    <!-- VIOLATION 3: Formular ohne Fehler-Ankündigungen -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 3: Formular-Validierung ohne Status-Ankündigungen</div>
+        <p><strong>Problem:</strong> Validierungsfehler werden nicht als Status-Nachrichten angekündigt</p>
+        <div class="form-container">
+            <form id="silent-form">
+                <div>
+                    <label for="email-field">E-Mail:</label>
+                    <input type="email" id="email-field" required>
+                </div>
+                <div>
+                    <label for="password-field">Passwort:</label>
+                    <input type="password" id="password-field" required minlength="8">
+                </div>
+                <div>
+                    <label for="confirm-field">Passwort bestätigen:</label>
+                    <input type="password" id="confirm-field" required>
+                </div>
+                <button type="submit">Absenden</button>
+            </form>
+            <!-- SCHLECHT: Fehlermeldungen ohne aria-live -->
+            <div id="form-errors" class="error-message"></div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 4: Dynamischer Inhalt ohne Ankündigungen -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 4: Dynamischer Inhalt ohne Ankündigungen</div>
+        <p><strong>Problem:</strong> Inhalte werden dynamisch geladen, aber Screen-Reader erfährt nichts davon</p>
+        <div class="button-group">
+            <button onclick="loadSilentContent()">Inhalt still laden</button>
+            <button onclick="updateSilentCounter()">Zähler still aktualisieren</button>
+            <button onclick="silentProgressUpdate()">Fortschritt still ändern</button>
+        </div>
+        <div id="dynamic-content" class="status-container">
+            Inhalt wird hier dynamisch geladen...
+        </div>
+        <div>Zähler: <span id="silent-counter">0</span></div>
+        <div class="progress-container">
+            <div id="silent-progress" class="progress-bar"></div>
+        </div>
+    </div>
+    
+    <!-- VIOLATION 5: Wichtige Benachrichtigungen ohne role="alert" -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5: Kritische Benachrichtigungen ohne role="alert"</div>
+        <p><strong>Problem:</strong> Wichtige/kritische Nachrichten werden nicht als Alarm behandelt</p>
+        <div class="button-group">
+            <button onclick="showSilentCriticalError()">Kritischen Fehler still anzeigen</button>
+            <button onclick="showSilentSecurityWarning()">Sicherheitswarnung still anzeigen</button>
+            <button onclick="showSilentSystemMessage()">System-Nachricht still anzeigen</button>
+        </div>
+        <!-- SCHLECHT: Kritische Nachrichten ohne role="alert" -->
+        <div id="critical-messages" class="status-container">
+            Kritische Nachrichten erscheinen hier...
+        </div>
+    </div>
+    
+    <!-- VIOLATION 6: Shopping Cart Updates ohne Ankündigungen -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 6: Warenkorb-Updates ohne Status-Ankündigungen</div>
+        <p><strong>Problem:</strong> Warenkorb-Änderungen werden nicht angekündigt</p>
+        <div class="button-group">
+            <button onclick="addToCartSilently()">Artikel still hinzufügen</button>
+            <button onclick="removeFromCartSilently()">Artikel still entfernen</button>
+            <button onclick="updateQuantitySilently()">Menge still ändern</button>
+        </div>
+        <div id="cart-status" class="status-container">
+            Warenkorb: 0 Artikel
+        </div>
+        <div>Gesamtpreis: <span id="cart-total">0,00 €</span></div>
+    </div>
+    
+    <!-- VIOLATION 7: Live Chat ohne Status-Updates -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Chat-Nachrichten ohne Live-Updates</div>
+        <p><strong>Problem:</strong> Neue Chat-Nachrichten werden nicht angekündigt</p>
+        <div class="button-group">
+            <button onclick="receiveSilentMessage()">Neue Nachricht still empfangen</button>
+            <button onclick="updateSilentTypingStatus()">Tippstatus still ändern</button>
+        </div>
+        <div id="chat-messages" class="status-container" style="height: 100px; overflow-y: scroll;">
+            <div>System: Chat gestartet</div>
+        </div>
+        <div id="typing-status" class="info-message"></div>
+    </div>
+    
+    <!-- VIOLATION 8: Timer/Countdown ohne Ankündigungen -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 8: Timer/Countdown ohne Ankündigungen</div>
+        <p><strong>Problem:</strong> Zeitbasierte Updates werden nicht angekündigt</p>
+        <div class="button-group">
+            <button onclick="startSilentTimer()">Timer still starten</button>
+            <button onclick="startSilentCountdown()">Countdown still starten</button>
+        </div>
+        <div>Timer: <span id="silent-timer">00:00</span></div>
+        <div>Countdown: <span id="silent-countdown">10</span> Sekunden</div>
+    </div>
+
+    <script>
+        let counter = 0;
+        let cartItems = 0;
+        let cartTotal = 0;
+        let messageCount = 1;
+        let timerSeconds = 0;
+        let countdownValue = 10;
+        let timerInterval, countdownInterval;
+        
+        // VIOLATION 1: Stille Status-Updates
+        function silentStatusUpdate() {
+            // SCHLECHT: Direktes innerHTML ohne aria-live
+            document.getElementById('silent-status').innerHTML = 
+                '<span class="info-message">Status wurde aktualisiert um ' + new Date().toLocaleTimeString() + '</span>';
+        }
+        
+        function silentErrorUpdate() {
+            // SCHLECHT: Fehler-Update ohne Ankündigung
+            document.getElementById('silent-status').innerHTML = 
+                '<span class="error-message">FEHLER: Verbindung fehlgeschlagen!</span>';
+        }
+        
+        function silentSuccessUpdate() {
+            // SCHLECHT: Erfolgs-Update ohne Ankündigung
+            document.getElementById('silent-status').innerHTML = 
+                '<span class="success-message">Erfolgreich gespeichert!</span>';
+        }
+        
+        // VIOLATION 2: Versteckte Status-Updates
+        function hiddenStatusUpdate() {
+            const statusDiv = document.getElementById('hidden-status');
+            // SCHLECHT: Text wird geändert während Element versteckt ist
+            statusDiv.textContent = 'Versteckter Status wurde um ' + new Date().toLocaleTimeString() + ' geändert';
+        }
+        
+        function toggleHiddenMessage() {
+            const statusDiv = document.getElementById('hidden-status');
+            // SCHLECHT: Ein-/Ausblenden ohne aria-live Ankündigung
+            statusDiv.classList.toggle('hidden');
+        }
+        
+        // VIOLATION 3: Formular-Validierung ohne Status
+        document.getElementById('silent-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email-field').value;
+            const password = document.getElementById('password-field').value;
+            const confirm = document.getElementById('confirm-field').value;
+            const errorsDiv = document.getElementById('form-errors');
+            
+            let errors = [];
+            if (!email.includes('@')) errors.push('Ungültige E-Mail-Adresse');
+            if (password.length < 8) errors.push('Passwort zu kurz');
+            if (password !== confirm) errors.push('Passwörter stimmen nicht überein');
+            
+            // SCHLECHT: Fehlermeldungen ohne aria-live oder role="alert"
+            if (errors.length > 0) {
+                errorsDiv.innerHTML = 'Fehler: ' + errors.join(', ');
+            } else {
+                errorsDiv.innerHTML = 'Formular erfolgreich übermittelt!';
+            }
+        });
+        
+        // VIOLATION 4: Dynamischer Inhalt ohne Ankündigungen
+        function loadSilentContent() {
+            // SCHLECHT: Inhalt wird geladen ohne Ankündigung
+            document.getElementById('dynamic-content').innerHTML = 
+                'Neuer Inhalt geladen um ' + new Date().toLocaleTimeString();
+        }
+        
+        function updateSilentCounter() {
+            counter++;
+            // SCHLECHT: Zähler-Update ohne Ankündigung
+            document.getElementById('silent-counter').textContent = counter;
+        }
+        
+        function silentProgressUpdate() {
+            const progress = document.getElementById('silent-progress');
+            const currentWidth = parseInt(progress.style.width) || 0;
+            const newWidth = Math.min(currentWidth + 20, 100);
+            // SCHLECHT: Fortschritts-Update ohne Ankündigung
+            progress.style.width = newWidth + '%';
+        }
+        
+        // VIOLATION 5: Kritische Nachrichten ohne role="alert"
+        function showSilentCriticalError() {
+            // SCHLECHT: Kritischer Fehler ohne role="alert"
+            document.getElementById('critical-messages').innerHTML = 
+                '<span class="error-message">KRITISCHER FEHLER: System überlastet!</span>';
+        }
+        
+        function showSilentSecurityWarning() {
+            // SCHLECHT: Sicherheitswarnung ohne role="alert"
+            document.getElementById('critical-messages').innerHTML = 
+                '<span class="warning-message">SICHERHEITSWARNUNG: Verdächtige Aktivität erkannt!</span>';
+        }
+        
+        function showSilentSystemMessage() {
+            // SCHLECHT: System-Nachricht ohne Ankündigung
+            document.getElementById('critical-messages').innerHTML = 
+                '<span class="info-message">System wird in 5 Minuten gewartet.</span>';
+        }
+        
+        // VIOLATION 6: Warenkorb-Updates ohne Ankündigungen
+        function addToCartSilently() {
+            cartItems++;
+            cartTotal += 19.99;
+            // SCHLECHT: Warenkorb-Updates ohne Ankündigung
+            document.getElementById('cart-status').textContent = `Warenkorb: ${cartItems} Artikel`;
+            document.getElementById('cart-total').textContent = cartTotal.toFixed(2) + ' €';
+        }
+        
+        function removeFromCartSilently() {
+            if (cartItems > 0) {
+                cartItems--;
+                cartTotal -= 19.99;
+                // SCHLECHT: Entfernung ohne Ankündigung
+                document.getElementById('cart-status').textContent = `Warenkorb: ${cartItems} Artikel`;
+                document.getElementById('cart-total').textContent = Math.max(0, cartTotal).toFixed(2) + ' €';
+            }
+        }
+        
+        function updateQuantitySilently() {
+            cartItems += 2;
+            cartTotal += 39.98;
+            // SCHLECHT: Mengen-Update ohne Ankündigung
+            document.getElementById('cart-status').textContent = `Warenkorb: ${cartItems} Artikel`;
+            document.getElementById('cart-total').textContent = cartTotal.toFixed(2) + ' €';
+        }
+        
+        // VIOLATION 7: Chat-Nachrichten ohne Live-Updates
+        function receiveSilentMessage() {
+            const chatDiv = document.getElementById('chat-messages');
+            // SCHLECHT: Neue Chat-Nachricht ohne aria-live
+            const newMessage = document.createElement('div');
+            newMessage.textContent = `Support: Nachricht ${messageCount++} um ${new Date().toLocaleTimeString()}`;
+            chatDiv.appendChild(newMessage);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+        
+        function updateSilentTypingStatus() {
+            // SCHLECHT: Tippstatus ohne Ankündigung
+            document.getElementById('typing-status').textContent = 'Support tippt...';
+            setTimeout(() => {
+                document.getElementById('typing-status').textContent = '';
+            }, 3000);
+        }
+        
+        // VIOLATION 8: Timer/Countdown ohne Ankündigungen
+        function startSilentTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerSeconds = 0;
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const minutes = Math.floor(timerSeconds / 60);
+                const seconds = timerSeconds % 60;
+                // SCHLECHT: Timer-Update ohne Ankündigung
+                document.getElementById('silent-timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function startSilentCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownValue = 10;
+            countdownInterval = setInterval(() => {
+                countdownValue--;
+                // SCHLECHT: Countdown ohne Ankündigung
+                document.getElementById('silent-countdown').textContent = countdownValue;
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                    // SCHLECHT: Countdown-Ende ohne Ankündigung
+                    document.getElementById('silent-countdown').textContent = 'Abgelaufen!';
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

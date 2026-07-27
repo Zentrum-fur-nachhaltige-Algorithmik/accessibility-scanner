@@ -1,17 +1,17 @@
 {
   "model": "google/gemini-3.1-flash-lite-preview",
   "slug": "gemini-3.1-flash-lite",
-  "timestamp": "2026-04-06T08:09:04.141Z",
+  "timestamp": "2026-04-06T14:47:15.655Z",
   "pages": [
     {
       "tech": "html",
       "css": "tailwind",
       "page": "form",
       "file": "generated/gemini-3.1-flash-lite/html-tailwind/form.html",
-      "size": 6260,
-      "promptTokens": 9255,
-      "completionTokens": 1792,
-      "elapsed": 7.6,
+      "size": 7260,
+      "promptTokens": 10636,
+      "completionTokens": 1945,
+      "elapsed": 8.1,
       "validationIssues": []
     },
     {
@@ -19,10 +19,10 @@
       "css": "tailwind",
       "page": "form",
       "file": "generated/gemini-3.1-flash-lite/react-tailwind/form.html",
-      "size": 6477,
-      "promptTokens": 12375,
-      "completionTokens": 1662,
-      "elapsed": 5.3,
+      "size": 6331,
+      "promptTokens": 13760,
+      "completionTokens": 1815,
+      "elapsed": 8.3,
       "validationIssues": []
     },
     {
@@ -30,10 +30,10 @@
       "css": "tailwind",
       "page": "form",
       "file": "generated/gemini-3.1-flash-lite/vue-tailwind/form.html",
-      "size": 6481,
-      "promptTokens": 11840,
-      "completionTokens": 1747,
-      "elapsed": 7,
+      "size": 7557,
+      "promptTokens": 13223,
+      "completionTokens": 2069,
+      "elapsed": 8.1,
       "validationIssues": []
     },
     {
@@ -41,10 +41,10 @@
       "css": "tailwind",
       "page": "form",
       "file": "generated/gemini-3.1-flash-lite/svelte-tailwind/form.html",
-      "size": 5805,
-      "promptTokens": 9257,
-      "completionTokens": 1551,
-      "elapsed": 5.2,
+      "size": 5588,
+      "promptTokens": 10640,
+      "completionTokens": 1731,
+      "elapsed": 7.4,
       "validationIssues": []
     },
     {
@@ -52,14 +52,14 @@
       "css": "tailwind",
       "page": "form",
       "file": "generated/gemini-3.1-flash-lite/angular-tailwind/form.html",
-      "size": 5835,
-      "promptTokens": 9258,
-      "completionTokens": 1627,
-      "elapsed": 5.7,
+      "size": 7928,
+      "promptTokens": 10641,
+      "completionTokens": 2228,
+      "elapsed": 9.8,
       "validationIssues": []
     }
   ],
-  "totalPromptTokens": 51985,
-  "totalCompletionTokens": 8379,
+  "totalPromptTokens": 58900,
+  "totalCompletionTokens": 9788,
   "errors": []
 }

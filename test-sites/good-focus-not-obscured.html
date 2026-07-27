@@ -1,0 +1,230 @@
+<!-- WCAG-TEST
+criterion: 2.4.11
+level: AA
+title: Focus Not Obscured (Minimum)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: Focused elements are never obscured by fixed/sticky elements
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Focus Not Obscured - Accessibility Test</title>
+    <style>
+        /* PATTERN 1: scroll-padding-top accounts for fixed header height */
+        html {
+            scroll-padding-top: 100px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Fixed header with proper scroll compensation */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: #1a237e;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        .fixed-header nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+        .fixed-header nav a:focus-visible {
+            outline: 3px solid #ffeb3b;
+            outline-offset: 4px;
+            border-radius: 2px;
+        }
+
+        .page-content {
+            padding-top: 90px;
+            padding-bottom: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* PATTERN 2: Focus styles that guarantee visibility above overlapping content */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #1565c0;
+            outline-offset: 4px;
+            border-radius: 2px;
+            position: relative;
+            z-index: 200;
+        }
+
+        /* PATTERN 3: Cookie banner uses position:relative at bottom of page, not fixed */
+        .cookie-banner {
+            background: #37474f;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .cookie-banner button {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            min-height: 44px;
+        }
+
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .form-section input,
+        .form-section select,
+        .form-section textarea {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            padding: 8px;
+            margin: 8px 0 16px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-section label {
+            font-weight: bold;
+        }
+        .form-section button {
+            padding: 10px 20px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            min-height: 44px;
+        }
+
+        .content-block {
+            margin: 20px 0;
+            padding: 15px;
+        }
+        .content-block a {
+            color: #1565c0;
+        }
+
+        footer {
+            background: #263238;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        footer a {
+            color: #80cbc4;
+            margin: 0 10px;
+        }
+
+        .compliant-note {
+            border: 2px solid #2e7d32;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5e9;
+        }
+        .compliant-label {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="fixed-header">
+        <strong>SiteName</strong>
+        <nav aria-label="Main navigation">
+            <a href="#home">Home</a>
+            <a href="#products">Products</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <main class="page-content">
+        <div class="compliant-note">
+            <div class="compliant-label">PATTERN 1: scroll-padding-top Compensates for Fixed Header</div>
+            <p>The html element has <code>scroll-padding-top: 100px</code> which ensures that when focus moves to an element and the browser scrolls, the focused element is not hidden behind the 70px fixed header.</p>
+        </div>
+
+        <div class="content-block">
+            <h1>Welcome to Our Site</h1>
+            <p>Browse our <a href="#catalog">product catalog</a> or <a href="#support">get support</a>.</p>
+            <p>Read our <a href="#blog">latest blog posts</a> and <a href="#news">company news</a>.</p>
+        </div>
+
+        <div class="compliant-note">
+            <div class="compliant-label">PATTERN 2: Focus Styles with Elevated z-index</div>
+            <p>All focusable elements receive <code>z-index: 200</code> on <code>:focus-visible</code>, ensuring they render above any overlapping elements. The outline-offset of 4px also provides visual clearance.</p>
+        </div>
+
+        <div class="form-section">
+            <h2>Contact Form</h2>
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name">
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email">
+
+            <label for="subject">Subject</label>
+            <select id="subject" name="subject">
+                <option value="">Select a topic...</option>
+                <option value="general">General Inquiry</option>
+                <option value="support">Technical Support</option>
+            </select>
+
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="4"></textarea>
+
+            <button type="submit">Send Message</button>
+        </div>
+
+        <div class="content-block">
+            <p><a href="#sitemap">Sitemap</a> | <a href="#careers">Careers</a> | <a href="#legal">Legal</a></p>
+        </div>
+    </main>
+
+    <!-- Cookie banner is in normal document flow, not position:fixed -->
+    <div class="cookie-banner" role="region" aria-label="Cookie consent">
+        <p>We use cookies to enhance your experience.</p>
+        <div>
+            <button>Accept All</button>
+            <button>Manage Preferences</button>
+        </div>
+    </div>
+
+    <footer>
+        <a href="#about">About</a>
+        <a href="#terms">Terms</a>
+        <a href="#contact-footer">Contact</a>
+    </footer>
+
+</body>
+</html>

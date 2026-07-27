@@ -1,0 +1,17 @@
+{
+  "testCase": "bad-color-contrast",
+  "timestamp": "2025-07-11T08:22:15.943Z",
+  "imageResults": [
+    {
+      "type": "background-text-image",
+      "confidence": 60,
+      "reasons": [
+        "background image with text overlay"
+      ]
+    }
+  ],
+  "summary": {
+    "suspectedTextImages": 0,
+    "backgroundTextImages": 1
+  }
+}

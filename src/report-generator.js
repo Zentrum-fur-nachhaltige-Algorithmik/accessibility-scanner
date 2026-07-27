@@ -5,20 +5,9 @@ const htmlPdf = require('html-pdf-node');
 
 const DEFAULT_ORG_NAME = 'Abraham Nemeth Society for Accessible Algorithmics e.V.';
 
-function classifyWcagPrinciple(violation) {
-  const criterion = violation.criterion || violation.wcagCriteria || violation.clause || '';
-  const str = String(criterion);
-  if (str.startsWith('EAA-')) return 'eaa';
-  const match = str.match(/^(?:9\.)?([1-4])\./);
-  if (match) {
-    const p = parseInt(match[1], 10);
-    if (p === 1) return 'perceivable';
-    if (p === 2) return 'operable';
-    if (p === 3) return 'understandable';
-    if (p === 4) return 'robust';
-  }
-  return 'other';
-}
+// Extracted to src/utils/wcag-principle.js so scan-pipeline.js can share it
+// without pulling this module's PDF stack into the scan path.
+const { classifyWcagPrinciple } = require('./utils/wcag-principle');
 
 function normalizeSeverity(violation) {
   const raw = (violation.severity || violation.impact || 'moderate').toLowerCase();
@@ -68,10 +57,13 @@ class ReportGenerator {
     const reportId = uuidv4();
     const timestamp = new Date().toISOString();
 
+    // scanData is spread FIRST so that scan-controlled fields can never shadow
+    // the ids/timestamps we generate (a scan result carrying its own `id` would
+    // otherwise decide what the report claims to be).
     const reportData = {
+      ...scanData,
       id: reportId,
       timestamp,
-      ...scanData,
       orgName: options.orgName || DEFAULT_ORG_NAME,
       orgLogo: options.orgLogo || null,
       orgContact: options.orgContact || null,
@@ -105,20 +97,51 @@ class ReportGenerator {
 
   async generateHTMLReport(reportData) {
     const template = await this.getHTMLTemplate(reportData);
-    return this.populateTemplate(template, reportData);
+    return this.ensureCharsetMeta(this.populateTemplate(template, reportData));
+  }
+
+  /**
+   * Guarantee an explicit UTF-8 declaration.
+   *
+   * Without one the browser (and headless Chrome during PDF rendering) may
+   * sniff the encoding, which is both a mojibake source and a classic escaping
+   * bypass — UTF-7-style payloads only work against an undeclared document.
+   * The built-in template already declares it; custom templates dropped into
+   * templates/ may not.
+   */
+  ensureCharsetMeta(html) {
+    if (/<meta[^>]+charset/i.test(html)) return html;
+    if (/<head[^>]*>/i.test(html)) {
+      return html.replace(/<head[^>]*>/i, (head) => `${head}\n<meta charset="utf-8">`);
+    }
+    return `<meta charset="utf-8">\n${html}`;
   }
 
   async generatePDFReport(reportData, htmlContent) {
+    // Rendered directly with puppeteer: html-pdf-node pipes the finished HTML
+    // through handlebars, so brace sequences inside real-world finding
+    // descriptions (CSS/code snippets) crash the render.
+    let browser;
     try {
-      const options = { format: 'A4', printBackground: true, margin: { top: '20mm', bottom: '25mm', left: '18mm', right: '18mm' } };
-      const file = { content: htmlContent };
-      const pdfBuffer = await htmlPdf.generatePdf(file, options);
+      // htmlContent is the already-escaped output of generateHTMLReport — the
+      // PDF renderer must never be handed raw scan data.
+      const puppeteer = require('puppeteer');
+      browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '20mm', bottom: '25mm', left: '18mm', right: '18mm' },
+      });
       const pdfPath = path.join(this.reportsDir, `${reportData.id}.pdf`);
       await fs.writeFile(pdfPath, pdfBuffer);
       return pdfPath;
     } catch (error) {
       console.error('PDF generation error:', error);
       throw new Error(`PDF generation failed: ${error.message}`);
+    } finally {
+      if (browser) await browser.close().catch(() => {});
     }
   }
 
@@ -149,7 +172,7 @@ class ReportGenerator {
     font-family: 'Source Sans Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.875rem;
     line-height: 1.55;
-    color: #2b2b2b;
+    color: #14181D;
     background: #fff;
     max-width: 60rem;
     margin: 0 auto;
@@ -181,7 +204,7 @@ class ReportGenerator {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-    background: #1b2a4a;
+    background: #1B3A6B;
     color: #fff;
     font-size: 0.8125rem;
     text-decoration: none;
@@ -198,33 +221,33 @@ class ReportGenerator {
     margin: 0;
     clip: auto;
     white-space: normal;
-    outline: 3px solid #1b2a4a;
+    outline: 3px solid #1B3A6B;
     outline-offset: 2px;
   }
 
   /* --- Typography hierarchy through weight and size only --- */
   h1, h2, h3, h4 {
     font-family: 'Source Sans Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    color: #1b2a4a;
+    color: #1B3A6B;
     letter-spacing: -0.01em;
   }
   h1 { font-size: 1.375rem; font-weight: 700; margin: 0 0 0.125rem; }
-  h2 { font-size: 1.125rem; font-weight: 700; margin: 1.75rem 0 0.625rem; padding-bottom: 0.25rem; border-bottom: 1.5px solid #1b2a4a; }
+  h2 { font-size: 1.125rem; font-weight: 700; margin: 1.75rem 0 0.625rem; padding-bottom: 0.25rem; border-bottom: 1.5px solid #1B3A6B; }
   h3 { font-size: 1rem; font-weight: 600; margin: 1.25rem 0 0.375rem; }
   h4 { font-size: 0.875rem; font-weight: 600; margin: 0.875rem 0 0.25rem; }
 
   p { margin: 0 0 0.5rem; }
-  a { color: #1b2a4a; text-decoration: underline; }
+  a { color: #1B3A6B; text-decoration: underline; }
   a:focus-visible,
   button:focus-visible,
-  [tabindex]:focus-visible { outline: 3px solid #1b2a4a; outline-offset: 2px; }
+  [tabindex]:focus-visible { outline: 3px solid #1B3A6B; outline-offset: 2px; }
 
   /* --- Document header (letterhead) --- */
   .doc-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 2px solid #1b2a4a;
+    border-bottom: 2px solid #1B3A6B;
     padding-bottom: 0.875rem;
     margin-bottom: 0.375rem;
   }
@@ -232,16 +255,16 @@ class ReportGenerator {
   .doc-header-right {
     text-align: left;
     font-size: 0.75rem;
-    color: #555;
+    color: #4A5560;
     line-height: 1.6;
     min-width: 10.625rem;
     padding-left: 1rem;
-    border-left: 0.5px solid #ccc;
+    border-left: 0.5px solid #B9C0C8;
   }
   .org-name {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #1b2a4a;
+    color: #1B3A6B;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     margin-bottom: 0.5rem;
@@ -253,24 +276,24 @@ class ReportGenerator {
   }
   .doc-subtitle {
     font-size: 0.8125rem;
-    color: #555;
+    color: #4A5560;
     margin-top: 0.1875rem;
   }
   .doc-meta-line {
     margin: 0 0 0.0625rem;
     font-size: 0.75rem;
-    color: #555;
+    color: #4A5560;
   }
   .doc-meta-line.doc-id {
     font-size: 0.8125rem;
-    color: #1b2a4a;
+    color: #1B3A6B;
     font-weight: 600;
     margin-bottom: 0.25rem;
   }
 
   /* --- Table of contents --- */
   .toc {
-    border: 0.5px solid #999;
+    border: 0.5px solid #A6AEB8;
     padding: 0.75rem 1.125rem;
     margin: 1rem 0 1.5rem;
     background: none;
@@ -278,7 +301,7 @@ class ReportGenerator {
   .toc-title {
     font-size: 0.8125rem;
     font-weight: 700;
-    color: #1b2a4a;
+    color: #1B3A6B;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin: 0 0 0.375rem;
@@ -290,7 +313,7 @@ class ReportGenerator {
     line-height: 1.9;
   }
   .toc ol ol { margin-top: 0; line-height: 1.7; list-style: none; padding-left: 1.6em; }
-  .toc a { text-decoration: none; color: #2b2b2b; min-height: 2.75rem; display: inline-flex; align-items: center; }
+  .toc a { text-decoration: none; color: #14181D; min-height: 2.75rem; display: inline-flex; align-items: center; }
   .toc a:hover,
   .toc a:focus-visible { text-decoration: underline; }
 
@@ -300,7 +323,7 @@ class ReportGenerator {
     text-align: left;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #1b2a4a;
+    color: #1B3A6B;
     padding: 0 0 0.25rem;
     font-style: italic;
   }
@@ -312,7 +335,7 @@ class ReportGenerator {
     -webkit-overflow-scrolling: touch;
     margin: 0.5rem 0 0.875rem;
   }
-  .table-responsive:focus-within { outline: 2px solid #1b2a4a; outline-offset: 2px; }
+  .table-responsive:focus-within { outline: 2px solid #1B3A6B; outline-offset: 2px; }
 
   /* --- Tables --- */
   table {
@@ -324,34 +347,38 @@ class ReportGenerator {
   .table-responsive table { margin: 0; }
   thead { display: table-header-group; }
   th, td {
-    border: 0.5px solid #999;
+    border: 0.5px solid #A6AEB8;
     padding: 0.5rem 0.625rem;
     text-align: left;
     vertical-align: top;
   }
   th {
-    background: #e8ecf2;
+    background: #EDF1F7;
     font-weight: 600;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #1b2a4a;
+    color: #1B3A6B;
   }
-  tr:nth-child(even) td { background: #f6f7f9; }
+  /* no zebra striping — document tables use hairlines only */
 
   /* --- Severity: monochrome labels, row tint for emphasis --- */
-  .sev { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: #2b2b2b; }
-  .method-badge { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.125rem 0.3125rem; border: 1px solid #999; border-radius: 2px; }
-  .method-llm { background: #f0f0f0; color: #444; }
-  .method-auto { background: transparent; color: #666; border-color: #ccc; }
-  tr.row-critical td { border-left: 3px solid #7a2e2e; }
-  tr.row-serious td  { border-left: 3px solid #6b4a1a; }
-  tr.row-moderate td { border-left: 3px solid #8a8a5a; }
-  tr.row-minor td    { border-left: 3px solid #7a8a9a; }
+  .sev { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: #14181D; }
+  .method-badge { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.125rem 0.3125rem; border: 1px solid #A6AEB8; border-radius: 2px; }
+  .method-llm { background: transparent; color: #4A5560; }
+  .method-auto { background: transparent; color: #4A5560; border-color: #B9C0C8; }
+  .source-badge { font-size: 0.6875rem; font-weight: 600; padding: 0.125rem 0.375rem; border: 1px solid #A6AEB8; border-radius: 2px; white-space: nowrap; }
+  .source-axe { background: transparent; color: #1B3A6B; border-color: #1B3A6B; }
+  .source-puppeteer { background: transparent; color: #4A5560; border-color: #A6AEB8; }
+  .source-llm { background: transparent; color: #14181D; border-color: #4A5560; }
+  tr.row-critical td { border-left: 3px solid #7D1408; }
+  tr.row-serious td  { border-left: 3px solid #A62117; }
+  tr.row-moderate td { border-left: 3px solid #8A5A00; }
+  tr.row-minor td    { border-left: 3px solid #4A5560; }
   tr.row-critical td:first-child, tr.row-serious td:first-child,
   tr.row-moderate td:first-child, tr.row-minor td:first-child { border-left-width: 3px; }
   tr.row-critical td:not(:first-child), tr.row-serious td:not(:first-child),
-  tr.row-moderate td:not(:first-child), tr.row-minor td:not(:first-child) { border-left: 0.5px solid #999; }
+  tr.row-moderate td:not(:first-child), tr.row-minor td:not(:first-child) { border-left: 0.5px solid #A6AEB8; }
 
   /* --- Severity symbols (non-color indicator) --- */
   tr.row-critical td:first-child .sev::before,
@@ -375,16 +402,16 @@ class ReportGenerator {
   code {
     font-family: 'Consolas', 'SF Mono', 'Monaco', monospace;
     font-size: 0.75rem;
-    background: #eef0f3;
+    background: #EDF1F7;
     padding: 0.0625rem 0.25rem;
-    color: #2b2b2b;
+    color: #14181D;
     overflow-wrap: break-word;
     word-break: normal;
   }
 
   /* --- Section numbering --- */
   .sn {
-    color: #595959;
+    color: #4A5560;
     margin-right: 0.3em;
     font-weight: 400;
   }
@@ -392,7 +419,7 @@ class ReportGenerator {
   /* --- Table footnotes --- */
   .table-note {
     font-size: 0.6875rem;
-    color: #555;
+    color: #4A5560;
     margin: -0.5rem 0 0.875rem;
     line-height: 1.5;
   }
@@ -400,8 +427,8 @@ class ReportGenerator {
   /* --- Scope disclaimer --- */
   .scope-note {
     font-size: 0.75rem;
-    color: #555;
-    border-left: 2px solid #ccc;
+    color: #4A5560;
+    border-left: 2px solid #B9C0C8;
     padding: 0.375rem 0 0.375rem 0.75rem;
     margin: 0.625rem 0 0.875rem;
     line-height: 1.5;
@@ -413,8 +440,8 @@ class ReportGenerator {
     margin-top: 2.5rem;
     padding: 0.5rem clamp(0.5rem, 4vw, 2.5rem);
     font-size: 0.6875rem;
-    color: #595959;
-    border-top: 0.5px solid #ccc;
+    color: #4A5560;
+    border-top: 0.5px solid #B9C0C8;
     display: flex;
     justify-content: space-between;
     background: #fff;
@@ -433,7 +460,7 @@ class ReportGenerator {
       padding-left: 0;
       padding-top: 0.75rem;
       margin-top: 0.75rem;
-      border-top: 0.5px solid #ccc;
+      border-top: 0.5px solid #B9C0C8;
       min-width: auto;
     }
     .doc-footer {
@@ -464,22 +491,26 @@ class ReportGenerator {
     .skip-link:focus, .skip-link:focus-visible { outline-color: #a8c0e0; }
     .doc-header { border-bottom-color: #a8c0e0; }
     .org-name { color: #a8c0e0; }
-    .doc-header-right { border-left-color: #555; color: #aaa; }
+    .doc-header-right { border-left-color: #4A5560; color: #aaa; }
     .doc-meta-line { color: #aaa; }
     .doc-meta-line.doc-id { color: #a8c0e0; }
-    .toc { border-color: #555; }
+    .toc { border-color: #4A5560; }
     .toc-title { color: #a8c0e0; }
     .toc a { color: #e0e0e0; }
     th { background: #2a2a4e; color: #a8c0e0; }
-    th, td { border-color: #555; }
+    th, td { border-color: #4A5560; }
     tr:nth-child(even) td { background: #222240; }
     code { background: #2a2a4e; color: #e0e0e0; }
     .sev { color: #e0e0e0; }
-    .method-badge { border-color: #666; }
-    .method-llm { background: #2a2a4e; color: #ccc; }
-    .method-auto { color: #aaa; border-color: #555; }
-    .doc-footer { background: #1a1a2e; border-top-color: #555; color: #aaa; }
-    .scope-note { border-left-color: #555; color: #aaa; }
+    .method-badge { border-color: #4A5560; }
+    .method-llm { background: #2a2a4e; color: #B9C0C8; }
+    .method-auto { color: #aaa; border-color: #4A5560; }
+    .source-badge { border-color: #4A5560; }
+    .source-axe { background: #1a3a5e; color: #c4dafd; border-color: #4a6a8e; }
+    .source-puppeteer { background: #5e4a1a; color: #fcdfa0; border-color: #8e7a4a; }
+    .source-llm { background: #4a1a5e; color: #dfc0fc; border-color: #7a4a8e; }
+    .doc-footer { background: #1a1a2e; border-top-color: #4A5560; color: #aaa; }
+    .scope-note { border-left-color: #4A5560; color: #aaa; }
     .table-note { color: #aaa; }
     caption { color: #a8c0e0; }
     .sn { color: #aaa; }
@@ -501,7 +532,7 @@ class ReportGenerator {
   }
 
   /* --- Print --- */
-  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 0.6875rem; color: #595959; } }
+  @page { margin: 20mm 18mm 25mm; @bottom-right { content: counter(page); font-size: 0.6875rem; color: #4A5560; } }
   @media print {
     body { padding: 0; max-width: none; font-size: 9pt; }
     .table-responsive { overflow: visible; }
@@ -513,10 +544,10 @@ class ReportGenerator {
     table { break-inside: auto; }
     thead { display: table-header-group; }
     tr { break-inside: avoid; }
-    th { background: #e8ecf2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    th { background: #EDF1F7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     tr:nth-child(even) td { background: #f6f7f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     tr.row-critical td, tr.row-serious td, tr.row-moderate td, tr.row-minor td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    a { color: #2b2b2b; }
+    a { color: #14181D; }
   }
 </style>
 </head>
@@ -606,49 +637,110 @@ class ReportGenerator {
     const bestPracticeCount = allFindings.filter(v => !isHardViolation(v)).length;
     const passes = data.passes || 0;
 
-    html = html.replace(/{{pageTitle}}/g, data.pageTitle || data.url || 'Unknown Page');
-    html = html.replace(/{{url}}/g, this.esc(data.url || ''));
-    html = html.replace(/{{reportDate}}/g, reportDate);
-    html = html.replace(/{{accessibilityScore}}/g, data.accessibilityScore || 0);
-    html = html.replace(/{{passes}}/g, passes);
-    html = html.replace(/{{id}}/g, data.id || 'unknown');
-    html = html.replace(/{{docNumber}}/g, this.esc(data.docNumber || ''));
-    html = html.replace(/{{violationsCount}}/g, violationsCount);
+    // Scalar placeholders — every value is scan-controlled, so every value is escaped.
+    html = this.fill(html, /{{pageTitle}}/g, this.esc(data.pageTitle || data.url || 'Unknown Page'));
+    html = this.fill(html, /{{url}}/g, this.esc(data.url || ''));
+    html = this.fill(html, /{{reportDate}}/g, this.esc(reportDate));
+    html = this.fill(html, /{{accessibilityScore}}/g, this.esc(data.accessibilityScore || 0));
+    html = this.fill(html, /{{passes}}/g, this.esc(passes));
+    html = this.fill(html, /{{id}}/g, this.esc(data.id || 'unknown'));
+    html = this.fill(html, /{{docNumber}}/g, this.esc(data.docNumber || ''));
+    html = this.fill(html, /{{violationsCount}}/g, this.esc(violationsCount));
 
     // Determine conformance target based on whether LLM scanners were used
     const hasLlmScanners = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
     const conformanceTarget = hasLlmScanners ? 'WCAG 2.2 Level AAA' : 'WCAG 2.2 Level AA';
-    html = html.replace(/{{conformanceTarget}}/g, conformanceTarget);
-    html = html.replace(/{{orgName}}/g, this.esc(data.orgName || DEFAULT_ORG_NAME));
-    html = html.replace(/{{generatedBy}}/g, this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0'));
+    html = this.fill(html, /{{conformanceTarget}}/g, conformanceTarget);
+    html = this.fill(html, /{{orgName}}/g, this.esc(data.orgName || DEFAULT_ORG_NAME));
+    html = this.fill(html, /{{generatedBy}}/g, this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0'));
 
     // Passes row (only if passes > 0)
     const passesRow = passes > 0
-      ? `<tr><th scope="row" class="col-label">Checks Passed</th><td>${passes}</td></tr>`
+      ? `<tr><th scope="row" class="col-label">Checks Passed</th><td>${this.esc(passes)}</td></tr>`
       : '';
-    html = html.replace(/{{passesRow}}/g, passesRow);
+    html = this.fill(html, /{{passesRow}}/g, passesRow);
 
     // Org logo
-    html = html.replace(/{{orgLogoHtml}}/g, data.orgLogo ? `<img class="org-logo" src="${this.esc(data.orgLogo)}" alt="${this.esc(data.orgName || 'Organization')} logo">` : '');
+    const orgLogoSrc = this.escUrl(data.orgLogo);
+    html = this.fill(html, /{{orgLogoHtml}}/g, orgLogoSrc ? `<img class="org-logo" src="${orgLogoSrc}" alt="${this.esc(data.orgName || 'Organization')} logo">` : '');
 
     // Org contact
-    html = html.replace(/{{orgContactHtml}}/g, data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : '');
+    html = this.fill(html, /{{orgContactHtml}}/g, data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : '');
 
-    // Sections
-    html = html.replace(/{{tocSection}}/g, this.generateTocSection(data));
-    html = html.replace(/{{severityDistribution}}/g, this.generateSeverityDistribution(data));
-    html = html.replace(/{{principleScoresTable}}/g, this.generatePrincipleScoresTable(data, getScoreClass));
-    html = html.replace(/{{methodologySection}}/g, this.generateMethodologySection(data));
-    html = html.replace(/{{findingsSection}}/g, this.generateFindingsSection(data));
-    html = html.replace(/{{euComplianceSection}}/g, this.generateEuComplianceSection(data));
-    html = html.replace(/{{recommendationsSection}}/g, this.generateRecommendationsSection(data));
-    html = html.replace(/{{appendixSection}}/g, this.generateAppendixSection(data));
+    // Sections — each generator escapes its own scan-derived values.
+    html = this.fill(html, /{{tocSection}}/g, this.generateTocSection(data));
+    html = this.fill(html, /{{severityDistribution}}/g, this.generateSeverityDistribution(data));
+    html = this.fill(html, /{{principleScoresTable}}/g, this.generatePrincipleScoresTable(data, getScoreClass));
+    html = this.fill(html, /{{methodologySection}}/g, this.generateMethodologySection(data));
+    html = this.fill(html, /{{findingsSection}}/g, this.generateFindingsSection(data));
+    html = this.fill(html, /{{euComplianceSection}}/g, this.generateEuComplianceSection(data));
+    html = this.fill(html, /{{recommendationsSection}}/g, this.generateRecommendationsSection(data));
+    html = this.fill(html, /{{appendixSection}}/g, this.generateAppendixSection(data));
 
     return html;
   }
 
+  /**
+   * THE HTML escaping helper for this generator.
+   *
+   * Every scan-result-derived string (descriptions, selectors, elements, URLs,
+   * scanner ids, criteria, summaries, counts) must pass through here before it
+   * is interpolated into report HTML — scan results are attacker-controlled:
+   * a hostile page can put markup into any DOM snippet the scanners capture,
+   * and the report is served from our own origin (and rendered into the PDF by
+   * headless Chrome).
+   *
+   * Escapes the five HTML-significant characters, so the result is safe both in
+   * text nodes and inside single- or double-quoted attribute values.
+   *
+   * @param {*} str
+   * @returns {string}
+   */
   esc(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  /**
+   * Escaping alone keeps a URL inside its quoted attribute, but it does not
+   * stop `javascript:`/`data:text/html` payloads from being placed in a src or
+   * href. Only image URLs we can vouch for are emitted; anything else is
+   * dropped.
+   *
+   * @param {*} value caller-supplied URL
+   * @returns {string} escaped, safe URL — or '' when it must not be emitted
+   */
+  escUrl(value) {
+    if (value === null || value === undefined) return '';
+    const raw = String(value).trim();
+    // Control characters / whitespace / quotes have no place in an attribute URL.
+    if (/[\s"'<>`\\]|[\x00-\x1f]/.test(raw)) return '';
+    if (/^https?:\/\//i.test(raw) || /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/=]+$/i.test(raw)) {
+      return this.esc(raw);
+    }
+    return '';
+  }
+
+  /**
+   * Substitute a {{placeholder}} with an already-built HTML fragment.
+   *
+   * Uses a replacer *function* so that `$&`, `$'`, `` $` `` and `$1` inside the
+   * value are inserted literally instead of being interpreted by
+   * String.prototype.replace as substitution patterns (a URL containing `$'`
+   * would otherwise splice the remainder of the template into the document).
+   *
+   * @param {string} html
+   * @param {RegExp} placeholder
+   * @param {string} value pre-escaped text or trusted generated markup
+   */
+  fill(html, placeholder, value) {
+    const literal = value === null || value === undefined ? '' : String(value);
+    return html.replace(placeholder, () => literal);
   }
 
   // --- Section generators ---
@@ -723,7 +815,7 @@ class ReportGenerator {
       html += `<tr><th scope="row">${name}</th>`;
       if (hasScores) {
         const score = cat?.score != null ? cat.score : '\u2014';
-        html += `<td>${score}${typeof score === 'number' ? '%' : ''}</td>`;
+        html += `<td>${this.esc(score)}${typeof score === 'number' ? '%' : ''}</td>`;
       }
       html += `<td>${violations}</td></tr>`;
     }
@@ -753,7 +845,7 @@ class ReportGenerator {
           .map(n => ({ name: n, count: data.scanners[n].violationCount || 0 }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
-        html += `<p>Findings concentrated in: ${top.map(t => `${t.name} (${t.count})`).join(', ')}.</p>`;
+        html += `<p>Findings concentrated in: ${top.map(t => `${this.esc(t.name)} (${this.esc(t.count)})`).join(', ')}.</p>`;
       }
     }
     return html;
@@ -812,25 +904,43 @@ class ReportGenerator {
   }
 
   renderViolationTable(violations, tableNum, captionText) {
-    let html = `<div class="table-responsive" tabindex="0" role="region" aria-label="${captionText || 'Data table'}">\n<table>\n`;
-    if (tableNum && captionText) html += `<caption>Table ${tableNum}: ${captionText}</caption>\n`;
-    const hasLlm = violations.some(v => (v.scannerId || '').startsWith('llm-'));
-    html += `<thead><tr><th scope="col" class="col-num">#</th><th scope="col" class="col-sev">Severity</th><th scope="col" class="col-criterion">Criterion</th>${hasLlm ? '<th scope="col" class="col-method">Method</th>' : ''}<th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
+    let html = `<div class="table-responsive" tabindex="0" role="region" aria-label="${this.esc(captionText || 'Data table')}">\n<table>\n`;
+    if (tableNum && captionText) html += `<caption>Table ${this.esc(tableNum)}: ${this.esc(captionText)}</caption>\n`;
+    html += `<thead><tr><th scope="col" class="col-num">#</th><th scope="col" class="col-sev">Severity</th><th scope="col" class="col-criterion">Criterion</th><th scope="col" class="col-source">Source</th><th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
 <tbody>`;
 
     violations.forEach((v, i) => {
       const sev = normalizeSeverity(v);
       const criterion = v.criterion || v.wcagCriteria || v.clause || '';
-      const desc = this.esc(v.description || v.type || v.issue || '');
-      const el = v.element ? `<code>${this.esc(v.element)}</code>` : '\u2014';
-      const rec = this.esc(v.recommendation || v.suggestion || '\u2014');
-      const isLlm = (v.scannerId || '').startsWith('llm-');
-      const methodCol = hasLlm ? `<td><span class="method-badge method-${isLlm ? 'llm' : 'auto'}">${isLlm ? 'LLM' : 'Auto'}</span></td>` : '';
-      html += `<tr class="row-${sev}"><th scope="row">${i + 1}</th><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(String(criterion)) || '\u2014'}</td>${methodCol}<td>${desc}</td><td>${el}</td><td>${rec}</td></tr>`;
+      const descText = v.description || v.type || v.issue || '';
+      const isIncomplete = sev === 'info';
+      const desc = this.esc(descText) + (isIncomplete ? ' <em>(Manual review required)</em>' : '');
+      const el = v.element
+        ? `<code>${this.esc(v.element)}</code>`
+        : (v.nodes && v.nodes[0] && v.nodes[0].selector ? `<code>${this.esc(v.nodes[0].selector)}</code>` : '\u2014');
+      const rec = this.esc(v.recommendation || v.suggestion || v.axeHelp || '\u2014');
+      const source = this._classifyViolationSource(v);
+      const sourceBadge = `<span class="source-badge source-${source.key}" title="${source.title}">${source.label}</span>`;
+      html += `<tr class="row-${sev}"><th scope="row">${i + 1}</th><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${sourceBadge}</td><td>${desc}</td><td>${el}</td><td>${rec}</td></tr>`;
     });
 
     html += '</tbody></table></div>';
     return html;
+  }
+
+  /**
+   * Classify a violation by its provenance layer.
+   * Returns { key, label, title }.
+   */
+  _classifyViolationSource(v) {
+    const scannerId = v.scannerId || '';
+    if (v.source === 'axe-core' || scannerId === 'axe-core') {
+      return { key: 'axe', label: 'axe', title: 'Static DOM analysis via axe-core (high confidence)' };
+    }
+    if (scannerId.startsWith('llm-') || v.source === 'llm') {
+      return { key: 'llm', label: 'LLM', title: 'AI-assisted semantic analysis (requires manual verification)' };
+    }
+    return { key: 'puppeteer', label: 'Puppeteer', title: 'Interaction/viewport/keyboard testing (medium confidence)' };
   }
 
   generateEuComplianceSection(data) {
@@ -843,7 +953,7 @@ class ReportGenerator {
     html += '<p>Assessment of compliance with the European Accessibility Act (EAA) and EN 301 549 procedural requirements.</p>';
 
     if (hasLegacyEu) {
-      html += `<p>EN 301 549 compliance score: ${data.euCompliance.en301549.score || 0} of 100.</p>`;
+      html += `<p>EN 301 549 compliance score: ${this.esc(data.euCompliance.en301549.score || 0)} of 100.</p>`;
     }
 
     if (eaaViolations.length > 0) {
@@ -920,7 +1030,7 @@ class ReportGenerator {
     html += `<table>\n<caption>Table ${tNum}: Technical parameters</caption>\n<tbody>`;
     html += `<tr><th scope="row" class="col-label">Report ID</th><td><code>${this.esc(data.id || '')}</code></td></tr>`;
     html += `<tr><th scope="row" class="col-label">Document Number</th><td>${this.esc(data.docNumber || '')}</td></tr>`;
-    html += `<tr><th scope="row" class="col-label">Generated</th><td>${new Date(data.timestamp).toLocaleString('en-GB')}</td></tr>`;
+    html += `<tr><th scope="row" class="col-label">Generated</th><td>${this.esc(new Date(data.timestamp).toLocaleString('en-GB'))}</td></tr>`;
     html += `<tr><th scope="row" class="col-label">Generator</th><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
     html += `<tr><th scope="row" class="col-label">Target</th><td>${this.esc(data.url || '')}</td></tr>`;
     const appLlm = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
@@ -933,7 +1043,7 @@ class ReportGenerator {
       html += `<h3 id="s-app-2"><span class="sn">A.2</span> Scanner Module Results</h3>`;
       html += `<table>\n<caption>Table ${tNum}: Individual scanner outcomes</caption>\n<thead><tr><th scope="col">Module</th><th scope="col">Result</th><th scope="col">Findings</th></tr></thead>\n<tbody>`;
       for (const [name, s] of Object.entries(data.scanners)) {
-        html += `<tr><th scope="row">${this.esc(name)}</th><td>${s.passed ? '\u2713 Pass' : '\u2717 Fail'}</td><td>${s.violationCount || 0}</td></tr>`;
+        html += `<tr><th scope="row">${this.esc(name)}</th><td>${s.passed ? '\u2713 Pass' : '\u2717 Fail'}</td><td>${this.esc(s.violationCount || 0)}</td></tr>`;
       }
       html += '</tbody></table>';
     }
@@ -942,7 +1052,21 @@ class ReportGenerator {
 
   // --- Utility methods ---
 
+  /**
+   * Report ids are used to build filesystem paths, so they must be opaque
+   * tokens — never traversal sequences. Mirrors the check in src/server.js.
+   * @param {string} reportId
+   * @throws {Error} when the id is not a safe token
+   */
+  assertSafeReportId(reportId) {
+    if (typeof reportId !== 'string' || !/^[a-zA-Z0-9_-]{1,64}$/.test(reportId)) {
+      throw new Error(`Invalid report id: ${String(reportId).slice(0, 64)}`);
+    }
+    return reportId;
+  }
+
   async getReport(reportId) {
+    this.assertSafeReportId(reportId);
     const metadataPath = path.join(this.reportsDir, `${reportId}.json`);
     try {
       const metadata = await fs.readJson(metadataPath);
@@ -960,6 +1084,7 @@ class ReportGenerator {
 
   async deleteReport(reportId) {
     try {
+      this.assertSafeReportId(reportId);
       const files = [`${reportId}.json`, `${reportId}.html`, `${reportId}.pdf`].map(f => path.join(this.reportsDir, f));
       await Promise.all(files.map(f => fs.remove(f).catch(() => {})));
       return true;

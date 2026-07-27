@@ -1,0 +1,22 @@
+{
+  "testCase": "bad-color-contrast",
+  "url": "http://localhost:8085/bad-color-contrast.html",
+  "timestamp": "2025-07-11T08:17:18.979Z",
+  "results": {
+    "colorContrast": {
+      "error": "ImprovedColorContrastScanner is not defined"
+    },
+    "useOfColor": {
+      "error": "ImprovedUseOfColorScanner is not defined"
+    },
+    "imagesOfText": {
+      "error": "ImprovedImagesOfTextScanner is not defined"
+    }
+  },
+  "summary": {
+    "totalViolations": 0,
+    "colorContrastViolations": 0,
+    "useOfColorViolations": 0,
+    "imagesOfTextViolations": 0
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "formulas": [
+    { "latex": "x + y = z", "shouldConvert": true, "tier": 1 },
+    { "latex": "\\alpha", "shouldConvert": true, "tier": 1 },
+    { "latex": "a^2 + b^2 = c^2", "shouldConvert": true, "tier": 1 },
+    { "latex": "n \\in \\mathbb{N}", "shouldConvert": true, "tier": 1 },
+    { "latex": "f(x) = x^2", "shouldConvert": true, "tier": 1 }
+  ]
+}

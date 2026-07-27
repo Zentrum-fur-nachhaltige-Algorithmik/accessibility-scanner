@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us — Acme Corp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-padding-top: 64px; }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0;
+            margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+            white-space: nowrap; border: 0;
+        }
+        .skip-link {
+            position: absolute; top: -100%; left: 16px; z-index: 100;
+            padding: 8px 16px; background: #1e3a5f; color: #fff;
+            text-decoration: underline; border-radius: 0 0 4px 4px; font-weight: 600;
+        }
+        .skip-link:focus { top: 0; }
+        :focus-visible {
+            outline: 3px solid #1e3a5f;
+            outline-offset: 2px;
+        }
+        @media (forced-colors: active) {
+            :focus-visible { outline: 3px solid LinkText; }
+            .icon-fallback { forced-color-adjust: auto; }
+        }
+        @media (prefers-contrast: more) {
+            :root { --tw-border-opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800 min-h-screen flex flex-col">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div role="status" aria-live="polite" aria-atomic="true" class="sr-only" id="route-announcer"></div>
+
+    <header class="bg-white border-b border-gray-500 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="text-xl font-bold text-gray-900" aria-label="Acme Corp home">
+                <span class="text-blue-700">Acme</span> Corp
+            </a>
+            <nav aria-label="Main navigation">
+                <ul class="flex gap-6 text-sm font-medium">
+                    <li><a href="/" class="text-gray-700 hover:text-gray-900 underline underline-offset-4 decoration-gray-600 hover:decoration-gray-900 transition-colors">Home</a></li>
+                    <li><a href="/about" class="text-gray-700 hover:text-gray-900 underline underline-offset-4 decoration-gray-600 hover:decoration-gray-900 transition-colors">About</a></li>
+                    <li><a href="/contact" aria-current="page" class="text-blue-700 underline underline-offset-4 decoration-blue-700 font-semibold">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="flex-1">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Contact Us</h1>
+            <p class="text-gray-600 mb-8" style="max-width:80ch;line-height:1.6;">Have a question or want to work together? Fill out the form below and we will get back to you within one business day.</p>
+
+            <div id="error-summary" class="hidden mb-6 p-4 bg-red-50 border-2 border-red-700 rounded-md" role="alert" tabindex="-1" aria-labelledby="error-summary-title">
+                <h2 class="text-red-800 font-bold text-lg mb-2" id="error-summary-title">Please fix the following errors</h2>
+                <ul class="list-disc list-inside text-red-800 space-y-1"></ul>
+            </div>
+
+            <div id="success-message" class="hidden mb-6 p-6 bg-emerald-50 border-2 border-emerald-700 rounded-md" role="status" tabindex="-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <svg aria-hidden="true" class="w-6 h-6 text-emerald-700 icon-fallback" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <h2 class="text-emerald-800 font-bold text-lg">Thank you for your message</h2>
+                </div>
+                <p class="text-emerald-800" style="max-width:80ch;line-height:1.6;">We have received your inquiry and will respond within one business day. You may now close this page or navigate elsewhere.</p>
+            </div>
+
+            <form id="contact-form" novalidate>
+                <fieldset class="border border-gray-500 rounded-md p-4 sm:p-6 mb-6">
+                    <legend class="text-lg font-semibold text-gray-900 px-1">Contact Information</legend>
+
+                    <div class="mb-5">
+                        <label for="name" class="block text-sm font-medium text-gray-800 mb-1">
+                            Full Name <span aria-hidden="true" class="text-red-700">*</span><span class="sr-only">(required)</span>
+                        </label>
+                        <input type="text" id="name" name="name" autocomplete="name" aria-required="true"
+                            class="w-full px-3 py-3 border border-gray-500 rounded-md text-gray-900 placeholder-gray-600">
+                        <p id="name-error" class="mt-1 text-sm text-red-700 hidden"></p>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="email" class="block text-sm font-medium text-gray-800 mb-1">
+                            Email Address <span aria-hidden="true" class="text-red-700">*</span><span class="sr-only">(required)</span>
+                        </label>
+                        <input type="email" id="email" name="email" autocomplete="email" aria-required="true"
+                            class="w-full px-3 py-3 border border-gray-500 rounded-md text-gray-900 placeholder-gray-600">
+                        <p id="email-error" class="mt-1 text-sm text-red-700 hidden"></p>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="phone" class="block text-sm font-medium text-gray-800 mb-1">
+                            Phone Number
+                        </label>
+                        <input type="tel" id="phone" name="phone" autocomplete="tel"
+                            class="w-full px-3 py-3 border border-gray-500 rounded-md text-gray-900 placeholder-gray-600">
+                        <p id="phone-error" class="mt-1 text-sm text-red-700 hidden"></p>
+                    </div>
+
+                    <div>
+                        <label for="company" class="block text-sm font-medium text-gray-800 mb-1">
+                            Company
+                        </label>
+                        <input type="text" id="company" name="company" autocomplete="organization"
+                            class="w-full px-3 py-3 border border-gray-500 rounded-md text-gray-900 placeholder-gray-600">
+                    </div>
+                </fieldset>
+
+                <fieldset class="border border-gray-500 rounded-md p-4 sm:p-6 mb-6">
+                    <legend class="text-lg font-semibold text-gray-900 px-1">Your Message</legend>
+
+                    <div class="mb-5">
+                        <label for="subject" class="block text-sm font-medium text-gray-800 mb-1">
+                            Subject <span aria-hidden="true" class="text-red-700">*</span><span class="sr-only">(required)</span>
+                        </label>
+                        <select id="subject" name="subject" aria-required="true"
+                            class="w-full px-3 py-3 border border-gray-500 rounded-md text-gray-900 bg-white">
+                            <option value="">Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="sales">Sales and Partnerships</option>
+                            <option value="billing">Billing</option>
+                            <option value="careers">Careers</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <p id="subject-error" class="mt-1 text-sm text-red-700 hidden"></p>
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-800 mb-1">
+                            Message <span aria-hidden="true" class="text-red-700">*</span><span class="sr-only">(required)</span>
+                        </label>
+                        <textarea id="message" name="message" rows="5" aria-required="true"
+                            class="w-full px-3 py-3 border border-gray-500 rounded-md text-gray-900 placeholder-gray-600 resize-vertical"
+                            placeholder="Tell us how we can help you..."></textarea>
+                        <p id="message-error" class="mt-1 text-sm text-red-700 hidden"></p>
+                    </div>
+                </fieldset>
+
+                <fieldset class="mb-8">
+                    <legend class="sr-only">Terms and conditions</legend>
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" id="terms" name="terms" aria-required="true"
+                            class="mt-0.5 w-5 h-5 border-gray-500 rounded text-blue-700 flex-shrink-0">
+                        <label for="terms" class="text-sm text-gray-800" style="line-height:1.5;">
+                            I agree to the <a href="/privacy" class="text-blue-700 underline underline-offset-2 hover:text-blue-900">Privacy Policy</a> and <a href="/terms" class="text-blue-700 underline underline-offset-2 hover:text-blue-900">Terms of Service</a> <span aria-hidden="true" class="text-red-700">*</span><span class="sr-only">(required)</span>
+                        </label>
+                    </div>
+                    <p id="terms-error" class="mt-1 text-sm text-red-700 hidden ml-8"></p>
+                </fieldset>
+
+                <button type="submit" id="submit-btn"
+                    class="w-full sm:w-auto px-8 py-3 bg-blue-700 text-white font-semibold rounded-md hover:bg-blue-800 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-colors"
+                    style="min-height:44px;">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-gray-100 border-t border-gray-500 mt-auto">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p class="text-sm text-gray-600">&copy; 2024 Acme Corp. All rights reserved.</p>
+            <nav aria-label="Footer navigation">
+                <ul class="flex gap-4 text-sm">
+                    <li><a href="/privacy" class="text-gray-600 underline underline-offset-2 hover:text-gray-900">Privacy Policy</a></li>
+                    <li><a href="/terms" class="text-gray-600 underline underline-offset-2 hover:text-gray-900">Terms of Service</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+    (function () {
+        'use strict';
+
+        /* ── Reactive state (Svelte compiled output pattern) ── */
+        var state = {
+            values: { name: '', email: '', phone: '', company: '', subject: '', message: '', terms: false },
+            errors: {},
+            touched: {},
+            submitted: false,
+            success: false
+        };
+        var dirty = false;
+        var subscribers = [];
+
+        function set(path, value) {
+            var parts = path.split('.');
+            var obj = state;
+            for (var i = 0; i < parts.length - 1; i++) obj = obj[parts[i]];
+            var key = parts[parts.length - 1];
+            if (obj[key] === value) return;
+            obj[key] = value;
+            dirty = true;
+        }
+
+        function flush() {
+            if (!dirty) return;
+            dirty = false;
+            var snap = JSON.parse(JSON.stringify(state));
+            for (var i = 0; i < subscribers.length; i++) subscribers[i](snap);
+        }
+
+        function onUpdate(fn) { subscribers.push(fn); }
+
+        /* ── DOM references (Svelte claim pattern) ── */
+        var form = document.getElementById('contact-form');
+        var errorSummary = document.getElementById('error-summary');
+        var errorSummaryList = errorSummary.querySelector('ul');
+        var successMessage = document.getElementById('success-message');
+        var submitBtn = document.getElementById('submit-btn');
+
+        var fields = {
+            name:    { input: document.getElementById('name'),    error: document.getElementById('name-error'),    label: 'Full Name' },
+            email:   { input: document.getElementById('email'),   error: document.getElementById('email-error'),   label: 'Email Address' },
+            phone:   { input: document.getElementById('phone'),   error: document.getElementById('phone-error'),   label: 'Phone Number' },
+            subject: { input: document.getElementById('subject'), error: document.getElementById('subject-error'), label: 'Subject' },
+            message: { input: document.getElementById('message'), error: document.getElementById('message-error'), label: 'Message' },
+            terms:   { input: document.getElementById('terms'),   error: document.getElementById('terms-error'),   label: 'Terms agreement' }
+        };
+
+        /* ── Validators ── */
+        function validateName(v) {
+            if (!v.trim()) return 'Full name is required.';
+            if (v.trim().length < 2) return 'Name must be at least 2 characters.';
+            return null;
+        }
+        function validateEmail(v) {
+            if (!v.trim()) return 'Email address is required.';
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return 'Please enter a valid email address.';
+            return null;
+        }
+        function validatePhone(v) {
+            if (!v.trim()) return null;
+            var digits = v.replace(/\D/g, '');
+            if (digits.length < 7 || digits.length > 15) return 'Please enter a valid phone number.';
+            return null;
+        }
+        function validateSubject(v) {
+            if (!v) return 'Please select a subject.';
+            return null;
+        }
+        function validateMessage(v) {
+            if (!v.trim()) return 'Message is required.';
+            if (v.trim().length < 10) return 'Message must be at least 10 characters.';
+            return null;
+        }
+        function validateTerms(v) {
+            if (!v) return 'You must agree to the privacy policy and terms of service.';
+            return null;
+        }
+
+        var validators = { name: validateName, email: validateEmail, phone: validatePhone, subject: validateSubject, message: validateMessage, terms: validateTerms };
+
+        function validateField(name) {
+            var fn = validators[name];
+            if (!fn) return true;
+            var msg = fn(state.values[name]);
+            if (msg) { state.errors[name] = msg; }
+            else { delete state.errors[name]; }
+            return !msg;
+        }
+
+        function validateAll() {
+            state.errors = {};
+            var v = state.values;
+            for (var key in validators) {
+                var msg = validators[key](v[key]);
+                if (msg) state.errors[key] = msg;
+            }
+            return Object.keys(state.errors).length === 0;
+        }
+
+        /* ── Render (Svelte update() pattern) ── */
+        function render(s) {
+            var errorKeys = Object.keys(s.errors);
+            var hasVisibleErrors = errorKeys.length > 0 && (s.submitted || errorKeys.some(function (k) { return s.touched[k]; }));
+
+            if (hasVisibleErrors) {
+                errorSummary.classList.remove('hidden');
+                errorSummaryList.innerHTML = errorKeys.map(function (key) {
+                    var lbl = fields[key] ? fields[key].label : key;
+                    return '<li><a href="#' + key + '" class="underline hover:no-underline">' + lbl + ': ' + s.errors[key] + '</a></li>';
+                }).join('');
+            } else {
+                errorSummary.classList.add('hidden');
+                errorSummaryList.innerHTML = '';
+            }
+
+            if (s.success) {
+                successMessage.classList.remove('hidden');
+                form.classList.add('hidden');
+            } else {
+                successMessage.classList.add('hidden');
+                form.classList.remove('hidden');
+            }
+
+            for (var key in fields) {
+                var f = fields[key];
+                var errEl = f.error;
+                if (!errEl) continue;
+                var hasError = s.errors[key];
+                var show = hasError && (s.submitted || s.touched[key]);
+
+                if (show) {
+                    errEl.textContent = hasError;
+                    errEl.classList.remove('hidden');
+                    f.input.setAttribute('aria-invalid', 'true');
+                    f.input.setAttribute('aria-describedby', key + '-error');
+                    f.input.classList.add('border-red-700');
+                    f.input.classList.remove('border-gray-500');
+                } else {
+                    errEl.textContent = '';
+                    errEl.classList.add('hidden');
+                    f.input.removeAttribute('aria-invalid');
+                    f.input.removeAttribute('aria-describedby');
+                    f.input.classList.remove('border-red-700');
+                    f.input.classList.add('border-gray-500');
+                }
+            }
+        }
+
+        /* ── Event handlers ── */
+        function onInput(e) {
+            var name = e.target.name;
+            if (name === 'terms') {
+                set('values.terms', e.target.checked);
+            } else {
+                set('values.' + name, e.target.value);
+            }
+            if (state.touched[name]) {
+                validateField(name);
+            }
+            flush();
+        }
+
+        function onBlur(e) {
+            var name = e.target.name;
+            set('touched.' + name, true);
+            validateField(name);
+            flush();
+        }
+
+        function onSubmit(e) {
+            e.preventDefault();
+            set('submitted', true);
+            for (var key in fields) set('touched.' + key, true);
+            var valid = validateAll();
+            flush();
+
+            if (!valid) {
+                errorSummary.focus();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            setTimeout(function () {
+                set('success', true);
+                flush();
+                successMessage.focus();
+                document.title = 'Message Sent — Acme Corp';
+                var announcer = document.getElementById('route-announcer');
+                announcer.textContent = '';
+                setTimeout(function () { announcer.textContent = 'Message sent successfully. Thank you for contacting us.'; }, 50);
+            }, 1200);
+        }
+
+        /* ── Mount (Svelte pattern: bind events, subscribe, initial flush) ── */
+        for (var key in fields) {
+            fields[key].input.addEventListener('input', onInput);
+            fields[key].input.addEventListener('blur', onBlur);
+        }
+        form.addEventListener('submit', onSubmit);
+        onUpdate(render);
+        flush();
+    })();
+    </script>
+</body>
+</html>

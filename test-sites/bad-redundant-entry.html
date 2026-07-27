@@ -1,0 +1,254 @@
+<!-- WCAG-TEST
+criterion: 3.3.7
+level: A
+title: Redundant Entry
+test_type: bad
+expected_violations: 4
+testable_by: dom
+scanners: forms
+description: Multi-step form forces redundant re-entry of previously provided information
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bad Redundant Entry - Accessibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .violation-section {
+            border: 2px solid #d32f2f;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffebee;
+        }
+        .violation-label {
+            color: #d32f2f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .step {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .step-header {
+            background: #37474f;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+        }
+        .step-body {
+            padding: 20px;
+        }
+        .step-body label {
+            display: block;
+            font-weight: bold;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .step-body input,
+        .step-body select,
+        .step-body textarea {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .step-body .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .step-body .form-row > div {
+            flex: 1;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .redundant-field {
+            border: 2px solid #ff9800;
+            background: #fff3e0;
+        }
+        .redundant-label {
+            color: #e65100;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Checkout Process</h1>
+    <p>Complete all 4 steps to place your order.</p>
+
+    <!-- VIOLATION 1: Step 1 collects name and email -->
+    <div class="step">
+        <div class="step-header">Step 1: Account Information</div>
+        <div class="step-body">
+            <label for="s1-first">First Name</label>
+            <input type="text" id="s1-first" name="first_name" value="Jane">
+
+            <label for="s1-last">Last Name</label>
+            <input type="text" id="s1-last" name="last_name" value="Doe">
+
+            <label for="s1-email">Email Address</label>
+            <input type="email" id="s1-email" name="email" value="jane.doe@example.com">
+
+            <label for="s1-phone">Phone Number</label>
+            <input type="tel" id="s1-phone" name="phone" value="555-0123">
+
+            <button class="btn" type="button">Continue to Shipping</button>
+        </div>
+    </div>
+
+    <!-- VIOLATION 1 & 2: Step 2 re-asks for name and email, plus collects shipping address -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 1: Name and Email Re-Requested</div>
+        <p>Step 2 asks for the same first name, last name, and email that were already entered in Step 1.</p>
+    </div>
+
+    <div class="step">
+        <div class="step-header">Step 2: Shipping Information</div>
+        <div class="step-body">
+            <label for="s2-first">First Name</label>
+            <input type="text" id="s2-first" name="ship_first_name" class="redundant-field">
+            <div class="redundant-label">Already collected in Step 1</div>
+
+            <label for="s2-last">Last Name</label>
+            <input type="text" id="s2-last" name="ship_last_name" class="redundant-field">
+            <div class="redundant-label">Already collected in Step 1</div>
+
+            <label for="s2-email">Email Address</label>
+            <input type="email" id="s2-email" name="ship_email" class="redundant-field">
+            <div class="redundant-label">Already collected in Step 1</div>
+
+            <label for="s2-address">Street Address</label>
+            <input type="text" id="s2-address" name="ship_address" value="123 Main St">
+
+            <div class="form-row">
+                <div>
+                    <label for="s2-city">City</label>
+                    <input type="text" id="s2-city" name="ship_city" value="Springfield">
+                </div>
+                <div>
+                    <label for="s2-state">State</label>
+                    <input type="text" id="s2-state" name="ship_state" value="IL">
+                </div>
+                <div>
+                    <label for="s2-zip">ZIP Code</label>
+                    <input type="text" id="s2-zip" name="ship_zip" value="62704">
+                </div>
+            </div>
+
+            <button class="btn" type="button">Continue to Billing</button>
+        </div>
+    </div>
+
+    <!-- VIOLATION 3: Step 3 forces full billing address re-entry with no "same as shipping" option -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 2: Full Billing Address Re-Entry Required</div>
+        <p>Step 3 requires entering the complete billing address from scratch. No "same as shipping" checkbox or auto-population is offered.</p>
+    </div>
+
+    <div class="step">
+        <div class="step-header">Step 3: Billing Information</div>
+        <div class="step-body">
+            <label for="s3-first">First Name</label>
+            <input type="text" id="s3-first" name="bill_first_name" class="redundant-field">
+            <div class="redundant-label">Already collected in Steps 1 and 2</div>
+
+            <label for="s3-last">Last Name</label>
+            <input type="text" id="s3-last" name="bill_last_name" class="redundant-field">
+            <div class="redundant-label">Already collected in Steps 1 and 2</div>
+
+            <label for="s3-address">Street Address</label>
+            <input type="text" id="s3-address" name="bill_address" class="redundant-field">
+            <div class="redundant-label">Already collected in Step 2</div>
+
+            <div class="form-row">
+                <div>
+                    <label for="s3-city">City</label>
+                    <input type="text" id="s3-city" name="bill_city" class="redundant-field">
+                </div>
+                <div>
+                    <label for="s3-state">State</label>
+                    <input type="text" id="s3-state" name="bill_state" class="redundant-field">
+                </div>
+                <div>
+                    <label for="s3-zip">ZIP Code</label>
+                    <input type="text" id="s3-zip" name="bill_zip" class="redundant-field">
+                </div>
+            </div>
+            <div class="redundant-label">City, state, ZIP already collected in Step 2</div>
+
+            <!-- No "same as shipping" checkbox provided -->
+
+            <label for="s3-card">Card Number</label>
+            <input type="text" id="s3-card" name="card_number">
+
+            <div class="form-row">
+                <div>
+                    <label for="s3-exp">Expiry</label>
+                    <input type="text" id="s3-exp" name="card_exp" placeholder="MM/YY">
+                </div>
+                <div>
+                    <label for="s3-cvv">CVV</label>
+                    <input type="text" id="s3-cvv" name="card_cvv">
+                </div>
+            </div>
+
+            <button class="btn" type="button">Continue to Review</button>
+        </div>
+    </div>
+
+    <!-- VIOLATION 4: Step 4 asks for email AGAIN for confirmation -->
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 3: Email Requested a Third Time</div>
+        <p>The review step asks for the email address again "for confirmation" even though it was entered in Steps 1 and 2.</p>
+    </div>
+
+    <div class="step">
+        <div class="step-header">Step 4: Order Review</div>
+        <div class="step-body">
+            <p><strong>Order Summary:</strong> 3 items - $149.97</p>
+            <p><strong>Shipping:</strong> Standard - $5.99</p>
+
+            <label for="s4-email">Confirm your email address</label>
+            <input type="email" id="s4-email" name="confirm_email" class="redundant-field">
+            <div class="redundant-label">Already entered in Steps 1 and 2</div>
+
+            <label for="s4-phone">Confirm your phone number</label>
+            <input type="tel" id="s4-phone" name="confirm_phone" class="redundant-field">
+            <div class="redundant-label">Already entered in Step 1</div>
+
+            <button class="btn" type="button">Place Order</button>
+        </div>
+    </div>
+
+    <div class="violation-section">
+        <div class="violation-label">VIOLATION 4: No Auto-Population Across Steps</div>
+        <p>None of the fields across steps are auto-populated from previously entered data. The user must manually re-type name, email, address, and phone at each step.</p>
+    </div>
+
+</body>
+</html>

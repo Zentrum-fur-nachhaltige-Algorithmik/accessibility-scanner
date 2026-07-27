@@ -1,0 +1,101 @@
+<!-- WCAG-TEST
+criterion: 1.4.2
+level: A
+title: Audio Control
+test_type: good
+expected_violations: 0
+testable_by: manual
+scanners: media
+description: All media elements provide user controls for pause, stop, and volume adjustment
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Proper Audio Controls (GOOD)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .media-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .media-controls button {
+            padding: 6px 14px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+        }
+        .hero-banner {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Proper Audio Controls (GOOD)</h1>
+    <p>This page demonstrates WCAG 1.4.2 compliance: all media includes controls for the user to pause, stop, or adjust volume.</p>
+
+    <!-- Pattern 1: Audio with native controls -->
+    <h2>Pattern 1: Audio Player with Native Controls</h2>
+    <div class="section">
+        <p>Listen to our latest podcast episode. Use the player controls to play, pause, and adjust volume.</p>
+        <audio controls preload="metadata">
+            <source src="podcast-episode-42.mp3" type="audio/mpeg">
+            <source src="podcast-episode-42.ogg" type="audio/ogg">
+            <p>Your browser does not support the audio element. <a href="podcast-episode-42.mp3">Download the audio file</a>.</p>
+        </audio>
+    </div>
+
+    <!-- Pattern 2: Video with controls, muted autoplay -->
+    <h2>Pattern 2: Muted Autoplay Video with Visible Controls</h2>
+    <div class="section">
+        <p>Product showcase video. Autoplays muted; use controls to unmute and adjust.</p>
+        <video controls autoplay muted loop width="600" style="max-width: 100%;">
+            <source src="hero-promo.mp4" type="video/mp4">
+            <source src="hero-promo.webm" type="video/webm">
+            <p>Your browser does not support the video element. <a href="hero-promo.mp4">Download the video</a>.</p>
+        </video>
+    </div>
+
+    <!-- Pattern 3: Custom controls for background audio -->
+    <h2>Pattern 3: Background Music with Custom Controls</h2>
+    <div class="section">
+        <p>Optional ambient music for your browsing experience. Music does not play until you start it.</p>
+        <audio id="bg-music" preload="none">
+            <source src="ambient-background.mp3" type="audio/mpeg">
+        </audio>
+        <div class="media-controls" role="group" aria-label="Background music controls">
+            <button type="button" onclick="document.getElementById('bg-music').play()" aria-label="Play background music">Play</button>
+            <button type="button" onclick="document.getElementById('bg-music').pause()" aria-label="Pause background music">Pause</button>
+            <button type="button" onclick="var a=document.getElementById('bg-music');a.pause();a.currentTime=0;" aria-label="Stop background music">Stop</button>
+            <label for="vol-slider">Volume:</label>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5"
+                   oninput="document.getElementById('bg-music').volume=this.value"
+                   aria-label="Background music volume">
+        </div>
+    </div>
+
+</body>
+</html>

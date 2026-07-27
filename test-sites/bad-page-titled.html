@@ -1,0 +1,163 @@
+<!-- WCAG-TEST
+criterion: 2.4.2
+level: A
+title: Page Titled
+test_type: bad
+expected_violations: 3
+testable_by: automated
+scanners: structure
+description: Missing, empty, or generic page titles that fail to describe the page content
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Violation 1: Title element is empty -->
+    <title></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 2em; border-bottom: 1px solid #ccc; }
+        .violation-note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .page-frame {
+            border: 2px solid #adb5bd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .page-frame .frame-bar {
+            background: #dee2e6;
+            padding: 4px 10px;
+            font-size: 0.85em;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-frame .frame-bar .tab-title {
+            background: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 3px 3px 0 0;
+            padding: 2px 12px;
+        }
+        .page-frame .frame-content {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Missing and Generic Page Titles (BAD)</h1>
+    <p>This page itself has an empty title element (Violation 1). Below are illustrations of additional title failures.</p>
+
+    <!-- Violation 1 explanation -->
+    <h2>Violation 1: Empty Title Element</h2>
+    <div class="violation-note">This page's &lt;title&gt; element is present but empty. The browser tab shows no meaningful text. Screen readers announce nothing or a URL fragment when switching to this tab.</div>
+    <div class="section">
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">&nbsp;</span>
+                <span>localhost:3000/account/settings</span>
+            </div>
+            <div class="frame-content">
+                <p>This is the account settings page, but users have no way to identify it from the title alone.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Violation 2: Generic non-descriptive titles -->
+    <h2>Violation 2: Generic Non-Descriptive Titles</h2>
+    <div class="violation-note">Pages across the site use generic titles like "Untitled", "Page", or "Home" that do not describe the specific content. Users cannot distinguish between tabs or bookmarks.</div>
+    <div class="section">
+        <p>These pages all exist in the same site but their titles are meaningless:</p>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Untitled Document</span>
+                <span>example.com/products/laptops</span>
+            </div>
+            <div class="frame-content"><p>Laptop product catalog with 200+ models and comparison tools.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Page</span>
+                <span>example.com/checkout/shipping</span>
+            </div>
+            <div class="frame-content"><p>Shipping address form for order checkout.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">Untitled</span>
+                <span>example.com/account/order-history</span>
+            </div>
+            <div class="frame-content"><p>Complete order history with tracking information.</p></div>
+        </div>
+    </div>
+
+    <!-- Violation 3: Same title on all pages -->
+    <h2>Violation 3: Identical Titles Across Different Pages</h2>
+    <div class="violation-note">Every page on the site uses the same title "MyStore". Users with multiple tabs open cannot distinguish between pages. Screen reader users navigating by window list hear the same name repeated.</div>
+    <div class="section">
+        <p>All pages share the identical title &ldquo;MyStore&rdquo;:</p>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">MyStore</span>
+                <span>mystore.com/</span>
+            </div>
+            <div class="frame-content"><p>Homepage with featured products and seasonal deals.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">MyStore</span>
+                <span>mystore.com/cart</span>
+            </div>
+            <div class="frame-content"><p>Shopping cart with 3 items totalling $149.97.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">MyStore</span>
+                <span>mystore.com/account/profile</span>
+            </div>
+            <div class="frame-content"><p>User profile settings and preferences.</p></div>
+        </div>
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title">MyStore</span>
+                <span>mystore.com/support/tickets</span>
+            </div>
+            <div class="frame-content"><p>Support ticket history and new ticket form.</p></div>
+        </div>
+    </div>
+
+    <!-- Additional iframe demonstrating missing title entirely -->
+    <h2>Additional: Iframe Page with No Title Element</h2>
+    <div class="violation-note">The following embedded content simulates a page where the &lt;title&gt; element is completely absent from the &lt;head&gt;.</div>
+    <div class="section">
+        <div class="page-frame">
+            <div class="frame-bar">
+                <span class="tab-title" style="color: #999; font-style: italic;">(no title)</span>
+                <span>example.com/dashboard</span>
+            </div>
+            <div class="frame-content">
+                <p>Full-featured analytics dashboard with charts, reports, and export options. The page has no &lt;title&gt; element at all.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,1143 @@
+================================================================================
+FILE: llm-base-scanner.js
+PATH: src/llm-base-scanner.js
+================================================================================
+
+/**
+ * LLMBaseScanner — base class for scanners that use LLM analysis.
+ *
+ * Extends BaseScanner with LLM capabilities for semantic checks that
+ * regex/DOM analysis cannot handle.
+ */
+
+const BaseScanner = require('./base-scanner');
+
+class LLMBaseScanner extends BaseScanner {
+  /**
+   * @param {string} id       — unique scanner identifier
+   * @param {Object} metadata — WCAG metadata
+   * @param {import('./llm-client')} llmClient — LLM client instance
+   */
+  constructor(id, metadata, llmClient) {
+    super(id, metadata);
+    if (!llmClient) {
+      throw new Error(`${id}: LLMBaseScanner requires an llmClient instance`);
+    }
+    this.llmClient = llmClient;
+  }
+
+  /**
+   * Send HTML snippet to LLM for analysis.
+   *
+   * @param {string} htmlSnippet — HTML to analyze
+   * @param {string} prompt — analysis prompt
+   * @param {string} [systemPrompt] — system role prompt
+   * @returns {Promise<Object>} Parsed JSON response
+   */
+  async analyzeWithLLM(htmlSnippet, prompt, systemPrompt) {
+    const fullPrompt = `Analyze the following HTML for accessibility issues.\n\nHTML:\n\`\`\`html\n${htmlSnippet}\n\`\`\`\n\n${prompt}`;
+
+    const defaultSystem = `You are an accessibility auditor. Analyze HTML for WCAG 2.2 compliance issues.
+
+CRITICAL RULES:
+1. ONLY report violations for the SPECIFIC criteria mentioned in the user prompt. Do NOT report violations for any other WCAG criteria.
+2. If the HTML is compliant for the requested criteria, return an EMPTY violations array.
+3. Err on the side of NOT flagging. Only report clear, unambiguous violations.
+4. Do NOT flag issues related to criteria not listed in the prompt (e.g., do not flag 1.3.1, 1.4.3, or 2.4.4 unless explicitly asked).
+
+Respond ONLY with valid JSON. Do not include markdown code fences or explanations.
+Format: { "violations": [{ "criterion": "X.Y.Z", "description": "...", "impact": "critical|serious|moderate|minor", "selector": "..." }], "summary": "..." }`;
+
+    const result = await this.llmClient.predict(fullPrompt, {
+      systemPrompt: systemPrompt || defaultSystem,
+      temperature: 0,
+      forceJson: true,
+    });
+
+    if (!result.success) {
+      throw new Error(`${this.id}: LLM analysis failed: ${result.error}`);
+    }
+
+    let parsed;
+    try {
+      let content = result.content;
+      if (typeof content === 'string') {
+        // Strip markdown code fences if present
+        content = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+        // Attempt to fix truncated JSON by closing open arrays/objects
+        try {
+          parsed = JSON.parse(content);
+        } catch {
+          // Try to recover truncated JSON
+          let fixed = content;
+          const openBraces = (fixed.match(/{/g) || []).length;
+          const closeBraces = (fixed.match(/}/g) || []).length;
+          const openBrackets = (fixed.match(/\[/g) || []).length;
+          const closeBrackets = (fixed.match(/]/g) || []).length;
+          // Remove trailing incomplete entries (e.g., trailing comma or partial object)
+          fixed = fixed.replace(/,\s*(?:{\s*"[^"]*":\s*)?$/, '');
+          for (let i = 0; i < openBrackets - closeBrackets; i++) fixed += ']';
+          for (let i = 0; i < openBraces - closeBraces; i++) fixed += '}';
+          parsed = JSON.parse(fixed);
+          console.warn(`${this.id}: Recovered truncated JSON response`);
+        }
+      } else {
+        parsed = content;
+      }
+    } catch (e) {
+      console.error(`${this.id}: Failed to parse LLM response: ${e.message}`);
+      // Return empty violations rather than crashing the scan
+      parsed = { violations: [], summary: 'LLM response could not be parsed' };
+    }
+
+    return parsed;
+  }
+
+  /**
+   * Extract relevant HTML from a page, truncated to stay within token limits.
+   *
+   * @param {import('puppeteer').Page} page — Puppeteer page
+   * @param {string} [selector='body'] — CSS selector for content to extract
+   * @param {number} [maxLength=15000] — Max characters to extract
+   * @returns {Promise<string>} Truncated HTML string
+   */
+  async extractRelevantHTML(page, selector = 'body', maxLength = 15000) {
+    const html = await page.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      return el ? el.outerHTML : document.documentElement.outerHTML;
+    }, selector);
+
+    if (html.length <= maxLength) return html;
+
+    // Truncate intelligently at a tag boundary if possible
+    const truncated = html.slice(0, maxLength);
+    const lastTagClose = truncated.lastIndexOf('>');
+    if (lastTagClose > maxLength * 0.8) {
+      return truncated.slice(0, lastTagClose + 1) + '\n<!-- ... truncated -->';
+    }
+    return truncated + '\n<!-- ... truncated -->';
+  }
+
+  /**
+   * Convert LLM violation objects to standard scanner violations.
+   *
+   * @param {Object[]} llmViolations — from LLM response
+   * @returns {Object[]} Standard violation format
+   */
+  convertViolations(llmViolations) {
+    if (!Array.isArray(llmViolations)) return [];
+
+    return llmViolations.map(v => this.formatViolation(
+      v.criterion || 'llm-detected',
+      v.impact || 'moderate',
+      v.description || 'LLM-detected accessibility issue',
+      v.selector ? [{ selector: v.selector }] : [],
+      v.helpUrl || ''
+    ));
+  }
+}
+
+module.exports = LLMBaseScanner;
+
+
+
+================================================================================
+FILE: llm-client.js
+PATH: src/llm-client.js
+================================================================================
+
+/**
+ * OpenRouter LLM client - ported from Python openrouter_client.py
+ * Zero external dependencies, uses Node 18+ built-in fetch.
+ */
+
+const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+class LLMClient {
+  /**
+   * @param {object} options
+   * @param {string} [options.apiKey] - OpenRouter API key (falls back to OPENROUTER_API_KEY env)
+   * @param {string} [options.model] - Primary model identifier
+   * @param {string[]} [options.fallbackModels] - Fallback models for OpenRouter routing
+   * @param {string} [options.siteUrl] - HTTP-Referer header for OpenRouter rankings
+   * @param {string} [options.appName] - X-Title header for tracking
+   * @param {number} [options.maxRetries] - Max retry attempts (default: 5)
+   * @param {number} [options.timeoutMs] - Request timeout in ms (default: 30000)
+   */
+  constructor(options = {}) {
+    this.apiKey = options.apiKey || process.env.OPENROUTER_API_KEY;
+    if (!this.apiKey) {
+      throw new Error('OPENROUTER_API_KEY is required (pass apiKey option or set env var)');
+    }
+
+    this.model = options.model || 'google/gemini-3-flash-preview';
+    this.fallbackModels = options.fallbackModels || [];
+    this.siteUrl = options.siteUrl || null;
+    this.appName = options.appName || 'AccessibilityScanner';
+    this.maxRetries = options.maxRetries ?? 5;
+    this.timeoutMs = options.timeoutMs ?? 30000;
+
+    // Simple request counter (no complex rate limiter needed in single-threaded Node)
+    this._requestCount = 0;
+  }
+
+  /**
+   * Send a prompt to the LLM and return the result.
+   *
+   * @param {string} prompt - User prompt
+   * @param {object} [options]
+   * @param {string} [options.systemPrompt] - System instruction
+   * @param {number} [options.temperature] - Sampling temperature (default: 0)
+   * @param {boolean} [options.forceJson] - Request JSON response format
+   * @returns {Promise<{success: true, content: string, model: string, usage: object} | {success: false, error: string, type: string}>}
+   */
+  async predict(prompt, options = {}) {
+    const {
+      systemPrompt = 'You are a helpful assistant.',
+      temperature = 0,
+      forceJson = false,
+    } = options;
+
+    const body = this._buildRequestBody(prompt, systemPrompt, temperature, forceJson);
+
+    const result = await this._retryWithBackoff(() => this._sendRequest(body));
+    return result;
+  }
+
+  // -- internal ---------------------------------------------------------------
+
+  _buildHeaders() {
+    const headers = {
+      'Authorization': `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json',
+    };
+    if (this.siteUrl) headers['HTTP-Referer'] = this.siteUrl;
+    if (this.appName) headers['X-Title'] = this.appName;
+    return headers;
+  }
+
+  _buildRequestBody(prompt, systemPrompt, temperature, forceJson) {
+    const body = {
+      model: this.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ],
+      temperature,
+    };
+
+    if (forceJson) {
+      body.response_format = { type: 'json_object' };
+    }
+
+    // OpenRouter fallback chain: primary + fallbacks in `models` array
+    if (this.fallbackModels.length > 0) {
+      body.models = [this.model, ...this.fallbackModels];
+    }
+
+    return body;
+  }
+
+  /**
+   * Single HTTP request attempt. Throws typed errors for retry logic.
+   * @returns {{success: true, content: string, model: string, usage: object}}
+   */
+  async _sendRequest(body) {
+    this._requestCount++;
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    let response;
+    try {
+      response = await fetch(API_URL, {
+        method: 'POST',
+        headers: this._buildHeaders(),
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        const e = new Error(`Request timed out after ${this.timeoutMs}ms`);
+        e.type = 'timeout';
+        throw e;
+      }
+      const e = new Error(`Network error: ${err.message}`);
+      e.type = 'network';
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
+
+    // Rate limit
+    if (response.status === 429) {
+      const retryAfterMs = this._parseRetryAfter(response);
+      const e = new Error(`Rate limit exceeded (429)`);
+      e.type = 'rate_limit';
+      e.retryAfterMs = retryAfterMs;
+      throw e;
+    }
+
+    // Server errors (5xx)
+    if (response.status >= 500) {
+      const text = await response.text().catch(() => '');
+      const e = new Error(`Server error ${response.status}: ${text.slice(0, 200)}`);
+      e.type = 'server_error';
+      e.statusCode = response.status;
+      throw e;
+    }
+
+    // Client errors (4xx, not 429)
+    if (response.status >= 400) {
+      const text = await response.text().catch(() => '');
+      const e = new Error(`Client error ${response.status}: ${text.slice(0, 200)}`);
+      e.type = 'client_error';
+      e.statusCode = response.status;
+      throw e;
+    }
+
+    // Parse success response
+    const data = await response.json();
+
+    if (!data.choices || data.choices.length === 0) {
+      const e = new Error('Empty response: no choices returned');
+      e.type = 'empty_response';
+      throw e;
+    }
+
+    const content = data.choices[0].message?.content;
+    if (content == null) {
+      const e = new Error('Empty response: choice has no content');
+      e.type = 'empty_response';
+      throw e;
+    }
+
+    return {
+      success: true,
+      content,
+      model: data.model || this.model,
+      usage: {
+        promptTokens: data.usage?.prompt_tokens ?? 0,
+        completionTokens: data.usage?.completion_tokens ?? 0,
+        totalTokens: data.usage?.total_tokens ?? 0,
+        cost: data.usage?.cost ?? null,
+      },
+    };
+  }
+
+  /**
+   * Retry with exponential backoff + jitter.
+   * Different delay strategies per error type (mirrors Python base_client.py).
+   */
+  async _retryWithBackoff(operation) {
+    let timeoutDelay = 1.0; // seconds, doubles on each timeout
+
+    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (err) {
+        const isLastAttempt = attempt === this.maxRetries - 1;
+        if (isLastAttempt) {
+          return {
+            success: false,
+            error: `Retry attempts exceeded (${this.maxRetries}): ${err.message}`,
+            type: err.type || 'unknown',
+          };
+        }
+
+        let delayMs;
+
+        switch (err.type) {
+          case 'rate_limit':
+            // Use Retry-After header or random 50-200ms
+            if (err.retryAfterMs) {
+              const bufferMs = 100 + Math.floor(Math.random() * 200);
+              delayMs = err.retryAfterMs + bufferMs;
+            } else {
+              delayMs = 50 + Math.floor(Math.random() * 150);
+            }
+            break;
+
+          case 'timeout':
+            delayMs = timeoutDelay * 1000;
+            timeoutDelay *= 2; // exponential doubling
+            break;
+
+          case 'server_error':
+            // 500-1000ms random
+            delayMs = 500 + Math.floor(Math.random() * 500);
+            break;
+
+          case 'client_error':
+            // 1000-2000ms random
+            delayMs = 1000 + Math.floor(Math.random() * 1000);
+            break;
+
+          default:
+            delayMs = 1000;
+            break;
+        }
+
+        console.warn(
+          `[LLMClient] Attempt ${attempt + 1}/${this.maxRetries} failed (${err.type}): ${err.message} | retry in ${delayMs}ms`
+        );
+        await this._sleep(delayMs);
+      }
+    }
+
+    // Should not reach here, but defensive
+    return { success: false, error: 'Retry loop exited unexpectedly', type: 'unknown' };
+  }
+
+  /**
+   * Parse Retry-After header. Supports:
+   * - Integer seconds: "60"
+   * - Seconds with unit: "60s", "1.5s"
+   * - OpenRouter X-RateLimit-Reset (ms timestamp)
+   * @returns {number|null} wait time in milliseconds
+   */
+  _parseRetryAfter(response) {
+    // Try OpenRouter X-RateLimit-Reset (ms timestamp)
+    const resetMs = response.headers.get('x-ratelimit-reset');
+    if (resetMs) {
+      const resetTimestamp = parseInt(resetMs, 10);
+      if (!isNaN(resetTimestamp)) {
+        const waitMs = Math.max(0, resetTimestamp - Date.now());
+        return waitMs;
+      }
+    }
+
+    // Standard Retry-After header (seconds)
+    const retryAfter = response.headers.get('retry-after');
+    if (!retryAfter) return null;
+
+    const match = retryAfter.match(/^(\d+(?:\.\d+)?)\s*s?$/i);
+    if (match) {
+      return Math.round(parseFloat(match[1]) * 1000);
+    }
+
+    return null;
+  }
+
+  _sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+}
+
+module.exports = { LLMClient };
+
+
+
+================================================================================
+FILE: llm-auth-scanner.js
+PATH: src/llm-auth-scanner.js
+================================================================================
+
+/**
+ * LLM Auth Scanner
+ *
+ * Covers authentication accessibility criteria:
+ * - 3.3.8 Accessible Authentication (Minimum) (AA)
+ * - 3.3.9 Accessible Authentication (Enhanced) (AAA)
+ */
+
+const LLMBaseScanner = require('./llm-base-scanner');
+
+class LLMAuthScanner extends LLMBaseScanner {
+  constructor(llmClient) {
+    super('llm-auth', {
+      wcagCriteria: ['3.3.8', '3.3.9'],
+      wcagPrinciple: 'understandable',
+    }, llmClient);
+  }
+
+  async scan(page, options = {}) {
+    const html = await this.extractRelevantHTML(page, 'body', 12000);
+
+    // Pre-check: does this page contain auth-related elements?
+    const hasAuth = await page.evaluate(() => {
+      const inputs = document.querySelectorAll('input[type="password"], input[autocomplete*="password"], form[action*="login"], form[action*="auth"], form[action*="signin"]');
+      const captchas = document.querySelectorAll('[class*="captcha"], [id*="captcha"], [class*="recaptcha"], iframe[src*="captcha"]');
+      return inputs.length > 0 || captchas.length > 0;
+    });
+
+    if (!hasAuth) {
+      return {
+        scannerId: this.id,
+        passed: true,
+        violations: [],
+        summary: { totalIssues: 0, note: 'No authentication elements detected' },
+      };
+    }
+
+    const prompt = `Check this HTML for WCAG 2.2 authentication accessibility:
+
+1. **3.3.8 Accessible Authentication (Minimum - AA)**:
+   - Is pasting blocked on password/auth fields? (onpaste="return false" or similar)
+   - Is autocomplete="off" set on password fields?
+   - Is there a CAPTCHA without an accessible alternative (audio, logic-based)?
+   - Is there a cognitive function test (transcribing text, solving puzzles)?
+   Exception: if a mechanism like copy-paste or password manager support exists, that's acceptable.
+
+2. **3.3.9 Accessible Authentication (Enhanced - AAA)**:
+   - ANY cognitive function test fails this (no exceptions except object recognition or personal content).
+   - Object recognition CAPTCHAs also fail at AAA level.
+
+Check for: onpaste handlers, autocomplete attributes, CAPTCHA elements, cognitive test patterns.
+Return violations as JSON.`;
+
+    const result = await this.analyzeWithLLM(html, prompt);
+    const violations = this.convertViolations(result.violations || []);
+
+    return {
+      scannerId: this.id,
+      passed: violations.length === 0,
+      violations,
+      summary: {
+        totalIssues: violations.length,
+        llmModel: result.model || 'unknown',
+        criteriaChecked: ['3.3.8', '3.3.9'],
+      },
+    };
+  }
+}
+
+module.exports = LLMAuthScanner;
+
+
+
+================================================================================
+FILE: llm-behavioral-scanner.js
+PATH: src/llm-behavioral-scanner.js
+================================================================================
+
+/**
+ * LLM Behavioral Scanner
+ *
+ * Covers criteria about application behavior and timing:
+ * - 2.2.3 No Timing (AAA)
+ * - 2.2.4 Interruptions (AAA)
+ * - 2.2.5 Re-authentication (AAA)
+ * - 2.2.6 Timeouts (AAA)
+ * - 3.2.5 Change on Request (AAA)
+ * - 3.3.5 Help (AAA)
+ */
+
+const LLMBaseScanner = require('./llm-base-scanner');
+
+class LLMBehavioralScanner extends LLMBaseScanner {
+  constructor(llmClient) {
+    super('llm-behavioral', {
+      wcagCriteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
+      wcagPrinciple: 'operable',
+    }, llmClient);
+  }
+
+  async scan(page, options = {}) {
+    const html = await this.extractRelevantHTML(page, 'body', 12000);
+
+    const prompt = `Check this HTML for WCAG 2.2 AAA behavioral/timing issues:
+
+1. **2.2.3 No Timing**: Are there any time limits on content (even with extensions)? Timed quizzes, countdown timers, auto-advancing slides? At AAA, no timing is allowed for non-essential activities.
+
+2. **2.2.4 Interruptions**: Can interruptions (notifications, alerts, popups) be postponed or suppressed? Look for auto-appearing modals, notification systems, or auto-refresh without user control.
+
+3. **2.2.5 Re-authentication**: After a session timeout, is all user data preserved when re-authenticating? Look for session timeout JavaScript, form data that would be lost.
+
+4. **2.2.6 Timeouts**: Are users warned about inactivity timeouts that will cause data loss? Look for session management code without timeout warnings.
+
+5. **3.2.5 Change on Request**: Are all context changes user-initiated? Look for auto-redirects (meta refresh, window.location changes), auto-submitting forms, content that updates without user action.
+
+6. **3.3.5 Help**: Is context-sensitive help available? For forms: are there help texts, tooltips, instructions, or links to documentation? Complex UI should have help mechanisms.
+
+Return violations as JSON.`;
+
+    const result = await this.analyzeWithLLM(html, prompt);
+    const violations = this.convertViolations(result.violations || []);
+
+    return {
+      scannerId: this.id,
+      passed: violations.length === 0,
+      violations,
+      summary: {
+        totalIssues: violations.length,
+        llmModel: result.model || 'unknown',
+        criteriaChecked: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
+      },
+    };
+  }
+}
+
+module.exports = LLMBehavioralScanner;
+
+
+
+================================================================================
+FILE: llm-focus-appearance-scanner.js
+PATH: src/llm-focus-appearance-scanner.js
+================================================================================
+
+/**
+ * LLM Focus Appearance Scanner
+ *
+ * Covers AAA focus criteria:
+ * - 2.4.12 Focus Not Obscured (Enhanced) (AAA)
+ * - 2.4.13 Focus Appearance (AAA)
+ */
+
+const LLMBaseScanner = require('./llm-base-scanner');
+
+class LLMFocusAppearanceScanner extends LLMBaseScanner {
+  constructor(llmClient) {
+    super('llm-focus-appearance', {
+      wcagCriteria: ['2.4.12', '2.4.13'],
+      wcagPrinciple: 'operable',
+    }, llmClient);
+  }
+
+  async scan(page, options = {}) {
+    const html = await this.extractRelevantHTML(page, 'html', 12000);
+
+    // Also extract computed styles for focus indicators
+    const focusStyles = await page.evaluate(() => {
+      const results = [];
+      const focusable = document.querySelectorAll(
+        'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+
+      for (const el of Array.from(focusable).slice(0, 20)) {
+        const tag = el.tagName.toLowerCase();
+        const type = el.getAttribute('type') || '';
+        const computed = window.getComputedStyle(el);
+        results.push({
+          tag,
+          type,
+          outline: computed.outline,
+          outlineOffset: computed.outlineOffset,
+          boxShadow: computed.boxShadow,
+          border: computed.border,
+        });
+      }
+      return results;
+    });
+
+    // Check for obscuring elements
+    const obscuringElements = await page.evaluate(() => {
+      const fixed = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+      const results = [];
+      for (const el of fixed) {
+        const rect = el.getBoundingClientRect();
+        const computed = window.getComputedStyle(el);
+        results.push({
+          tag: el.tagName.toLowerCase(),
+          className: el.className,
+          position: computed.position,
+          zIndex: computed.zIndex,
+          rect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right },
+        });
+      }
+      return results;
+    });
+
+    const prompt = `Check this HTML for WCAG 2.2 AAA focus criteria:
+
+1. **2.4.12 Focus Not Obscured (Enhanced)**: At AAA level, NO PART of the focused element can be obscured by other content. Check for:
+   - position:fixed/sticky elements that could cover focused elements
+   - Cookie banners, floating toolbars, chat widgets overlapping focus
+   - Popover menus or dropdowns that could cover nearby focusable elements
+
+Fixed/sticky elements found: ${JSON.stringify(obscuringElements)}
+
+2. **2.4.13 Focus Appearance**: Focus indicators must:
+   - Have an area of at least a 2px thick perimeter of the unfocused element
+   - Have contrast ratio of at least 3:1 between focused and unfocused states
+   - Have contrast ratio of at least 3:1 against adjacent colors
+
+Focus styles found on interactive elements: ${JSON.stringify(focusStyles)}
+
+HTML being analyzed:
+Check for CSS that removes or minimizes focus indicators (outline: none, outline: 0, :focus { outline: none }).
+
+Return violations as JSON.`;
+
+    const result = await this.analyzeWithLLM(html, prompt);
+    const violations = this.convertViolations(result.violations || []);
+
+    return {
+      scannerId: this.id,
+      passed: violations.length === 0,
+      violations,
+      summary: {
+        totalIssues: violations.length,
+        llmModel: result.model || 'unknown',
+        criteriaChecked: ['2.4.12', '2.4.13'],
+        focusableElementsChecked: focusStyles.length,
+        obscuringElements: obscuringElements.length,
+      },
+    };
+  }
+}
+
+module.exports = LLMFocusAppearanceScanner;
+
+
+
+================================================================================
+FILE: llm-media-alternatives-scanner.js
+PATH: src/llm-media-alternatives-scanner.js
+================================================================================
+
+/**
+ * LLM Media Alternatives Scanner
+ *
+ * Covers AAA media criteria:
+ * - 1.2.6 Sign Language (Recorded) (AAA)
+ * - 1.2.7 Extended Audio Description (Recorded) (AAA)
+ * - 1.2.8 Media Alternative (Recorded) (AAA)
+ * - 1.2.9 Audio-only (Live) (AAA)
+ */
+
+const LLMBaseScanner = require('./llm-base-scanner');
+
+class LLMMediaAlternativesScanner extends LLMBaseScanner {
+  constructor(llmClient) {
+    super('llm-media-alternatives', {
+      wcagCriteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
+      wcagPrinciple: 'perceivable',
+    }, llmClient);
+  }
+
+  async scan(page, options = {}) {
+    const html = await this.extractRelevantHTML(page, 'body', 12000);
+
+    // Pre-check: does this page contain media elements or media-related content?
+    const hasMedia = await page.evaluate(() => {
+      const media = document.querySelectorAll('video, audio, iframe[src*="youtube"], iframe[src*="vimeo"], [class*="player"], [class*="stream"], [class*="media"], [class*="video"], [class*="audio"]');
+      if (media.length > 0) return true;
+      // Also check for text references to media content
+      const text = document.body?.textContent || '';
+      return /\b(video|audio|stream|recording|media player|captions?|transcript)\b/i.test(text);
+    });
+
+    if (!hasMedia) {
+      return {
+        scannerId: this.id,
+        passed: true,
+        violations: [],
+        summary: { totalIssues: 0, note: 'No media elements detected' },
+      };
+    }
+
+    const prompt = `Check this HTML for WCAG 2.2 AAA media accessibility. Only flag CLEAR violations, not borderline cases.
+
+1. **1.2.6 Sign Language (Recorded)**: Does recorded video content include sign language interpretation? Look for: sign language video track, picture-in-picture interpreter overlay, or a link to a separate sign language version. If a page provides a link to a sign language version or mentions sign language interpretation, it PASSES this criterion.
+
+2. **1.2.7 Extended Audio Description**: For pre-recorded video, is there an extended audio description option? Look for: a <track kind="descriptions"> element, a link to an audio-described version, or mention of extended descriptions. If no video elements exist on the page, skip this check.
+
+3. **1.2.8 Media Alternative (Recorded)**: Is there a full text transcript for all recorded video content? Look for: a visible transcript on the page, a link to a transcript document, or a <details> element containing a transcript. Captions alone do NOT satisfy this — a separate full-text document is needed.
+
+4. **1.2.9 Audio-only (Live)**: For live audio-only streams, is there a real-time text alternative? Only flag this if the page actually contains live audio-only content (live stream without video). If media has video, this criterion does not apply.
+
+IMPORTANT: Only flag violations for media elements that actually exist in the HTML. If a page provides transcripts, sign language links, or description tracks alongside its media, those media elements are COMPLIANT. Do not flag media that already has the required alternatives. Do not report violations for criteria that don't apply to the media on the page (e.g., don't flag 1.2.9 for pre-recorded content).
+
+Return violations as JSON.`;
+
+    const result = await this.analyzeWithLLM(html, prompt);
+    const violations = this.convertViolations(result.violations || []);
+
+    return {
+      scannerId: this.id,
+      passed: violations.length === 0,
+      violations,
+      summary: {
+        totalIssues: violations.length,
+        llmModel: result.model || 'unknown',
+        criteriaChecked: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
+      },
+    };
+  }
+}
+
+module.exports = LLMMediaAlternativesScanner;
+
+
+
+================================================================================
+FILE: llm-semantic-text-scanner.js
+PATH: src/llm-semantic-text-scanner.js
+================================================================================
+
+/**
+ * LLM Semantic Text Scanner
+ *
+ * Covers criteria requiring semantic text analysis:
+ * - 3.1.3 Unusual Words (AAA)
+ * - 3.1.4 Abbreviations (AAA)
+ * - 3.1.6 Pronunciation (AAA)
+ * - 2.4.9 Link Purpose (Link Only) (AAA)
+ * - 2.4.10 Section Headings (AAA)
+ * - 1.3.6 Identify Purpose (AAA)
+ */
+
+const LLMBaseScanner = require('./llm-base-scanner');
+
+class LLMSemanticTextScanner extends LLMBaseScanner {
+  constructor(llmClient) {
+    super('llm-semantic-text', {
+      wcagCriteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
+      wcagPrinciple: 'understandable',
+    }, llmClient);
+  }
+
+  async scan(page, options = {}) {
+    const html = await this.extractRelevantHTML(page, 'body', 12000);
+
+    const prompt = `Check this HTML for these WCAG 2.2 AAA criteria. Be STRICT about real violations but do NOT flag false positives.
+
+1. **3.1.3 Unusual Words**: Are domain-specific jargon, idioms, or technical terms used WITHOUT a definition mechanism (<dfn>, glossary link, title attribute)? Only flag terms that a general audience would not understand. Do NOT flag common tech terms like "API", "URL", "PDF", "FAQ" — these are universally understood.
+
+2. **3.1.4 Abbreviations**: Are abbreviations used WITHOUT <abbr title="..."> on at least their first occurrence? Do NOT flag universally known abbreviations (FAQ, PDF, URL, HTML, CSS, API). Only flag domain-specific or uncommon abbreviations.
+
+3. **3.1.6 Pronunciation**: Are there words where pronunciation is ambiguous AND affects meaning (e.g., "lead" metal vs. verb, "read" past vs present) without disambiguation? This is rare — only flag clear cases.
+
+4. **2.4.9 Link Purpose (Link Only)**: Can each link's purpose be determined from the link text ALONE? Flag only truly ambiguous links like "click here", "read more", "learn more", "here", "more info". Do NOT flag links with descriptive text like "View product details", "Download annual report", "Read customer reviews", "Purchase Widget Pro", etc. — these ARE descriptive enough. Single well-known words like "FAQ", "Help", "Home" are also acceptable.
+
+5. **2.4.10 Section Headings**: Does each major content section have a heading? Only flag sections with substantial content (multiple paragraphs or complex content) that lack any heading. Do NOT flag small utility sections (footers, nav bars).
+
+6. **1.3.6 Identify Purpose**: Do key UI regions use landmark roles (header/banner, nav/navigation, main, footer/contentinfo)? Do interactive icons have aria-label or visible text? Only flag pages that are clearly missing basic landmark structure.
+
+IMPORTANT: Err on the side of NOT flagging. Only report clear, unambiguous violations. If an element is borderline compliant, do NOT report it.
+
+Return violations as JSON.`;
+
+    const result = await this.analyzeWithLLM(html, prompt);
+    const violations = this.convertViolations(result.violations || []);
+
+    return {
+      scannerId: this.id,
+      passed: violations.length === 0,
+      violations,
+      summary: {
+        totalIssues: violations.length,
+        llmModel: result.model || 'unknown',
+        criteriaChecked: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
+      },
+    };
+  }
+}
+
+module.exports = LLMSemanticTextScanner;
+
+
+
+================================================================================
+FILE: llm-visual-presentation-scanner.js
+PATH: src/llm-visual-presentation-scanner.js
+================================================================================
+
+/**
+ * LLM Visual Presentation Scanner
+ *
+ * Covers AAA visual criteria:
+ * - 1.4.7 Low or No Background Audio (AAA)
+ * - 1.4.8 Visual Presentation (AAA)
+ * - 1.4.9 Images of Text (No Exception) (AAA)
+ */
+
+const LLMBaseScanner = require('./llm-base-scanner');
+
+class LLMVisualPresentationScanner extends LLMBaseScanner {
+  constructor(llmClient) {
+    super('llm-visual-presentation', {
+      wcagCriteria: ['1.4.7', '1.4.8', '1.4.9'],
+      wcagPrinciple: 'perceivable',
+    }, llmClient);
+  }
+
+  async scan(page, options = {}) {
+    const html = await this.extractRelevantHTML(page, 'body', 12000);
+
+    const prompt = `Check this HTML for WCAG 2.2 AAA visual presentation issues:
+
+1. **1.4.7 Low or No Background Audio**: If there's audio content with speech, does the background audio interfere? Check for audio/video elements with background music that might overwhelm foreground speech. Look for audio without volume controls.
+
+2. **1.4.8 Visual Presentation**: Check text blocks for:
+   - Lines wider than 80 characters (no max-width constraint)
+   - Text-align: justify (justified text)
+   - Line-height less than 1.5 for body text
+   - No mechanism to change foreground/background colors
+   - Text cannot be resized to 200%
+   - Fixed width containers that prevent text reflow
+
+3. **1.4.9 Images of Text (No Exception)**: At AAA, images of text are NOT allowed except for:
+   - Logotypes (text that is part of a logo or brand name)
+   Look for: <img> elements that appear to contain text (filename hints like *-text*, *-heading*, *-banner*), CSS background-image on elements that seem to display text, canvas elements rendering text.
+
+Return violations as JSON.`;
+
+    const result = await this.analyzeWithLLM(html, prompt);
+    const violations = this.convertViolations(result.violations || []);
+
+    return {
+      scannerId: this.id,
+      passed: violations.length === 0,
+      violations,
+      summary: {
+        totalIssues: violations.length,
+        llmModel: result.model || 'unknown',
+        criteriaChecked: ['1.4.7', '1.4.8', '1.4.9'],
+      },
+    };
+  }
+}
+
+module.exports = LLMVisualPresentationScanner;
+
+
+
+================================================================================
+FILE: test-llm-scanners.js
+PATH: src/test-llm-scanners.js
+================================================================================
+
+#!/usr/bin/env node
+
+/**
+ * LLM Scanner Smoke Test
+ *
+ * Tests each LLM scanner against 2 bad + 2 good files.
+ * Success criteria: >80% detection rate on bad, <20% false positive on good.
+ */
+
+const path = require('path');
+const http = require('http');
+const fs = require('fs');
+const { parseWcagMetadata } = require('./wcag-metadata-parser');
+
+// Load .env if present
+const envPath = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const match = line.match(/^(\w+)=(.*)$/);
+    if (match && !process.env[match[1]]) {
+      process.env[match[1]] = match[2].trim();
+    }
+  }
+}
+
+async function loadPuppeteer() {
+  // Try different import strategies
+  try {
+    return require('puppeteer');
+  } catch {
+    const mod = await import('puppeteer');
+    return mod.default || mod;
+  }
+}
+
+// Scanner → test file mappings
+const SCANNER_TESTS = {
+  'llm-semantic-text': {
+    bad: ['bad-language-aaa.html', 'bad-navigation-aaa.html'],
+    good: ['good-language-aaa.html', 'good-navigation-aaa.html'],
+    criteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
+  },
+  'llm-auth': {
+    bad: ['bad-accessible-auth.html', 'bad-accessible-auth-enhanced.html'],
+    good: ['good-accessible-auth.html', 'good-accessible-auth-enhanced.html'],
+    criteria: ['3.3.8', '3.3.9'],
+  },
+  'llm-media-alternatives': {
+    bad: ['bad-media-aaa.html', 'bad-media-alternatives.html'],
+    good: ['good-media-aaa.html', 'good-accessibility.html'],
+    criteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
+  },
+  'llm-visual-presentation': {
+    bad: ['bad-visual-presentation.html', 'bad-low-background-audio.html'],
+    good: ['good-visual-presentation.html', 'good-low-background-audio.html'],
+    criteria: ['1.4.7', '1.4.8', '1.4.9'],
+  },
+  'llm-behavioral': {
+    bad: ['bad-timing-aaa.html', 'bad-change-on-request.html'],
+    good: ['good-timing-aaa.html', 'good-change-on-request.html'],
+    criteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
+  },
+  'llm-focus-appearance': {
+    bad: ['bad-focus-appearance.html', 'bad-focus-not-obscured-enhanced.html'],
+    good: ['good-focus-appearance.html', 'good-focus-not-obscured-enhanced.html'],
+    criteria: ['2.4.12', '2.4.13'],
+  },
+};
+
+async function main() {
+  if (!process.env.OPENROUTER_API_KEY) {
+    console.error('OPENROUTER_API_KEY not set. Cannot test LLM scanners.');
+    process.exit(1);
+  }
+
+  const puppeteer = await loadPuppeteer();
+  const { LLMClient } = require('../src/llm-client');
+  const LLMSemanticTextScanner = require('../src/llm-semantic-text-scanner');
+  const LLMAuthScanner = require('../src/llm-auth-scanner');
+  const LLMMediaAlternativesScanner = require('../src/llm-media-alternatives-scanner');
+  const LLMVisualPresentationScanner = require('../src/llm-visual-presentation-scanner');
+  const LLMBehavioralScanner = require('../src/llm-behavioral-scanner');
+  const LLMFocusAppearanceScanner = require('../src/llm-focus-appearance-scanner');
+
+  const client = new LLMClient({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    maxRetries: 3,
+    timeoutMs: 60000,
+  });
+
+  const scanners = {
+    'llm-semantic-text': new LLMSemanticTextScanner(client),
+    'llm-auth': new LLMAuthScanner(client),
+    'llm-media-alternatives': new LLMMediaAlternativesScanner(client),
+    'llm-visual-presentation': new LLMVisualPresentationScanner(client),
+    'llm-behavioral': new LLMBehavioralScanner(client),
+    'llm-focus-appearance': new LLMFocusAppearanceScanner(client),
+  };
+
+  // Start static file server
+  const staticServer = http.createServer((req, res) => {
+    const filePath = path.join(__dirname, req.url.replace(/^\//, ''));
+    if (!fs.existsSync(filePath)) {
+      res.writeHead(404);
+      res.end('Not found');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(fs.readFileSync(filePath));
+  });
+
+  await new Promise(resolve => staticServer.listen(8099, resolve));
+  console.log('Static server on port 8099\n');
+
+  // Launch browser
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  const results = {};
+  let totalTests = 0;
+  let totalPassed = 0;
+
+  for (const [scannerId, testConfig] of Object.entries(SCANNER_TESTS)) {
+    const scanner = scanners[scannerId];
+    console.log(`\n=== ${scannerId} ===`);
+    console.log(`Criteria: ${testConfig.criteria.join(', ')}`);
+
+    results[scannerId] = { bad: [], good: [] };
+
+    // Test bad files (should find violations)
+    for (const file of testConfig.bad) {
+      const filePath = path.join(__dirname, file);
+      if (!fs.existsSync(filePath)) {
+        console.log(`  SKIP (not found): ${file}`);
+        continue;
+      }
+
+      totalTests++;
+      const page = await browser.newPage();
+      try {
+        await page.goto(`http://localhost:8099/${file}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        const result = await scanner.scan(page);
+        const detected = result.violations.length > 0;
+        const status = detected ? 'PASS' : 'FAIL';
+        if (detected) totalPassed++;
+
+        console.log(`  [BAD]  ${file}: ${status} (${result.violations.length} violations)`);
+        if (result.violations.length > 0) {
+          result.violations.slice(0, 3).forEach(v => {
+            console.log(`         - ${v.ruleId}: ${v.description.slice(0, 80)}`);
+          });
+        }
+
+        results[scannerId].bad.push({ file, detected, violations: result.violations.length });
+      } catch (err) {
+        console.log(`  [BAD]  ${file}: ERROR - ${err.message}`);
+        results[scannerId].bad.push({ file, detected: false, error: err.message });
+      } finally {
+        await page.close();
+      }
+    }
+
+    // Test good files (should NOT find violations)
+    for (const file of testConfig.good) {
+      const filePath = path.join(__dirname, file);
+      if (!fs.existsSync(filePath)) {
+        console.log(`  SKIP (not found): ${file}`);
+        continue;
+      }
+
+      totalTests++;
+      const page = await browser.newPage();
+      try {
+        await page.goto(`http://localhost:8099/${file}`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        const result = await scanner.scan(page);
+
+        // Filter violations to only count those matching the file's target criteria
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        const metadata = parseWcagMetadata(fileContent);
+        const targetCriteria = metadata && Array.isArray(metadata.criterion) ? metadata.criterion : [];
+
+        let relevantViolations = result.violations;
+        if (targetCriteria.length > 0) {
+          relevantViolations = result.violations.filter(v => {
+            const criterion = v.ruleId || '';
+            return targetCriteria.some(tc => criterion.includes(tc));
+          });
+          const filtered = result.violations.length - relevantViolations.length;
+          if (filtered > 0) {
+            console.log(`         (filtered ${filtered} out-of-scope violations)`);
+          }
+        }
+
+        const clean = relevantViolations.length === 0;
+        const status = clean ? 'PASS' : 'FAIL';
+        if (clean) totalPassed++;
+
+        console.log(`  [GOOD] ${file}: ${status} (${relevantViolations.length} relevant / ${result.violations.length} total violations)`);
+        if (relevantViolations.length > 0) {
+          relevantViolations.slice(0, 2).forEach(v => {
+            console.log(`         - FALSE POS: ${v.ruleId}: ${v.description.slice(0, 80)}`);
+          });
+        }
+
+        results[scannerId].good.push({ file, clean, violations: relevantViolations.length });
+      } catch (err) {
+        console.log(`  [GOOD] ${file}: ERROR - ${err.message}`);
+        results[scannerId].good.push({ file, clean: false, error: err.message });
+      } finally {
+        await page.close();
+      }
+    }
+  }
+
+  await browser.close();
+  staticServer.close();
+
+  // Summary
+  console.log('\n\n=== SUMMARY ===');
+  console.log(`Total tests: ${totalTests}`);
+  console.log(`Passed: ${totalPassed}/${totalTests} (${(totalPassed / totalTests * 100).toFixed(0)}%)`);
+
+  for (const [scannerId, res] of Object.entries(results)) {
+    const badDetected = res.bad.filter(r => r.detected).length;
+    const goodClean = res.good.filter(r => r.clean).length;
+    const detectionRate = res.bad.length > 0 ? (badDetected / res.bad.length * 100).toFixed(0) : 'N/A';
+    const fpRate = res.good.length > 0 ? ((res.good.length - goodClean) / res.good.length * 100).toFixed(0) : 'N/A';
+    console.log(`  ${scannerId}: detection=${detectionRate}%, false_positive=${fpRate}%`);
+  }
+}
+
+main().catch(err => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});
+
+
+

@@ -1,0 +1,74 @@
+Test plan: 42 tests across 7 scanners
+
+
+--- keyboard-navigation (11 tests) ---
+  PASS [TRUE-POS] bad-beeproduced-real-issues.html: 7 violations
+  PASS [TRUE-POS] bad-character-key-shortcuts.html: 5 violations
+  PASS [TRUE-POS] bad-keyboard-access.html: 33 violations
+  PASS [TRUE-POS] bad-keyboard-native-override.html: 35 violations
+  PASS [TRUE-POS] bad-keyboard-trap.html: 1 violations
+  PASS [TRUE-POS] bad-scrollable-content.html: 6 violations
+  PASS [FALSE-POS] good-accessibility.html: 0 false positives
+  PASS [FALSE-POS] good-character-key-shortcuts.html: 0 false positives
+  PASS [FALSE-POS] good-keyboard-native-override.html: 0 false positives
+  PASS [FALSE-POS] good-keyboard-trap.html: 0 false positives
+  PASS [FALSE-POS] good-scrollable-content.html: 0 false positives
+
+--- input-modalities (13 tests) ---
+  PASS [TRUE-POS] bad-dragging-movements.html: 7 violations
+  PASS [TRUE-POS] bad-input-modalities.html: 9 violations
+  FAIL [TRUE-POS] bad-keyboard-native-override.html: 0 violations
+  PASS [TRUE-POS] bad-label-in-name.html: 6 violations
+  PASS [TRUE-POS] bad-motion-vestibular.html: 15 violations
+  PASS [TRUE-POS] bad-pointer-cancellation.html: 5 violations
+  PASS [TRUE-POS] bad-target-size-minimum.html: 37 violations
+  PASS [FALSE-POS] good-dragging-movements.html: 0 false positives
+  PASS [FALSE-POS] good-keyboard-native-override.html: 0 false positives
+  PASS [FALSE-POS] good-label-in-name.html: 0 false positives
+  PASS [FALSE-POS] good-motion-vestibular.html: 0 false positives
+  PASS [FALSE-POS] good-pointer-cancellation.html: 0 false positives
+  PASS [FALSE-POS] good-target-size-minimum.html: 0 false positives
+
+--- focus-management (6 tests) ---
+  PASS [TRUE-POS] bad-focus-management.html: 2 violations
+  PASS [TRUE-POS] bad-focus-not-obscured.html: 2 violations
+  PASS [TRUE-POS] bad-focus-order.html: 1 violations
+  PASS [TRUE-POS] bad-focus-visible.html: 1 violations
+  PASS [FALSE-POS] good-focus-management.html: 0 false positives
+  PASS [FALSE-POS] good-focus-not-obscured.html: 0 false positives
+
+--- hover-focus-content (2 tests) ---
+  PASS [TRUE-POS] bad-hover-focus-content.html: 7 violations
+  PASS [FALSE-POS] good-hover-focus-content.html: 0 false positives
+
+--- multiple-ways (2 tests) ---
+  PASS [TRUE-POS] bad-multiple-ways.html: 1 violations
+  PASS [FALSE-POS] good-multiple-ways.html: 0 false positives
+
+--- responsive-design (6 tests) ---
+  PASS [TRUE-POS] bad-reflow.html: 4 violations
+  PASS [TRUE-POS] bad-text-resize.html: 31 violations
+  PASS [TRUE-POS] bad-text-spacing.html: 13 violations
+  PASS [FALSE-POS] good-reflow.html: 0 false positives
+  PASS [FALSE-POS] good-text-resize.html: 0 false positives
+  PASS [FALSE-POS] good-text-spacing.html: 0 false positives
+
+--- seizure-prevention (2 tests) ---
+  PASS [TRUE-POS] bad-seizure-risk.html: 10 violations
+  PASS [FALSE-POS] good-seizure-safe.html: 0 false positives
+
+--- responsive-design FULL-MATRIX dedup test ---
+  PASS [FULL-MATRIX DEDUP] bad-reflow.html: 31 deduplicated violations, all have affectedViewports
+  PASS [FULL-MATRIX] good-reflow.html: 0 violations
+
+--- responsive-design FULL-MODE criterion tests ---
+  PASS [FULL-MODE] bad-text-resize.html: 31 violations for 1.4.4
+  PASS [FULL-MODE] good-text-resize.html: 0 violations for 1.4.4
+  PASS [FULL-MODE] bad-reflow.html: 28 violations for 1.4.10
+  PASS [FULL-MODE] good-reflow.html: 0 violations for 1.4.10
+
+=== SUMMARY ===
+Total: 48 | Passed: 47 | Failed: 1
+
+Failures:
+  input-modalities / bad-keyboard-native-override.html [TRUE-POS]: 0 violations

@@ -106,7 +106,7 @@ export function clearHistory() {
   return [];
 }
 
-/** Stable key for React lists — jobId is optional on legacy responses. */
+/** Stable key for React lists; jobId is optional on legacy responses. */
 export function entryKey(entry, index) {
   return entry.jobId || `${entry.url}-${entry.date}-${index}`;
 }

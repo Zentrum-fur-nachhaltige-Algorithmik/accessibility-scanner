@@ -42,9 +42,9 @@ module.exports = [
   {
     ignores: [
       'node_modules',
+      '.claude',
       'frontend/.next',
-      'src/agent',
-      'tests/agent',
+      'src/agent/vendor',
       'reports',
       'test-sites',
       'tmp',
@@ -64,7 +64,14 @@ module.exports = [
     },
   },
   {
-    files: ['scripts/**/*.js', 'eslint.config.js'],
+    files: [
+      'scripts/**/*.js',
+      'eslint.config.js',
+      'src/agent/run.js',
+      'src/agent/generate-tasks.js',
+      'src/agent/validate-nopt.js',
+      'src/agent/blind-mode/server/recompute-nopt.js',
+    ],
     rules: { 'no-console': 'off' },
   },
   {

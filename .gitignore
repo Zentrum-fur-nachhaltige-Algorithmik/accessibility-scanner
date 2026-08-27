@@ -20,3 +20,5 @@ Thumbs.db
 *.tgz
 docs/
 test-sites/realworld/med-templates/
+.tmp-agent/
+.scratch/

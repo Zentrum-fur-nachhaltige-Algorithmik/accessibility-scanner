@@ -1,13 +1,19 @@
 # accessibility-scanner
 
-axe-core covers the WCAG 2.2 criteria that can be decided from the DOM alone.
-This project extends it with checks that need a real browser session or
-judgement: 30 deterministic Puppeteer scanners (keyboard, focus, reflow, text
-resize, motion, timing, contrast of non-text content, EAA statement and
-contact requirements) and 12 LLM-assisted scanners for criteria such as
-reading level, sensory characteristics or alt text quality. An agentic
-screen-reader check, where an LLM has to complete tasks using only what a
-screen reader announces, is in progress on the `feat/sr-agent` branch.
+Three layers of WCAG 2.2 checking on top of axe-core, and a measurement of what
+the checks cannot see: whether a screen reader user can actually get things done.
+
+1. axe-core covers the criteria that can be decided from the DOM alone.
+2. 30 deterministic Puppeteer scanners cover what needs a real browser session:
+   keyboard and focus behaviour, reflow and text resize, motion, timing,
+   contrast of non-text content, EAA statement and contact requirements.
+3. 12 LLM-assisted scanners cover criteria that need judgement: reading level,
+   sensory characteristics, alt text quality, consistent help.
+4. The screen reader agent: an LLM has to complete real tasks on the page
+   while receiving only what a screen reader announces. Its detours against
+   the shortest possible route are the score; the places it got stuck are the
+   findings. A playable version of the same setup (Blind Mode) lets a sighted
+   person try it.
 
 Everything runs through one Express API and one headless Chromium pipeline
 and comes back as JSON, HTML or PDF. Every success criterion is mapped to a
@@ -151,6 +157,83 @@ A and AA: 48 of 55 criteria are covered by proven mechanisms, 2 need manual revi
 Full matrix with fixtures, harness evidence and justifications: tests/data/coverage-matrix.json.
 <!-- coverage-matrix:end -->
 
+## Screen reader agent
+
+Static checks cannot tell whether a page is usable without sight. The agent
+measures that directly: it gets a task ("send the contact form", "find the
+state pension age") and a screen reader, nothing else.
+
+```
+task ------------------------------+
+                                   v
++-----------------+   phrase,    +-----------+   command    +------------------+
+| ScreenReaderEnv | ---------->  | LLM agent | ---------->  | ScreenReaderEnv  |
+| virtual screen  |  rotor lists |           |  next, tab,  | in the page      |
+| reader in page  |  live regions|           |  H, L, F, D, |                  |
++-----------------+              +-----------+  activate    +------------------+
+        ^                                                          |
+        |                  oracle checked after every step         |
+        +----------------------------------------------------------+
+```
+
+The agent never sees HTML, an accessibility tree, a screenshot or a selector.
+Each turn it receives the phrase at the cursor, the announcements since the
+last step and, on request, a rotor list (headings, landmarks, links, form
+fields). Every command counts as one step, including failed ones.
+
+Scoring per task:
+
+```
+nOpt  shortest command sequence that solves the task, computed
+      deterministically along the sighted reference path (optimal-path.js)
+nSr   commands the agent used
+R     = min(1, nOpt / nSr), 0 when the task was not solved
+```
+
+`siteScore` is the weighted mean of R over the valid tasks. Tasks come from
+`generic-tasks.js` (cookie banner, navigation, search, contact, login, form)
+or from the task generator, which solves the page sighted first, derives an
+oracle for each task and validates it by deterministic replay; a task that
+cannot be replayed is excluded, never scored.
+
+Findings are read off the trace without an LLM and use the same shape as the
+scanners' violations: `focus-lost` (2.4.3), `dialog-not-trapped` (2.4.3),
+`escape-does-not-close` (2.1.2), `unannounced-change` (4.1.3),
+`unnamed-control-used` (4.1.2), `agent-claimed-done-prematurely`.
+
+A run on gov.uk with generated tasks:
+
+```
+task                                   nOpt  nSr   R
+cookie-banner-dismiss                     2    5   0.40
+site-search                               3    5   0.60
+contact-page, mot-history, travel-advice,
+passport, departments                     3    3   1.00
+state-pension-age                         6    6   1.00
+siteScore 0.94, 8 tasks, cost 0.056 USD
+```
+
+```
+export OPENROUTER_API_KEY=...
+npm run sr-agent -- https://example.com --generate --out result.json
+npm run sr-agent -- https://example.com --tasks tasks.json --k 3
+node src/agent/validate-nopt.js https://example.com --tasks tasks.json
+```
+
+### Blind Mode (live demo)
+
+The same environment as a game: black screen, speech output through the Web
+Speech API, one key per screen reader command, the oracle evaluated on the
+server after every step. At the end the player sees their step count against
+`nOpt`, the same R as the agent, and the longest stretch without progress.
+
+```
+npm run blind-mode          # http://127.0.0.1:8790, demo site included
+```
+
+Sessions are logged as traces in the same format as the agent runs, so human
+and agent routes through the same task are directly comparable.
+
 ## Configuration
 
 | Variable                  | Default                          | Purpose                                      |
@@ -178,6 +261,7 @@ directly. Nothing reads `.env` in production.
 ```
 npm test                    # unit: no browser, seconds
 npm run test:e2e            # scanners against test-sites/ fixtures, Chromium, sequential
+npm run test:agent          # screen reader agent, Chromium, no API key needed
 npm run test:self-scan      # builds the UI and scans it with the API
 npm run lint                # eslint, prettier, dash check
 ```
@@ -210,11 +294,12 @@ src/
   llm/client.js          OpenRouter client with retry and fallback models
   report/                HTML and PDF report generator
   utils/                 accessible name, contrast, rendered-state helpers, logger
+  agent/                 screen reader agent: env, optimal path, tasks, harness, blind-mode
   data/                  wcag22-criteria.json
 frontend/                Next.js UI (pages, components, lib)
 scripts/                 coverage matrix, trust derivation, harnesses, fixture capture
 tests/
-  unit/  e2e/  self-scan/  helpers/  data/
+  unit/  e2e/  agent/  self-scan/  helpers/  data/
 test-sites/              fixture pages and captured real-world snapshots
 Dockerfile, docker-compose.yml, .github/workflows/ci.yml
 ```

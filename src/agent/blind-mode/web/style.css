@@ -1,0 +1,281 @@
+/*
+ * Blind Mode — white on black, everything at least 7:1 (WCAG AAA for text),
+ * every interactive element keyboard operable with a focus indicator that is
+ * visible on the black background.
+ */
+
+:root {
+  --bg: #000;
+  --fg: #fff;
+  /* #ffd166 on #000 = 12.6:1, #9fe6ff on #000 = 13.4:1 */
+  --accent: #ffd166;
+  --muted: #d9d9d9; /* on #000 = 15.9:1 */
+  --info: #9fe6ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+:focus-visible,
+[tabindex='-1']:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 0.5rem 1rem;
+  z-index: 10;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-header {
+  padding: 1rem 1.25rem 0;
+}
+
+.brand {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+main {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 4rem;
+}
+
+h1 {
+  font-size: 1.9rem;
+  line-height: 1.2;
+  margin: 0.6rem 0 1rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 2rem 0 0.5rem;
+}
+
+.lead {
+  color: var(--muted);
+}
+
+fieldset {
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem 1rem;
+}
+
+legend {
+  font-weight: 700;
+  padding: 0 0.4rem;
+}
+
+.choice {
+  margin: 0.35rem 0;
+}
+
+.choice input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--accent);
+  vertical-align: middle;
+}
+
+.choice label {
+  padding-left: 0.3rem;
+}
+
+.hint,
+.data-note {
+  display: block;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hint {
+  margin-left: 1.8rem;
+}
+
+button {
+  font: inherit;
+  background: transparent;
+  color: var(--fg);
+  border: 2px solid var(--fg);
+  border-radius: 6px;
+  padding: 0.55rem 1.2rem;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--fg);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+kbd {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  border: 1px solid var(--muted);
+  border-radius: 4px;
+  padding: 0 0.35rem;
+  font-size: 0.9em;
+}
+
+ul.keys {
+  padding-left: 1.2rem;
+}
+
+ul.keys li {
+  margin: 0.25rem 0;
+}
+
+.rule {
+  font-weight: 700;
+}
+
+.task-sentence {
+  font-size: 1.2rem;
+}
+
+/* --- play screen --------------------------------------------------- */
+
+.play-heading {
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.play-task,
+.play-counter {
+  margin: 0.15rem 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+#capture {
+  margin: 1.5rem 0;
+  min-height: 55vh;
+  border: 1px dashed #6f6f6f;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+#capture:focus,
+#capture:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-style: solid;
+}
+
+.capture-hint {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.phrase-display {
+  font-size: 1.4rem;
+  color: var(--info);
+  max-width: 34rem;
+}
+
+.pause {
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.5rem 1rem 1rem;
+}
+
+/* --- result screen ------------------------------------------------- */
+
+.verdict {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+dl.numbers {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0;
+}
+
+dl.numbers dt {
+  color: var(--muted);
+}
+
+dl.numbers dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+ol.optimal,
+ol.stuck {
+  padding-left: 1.4rem;
+}
+
+ol.optimal li,
+ol.stuck li {
+  margin: 0.3rem 0;
+}
+
+ol.optimal .key {
+  display: inline-block;
+  min-width: 5.5rem;
+  color: var(--accent);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

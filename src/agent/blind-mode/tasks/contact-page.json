@@ -1,0 +1,44 @@
+{
+  "id": "contact-page",
+  "template": "contact-page",
+  "url": "/site/generic-home.html",
+  "description": "Finde die Seite, auf der steht, wie man diese Firma erreichen kann.",
+  "weight": 1,
+  "preconditions": [
+    {
+      "action": "click",
+      "selector": "#cookie-accept"
+    }
+  ],
+  "oracle": {
+    "type": "any",
+    "of": [
+      {
+        "type": "urlMatches",
+        "pattern": "generic-contact\\.html"
+      },
+      {
+        "type": "titleMatches",
+        "pattern": "contact|kontakt"
+      }
+    ]
+  },
+  "sightedPath": [
+    {
+      "action": "click",
+      "selector": "body > header > nav > ul > li:nth-of-type(3) > a"
+    }
+  ],
+  "nOpt": 2,
+  "meta": {
+    "source": "generic-tasks/contact-page on test-sites/agent/generic-home.html"
+  },
+  "optimalPath": [
+    {
+      "type": "prevLink"
+    },
+    {
+      "type": "activate"
+    }
+  ]
+}

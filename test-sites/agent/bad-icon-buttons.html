@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Unnamed icon buttons</title>
+<style>.icon{width:1em;height:1em;display:inline-block;background:#333}</style>
+</head>
+<body>
+  <header><h1>Toolbar with unnamed icon buttons</h1></header>
+  <main>
+    <p id="state">Nothing happened yet.</p>
+    <button id="b1" type="button"><span class="icon" aria-hidden="true"></span></button>
+    <button id="b2" type="button"><span class="icon" aria-hidden="true"></span></button>
+  </main>
+  <script>
+    document.getElementById('b1').addEventListener('click', function () {
+      document.getElementById('state').textContent = 'The first icon button was pressed.';
+    });
+  </script>
+</body>
+</html>

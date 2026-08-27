@@ -1,0 +1,35 @@
+{
+  "id": "cookie-banner",
+  "template": "cookie-banner-dismiss",
+  "url": "/site/generic-home.html",
+  "description": "Schliesse den Cookie-Hinweis, damit du die Website benutzen kannst.",
+  "weight": 1,
+  "preconditions": [],
+  "oracle": {
+    "type": "not",
+    "of": [
+      {
+        "type": "elementVisible",
+        "selector": "#cookie-banner"
+      }
+    ]
+  },
+  "sightedPath": [
+    {
+      "action": "click",
+      "selector": "#cookie-accept"
+    }
+  ],
+  "nOpt": 2,
+  "meta": {
+    "source": "generic-tasks/cookie-banner-dismiss on test-sites/agent/generic-home.html"
+  },
+  "optimalPath": [
+    {
+      "type": "tab"
+    },
+    {
+      "type": "activate"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Effect-equivalent targets</title></head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="generic-home.html">Home</a></li>
+        <li><a href="generic-products.html">Products</a></li>
+        <li><a id="nav-contact" href="generic-contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Equivalent routes</h1>
+    <h2 id="section-two">Second heading</h2>
+    <p>The second heading is also the thing the sighted user clicks.</p>
+    <h3>Third heading</h3>
+    <p>A third heading keeps the second one two steps away in both directions.</p>
+    <form id="mini-search" action="generic-search.html" method="get">
+      <label for="mq">Search</label>
+      <input id="mq" name="q" type="search">
+      <button id="mini-search-go" type="submit">Search</button>
+    </form>
+  </main>
+
+  <footer>
+    <p><a id="footer-contact" href="generic-contact.html">Contact us</a></p>
+  </footer>
+
+  <script>
+    document.getElementById('section-two').addEventListener('click', function () {
+      document.title = 'Second heading opened';
+    });
+  </script>
+</body>
+</html>

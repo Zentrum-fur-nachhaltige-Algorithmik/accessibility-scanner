@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Bad modal</title></head>
+<body>
+  <header><h1>Settings demo (broken modal)</h1></header>
+  <main>
+    <p>Open the settings dialog.</p>
+    <button id="open" type="button">Open settings</button>
+    <p><a href="#after" id="after-link">A link after the button</a></p>
+  </main>
+  <div id="dialog" role="dialog" aria-modal="true" aria-labelledby="dtitle" hidden>
+    <h2 id="dtitle">Settings</h2>
+    <button id="close" type="button">Close dialog</button>
+  </div>
+  <script>
+    var dlg = document.getElementById('dialog');
+    document.getElementById('open').addEventListener('click', function () {
+      dlg.hidden = false;
+      // Focus moves into the dialog, but nothing traps it and Escape is ignored.
+      document.getElementById('close').focus();
+    });
+    document.getElementById('close').addEventListener('click', function () {
+      dlg.hidden = true;
+      // Focus is dropped on the document body instead of returning to the trigger.
+      document.activeElement.blur();
+    });
+  </script>
+</body>
+</html>

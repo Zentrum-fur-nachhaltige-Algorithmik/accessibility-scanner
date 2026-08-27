@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mini Site — Home</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; }
+  #cookie-banner { background: #eee; padding: 1rem; border-bottom: 2px solid #333; }
+  header, main { padding: 1rem; }
+  nav ul { list-style: none; display: flex; gap: 1rem; padding: 0; }
+</style>
+</head>
+<body>
+  <div id="cookie-banner" role="region" aria-label="Cookie notice">
+    <p>This website uses cookies to improve your experience.</p>
+    <button id="cookie-accept" type="button">Accept all</button>
+    <button id="cookie-decline" type="button">Decline</button>
+  </div>
+
+  <header>
+    <p><a id="login-link" href="generic-login.html">Log in</a></p>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="generic-home.html">Home</a></li>
+        <li><a href="generic-products.html">Products</a></li>
+        <li><a href="generic-contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <form id="search-form" action="generic-search.html" method="get" role="search">
+      <label for="q">Search the site</label>
+      <input id="q" name="q" type="search">
+      <button type="submit">Search</button>
+    </form>
+  </header>
+
+  <main>
+    <h1>Welcome to the Mini Site</h1>
+    <p>We build small things for small tests.</p>
+
+    <h2>Send us a message</h2>
+    <form id="contact-form" action="generic-thanks.html" method="post">
+      <p><label for="cf-name">Name</label> <input id="cf-name" name="name" type="text"></p>
+      <p><label for="cf-mail">E-mail</label> <input id="cf-mail" name="email" type="email"></p>
+      <p><label for="cf-msg">Message</label> <textarea id="cf-msg" name="message"></textarea></p>
+      <button type="submit">Send message</button>
+    </form>
+  </main>
+
+<script>
+  document.getElementById('cookie-accept').addEventListener('click', function () {
+    document.getElementById('cookie-banner').style.display = 'none';
+  });
+  document.getElementById('cookie-decline').addEventListener('click', function () {
+    document.getElementById('cookie-banner').style.display = 'none';
+  });
+</script>
+</body>
+</html>

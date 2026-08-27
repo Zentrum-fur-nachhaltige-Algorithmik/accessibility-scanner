@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Oracle Playground</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem; }
+  [hidden] { display: none; }
+  #panel { display: none; padding: 1rem; border: 1px solid #333; }
+  #panel.open { display: block; }
+  #dlg { border: 2px solid #333; padding: 1rem; max-width: 20rem; }
+</style>
+</head>
+<body>
+  <h1>Oracle Playground</h1>
+  <p id="status">idle</p>
+
+  <button id="show-success" type="button">Show success message</button>
+  <div id="panel">Success! Your request has been sent.</div>
+
+  <p>
+    <label for="name">Your name</label>
+    <input id="name" name="name" type="text" value="">
+  </p>
+  <button id="fill" type="button">Fill in name</button>
+
+  <button id="ping" type="button">Send request</button>
+  <button id="store" type="button">Store preferences</button>
+
+  <button id="open-dlg" type="button">Open newsletter dialog</button>
+  <div id="dlg" role="dialog" aria-label="Newsletter signup" hidden>
+    <h2>Newsletter signup</h2>
+    <button id="dlg-close" type="button">Close</button>
+  </div>
+
+  <p><a id="to-second" href="oracle-second.html">Go to the second page</a></p>
+
+<script>
+  document.getElementById('show-success').addEventListener('click', function () {
+    document.getElementById('panel').classList.add('open');
+    document.getElementById('status').textContent = 'done';
+  });
+  document.getElementById('fill').addEventListener('click', function () {
+    document.getElementById('name').value = 'Ada Lovelace';
+  });
+  document.getElementById('ping').addEventListener('click', function () {
+    fetch('oracle-ping.json', { method: 'POST', body: '{}' }).catch(function () {});
+  });
+  document.getElementById('store').addEventListener('click', function () {
+    try { localStorage.setItem('sr-agent-pref', 'accepted'); } catch (e) {}
+    try { sessionStorage.setItem('sr-agent-session', 'live'); } catch (e) {}
+    document.cookie = 'sr-agent-cookie=accepted; path=/';
+  });
+  document.getElementById('open-dlg').addEventListener('click', function () {
+    var dlg = document.getElementById('dlg');
+    dlg.hidden = false;
+    document.getElementById('dlg-close').focus();
+  });
+  document.getElementById('dlg-close').addEventListener('click', function () {
+    document.getElementById('dlg').hidden = true;
+    document.getElementById('open-dlg').focus();
+  });
+</script>
+</body>
+</html>

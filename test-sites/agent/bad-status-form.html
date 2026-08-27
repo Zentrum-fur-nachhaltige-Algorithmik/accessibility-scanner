@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Form without status message</title></head>
+<body>
+  <header><h1>Contact form (silent result)</h1></header>
+  <main>
+    <form id="form">
+      <label for="msg">Your message</label>
+      <input id="msg" name="msg" type="text">
+      <button id="send" type="submit">Send message</button>
+    </form>
+    <div id="status"></div>
+  </main>
+  <script>
+    document.getElementById('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var s = document.getElementById('status');
+      s.innerHTML = '<p>Thank you, your message was sent.</p><p>We will reply within two days.</p><p>Reference number 4711.</p>';
+    });
+  </script>
+</body>
+</html>

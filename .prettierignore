@@ -8,3 +8,4 @@ tmp
 package-lock.json
 tests/data/*.json
 src/core/scanner-trust.json
+.claude

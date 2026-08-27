@@ -1,0 +1,54 @@
+{
+  "id": "site-search",
+  "template": "site-search",
+  "url": "/site/generic-home.html",
+  "description": "Suche mit der Suche dieser Website nach \"kontakt\".",
+  "weight": 1,
+  "preconditions": [
+    {
+      "action": "click",
+      "selector": "#cookie-accept"
+    }
+  ],
+  "oracle": {
+    "type": "any",
+    "of": [
+      {
+        "type": "urlMatches",
+        "pattern": "[?&]q="
+      },
+      {
+        "type": "requestSent",
+        "urlPattern": "[?&]q=",
+        "method": "GET"
+      }
+    ]
+  },
+  "sightedPath": [
+    {
+      "action": "type",
+      "selector": "#q",
+      "text": "kontakt"
+    },
+    {
+      "action": "click",
+      "selector": "#search-form > button"
+    }
+  ],
+  "nOpt": 3,
+  "meta": {
+    "source": "generic-tasks/site-search on test-sites/agent/generic-home.html"
+  },
+  "optimalPath": [
+    {
+      "type": "nextFormField"
+    },
+    {
+      "type": "type",
+      "arg": "kontakt"
+    },
+    {
+      "type": "activate"
+    }
+  ]
+}

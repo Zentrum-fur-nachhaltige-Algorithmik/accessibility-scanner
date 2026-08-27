@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Good modal</title></head>
+<body>
+  <header><h1>Settings demo (accessible modal)</h1></header>
+  <main>
+    <p>Open the settings dialog.</p>
+    <button id="open" type="button">Open settings</button>
+    <p><a href="#after" id="after-link">A link after the button</a></p>
+  </main>
+  <div id="dialog" role="dialog" aria-modal="true" aria-labelledby="dtitle" hidden>
+    <h2 id="dtitle">Settings</h2>
+    <label for="nickname">Nickname</label>
+    <input id="nickname" type="text">
+    <button id="save" type="button">Save settings</button>
+    <button id="close" type="button">Close dialog</button>
+  </div>
+  <script>
+    var dlg = document.getElementById('dialog');
+    var open = document.getElementById('open');
+    function focusables() {
+      return Array.prototype.slice.call(dlg.querySelectorAll('input, button'));
+    }
+    function openDialog() {
+      dlg.hidden = false;
+      focusables()[0].focus();
+    }
+    function closeDialog() {
+      dlg.hidden = true;
+      open.focus();
+    }
+    open.addEventListener('click', openDialog);
+    document.getElementById('close').addEventListener('click', closeDialog);
+    document.addEventListener('keydown', function (e) {
+      if (dlg.hidden) return;
+      if (e.key === 'Escape') { closeDialog(); return; }
+      if (e.key !== 'Tab') return;
+      var items = focusables();
+      var first = items[0];
+      var last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      else if (items.indexOf(document.activeElement) === -1) { e.preventDefault(); first.focus(); }
+    });
+  </script>
+</body>
+</html>

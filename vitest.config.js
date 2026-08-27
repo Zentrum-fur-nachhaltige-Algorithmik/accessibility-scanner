@@ -17,6 +17,15 @@ export default defineConfig({
       },
       {
         test: {
+          name: 'agent',
+          include: ['tests/agent/**/*.test.js'],
+          testTimeout: 60000,
+          hookTimeout: 120000,
+          fileParallelism: false,
+        },
+      },
+      {
+        test: {
           name: 'self-scan',
           include: ['tests/self-scan/**/*.test.js'],
           testTimeout: 240000,

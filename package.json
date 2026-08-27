@@ -17,6 +17,7 @@
     "test": "vitest run --project unit",
     "test:unit": "vitest run --project unit",
     "test:e2e": "vitest run --project e2e",
+    "test:agent": "vitest run --project agent",
     "test:self-scan": "vitest run --project self-scan",
     "test:all": "vitest run",
     "test:watch": "vitest --project unit",
@@ -29,6 +30,8 @@
     "harness:llm": "node scripts/harness/llm.js",
     "harness:golden": "node scripts/harness/golden.js",
     "harness:realworld": "node scripts/harness/realworld.js",
+    "sr-agent": "node src/agent/run.js",
+    "blind-mode": "node src/agent/blind-mode/server/index.js",
     "lint": "eslint . && sh scripts/check-no-emdash.sh",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -48,10 +51,13 @@
     "puppeteer": "^22.15.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@guidepup/virtual-screen-reader": "^0.32.1",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",

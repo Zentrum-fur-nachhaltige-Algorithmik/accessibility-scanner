@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Landmark-reached button</title></head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#a1">One</a></li>
+        <li><a href="#a2">Two</a></li>
+        <li><a href="#a3">Three</a></li>
+        <li><a href="#a4">Four</a></li>
+        <li><a href="#a5">Five</a></li>
+        <li><a href="#a6">Six</a></li>
+        <li><a href="#a7">Seven</a></li>
+        <li><a href="#a8">Eight</a></li>
+        <li><a href="#a9">Nine</a></li>
+        <li><a href="#a10">Ten</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <h1>A long page</h1>
+    <p>Some text. More text. Even more text.</p>
+    <p>Another paragraph so the reading order is long.</p>
+  </main>
+  <section id="banner" role="region" aria-label="Cookie notice">
+    <button id="accept" type="button">Accept all cookies</button>
+  </section>
+  <script>
+    document.getElementById('accept').addEventListener('click', function () {
+      document.getElementById('banner').hidden = true;
+      document.title = 'Cookies accepted';
+    });
+  </script>
+</body>
+</html>

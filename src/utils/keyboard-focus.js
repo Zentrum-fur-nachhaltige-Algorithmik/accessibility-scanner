@@ -82,7 +82,29 @@ const helperCode = `
   ${contrastCode}
   ${renderedCode}
   const __A11Y_PROPS = ${JSON.stringify(TRACKED_PROPS)};
-  function __a11ySnapshot(el) {
+
+  // Elements that a page commonly paints the focus ring on instead of the
+  // focused control itself: the label of a custom checkbox
+  // (input:focus-visible + label::before), and the wrapper of a search bar
+  // (.searchbar:focus-within { box-shadow: ... }).
+  function __a11yRelated(el) {
+    const out = [];
+    const push = (n) => {
+      if (n && n.nodeType === 1 && n !== document.body && n !== document.documentElement && out.indexOf(n) === -1) out.push(n);
+    };
+    if (el.id) {
+      try { push(document.querySelector('label[for="' + CSS.escape(el.id) + '"]')); } catch (e) { /* invalid id */ }
+    }
+    push(el.closest('label'));
+    let n = el.parentElement;
+    for (let depth = 0; n && depth < 2; depth++) {
+      push(n);
+      n = n.parentElement;
+    }
+    return out.slice(0, 4);
+  }
+
+  function __a11yStyleProps(el) {
     const cs = window.getComputedStyle(el);
     const o = {};
     for (const p of __A11Y_PROPS) o[p] = cs[p];
@@ -93,6 +115,12 @@ const helperCode = `
         o['pseudo' + pseudo] = { boxShadow: ps.boxShadow, outlineStyle: ps.outlineStyle, outlineWidth: ps.outlineWidth, backgroundColor: ps.backgroundColor, borderTopWidth: ps.borderTopWidth, borderTopColor: ps.borderTopColor, opacity: ps.opacity };
       }
     }
+    return o;
+  }
+
+  function __a11ySnapshot(el) {
+    const o = __a11yStyleProps(el);
+    o.related = __a11yRelated(el).map(__a11yStyleProps);
     return o;
   }
 
@@ -147,6 +175,25 @@ const helperCode = `
     for (const k of ['pseudo::before', 'pseudo::after']) {
       const b = before[k], a = after[k];
       if (a && JSON.stringify(a) !== JSON.stringify(b)) reasons.push(k);
+    }
+
+    // 6. Ring painted on a related element instead of on the control itself:
+    // a label styled through :focus-visible + label, or a wrapper styled
+    // through :focus-within. Same evidence, one element further out.
+    const beforeRel = before.related || [], afterRel = after.related || [];
+    for (let i = 0; i < afterRel.length && i < beforeRel.length; i++) {
+      const b = beforeRel[i], a = afterRel[i];
+      if (!b || !a) continue;
+      const grew = (a.outlineStyle !== 'none' && parseFloat(a.outlineWidth) > 0 && !__isColorTransparent(a.outlineColor) && (b.outlineStyle !== a.outlineStyle || b.outlineWidth !== a.outlineWidth || b.outlineColor !== a.outlineColor))
+        || (a.boxShadow !== 'none' && a.boxShadow !== b.boxShadow)
+        || borderKeys.some(k => b[k] !== a[k])
+        || b.backgroundColor !== a.backgroundColor
+        || (a['pseudo::before'] && JSON.stringify(a['pseudo::before']) !== JSON.stringify(b['pseudo::before']))
+        || (a['pseudo::after'] && JSON.stringify(a['pseudo::after']) !== JSON.stringify(b['pseudo::after']));
+      if (grew) {
+        reasons.push('related-element');
+        break;
+      }
     }
 
     // baselineKnown === false means the unfocused snapshot is a copy of the
@@ -204,6 +251,7 @@ async function prepareTabWalk(page) {
         document.head.appendChild(st);
       }
       window.__a11yTabSnapshots = {};
+      window.__a11yPrevTabEl = null;
       const all = document.querySelectorAll(
         'a, area, button, input, select, textarea, summary, iframe, audio, video, [tabindex], [contenteditable]'
       );
@@ -241,13 +289,14 @@ async function cleanupTabWalk(page) {
       const st = document.getElementById('__a11y-no-smooth');
       if (st) st.remove();
       delete window.__a11yTabSnapshots;
+      delete window.__a11yPrevTabEl;
     }, TAB_ATTR)
     .catch(() => {});
 }
 
 /**
  * Walk the page with real Tab key presses and yield one step per focused element:
- * { tabId, selector, tag, rect, before, after, indicator, stuck, rendered }
+ * { tabId, selector, tag, rect, before, after, indicator, stuck, rendered, domOrderBack }
  * where before/after are computed-style snapshots (unfocused/focused) and
  * indicator is { visible, reasons[], lowContrast, ratio, backdrop, baselineKnown, confirmed }.
  * Stops at the end of the document, on a cycle, on a stuck Tab, or at maxSteps.
@@ -268,8 +317,11 @@ async function* tabWalk(page, opts = {}) {
   let prevId = null;
   let yielded = 0;
   let entryRetries = 0;
+  let stuckPresses = 0;
+  // Tab presses that may land on the same element before it counts as stuck.
+  const STUCK_CONFIRM_PRESSES = 3;
 
-  for (let step = 0; step < maxSteps; step++) {
+  for (let step = 0; step < maxSteps + STUCK_CONFIRM_PRESSES; step++) {
     await page.keyboard.press('Tab');
     if (settleMs) await new Promise((r) => setTimeout(r, settleMs));
 
@@ -288,7 +340,20 @@ async function* tabWalk(page, opts = {}) {
         const before = window.__a11yTabSnapshots[id];
         const after = __a11ySnapshot(el);
         const r = el.getBoundingClientRect();
+        // Did this Tab press move BACKWARDS through the document? Only a
+        // positive tabindex can do that, and that is the one focus order
+        // divergence a machine can decide (SC 2.4.3).
+        const prev = window.__a11yPrevTabEl;
+        const domOrderBack = !!(
+          prev &&
+          prev.isConnected &&
+          prev !== el &&
+          el.compareDocumentPosition(prev) & Node.DOCUMENT_POSITION_FOLLOWING
+        );
+        window.__a11yPrevTabEl = el;
         return {
+          domOrderBack,
+          tabIndexValue: el.tabIndex,
           tabId: id,
           tag: el.tagName.toLowerCase(),
           selector: __a11ySelector(el),
@@ -342,6 +407,17 @@ async function* tabWalk(page, opts = {}) {
         continue;
       }
       return;
+    }
+    // A Tab that leaves activeElement where it was is not yet a trap. A
+    // composite control eats Tab presses of its own: `<input type="date">`
+    // has three segments, a spin button has two, a rich text editor inserts
+    // an indent. Press on before concluding anything, and only report the
+    // element after several presses in a row have changed nothing.
+    if (info.tabId === prevId) {
+      stuckPresses++;
+      if (stuckPresses <= STUCK_CONFIRM_PRESSES) continue;
+    } else {
+      stuckPresses = 0;
     }
     yielded++;
 

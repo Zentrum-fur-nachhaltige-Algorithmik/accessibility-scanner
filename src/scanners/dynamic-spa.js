@@ -656,8 +656,7 @@ class DynamicSpaScanner extends BaseScanner {
 
               errorMessages.forEach((error, errorIndex) => {
                 if (
-                  !error.hasAttribute('aria-live') &&
-                  !error.closest('[aria-live]') &&
+                  !error.closest('[aria-live], [role="alert"], [role="status"]') &&
                   error.textContent.trim()
                 ) {
                   violations.push({

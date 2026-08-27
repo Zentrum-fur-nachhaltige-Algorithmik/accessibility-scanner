@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 182,
+  "fixtureCount": 203,
   "scanners": [
     {
       "id": "axe-core",
@@ -530,6 +530,7 @@
         "good": [
           "good-accessibility.html",
           "good-css-background-accessible.html",
+          "good-descriptive-photo-alt.html",
           "good-image-alt-complex.html"
         ],
         "bad": [
@@ -1188,7 +1189,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1395,7 +1396,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1434,9 +1435,10 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 6,
         "from": [
-          "concurrent"
+          "concurrent",
+          "exclusive"
         ]
       }
     },
@@ -1472,7 +1474,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1497,10 +1499,12 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-hover-focus-content.html"
+          "good-hover-focus-content.html",
+          "good-title-supplementing-name.html"
         ],
         "bad": [
-          "bad-hover-focus-content.html"
+          "bad-hover-focus-content.html",
+          "bad-title-only-name.html"
         ]
       },
       "harness": [
@@ -1511,7 +1515,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1538,8 +1542,12 @@
       "fixtures": {
         "good": [
           "good-accessibility.html",
+          "good-bypass-landmarks-only.html",
+          "good-clickable-wrappers.html",
+          "good-composite-widget-tabindex.html",
           "good-keyboard-native-override.html",
-          "good-scrollable-content.html"
+          "good-scrollable-content.html",
+          "good-scrollable-wrappers.html"
         ],
         "bad": [
           "bad-beeproduced-real-issues.html",
@@ -1556,7 +1564,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 7,
+        "runs": 12,
         "from": [
           "exclusive"
         ]
@@ -1641,6 +1649,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-accesskeys-and-widget-keys.html",
           "good-character-key-shortcuts.html"
         ],
         "bad": [
@@ -1653,7 +1662,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1719,6 +1728,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-static-live-wording.html",
           "good-timing-controls.html"
         ],
         "bad": [
@@ -1955,8 +1965,10 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-bypass-landmarks-only.html",
           "good-landing-page.html",
           "good-landmarks.html",
+          "good-skip-link-lookalikes.html",
           "good-skip-links.html"
         ],
         "bad": [
@@ -2033,7 +2045,10 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-dialog-already-open.html",
+          "good-dismiss-and-load-more.html",
           "good-focus-management.html",
+          "good-rtl-tab-order.html",
           "good-two-column-tab-order.html"
         ],
         "bad": [
@@ -2047,7 +2062,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 7,
         "from": [
           "exclusive"
         ]
@@ -2166,7 +2181,9 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-focus-management.html"
+          "good-focus-management.html",
+          "good-focus-within-indicator.html",
+          "good-skip-link-lookalikes.html"
         ],
         "bad": [
           "bad-focus-management.html",
@@ -2180,7 +2197,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2286,7 +2303,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-focus-not-obscured.html"
+          "good-focus-not-obscured.html",
+          "good-transparent-fixed-overlay.html"
         ],
         "bad": [
           "bad-focus-not-obscured.html"
@@ -2299,7 +2317,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2452,6 +2470,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-icon-button-and-honeypot.html",
           "good-label-in-name.html"
         ],
         "bad": [
@@ -2468,7 +2487,7 @@
       "outcome": {
         "tp": true,
         "fpClean": false,
-        "runs": 6,
+        "runs": 7,
         "from": [
           "concurrent",
           "exclusive"
@@ -2850,10 +2869,12 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-context-change.html"
+          "good-context-change.html",
+          "good-focus-reveal-external-links.html"
         ],
         "bad": [
-          "bad-context-change.html"
+          "bad-context-change.html",
+          "bad-external-link-identification.html"
         ]
       },
       "harness": [
@@ -2954,10 +2975,12 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-consistent-identification.html"
+          "good-consistent-identification.html",
+          "good-focus-reveal-external-links.html"
         ],
         "bad": [
-          "bad-consistent-identification.html"
+          "bad-consistent-identification.html",
+          "bad-external-link-identification.html"
         ]
       },
       "harness": [
@@ -3130,7 +3153,8 @@
       "fixtures": {
         "good": [
           "good-error-tokens-not-error-messages.html",
-          "good-form-errors.html"
+          "good-form-errors.html",
+          "good-icon-button-and-honeypot.html"
         ],
         "bad": [
           "bad-form-errors.html"
@@ -3333,8 +3357,11 @@
       ],
       "llm": [],
       "fixtures": {
-        "good": [],
+        "good": [
+          "good-modern-aria.html"
+        ],
         "bad": [
+          "bad-aria-hidden-focusable.html",
           "bad-html-validation.html"
         ]
       },
@@ -3407,6 +3434,7 @@
           "good-aria-state-updates.html",
           "good-bootstrap-patterns.html",
           "good-hidden-modal.html",
+          "good-icon-button-and-honeypot.html",
           "good-js-validation.html",
           "good-landing-page.html",
           "good-redundant-aria.html",
@@ -3454,6 +3482,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-account-menu-no-counter.html",
           "good-aria-state-updates.html"
         ],
         "bad": [

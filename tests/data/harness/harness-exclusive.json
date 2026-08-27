@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-07-27T16:43:28.117Z",
+  "generatedAt": "2026-08-27T20:43:48.590Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 50,
+    "passed": 70,
     "failed": 0
   },
   "results": [
@@ -10,39 +10,60 @@
       "file": "bad-beeproduced-real-issues.html",
       "scanner": "keyboard-navigation",
       "expectViolations": true,
-      "criteria": ["2.1.1"],
-      "matched": 6,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 2,
       "status": "PASS"
     },
     {
       "file": "bad-character-key-shortcuts.html",
       "scanner": "keyboard-navigation",
       "expectViolations": true,
-      "criteria": ["2.1.4"],
-      "matched": 5,
+      "criteria": [
+        "2.1.4"
+      ],
+      "matched": 1,
       "status": "PASS"
     },
     {
       "file": "bad-keyboard-access.html",
       "scanner": "keyboard-navigation",
       "expectViolations": true,
-      "criteria": ["2.1.1", "2.1.2"],
-      "matched": 31,
+      "criteria": [
+        "2.1.1",
+        "2.1.2"
+      ],
+      "matched": 29,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-keyboard-fixed-skiplink-tab-order.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 1,
       "status": "PASS"
     },
     {
       "file": "bad-keyboard-native-override.html",
       "scanner": "keyboard-navigation",
       "expectViolations": true,
-      "criteria": ["2.1.1"],
-      "matched": 54,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 29,
       "status": "PASS"
     },
     {
       "file": "bad-keyboard-trap.html",
       "scanner": "keyboard-navigation",
       "expectViolations": true,
-      "criteria": ["2.1.2"],
+      "criteria": [
+        "2.1.2"
+      ],
       "matched": 1,
       "status": "PASS"
     },
@@ -50,15 +71,39 @@
       "file": "bad-scrollable-content.html",
       "scanner": "keyboard-navigation",
       "expectViolations": true,
-      "criteria": ["2.1.1"],
-      "matched": 6,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 5,
       "status": "PASS"
     },
     {
       "file": "good-accessibility.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
-      "criteria": ["2.1.1"],
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-accesskeys-and-widget-keys.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-bypass-landmarks-only.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -66,7 +111,29 @@
       "file": "good-character-key-shortcuts.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
-      "criteria": ["2.1.4"],
+      "criteria": [
+        "2.1.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-clickable-wrappers.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-composite-widget-tabindex.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -74,7 +141,9 @@
       "file": "good-keyboard-native-override.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
-      "criteria": ["2.1.1"],
+      "criteria": [
+        "2.1.1"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -82,7 +151,9 @@
       "file": "good-keyboard-trap.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
-      "criteria": ["2.1.2"],
+      "criteria": [
+        "2.1.2"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -90,7 +161,19 @@
       "file": "good-scrollable-content.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
-      "criteria": ["2.1.1"],
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-scrollable-wrappers.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -98,7 +181,9 @@
       "file": "bad-concurrent-input.html",
       "scanner": "concurrent-input",
       "expectViolations": true,
-      "criteria": ["2.5.6"],
+      "criteria": [
+        "2.5.6"
+      ],
       "matched": 14,
       "status": "PASS"
     },
@@ -106,7 +191,9 @@
       "file": "good-concurrent-input.html",
       "scanner": "concurrent-input",
       "expectViolations": false,
-      "criteria": ["2.5.6"],
+      "criteria": [
+        "2.5.6"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -114,7 +201,9 @@
       "file": "bad-dragging-movements.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.7"],
+      "criteria": [
+        "2.5.7"
+      ],
       "matched": 7,
       "status": "PASS"
     },
@@ -122,7 +211,12 @@
       "file": "bad-input-modalities.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.1", "2.5.2", "2.5.3", "2.5.4"],
+      "criteria": [
+        "2.5.1",
+        "2.5.2",
+        "2.5.3",
+        "2.5.4"
+      ],
       "matched": 9,
       "status": "PASS"
     },
@@ -130,7 +224,9 @@
       "file": "bad-keyboard-native-override.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.1"],
+      "criteria": [
+        "2.5.1"
+      ],
       "matched": 5,
       "status": "PASS"
     },
@@ -138,15 +234,19 @@
       "file": "bad-label-in-name.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.3"],
-      "matched": 6,
+      "criteria": [
+        "2.5.3"
+      ],
+      "matched": 11,
       "status": "PASS"
     },
     {
       "file": "bad-motion-vestibular.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.4"],
+      "criteria": [
+        "2.5.4"
+      ],
       "matched": 15,
       "status": "PASS"
     },
@@ -154,7 +254,9 @@
       "file": "bad-pointer-cancellation.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.2"],
+      "criteria": [
+        "2.5.2"
+      ],
       "matched": 5,
       "status": "PASS"
     },
@@ -162,15 +264,29 @@
       "file": "bad-target-size-minimum.html",
       "scanner": "input-modalities",
       "expectViolations": true,
-      "criteria": ["2.5.8"],
-      "matched": 37,
+      "criteria": [
+        "2.5.8"
+      ],
+      "matched": 13,
       "status": "PASS"
     },
     {
       "file": "good-dragging-movements.html",
       "scanner": "input-modalities",
       "expectViolations": false,
-      "criteria": ["2.5.7"],
+      "criteria": [
+        "2.5.7"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-icon-button-and-honeypot.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.3"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -178,7 +294,9 @@
       "file": "good-keyboard-native-override.html",
       "scanner": "input-modalities",
       "expectViolations": false,
-      "criteria": ["2.5.1"],
+      "criteria": [
+        "2.5.1"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -186,7 +304,9 @@
       "file": "good-label-in-name.html",
       "scanner": "input-modalities",
       "expectViolations": false,
-      "criteria": ["2.5.3"],
+      "criteria": [
+        "2.5.3"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -194,7 +314,9 @@
       "file": "good-motion-vestibular.html",
       "scanner": "input-modalities",
       "expectViolations": false,
-      "criteria": ["2.5.4"],
+      "criteria": [
+        "2.5.4"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -202,7 +324,9 @@
       "file": "good-pointer-cancellation.html",
       "scanner": "input-modalities",
       "expectViolations": false,
-      "criteria": ["2.5.2"],
+      "criteria": [
+        "2.5.2"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -210,7 +334,9 @@
       "file": "good-target-size-minimum.html",
       "scanner": "input-modalities",
       "expectViolations": false,
-      "criteria": ["2.5.8"],
+      "criteria": [
+        "2.5.8"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -218,15 +344,20 @@
       "file": "bad-focus-management.html",
       "scanner": "focus-management",
       "expectViolations": true,
-      "criteria": ["2.4.3", "2.4.7"],
-      "matched": 2,
+      "criteria": [
+        "2.4.3",
+        "2.4.7"
+      ],
+      "matched": 1,
       "status": "PASS"
     },
     {
       "file": "bad-focus-not-obscured.html",
       "scanner": "focus-management",
       "expectViolations": true,
-      "criteria": ["2.4.11"],
+      "criteria": [
+        "2.4.11"
+      ],
       "matched": 2,
       "status": "PASS"
     },
@@ -234,7 +365,9 @@
       "file": "bad-focus-order.html",
       "scanner": "focus-management",
       "expectViolations": true,
-      "criteria": ["2.4.3"],
+      "criteria": [
+        "2.4.3"
+      ],
       "matched": 1,
       "status": "PASS"
     },
@@ -242,15 +375,40 @@
       "file": "bad-focus-visible.html",
       "scanner": "focus-management",
       "expectViolations": true,
-      "criteria": ["2.4.7"],
-      "matched": 1,
+      "criteria": [
+        "2.4.7"
+      ],
+      "matched": 20,
+      "status": "PASS"
+    },
+    {
+      "file": "good-dialog-already-open.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.3"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-dismiss-and-load-more.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.3"
+      ],
+      "matched": 0,
       "status": "PASS"
     },
     {
       "file": "good-focus-management.html",
       "scanner": "focus-management",
       "expectViolations": false,
-      "criteria": ["2.4.3", "2.4.7"],
+      "criteria": [
+        "2.4.3",
+        "2.4.7"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -258,7 +416,59 @@
       "file": "good-focus-not-obscured.html",
       "scanner": "focus-management",
       "expectViolations": false,
-      "criteria": ["2.4.11"],
+      "criteria": [
+        "2.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-focus-within-indicator.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.7"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-rtl-tab-order.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.3"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-skip-link-lookalikes.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.7"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-transparent-fixed-overlay.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-two-column-tab-order.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.3"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -266,15 +476,39 @@
       "file": "bad-hover-focus-content.html",
       "scanner": "hover-focus-content",
       "expectViolations": true,
-      "criteria": ["1.4.13"],
-      "matched": 7,
+      "criteria": [
+        "1.4.13"
+      ],
+      "matched": 5,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-title-only-name.html",
+      "scanner": "hover-focus-content",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.13"
+      ],
+      "matched": 2,
       "status": "PASS"
     },
     {
       "file": "good-hover-focus-content.html",
       "scanner": "hover-focus-content",
       "expectViolations": false,
-      "criteria": ["1.4.13"],
+      "criteria": [
+        "1.4.13"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-title-supplementing-name.html",
+      "scanner": "hover-focus-content",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.13"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -282,7 +516,9 @@
       "file": "bad-multiple-ways.html",
       "scanner": "multiple-ways",
       "expectViolations": true,
-      "criteria": ["2.4.5"],
+      "criteria": [
+        "2.4.5"
+      ],
       "matched": 1,
       "status": "PASS"
     },
@@ -290,7 +526,29 @@
       "file": "good-multiple-ways.html",
       "scanner": "multiple-ways",
       "expectViolations": false,
-      "criteria": ["2.4.5"],
+      "criteria": [
+        "2.4.5"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-nontext-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 22,
+      "status": "PASS"
+    },
+    {
+      "file": "good-nontext-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -298,7 +556,9 @@
       "file": "bad-reflow.html",
       "scanner": "responsive-design",
       "expectViolations": true,
-      "criteria": ["1.4.10"],
+      "criteria": [
+        "1.4.10"
+      ],
       "matched": 4,
       "status": "PASS"
     },
@@ -306,23 +566,40 @@
       "file": "bad-text-resize.html",
       "scanner": "responsive-design",
       "expectViolations": true,
-      "criteria": ["1.4.4"],
-      "matched": 31,
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 1,
       "status": "PASS"
     },
     {
       "file": "bad-text-spacing.html",
       "scanner": "responsive-design",
       "expectViolations": true,
-      "criteria": ["1.4.12"],
-      "matched": 13,
+      "criteria": [
+        "1.4.12"
+      ],
+      "matched": 12,
+      "status": "PASS"
+    },
+    {
+      "file": "good-decorative-blur-blob.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.10",
+        "1.4.4"
+      ],
+      "matched": 0,
       "status": "PASS"
     },
     {
       "file": "good-reflow.html",
       "scanner": "responsive-design",
       "expectViolations": false,
-      "criteria": ["1.4.10"],
+      "criteria": [
+        "1.4.10"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -330,7 +607,19 @@
       "file": "good-text-resize.html",
       "scanner": "responsive-design",
       "expectViolations": false,
-      "criteria": ["1.4.4"],
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-text-spacing-grid-cards.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.12"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -338,7 +627,9 @@
       "file": "good-text-spacing.html",
       "scanner": "responsive-design",
       "expectViolations": false,
-      "criteria": ["1.4.12"],
+      "criteria": [
+        "1.4.12"
+      ],
       "matched": 0,
       "status": "PASS"
     },
@@ -346,7 +637,9 @@
       "file": "bad-seizure-risk.html",
       "scanner": "seizure-prevention",
       "expectViolations": true,
-      "criteria": ["2.3.1"],
+      "criteria": [
+        "2.3.1"
+      ],
       "matched": 10,
       "status": "PASS"
     },
@@ -354,7 +647,9 @@
       "file": "good-seizure-safe.html",
       "scanner": "seizure-prevention",
       "expectViolations": false,
-      "criteria": ["2.3.1"],
+      "criteria": [
+        "2.3.1"
+      ],
       "matched": 0,
       "status": "PASS"
     }

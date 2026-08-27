@@ -958,6 +958,20 @@ class KeyboardNavigationScanner extends BaseScanner {
         ) {
           return;
         }
+        // A second link to the same page, the pattern every teaser card uses:
+        // the image link is taken out of the tab order and the headline link
+        // beside it leads to the same place, so nothing is unreachable.
+        if (element.tagName.toLowerCase() === 'a' && element.hasAttribute('href')) {
+          const href = element.getAttribute('href');
+          const twin = [...document.querySelectorAll('a[href]')].some(
+            (other) =>
+              other !== element &&
+              other.getAttribute('href') === href &&
+              other.tabIndex >= 0 &&
+              __isRendered(other)
+          );
+          if (twin) return;
+        }
 
         issues.push({
           type: 'focusable-element',

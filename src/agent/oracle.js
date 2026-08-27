@@ -1,33 +1,7 @@
 /**
- * src/agent/oracle.js — deterministic task oracles for the SR-Agent.
- *
- * An oracle is a JSON-serialisable predicate spec that can be evaluated against a
- * Puppeteer page: `evaluate(spec, page, ctx) -> Promise<boolean>`. Oracles decide
- * whether a task ("dismiss the cookie banner", "send the contact form") has been
- * completed. They must be deterministic and must never involve an LLM.
- *
- * Pattern semantics
- * -----------------
- * Every `*pattern*` field (`pattern`, `text`, `urlPattern`, `valuePattern`,
- * `namePattern`) is a STRING that is interpreted as a JavaScript regular
- * expression with the `i` (case-insensitive) flag. Plain substrings therefore
- * work as-is ("cookie" matches "Cookie-Banner"), while callers who need anchors
- * or alternation can write them ("^/contact$", "login|sign in"). Regex special
- * characters in literal text must be escaped by the caller; `escapeRegExp()` is
- * exported as a convenience.
- *
- * Supported spec types:
- *   { type: 'urlMatches',     pattern }
- *   { type: 'elementWithText', text, selector? }      // selector defaults to 'body'
- *   { type: 'elementVisible', selector, negate? }
- *   { type: 'formValue',      selector, value }        // `value` is a pattern
- *   { type: 'requestSent',    urlPattern, method? }    // needs a request recorder in ctx
- *   { type: 'storageKey',     kind: 'cookie'|'local'|'session', key, valuePattern? }
- *   { type: 'titleMatches',   pattern }
- *   { type: 'focusInDialog',  namePattern? }
- *   { type: 'all', of: [...] }
- *   { type: 'any', of: [...] }
- *   { type: 'not', of: [spec] } | { type: 'not', spec }
+ * Deterministic task oracles for the SR agent.
+ * An oracle is a JSON-serialisable predicate spec evaluated against a Puppeteer
+ * page to decide whether a task was completed. No LLM is involved.
  */
 
 'use strict';
@@ -51,7 +25,13 @@ function escapeRegExp(str) {
   return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** Compile a pattern string into a case-insensitive RegExp. */
+/**
+ * Compile a pattern string into a case-insensitive RegExp.
+ * Every `*pattern*` field (`pattern`, `text`, `urlPattern`, `valuePattern`,
+ * `namePattern`) is a string used as a regular expression with the `i` flag, so
+ * plain substrings work as-is and anchors or alternation can be written directly.
+ * Literal regex characters must be escaped by the caller (see `escapeRegExp`).
+ */
 function toRegExp(pattern, field) {
   if (typeof pattern !== 'string' || pattern.length === 0) {
     throw new Error(`Oracle: "${field}" must be a non-empty pattern string`);
@@ -66,6 +46,17 @@ function toRegExp(pattern, field) {
 /**
  * Validate an oracle spec recursively. Throws on unknown types or missing
  * required fields. Returns the spec for convenience.
+ * Spec types:
+ *   { type: 'urlMatches',      pattern }
+ *   { type: 'elementWithText', text, selector? }      // selector defaults to 'body'
+ *   { type: 'elementVisible',  selector, negate? }
+ *   { type: 'formValue',       selector, value }        // `value` is a pattern
+ *   { type: 'requestSent',     urlPattern, method? }    // needs a request recorder in ctx
+ *   { type: 'storageKey',      kind: 'cookie'|'local'|'session', key, valuePattern? }
+ *   { type: 'titleMatches',    pattern }
+ *   { type: 'focusInDialog',   namePattern? }
+ *   { type: 'all' | 'any',     of: [...] }
+ *   { type: 'not', of: [spec] } | { type: 'not', spec }
  */
 function validateSpec(spec, path = 'oracle') {
   if (!spec || typeof spec !== 'object' || Array.isArray(spec)) {
@@ -137,15 +128,13 @@ function validateSpec(spec, path = 'oracle') {
       break;
     }
     default:
-      /* istanbul ignore next — guarded above */
+      /* istanbul ignore next */
       break;
   }
   return spec;
 }
 
-/* ------------------------------------------------------------------ */
-/* Request recorder                                                    */
-/* ------------------------------------------------------------------ */
+// Request recorder
 
 /**
  * Record every request the page issues from now on.
@@ -164,7 +153,7 @@ function createRequestRecorder(page) {
         timestamp: Date.now(),
       });
     } catch (_) {
-      /* request objects can be detached after navigation — ignore */
+      /* request objects can be detached after navigation */
     }
   };
   page.on('request', onRequest);
@@ -186,9 +175,7 @@ function ctxRequests(ctx) {
   return null;
 }
 
-/* ------------------------------------------------------------------ */
-/* Evaluation                                                          */
-/* ------------------------------------------------------------------ */
+// Evaluation
 
 async function evalUrlMatches(spec, page) {
   return toRegExp(spec.pattern, 'pattern').test(page.url());
@@ -201,8 +188,7 @@ async function evalTitleMatches(spec, page) {
 async function evalElementWithText(spec, page) {
   const selector = spec.selector || 'body';
   const texts = await page.evaluate((sel) => {
-    // Inlined visibility check (kept inline so no eval/new Function is needed —
-    // pages with a strict CSP would otherwise break).
+    // Visibility check is inlined so no eval/new Function is needed (strict CSP pages).
     const isVisible = (el) => {
       if (!el) return false;
       const style = window.getComputedStyle(el);
@@ -276,7 +262,7 @@ async function evalRequestSent(spec, page, ctx) {
   const requests = ctxRequests(ctx);
   if (!requests) {
     throw new Error(
-      'Oracle: predicate "requestSent" requires a request recorder — pass ctx.recorder (createRequestRecorder(page)) or ctx.requests'
+      'Oracle: predicate "requestSent" requires a request recorder: pass ctx.recorder (createRequestRecorder(page)) or ctx.requests'
     );
   }
   const re = toRegExp(spec.urlPattern, 'urlPattern');
@@ -358,9 +344,9 @@ async function evalFocusInDialog(spec, page) {
 
 /**
  * Evaluate an oracle spec against a page.
- * @param {object} spec  oracle spec (see module docs)
+ * @param {object} spec - oracle spec (see `validateSpec`)
  * @param {import('puppeteer').Page} page
- * @param {object} [ctx] `{ recorder }` or `{ requests }` for `requestSent`
+ * @param {object} [ctx] - `{ recorder }` or `{ requests }` for `requestSent`
  * @returns {Promise<boolean>}
  */
 async function evaluate(spec, page, ctx = {}) {

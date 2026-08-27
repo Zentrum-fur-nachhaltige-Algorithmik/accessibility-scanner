@@ -2,7 +2,7 @@
   "id": "site-search",
   "template": "site-search",
   "url": "/site/generic-home.html",
-  "description": "Suche mit der Suche dieser Website nach \"kontakt\".",
+  "description": "Use the site search to search for \"kontakt\".",
   "weight": 1,
   "preconditions": [
     {

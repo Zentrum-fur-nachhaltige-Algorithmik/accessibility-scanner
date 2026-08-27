@@ -1,36 +1,8 @@
 /**
- * src/agent/task-generator.js — Stage 3: the SIGHTED task generator.
- *
- * Given nothing but a URL it produces a `tasks.json` that
- * `node src/agent/run.js <url> --tasks tasks.json` consumes unchanged.
- *
- * Why a generator at all: `generic-tasks.js` instantiates fixed DOM heuristics.
- * They are site-agnostic by design and therefore sometimes nonsensical — a
- * "log in" task on gov.uk, where nobody logs in. A measurement is only worth
- * something if the tasks are the things people actually come to the site to do.
- *
- * The pipeline, per site:
- *
- *   1. EXPLORE   load the page with full sighted access, dismiss a cookie banner
- *                (which becomes a `preconditions` step applied everywhere else),
- *                follow up to N main-navigation links and observe those too.
- *   2. PROPOSE   ONE llm call → site type + 5–10 candidate tasks in plain user
- *                language. Merged with the applicable generic templates.
- *   3. SOLVE     the sighted agent really solves each candidate on a fresh,
- *                isolated page. Its trajectory becomes the `sightedPath`.
- *   4. ORACLE    a deterministic fallback oracle is derived from the observed
- *                before/after state; the llm additionally proposes one from the
- *                oracle catalog.
- *   5. VALIDATE  `replay.validateTask` — oracle false at state 0, true after the
- *                replay, twice, on fresh contexts. A task that does not survive
- *                this is DROPPED with a reason. A wrong task must never become a
- *                false accessibility finding.
- *
- * Ambiguity signal: `ratio = sightedAgentSteps / pathLength`. A sighted agent
- * with the whole page in front of it that needed 4 actions for a 1-click path was
- * itself confused — the task is ambiguous, not (only) inaccessible. Such tasks
- * get `ambiguous: true` and their weight lowered by one (min 1), so the
- * screen-reader score is not dominated by them.
+ * The sighted task generator: from a URL to a `tasks.json` that `run.js` consumes.
+ * Pipeline per site: explore (sighted page views), propose (one LLM call plus
+ * generic templates), solve (sighted agent), derive an oracle, validate by replay.
+ * Tasks that fail validation are dropped with a reason.
  */
 
 'use strict';
@@ -155,9 +127,7 @@ const PROPOSE_ORACLE_TOOL = {
   },
 };
 
-/* ------------------------------------------------------------------ */
-/* Prompts                                                             */
-/* ------------------------------------------------------------------ */
+// Prompts
 
 const PROPOSE_SYSTEM = [
   'You design usability tasks for an accessibility measurement.',
@@ -170,7 +140,7 @@ const PROPOSE_SYSTEM = [
   '- It must have an observable end state (a different page, a result list, a visible confirmation).',
   '- Write the description the way a person would state their goal, e.g. "Find out how much a new',
   '  passport costs." NEVER name buttons, links, menus, headings or any element, and never',
-  '  describe the clicks — the description is read by someone who cannot see the page.',
+  '  describe the clicks: the description is read by someone who cannot see the page.',
   '- Do not propose tasks that require logging in, paying, or sending personal data.',
   '- Prefer breadth: cover different parts of the site rather than five variations of one thing.',
 ].join('\n');
@@ -185,9 +155,7 @@ const ORACLE_SYSTEM = [
   'slashes are fine unescaped. Keep patterns specific enough to be wrong on the start page.',
 ].join('\n');
 
-/* ------------------------------------------------------------------ */
-/* Main entry point                                                    */
-/* ------------------------------------------------------------------ */
+// Main entry point
 
 /**
  * Generate, solve and validate tasks for one site.
@@ -195,9 +163,9 @@ const ORACLE_SYSTEM = [
  * @param {object} args
  * @param {import('puppeteer').Browser} args.browser
  * @param {string} args.url
- * @param {object} args.llm    client with `chat()` (see llm-chat.js)
+ * @param {object} args.llm - client with `chat()` (see llm-chat.js)
  * @param {string} [args.model]
- * @param {object} [args.options]  see DEFAULTS
+ * @param {object} [args.options] - see DEFAULTS
  * @param {{info?: Function, warn?: Function}} [args.logger]
  * @returns {Promise<{url, siteType, tasks, dropped, usage, preconditions, explored}>}
  */
@@ -207,7 +175,7 @@ async function generateTasks({ browser, url, llm, model, options = {}, logger = 
   const usage = { promptTokens: 0, completionTokens: 0, calls: 0, cost: 0, costKnown: true };
   const dropped = [];
 
-  /* 1. EXPLORE ------------------------------------------------------- */
+  // 1. Explore
   log(`[generate] exploring ${url}`);
   const exploration = await explore({ browser, url, opts });
   const { preconditions, views, genericTasks } = exploration;
@@ -216,7 +184,7 @@ async function generateTasks({ browser, url, llm, model, options = {}, logger = 
       `${preconditions.length ? 'cookie banner dismissed as precondition' : 'no cookie banner'}`
   );
 
-  /* 2. PROPOSE ------------------------------------------------------- */
+  // 2. Propose
   const proposal = await proposeTasks({ llm, model, url, views, usage });
   if (proposal.error) {
     log(`[generate] proposal failed: ${proposal.error}`);
@@ -231,7 +199,7 @@ async function generateTasks({ browser, url, llm, model, options = {}, logger = 
   });
   log(`[generate] ${candidates.length} candidate task(s) after merging with generic templates`);
 
-  /* 3.–5. SOLVE / ORACLE / VALIDATE ---------------------------------- */
+  // 3. to 5. Solve, derive an oracle, validate
   const tasks = [];
   for (const cand of candidates) {
     const built = await buildTask({
@@ -265,9 +233,7 @@ async function generateTasks({ browser, url, llm, model, options = {}, logger = 
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* 1. Explore                                                          */
-/* ------------------------------------------------------------------ */
+// 1. Explore
 
 async function explore({ browser, url, opts }) {
   const context = await createIsolatedContext(browser);
@@ -280,7 +246,7 @@ async function explore({ browser, url, opts }) {
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: opts.gotoTimeout });
     } catch (err) {
-      throw new Error(`cannot load ${url} — ${err.message}`);
+      throw new Error(`cannot load ${url}: ${err.message}`);
     }
 
     // A cookie banner has to go before anything else is observed: it covers the
@@ -288,8 +254,8 @@ async function explore({ browser, url, opts }) {
     const pre = await collectCandidates(page, WORDS).catch(() => ({}));
     if (pre && pre.cookie && pre.cookie.button) {
       preconditions = [{ action: 'click', selector: pre.cookie.button }];
-      // The cookie banner is itself a legitimate (and very common) task, so it is
-      // instantiated BEFORE we dismiss it — afterwards its oracle is already true.
+      // The cookie banner is itself a common task, so it is instantiated before
+      // the dismissal; afterwards its oracle is already true.
       if (opts.generic) {
         genericTasks = genericTasks.concat(
           await instantiateGenericTasks(page, { only: ['cookie-banner-dismiss'] }).catch(() => [])
@@ -311,7 +277,7 @@ async function explore({ browser, url, opts }) {
         await page.goto(link, { waitUntil: 'domcontentloaded', timeout: opts.gotoTimeout });
         views.push(await extractPageView(page, { screenshot: false }));
       } catch (_) {
-        /* a dead nav link is the site's problem, not ours — just skip it */
+        /* a dead nav link is skipped */
       }
     }
   } finally {
@@ -364,9 +330,7 @@ function normalisePath(href) {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* 2. Propose                                                          */
-/* ------------------------------------------------------------------ */
+// 2. Propose
 
 async function proposeTasks({ llm, model, url, views, usage }) {
   const pages = views
@@ -432,22 +396,16 @@ function kebab(s) {
 }
 
 /**
- * Merge llm proposals with the generic templates.
+ * Merge LLM proposals with the generic templates.
  *
  * Generic tasks already carry a verified oracle and sightedPath, so they are
- * cheap and reliable — they are kept. An llm proposal that means the same thing
- * (cookie / search / contact / login) is dropped as a duplicate: the generic
- * version is the one that will survive validation.
+ * kept and an LLM proposal with the same intent (cookie / search / contact /
+ * login) is dropped as a duplicate.
  *
- * The generic `login` template is the exception. It fires on any "Sign in" link,
- * and most sites have one without logging in being a thing users come for —
- * gov.uk is the canonical example: "HMRC account: sign in" is a link on the
- * homepage, but nobody's errand on gov.uk is "reach the login page". A task
- * nobody performs still counts in `siteScore`, so it is dropped unless the LLM,
- * which looked at the actual site, proposed a login-like task ITSELF
- * (`generic-login-not-corroborated`). When it did, the generic version is kept
- * and the proposal is deduplicated into it as usual — the generic one carries a
- * verified oracle and path, so it is the cheaper of the two.
+ * Exception: the generic `login` template fires on any "Sign in" link, but on
+ * many sites nobody's errand is "reach the login page", and a task nobody
+ * performs still counts in `siteScore`. It is therefore dropped unless the LLM
+ * proposed a login-like task itself (`generic-login-not-corroborated`).
  */
 function mergeCandidates({ proposed, genericTasks, maxTasks, dropped }) {
   const proposedIntents = new Set(proposed.map((p) => intentOf(p.description)).filter(Boolean));
@@ -465,7 +423,7 @@ function mergeCandidates({ proposed, genericTasks, maxTasks, dropped }) {
     dropped.push({
       id: g.id,
       description: g.description,
-      reason: 'generic-login-not-corroborated — the site proposal contains no login-like task',
+      reason: 'generic-login-not-corroborated: the site proposal contains no login-like task',
     });
     return false;
   });
@@ -478,7 +436,7 @@ function mergeCandidates({ proposed, genericTasks, maxTasks, dropped }) {
       dropped.push({
         id: p.id,
         description: p.description,
-        reason: `duplicate-intent (${intent}) — covered by a generic template`,
+        reason: `duplicate-intent (${intent}): covered by a generic template`,
       });
       continue;
     }
@@ -502,15 +460,13 @@ function intentOf(text) {
   return null;
 }
 
-/* ------------------------------------------------------------------ */
-/* 3.–5. Solve, derive an oracle, validate                             */
-/* ------------------------------------------------------------------ */
+// 3. to 5. Solve, derive an oracle, validate
 
 async function buildTask({ browser, url, llm, model, cand, preconditions, opts, usage, log }) {
-  // A generic template is already a complete task — it only needs validating.
+  // A generic template is already a complete task; it only needs validating.
   if (cand.prebuilt) {
     const task = { ...cand.prebuilt, preconditions: preconditions.slice() };
-    // The cookie task must NOT have the cookie dismissal as its own precondition.
+    // The cookie task must not have the cookie dismissal as its own precondition.
     if (cand.template === 'cookie-banner-dismiss') task.preconditions = [];
     const v = await validateTask(browser, url, task, { repeats: opts.repeats });
     if (!v.valid)
@@ -526,7 +482,7 @@ async function buildTask({ browser, url, llm, model, cand, preconditions, opts, 
     };
   }
 
-  /* --- solve it with the sighted agent ----------------------------- */
+  // Solve it with the sighted agent
   const solved = await solveCandidate({
     browser,
     url,
@@ -558,7 +514,7 @@ async function buildTask({ browser, url, llm, model, cand, preconditions, opts, 
     };
   }
 
-  /* --- oracle candidates: deterministic fallback + llm proposal ----- */
+  // Oracle candidates: deterministic fallback + LLM proposal
   const fallback = deterministicOracle(solved);
   const llmOracle = await proposeOracle({ llm, model, cand, solved, usage });
 
@@ -573,7 +529,7 @@ async function buildTask({ browser, url, llm, model, cand, preconditions, opts, 
     return { task: null, reason: 'no oracle could be derived (nothing observable changed)' };
   }
 
-  /* --- validate ----------------------------------------------------- */
+  // Validate
   const reasons = [];
   let retries = 0;
   for (const candidateOracle of oracleCandidates) {
@@ -614,7 +570,7 @@ async function buildTask({ browser, url, llm, model, cand, preconditions, opts, 
     reasons.push(`${candidateOracle.origin}: ${firstReason(v)}`);
     retries += 1;
   }
-  return { task: null, reason: `no oracle validated — ${reasons.join(' | ')}` };
+  return { task: null, reason: `no oracle validated: ${reasons.join(' | ')}` };
 }
 
 /** Run the sighted agent once on a fresh isolated page and record everything. */
@@ -626,7 +582,7 @@ async function solveCandidate({ browser, url, cand, preconditions, llm, model, o
     await page.setViewport({ width: 1280, height: 900 });
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: opts.gotoTimeout });
     const pre = await runPreconditions(page, { preconditions });
-    if (!pre.ok) return { error: `precondition failed — ${pre.error}` };
+    if (!pre.ok) return { error: `precondition failed: ${pre.error}` };
 
     const before = await captureState(page);
     recorder = createRequestRecorder(page);
@@ -672,9 +628,9 @@ async function solveCandidate({ browser, url, cand, preconditions, llm, model, o
 }
 
 /**
- * "Plausible end state": something observable must have changed, otherwise a
- * `done` is just the model being optimistic. Cheap and deliberately generous —
- * `validateTask` is the real gate.
+ * Plausible end state: something observable must have changed, otherwise a
+ * `done` is just the model being optimistic. Generous on purpose; `validateTask`
+ * is the real gate.
  */
 function isPlausible(before, after, run) {
   if (run.stoppedBy !== 'done') return false;
@@ -740,8 +696,8 @@ const diffStrings = (before, after) => (after || []).filter((x) => !(before || [
 
 /**
  * Derive an oracle from what actually changed, without an LLM:
- * URL changed → `urlMatches` on the new path; else a newly appeared status text
- * or heading → `elementWithText`; else a changed title → `titleMatches`.
+ * a changed URL gives `urlMatches` on the new path; else a newly appeared status
+ * text or heading gives `elementWithText`; else a changed title gives `titleMatches`.
  */
 function deterministicOracle(solved) {
   const { before, after } = solved;
@@ -831,9 +787,9 @@ function stripUndefined(o) {
 
 /**
  * Attach the generator provenance and apply the ambiguity weighting: a task the
- * SIGHTED agent needed more than `ambiguityRatio` × the path length to solve was
- * ambiguous for a user who could see everything, so it must not dominate the
- * screen-reader score.
+ * sighted agent needed more than `ambiguityRatio` times the path length to solve
+ * was ambiguous for a user who could see everything (`ambiguous: true`, weight
+ * lowered by one, min 1), so it must not dominate the screen-reader score.
  */
 function withGeneratorMeta(task, generator) {
   const out = { ...task, generator };

@@ -1,28 +1,8 @@
 /**
- * src/agent/sighted-agent.js — the SIGHTED reference agent.
- *
- * The mirror image of `sr-agent.js`. This agent gets the full sighted view of
- * the page (`page-view.js`) and solves a goal with mouse-and-keyboard actions.
- * It exists for exactly one reason: to SOLVE a candidate task so that the task
- * generator can turn the solution into a deterministic `sightedPath` and check
- * that the task is doable at all before the screen-reader agent is asked to do
- * it. Anything a sighted agent with the whole page in front of it cannot do is
- * not a fair measurement of screen-reader accessibility.
- *
- * Every action is executed through `replay.executeStep`, the same function that
- * later replays the recorded path — so a recorded trajectory replays identically
- * by construction.
- *
- * Safety: on non-localhost origins the agent must not actually submit POST forms
- * (it would send real messages, orders or registrations to a stranger's site).
- * `allowSubmit: false` (the default) blocks those actions and reports them back
- * to the model as a refusal; the generator drops such tasks with the reason
- * `needs-submit`. GET forms (site search) stay allowed — they are safe reads.
- *
- * Observation mode: DOM-first. The text page view is always what the agent works
- * from. With `vision: true` (CLI `--vision`) the CURRENT turn's observation also
- * carries a viewport screenshot as an image content part — older turns stay
- * text-only so the history does not fill up with images.
+ * The sighted reference agent, mirror image of `sr-agent.js`.
+ * Solves a candidate task from the full page view (`page-view.js`) so the task
+ * generator can turn the solution into a deterministic `sightedPath`.
+ * Actions run through `replay.executeStep`, so a recorded trajectory replays identically.
  */
 
 'use strict';
@@ -93,7 +73,7 @@ const SYSTEM_PROMPT = [
   'You are an experienced sighted user operating a website with mouse and keyboard.',
   'Each turn you see the current page: its URL, title, landmarks, headings, a numbered list of',
   'interactive elements and a shortened version of the visible text. Sometimes a screenshot of the',
-  'viewport is attached as well — it is extra context only; the numbered list stays authoritative.',
+  'viewport is attached as well: it is extra context only; the numbered list stays authoritative.',
   '',
   'Rules:',
   '- Call exactly one tool per turn. Never zero, never two, never prose only.',
@@ -107,17 +87,22 @@ const SYSTEM_PROMPT = [
 /**
  * Solve one goal on a live page.
  *
+ * With `allowSubmit: false` (default) POST submits on non-localhost origins are
+ * refused and reported back to the model; GET forms (site search) stay allowed.
+ * With `vision: true` only the current turn carries a viewport screenshot; older
+ * turns stay text-only.
+ *
  * @param {object} args
- * @param {import('puppeteer').Page} args.page  already navigated, preconditions applied
- * @param {object} args.llm    client with `chat(messages, options)` (see llm-chat.js)
+ * @param {import('puppeteer').Page} args.page - already navigated, preconditions applied
+ * @param {object} args.llm - client with `chat(messages, options)` (see llm-chat.js)
  * @param {string} [args.model]
- * @param {string} args.goal   plain-language goal, optionally plus an expected outcome
+ * @param {string} args.goal - plain-language goal, optionally plus an expected outcome
  * @param {number} [args.maxSteps=15]
- * @param {boolean} [args.allowSubmit=false]  allow POST submits on non-localhost origins
- * @param {boolean} [args.vision=false]  additionally send a viewport screenshot each turn
+ * @param {boolean} [args.allowSubmit=false] - allow POST submits on non-localhost origins
+ * @param {boolean} [args.vision=false] - additionally send a viewport screenshot each turn
  * @param {number} [args.memoryTurns=6]
- * @param {object} [args.viewOptions]  passed to `extractPageView`
- * @param {(entry: object) => any} [args.onStep]  may return `{ stop: true, reason }`
+ * @param {object} [args.viewOptions] - passed to `extractPageView`
+ * @param {(entry: object) => any} [args.onStep] - may return `{ stop: true, reason }`
  * @returns {Promise<{trajectory: object[], steps: number, stoppedBy: string, summary: string|null,
  *                    usage: object, blockedSubmits: number, finalView: object|null, error?: string}>}
  */
@@ -190,8 +175,8 @@ async function runSightedAgent({
     if (invalid) {
       // A confused turn costs a step, exactly as in sr-agent.
       steps += 1;
-      // The goal stays pinned even on a wasted turn — dropping it here would
-      // leave the model with an error message and no idea what it was doing.
+      // The goal stays pinned even on a wasted turn, otherwise the model is
+      // left with an error message and no idea what it was doing.
       pending = observationText({
         goal,
         view,
@@ -297,15 +282,13 @@ async function runSightedAgent({
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Trajectory → sightedPath                                            */
-/* ------------------------------------------------------------------ */
+// Trajectory to sightedPath
 
 /**
  * Convert a recorded trajectory into a replayable `sightedPath`.
  *
  * `back` cannot be replayed as such (there is no history on a fresh page), so it
- * becomes a `goto` to the page it landed on. Steps that failed are dropped —
+ * becomes a `goto` to the page it landed on. Steps that failed are dropped:
  * they did not change the page and would only make the replay brittle.
  * Consecutive navigations to the same URL are collapsed.
  *
@@ -340,13 +323,11 @@ function toSightedPath(trajectory) {
   return path;
 }
 
-/* ------------------------------------------------------------------ */
-/* internals                                                           */
-/* ------------------------------------------------------------------ */
+// Internals
 
 /**
  * Wait until the document is parsed. `executeStep` already awaits the navigation
- * event, but at that moment the new document can still be `loading` — extracting
+ * event, but at that moment the new document can still be `loading`; extracting
  * the view right then yields an empty title and half the elements.
  */
 async function settle(page) {
@@ -373,7 +354,7 @@ function toStep(name, args, target) {
   }
 }
 
-/** `true` for localhost/127.0.0.1/[::1] — our own fixtures, safe to submit to. */
+/** `true` for localhost/127.0.0.1/[::1]: local fixtures, safe to submit to. */
 function isLocalOrigin(url) {
   try {
     const host = new URL(url).hostname;
@@ -470,7 +451,7 @@ function buildMessages({ goal, history, memoryTurns, pending, view }) {
       content: `action: ${history[history.length - 1].command}`,
     });
   }
-  // Only the current turn may carry the screenshot — history stays text-only.
+  // Only the current turn may carry the screenshot; history stays text-only.
   messages.push({ role: 'user', content: toMessageContent(view, pending) });
   return messages;
 }

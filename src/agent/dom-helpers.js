@@ -1,20 +1,8 @@
 /**
- * src/agent/dom-helpers.js — the ONE in-page DOM helper set.
- *
- * Selector generation, visibility, text and accessible-name extraction are
- * needed by several modules (`generic-tasks.js`, `page-view.js`, …). They must
- * agree exactly: a selector produced while observing the page is later replayed
- * by `replay.executeStep`, so two slightly different implementations would
- * silently produce unreplayable tasks.
- *
- * The helpers are therefore defined ONCE, as source, and installed into the page
- * as `window.__A11YH`. Installation goes through `page.evaluate(<string>)`, i.e.
- * CDP `Runtime.evaluate`, which is exempt from the page's Content-Security-Policy
- * — unlike `page.addScriptTag()` or an in-page `new Function(...)`, both of which
- * break on sites with a strict CSP (gov.uk, most public-sector sites).
- *
- * `ensureHelpers(page)` is idempotent and cheap; call it before any
- * `page.evaluate` that uses `window.__A11YH`.
+ * dom-helpers: the single in-page DOM helper set (`window.__A11YH`).
+ * Selector, visibility, text and accessible-name helpers shared by every module that
+ * observes or replays a page, so recorded selectors replay verbatim. Installed via
+ * `page.evaluate(<string>)`, which is exempt from the page's Content-Security-Policy.
  */
 
 'use strict';
@@ -42,10 +30,9 @@ const HELPERS_SRC = `(function () {
   }
 
   /**
-   * True for ids that are generated per render and therefore useless as a
-   * selector on a later page load — "search-main-0a5acb20" (gov.uk), ":r3:"
-   * (React), "ember1234", "radix-:r1:". A recorded path built on one of those
-   * fails on the very next visit, so we fall through to the structural path.
+   * True for ids generated per render and therefore useless as a selector on a
+   * later page load: "search-main-0a5acb20", ":r3:", "ember1234", "radix-:r1:".
+   * Such ids fall through to the structural path.
    */
   function isGeneratedId(id) {
     if (!id) return true;
@@ -54,7 +41,7 @@ const HELPERS_SRC = `(function () {
     return /^(ember|react|radix|mui|headlessui|downshift|aria)[-_:]?[0-9]/i.test(id);
   }
 
-  /** Shortest reasonably stable unique selector: id → data-testid → nth-of-type path. */
+  /** Shortest reasonably stable unique selector: id, data-testid, nth-of-type path. */
   function selectorFor(node) {
     var el = node;
     if (el && el.nodeType !== 1) el = el.parentElement;
@@ -98,7 +85,7 @@ const HELPERS_SRC = `(function () {
     }
   }
 
-  /** Cheap accessible name: aria-label → aria-labelledby → label → text → title/alt/value. */
+  /** Cheap accessible name: aria-label, aria-labelledby, label, text, title/alt/value. */
   function accName(el) {
     if (!el || el.nodeType !== 1) return '';
     var aria = el.getAttribute('aria-label');
@@ -189,9 +176,10 @@ const HELPERS_SRC = `(function () {
 })()`;
 
 /**
- * Make sure `window.__A11YH` exists in the page's current document.
- * Also registers the bundle for every future document of that page, so it
- * survives navigations the agent triggers.
+ * Make sure `window.__A11YH` exists in the page's current document. Idempotent
+ * and cheap; call it before any `page.evaluate` that uses the helpers. Also
+ * registers the bundle for every future document of that page, so it survives
+ * navigations the agent triggers.
  *
  * @param {import('puppeteer').Page} page
  */
@@ -207,10 +195,10 @@ async function ensureHelpers(page) {
         configurable: true,
       });
     } catch (_) {
-      /* frozen page object in a test double — the evaluate below still works */
+      /* frozen page object in a test double; the evaluate below still works */
     }
   }
-  // String form → Runtime.evaluate → exempt from the page CSP.
+  // String form goes through Runtime.evaluate, which is exempt from the page CSP.
   await page.evaluate(HELPERS_SRC);
 }
 

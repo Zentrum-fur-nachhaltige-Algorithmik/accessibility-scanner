@@ -63,7 +63,7 @@ async function idOf(page, name) {
 }
 
 /**
- * LLM double that addresses elements BY NAME: it reads the id out of the
+ * LLM double that addresses elements by name: it reads the id out of the
  * rendered observation it was just given, exactly as a model would. Element
  * numbers change after every page change, so a script of fixed ids would be
  * wrong the moment the first action changes the DOM.
@@ -110,7 +110,7 @@ function idFromRendered(text, name) {
   return Number(line.match(/\[(\d+)\]/)[1]);
 }
 
-describe('agent/sighted-agent — tools', () => {
+describe('agent/sighted-agent: tools', () => {
   it('exposes exactly click, type, press, goto, back, done', () => {
     expect(SIGHTED_TOOLS.map((t) => t.function.name)).toEqual([
       'click',
@@ -128,7 +128,7 @@ describe('agent/sighted-agent — tools', () => {
   });
 });
 
-describe('agent/sighted-agent — solving on a real page', () => {
+describe('agent/sighted-agent: solving on a real page', () => {
   let page;
 
   beforeAll(async () => {
@@ -158,7 +158,7 @@ describe('agent/sighted-agent — solving on a real page', () => {
     expect(run.summary).toMatch(/postal address/);
     expect(run.steps).toBe(3);
     expect(run.trajectory).toHaveLength(2);
-    expect(run.trajectory[1]).toMatchObject({ action: 'click', titleAfter: 'Contact — Mini Site' });
+    expect(run.trajectory[1]).toMatchObject({ action: 'click', titleAfter: 'Contact - Mini Site' });
     expect(run.trajectory[1].urlBefore).toContain(HOME);
     expect(run.trajectory[1].urlAfter).toContain('generic-contact.html');
     expect(run.usage).toMatchObject({ calls: 3, promptTokens: 21, costKnown: true });
@@ -230,7 +230,7 @@ describe('agent/sighted-agent — solving on a real page', () => {
     const run = await runSightedAgent({ page, llm, goal: 'Open the product overview.' });
     expect(run.trajectory[0]).toMatchObject({
       action: 'goto',
-      titleAfter: 'Mini Site — Products',
+      titleAfter: 'Mini Site - Products',
     });
     expect(toSightedPath(run.trajectory)).toEqual([
       { action: 'goto', url: `${baseUrl}/agent/generic-products.html` },
@@ -238,7 +238,7 @@ describe('agent/sighted-agent — solving on a real page', () => {
   }, 60000);
 });
 
-describe('agent/sighted-agent — turn discipline', () => {
+describe('agent/sighted-agent: turn discipline', () => {
   let page;
 
   beforeAll(async () => {
@@ -320,7 +320,7 @@ describe('agent/sighted-agent — turn discipline', () => {
   }, 60000);
 });
 
-describe('agent/sighted-agent — the submit guard', () => {
+describe('agent/sighted-agent: the submit guard', () => {
   it('recognises local origins', () => {
     expect(isLocalOrigin('http://localhost:8765/x')).toBe(true);
     expect(isLocalOrigin('http://127.0.0.1:3000/')).toBe(true);
@@ -392,7 +392,7 @@ describe('agent/sighted-agent — the submit guard', () => {
   });
 });
 
-describe('agent/sighted-agent — toSightedPath', () => {
+describe('agent/sighted-agent: toSightedPath', () => {
   it('drops failed steps and collapses repeated navigations', () => {
     const path = toSightedPath([
       { action: 'click', selector: '#a', urlBefore: 'u', urlAfter: 'u' },

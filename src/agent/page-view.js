@@ -1,28 +1,8 @@
 /**
- * src/agent/page-view.js — the SIGHTED observation.
- *
- * The counterpart to `screenreader-env.js`: where the SR agent hears one element
- * at a time, the sighted agent sees the whole page at once — the way a sighted
- * user does. `extractPageView(page)` produces a compact, token-bounded snapshot:
- * landmarks, headings, a numbered list of interactive elements and a short
- * summary of the visible main text.
- *
- * Two rules make this safe to hand to an LLM:
- *
- *  1. **Numbers, not selectors.** Every interactive element gets a small integer
- *     id. The CSS selector that actually drives Puppeteer stays server-side in
- *     `view.elements[i].selector` and is never rendered into the prompt, so the
- *     model cannot invent one and the task descriptions it later writes cannot
- *     leak implementation details (`task.js` rejects those).
- *  2. **One selector algorithm.** Selectors come from `dom-helpers.js`, the same
- *     code `generic-tasks.js` uses, so anything observed here can be replayed by
- *     `replay.executeStep` verbatim.
- *
- * DOM-first: the default path uses no screenshot at all, so the generator works
- * from the same structural information the rest of the pipeline uses (and stays
- * cheap). `{ screenshot: true }` additionally attaches a base64 JPEG of the
- * viewport, which `sighted-agent.js` sends as an image content part in `--vision`
- * mode. The screenshot is an ADDITION to the text view, never a replacement.
+ * page-view: the sighted observation, counterpart of screenreader-env.js.
+ * `extractPageView(page)` returns a compact, token-bounded snapshot: landmarks, headings,
+ * numbered interactive elements and a main-text summary. Elements are addressed by
+ * integer id only; selectors stay server-side and come from dom-helpers.js.
  */
 
 'use strict';
@@ -60,7 +40,9 @@ const INTERACTIVE_SELECTOR = [
 ].join(',');
 
 /**
- * Extract the sighted page view.
+ * Extract the sighted page view. DOM-first: `{ screenshot: true }` additionally
+ * attaches a viewport JPEG that `sighted-agent.js` sends as an image part in
+ * `--vision` mode; it supplements the text view, never replaces it.
  *
  * @param {import('puppeteer').Page} page  already navigated
  * @param {object} [options]
@@ -89,7 +71,7 @@ async function extractPageView(page, options = {}) {
       const H = window.__A11YH;
       const clip = (s, n) => (s && s.length > n ? `${s.slice(0, n)}…` : s || '');
 
-      /* --- landmarks ------------------------------------------------- */
+      // landmarks
       const LM =
         'header,footer,nav,main,aside,form,section[aria-label],section[aria-labelledby],' +
         '[role=banner],[role=contentinfo],[role=navigation],[role=main],' +
@@ -99,7 +81,7 @@ async function extractPageView(page, options = {}) {
         .slice(0, cfg.maxLandmarks)
         .map((el) => ({ role: H.roleOf(el), label: clip(H.accName(el), cfg.maxNameChars) }));
 
-      /* --- headings --------------------------------------------------- */
+      // headings
       const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6,[role="heading"]'))
         .filter(H.isVisible)
         .slice(0, cfg.maxHeadings)
@@ -111,7 +93,7 @@ async function extractPageView(page, options = {}) {
         })
         .filter((h) => h.text);
 
-      /* --- interactive elements --------------------------------------- */
+      // interactive elements
       const seen = new Set();
       const all = Array.from(document.querySelectorAll(interactiveSelector)).filter((el) => {
         if (seen.has(el)) return false;
@@ -151,7 +133,7 @@ async function extractPageView(page, options = {}) {
         if (entry.selector) elements.push(entry);
       });
 
-      /* --- main content text ------------------------------------------- */
+      // main content text
       const mainEl =
         document.querySelector('main, [role="main"]') || document.body || document.documentElement;
       const raw = H.text(mainEl);
@@ -188,7 +170,7 @@ async function extractPageView(page, options = {}) {
 }
 
 /**
- * Render a PageView as plain text for the model. NEVER emits selectors — the
+ * Render a PageView as plain text for the model. Never emits selectors: the
  * model addresses elements by their numeric id only.
  *
  * @param {PageView} view

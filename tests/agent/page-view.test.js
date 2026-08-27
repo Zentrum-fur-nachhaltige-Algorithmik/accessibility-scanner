@@ -28,7 +28,7 @@ afterAll(async () => {
   await stopFixtureServer();
 });
 
-describe('agent/page-view — extraction', () => {
+describe('agent/page-view: extraction', () => {
   let page;
   let view;
 
@@ -43,7 +43,7 @@ describe('agent/page-view — extraction', () => {
 
   it('reports url and title', () => {
     expect(view.url).toContain(HOME);
-    expect(view.title).toBe('Mini Site — Home');
+    expect(view.title).toBe('Mini Site - Home');
   });
 
   it('lists landmarks and headings with their level', () => {
@@ -110,7 +110,7 @@ describe('agent/page-view — extraction', () => {
   });
 });
 
-describe('agent/page-view — selector stability', () => {
+describe('agent/page-view: selector stability', () => {
   let page;
 
   beforeAll(async () => {
@@ -207,7 +207,7 @@ describe('agent/page-view — selector stability', () => {
   });
 });
 
-describe('agent/page-view — rendering', () => {
+describe('agent/page-view: rendering', () => {
   const view = {
     url: 'http://example.test/x',
     title: 'Example',
@@ -300,7 +300,7 @@ describe('agent/page-view — rendering', () => {
   });
 });
 
-describe('agent/page-view — message content', () => {
+describe('agent/page-view: message content', () => {
   it('stays a plain string without a screenshot', () => {
     expect(toMessageContent({ url: 'u' }, 'hello')).toBe('hello');
   });

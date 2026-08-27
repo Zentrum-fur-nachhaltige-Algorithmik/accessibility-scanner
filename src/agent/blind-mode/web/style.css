@@ -1,7 +1,6 @@
-/*
- * Blind Mode — white on black, everything at least 7:1 (WCAG AAA for text),
- * every interactive element keyboard operable with a focus indicator that is
- * visible on the black background.
+/**
+ * Blind Mode styles: white on black, every text contrast at least 7:1 (WCAG AAA),
+ * every interactive element keyboard operable with a focus indicator visible on black.
  */
 
 :root {
@@ -179,7 +178,7 @@ ul.keys li {
   font-size: 1.2rem;
 }
 
-/* --- play screen --------------------------------------------------- */
+/* Play screen */
 
 .play-heading {
   font-size: 1rem;
@@ -232,7 +231,7 @@ ul.keys li {
   padding: 0.5rem 1rem 1rem;
 }
 
-/* --- result screen ------------------------------------------------- */
+/* Result screen */
 
 .verdict {
   font-size: 1.35rem;

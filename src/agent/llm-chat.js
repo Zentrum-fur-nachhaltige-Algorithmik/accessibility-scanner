@@ -1,11 +1,7 @@
 /**
- * AgentLLMClient — LLMClient + OpenAI-compatible tool calling over OpenRouter.
- *
- * Lives in src/agent/ (not src/llm/) so the SR-agent package stays self-contained
- * and never has to patch the shared client. `predict()` is inherited unchanged.
- *
- * Every chat request asks OpenRouter for `usage.cost` (`usage: { include: true }`),
- * so callers can attribute real money per call / task / site.
+ * AgentLLMClient: LLMClient plus OpenAI-compatible tool calling over OpenRouter.
+ * Kept in the agent package so the shared client stays untouched; `predict()` is inherited.
+ * Every chat request asks OpenRouter for `usage.cost` so callers can attribute cost per call.
  */
 
 const { LLMClient } = require('../llm/client');
@@ -16,12 +12,12 @@ class AgentLLMClient extends LLMClient {
   /**
    * @param {Array<{role: string, content: any}>} messages
    * @param {object} [options]
-   * @param {Array<object>} [options.tools]      OpenAI-shape function tools
-   * @param {string|object} [options.toolChoice] 'auto' | 'required' | 'none' | {type:'function',...}
-   * @param {number} [options.temperature]       default 0
-   * @param {number} [options.maxTokens]         default 8192 (same as predict)
-   * @param {string} [options.systemPrompt]      prepended as a system message
-   * @param {string} [options.model]             per-call model override
+   * @param {Array<object>} [options.tools] - OpenAI-shape function tools
+   * @param {string|object} [options.toolChoice] - 'auto' | 'required' | 'none' | {type:'function',...}
+   * @param {number} [options.temperature] - default 0
+   * @param {number} [options.maxTokens] - default 8192 (same as predict)
+   * @param {string} [options.systemPrompt] - prepended as a system message
+   * @param {string} [options.model] - per-call model override
    * @returns {Promise<{success: true, message: object, toolCalls: Array<{id: string, name: string, arguments: object|null, argumentsRaw: string}>, usage: object, model: string} | {success: false, error: string, type: string, terminal?: boolean}>}
    */
   async chat(messages, options = {}) {
@@ -138,7 +134,7 @@ class AgentLLMClient extends LLMClient {
   }
 }
 
-/** '' → {}, valid JSON object → object, anything else → null. */
+/** '' gives {}, a valid JSON object gives that object, anything else gives null. */
 function parseArguments(raw) {
   if (typeof raw !== 'string') return raw && typeof raw === 'object' ? raw : null;
   if (raw.trim() === '') return {};

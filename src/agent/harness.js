@@ -1,26 +1,15 @@
 /**
- * src/agent/harness.js — orchestrates the SR-agent measurement for one site.
- *
- * Per task: validate the task (a task that cannot be replayed is the task's
- * fault, not the page's, so it is excluded rather than scored 0), measure the
- * model-independent baselines `nSighted` (clicks) and `nOpt` (the shortest
- * ScreenReaderEnv command sequence, see optimal-path.js), then run the SR agent
- * `k` times on a fresh page and score
- *   R = min(1, nOpt / nSr),  R = 0 on failure.
- * `nSighted` is in clicks and `nSr` in keystroke-level commands — different
- * units, so `nSighted` only validates the task and (together with nOpt) sizes
- * the step budget; the score itself compares like with like.
- *
- * `replay`, `oracle` and `screenreader-env` are required lazily so this module
- * (and its tests) can load before/without them.
+ * Harness: orchestrates the SR-agent measurement for one site.
+ * Per task: validate (an unreplayable task is excluded, not scored 0), measure
+ * nSighted and nOpt, run the SR agent k times and score R = min(1, nOpt / nSr).
  */
 
 const { runSrAgent } = require('./sr-agent');
 
 /**
- * R = min(1, nOpt / nSr); 0 when the task was not solved. No smoothing
- * constant: both numbers count the same thing (env commands), so their ratio is
- * already meaningful. A solved task that cost no commands at all scores 1.
+ * R = min(1, nOpt / nSr); 0 when the task was not solved. Both numbers count
+ * env commands, so no smoothing constant is needed. A solved task that cost no
+ * commands scores 1.
  */
 function scoreTask(nOpt, nSr, success) {
   if (!success) return 0;
@@ -41,16 +30,16 @@ function loadEnv() {
 }
 
 /**
- * `validateTask` / `replaySightedPath` / `runPreconditions` are specced across
- * task.js and replay.js; prefer replay.js and fall back to task.js so we work
- * with either layout.
+ * Resolve `validateTask` / `replaySightedPath` / `runPreconditions` from
+ * replay.js, falling back to task.js. Sibling modules are required lazily so this
+ * file loads without them.
  */
 function resolveFn(name, required = true) {
   const mods = [];
   try {
     mods.push(loadReplay());
   } catch {
-    /* not written yet */
+    /* replay.js unavailable */
   }
   try {
     mods.push(require('./task'));
@@ -84,15 +73,14 @@ async function runSite({ browser, url, tasks, llm, k = 1, model, logger = consol
     if (logger && typeof logger.warn === 'function') logger.warn(m);
   };
 
-  // `deps` is a test seam: the sibling modules live behind lazy requires so this
-  // file loads (and is testable) even before they exist on disk.
+  // `deps` is a test seam for the lazily required sibling modules.
   const d = deps || {};
   const validateTask = d.validateTask || resolveFn('validateTask');
   const oracleMod = d.oracle || loadOracle();
   const ScreenReaderEnv = d.ScreenReaderEnv || loadEnv().ScreenReaderEnv;
   const agentFn = d.runSrAgent || runSrAgent;
   // Preconditions: replay.runPreconditions(page, task) if available, else
-  // replay the precondition list as if it were a sighted path.
+  // replay the precondition list as a sighted path.
   const runPreconditions =
     d.runPreconditions ||
     resolveFn('runPreconditions', false) ||
@@ -130,8 +118,9 @@ async function runSite({ browser, url, tasks, llm, k = 1, model, logger = consol
     }
 
     const nSighted = Number(validation.nSighted ?? (task.sightedPath || []).length) || 0;
-    // No nOpt (older validateTask, or the measurement failed) → fall back to
-    // nSighted so a task is still scored, just more coarsely.
+    // Without nOpt (measurement failed) fall back to nSighted so the task is
+    // still scored, just more coarsely. nSighted is in clicks, nSr in commands,
+    // so nSighted otherwise only validates the task and sizes the budget.
     const nOpt =
       Number.isFinite(validation.nOpt) && validation.nOpt !== null
         ? Number(validation.nOpt)
@@ -142,7 +131,7 @@ async function runSite({ browser, url, tasks, llm, k = 1, model, logger = consol
         `[harness] task "${task.id}": nOpt measurement failed (${validation.optimalPathError}), falling back to nSighted=${nSighted}`
       );
     }
-    // Budget: generous enough for both baselines, whichever is larger.
+    // Budget: the larger of both baselines.
     const maxSteps = Math.max(3 * nOpt + 10, 3 * nSighted + 10);
 
     const runs = [];
@@ -208,7 +197,7 @@ async function runOnce({
   let env;
   let context;
   try {
-    // Isolated context per run so state (cookies, storage) never leaks between runs/tasks.
+    // Isolated context per run so cookies and storage never leak between runs.
     context = await createIsolatedContext(browser);
     page = await context.newPage();
 

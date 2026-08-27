@@ -1,14 +1,7 @@
 /**
- * blind-mode/server/session.js — one game = one isolated browser context.
- *
- * The player types keys in the browser; the server turns them into
- * `ScreenReaderEnv` commands on a real Puppeteer page and sends back exactly
- * what the screen reader said. The oracle is evaluated SERVER-SIDE after every
- * counted command and never reaches the client: the player must decide from the
- * spoken output alone whether the task is done, just like the SR agent.
- *
- * Commands are serialised through a per-session promise chain, so a burst of
- * keystrokes is executed in order and none is dropped.
+ * Blind Mode session: one game in one isolated browser context.
+ * Keys become ScreenReaderEnv commands; only the spoken output goes back to the
+ * client. The oracle runs server-side after every counted command.
  */
 
 'use strict';
@@ -24,17 +17,16 @@ const { appendSession } = require('./store');
 const budgetFor = (nOpt) => 3 * nOpt + 10;
 
 /**
- * A run of this many commands without progress counts as "you got stuck here".
- * The real threshold is `max(STUCK_MIN_RUN, nOpt)`: spending more consecutive
- * fruitless commands than the WHOLE optimal route takes is what "stuck" means.
- * Without that, a near-optimal winning session would also get a stuck window.
+ * Minimum run of commands without progress that counts as "stuck". The effective
+ * threshold is `max(STUCK_MIN_RUN, nOpt)`, so a near-optimal winning session
+ * does not get a stuck window.
  */
 const STUCK_MIN_RUN = 3;
 
 /**
  * The longest window in which nothing moved forward: no navigation, no dialog
- * opening or closing, no activation. It is an approximation of "the cursor made
- * no progress towards the goal" that needs no knowledge of the goal.
+ * opening or closing, no activation. Approximates "no progress towards the goal"
+ * without knowing the goal.
  */
 function computeStuck(trace, minRun = STUCK_MIN_RUN) {
   const counted = trace.filter((e) => !e.free);
@@ -63,20 +55,20 @@ function computeStuck(trace, minRun = STUCK_MIN_RUN) {
   };
 }
 
-/** The German verdict sentence shown on the result screen. */
+/** The verdict sentence shown on the result screen. */
 function verdictFor({ success, R, nHuman, nOpt }) {
-  if (!success) return 'Ein blinder Nutzer wäre hier genauso hängen geblieben.';
-  if (R >= 0.7) return 'Fast optimal - die Seite lässt sich gut hören.';
-  return `Du hast ${nHuman} Schritte gebraucht, nötig wären ${nOpt}. Die Seite ist das Problem, nicht du.`;
+  if (!success) return 'A blind user would have got stuck here too.';
+  if (R >= 0.7) return 'Almost optimal: this page is easy to hear.';
+  return `You needed ${nHuman} steps, ${nOpt} would have been enough. The page is the problem, not you.`;
 }
 
 class Session {
   /**
    * @param {object} deps
-   * @param {(msg: object) => void} deps.send      send one JSON message to the client
+   * @param {(msg: object) => void} deps.send send one JSON message to the client
    * @param {() => Promise<import('puppeteer').Browser>} deps.getBrowser
-   * @param {object} deps.optimalCache             see optimal.js
-   * @param {string} deps.origin                   this server's own origin
+   * @param {object} deps.optimalCache see optimal.js
+   * @param {string} deps.origin this server's own origin
    */
   constructor({ send, getBrowser, optimalCache, origin }) {
     this.send = send;
@@ -114,7 +106,7 @@ class Session {
     this.url = resolveUrl(task, this.origin);
 
     // nOpt from the task file, otherwise computed (the cache also produces the
-    // spoken optimal path, which the result screen needs anyway).
+    // spoken optimal path the result screen needs).
     let nOpt = task.nOpt;
     const optimalPromise = this.optimalCache.get({ ...task, url: this.url });
     if (!Number.isInteger(nOpt) || nOpt <= 0) {
@@ -145,7 +137,7 @@ class Session {
       type: 'started',
       lang: (lang && lang.trim()) || 'en',
       budget: this.env.maxSteps,
-      task: { ...publicTask(task), nOpt: null }, // nOpt is deliberately hidden while playing
+      task: { ...publicTask(task), nOpt: null }, // nOpt stays hidden while playing
     });
     // The opening phrase ("document") so the player hears where the cursor is.
     this.send({

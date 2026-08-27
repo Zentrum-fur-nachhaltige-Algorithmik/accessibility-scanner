@@ -22,7 +22,7 @@ async function optimal(fixture, sightedPath) {
   }
 }
 
-describe('agent/optimal-path — chooseReach (pure)', () => {
+describe('agent/optimal-path: chooseReach (pure)', () => {
   it('takes the cheapest strategy and prefers the rotor on a tie', () => {
     const analysis = {
       inReadingOrder: true,
@@ -65,7 +65,7 @@ describe('agent/optimal-path — chooseReach (pure)', () => {
   });
 });
 
-describe('agent/optimal-path — computeOptimalPath', () => {
+describe('agent/optimal-path: computeOptimalPath', () => {
   beforeAll(async () => {
     await startFixtureServer();
     await launchBrowser();
@@ -77,9 +77,9 @@ describe('agent/optimal-path — computeOptimalPath', () => {
   });
 
   it('reaches the last link on the page with one prevLink step: nOpt = 2', async () => {
-    // "Contact" is the last link of generic-home.html, and the rotor STEP
-    // commands wrap, so Shift+L reaches it in a single keystroke — cheaper than
-    // the rotor list + jumpTo (2) the pre-stepping model had to use.
+    // "Contact" is the last link of generic-home.html and the rotor step
+    // commands wrap, so Shift+L reaches it in one keystroke, cheaper than the
+    // rotor list + jumpTo (2).
     const res = await optimal(HOME, [{ action: 'click', selector: CONTACT_LINK }]);
     expect(res.error).toBeUndefined();
     expect(res.nOpt).toBe(2);
@@ -134,7 +134,7 @@ describe('agent/optimal-path — computeOptimalPath', () => {
       steps: 1,
       k: 0,
     });
-    // `type` steps are never given an equivalence class — only click / Enter.
+    // `type` steps are never given an equivalence class, only click / Enter.
     expect(res.steps[0].equivalenceClassSize).toBe(1);
   }, 60000);
 
@@ -205,7 +205,7 @@ describe('agent/optimal-path — computeOptimalPath', () => {
     const res = await optimal(EQUIV, [{ action: 'click', selector: '#nav-contact' }]);
     expect(res.error).toBeUndefined();
     // #nav-contact itself costs 2 (links rotor + jumpTo); the footer link with
-    // the identical href is the LAST link, so Shift+L reaches it in one.
+    // the identical href is the last link, so Shift+L reaches it in one.
     expect(res.steps[0].reach).toMatchObject({ strategy: 'step', cost: 1 });
     expect(res.steps[0].reach.via).toMatchObject({
       command: 'prevLink',
@@ -231,7 +231,7 @@ describe('agent/optimal-path — computeOptimalPath', () => {
     expect(res.error).toBeUndefined();
     const submit = res.steps[1];
     // The cursor is still in the field the previous step typed into, and Enter
-    // there submits the same form — so the reach for the submit step is free.
+    // there submits the same form, so the reach for the submit step is free.
     expect(submit.reach).toMatchObject({ strategy: 'none', cost: 0 });
     expect(submit.reach.via).toMatchObject({
       equivalentOf: '#mq',
@@ -254,7 +254,7 @@ describe('agent/optimal-path — computeOptimalPath', () => {
 
   it('reuses the cached page analysis for the members of one equivalence class', async () => {
     const res = await optimal(EQUIV, [{ action: 'click', selector: '#nav-contact' }]);
-    // Both class members were costed from ONE reading-order walk.
+    // Both class members were costed from one reading-order walk.
     expect(res.steps[0].analysis.cacheHit).toBe(false);
     expect(res.steps[0].equivalenceClassSize).toBeGreaterThan(1);
   }, 60000);

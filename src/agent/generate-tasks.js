@@ -1,11 +1,6 @@
 #!/usr/bin/env node
 /**
- * src/agent/generate-tasks.js — CLI for the Stage 3 sighted task generator.
- *
- *   node src/agent/generate-tasks.js <url> [--out tasks.json]
- *        [--model google/gemini-3.7-flash] [--max-tasks 8] [--explore 4]
- *        [--vision] [--allow-submit] [--headless true] [--quiet]
- *
+ * generate-tasks CLI: the sighted task generator for one site.
  * Writes a `{ url, tasks }` file that `run.js --tasks` consumes unchanged.
  * Needs OPENROUTER_API_KEY.
  */

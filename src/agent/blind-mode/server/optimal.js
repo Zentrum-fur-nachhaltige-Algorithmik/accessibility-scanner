@@ -1,16 +1,7 @@
 /**
- * blind-mode/server/optimal.js — the "So wäre es gegangen" path.
- *
- * `optimal-path.js` gives the CHEAPEST screen-reader route through a task and
- * its length `nOpt`, but only as a cost breakdown ("rotor+next, k = 2"). The
- * result screen has to show the player the actual keystrokes AND what the
- * screen reader would have said at each of them, so this module
- *   1. expands the cost breakdown into a concrete ScreenReaderEnv command list
- *      whose length is exactly `nOpt`, and
- *   2. replays that list in a fresh isolated context to collect the phrases.
- *
- * Both are done once per task and cached; the replay needs a browser context and
- * takes a few seconds, so it runs in the background from server start.
+ * Blind Mode optimal path: the keystrokes and phrases of the shortest route.
+ * Expands the cost breakdown from optimal-path.js into a ScreenReaderEnv command
+ * list of length nOpt and replays it in a fresh context to collect the phrases.
  */
 
 'use strict';
@@ -31,7 +22,7 @@ function commandsFromOptimalSteps(optSteps, sightedPath) {
     const reach = entry.reach || { strategy: 'none', cost: 0 };
 
     // One shared expansion for every strategy (rotor, rotor step commands,
-    // tab, reading order) — see `optimal-path.reachCommands`.
+    // tab, reading order), see `optimal-path.reachCommands`.
     for (const cmd of reachCommands(reach) || []) commands.push(cmd);
 
     if (step.action === 'type') commands.push({ type: 'type', arg: step.text });
@@ -45,10 +36,11 @@ function commandsFromOptimalSteps(optSteps, sightedPath) {
 }
 
 /**
- * Compute `nOpt` and the spoken optimal path for one task.
+ * Compute `nOpt` and the spoken optimal path for one task. Cached per task by
+ * `createOptimalCache`; the replay takes a few seconds, so the server warms it at start.
  *
  * @param {import('puppeteer').Browser} browser
- * @param {object} task    task with an ABSOLUTE `url`
+ * @param {object} task task with an absolute `url`
  * @returns {Promise<{ nOpt: number|null, path: Array<{cmd: object, phrase: string}>, error?: string }>}
  */
 async function computeSpokenOptimalPath(browser, task) {
@@ -60,7 +52,7 @@ async function computeSpokenOptimalPath(browser, task) {
       await page.setViewport({ width: 1280, height: 900 });
       await page.goto(task.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
       const pre = await runPreconditions(page, task);
-      if (!pre.ok) return { nOpt: null, path: [], error: `precondition failed — ${pre.error}` };
+      if (!pre.ok) return { nOpt: null, path: [], error: `precondition failed: ${pre.error}` };
       computed = await computeOptimalPath(page, task, {}, {});
     } catch (err) {
       return { nOpt: null, path: [], error: err.message };
@@ -83,16 +75,14 @@ async function computeSpokenOptimalPath(browser, task) {
     await page.goto(task.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const pre = await runPreconditions(page, task);
     if (!pre.ok)
-      return { nOpt: computed.nOpt, path: [], error: `precondition failed — ${pre.error}` };
+      return { nOpt: computed.nOpt, path: [], error: `precondition failed: ${pre.error}` };
     const env = new ScreenReaderEnv(page, { maxSteps: commands.length + 5 });
     await env.start();
     for (const cmd of commands) {
       const obs = await env.step(cmd);
-      // A rotor LIST command does not move the cursor, so its phrase would just
+      // A rotor list command does not move the cursor, so its phrase would just
       // repeat the previous one. Say what actually happens instead.
-      const phrase = obs.rotor
-        ? `${obs.rotor.items.length} Einträge in der Liste`
-        : obs.phrase || '';
+      const phrase = obs.rotor ? `${obs.rotor.items.length} entries in the list` : obs.phrase || '';
       path.push({ cmd, phrase });
     }
     await env.stop().catch(() => {});

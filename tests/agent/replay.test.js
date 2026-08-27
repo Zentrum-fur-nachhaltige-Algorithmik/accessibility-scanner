@@ -20,9 +20,7 @@ const {
 const HOME = '/agent/generic-home.html';
 const BASIC = '/agent/oracle-basic.html';
 
-/* ------------------------------------------------------------------ */
-/* Task schema (no browser needed)                                     */
-/* ------------------------------------------------------------------ */
+// Task schema (no browser needed)
 
 const baseTask = () => ({
   id: 't1',
@@ -31,7 +29,7 @@ const baseTask = () => ({
   sightedPath: [{ action: 'click', selector: '#a' }],
 });
 
-describe('agent/task — schema', () => {
+describe('agent/task: schema', () => {
   it('applies defaults (weight 1, empty preconditions)', () => {
     const t = validateTaskShape(baseTask());
     expect(t.weight).toBe(1);
@@ -106,9 +104,7 @@ describe('agent/task — schema', () => {
   });
 });
 
-/* ------------------------------------------------------------------ */
-/* Replay                                                              */
-/* ------------------------------------------------------------------ */
+// Replay
 
 describe('agent/replay', () => {
   beforeAll(async () => {

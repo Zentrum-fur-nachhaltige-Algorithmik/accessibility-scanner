@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url);
 const { parseArgs, printTable, validateNopt } = require('../../src/agent/validate-nopt');
 const { DEFAULTS } = require('../../src/agent/bfs-optimum');
 
-describe('agent/validate-nopt — CLI arguments', () => {
+describe('agent/validate-nopt: CLI arguments', () => {
   it('defaults to the within-page BFS budgets', () => {
     const args = parseArgs(['https://example.com', '--tasks', 't.json']);
     expect(args).toMatchObject({
@@ -34,7 +34,7 @@ describe('agent/validate-nopt — CLI arguments', () => {
   });
 });
 
-describe('agent/validate-nopt — verdicts', () => {
+describe('agent/validate-nopt: verdicts', () => {
   const logger = () => {
     const lines = [];
     return { lines, log: (l) => lines.push(String(l)) };

@@ -1,72 +1,8 @@
 /**
- * src/agent/optimal-path.js — `n_opt`, the shortest screen-reader command
- * sequence that performs the task.
- *
- * `n_sighted` (mouse clicks) and `n_sr` (screen-reader keystrokes) are measured
- * in different units, so comparing them directly says nothing. `n_opt` is the
- * same task expressed in the SAME unit as `n_sr`: the number of ScreenReaderEnv
- * commands an optimally-playing screen-reader user would need. The score is
- * therefore `R = n_opt / n_sr` (capped at 1) — how close the agent came to the
- * best possible screen-reader route through this page.
- *
- * Everything here is deterministic — no LLM. The reading order and the rotor
- * lists come from the SAME in-page functions the env uses (exposed as
- * `window.__SRENV.internals`), so `n_opt` is expressed in a command space that
- * the agent really has.
- *
- * Cost model (one command = 1)
- * ----------------------------
- * Reach the target from the current cursor position, cheapest of
- *   - `none`                    0    the cursor is already there
- *   - `rotor` + `jumpTo`        2    (headings|landmarks|links|formFields)
- *   - `rotor` + `jumpTo` + `next` × k   2 + k   (`rotor+next`)
- *   - `step`                    s    s presses of a rotor STEP command
- *                                    (`nextHeading`/`prevHeading`/`nextLink`/…),
- *                                    counted in whichever direction is shorter,
- *                                    wrapping at the document boundary exactly
- *                                    like `ScreenReaderEnv.stepToKind`
- *   - `step+next`               s + k   step to the nearest preceding element of
- *                                    a rotor kind, then `next` × k (this is how
- *                                    buttons — in no rotor list — are reached)
- *   - `tab` / `shiftTab`        distance in tab order
- *   - `next` / `prev`           distance in VSR reading order
- * then perform the step
- *   - click → `activate` 1 · type → `type` 1 · press → `activate` 1 ·
- *     goto → navigation 1 (no reach cost; the cursor resets)
- *
- * Effect-equivalence targets
- * --------------------------
- * A screen-reader user is not obliged to touch the same ELEMENT the sighted user
- * clicked — only to produce the same EFFECT. Every `click` / `press Enter` step
- * is therefore costed against an equivalence class of elements and the cheapest
- * member wins:
- *   - links: every visible `<a href>` / `[role=link][href]` resolving to the
- *     same absolute URL (fragment included only when the target itself has one);
- *   - form submission: if the step activates a submit control of form F, the
- *     class also holds "press Enter in a text field of F that is already filled"
- *     — that costs reach(field) + 1, so a preceding `type` step makes it free
- *     apart from the Enter itself, and the other submit controls of F;
- *   - buttons: same accessible name inside the same form / dialog container
- *     (deliberately conservative — same name elsewhere on the page is NOT
- *     assumed to have the same effect).
- * The chosen member is recorded as `reach.via.equivalentOf` when it differs from
- * the sighted element, together with `equivalenceClassSize` on the step. Only the
- * SIGHTED step is ever executed — the equivalent route is priced, never clicked,
- * so this cannot submit anything the sighted path did not submit itself.
- *
- * Reading-order cache
- * -------------------
- * One `computeOptimalPath()` call analyses the same page state several times
- * (once per member of an equivalence class, and again for a step that did not
- * change the DOM). The expensive part — the VSR reading-order walk, the four
- * rotor lists and the tab order — is therefore cached IN THE PAGE under
- * `window.__OPT_ANALYSIS_CACHE`, keyed by (run id, url, DOM fingerprint), and
- * dropped as soon as the DOM changes. It is an internal optimisation: the
- * numbers with and without it are identical.
- *
- * The cursor starts at document start and is reset to document start by any
- * navigation — exactly what ScreenReaderEnv does when it re-injects after
- * `framenavigated`.
+ * optimal-path: `n_opt`, the shortest screen-reader command sequence for a task.
+ * Costs each sighted-path step in ScreenReaderEnv commands (reach the target, then act),
+ * using the env's own in-page reading order and rotor lists. Deterministic, no LLM.
+ * Score: `R = n_opt / n_sr`, capped at 1.
  */
 
 'use strict';
@@ -84,10 +20,9 @@ const STEP_COMMAND_BY_KIND = Object.entries(ROTOR_STEP_COMMANDS).reduce((acc, [c
 
 /**
  * Reach strategies, in tie-break preference order (cheapest wins first; equal
- * cost is broken by this order). A rotor STEP command beats the equally
- * expensive rotor LIST + `jumpTo`: both are two keystrokes, but stepping is what
- * screen-reader users actually reach for, and it does not require having read a
- * list first.
+ * cost is broken by this order). A rotor step command beats the equally
+ * expensive rotor list + `jumpTo`: both are two keystrokes, but stepping is what
+ * screen-reader users reach for, and it does not require reading a list first.
  */
 const STRATEGY_ORDER = [
   'none',
@@ -104,9 +39,19 @@ const STRATEGY_ORDER = [
 /** Action cost of one sighted-path step, once the target has been reached. */
 const ACTION_COST = { click: 1, type: 1, press: 1, goto: 1 };
 
-/* ------------------------------------------------------------------ *
+/**
  * In-page analysis. Runs in the browser; uses window.__SRENV.internals.
- * ------------------------------------------------------------------ */
+ *
+ * Costs the target of one sighted step against an effect-equivalence class and
+ * returns every member as a candidate: links resolving to the same URL, the
+ * other submit controls of the same form plus Enter in an already filled text
+ * field of it, and buttons with the same accessible name in the same form or
+ * dialog container. Only the sighted step is ever executed; equivalents are
+ * priced, never clicked.
+ *
+ * The reading-order walk, rotor lists and tab order are cached in the page
+ * under `window.__OPT_ANALYSIS_CACHE`, keyed by (run id, url, DOM fingerprint).
+ */
 /* istanbul ignore next -- runs in the browser */
 async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
   const I = window.__SRENV.internals;
@@ -121,7 +66,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
 
   const mod = (a, n) => ((a % n) + n) % n;
 
-  /* --- page fingerprint (cheap; no reading-order walk) -------------- */
+  // page fingerprint (cheap; no reading-order walk)
   const fingerprint = () => {
     const values = Array.prototype.map
       .call(document.querySelectorAll('input, select, textarea'), (el) => {
@@ -182,7 +127,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       rotors[kind] = { items: rotor.items, nodes: I.getLastRotorNodes().slice() };
     }
 
-    /* --- tab order ------------------------------------------------- */
+    // tab order
     const FOCUSABLE =
       'a[href], area[href], button, input, select, textarea, summary, iframe, object,' +
       ' embed, audio[controls], video[controls], [contenteditable], [tabindex]';
@@ -197,7 +142,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       return true;
     });
     // Positive tabindex first (ascending, document order within a value), then
-    // everything else in document order — the browser's tab sequence.
+    // everything else in document order: the browser's tab sequence.
     const positive = focusables
       .filter((el) => Number(el.getAttribute('tabindex')) > 0)
       .sort((a, b) => Number(a.getAttribute('tabindex')) - Number(b.getAttribute('tabindex')));
@@ -211,17 +156,17 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
 
   const cursorEl = cursorSelector ? document.querySelector(cursorSelector) : null;
   const cursorIdxs = (cursorEl && idxOf.get(cursorEl)) || [];
-  // Cursor at document start (or on an element that left the reading order,
-  // e.g. a dismissed banner) → document start.
+  // Cursor at document start, or on an element that left the reading order
+  // (e.g. a dismissed banner), maps to document start.
   const cIdx = cursorIdxs.length ? cursorIdxs[0] : docStart;
 
-  /* --- where the cursor sits in the tab sequence -------------------- */
+  // where the cursor sits in the tab sequence
   let cursorPos;
   const cursorTabIdx = cursorEl ? tabOrder.indexOf(cursorEl) : -1;
   if (cursorTabIdx !== -1) {
     cursorPos = cursorTabIdx;
   } else {
-    // Not itself a tab stop: it sits BETWEEN two stops — modelled as
+    // Not itself a tab stop: it sits between two stops, modelled as
     // `index - 0.5`, so one Tab reaches the following stop and one Shift+Tab
     // the preceding one.
     let following = tabOrder.length;
@@ -238,7 +183,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     cursorPos = following - 0.5;
   }
 
-  /* --- rotor STEP commands: cost of reaching each rotor entry -------- */
+  // rotor step commands: cost of reaching each rotor entry
   // `nextHeading` & co. wrap at the document boundary (see
   // ScreenReaderEnv.stepToKind), so the cheaper of the two directions counts.
   const stepCostByKind = {};
@@ -269,7 +214,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     stepCostByKind[kind] = { positions, costs };
   }
 
-  /* --- cost analysis of ONE element --------------------------------- */
+  // cost analysis of one element
   const analyzeElement = (el) => {
     const list = idxOf.get(el) || [];
 
@@ -282,7 +227,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       if (prev === null || b < prev) prev = b;
     }
 
-    /* rotor (+ next × k) */
+    // rotor (+ next x k)
     let rotor = null;
     for (const kind of kinds) {
       const nodes = rotors[kind].nodes;
@@ -312,7 +257,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       }
     }
 
-    /* rotor step command (+ next × k) */
+    // rotor step command (+ next x k)
     let step = null;
     for (const kind of kinds) {
       const { positions, costs } = stepCostByKind[kind];
@@ -328,7 +273,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
         const c = costs.get(p.el);
         if (!c) continue;
         const cost = c.steps + k;
-        // On a tie the SHORTER tail wins: a pure `step` (k = 0) beats stepping
+        // On a tie the shorter tail wins: a pure `step` (k = 0) beats stepping
         // to an earlier element of the kind and walking forward.
         if (!step || cost < step.cost || (cost === step.cost && k < step.k)) {
           step = {
@@ -344,7 +289,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     }
     if (step && !step.command) step = null;
 
-    /* tab order */
+    // tab order
     let tab = null;
     const tIdxTab = tabOrder.indexOf(el);
     if (tIdxTab !== -1) {
@@ -365,7 +310,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     };
   };
 
-  /* --- the equivalence class of the step's target ------------------- */
+  // the equivalence class of the step's target
   const SUBMITTABLE = 'button, input[type="submit"], input[type="image"]';
   const TEXTFIELD =
     'input:not([type]), input[type="text"], input[type="search"], input[type="email"],' +
@@ -420,7 +365,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
 
   const equivalenceEligible = action === 'click' || (action === 'press' && key === 'Enter');
   if (equivalenceEligible) {
-    /* links with the same resolved href */
+    // links with the same resolved href
     if (target.matches('a[href], area[href], [role="link"][href]')) {
       const key0 = urlKeyOf(target);
       if (key0) {
@@ -431,7 +376,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       }
     }
 
-    /* form submission: other submit controls + Enter in a filled text field */
+    // form submission: other submit controls + Enter in a filled text field
     const form = target.closest ? target.closest('form') : null;
     if (form && isSubmitControl(target)) {
       Array.prototype.forEach.call(form.querySelectorAll(SUBMITTABLE), (el) => {
@@ -447,7 +392,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       });
     }
 
-    /* buttons: same accessible name inside the same form / dialog container */
+    // buttons: same accessible name inside the same form / dialog container
     if (target.matches(BUTTONISH)) {
       const name = accName(target);
       const cont = containerOf(target);
@@ -479,15 +424,13 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
   };
 }
 
-/* ------------------------------------------------------------------ *
- * Node side
- * ------------------------------------------------------------------ */
+// Node side
 
 /**
  * Expand a chosen reach strategy into the literal env commands it costs.
- * `reachCommands(reach).length === reach.cost` for every strategy — that
- * identity is what lets `nOpt` be reported as a keystroke list (Blind Mode's
- * "so wäre es gegangen") and what makes the BFS edge weights honest.
+ * `reachCommands(reach).length === reach.cost` for every strategy; that
+ * identity lets `nOpt` be reported as a keystroke list (Blind Mode's optimal
+ * route) and keeps the BFS edge weights honest.
  */
 function reachCommands(reach) {
   const repeat = (type, n) => Array.from({ length: n }, () => ({ type }));
@@ -520,7 +463,14 @@ function reachCommands(reach) {
   }
 }
 
-/** Picks the cheapest reach strategy from the in-page analysis. */
+/**
+ * Picks the cheapest reach strategy from the in-page analysis. One command = 1:
+ * `none` 0; `rotor` (list + `jumpTo`) 2; `rotor+next` 2 + k; `step` s presses of
+ * a rotor step command in the shorter direction, wrapping like
+ * `ScreenReaderEnv.stepToKind`; `step+next` s + k (how buttons, which are in no
+ * rotor list, are reached); `tab`/`shiftTab` tab-order distance; `next`/`prev`
+ * reading-order distance.
+ */
 function chooseReach(analysis) {
   const candidates = [];
   if (analysis.inReadingOrder && analysis.next === 0) {
@@ -562,13 +512,14 @@ function chooseReach(analysis) {
  * Compute the shortest screen-reader command sequence for a task's sighted path.
  *
  * The page must be freshly navigated to the task URL with the task's
- * preconditions already applied — the same state 0 the SR agent gets. Each step
- * is really executed (through `replay.executeStep`) after it has been costed, so
- * the DOM the next step is costed against is the real one.
+ * preconditions already applied: the same state 0 the SR agent gets. Each step
+ * costs reach + action (click/type/press/goto = 1; goto has no reach cost and
+ * resets the cursor). Each step is executed for real (`replay.executeStep`)
+ * after it has been costed, so the next step is costed against the real DOM.
  *
  * @param {import('puppeteer').Page} page
  * @param {object} task
- * @param {object} [ctx]      reserved (oracle context), unused today
+ * @param {object} [ctx]      reserved (oracle context), unused
  * @param {object} [options]  replay timeout overrides
  * @returns {Promise<{nOpt: number|null, steps: object[], error?: string}>}
  */
@@ -610,7 +561,7 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
           stepCommands: STEP_COMMAND_BY_KIND,
         });
       } catch (err) {
-        return { nOpt: null, steps, error: `optimalPath[${i}]: analysis failed — ${err.message}` };
+        return { nOpt: null, steps, error: `optimalPath[${i}]: analysis failed: ${err.message}` };
       }
       if (analysis.error)
         return { nOpt: null, steps, error: `optimalPath[${i}]: ${analysis.error}` };
@@ -667,7 +618,7 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     if (step.action === 'type' && step.selector) typedSelectors.push(step.selector);
 
     // Execute the step for real so the next step is costed against real DOM.
-    // Only the SIGHTED step runs — an equivalent route is priced, never taken.
+    // Only the sighted step runs; an equivalent route is priced, never taken.
     const urlBefore = page.url();
     try {
       await executeStep(page, step, `optimalPath[${i}] ${step.action}`, options);

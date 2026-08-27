@@ -1,25 +1,8 @@
 #!/usr/bin/env node
 /**
- * blind-mode/server/recompute-nopt.js — refresh the `nOpt` baked into
- * `blind-mode/tasks/*.json`.
- *
- * The task files carry a precomputed `nOpt` so a session can start instantly and
- * so the budget (`3 * nOpt + 10`) is known before the first keystroke. That
- * number is only as current as the cost model in `src/agent/optimal-path.js`:
- * when the model changes (rotor stepping, effect-equivalent targets, …) the
- * stored values silently become wrong — a player would be scored against a route
- * nobody can take any more.
- *
- * This script recomputes them. It serves `test-sites/agent` on an ephemeral port
- * exactly the way the game server does (`/site/*`), runs `computeOptimalPath()`
- * per task and writes back
- *   nOpt         — the new command count, and
- *   optimalPath  — the literal command list (`[{ type, arg? }]`, length = nOpt),
- *                  purely as documentation of WHICH route that number describes.
- * Tasks whose `url` is absolute (a real website) are recomputed against that
- * site; pass `--skip-remote` to leave them alone.
- *
- *   node src/agent/blind-mode/server/recompute-nopt.js [--dry-run] [--skip-remote]
+ * recompute-nopt CLI: refresh the `nOpt` baked into `blind-mode/tasks/*.json`.
+ * The stored value is only as current as the cost model in optimal-path.js, so
+ * this serves test-sites/agent, runs computeOptimalPath per task and writes back.
  */
 
 'use strict';
@@ -60,7 +43,7 @@ async function optimalFor(browser, task, url) {
     await page.setViewport({ width: 1280, height: 900 });
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const pre = await runPreconditions(page, task);
-    if (!pre.ok) return { nOpt: null, commands: null, error: `precondition failed — ${pre.error}` };
+    if (!pre.ok) return { nOpt: null, commands: null, error: `precondition failed: ${pre.error}` };
     const res = await computeOptimalPath(page, task, {}, {});
     if (res.error || res.nOpt == null) {
       return { nOpt: null, commands: null, error: res.error || 'no optimal path' };
@@ -83,6 +66,11 @@ async function optimalFor(browser, task, url) {
   }
 }
 
+/**
+ * Usage: recompute-nopt.js [--dry-run] [--skip-remote]. Writes `nOpt` and
+ * `optimalPath` (the literal command list) per task; `--skip-remote` leaves
+ * tasks with an absolute `url` alone.
+ */
 async function main() {
   const argv = process.argv.slice(2);
   const dryRun = argv.includes('--dry-run');

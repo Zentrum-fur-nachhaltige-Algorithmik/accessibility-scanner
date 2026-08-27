@@ -190,8 +190,8 @@ describe('blind-mode server', () => {
       expect(result.optimalPath.map((s) => s.cmd.type)).toContain('activate');
     });
 
-    it('phrases a German verdict and carries the full trace', () => {
-      expect(result.verdict).toMatch(/Schritte gebraucht|Fast optimal/);
+    it('phrases the verdict and carries the full trace', () => {
+      expect(result.verdict).toMatch(/would have been enough|Almost optimal/);
       expect(result.nAgent).toBeNull();
       expect(result.trace.length).toBe(6); // 5 counted + 1 free
       expect(result.trace.filter((c) => c.free).length).toBe(1);
@@ -224,7 +224,7 @@ describe('blind-mode server', () => {
       expect(result.stoppedBy).toBe('abort');
       expect(result.R).toBe(0);
       expect(result.nHuman).toBe(1);
-      expect(result.verdict).toMatch(/genauso hängen geblieben/);
+      expect(result.verdict).toMatch(/would have got stuck here too/);
       client.close();
     }, 120000);
   });
@@ -249,14 +249,12 @@ describe('blind-mode server', () => {
   });
 
   describe('unit pieces', () => {
-    it('verdictFor speaks the three German sentences', () => {
-      expect(verdictFor({ success: true, R: 1, nHuman: 3, nOpt: 3 })).toMatch(/Fast optimal/);
+    it('verdictFor speaks the three verdict sentences', () => {
+      expect(verdictFor({ success: true, R: 1, nHuman: 3, nOpt: 3 })).toMatch(/Almost optimal/);
       expect(verdictFor({ success: true, R: 0.3, nHuman: 10, nOpt: 3 })).toMatch(
-        /Die Seite ist das Problem, nicht du\./
+        /The page is the problem, not you\./
       );
-      expect(verdictFor({ success: false, R: 0, nHuman: 9, nOpt: 3 })).toMatch(
-        /Ein blinder Nutzer/
-      );
+      expect(verdictFor({ success: false, R: 0, nHuman: 9, nOpt: 3 })).toMatch(/A blind user/);
     });
 
     it('computeStuck finds the longest run without progress', () => {
@@ -319,7 +317,7 @@ describe('blind-mode server', () => {
         'tab',
         'tab',
         'activate',
-        // the rotor STEP commands expand the same way
+        // the rotor step commands expand the same way
         'nextHeading',
         'nextHeading',
         'next',
@@ -368,7 +366,7 @@ describe('blind-mode server', () => {
       await page.click('#mode-training'); // so the spoken phrase is also readable
       await page.click('#start-button');
       await page.waitForSelector('#screen-briefing:not([hidden])');
-      expect(await page.$eval('#briefing-task', (el) => el.textContent)).toMatch(/Firma/);
+      expect(await page.$eval('#briefing-task', (el) => el.textContent)).toMatch(/company/);
 
       await page.click('#begin-button');
       await page.waitForSelector('#screen-play:not([hidden])');
@@ -389,7 +387,7 @@ describe('blind-mode server', () => {
       for (let i = 0; i < 4; i += 1) {
         await page.keyboard.press('KeyL');
         await page.waitForFunction(
-          (n) => document.getElementById('play-counter').textContent === `Schritt ${n}`,
+          (n) => document.getElementById('play-counter').textContent === `Step ${n}`,
           { timeout: 30000 },
           i + 1
         );

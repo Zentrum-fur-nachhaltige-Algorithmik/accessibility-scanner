@@ -2,7 +2,7 @@
   "id": "cookie-banner",
   "template": "cookie-banner-dismiss",
   "url": "/site/generic-home.html",
-  "description": "Schliesse den Cookie-Hinweis, damit du die Website benutzen kannst.",
+  "description": "Close the cookie notice so you can use the website.",
   "weight": 1,
   "preconditions": [],
   "oracle": {

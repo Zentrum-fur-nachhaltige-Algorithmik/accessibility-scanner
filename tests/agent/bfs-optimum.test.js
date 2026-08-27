@@ -27,7 +27,7 @@ const SHORTCUT_TASK = {
   ],
 };
 
-/** The same two-click task, but on a page WITHOUT the footer shortcut. */
+/** The same two-click task, but on a page without the footer shortcut. */
 const DEEP_TASK = { ...SHORTCUT_TASK, id: 'bfs-deep' };
 
 const SIMPLE_TASK = {
@@ -47,7 +47,7 @@ const POST_TASK = {
   ],
 };
 
-describe('agent/bfs-optimum — cost model (pure)', () => {
+describe('agent/bfs-optimum: cost model (pure)', () => {
   it('turns a reach strategy into exactly `cost` env commands', () => {
     expect(reachCommands({ strategy: 'none', cost: 0 })).toEqual([]);
     expect(
@@ -188,13 +188,13 @@ describe('agent/bfs-optimum — cost model (pure)', () => {
 });
 
 /**
- * The module defaults are a WITHIN-PAGE validator (`maxPages: 1`), so the
+ * The module defaults are a within-page validator (`maxPages: 1`), so the
  * fixtures whose whole point is a route across several pages have to ask for
  * the exhaustive budgets explicitly.
  */
 const CROSS_PAGE = { maxPages: 40, maxDepth: 12, maxEdges: 600, timeoutMs: 120000 };
 
-describe('agent/bfs-optimum — search against real pages', () => {
+describe('agent/bfs-optimum: search against real pages', () => {
   let base;
   let browser;
 
@@ -270,7 +270,7 @@ describe('agent/bfs-optimum — search against real pages', () => {
     const res = await computeBfsOptimum(browser, `${base}/agent/bfs-post.html`, POST_TASK, {
       ...CROSS_PAGE,
       // The fixture server is localhost, which the search treats as a safe
-      // sandbox — turn that off so the real-site guard is what is under test.
+      // sandbox; turn that off so the real-site guard is what is under test.
       localhostIsSafe: false,
       onPage: (page) => {
         recorder = createRequestRecorder(page);

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { runSrAgent, SR_TOOLS, SYSTEM_PROMPT } from '../../src/agent/sr-agent.js';
 
-/** In-memory stand-in for ScreenReaderEnv — deterministic, no browser, no VSR. */
+/** In-memory stand-in for ScreenReaderEnv: deterministic, no browser, no VSR. */
 function fakeEnv({ maxSteps = 10, phraseFor } = {}) {
   const env = {
     maxSteps,
@@ -119,7 +119,7 @@ describe('runSrAgent tool schema', () => {
     }
   });
 
-  it('does not offer `repeat` as a tool — it is free and not part of the cost measure', () => {
+  it('does not offer `repeat` as a tool: it is free and not part of the cost measure', () => {
     expect(SR_TOOLS.map((t) => t.function.name)).not.toContain('repeat');
   });
 
@@ -276,7 +276,7 @@ describe('runSrAgent observations', () => {
       ]) {
         expect(blob.toLowerCase()).not.toContain(forbidden.toLowerCase());
       }
-      // ...but the screen-reader-only channels ARE present
+      // ...but the screen-reader-only channels are present
       expect(blob).toContain('TASK:');
     }
   });

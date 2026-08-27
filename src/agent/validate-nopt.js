@@ -1,31 +1,8 @@
 #!/usr/bin/env node
 /**
- * src/agent/validate-nopt.js — does the guided optimum still price the page
- * correctly?
- *
- *   node src/agent/validate-nopt.js <url> --tasks tasks.json [--max-pages 1]
- *                                   [--only id,id] [--headless true]
- *                                   [--max-edges 60] [--timeout 60000] [--out file.json]
- *
- * `optimal-path.js` computes `nOpt` GUIDED by the sighted path: it prices the
- * cheapest screen-reader route to the elements the sighted user touched, in that
- * order. `bfs-optimum.js` searches the command space itself. If the search finds
- * a conclusively cheaper route than the guided model, the model has a GAP — a
- * kind of route it structurally cannot see (that is how effect-equivalent
- * targets and rotor stepping were found in the first place) — and every score
- * `R = min(1, nOpt / nSr)` computed against it is inflated.
- *
- * So: run both per task, print them side by side, and exit non-zero if any
- * CONCLUSIVE `nOptBfs` is smaller than `nOptGuided`. Inconclusive rows (the
- * search hit a budget) are reported but never fail the run — they prove nothing
- * either way.
- *
- * The BFS defaults are the within-page validator (`maxPages: 1`, see
- * `docs/sprints/sr-agent/bfs-optimum.md`): every edge on the start page,
- * navigations included, is executed and goal-tested, but other pages are not
- * expanded. That is the scope the guided optimum claims to be optimal in.
- * `--max-pages 40` widens it to the old cross-site search (only affordable on
- * small fixtures).
+ * validate-nopt CLI: checks the guided optimum against a BFS over the command space.
+ * A conclusively cheaper BFS route means optimal-path.js has a gap and every
+ * score computed against its nOpt is inflated; inconclusive rows never fail the run.
  */
 
 'use strict';
@@ -85,7 +62,10 @@ const pad = (s, n) => {
 };
 
 /**
- * One `compareOptima` per task, plus the verdict per row.
+ * One `compareOptima` per task, plus the verdict per row. A row is a gap when a
+ * conclusive `nOptBfs` is smaller than `nOptGuided`. The BFS default
+ * (`maxPages: 1`) executes and goal-tests every edge on the start page without
+ * expanding other pages; `--max-pages` widens the search.
  * `compare` is injectable so the verdict logic can be tested without a browser.
  */
 async function validateNopt({

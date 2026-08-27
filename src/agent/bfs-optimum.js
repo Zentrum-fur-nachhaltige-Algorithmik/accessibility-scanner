@@ -1,70 +1,8 @@
 /**
- * src/agent/bfs-optimum.js — `n_opt_bfs`, a TRUE (bounded) optimum over the
- * screen-reader command space.
- *
- * `optimal-path.js` computes the GUIDED optimum: it is told which elements the
- * sighted user touched and only asks "what is the cheapest screen-reader route
- * to each of them, in order". That is an upper bound on the real optimum,
- * because a screen-reader user is not obliged to take the sighted route. A
- * footer link that goes straight to the contact page is invisible to the guided
- * optimum if the sighted path went home → Products → Contact.
- *
- * This module answers the harder question: over ALL sequences of ScreenReaderEnv
- * commands, what is the SHORTEST one after which the task oracle is true?
- *
- * Search model
- * ------------
- * A search state is `(page state, cursor position)`:
- *   - the page state is a fingerprint — `url` + a hash of the VSR reading-order
- *     phrases + the open dialogs + all form values — so the same page reached
- *     two different ways collapses to one state;
- *   - the cursor position is the selector the VSR cursor sits on (`null` =
- *     document start, which is where every navigation puts it).
- *
- * Cursor moves are NOT search transitions. For a given page state, ONE in-page
- * pass computes the cheapest reach cost from the current cursor to EVERY
- * reading-order / tab-order element, using exactly the strategies the env
- * offers (rotor + `jumpTo` = 2, rotor + `jumpTo` + `next`×k = 2+k, `tab` /
- * `shiftTab` distance, `next` / `prev` distance). The cost analysis is shaped
- * like `optimal-path.analyzeInPage`'s and is fed to that module's own
- * `chooseReach()`, so both optima agree on what a route costs.
- *
- * The real transitions are the things that can CHANGE the page:
- *   - `activate` on an actionable node          cost = reach + 1
- *   - `type` into a text field                  cost = reach + 1
- *   - `type` + `activate` (Enter) in a field    cost = reach + 2
- * `type` transitions only exist when the task's `sightedPath` contains a `type`
- * step; the same text is reused (we are measuring routes, not guessing input).
- *
- * That makes the search a Dijkstra over page states with edge weights measured
- * in env commands, so `nOptBfs` really is "the minimal number of env commands
- * after which the oracle is true".
- *
- * Execution
- * ---------
- * Every transition is really executed in a browser. One isolated context is
- * used for the whole search; a state is re-established by replaying its click /
- * type path from the start URL (after the task's preconditions), which is slow
- * but obviously correct. Analyses are cached by state key, so each state is
- * analysed once.
- *
- * Bounding
- * --------
- * The guided optimum `nOptGuided` is an upper bound on the true optimum. Once
- * the cheapest unexpanded state costs `>= nOptGuided`, no cheaper goal can
- * exist any more, so the search stops and reports
- * `nOptBfs = nOptGuided, reason = 'bounded-by-guided'`. On the many sites where
- * the sighted route already is the best screen-reader route this keeps the whole
- * thing to a single state expansion.
- *
- * Safety
- * ------
- * The search clicks things on real websites, so it refuses to:
- *   - submit a form with `method="post"` on a non-localhost origin unless
- *     `options.allowSubmit` (this also covers pressing Enter in its fields),
- *   - leave the origin while `sameOriginOnly`,
- *   - follow `mailto:` / `tel:` / `sms:` / `javascript:` or `download` links.
- * Everything it refuses is reported in `explored.skipped`.
+ * bfs-optimum: `n_opt_bfs`, a bounded true optimum over the screen-reader command space.
+ * Dijkstra over page states (url + reading-order hash + dialogs + form values, plus cursor
+ * position); edges are activate/type transitions costed in env commands and executed in
+ * a real browser. The guided optimum from optimal-path.js is the upper bound.
  */
 
 'use strict';
@@ -82,32 +20,29 @@ const {
 const { validateTaskShape } = require('./task');
 
 /**
- * Defaults: a WITHIN-PAGE validator (see docs/sprints/sr-agent/bfs-optimum.md).
+ * Defaults for a within-page validator.
  *
- * `maxPages: 1` keeps the search on the start URL: every edge — navigations
- * included — is still executed and goal-tested, but a non-goal page at another
- * URL is never expanded. That is deliberate. The guided optimum is defined as
- * "optimal with respect to the trees seen along the sighted trajectory", so the
- * question BFS has to answer is whether a cheaper route exists ON THE PAGE the
- * user is looking at — not whether some other page of the site offers a
- * shortcut. Cross-site search is affordable only on toy fixtures anyway (one
- * gov.uk expansion is hundreds of navigations); pass `maxPages: 40` explicitly
- * to get the old exhaustive behaviour.
+ * `maxPages: 1` keeps the search on the start URL: every edge, navigations
+ * included, is still executed and goal-tested, but a non-goal page at another
+ * URL is never expanded. The guided optimum is defined relative to the trees
+ * seen along the sighted trajectory, so the question is whether a cheaper route
+ * exists on the page the user is looking at, not elsewhere on the site.
+ * Cross-site search is affordable only on small fixtures (one gov.uk expansion
+ * is hundreds of navigations); pass e.g. `maxPages: 40` for an exhaustive search.
  */
 const DEFAULTS = {
   maxDepth: 6,
   maxStates: 400,
   maxPages: 1,
   /**
-   * Cap on transitions really executed. One expansion on a large real site can
-   * be hundreds of edges (every link on a gov.uk page is an edge), and each one
-   * costs a navigation plus a full reading-order walk, so this is the budget
-   * that actually bites in practice.
+   * Cap on transitions really executed. One expansion on a large site can be
+   * hundreds of edges, each costing a navigation plus a full reading-order walk,
+   * so this is the budget that bites in practice.
    */
   maxEdges: 60,
   sameOriginOnly: true,
   timeoutMs: 60000,
-  /** Submit `method="post"` forms. Off by default — this clicks real websites. */
+  /** Submit `method="post"` forms. Off by default: this clicks real websites. */
   allowSubmit: false,
   /**
    * A localhost origin is treated as a safe sandbox, so POST forms there are
@@ -119,21 +54,16 @@ const DEFAULTS = {
   maxSkippedReported: 200,
 };
 
-/* ------------------------------------------------------------------ *
- * In-page analysis. Runs in the browser; uses window.__SRENV.internals.
- *
- * This is a whole-page generalisation of `optimal-path.analyzeInPage`: instead
- * of costing ONE known target it costs EVERY candidate in a single reading-order
- * walk, and it also returns the state fingerprint. The tab-order and rotor
- * logic is a deliberate copy of that function (it is not exported in a form that
- * can be reused per-element, and `optimal-path.js` must not be refactored) —
- * the two must stay in sync.
- * ------------------------------------------------------------------ */
+// In-page analysis. Runs in the browser; uses window.__SRENV.internals.
+//
+// Whole-page generalisation of `optimal-path.analyzeInPage`: costs every
+// candidate in a single reading-order walk and returns the state fingerprint.
+// The tab-order and rotor logic is a copy of that function; keep the two in sync.
 /* istanbul ignore next -- runs in the browser */
 async function analyzeStateInPage(cursorSelector, kinds, cfg) {
   const I = window.__SRENV.internals;
 
-  /* --- reading order (one walk) ----------------------------------- */
+  // reading order (one walk)
   const order = await I.readingOrder();
   const els = order.map((e) => I.elementOf(e.node));
   const N = els.length;
@@ -162,7 +92,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
 
   const mod = (a, n) => ((a % n) + n) % n;
 
-  /* --- rotor starts, and the nearest one preceding every index ----- */
+  // rotor starts, and the nearest one preceding every index
   const rotorAt = new Array(N).fill(null);
   const rotorNodesByKind = {};
   for (const kind of kinds) {
@@ -185,12 +115,12 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     }
   }
 
-  /* --- rotor STEP commands (`nextHeading` & co.) -------------------- */
+  // rotor step commands (`nextHeading` & co.)
   // Mirror of `optimal-path.analyzeInPage`'s step block, made whole-page.
   // For one kind the cost of reaching reading-order index `i` is
   //   min over kind-elements p of  steps(p) + (i - index(p)) mod N,
   // which a cyclic min-plus sweep (`best[i] = min(g[i], best[i-1] + 1)`, two
-  // passes for the wrap) computes for every `i` in O(N) — the same minimum
+  // passes for the wrap) computes for every `i` in O(N): the same minimum
   // `optimal-path.js` takes directly over the (single) target's indices.
   const INF = Infinity;
   const stepBest = {}; // kind -> { cost: number[], dir: string[], steps: number[], from: number[] }
@@ -242,7 +172,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
       for (let i = 0; i < N; i += 1) {
         cur = cur === INF ? INF : cur + 1;
         // `<=`: on a tie prefer the nearer source, i.e. the shorter `next` tail
-        // — the same tie-break `optimal-path.js` applies.
+        // (the same tie-break `optimal-path.js` applies).
         if (g[i] <= cur) {
           cur = g[i];
           curDir = gDir[i];
@@ -258,7 +188,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     stepBest[kind] = { cost, dir, steps, from };
   }
 
-  /* --- tab order --------------------------------------------------- */
+  // tab order
   const FOCUSABLE =
     'a[href], area[href], button, input, select, textarea, summary, iframe, object,' +
     ' embed, audio[controls], video[controls], [contenteditable], [tabindex]';
@@ -296,7 +226,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     cursorPos = following - 0.5;
   }
 
-  /* --- what can be acted on ---------------------------------------- */
+  // what can be acted on
   const ACTIONABLE =
     'a[href], button, input[type="submit"], input[type="button"], input[type="reset"],' +
     ' [role="button"], [role="link"], [role="menuitem"], summary, [onclick]';
@@ -330,7 +260,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     const selector = I.selectorFor(el);
     const note = (reason) => skipped.push({ selector, reason });
 
-    /* -- link safety -- */
+    // link safety
     let unsafeActivate = null;
     if (el.tagName === 'A' && el.hasAttribute('href')) {
       const raw = el.getAttribute('href') || '';
@@ -347,7 +277,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
       }
     }
 
-    /* -- POST-form safety -- */
+    // POST-form safety
     const form = el.closest ? el.closest('form') : null;
     const postForm =
       !!form && String(form.getAttribute('method') || 'get').toLowerCase() === 'post';
@@ -359,7 +289,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     if (unsafeActivate) note(unsafeActivate);
     if (unsafeEnter) note('post-form-enter');
 
-    /* -- reach cost analysis (shape = optimal-path.analyzeInPage) -- */
+    // reach cost analysis (shape = optimal-path.analyzeInPage)
     const list = idxOf.get(el) || [];
     let next = null;
     let prev = null;
@@ -417,7 +347,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     });
   }
 
-  /* --- fingerprint -------------------------------------------------- */
+  // fingerprint
   const dialogs = Array.prototype.filter
     .call(document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog'), (el) => {
       if (el.tagName === 'DIALOG' && !el.open) return false;
@@ -433,7 +363,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     .join('');
   const SEP = String.fromCharCode(1);
   const material = order.map((e) => e.phrase).join(SEP) + SEP + dialogs + SEP + values;
-  // FNV-1a, 32 bit — good enough to separate page states, cheap to compute.
+  // FNV-1a, 32 bit: good enough to separate page states, cheap to compute.
   let h = 0x811c9dc5;
   for (let i = 0; i < material.length; i += 1) {
     h ^= material.charCodeAt(i);
@@ -451,9 +381,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
   };
 }
 
-/* ------------------------------------------------------------------ *
- * Node side
- * ------------------------------------------------------------------ */
+// Node side
 
 /** The distinct texts the task types, in order of first appearance. */
 function typeTextsOf(task) {
@@ -571,7 +499,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
     return fail(err.message);
   }
 
-  /* --- the guided optimum is our upper bound ----------------------- */
+  // the guided optimum is the upper bound
   let nOptGuided =
     typeof opts.nOptGuided === 'number' && Number.isFinite(opts.nOptGuided)
       ? opts.nOptGuided
@@ -602,8 +530,8 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
 
   /**
    * Bring the page into the state reached by `steps` (from the start URL).
-   * A no-op when the page already IS in that state and nothing has touched it
-   * since — analysing a state does not count as touching it.
+   * A no-op when the page already is in that state and nothing has touched it
+   * since (analysing a state does not count as touching it).
    */
   let establishedSig = null;
   let pageDirty = true;
@@ -613,7 +541,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
     establishedSig = null;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: REPLAY_DEFAULTS.gotoTimeout });
     const pre = await runPreconditions(page, normalized, options);
-    if (!pre.ok) throw new Error(`precondition failed — ${pre.error}`);
+    if (!pre.ok) throw new Error(`precondition failed: ${pre.error}`);
     // Recorder starts at state 0, exactly like `replay.validateTask`, so a
     // `requestSent` oracle is not satisfied by the setup itself.
     recorder.reset();
@@ -642,7 +570,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
   let bestVia = null;
 
   try {
-    /* --- state 0 -------------------------------------------------- */
+    // state 0
     await establish([]);
     const startFp = await analyze(null);
     const startKey = stateKeyOf(startFp, null);
@@ -717,7 +645,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
         try {
           await establish(node.steps);
           pageDirty = true; // the transition below changes the page
-          // A marker that only survives if the document is not replaced — the
+          // A marker that only survives if the document is not replaced: the
           // reliable way to tell a navigation from an in-page change, even when
           // a link navigates to the URL the page is already on.
           await page.evaluate(() => {
@@ -754,9 +682,9 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
           continue; // a goal state is never worth expanding further
         }
 
-        // Not a goal — is it a state worth remembering? After a navigation the
-        // env re-injects and puts the cursor at document start; otherwise
-        // `activate`/`type` leave it on the element it acted on.
+        // Not a goal. After a navigation the env re-injects and puts the cursor
+        // at document start; otherwise `activate`/`type` leave it on the
+        // element it acted on.
         const cursor = navigated ? null : t.selector;
         let fp;
         try {
@@ -767,7 +695,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
         }
         const key = stateKeyOf(fp, cursor);
         // A "page" is a URL: in-page state changes (a dismissed banner, a filled
-        // field) are STATES, not pages, so `maxPages: 1` still searches them.
+        // field) are states, not pages, so `maxPages: 1` still searches them.
         const pageKey = fp.url;
         if (seenStates.has(key) || expandedKeys.has(key)) continue;
         // A state dropped by a budget only makes the result inconclusive if
@@ -818,7 +746,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
     }
     explored.ms = Date.now() - startedAt;
 
-    /* --- what did we prove? --------------------------------------- */
+    // result classification
     const bestFound = bestPath
       ? { cost: best, path: bestPath, steps: bestSteps, via: bestVia }
       : null;
@@ -854,7 +782,7 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
 
 /**
  * Measure the guided optimum and the BFS optimum for one task side by side.
- * `delta = nOptGuided - nOptBfs` — how many commands the sighted route costs
+ * `delta = nOptGuided - nOptBfs`: how many commands the sighted route costs
  * over the best screen-reader route (0 when they agree, `null` when unknown).
  */
 async function compareOptima(browser, url, task, options = {}) {

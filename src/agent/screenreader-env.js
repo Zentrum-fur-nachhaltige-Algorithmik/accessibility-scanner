@@ -1,61 +1,8 @@
 /**
- * ScreenReaderEnv — the screen-reader observation environment for the SR agent.
- *
- * Wraps an already-navigated Puppeteer page and exposes exactly what a blind
- * screen-reader user gets: a cursor, the phrase spoken for the current element,
- * live-region announcements since the last step, and rotor lists. It never
- * exposes the full accessibility tree.
- *
- * The screen reader itself is @guidepup/virtual-screen-reader, re-bundled as a
- * browser IIFE (see scripts/build-vsr.js -> src/agent/vendor/virtual-screen-reader.js)
- * and injected with `page.evaluate(source)`. Injecting through the CDP runtime
- * rather than `page.addScriptTag` means a restrictive `script-src` CSP on the
- * page under test cannot block the screen reader.
- *
- * All screen-reader state lives in the page, so it is destroyed on navigation.
- * The env listens for `framenavigated` on the main frame and re-injects + restarts
- * the cursor at document start before the next command.
- *
- * ------------------------------------------------------------------------
- * COMMAND REFERENCE — `env.step({ type, arg? })`
- * ------------------------------------------------------------------------
- * Every command costs exactly one step, except `repeat` (free, see below).
- *
- *   Reading cursor
- *     next                 move one element forward in reading order
- *     prev                 move one element backward in reading order
- *     tab                  press Tab (next keyboard-focusable element)
- *     shiftTab             press Shift+Tab (previous focusable element)
- *
- *   Rotor lists (NVDA/VoiceOver "rotor"): retrieve, then jump
- *     headings             list all headings          -> obs.rotor
- *     landmarks            list all landmarks/regions -> obs.rotor
- *     links                list all links             -> obs.rotor
- *     formFields           list all form fields       -> obs.rotor
- *     jumpTo   arg: index  move the cursor to an entry of the LAST rotor list
- *
- *   Rotor stepping (NVDA quick-navigation keys H / K / F / D and Shift+…):
- *     nextHeading / prevHeading        next/previous heading
- *     nextLink / prevLink              next/previous link
- *     nextFormField / prevFormField    next/previous form field
- *     nextLandmark / prevLandmark      next/previous landmark
- *     All of these wrap around at the end/start of the document. `obs.phrase`
- *     is the phrase of the element they land on. If the document contains no
- *     element of that kind the cursor stays put and the observation carries
- *     `error: 'no heading' | 'no link' | 'no form field' | 'no landmark'`
- *     — that still costs a step, exactly like a real fruitless key press.
- *
- *   Interaction
- *     activate             press Enter on / click the element at the cursor
- *     type     arg: text   type into the form field at the cursor
- *     escape               press Escape
- *     done                 the agent declares the task complete (recorded only)
- *
- *   Free
- *     repeat               re-emit the last spoken phrase. Does NOT increase
- *                          `stepCount` or consume budget; it appends a trace
- *                          entry flagged `free: true` and the observation
- *                          carries `free: true`.
+ * ScreenReaderEnv: the screen-reader observation environment for the SR agent.
+ * Wraps a navigated Puppeteer page and exposes only what a blind user gets: cursor phrase,
+ * live-region announcements and rotor lists. The virtual screen reader is injected via
+ * `page.evaluate` (CSP-proof) and re-injected after every main-frame navigation.
  */
 const fs = require('fs');
 const path = require('path');
@@ -116,11 +63,8 @@ const COMMAND_TYPES = [
 /** Commands whose implementation walks the whole reading order internally. */
 const WALKING_COMMANDS = new Set([...ROTOR_KINDS, 'jumpTo', ...ROTOR_STEP_TYPES]);
 
-/* ------------------------------------------------------------------ *
- * In-page runtime. Serialised with Function.prototype.toString() and
- * evaluated in the page after the VSR bundle. Everything inside this
- * function runs in the browser, not in Node.
- * ------------------------------------------------------------------ */
+// In-page runtime. Serialised with Function.prototype.toString() and evaluated
+// in the page after the VSR bundle; everything inside runs in the browser.
 /* istanbul ignore next -- runs in the browser */
 function srenvRuntime() {
   if (window.__SRENV && window.__SRENV.ready) return;
@@ -128,9 +72,8 @@ function srenvRuntime() {
   const virtual = window.__VSR.virtual;
   const MAX_WALK = 4000;
 
-  // Mirror of ROTOR_STEP_COMMANDS on the Node side. This function is shipped
-  // into the page with Function.prototype.toString(), so it cannot close over
-  // module scope — the table has to live here as well. Keep the two in sync.
+  // Mirror of ROTOR_STEP_COMMANDS. This function is shipped into the page as
+  // source text, so it cannot close over module scope. Keep the two in sync.
   const STEP_COMMANDS = {
     nextHeading: { kind: 'headings', dir: 'next', label: 'heading' },
     prevHeading: { kind: 'headings', dir: 'prev', label: 'heading' },
@@ -432,14 +375,14 @@ function srenvRuntime() {
    * The VSR reading order is cyclic, so one full lap without a match means the
    * document holds no such element; the cursor is then back where it started.
    * If the only element of that kind is the one the cursor already sits on, the
-   * wrap lands on it again and its phrase is re-spoken — the same thing NVDA
-   * does with wrapping enabled.
+   * wrap lands on it again and its phrase is re-spoken, as NVDA does with
+   * wrapping enabled.
    *
-   * Element kinds are matched with `matchesKind` — the very same predicate the
-   * rotor lists use — so `nextHeading` walks exactly the set the `headings`
-   * rotor lists. Container landmarks occupy two positions in the VSR reading
-   * order ("main" … "end of main"); the closing boundary is skipped so stepping
-   * always lands on the landmark itself, the way NVDA's D key does.
+   * Element kinds are matched with `matchesKind`, the predicate the rotor lists
+   * use, so `nextHeading` walks exactly the set the `headings` rotor lists.
+   * Container landmarks occupy two positions in the VSR reading order ("main",
+   * "end of main"); the closing boundary is skipped so stepping always lands on
+   * the landmark itself, the way NVDA's D key does.
    *
    * @returns {Promise<boolean>} false when the document has no element of `kind`
    */
@@ -573,8 +516,7 @@ function srenvRuntime() {
         case 'done':
           break;
         case 'repeat':
-          // Nothing to do: `snapshot()` re-reads lastSpokenPhrase, which is
-          // exactly "say the last thing again". Free, see ScreenReaderEnv.step.
+          // Nothing to do: `snapshot()` re-reads lastSpokenPhrase. Free command.
           break;
         default: {
           const step = STEP_COMMANDS[type];
@@ -608,10 +550,8 @@ function srenvRuntime() {
   window.__SRENV = {
     ready: false,
     /**
-     * The building blocks of the command implementations, exposed so other
-     * deterministic analyses (src/agent/optimal-path.js) can compute reading
-     * order and rotor lists with EXACTLY the logic the commands use, instead of
-     * re-implementing them and drifting apart.
+     * Building blocks of the command implementations, exposed so optimal-path.js
+     * computes reading order and rotor lists with the same logic the commands use.
      */
     internals: {
       readingOrder,
@@ -682,9 +622,7 @@ function srenvRuntime() {
   window.__SRENV.ready = false;
 }
 
-/* ------------------------------------------------------------------ *
- * Node side
- * ------------------------------------------------------------------ */
+// Node side
 
 const FINDING_DEFS = {
   'focus-lost': {
@@ -789,15 +727,23 @@ class ScreenReaderEnv {
     return Math.max(0, this.maxSteps - this.stepCount);
   }
 
-  /** The last `phraseWindow` spoken phrases — the agent's memory cap. */
+  /** The last `phraseWindow` spoken phrases (the agent's memory cap). */
   get recentPhrases() {
     return this.phrases.slice(-this.phraseWindow);
   }
 
   /**
-   * Executes one command and returns the observation.
-   * Every call — including unknown commands and refused ones — counts as a step,
-   * except when the budget is already exhausted (nothing is executed then).
+   * Executes one command `{ type, arg? }` and returns the observation.
+   * Every call, including unknown and refused commands, costs one step unless the
+   * budget is already exhausted (nothing is executed then). `repeat` is free.
+   *
+   * Commands: next, prev, tab, shiftTab (cursor); headings, landmarks, links,
+   * formFields (rotor list into obs.rotor), jumpTo arg:index (entry of the last
+   * rotor list); nextHeading/prevHeading, nextLink/prevLink, nextFormField/
+   * prevFormField, nextLandmark/prevLandmark (quick navigation, wraps around; an
+   * empty kind leaves the cursor put and sets `error: 'no <kind>'`); activate,
+   * type arg:text, escape; done (recorded only); repeat (re-emits the last phrase,
+   * trace entry and observation flagged `free: true`).
    */
   async step(cmd) {
     if (!this.started) throw new Error('ScreenReaderEnv.step() called before start()');
@@ -824,10 +770,9 @@ class ScreenReaderEnv {
     const before = await this.page.evaluate(() => window.__SRENV.snapshot());
     const urlBefore = before.url;
 
-    // Free commands (`repeat`) re-emit what was last spoken. They change no
-    // state, so they neither consume budget nor advance `stepCount` — but they
-    // ARE recorded in the trace (flagged `free: true`) because they are part of
-    // what the user really did.
+    // Free commands (`repeat`) change no state, so they neither consume budget
+    // nor advance `stepCount`. They are still recorded in the trace (flagged
+    // `free: true`) because they are part of what the user did.
     if (FREE_COMMANDS.has(command.type)) {
       const obs = {
         step: this.stepCount,
@@ -980,7 +925,7 @@ class ScreenReaderEnv {
   }
 
   /**
-   * Deterministic barriers read off the trace — no LLM involved.
+   * Deterministic barriers read off the trace, no LLM involved.
    * Returns findings shaped like BaseScanner.formatViolation output so the
    * report pipeline and src/severity.js can consume them unchanged.
    */
@@ -1019,7 +964,7 @@ class ScreenReaderEnv {
       const focusChanged =
         (focusBefore && focusBefore.selector) !== (focusAfter && focusAfter.selector);
 
-      // focus-lost — activation/escape changed the DOM but dropped focus on body
+      // focus-lost: activation/escape changed the DOM but dropped focus on body.
       // A full page navigation legitimately resets focus to <body>; that is not a barrier.
       if (
         (cmd === 'activate' || cmd === 'escape') &&
@@ -1039,7 +984,7 @@ class ScreenReaderEnv {
         );
       }
 
-      // dialog-not-trapped — Tab escaped an open dialog
+      // dialog-not-trapped: Tab escaped an open dialog
       if (cmd === 'tab' || cmd === 'shiftTab') {
         const openBefore = dialogsBefore.filter((d) => d.containsFocus);
         for (const dlg of openBefore) {
@@ -1056,7 +1001,7 @@ class ScreenReaderEnv {
         }
       }
 
-      // escape-does-not-close — dialog survived Escape
+      // escape-does-not-close: dialog survived Escape
       if (cmd === 'escape') {
         for (const dlg of dialogsBefore) {
           if (!dlg.modal) continue;
@@ -1072,7 +1017,7 @@ class ScreenReaderEnv {
         }
       }
 
-      // unannounced-change — significant DOM change, nothing spoken, focus stayed put
+      // unannounced-change: significant DOM change, nothing spoken, focus stayed put
       if (
         (cmd === 'activate' || cmd === 'type' || cmd === 'escape') &&
         entry.domChanged &&
@@ -1095,14 +1040,14 @@ class ScreenReaderEnv {
         }
       }
 
-      // unnamed-control-used — activated a control whose phrase is role-only
+      // unnamed-control-used: activated a control whose phrase is role-only
       if (cmd === 'activate') {
         const phrase = (entry.obsBefore.phrase || '').trim();
         const head = phrase.split(',')[0].trim();
         if (phrase && ROLE_ONLY_RE.test(phrase)) {
           push(
             'unnamed-control-used',
-            `The control the agent had to activate is announced only as "${head}" — it has no accessible name, so a screen-reader user cannot tell what it does.`,
+            `The control the agent had to activate is announced only as "${head}": it has no accessible name, so a screen-reader user cannot tell what it does.`,
             {
               selector: entry.obsBefore.focusSelector || before.cursorSelector || null,
               phrase,
@@ -1128,9 +1073,9 @@ class ScreenReaderEnv {
 }
 
 /**
- * Injects the VSR bundle + the in-page runtime and starts the cursor at
- * document start — exactly the way `ScreenReaderEnv` does it. Shared with
- * `optimal-path.js` so both see the identical reading order and rotor lists.
+ * Injects the VSR bundle and the in-page runtime and starts the cursor at
+ * document start. Shared with `optimal-path.js` so both see the identical
+ * reading order and rotor lists.
  *
  * @param {import('puppeteer').Page} page
  * @param {{force?: boolean}} [options] force = inject even if a runtime is present

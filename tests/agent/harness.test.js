@@ -1,12 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { runSite, scoreTask } from '../../src/agent/harness.js';
 
-// The sibling modules (replay / oracle / screenreader-env / sr-agent) are owned
-// by other agents. `vi.mock()` cannot intercept them here because the harness
-// pulls them in through CommonJS `require()` (lazily, so the file loads even
-// before they exist), which vitest's ESM mock registry does not touch.
-// `runSite` therefore exposes a `deps` seam that replaces exactly that
-// boundary; the mock modules below are injected through it.
+// The harness loads replay / oracle / screenreader-env / sr-agent lazily via
+// CommonJS `require()`, which vitest's ESM mock registry does not intercept,
+// so the mocks below are injected through the `deps` seam of `runSite`.
 const replay = {
   validateTask: vi.fn(),
   runPreconditions: vi.fn(async () => ({ ok: true })),
@@ -83,7 +80,7 @@ beforeEach(() => {
 });
 
 describe('scoreTask', () => {
-  it('implements R = min(1, nOpt / nSr) — no smoothing constant', () => {
+  it('implements R = min(1, nOpt / nSr) without a smoothing constant', () => {
     expect(scoreTask(3, 3, true)).toBe(1);
     expect(scoreTask(3, 9, true)).toBeCloseTo(1 / 3);
     expect(scoreTask(4, 6, true)).toBeCloseTo(2 / 3);

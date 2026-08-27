@@ -1,14 +1,7 @@
 /**
- * blind-mode/server/tasks.js — load the playable tasks from `blind-mode/tasks/*.json`.
- *
- * A task file is a normal SR-Agent task (see `src/agent/task.js`) plus two
- * fields the game needs:
- *   url   — where the task starts. A path like "/site/generic-home.html" is
- *           resolved against the game server's own origin, so the demo tasks
- *           work on any port with zero setup; an absolute http(s) URL is used
- *           as-is (that is how you point the game at a real website).
- *   nOpt  — the precomputed shortest screen-reader command count. `0`/absent
- *           means "compute it at runtime" (see optimal.js).
+ * Blind Mode task loader for `blind-mode/tasks/*.json`.
+ * A task file is a normal SR-agent task (see task.js) plus `url` (start page,
+ * a `/site/...` path or absolute URL) and `nOpt` (precomputed shortest command count).
  */
 
 'use strict';
@@ -19,7 +12,10 @@ const { validateTaskShape } = require('../../task');
 
 const TASKS_DIR = path.join(__dirname, '..', 'tasks');
 
-/** Load and validate every task file. Sorted by id so the UI order is stable. */
+/**
+ * Load and validate every task file, sorted by id so the UI order is stable.
+ * `nOpt` of 0 or absent means "compute at runtime" (see optimal.js).
+ */
 function loadTasks(dir = TASKS_DIR) {
   const files = fs
     .readdirSync(dir)
@@ -33,7 +29,7 @@ function loadTasks(dir = TASKS_DIR) {
     try {
       raw = JSON.parse(fs.readFileSync(full, 'utf8'));
     } catch (err) {
-      throw new Error(`blind-mode task ${file}: invalid JSON — ${err.message}`);
+      throw new Error(`blind-mode task ${file}: invalid JSON: ${err.message}`);
     }
     if (typeof raw.url !== 'string' || raw.url === '') {
       throw new Error(`blind-mode task ${file}: "url" is required`);
@@ -48,7 +44,7 @@ function loadTasks(dir = TASKS_DIR) {
   return tasks;
 }
 
-/** Absolute URL for a task, resolved against the running server's origin. */
+/** Absolute URL for a task; a relative path is resolved against the server's origin. */
 function resolveUrl(task, origin) {
   if (/^https?:\/\//i.test(task.url)) return task.url;
   return new URL(task.url, origin).href;

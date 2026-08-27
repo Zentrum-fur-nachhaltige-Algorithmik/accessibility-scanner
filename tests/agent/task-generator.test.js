@@ -35,16 +35,14 @@ afterAll(async () => {
   await stopFixtureServer();
 });
 
-/* ------------------------------------------------------------------ */
-/* The LLM double                                                      */
-/* ------------------------------------------------------------------ */
+// The LLM double
 
 /**
  * One fake client for the whole pipeline. It dispatches on which tool it was
  * offered: `propose_tasks` → the proposal, `propose_oracle` → an oracle spec,
  * anything else → the sighted-agent action script for the goal in the message.
  *
- * Sighted actions address elements BY NAME and read the number out of the
+ * Sighted actions address elements by name and read the number out of the
  * rendered observation, exactly as a real model has to.
  */
 function fakeLlm({ proposal, solutions, oracle }) {
@@ -118,11 +116,9 @@ function idFromRendered(text, name) {
   return line ? Number(line.match(/\[(\d+)\]/)[1]) : null;
 }
 
-/* ------------------------------------------------------------------ */
-/* Pure units                                                          */
-/* ------------------------------------------------------------------ */
+// Pure units
 
-describe('agent/task-generator — tool schemas', () => {
+describe('agent/task-generator: tool schemas', () => {
   it('propose_tasks enforces the candidate shape', () => {
     const p = PROPOSE_TASKS_TOOL.function.parameters;
     expect(p.required).toEqual(['siteType', 'tasks']);
@@ -142,7 +138,7 @@ describe('agent/task-generator — tool schemas', () => {
   });
 });
 
-describe('agent/task-generator — merging and intent', () => {
+describe('agent/task-generator: merging and intent', () => {
   it('buckets descriptions into coarse intents', () => {
     expect(intentOf('Close the cookie notice.')).toBe('cookie');
     expect(intentOf('Search the site for a form.')).toBe('search');
@@ -232,7 +228,7 @@ describe('agent/task-generator — merging and intent', () => {
   });
 });
 
-describe('agent/task-generator — deterministic oracle', () => {
+describe('agent/task-generator: deterministic oracle', () => {
   const base = {
     url: 'http://s/a',
     title: 'A',
@@ -272,7 +268,7 @@ describe('agent/task-generator — deterministic oracle', () => {
   });
 });
 
-describe('agent/task-generator — plausibility and ambiguity weighting', () => {
+describe('agent/task-generator: plausibility and ambiguity weighting', () => {
   const s = {
     url: 'u',
     title: 't',
@@ -306,7 +302,7 @@ describe('agent/task-generator — plausibility and ambiguity weighting', () => 
   });
 });
 
-describe('agent/task-generator — exploration links', () => {
+describe('agent/task-generator: exploration links', () => {
   const view = {
     elements: [
       { href: 'http://s/a', region: 'navigation "Main"' },
@@ -328,11 +324,9 @@ describe('agent/task-generator — exploration links', () => {
   });
 });
 
-/* ------------------------------------------------------------------ */
-/* End to end against the mini-site, with the fake LLM                 */
-/* ------------------------------------------------------------------ */
+// End to end against the mini-site, with the fake LLM
 
-describe('agent/task-generator — end to end (fake llm, real browser)', () => {
+describe('agent/task-generator: end to end (fake llm, real browser)', () => {
   let result;
   let llm;
 

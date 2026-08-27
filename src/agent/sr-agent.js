@@ -1,16 +1,8 @@
 /**
- * src/agent/sr-agent.js — the LLM screen-reader agent loop.
- *
- * The agent solves a task through a `ScreenReaderEnv` while only ever seeing
- * what a screen-reader user hears: the spoken phrase at the cursor, live-region
- * announcements, rotor lists on request, the role/name of the focused element
- * and the URL. It NEVER sees the DOM, the accessibility tree, selectors or a
- * screenshot — that restriction is the entire point of the measurement, so the
- * observation renderer below is deliberately allow-list based.
- *
- * Cost measure: every turn costs one step (each `next`, each rotor list, and
- * also every malformed turn where the model failed to emit exactly one tool
- * call — a real user pays for confusion too).
+ * The LLM screen-reader agent loop.
+ * The agent solves a task through a `ScreenReaderEnv` and only sees what a
+ * screen-reader user hears (phrase, announcements, rotor lists, focus, URL);
+ * never DOM, tree, selectors or screenshots. Every turn costs one step, including malformed ones.
  */
 
 const DEFAULT_MEMORY_TURNS = 8;
@@ -92,7 +84,7 @@ function fn(name, description, parameters) {
 
 const SYSTEM_PROMPT = [
   'You are a blind person using a screen reader to operate a website. You cannot see the page.',
-  'You never receive HTML, source code, a page structure dump, a screenshot or element selectors —',
+  'You never receive HTML, source code, a page structure dump, a screenshot or element selectors:',
   'only what a screen reader speaks to you.',
   '',
   'Available commands (each is a tool; every command costs exactly one step):',
@@ -251,7 +243,7 @@ async function runSrAgent({
   }
 
   return {
-    // The harness owns the verdict — the agent is never told whether it won.
+    // The harness owns the verdict; the agent is never told whether it won.
     success: null,
     nSr: steps,
     steps,
@@ -262,7 +254,7 @@ async function runSrAgent({
   };
 }
 
-// -- internals ----------------------------------------------------------------
+// Internals
 
 function numberOr(value, fallback) {
   return typeof value === 'number' && !Number.isNaN(value) ? value : fallback;
@@ -305,9 +297,9 @@ function truncate(s, n) {
 }
 
 /**
- * Render one observation as plain text. ALLOW-LIST: task, phrase, announcements,
+ * Render one observation as plain text. Allow-list: task, phrase, announcements,
  * rotor, focus role/name, url + changed flag, budget, error, recent phrases.
- * Deliberately never includes selectors, markup or any structural dump.
+ * Never includes selectors, markup or any structural dump.
  */
 function renderObservation({ description, obs, phrases, phraseWindow, step, budgetLeft }) {
   const o = obs || {};
@@ -351,8 +343,8 @@ function renderObservation({ description, obs, phrases, phraseWindow, step, budg
 /**
  * Build the message list: pinned task, then the last `memoryTurns`
  * command/observation pairs, then the current observation. Older turns are
- * dropped entirely — the memory cap is what stops the agent from accumulating
- * the whole page and turning into a tree reader.
+ * dropped entirely; the memory cap stops the agent from accumulating the
+ * whole page and turning into a tree reader.
  */
 function buildMessages({ description, history, memoryTurns, pending }) {
   const messages = [

@@ -1,33 +1,23 @@
-/*
- * Blind Mode — client.
- *
- * The browser is the speaker and the keyboard, nothing else: every key is sent
- * to the server as a ScreenReaderEnv command and the server sends back what the
- * screen reader said. No page content ever reaches this file, so the player
- * really is limited to what is spoken.
- *
- * Everything spoken also goes into an aria-live="assertive" region, so a player
- * who uses a REAL screen reader (or has no speech synthesis at all) gets the
- * same information. Every speech call is guarded: headless browsers and locked
- * down environments have no speechSynthesis and the game must still work.
+/**
+ * Blind Mode client: speaker and keyboard only. Every key becomes a
+ * ScreenReaderEnv command; the server returns what the screen reader said.
+ * Everything spoken also goes into an aria-live region for real screen readers.
  */
 (function () {
   'use strict';
 
-  /* ---------------------------------------------------------------- *
-   * Key map. One place for "which key means which env command", used by
-   * the play screen, the key help and the optimal-path rendering.
-   * ---------------------------------------------------------------- */
+  // Key map: which key means which env command, used by the play screen,
+  // the key help and the optimal-path rendering.
   var KEY_LABEL = {
-    next: 'Pfeil runter',
-    prev: 'Pfeil hoch',
+    next: 'Arrow down',
+    prev: 'Arrow up',
     tab: 'Tab',
     shiftTab: 'Shift+Tab',
-    headings: 'Liste Überschriften',
-    landmarks: 'Liste Bereiche',
-    links: 'Liste Links',
-    formFields: 'Liste Felder',
-    jumpTo: 'Auswahl aus der Liste',
+    headings: 'List headings',
+    landmarks: 'List landmarks',
+    links: 'List links',
+    formFields: 'List fields',
+    jumpTo: 'Pick from the list',
     nextHeading: 'H',
     prevHeading: 'Shift+H',
     nextLink: 'L',
@@ -37,30 +27,28 @@
     nextLandmark: 'D',
     prevLandmark: 'Shift+D',
     activate: 'Enter',
-    type: 'Eingabe',
+    type: 'Type',
     escape: 'Esc',
     repeat: 'R',
-    done: 'Fertig',
+    done: 'Done',
   };
 
   var KEY_HELP = [
-    'Pfeil runter und Pfeil hoch: ein Element weiter oder zurück.',
-    'Tab und Shift Tab: nächstes bedienbares Element.',
-    'H: nächste Überschrift, Shift H zurück.',
-    'L: nächster Link, Shift L zurück.',
-    'F: nächstes Formularfeld, Shift F zurück.',
-    'D: nächster Seitenbereich, Shift D zurück.',
-    'Enter: auslösen. In einem Textfeld: Eingabemodus.',
-    'Esc: abbrechen. R: letzte Ansage wiederholen.',
-    'Fragezeichen: diese Liste. Esc Esc: Spiel verlassen.',
+    'Arrow down and arrow up: one element forward or back.',
+    'Tab and Shift Tab: next interactive element.',
+    'H: next heading, Shift H back.',
+    'L: next link, Shift L back.',
+    'F: next form field, Shift F back.',
+    'D: next landmark, Shift D back.',
+    'Enter: activate. In a text field: input mode.',
+    'Esc: cancel. R: repeat the last announcement.',
+    'Question mark: this list. Esc Esc: leave the game.',
   ].join(' ');
 
   /** Roles whose phrase means "the cursor sits in a text field". */
   var TEXT_FIELD_RE = /^(textbox|searchbox|combobox|spinbutton)\b/i;
 
-  /* ---------------------------------------------------------------- *
-   * Elements
-   * ---------------------------------------------------------------- */
+  // Elements
   var $ = function (id) {
     return document.getElementById(id);
   };
@@ -79,9 +67,7 @@
   var live = $('live');
   var capture = $('capture');
 
-  /* ---------------------------------------------------------------- *
-   * State
-   * ---------------------------------------------------------------- */
+  // State
   var state = {
     tasks: [],
     task: null,
@@ -103,10 +89,8 @@
     result: null,
   };
 
-  /* ---------------------------------------------------------------- *
-   * Live region + speech. Both are always used together: the live region
-   * is the accessible fallback, speech is the experience.
-   * ---------------------------------------------------------------- */
+  // Live region + speech. Both are always used together: the live region
+  // is the accessible fallback, speech is the experience.
   function announce(text) {
     if (!live) return;
     // Re-setting identical text does not re-trigger a live region; toggle it.
@@ -125,7 +109,7 @@
       try {
         window.speechSynthesis.cancel();
       } catch (e) {
-        /* not available */
+        /* speech not available */
       }
     },
     /**
@@ -164,7 +148,7 @@
     },
   };
 
-  /* --- earcons (WebAudio, no assets) -------------------------------- */
+  // Earcons (WebAudio, no assets)
   var audio = {
     ctx: null,
     ensure: function () {
@@ -216,9 +200,7 @@
     },
   };
 
-  /* ---------------------------------------------------------------- *
-   * Screens
-   * ---------------------------------------------------------------- */
+  // Screens
   function show(name) {
     Object.keys(screens).forEach(function (key) {
       screens[key].hidden = key !== name;
@@ -233,14 +215,12 @@
     }
   }
 
-  /* ---------------------------------------------------------------- *
-   * Setup screen
-   * ---------------------------------------------------------------- */
+  // Setup screen
   function renderTasks(tasks) {
     var box = $('task-choices');
     box.innerHTML = '';
     if (!tasks.length) {
-      box.textContent = 'Keine Aufgaben gefunden.';
+      box.textContent = 'No tasks found.';
       return;
     }
     tasks.forEach(function (task, i) {
@@ -281,12 +261,10 @@
     show('briefing');
   });
 
-  /* ---------------------------------------------------------------- *
-   * Briefing screen
-   * ---------------------------------------------------------------- */
+  // Briefing screen
   function beginGame() {
     $('play-task').textContent = state.task.description;
-    $('play-counter').textContent = 'Schritt 0';
+    $('play-counter').textContent = 'Step 0';
     $('phrase-display').hidden = state.mode !== 'training';
     $('phrase-display').textContent = '';
     $('pause-panel').hidden = true;
@@ -308,9 +286,7 @@
     }
   });
 
-  /* ---------------------------------------------------------------- *
-   * WebSocket
-   * ---------------------------------------------------------------- */
+  // WebSocket
   function connect() {
     var proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     var ws = new WebSocket(proto + '//' + window.location.host + '/ws');
@@ -361,7 +337,7 @@
     if (msg.type === 'started') {
       state.lang = msg.lang || 'en';
       state.budget = msg.budget;
-      speech.speak('Es geht los.', { lang: 'de' });
+      speech.speak('Go.', { lang: 'en' });
     } else if (msg.type === 'obs') {
       onObservation(msg);
     } else if (msg.type === 'result') {
@@ -369,7 +345,7 @@
     } else if (msg.type === 'error') {
       state.inFlight = false;
       earcon.noop();
-      speech.speak('Fehler: ' + msg.message, { lang: 'de' });
+      speech.speak('Error: ' + msg.message, { lang: 'en' });
     }
   }
 
@@ -377,17 +353,17 @@
     state.inFlight = false;
     if (!msg.free) state.step = msg.step;
     state.lastPhrase = msg.phrase || '';
-    $('play-counter').textContent = 'Schritt ' + state.step;
+    $('play-counter').textContent = 'Step ' + state.step;
     if (state.mode === 'training') $('phrase-display').textContent = state.lastPhrase;
 
     var spoken;
     if (msg.kind === 'noop') {
       earcon.noop();
-      spoken = speech.speak(state.lastPhrase || 'Nichts passiert.');
+      spoken = speech.speak(state.lastPhrase || 'Nothing happened.');
     } else if (msg.kind === 'announcement') {
       earcon.announcement();
       spoken = speech
-        .speak('Ansage: ' + (msg.announcements || []).join('. '), { pitch: 1.4 })
+        .speak('Announcement: ' + (msg.announcements || []).join('. '), { pitch: 1.4 })
         .then(function () {
           return speech.speak(state.lastPhrase);
         });
@@ -398,15 +374,13 @@
     if (!msg.free && !state.warned && msg.budgetLeft === 5) {
       state.warned = true;
       spoken.then(function () {
-        return speech.speak('noch 5 Schritte', { lang: 'de' });
+        return speech.speak('5 steps left', { lang: 'en' });
       });
     }
     pump();
   }
 
-  /* ---------------------------------------------------------------- *
-   * Play screen: keyboard
-   * ---------------------------------------------------------------- */
+  // Play screen: keyboard
   var PLAIN_KEYS = {
     ArrowDown: 'next',
     ArrowUp: 'prev',
@@ -451,7 +425,7 @@
     }
     if (key === '?') {
       event.preventDefault();
-      speech.speak(KEY_HELP, { lang: 'de' });
+      speech.speak(KEY_HELP, { lang: 'en' });
       return;
     }
     var lower = typeof key === 'string' ? key.toLowerCase() : '';
@@ -468,8 +442,8 @@
 
   /**
    * Esc is both "press Escape on the page" and, pressed twice, "leave the
-   * game". A single Esc is therefore held back for a moment: a second Esc
-   * within the window leaves instead of spending a step on the page.
+   * game". A single Esc is held back for a moment: a second Esc within the
+   * window leaves instead of spending a step on the page.
    */
   var ESC_DOUBLE_MS = 500;
   function onEscape() {
@@ -487,7 +461,7 @@
 
   function leaveCapture() {
     $('pause-panel').hidden = false;
-    speech.speak('Spiel pausiert, Tab für Aufgeben', { lang: 'de' });
+    speech.speak('Game paused, Tab to give up', { lang: 'en' });
     var heading = $('pause-heading');
     if (heading) heading.focus();
   }
@@ -495,7 +469,7 @@
   $('resume-button').addEventListener('click', function () {
     $('pause-panel').hidden = true;
     capture.focus();
-    speech.speak('Weiter.', { lang: 'de' });
+    speech.speak('Resumed.', { lang: 'en' });
   });
 
   $('giveup-button').addEventListener('click', function () {
@@ -503,10 +477,10 @@
     send({ type: 'abort' });
   });
 
-  /* --- input mode --------------------------------------------------- */
+  // Input mode
   function fieldNameOf(phrase) {
     var parts = String(phrase || '').split(',');
-    return (parts[1] || parts[0] || 'Feld').trim();
+    return (parts[1] || parts[0] || 'field').trim();
   }
 
   function enterInputMode() {
@@ -514,7 +488,7 @@
     state.inputBuffer = '';
     state.inputField = fieldNameOf(state.lastPhrase);
     earcon.inputMode();
-    speech.speak('Eingabemodus, ' + state.inputField, { lang: 'de' });
+    speech.speak('Input mode, ' + state.inputField, { lang: 'en' });
   }
 
   function leaveInputMode() {
@@ -528,7 +502,7 @@
       event.preventDefault();
       leaveInputMode();
       earcon.noop();
-      speech.speak('Eingabe abgebrochen.', { lang: 'de' });
+      speech.speak('Input cancelled.', { lang: 'en' });
       return;
     }
     if (key === 'Enter') {
@@ -543,23 +517,21 @@
     if (key === 'Backspace') {
       event.preventDefault();
       state.inputBuffer = state.inputBuffer.slice(0, -1);
-      speech.speak('gelöscht', { lang: 'de', quiet: true });
+      speech.speak('deleted', { lang: 'en', quiet: true });
       return;
     }
     if (typeof key === 'string' && key.length === 1) {
       event.preventDefault();
       state.inputBuffer += key;
-      speech.speak(key === ' ' ? 'Leerzeichen' : key, { lang: 'de', quiet: true });
+      speech.speak(key === ' ' ? 'space' : key, { lang: 'en', quiet: true });
     }
   }
 
-  /* ---------------------------------------------------------------- *
-   * Result screen
-   * ---------------------------------------------------------------- */
+  // Result screen
   function keyFor(cmd) {
     if (!cmd) return '?';
     var label = KEY_LABEL[cmd.type] || cmd.type;
-    if (cmd.type === 'type') return 'Eingabe "' + cmd.arg + '"';
+    if (cmd.type === 'type') return 'Type "' + cmd.arg + '"';
     if (cmd.type === 'jumpTo') return label;
     return label;
   }
@@ -576,11 +548,11 @@
     var dl = $('result-numbers');
     dl.innerHTML = '';
     var rows = [
-      ['Deine Schritte', String(msg.nHuman)],
-      ['Kürzester Weg', String(msg.nOpt)],
-      ['Wert R', String(Math.round(msg.R * 100) / 100)],
+      ['Your steps', String(msg.nHuman)],
+      ['Shortest path', String(msg.nOpt)],
+      ['Score R', String(Math.round(msg.R * 100) / 100)],
     ];
-    if (msg.nAgent != null) rows.splice(2, 0, ['KI-Agent', String(msg.nAgent)]);
+    if (msg.nAgent != null) rows.splice(2, 0, ['AI agent', String(msg.nAgent)]);
     rows.forEach(function (row) {
       var dt = document.createElement('dt');
       dt.textContent = row[0];
@@ -590,7 +562,7 @@
       dl.appendChild(dd);
     });
 
-    $('optimal-intro').textContent = 'So wäre es in ' + msg.nOpt + ' Schritten gegangen:';
+    $('optimal-intro').textContent = 'It could have been done in ' + msg.nOpt + ' steps:';
     var ol = $('result-optimal');
     ol.innerHTML = '';
     (msg.optimalPath || []).forEach(function (entry) {
@@ -608,7 +580,7 @@
     if (msg.stuck) {
       stuckSection.hidden = false;
       $('stuck-intro').textContent =
-        'Schritt ' + msg.stuck.fromStep + ' bis ' + msg.stuck.toStep + '. Das hast du gehört:';
+        'Step ' + msg.stuck.fromStep + ' to ' + msg.stuck.toStep + '. This is what you heard:';
       var sol = $('result-stuck');
       sol.innerHTML = '';
       msg.stuck.phrases.forEach(function (phrase) {
@@ -621,7 +593,7 @@
     }
 
     show('result');
-    speech.speak(msg.verdict, { lang: 'de' });
+    speech.speak(msg.verdict, { lang: 'en' });
   }
 
   $('playback-button').addEventListener('click', function () {
@@ -632,7 +604,7 @@
       var entry = path[i];
       i += 1;
       speech
-        .speak(keyFor(entry.cmd), { lang: 'de' })
+        .speak(keyFor(entry.cmd), { lang: 'en' })
         .then(function () {
           return speech.speak(entry.phrase || '');
         })
@@ -653,9 +625,7 @@
     show('setup');
   });
 
-  /* ---------------------------------------------------------------- *
-   * Boot
-   * ---------------------------------------------------------------- */
+  // Boot
   fetch('/api/tasks')
     .then(function (res) {
       return res.json();
@@ -665,7 +635,7 @@
       renderTasks(tasks);
     })
     .catch(function () {
-      $('task-choices').textContent = 'Aufgaben konnten nicht geladen werden.';
+      $('task-choices').textContent = 'Tasks could not be loaded.';
     });
 
   // Exposed for the smoke test and for debugging in the browser console.

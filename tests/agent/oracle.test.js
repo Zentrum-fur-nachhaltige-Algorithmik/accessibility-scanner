@@ -14,7 +14,7 @@ const {
 
 const BASIC = '/agent/oracle-basic.html';
 
-describe('agent/oracle — validateSpec', () => {
+describe('agent/oracle: validateSpec', () => {
   it('rejects unknown predicate types', () => {
     expect(() => validateSpec({ type: 'doesNotExist' })).toThrow(/unknown predicate type/i);
   });
@@ -76,7 +76,7 @@ describe('agent/oracle — validateSpec', () => {
   });
 });
 
-describe('agent/oracle — evaluate', () => {
+describe('agent/oracle: evaluate', () => {
   let page;
 
   beforeAll(async () => {

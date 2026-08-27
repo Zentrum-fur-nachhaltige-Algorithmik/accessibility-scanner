@@ -1,18 +1,8 @@
 #!/usr/bin/env node
 /**
- * src/agent/run.js — CLI for the SR-agent measurement.
- *
- *   node src/agent/run.js <url> [--tasks tasks.json] [--generate] [--k 1]
- *                              [--model google/gemini-3.7-flash]
- *                              [--out result.json] [--headless true]
- *
- * Task source, in order of precedence:
- *   --tasks FILE  a generated / hand-written task file
- *   --generate    run the Stage 3 sighted generator first (src/agent/task-generator.js)
- *                 and save the tasks next to --out as `<out>.tasks.json`
- *   (neither)     the generic site-agnostic templates instantiated on first load
- *
- * Needs OPENROUTER_API_KEY.
+ * run CLI: the SR-agent measurement for one site. Needs OPENROUTER_API_KEY.
+ * Task source by precedence: `--tasks FILE`, `--generate` (sighted task
+ * generator, saved as `<out>.tasks.json`), otherwise the generic templates.
  */
 
 const fs = require('fs');
@@ -143,7 +133,7 @@ async function main() {
       tasks = JSON.parse(fs.readFileSync(path.resolve(args.tasks), 'utf8'));
       if (!Array.isArray(tasks)) tasks = tasks.tasks;
     } else if (args.generate) {
-      // Stage 3: derive site-specific tasks first, then measure with them.
+      // Derive site-specific tasks first, then measure with them.
       const { generateTasks } = require('./task-generator');
       const { saveTasks } = require('./task');
       const { printSummary: printGenSummary } = require('./generate-tasks');

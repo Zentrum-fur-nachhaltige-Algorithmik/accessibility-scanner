@@ -1,11 +1,7 @@
 /**
- * src/agent/replay.js — deterministic replay of a task's sighted path.
- *
- * The sighted path is the model-independent baseline for the SR-Agent score:
- * `n_sighted` is simply its number of steps. Replaying it also proves the task
- * is well-formed: the oracle must be FALSE before the path runs and TRUE after.
- *
- * Everything here is deterministic — no LLM, no heuristics beyond waiting.
+ * Replay: deterministic replay of a task's sighted path, no LLM involved.
+ * Replaying proves the task is well-formed: the oracle must be false before
+ * the path runs and true after. `nSighted` is the path's step count.
  */
 
 'use strict';
@@ -32,7 +28,7 @@ async function requireSelector(page, selector, label, opts) {
   try {
     await page.waitForSelector(selector, { visible: true, timeout: opts.selectorTimeout });
   } catch (_) {
-    // Fall back to a non-visible match so we can distinguish "missing" from "hidden".
+    // A non-visible match distinguishes "missing" from "hidden".
     const exists = await page.$(selector).catch(() => null);
     throw new Error(
       exists
@@ -56,8 +52,8 @@ async function executeStep(page, step, label, options = {}) {
 
   if (step.selector) await requireSelector(page, step.selector, label, opts);
 
-  // Any of the interactions below may or may not navigate. We arm a navigation
-  // watcher first and swallow its timeout when nothing navigates.
+  // Any of the interactions below may navigate. Arm a navigation watcher first
+  // and swallow its timeout when nothing navigates.
   const navPromise = page
     .waitForNavigation({ waitUntil: 'domcontentloaded', timeout: opts.navigationTimeout })
     .then(() => true)
@@ -92,9 +88,9 @@ async function runSteps(page, steps, kind, options) {
 }
 
 /**
- * Run the task's preconditions (e.g. dismiss a cookie banner). They are run
- * before BOTH the sighted replay and the SR agent, so the oracle's "state 0"
- * is the state after preconditions.
+ * Run the task's preconditions (e.g. dismiss a cookie banner). They run before
+ * both the sighted replay and the SR agent, so the oracle's "state 0" is the
+ * state after preconditions.
  * @returns {Promise<{ ok: boolean, error?: string }>}
  */
 async function runPreconditions(page, task, options = {}) {
@@ -111,9 +107,9 @@ async function runPreconditions(page, task, options = {}) {
 /**
  * Replay a task's sighted path deterministically.
  *
- * @param {import('puppeteer').Page} page  already navigated, preconditions applied
+ * @param {import('puppeteer').Page} page already navigated, preconditions applied
  * @param {object} task
- * @param {object} [ctx]  oracle context, e.g. `{ recorder }` for `requestSent`
+ * @param {object} [ctx] oracle context, e.g. `{ recorder }` for `requestSent`
  * @param {object} [options] timeout overrides (see DEFAULTS)
  * @returns {Promise<{ok, nSighted, oracleBefore, oracleAfter, error?}>}
  */
@@ -133,7 +129,7 @@ async function replaySightedPath(page, task, ctx = {}, options = {}) {
     await runSteps(page, steps, 'sightedPath', options);
   } catch (err) {
     result.error = err.message;
-    // Still report the oracle state so callers can see how far we got.
+    // Still report the oracle state so callers can see how far the replay got.
     result.oracleAfter = await evaluate(task.oracle, page, ctx).catch(() => null);
     return result;
   }
@@ -152,16 +148,14 @@ async function replaySightedPath(page, task, ctx = {}, options = {}) {
 
 /**
  * Validate a task against a live site by replaying it `repeats` times, each on a
- * fresh page. A task is valid only if, on EVERY repeat, the oracle is false at
+ * fresh page. A task is valid only if, on every repeat, the oracle is false at
  * state 0 (after preconditions) and true after the replay. An invalid task is
- * excluded from scoring — it says nothing about the accessibility of the page.
+ * excluded from scoring: it says nothing about the accessibility of the page.
  *
- * A valid task additionally gets its `nOpt`: the length of the shortest
- * ScreenReaderEnv command sequence that performs the same path (see
- * `optimal-path.js`). It is measured on ONE extra isolated-context page, so the
- * repeats above stay untouched by it. `nSighted` is kept for validation and the
- * step budget only — it is in clicks, not in screen-reader commands, and never
- * enters the score.
+ * A valid task additionally gets its `nOpt`, the length of the shortest
+ * ScreenReaderEnv command sequence for the same path (see optimal-path.js),
+ * measured on one extra isolated-context page. `nSighted` is in clicks, not
+ * screen-reader commands, and serves validation and the step budget only.
  *
  * @returns {Promise<{ valid, reasons: string[], nSighted, nOpt: number|null,
  *                     optimalPath: object[]|null, optimalPathError?: string }>}
@@ -193,7 +187,7 @@ async function validateTask(
 
       const pre = await runPreconditions(page, normalized, options);
       if (!pre.ok) {
-        reasons.push(`repeat ${attempt}: precondition failed — ${pre.error}`);
+        reasons.push(`repeat ${attempt}: precondition failed: ${pre.error}`);
         continue;
       }
 
@@ -245,7 +239,7 @@ async function measureOptimalPath(browser, url, task, options = {}) {
     await page.setViewport({ width: 1280, height: 900 });
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: DEFAULTS.gotoTimeout });
     const pre = await runPreconditions(page, task, options);
-    if (!pre.ok) return { nOpt: null, steps: null, error: `precondition failed — ${pre.error}` };
+    if (!pre.ok) return { nOpt: null, steps: null, error: `precondition failed: ${pre.error}` };
     return await computeOptimalPath(page, task, {}, options);
   } catch (err) {
     return { nOpt: null, steps: null, error: err.message };

@@ -1,16 +1,7 @@
 /**
- * blind-mode/server/store.js — the session trace log.
- *
- * One JSON object per line in `data/sessions.jsonl`, in exactly the vocabulary
- * of `ScreenReaderEnv.trace` (command types, phrases, announcements), so a human
- * session and an SR-agent run can be compared line by line.
- *
- * What is stored: the task, the keystroke sequence and what was spoken.
- * What is NOT stored: IP address, user agent, names, any identifier of the
- * person playing. The session id is a fresh random uuid per game.
- *
- * `BLIND_MODE_DATA` overrides the DIRECTORY; the file inside it is always
- * `sessions.jsonl`.
+ * Blind Mode session log: one JSON object per line in `data/sessions.jsonl`,
+ * in the vocabulary of `ScreenReaderEnv.trace` so human and agent runs compare
+ * line by line. Stores task, keystrokes and spoken output; no IP, user agent or names.
  */
 
 'use strict';
@@ -20,6 +11,7 @@ const path = require('path');
 
 const DEFAULT_DIR = path.join(__dirname, '..', 'data');
 
+/** `BLIND_MODE_DATA` overrides the directory; the file name is fixed. */
 function dataDir() {
   return process.env.BLIND_MODE_DATA || DEFAULT_DIR;
 }
@@ -36,7 +28,7 @@ function appendSession(record) {
     fs.appendFileSync(file, `${JSON.stringify(record)}\n`, 'utf8');
     return file;
   } catch (err) {
-    process.stderr.write(`blind-mode: could not write session log — ${err.message}\n`);
+    process.stderr.write(`blind-mode: could not write session log: ${err.message}\n`);
     return null;
   }
 }

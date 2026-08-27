@@ -1,28 +1,8 @@
 /**
- * src/agent/generic-tasks.js — site-agnostic task templates.
- *
- * `instantiateGenericTasks(page)` inspects the DOM of an already-navigated page
- * and returns a Task[] (see `src/agent/task.js`) for every template that is
- * applicable. Templates that find no anchor in the DOM are simply omitted, and
- * templates whose oracle is ALREADY true on the current page are omitted too —
- * such a task would be trivially solved and would be rejected by
- * `validateTask()` anyway.
- *
- * Templates:
- *   cookie-banner-dismiss  — close the cookie/consent notice
- *   main-navigation        — follow the first entry of the main menu
- *   site-search            — use the site search
- *   contact-page           — find the contact page
- *   login                  — open the login
- *   simple-form            — fill in and send a short form
- *
- * The heuristics below are deliberately simple and text-driven (English +
- * German wording). They are a starting point and meant to be refined; every
- * instantiated task is verified afterwards by `validateTask()`, so a bad guess
- * costs a dropped task, never a false accessibility finding.
- *
- * Task descriptions are written in plain user language (English) and must not
- * mention element names or selectors — the SR agent only ever sees them.
+ * Site-agnostic task templates.
+ * `instantiateGenericTasks(page)` inspects an already-navigated page and returns
+ * a Task[] for every applicable template. Heuristics are simple and text-driven
+ * (English and German wording); `validateTask()` catches bad guesses afterwards.
  */
 
 'use strict';
@@ -30,9 +10,7 @@
 const { escapeRegExp, evaluate } = require('./oracle');
 const { ensureHelpers } = require('./dom-helpers');
 
-/* ------------------------------------------------------------------ */
-/* Wording heuristics (shared with the in-page collector as strings)   */
-/* ------------------------------------------------------------------ */
+// Wording heuristics (shared with the in-page collector as strings)
 
 const WORDS = {
   cookieContainer: 'cookie|consent|gdpr|dsgvo|datenschutz-?banner|cmp',
@@ -51,12 +29,12 @@ async function collectCandidates(page, words) {
   await ensureHelpers(page);
   return page.evaluate((W) => {
     const rx = (s) => new RegExp(s, 'i');
-    // ONE shared implementation of selector/visibility/text/name — see dom-helpers.js.
+    // Shared implementation of selector/visibility/text/name, see dom-helpers.js.
     const { isVisible, text, selectorFor, accName } = window.__A11YH;
 
     const out = {};
 
-    /* --- cookie banner ------------------------------------------------ */
+    // cookie banner
     (() => {
       const containers = Array.from(
         document.querySelectorAll('[id],[class],[role="dialog"],[role="alertdialog"],dialog')
@@ -83,7 +61,7 @@ async function collectCandidates(page, words) {
       }
     })();
 
-    /* --- main navigation --------------------------------------------- */
+    // main navigation
     (() => {
       const nav =
         document.querySelector('header nav, nav[role="navigation"], nav, [role="navigation"]') ||
@@ -107,7 +85,7 @@ async function collectCandidates(page, words) {
       }
     })();
 
-    /* --- site search --------------------------------------------------- */
+    // site search
     (() => {
       const input = Array.from(
         document.querySelectorAll('input[type="search"], input[type="text"], input:not([type])')
@@ -135,7 +113,7 @@ async function collectCandidates(page, words) {
       };
     })();
 
-    /* --- contact page --------------------------------------------------- */
+    // contact page
     (() => {
       const link = Array.from(document.querySelectorAll('a[href]'))
         .filter(isVisible)
@@ -147,7 +125,7 @@ async function collectCandidates(page, words) {
       if (link) out.contact = { selector: selectorFor(link), href: link.href, label: text(link) };
     })();
 
-    /* --- login ---------------------------------------------------------- */
+    // login
     (() => {
       const el = Array.from(document.querySelectorAll('a[href], button, [role="button"]'))
         .filter(isVisible)
@@ -164,7 +142,7 @@ async function collectCandidates(page, words) {
       };
     })();
 
-    /* --- simple form ------------------------------------------------------ */
+    // simple form
     (() => {
       const searchInput = out.search ? document.querySelector(out.search.selector) : null;
       const forms = Array.from(document.querySelectorAll('form')).filter(isVisible);
@@ -225,9 +203,8 @@ function sampleValue(field) {
   return 'Testeingabe';
 }
 
-/* ------------------------------------------------------------------ */
-/* Template builders — each returns a Task or null                     */
-/* ------------------------------------------------------------------ */
+// Template builders: each returns a Task or null. Descriptions are plain user
+// language without element names or selectors, since the SR agent sees them.
 
 const TEMPLATES = {
   'cookie-banner-dismiss'(c) {
@@ -344,11 +321,14 @@ const TEMPLATE_IDS = Object.keys(TEMPLATES);
 
 /**
  * Instantiate all applicable generic tasks for the current page.
+ * Templates: cookie-banner-dismiss, main-navigation, site-search, contact-page,
+ * login, simple-form. Templates without a DOM anchor, and (by default) tasks
+ * whose oracle already holds, are omitted.
  *
- * @param {import('puppeteer').Page} page  already navigated page
+ * @param {import('puppeteer').Page} page - already navigated page
  * @param {object} [opts]
- * @param {string[]} [opts.only]        restrict to these template ids
- * @param {boolean} [opts.skipSatisfied=true] drop tasks whose oracle is already true
+ * @param {string[]} [opts.only] - restrict to these template ids
+ * @param {boolean} [opts.skipSatisfied=true] - drop tasks whose oracle is already true
  * @returns {Promise<object[]>} Task[] (weight defaults applied)
  */
 async function instantiateGenericTasks(page, opts = {}) {
@@ -365,7 +345,7 @@ async function instantiateGenericTasks(page, opts = {}) {
       task = null; // a broken heuristic must never break the whole run
     }
     if (!task) continue;
-    // Selector generation can fail (exotic DOM) — drop the task rather than
+    // Selector generation can fail (exotic DOM); drop the task rather than
     // emitting a step that can never run.
     const needsSelector = (s) => s.action === 'click' || s.action === 'type';
     if (task.sightedPath.some((s) => needsSelector(s) && !s.selector)) continue;
@@ -374,8 +354,8 @@ async function instantiateGenericTasks(page, opts = {}) {
 
     if (skipSatisfied) {
       // A task whose oracle already holds at state 0 is not measurable.
-      // `requestSent` sub-predicates need a recorder we do not have here; treat
-      // them as "not yet satisfied" by passing an empty request list.
+      // `requestSent` sub-predicates need a recorder that is absent here; an
+      // empty request list treats them as not yet satisfied.
       let already = false;
       try {
         already = await evaluate(task.oracle, page, { requests: [] });

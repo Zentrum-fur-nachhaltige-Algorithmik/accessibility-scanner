@@ -1,31 +1,7 @@
 /**
- * src/agent/task.js — Task schema for the SR-Agent measurement.
- *
- * A Task describes one realistic user goal on a page, together with
- *  - a deterministic oracle deciding whether the goal was reached, and
- *  - a `sightedPath`: the shortest sensible click path a sighted user would take.
- *    Its length is `n_sighted`, the model-independent baseline of the score.
- *
- * Shape:
- * ```js
- * {
- *   id: string,                  // stable, unique per site
- *   description: string,         // plain user language, NO selectors / element names
- *   weight: number = 1,          // weight in the site score
- *   oracle: OracleSpec,          // see src/agent/oracle.js
- *   sightedPath: Step[],         // >= 1 step
- *   preconditions?: Step[],      // run before BOTH agents (e.g. dismiss cookie banner)
- *   template?: string,           // generic-task template id it was instantiated from
- *   meta?: object                // free-form provenance
- * }
- * ```
- * Step (one of):
- * ```js
- * { action: 'click',  selector }
- * { action: 'type',   selector, text }
- * { action: 'press',  key, selector? }   // selector: focus it first
- * { action: 'goto',   url }
- * ```
+ * Task schema for the SR-agent measurement.
+ * A task is one user goal on a page with a deterministic oracle and a
+ * `sightedPath` (shortest sensible click path; its length is `n_sighted`).
  */
 
 'use strict';
@@ -36,7 +12,11 @@ const { validateSpec } = require('./oracle');
 
 const STEP_ACTIONS = ['click', 'type', 'press', 'goto'];
 
-/** Validate a single sightedPath/precondition step. Throws with a clear message. */
+/**
+ * Validate a single sightedPath/precondition step. Throws with a clear message.
+ * Step shapes: `{ action: 'click', selector }`, `{ action: 'type', selector, text }`,
+ * `{ action: 'press', key, selector? }` (selector: focus it first), `{ action: 'goto', url }`.
+ */
 function validateStep(step, where) {
   if (!step || typeof step !== 'object' || Array.isArray(step)) {
     throw new Error(`Task: ${where} must be an object`);
@@ -83,7 +63,10 @@ const SELECTORY =
 
 /**
  * Validate the shape of a task. Throws on structural problems.
- * Returns a NEW task object with defaults applied (does not mutate the input).
+ * Returns a new task object with defaults applied (does not mutate the input).
+ * Fields: id, description (plain user language, no selectors), weight = 1, oracle
+ * (see oracle.js), sightedPath (>= 1 step), preconditions? (run before both agents),
+ * template? (generic-task template id), meta? (free-form provenance).
  */
 function validateTaskShape(task) {
   if (!task || typeof task !== 'object' || Array.isArray(task)) {
@@ -169,7 +152,7 @@ function loadTasks(filePath) {
   try {
     payload = JSON.parse(raw);
   } catch (err) {
-    throw new Error(`Task file ${filePath}: invalid JSON — ${err.message}`);
+    throw new Error(`Task file ${filePath}: invalid JSON: ${err.message}`);
   }
   return parseTasks(payload);
 }

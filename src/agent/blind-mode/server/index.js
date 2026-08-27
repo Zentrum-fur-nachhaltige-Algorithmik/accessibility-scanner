@@ -1,22 +1,7 @@
 /**
- * blind-mode/server/index.js — "Blind Mode": play a website the way a screen
- * reader user hears it.
- *
- * One sighted player, one simulated screen reader. The browser is only the
- * speaker and the keyboard; everything real happens here: a Puppeteer page per
- * session, driven through `ScreenReaderEnv`, with the task oracle evaluated
- * server-side after every command.
- *
- *   npm run blind-mode          # http://127.0.0.1:8790
- *   PORT=9000 npm run blind-mode
- *   BLIND_MODE_DATA=/tmp/bm npm run blind-mode   # session log directory
- *
- * Routes
- *   GET  /            the game (static files from ../web)
- *   GET  /site/*      the demo mini-site (test-sites/agent), so the demo tasks
- *                     need no other server running
- *   GET  /api/tasks   the playable tasks
- *   WS   /ws          the game protocol (see the README)
+ * Blind Mode server: play a website the way a screen reader user hears it.
+ * The browser is only speaker and keyboard; each session drives a Puppeteer
+ * page through ScreenReaderEnv and evaluates the task oracle server-side.
  */
 
 'use strict';
@@ -36,13 +21,13 @@ const SITE_DIR = path.join(__dirname, '..', '..', '..', '..', 'test-sites', 'age
 const DEFAULT_PORT = 8790;
 
 /**
- * Build (but do not listen on) the game server.
+ * Build (but do not listen on) the game server. Routes: `/` static web client,
+ * `/site/*` the demo mini-site from test-sites/agent, `/api/tasks`, `/ws` game protocol.
  *
  * @param {object} [options]
- * @param {string} [options.tasksDir]   where the task JSON files live
- * @param {boolean} [options.precompute=true] compute the optimal paths in the
- *        background at start; turning it off makes the first result slower but
- *        the start instant (used by the tests).
+ * @param {string} [options.tasksDir] where the task JSON files live
+ * @param {boolean} [options.precompute=true] compute optimal paths in the background at
+ *        start; off makes the first result slower but the start instant (tests)
  * @returns {{ server: http.Server, app: express.Express, listen: Function, close: Function }}
  */
 function createServer(options = {}) {
@@ -114,7 +99,7 @@ function createServer(options = {}) {
     const address = server.address();
     const origin = `http://${host}:${address.port}`;
     if (options.precompute !== false) {
-      // Warm the "So wäre es gegangen" paths so the first result screen is fast.
+      // Warm the optimal paths so the first result screen is fast.
       for (const task of tasks) {
         optimalCache
           .get({ ...task, url: resolveUrl(task, origin) })
@@ -150,7 +135,7 @@ if (require.main === module) {
   game
     .listen(port)
     .then((origin) => {
-      process.stdout.write(`Blind Mode läuft auf ${origin}\n`);
+      process.stdout.write(`Blind Mode running at ${origin}\n`);
     })
     .catch((err) => {
       process.stderr.write(`blind-mode: ${err.message}\n`);

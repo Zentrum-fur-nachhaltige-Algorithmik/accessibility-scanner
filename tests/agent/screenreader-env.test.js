@@ -207,7 +207,7 @@ describe('ScreenReaderEnv', () => {
 
         const landmark = await env.step({ type: 'nextLandmark' });
         expect(landmark.error).toBeUndefined();
-        // A landmark, never the "end of ..." boundary of the one we are inside.
+        // A landmark, never the "end of ..." boundary of the enclosing one.
         expect(landmark.phrase).not.toMatch(/^end of/i);
       });
     }, 60000);
@@ -234,7 +234,7 @@ describe('ScreenReaderEnv', () => {
         expect(noLinkBack.error).toBe('no link');
         expect(env.stepCount).toBe(2);
 
-        // The kinds that DO exist here still work.
+        // The kinds that do exist here still work.
         expect(await env.step({ type: 'nextHeading' }).then((o) => o.error)).toBeUndefined();
         expect(await env.step({ type: 'nextFormField' }).then((o) => o.error)).toBeUndefined();
       });

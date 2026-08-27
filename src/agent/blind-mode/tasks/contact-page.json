@@ -2,7 +2,7 @@
   "id": "contact-page",
   "template": "contact-page",
   "url": "/site/generic-home.html",
-  "description": "Finde die Seite, auf der steht, wie man diese Firma erreichen kann.",
+  "description": "Find the page that tells you how to reach this company.",
   "weight": 1,
   "preconditions": [
     {

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,49 +7,49 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="page-header">
       <p class="brand">Blind Mode</p>
     </header>
 
     <main id="main" tabindex="-1">
-      <!-- 1 ------------------------------------------------------------ -->
+      <!-- 1: setup -->
       <section id="screen-setup" class="screen" aria-labelledby="setup-heading">
-        <h1 id="setup-heading" tabindex="-1">Eine Website nur mit den Ohren</h1>
+        <h1 id="setup-heading" tabindex="-1">A website by ear only</h1>
         <p class="lead">
-          Du bekommst genau das, was ein Screenreader vorliest. Kein Bild, keine Maus. Deine Aufgabe
-          steht gleich auf dem nächsten Bildschirm.
+          You get exactly what a screen reader reads out. No picture, no mouse. Your task is on the
+          next screen.
         </p>
 
         <form id="setup-form">
           <fieldset>
-            <legend>Aufgabe</legend>
+            <legend>Task</legend>
             <div id="task-choices" class="choices">
-              <p id="task-loading">Aufgaben werden geladen.</p>
+              <p id="task-loading">Loading tasks.</p>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>Sprechtempo</legend>
+            <legend>Speech rate</legend>
             <div class="choices">
               <p class="choice">
                 <input type="radio" name="rate" id="rate-10" value="1.0" />
-                <label for="rate-10">Ruhig (1,0)</label>
+                <label for="rate-10">Calm (1.0)</label>
               </p>
               <p class="choice">
                 <input type="radio" name="rate" id="rate-12" value="1.2" checked />
-                <label for="rate-12">Normal (1,2)</label>
+                <label for="rate-12">Normal (1.2)</label>
               </p>
               <p class="choice">
                 <input type="radio" name="rate" id="rate-15" value="1.5" />
-                <label for="rate-15">Schnell (1,5)</label>
+                <label for="rate-15">Fast (1.5)</label>
               </p>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>Modus</legend>
+            <legend>Mode</legend>
             <div class="choices">
               <p class="choice">
                 <input
@@ -60,9 +60,9 @@
                   checked
                   aria-describedby="mode-experience-hint"
                 />
-                <label for="mode-experience">Erlebnis</label>
+                <label for="mode-experience">Experience</label>
                 <span id="mode-experience-hint" class="hint"
-                  >Schwarzer Bildschirm. Du hörst nur, du liest nichts.</span
+                  >Black screen. You only hear, you read nothing.</span
                 >
               </p>
               <p class="choice">
@@ -75,100 +75,102 @@
                 />
                 <label for="mode-training">Training</label>
                 <span id="mode-training-hint" class="hint"
-                  >Die letzte Ansage steht zusätzlich als Text da.</span
+                  >The last announcement is also shown as text.</span
                 >
               </p>
             </div>
           </fieldset>
 
-          <p class="data-note">Wir speichern nur Tastenfolge und Ansagen, keine Person.</p>
+          <p class="data-note">
+            Only the key sequence and announcements are stored, nothing about you.
+          </p>
 
           <p><button type="submit" class="primary" id="start-button">Start</button></p>
         </form>
       </section>
 
-      <!-- 2 ------------------------------------------------------------ -->
+      <!-- 2: briefing -->
       <section id="screen-briefing" class="screen" hidden aria-labelledby="briefing-heading">
-        <h1 id="briefing-heading" tabindex="-1">Deine Aufgabe</h1>
+        <h1 id="briefing-heading" tabindex="-1">Your task</h1>
         <p class="task-sentence" id="briefing-task"></p>
 
-        <h2>Tasten</h2>
+        <h2>Keys</h2>
         <ul class="keys" id="briefing-keys">
-          <li><kbd>Pfeil runter</kbd> / <kbd>Pfeil hoch</kbd>: ein Element weiter oder zurück</li>
-          <li><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd>: nächstes bedienbares Element</li>
-          <li><kbd>H</kbd> / <kbd>Shift</kbd>+<kbd>H</kbd>: nächste Überschrift</li>
-          <li><kbd>L</kbd> / <kbd>Shift</kbd>+<kbd>L</kbd>: nächster Link</li>
-          <li><kbd>F</kbd> / <kbd>Shift</kbd>+<kbd>F</kbd>: nächstes Formularfeld</li>
-          <li><kbd>D</kbd> / <kbd>Shift</kbd>+<kbd>D</kbd>: nächster Seitenbereich</li>
-          <li><kbd>Enter</kbd>: auslösen, in einem Textfeld: Eingabemodus</li>
-          <li><kbd>Esc</kbd>: abbrechen, Dialog schließen</li>
-          <li><kbd>R</kbd>: letzte Ansage wiederholen</li>
-          <li><kbd>?</kbd>: diese Tastenliste vorlesen</li>
-          <li><kbd>Esc</kbd> <kbd>Esc</kbd>: Spiel verlassen</li>
+          <li><kbd>Arrow down</kbd> / <kbd>Arrow up</kbd>: one element forward or back</li>
+          <li><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd>: next interactive element</li>
+          <li><kbd>H</kbd> / <kbd>Shift</kbd>+<kbd>H</kbd>: next heading</li>
+          <li><kbd>L</kbd> / <kbd>Shift</kbd>+<kbd>L</kbd>: next link</li>
+          <li><kbd>F</kbd> / <kbd>Shift</kbd>+<kbd>F</kbd>: next form field</li>
+          <li><kbd>D</kbd> / <kbd>Shift</kbd>+<kbd>D</kbd>: next landmark</li>
+          <li><kbd>Enter</kbd>: activate, in a text field: input mode</li>
+          <li><kbd>Esc</kbd>: cancel, close dialog</li>
+          <li><kbd>R</kbd>: repeat the last announcement</li>
+          <li><kbd>?</kbd>: read this key list aloud</li>
+          <li><kbd>Esc</kbd> <kbd>Esc</kbd>: leave the game</li>
         </ul>
 
         <p class="rule">
-          Jeder Tastendruck ist ein Schritt. Am Ende vergleichen wir mit dem kürzesten möglichen
-          Weg.
+          Every key press is one step. At the end your route is compared with the shortest possible
+          one.
         </p>
         <p class="hint">
-          <kbd>?</kbd> liest die Tasten vor, <kbd>R</kbd> wiederholt die letzte Ansage. Beides
-          kostet keinen Schritt.
+          <kbd>?</kbd> reads the keys aloud, <kbd>R</kbd> repeats the last announcement. Neither
+          costs a step.
         </p>
 
-        <p><button type="button" class="primary" id="begin-button">Los geht's (Enter)</button></p>
+        <p><button type="button" class="primary" id="begin-button">Go (Enter)</button></p>
       </section>
 
-      <!-- 3 ------------------------------------------------------------ -->
+      <!-- 3: play -->
       <section id="screen-play" class="screen play" hidden aria-labelledby="play-heading">
-        <h1 id="play-heading" tabindex="-1" class="play-heading">Spiel läuft</h1>
+        <h1 id="play-heading" tabindex="-1" class="play-heading">Game running</h1>
         <p class="play-task" id="play-task"></p>
         <p class="play-counter">
-          <span id="play-counter">Schritt 0</span>
+          <span id="play-counter">Step 0</span>
         </p>
 
         <div
           id="capture"
           role="application"
           tabindex="0"
-          aria-label="Spielfeld. Pfeiltasten lesen, H Überschrift, L Link, F Formularfeld, D Seitenbereich, Enter auslösen, R wiederholen, Fragezeichen liest die Tasten vor. Esc Esc zum Verlassen."
+          aria-label="Playing field. Arrow keys read, H heading, L link, F form field, D landmark, Enter activate, R repeat, question mark reads the keys aloud. Esc Esc to leave."
         >
           <p class="capture-hint" id="capture-hint">
-            Hör hin. <kbd>Esc</kbd> <kbd>Esc</kbd> zum Verlassen.
+            Listen. <kbd>Esc</kbd> <kbd>Esc</kbd> to leave.
           </p>
           <p class="phrase-display" id="phrase-display" hidden></p>
         </div>
 
         <div id="pause-panel" class="pause" hidden>
-          <h2 id="pause-heading" tabindex="-1">Spiel pausiert</h2>
-          <p>Zurück ins Spiel oder aufgeben.</p>
+          <h2 id="pause-heading" tabindex="-1">Game paused</h2>
+          <p>Back to the game or give up.</p>
           <p>
-            <button type="button" id="resume-button" class="primary">Weiter</button>
-            <button type="button" id="giveup-button">Aufgeben</button>
+            <button type="button" id="resume-button" class="primary">Resume</button>
+            <button type="button" id="giveup-button">Give up</button>
           </p>
         </div>
       </section>
 
-      <!-- 4 ------------------------------------------------------------ -->
+      <!-- 4: result -->
       <section id="screen-result" class="screen" hidden aria-labelledby="result-heading">
-        <h1 id="result-heading" tabindex="-1">Ergebnis</h1>
+        <h1 id="result-heading" tabindex="-1">Result</h1>
         <p class="verdict" id="result-verdict"></p>
 
-        <h2>Zahlen</h2>
+        <h2>Numbers</h2>
         <dl class="numbers" id="result-numbers"></dl>
 
-        <h2 id="optimal-heading">Der kürzeste Weg</h2>
+        <h2 id="optimal-heading">The shortest path</h2>
         <p id="optimal-intro"></p>
         <ol class="optimal" id="result-optimal"></ol>
-        <p><button type="button" id="playback-button">Vorspielen</button></p>
+        <p><button type="button" id="playback-button">Play it back</button></p>
 
         <section aria-labelledby="stuck-heading" id="stuck-section" hidden>
-          <h2 id="stuck-heading">Hier hingst du</h2>
+          <h2 id="stuck-heading">Where you got stuck</h2>
           <p id="stuck-intro"></p>
           <ol class="stuck" id="result-stuck"></ol>
         </section>
 
-        <p><button type="button" class="primary" id="again-button">Nochmal spielen</button></p>
+        <p><button type="button" class="primary" id="again-button">Play again</button></p>
       </section>
     </main>
 

@@ -3,10 +3,10 @@ criterion: 2.1.2
 level: A
 title: No Keyboard Trap
 test_type: bad
-expected_violations: 5
+expected_violations: 6
 testable_by: dom
 scanners: keyboard-navigation, focus-management
-description: Focus trapped in components without escape mechanism
+description: Focus trapped in components without escape mechanism, including a text field that cancels every Tab press and is reachable on page load
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -537,6 +537,28 @@ description: Focus trapped in components without escape mechanism
         // Missing proper Escape key handling throughout
         // Missing focus restoration
         // Missing proper ARIA patterns for complex widgets
+    </script>
+
+    <!-- VIOLATION 7: Trap that is present on page load -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 7: Comment box that swallows Tab</div>
+        <div class="trap-example">
+            <h3>Inline Comment Editor</h3>
+            <p>The editor cancels every Tab press to insert an indent, so the keyboard can never leave it:</p>
+            <label for="trapEditor">Your comment</label>
+            <input type="text" id="trapEditor" value="Type here, then try to leave with Tab">
+            <p><strong>Problem:</strong> Tab and Shift+Tab are cancelled, so focus stays on the field forever.</p>
+        </div>
+    </div>
+    <script>
+        // No modifier, no exit: every Tab is cancelled and focus is put back.
+        document.getElementById('trapEditor').addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.target.focus();
+            }
+        });
     </script>
 
 </body>

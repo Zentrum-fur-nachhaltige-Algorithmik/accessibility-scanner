@@ -1,0 +1,73 @@
+<!-- WCAG-TEST
+criterion: 1.1.1
+level: A
+title: Non-text Content
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: media-accessibility, screen-reader
+description: News photographs with long descriptive alt text, and file names and class names containing photograph and paragraph, none of which is a data visualisation
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Descriptive photo alt text</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 44rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+      figure {
+        margin: 2rem 0;
+      }
+      figcaption {
+        font-size: 0.9rem;
+        color: #4a4a4a;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Descriptive photo alt text</h1>
+
+      <figure>
+        <img
+          class="c-photograph"
+          src="images/harbour-photograph.jpg"
+          width="640"
+          height="360"
+          alt="Fishing boats moored three deep along a stone harbour wall at dawn, their masts silhouetted against a pale orange sky while two crew members haul nets onto the quayside"
+        />
+        <figcaption>Dawn at the harbour.</figcaption>
+      </figure>
+
+      <p class="c-article__paragraph">
+        The alt text above is long because the photograph is worth describing. Length alone is not a
+        failure, and a file or class name containing the letters of another word does not make a
+        photograph a chart.
+      </p>
+
+      <figure>
+        <img
+          class="c-article__paragraph-figure"
+          src="images/market-photograph-02.jpg"
+          width="640"
+          height="360"
+          alt="Stallholders arranging crates of apples, pears and winter squash under a striped awning while early customers queue along the pavement in heavy coats"
+        />
+        <figcaption>The Saturday market.</figcaption>
+      </figure>
+    </main>
+  </body>
+</html>

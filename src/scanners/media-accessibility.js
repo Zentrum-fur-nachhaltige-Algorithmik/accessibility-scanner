@@ -7,7 +7,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
-const { TIMEOUTS } = require('../core/constants');
+const { TIMEOUTS, ALT_TEXT_MAX_LENGTH } = require('../core/constants');
 const log = require('../utils/logger').createLogger('media-accessibility');
 
 class MediaAccessibilityScanner extends BaseScanner {
@@ -81,7 +81,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       screenshotPromise = page.screenshot({ path: initialScreenshot, fullPage: true });
     }
 
-    const mediaAnalysis = await page.evaluate(() => {
+    const mediaAnalysis = await page.evaluate((altMaxLength) => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -230,7 +230,7 @@ class MediaAccessibilityScanner extends BaseScanner {
           }
 
           // Long alt text
-          if (alt.length > 125) {
+          if (alt.length > altMaxLength) {
             allIssues.push({
               type: 'image-alt',
               element: selector,
@@ -253,18 +253,20 @@ class MediaAccessibilityScanner extends BaseScanner {
           });
         }
 
-        // Complex image analysis
+        // Complex image analysis. Whole words only: "photograph",
+        // "infographics" and a BEM class ending in "-paragraph" all contain
+        // "graph" without being a data visualisation.
+        const COMPLEX_WORDS = ['chart', 'charts', 'graph', 'graphs', 'diagram', 'diagrams'];
+        const namesComplexImage = (value) =>
+          String(value || '')
+            .toLowerCase()
+            .split(/[^a-z]+/)
+            .some((word) => COMPLEX_WORDS.includes(word));
         const isLikelyComplex =
-          (src && src.toLowerCase().includes('chart')) ||
-          (src && src.toLowerCase().includes('graph')) ||
-          (src && src.toLowerCase().includes('diagram')) ||
-          (alt && alt.toLowerCase().includes('chart')) ||
-          (alt && alt.toLowerCase().includes('graph')) ||
-          (alt && alt.toLowerCase().includes('diagram')) ||
-          className.toLowerCase().includes('chart') ||
-          className.toLowerCase().includes('graph') ||
-          id.toLowerCase().includes('chart') ||
-          id.toLowerCase().includes('graph');
+          namesComplexImage(src) ||
+          namesComplexImage(alt) ||
+          namesComplexImage(className) ||
+          namesComplexImage(id);
 
         if (isLikelyComplex) {
           const hasLongdesc = img.hasAttribute('longdesc');
@@ -772,7 +774,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       });
 
       return { allIssues, mediaCounts };
-    });
+    }, ALT_TEXT_MAX_LENGTH);
 
     // Wait for screenshot to complete
     await screenshotPromise;

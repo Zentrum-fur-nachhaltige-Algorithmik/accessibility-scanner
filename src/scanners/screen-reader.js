@@ -5,6 +5,7 @@
  * usage from the DOM; reports only findings axe-core does not cover.
  */
 const BaseScanner = require('../core/base-scanner');
+const { ALT_TEXT_MAX_LENGTH } = require('../core/constants');
 
 class ScreenReaderScanner extends BaseScanner {
   constructor() {
@@ -361,68 +362,72 @@ class ScreenReaderScanner extends BaseScanner {
   }
 
   async analyzeImages(page) {
-    return await page.evaluate((helperScript) => {
-      eval(helperScript);
-      const images = Array.from(document.querySelectorAll('img'));
-      const problematic = [];
-      let withAlt = 0;
-      let decorative = 0;
+    return await page.evaluate(
+      (helperScript, altMaxLength) => {
+        eval(helperScript);
+        const images = Array.from(document.querySelectorAll('img'));
+        const problematic = [];
+        let withAlt = 0;
+        let decorative = 0;
 
-      images.forEach((img, index) => {
-        const alt = img.getAttribute('alt');
-        const src = img.src;
-        const selector = getElementSelector(img);
-        const isDecorative = alt === '';
+        images.forEach((img, index) => {
+          const alt = img.getAttribute('alt');
+          const src = img.src;
+          const selector = getElementSelector(img);
+          const isDecorative = alt === '';
 
-        if (isDecorative) {
-          decorative++;
-        } else if (alt && alt.trim()) {
-          withAlt++;
-        } else {
-          problematic.push({
-            index: index + 1,
-            selector,
-            src: src.substring(0, 100),
-            type: 'image-missing-alt',
-            issue: 'Missing alt attribute',
-            severity: 'critical',
-            suggestion: 'Add alt="…" describing the image, or alt="" if it is decorative',
-          });
-        }
+          if (isDecorative) {
+            decorative++;
+          } else if (alt && alt.trim()) {
+            withAlt++;
+          } else {
+            problematic.push({
+              index: index + 1,
+              selector,
+              src: src.substring(0, 100),
+              type: 'image-missing-alt',
+              issue: 'Missing alt attribute',
+              severity: 'critical',
+              suggestion: 'Add alt="…" describing the image, or alt="" if it is decorative',
+            });
+          }
 
-        if (alt && alt.length > 125) {
-          problematic.push({
-            index: index + 1,
-            selector,
-            src: src.substring(0, 100),
-            type: 'alt-text-too-long',
-            issue: `Alt text too long (${alt.length} characters)`,
-            severity: 'moderate',
-            suggestion:
-              'Keep alt short and move any long description into the page or a longdesc target',
-          });
-        }
+          if (alt && alt.length > altMaxLength) {
+            problematic.push({
+              index: index + 1,
+              selector,
+              src: src.substring(0, 100),
+              type: 'alt-text-too-long',
+              issue: `Alt text too long (${alt.length} characters)`,
+              severity: 'moderate',
+              suggestion:
+                'Keep alt short and move any long description into the page or a longdesc target',
+            });
+          }
 
-        if (alt && /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(alt)) {
-          problematic.push({
-            index: index + 1,
-            selector,
-            src: src.substring(0, 100),
-            type: 'alt-text-is-filename',
-            issue: 'Alt text contains file extension',
-            severity: 'minor',
-            suggestion: 'Replace the filename with a description of what the image conveys',
-          });
-        }
-      });
+          if (alt && /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(alt)) {
+            problematic.push({
+              index: index + 1,
+              selector,
+              src: src.substring(0, 100),
+              type: 'alt-text-is-filename',
+              issue: 'Alt text contains file extension',
+              severity: 'minor',
+              suggestion: 'Replace the filename with a description of what the image conveys',
+            });
+          }
+        });
 
-      return {
-        total: images.length,
-        withAlt,
-        decorative,
-        problematic,
-      };
-    }, ScreenReaderScanner.selectorHelperScript);
+        return {
+          total: images.length,
+          withAlt,
+          decorative,
+          problematic,
+        };
+      },
+      ScreenReaderScanner.selectorHelperScript,
+      ALT_TEXT_MAX_LENGTH
+    );
   }
 
   async analyzeForms(page) {

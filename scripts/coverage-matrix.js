@@ -97,24 +97,11 @@ function parseCriteria() {
 
 /**
  * Instantiate every scanner and read its declared `wcagCriteria`.
- * LLM scanners are only registered when an API key is present, so a placeholder
- * is injected; the registry never makes a network call at construction time.
+ * LLM scanners are built with a stub client so they register without an API key.
  */
 function collectScanners() {
-  const hadKey = Boolean(process.env.OPENROUTER_API_KEY);
-  if (!hadKey) process.env.OPENROUTER_API_KEY = 'coverage-matrix-placeholder';
-
-  // Silence the registry's "LLM scanners enabled" banner so --json stays clean.
-  const origLog = console.log;
-  console.log = () => {};
-  let scanners;
-  try {
-    const { createAllScanners } = require(path.join(ROOT, 'src', 'core', 'scanner-registry.js'));
-    scanners = createAllScanners();
-  } finally {
-    console.log = origLog;
-    if (!hadKey) delete process.env.OPENROUTER_API_KEY;
-  }
+  const { createAllScanners } = require(path.join(ROOT, 'src', 'core', 'scanner-registry.js'));
+  const scanners = createAllScanners({ llmClient: {} });
 
   const { trustTier, trustReason } = require(path.join(ROOT, 'src', 'core', 'scanner-trust.js'));
 

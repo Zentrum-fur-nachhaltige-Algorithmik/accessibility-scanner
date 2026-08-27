@@ -1,4 +1,3 @@
-const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
 const { injectableCode: accnameUtils } = require('./utils/accessible-name');
@@ -82,44 +81,6 @@ class LabelInNameScanner extends BaseScanner {
             recommendations: this.generateLabelInNameRecommendations(violations),
             voiceControlTesting: this.generateVoiceControlTestCases(violations)
         };
-    }
-
-    /**
-     * @deprecated Use scan(page, options) via ScanPipeline instead
-     * Scan label in name compliance (WCAG 2.5.3)
-     * @param {string} url - URL to scan
-     * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} LabelInNameReport
-     */
-    async scanLabelInName(url, options = {}) {
-        try {
-            await this.init();
-            const page = await this.browser.newPage();
-            const timestamp = Date.now();
-            const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-            await fs.ensureDir(scanDir);
-
-            await page.setViewport({ width: 1280, height: 1024 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: options.timeout || 60000 });
-
-            // Take screenshot for analysis
-            const screenshotPath = path.join(scanDir, 'label-in-name-analysis.png');
-            await page.screenshot({
-                path: screenshotPath,
-                fullPage: true
-            });
-
-            try {
-                const result = await this.scan(page, options);
-                result.screenshotPath = screenshotPath;
-                return result;
-            } finally {
-                await page.close();
-            }
-
-        } catch (error) {
-            throw new Error(`Label in name scan failed: ${error.message}`);
-        }
     }
 
     /**

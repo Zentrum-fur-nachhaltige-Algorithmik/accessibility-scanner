@@ -49,38 +49,6 @@ class ComplianceMonitoringScanner extends BaseScanner {
   }
 
   /**
-   * @deprecated Use scan(page, options) via ScanPipeline instead
-   * Scan for compliance monitoring procedures
-   * @param {string} url - URL to scan
-   * @param {Object} options - Scanning options
-   * @returns {Promise<Object>} ComplianceMonitoringReport
-   */
-  async scanComplianceMonitoring(url, options = {}) {
-    const defaultOptions = {
-      timeout: 30000,
-      searchDepth: 3
-    };
-
-    const scanOptions = { ...defaultOptions, ...options };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, options);
-      } finally {
-        await page.close();
-      }
-
-    } catch (error) {
-      throw new Error(`Compliance monitoring scan failed: ${error.message}`);
-    }
-  }
-
-  /**
    * Analyze compliance monitoring procedures
    */
   async analyzeComplianceMonitoring(page, options) {

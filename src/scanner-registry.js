@@ -43,9 +43,9 @@ const AxeCoreAdapter = require('./axe-core-adapter');
  * Create LLM scanner instances if OPENROUTER_API_KEY is available.
  * @returns {import('./base-scanner')[]}
  */
-function createLLMScanners() {
+function createLLMScanners({ llmClient } = {}) {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
+  if (!llmClient && !apiKey) {
     return [];
   }
 
@@ -63,9 +63,8 @@ function createLLMScanners() {
   const LLMConsistentHelpScanner = require('./llm-consistent-help-scanner');
   const LLMAltQualityScanner = require('./llm-alt-quality-scanner');
 
-  const client = new LLMClient({ apiKey });
-
-  console.log('LLM scanners enabled (OPENROUTER_API_KEY detected)');
+  const client = llmClient || new LLMClient({ apiKey });
+  if (!llmClient) console.log('LLM scanners enabled (OPENROUTER_API_KEY detected)');
 
   return [
     new LLMSemanticTextScanner(client),
@@ -89,7 +88,7 @@ function createLLMScanners() {
  * Create all scanner instances.
  * @returns {import('./base-scanner')[]}
  */
-function createAllScanners() {
+function createAllScanners({ llmClient } = {}) {
   const scanners = [
     // axe-core — high-precision static DOM analysis (replaces 10 heuristic scanners)
     new AxeCoreAdapter(),
@@ -147,7 +146,7 @@ function createAllScanners() {
   ];
 
   // Conditionally add LLM-powered scanners
-  const llmScanners = createLLMScanners();
+  const llmScanners = createLLMScanners({ llmClient });
   scanners.push(...llmScanners);
 
   return scanners;
@@ -212,16 +211,7 @@ const PROFILE_OPTIONS = {
  * twice or requiring an API key.
  */
 function allScannerIds() {
-  const hadKey = Boolean(process.env.OPENROUTER_API_KEY);
-  if (!hadKey) process.env.OPENROUTER_API_KEY = 'profile-resolution-placeholder';
-  const origLog = console.log;
-  console.log = () => {};
-  try {
-    return createAllScanners().map((s) => s.id);
-  } finally {
-    console.log = origLog;
-    if (!hadKey) delete process.env.OPENROUTER_API_KEY;
-  }
+  return createAllScanners({ llmClient: {} }).map((s) => s.id);
 }
 
 /**

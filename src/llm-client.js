@@ -209,6 +209,12 @@ class LLMClient {
     };
   }
 
+  /** 4xx statuses that will not change on retry. */
+  static isTerminalStatus(status) {
+    return typeof status === 'number' && status >= 400 && status < 500 &&
+      status !== 408 && status !== 409 && status !== 429;
+  }
+
   /**
    * Retry with exponential backoff + jitter.
    * Different delay strategies per error type (mirrors Python base_client.py).
@@ -220,6 +226,19 @@ class LLMClient {
       try {
         return await operation();
       } catch (err) {
+        // 402 (no credits), 401/403 (bad key) and 400 (malformed body) cannot
+        // change on retry. 408, 409 and 429 stay retryable.
+        if (err.type === 'client_error' && LLMClient.isTerminalStatus(err.statusCode)) {
+          console.warn(`[LLMClient] Terminal client error ${err.statusCode}, not retrying: ${err.message}`);
+          return {
+            success: false,
+            error: err.message,
+            type: err.type,
+            statusCode: err.statusCode,
+            terminal: true,
+          };
+        }
+
         const isLastAttempt = attempt === this.maxRetries - 1;
         if (isLastAttempt) {
           return {

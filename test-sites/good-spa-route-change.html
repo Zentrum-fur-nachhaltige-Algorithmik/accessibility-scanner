@@ -1,0 +1,79 @@
+<!-- WCAG-TEST
+criterion: 2.4.2, 2.4.3
+level: A
+title: Client side routing that updates the title and moves focus
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: dynamic-spa
+description: A skip link and a table of contents link that only change the fragment, next to a router that calls history.pushState, sets document.title for the new route and moves focus to the new heading. Neither the fragment links nor the correct router is a 2.4.2 or 2.4.3 failure.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home - Field guide</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; line-height: 1.5; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a { color: #0b4f6c; }
+  a:focus-visible, h1:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  nav a { margin-right: 16px; }
+  .skip-link { position: absolute; left: -9999px; }
+  .skip-link:focus { position: static; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav aria-label="Sections">
+  <a href="#chapter-one">Chapter one</a>
+  <a href="#chapter-two">Chapter two</a>
+</nav>
+
+<nav aria-label="Main">
+  <a href="?route=home" data-route="home">Home</a>
+  <a href="?route=products" data-route="products">Products</a>
+  <a href="?route=contact" data-route="contact">Contact</a>
+</nav>
+
+<main id="main" tabindex="-1">
+  <h1 id="routeHeading" tabindex="-1">Home</h1>
+  <div id="routeBody">
+    <h2 id="chapter-one">Chapter one</h2>
+    <p>The guide is organised by habitat.</p>
+    <h2 id="chapter-two">Chapter two</h2>
+    <p>Each entry lists the season in which the species is visible.</p>
+  </div>
+</main>
+
+<script>
+  var TITLES = { home: 'Home', products: 'Products', contact: 'Contact' };
+
+  function render(route) {
+    var name = TITLES[route] || 'Home';
+    document.getElementById('routeHeading').textContent = name;
+    document.getElementById('routeBody').innerHTML = '<p>The ' + name + ' route.</p>';
+    // The new route is a new page: it gets its own title.
+    document.title = name + ' - Field guide';
+    // And focus moves to the heading of the new route instead of being lost.
+    document.getElementById('routeHeading').focus();
+  }
+
+  document.querySelectorAll('a[data-route]').forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      var route = link.getAttribute('data-route');
+      history.pushState({ route: route }, '', '?route=' + route);
+      render(route);
+    });
+  });
+
+  window.addEventListener('popstate', function () {
+    var params = new URLSearchParams(location.search);
+    render(params.get('route') || 'home');
+  });
+</script>
+</body>
+</html>

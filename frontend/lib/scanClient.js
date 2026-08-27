@@ -116,10 +116,10 @@ export async function startScan({ url, profile, token, signal } = {}) {
 
 /** @returns {Promise<{status: string, queuePosition?: number, result?: object, error?: string}>} */
 export async function fetchJob(jobId, { token, signal } = {}) {
-  const { payload } = await request(
-    `/api/scan/job/${encodeURIComponent(jobId)}`,
-    { token, signal }
-  );
+  const { payload } = await request(`/api/scan/job/${encodeURIComponent(jobId)}`, {
+    token,
+    signal,
+  });
   if (!payload || typeof payload !== 'object') {
     throw new ApiError(
       'The server status response was empty or malformed. Please start the scan again.',
@@ -144,10 +144,7 @@ export async function fetchReportHtml(reportUrl, { token } = {}) {
   try {
     response = await fetch(reportUrl, { headers });
   } catch {
-    throw new ApiError(
-      'The generated report could not be loaded. Please try again.',
-      null
-    );
+    throw new ApiError('The generated report could not be loaded. Please try again.', null);
   }
 
   if (response.status === 401 || response.status === 403) {

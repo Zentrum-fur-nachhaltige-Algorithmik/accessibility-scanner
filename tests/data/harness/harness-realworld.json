@@ -10,10 +10,7 @@
       "elapsedMs": 1865426,
       "timedOut": false,
       "totalViolations": 29,
-      "band": [
-        14,
-        56
-      ],
+      "band": [14, 56],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -64,10 +61,7 @@
       "elapsedMs": 90853,
       "timedOut": false,
       "totalViolations": 41,
-      "band": [
-        22,
-        88
-      ],
+      "band": [22, 88],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -112,10 +106,7 @@
       "elapsedMs": 95418,
       "timedOut": false,
       "totalViolations": 430,
-      "band": [
-        189,
-        758
-      ],
+      "band": [189, 758],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -164,10 +155,7 @@
       "elapsedMs": 360199,
       "timedOut": false,
       "totalViolations": 1637,
-      "band": [
-        810,
-        3240
-      ],
+      "band": [810, 3240],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -232,10 +220,7 @@
       "elapsedMs": 204583,
       "timedOut": false,
       "totalViolations": 250,
-      "band": [
-        111,
-        446
-      ],
+      "band": [111, 446],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [

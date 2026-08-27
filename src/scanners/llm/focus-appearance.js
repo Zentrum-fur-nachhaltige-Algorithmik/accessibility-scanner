@@ -44,10 +44,14 @@ const MISSING_INDICATOR_CLAIM =
 
 class LLMFocusAppearanceScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-focus-appearance', {
-      wcagCriteria: ['2.4.12', '2.4.13'],
-      wcagPrinciple: 'operable',
-    }, llmClient);
+    super(
+      'llm-focus-appearance',
+      {
+        wcagCriteria: ['2.4.12', '2.4.13'],
+        wcagPrinciple: 'operable',
+      },
+      llmClient
+    );
   }
 
   /**
@@ -86,7 +90,10 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
           obscured: occlusion,
         });
 
-        if (stops.length >= MAX_TAB_STOPS) { truncated = true; break; }
+        if (stops.length >= MAX_TAB_STOPS) {
+          truncated = true;
+          break;
+        }
       }
     } finally {
       await cleanupTabWalk(page);
@@ -101,52 +108,66 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
    * an element is never obscured by its own ancestor (FP-9).
    */
   async measureOcclusion(page, tabId) {
-    return page.evaluate((ATTR, id) => {
-      const el = document.querySelector(`[${ATTR}="${CSS.escape(id)}"]`);
-      if (!el) return { measured: false };
-      const r = el.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) return { measured: false };
-      const inset = Math.min(2, r.width / 4, r.height / 4);
-      const xs = [r.left + inset, r.left + r.width / 2, r.right - inset];
-      const ys = [r.top + inset, r.top + r.height / 2, r.bottom - inset];
-      const vw = window.innerWidth, vh = window.innerHeight;
-      let sampled = 0, covered = 0, coverer = null, position = null;
+    return page.evaluate(
+      (ATTR, id) => {
+        const el = document.querySelector(`[${ATTR}="${CSS.escape(id)}"]`);
+        if (!el) return { measured: false };
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return { measured: false };
+        const inset = Math.min(2, r.width / 4, r.height / 4);
+        const xs = [r.left + inset, r.left + r.width / 2, r.right - inset];
+        const ys = [r.top + inset, r.top + r.height / 2, r.bottom - inset];
+        const vw = window.innerWidth,
+          vh = window.innerHeight;
+        let sampled = 0,
+          covered = 0,
+          coverer = null,
+          position = null;
 
-      for (const x of xs) {
-        for (const y of ys) {
-          if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
-          sampled++;
-          const hit = document.elementFromPoint(x, y);
-          if (!hit || hit === el || el.contains(hit) || hit.contains(el)) continue;
-          let n = hit, overlay = null;
-          while (n && n !== document.body) {
-            const pos = window.getComputedStyle(n).position;
-            // `n.contains(el)` → n is an ancestor of the focused element and
-            // therefore cannot obscure it.
-            if ((pos === 'fixed' || pos === 'sticky') && !n.contains(el)) { overlay = n; break; }
-            n = n.parentElement;
-          }
-          if (!overlay) continue;
-          covered++;
-          if (!coverer) {
-            position = window.getComputedStyle(overlay).position;
-            const cls = typeof overlay.className === 'string' && overlay.className.trim()
-              ? '.' + overlay.className.trim().split(/\s+/)[0] : '';
-            coverer = overlay.tagName.toLowerCase() + (overlay.id ? '#' + overlay.id : '') + cls;
+        for (const x of xs) {
+          for (const y of ys) {
+            if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
+            sampled++;
+            const hit = document.elementFromPoint(x, y);
+            if (!hit || hit === el || el.contains(hit) || hit.contains(el)) continue;
+            let n = hit,
+              overlay = null;
+            while (n && n !== document.body) {
+              const pos = window.getComputedStyle(n).position;
+              // `n.contains(el)` → n is an ancestor of the focused element and
+              // therefore cannot obscure it.
+              if ((pos === 'fixed' || pos === 'sticky') && !n.contains(el)) {
+                overlay = n;
+                break;
+              }
+              n = n.parentElement;
+            }
+            if (!overlay) continue;
+            covered++;
+            if (!coverer) {
+              position = window.getComputedStyle(overlay).position;
+              const cls =
+                typeof overlay.className === 'string' && overlay.className.trim()
+                  ? '.' + overlay.className.trim().split(/\s+/)[0]
+                  : '';
+              coverer = overlay.tagName.toLowerCase() + (overlay.id ? '#' + overlay.id : '') + cls;
+            }
           }
         }
-      }
-      return {
-        measured: true,
-        sampledPoints: sampled,
-        coveredPoints: covered,
-        // 2.4.12 (AAA) fails when ANY part is hidden; 2.4.11 (AA) only when all is.
-        anyPartObscured: covered > 0,
-        entirelyObscured: sampled > 0 && covered === sampled,
-        coveredBy: coverer,
-        covererPosition: position,
-      };
-    }, TAB_ATTR, String(tabId));
+        return {
+          measured: true,
+          sampledPoints: sampled,
+          coveredPoints: covered,
+          // 2.4.12 (AAA) fails when ANY part is hidden; 2.4.11 (AA) only when all is.
+          anyPartObscured: covered > 0,
+          entirelyObscured: sampled > 0 && covered === sampled,
+          coveredBy: coverer,
+          covererPosition: position,
+        };
+      },
+      TAB_ATTR,
+      String(tabId)
+    );
   }
 
   /**
@@ -170,14 +191,26 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
       indicatorsMissing: stops.filter((s) => !s.indicatorVisible).map((s) => s.selector),
       lowContrastIndicators: stops.filter((s) => s.lowContrastIndicator).map((s) => s.selector),
       minIndicatorContrast: stops.reduce(
-        (m, s) => (s.indicatorContrast == null ? m : m == null ? s.indicatorContrast : Math.min(m, s.indicatorContrast)),
+        (m, s) =>
+          s.indicatorContrast == null
+            ? m
+            : m == null
+              ? s.indicatorContrast
+              : Math.min(m, s.indicatorContrast),
         null
       ),
       // No tab stop is covered anywhere → 2.4.12 cannot fail.
-      noneObscured: complete && stops.length > 0 && stops.every((s) => !(s.obscured && s.obscured.anyPartObscured)),
+      noneObscured:
+        complete &&
+        stops.length > 0 &&
+        stops.every((s) => !(s.obscured && s.obscured.anyPartObscured)),
       obscuredStops: stops
         .filter((s) => s.obscured && s.obscured.anyPartObscured)
-        .map((s) => ({ selector: s.selector, coveredBy: s.obscured.coveredBy, points: `${s.obscured.coveredPoints}/${s.obscured.sampledPoints}` })),
+        .map((s) => ({
+          selector: s.selector,
+          coveredBy: s.obscured.coveredBy,
+          points: `${s.obscured.coveredPoints}/${s.obscured.sampledPoints}`,
+        })),
     };
   }
 
@@ -186,16 +219,24 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
     if (guards.allIndicatorsCompliant) {
       facts.push(
         `VERIFIED BY MEASUREMENT: all ${guards.tabStops} keyboard tab stops on this page show a focus indicator of at least ${MIN_INDICATOR_PX}px with at least ${MIN_INDICATOR_CONTRAST}:1 contrast` +
-        (guards.minIndicatorContrast != null ? ` (lowest measured ratio ${guards.minIndicatorContrast}:1)` : '') +
-        `. Do NOT report a missing, removed, weak or insufficient focus indicator — such a finding would be false and will be rejected.`
+          (guards.minIndicatorContrast != null
+            ? ` (lowest measured ratio ${guards.minIndicatorContrast}:1)`
+            : '') +
+          `. Do NOT report a missing, removed, weak or insufficient focus indicator — such a finding would be false and will be rejected.`
       );
     } else if (guards.allIndicatorsVisible) {
-      facts.push(`VERIFIED BY MEASUREMENT: every keyboard tab stop shows a visible focus indicator. Only its thickness/contrast can be at issue, never its absence.`);
+      facts.push(
+        `VERIFIED BY MEASUREMENT: every keyboard tab stop shows a visible focus indicator. Only its thickness/contrast can be at issue, never its absence.`
+      );
     }
     if (guards.noneObscured) {
-      facts.push(`VERIFIED BY MEASUREMENT: no tab stop was covered by any fixed/sticky element (hit-tested at 9 points per element while actually focused). Do NOT report 2.4.12 obscuring.`);
+      facts.push(
+        `VERIFIED BY MEASUREMENT: no tab stop was covered by any fixed/sticky element (hit-tested at 9 points per element while actually focused). Do NOT report 2.4.12 obscuring.`
+      );
     } else if (guards.obscuredStops.length) {
-      facts.push(`MEASURED obscuring (element : coverer : covered sample points): ${guards.obscuredStops.map((o) => `${o.selector} : ${o.coveredBy} : ${o.points}`).join('; ')}`);
+      facts.push(
+        `MEASURED obscuring (element : coverer : covered sample points): ${guards.obscuredStops.map((o) => `${o.selector} : ${o.coveredBy} : ${o.points}`).join('; ')}`
+      );
     }
 
     return `Check this page for WCAG 2.2 AAA focus criteria. Report ONLY 2.4.12 and 2.4.13.
@@ -283,12 +324,17 @@ Return violations as JSON; return an empty array when the measurements show no f
     const cited = [];
     for (const n of v.nodes || []) if (n && n.selector) cited.push(String(n.selector));
     // Selectors quoted inside the prose, e.g. "the `.menu-btn` element".
-    for (const m of String(v.description || '').matchAll(/[.#][A-Za-z_][\w-]{2,}/g)) cited.push(m[0]);
+    for (const m of String(v.description || '').matchAll(/[.#][A-Za-z_][\w-]{2,}/g))
+      cited.push(m[0]);
     if (cited.length === 0) return [];
 
     const keys = new Set();
     for (const c of cited) {
-      const last = c.trim().split(/[\s>+~]+/).pop() || '';
+      const last =
+        c
+          .trim()
+          .split(/[\s>+~]+/)
+          .pop() || '';
       for (const m of last.matchAll(/[.#][A-Za-z_][\w-]*/g)) keys.add(m[0]);
     }
     if (keys.size === 0) return [];
@@ -306,20 +352,27 @@ Return violations as JSON; return an empty array when the measurements show no f
 
     if (criterion === '2.4.13' && MISSING_INDICATOR_CLAIM.test(text)) {
       if (guards.allIndicatorsCompliant) {
-        return `measured: all ${guards.tabStops} tab stops have a >=${MIN_INDICATOR_PX}px indicator at >=${MIN_INDICATOR_CONTRAST}:1` +
-          (guards.minIndicatorContrast != null ? ` (min ${guards.minIndicatorContrast}:1)` : '');
+        return (
+          `measured: all ${guards.tabStops} tab stops have a >=${MIN_INDICATOR_PX}px indicator at >=${MIN_INDICATOR_CONTRAST}:1` +
+          (guards.minIndicatorContrast != null ? ` (min ${guards.minIndicatorContrast}:1)` : '')
+        );
       }
       // Per-element guard: the page as a whole may fail, but THIS element's
       // indicator was measured under real keyboard focus and is compliant.
       if (matched.length > 0 && matched.every((s) => this.isCompliantStop(s))) {
         const s = matched[0];
-        return `measured under real keyboard focus: ${s.selector} shows ${s.outline}` +
-          (s.indicatorContrast != null ? ` at ${s.indicatorContrast}:1` : '');
+        return (
+          `measured under real keyboard focus: ${s.selector} shows ${s.outline}` +
+          (s.indicatorContrast != null ? ` at ${s.indicatorContrast}:1` : '')
+        );
       }
     }
 
-    if (criterion === '2.4.13' && guards.allIndicatorsVisible &&
-        /missing|absent|removed|no (visible )?focus|not visible|outline:?\s*(none|0)/i.test(text)) {
+    if (
+      criterion === '2.4.13' &&
+      guards.allIndicatorsVisible &&
+      /missing|absent|removed|no (visible )?focus|not visible|outline:?\s*(none|0)/i.test(text)
+    ) {
       return 'measured: every tab stop showed a visible focus indicator under real keyboard focus';
     }
 
@@ -337,11 +390,13 @@ Return violations as JSON; return an empty array when the measurements show no f
 
   /** A tab stop whose measured indicator satisfies 2.4.13 on its own. */
   isCompliantStop(s) {
-    return !!s.indicatorVisible &&
-      (s.outlineWidthPx >= MIN_INDICATOR_PX || (s.indicatorReasons || []).includes('outline-auto')) &&
-      (s.indicatorContrast == null || s.indicatorContrast >= MIN_INDICATOR_CONTRAST);
+    return (
+      !!s.indicatorVisible &&
+      (s.outlineWidthPx >= MIN_INDICATOR_PX ||
+        (s.indicatorReasons || []).includes('outline-auto')) &&
+      (s.indicatorContrast == null || s.indicatorContrast >= MIN_INDICATOR_CONTRAST)
+    );
   }
-
 }
 
 module.exports = LLMFocusAppearanceScanner;

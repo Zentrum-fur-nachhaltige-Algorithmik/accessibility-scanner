@@ -36,27 +36,37 @@ class UrlGuardError extends Error {
 
 /** URL is absent, not a string, or not parseable. */
 class InvalidUrlError extends UrlGuardError {
-  constructor(message) { super(message, 'INVALID_URL'); }
+  constructor(message) {
+    super(message, 'INVALID_URL');
+  }
 }
 
 /** URL uses a scheme other than http/https (file:, data:, chrome:, …). */
 class BlockedProtocolError extends UrlGuardError {
-  constructor(message) { super(message, 'BLOCKED_PROTOCOL'); }
+  constructor(message) {
+    super(message, 'BLOCKED_PROTOCOL');
+  }
 }
 
 /** SCAN_ALLOWED_HOSTS is configured and the host does not match any entry. */
 class HostNotAllowedError extends UrlGuardError {
-  constructor(message) { super(message, 'HOST_NOT_ALLOWED'); }
+  constructor(message) {
+    super(message, 'HOST_NOT_ALLOWED');
+  }
 }
 
 /** Host is, or resolves to, a private/reserved address. */
 class PrivateAddressError extends UrlGuardError {
-  constructor(message) { super(message, 'PRIVATE_ADDRESS'); }
+  constructor(message) {
+    super(message, 'PRIVATE_ADDRESS');
+  }
 }
 
 /** Hostname could not be resolved at all — we refuse to hand it to the browser. */
 class DnsResolutionError extends UrlGuardError {
-  constructor(message) { super(message, 'DNS_RESOLUTION_FAILED'); }
+  constructor(message) {
+    super(message, 'DNS_RESOLUTION_FAILED');
+  }
 }
 
 // ── Address classification ──────────────────────────────────────
@@ -287,7 +297,10 @@ async function assertScannableUrl(url, options = {}) {
 
   // WHATWG URL keeps IPv6 literals bracketed and normalises decimal/octal IPv4
   // forms (http://2130706433/ -> 127.0.0.1), so this is the canonical host.
-  const hostname = parsed.hostname.replace(/^\[|\]$/g, '').replace(/\.$/, '').toLowerCase();
+  const hostname = parsed.hostname
+    .replace(/^\[|\]$/g, '')
+    .replace(/\.$/, '')
+    .toLowerCase();
   if (!hostname) {
     throw new InvalidUrlError('URL has no hostname');
   }
@@ -319,17 +332,20 @@ async function assertScannableUrl(url, options = {}) {
     return { url: parsed.href, hostname, addresses: [hostname], allowlisted: !!hit };
   }
 
-  const lookup =
-    options.lookup || ((host) => dns.lookup(host, { all: true, verbatim: true }));
+  const lookup = options.lookup || ((host) => dns.lookup(host, { all: true, verbatim: true }));
 
   let records;
   try {
     records = await lookup(hostname);
   } catch (error) {
-    throw new DnsResolutionError(`Could not resolve host "${hostname}": ${error.code || error.message}`);
+    throw new DnsResolutionError(
+      `Could not resolve host "${hostname}": ${error.code || error.message}`
+    );
   }
 
-  const addresses = (records || []).map((r) => (typeof r === 'string' ? r : r.address)).filter(Boolean);
+  const addresses = (records || [])
+    .map((r) => (typeof r === 'string' ? r : r.address))
+    .filter(Boolean);
   if (addresses.length === 0) {
     throw new DnsResolutionError(`Host "${hostname}" did not resolve to any address`);
   }
@@ -383,7 +399,10 @@ function createRequestGuard(options = {}) {
   const passthroughSchemes = new Set(['data:', 'blob:', 'about:']);
 
   return async function guardRequest(request) {
-    if (typeof request.isInterceptResolutionHandled === 'function' && request.isInterceptResolutionHandled()) {
+    if (
+      typeof request.isInterceptResolutionHandled === 'function' &&
+      request.isInterceptResolutionHandled()
+    ) {
       return;
     }
 
@@ -405,7 +424,11 @@ function createRequestGuard(options = {}) {
       await request.continue().catch(() => {});
     } catch (error) {
       if (onBlock) {
-        try { onBlock(requestUrl, error); } catch (e) { /* never let logging break a scan */ }
+        try {
+          onBlock(requestUrl, error);
+        } catch (e) {
+          /* never let logging break a scan */
+        }
       }
       await request.abort('blockedbyclient').catch(() => {});
     }

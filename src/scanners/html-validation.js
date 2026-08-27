@@ -16,7 +16,7 @@ class HTMLValidationScanner extends BaseScanner {
   constructor() {
     super('html-validation', {
       wcagCriteria: ['4.1.1', '4.1.2'],
-      wcagPrinciple: 'robust'
+      wcagPrinciple: 'robust',
     });
   }
 
@@ -31,7 +31,7 @@ class HTMLValidationScanner extends BaseScanner {
       strictValidation: true,
       checkAccessibilityMarkup: true,
       validateARIA: true,
-      timeout: 60000
+      timeout: 60000,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -45,17 +45,17 @@ class HTMLValidationScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.4.1.1", "9.4.1.3"],
+      criteria: ['9.4.1.1', '9.4.1.3'],
       passed: htmlResults.violations.length === 0,
       violations: htmlResults.violations,
       summary: {
         syntaxErrors: htmlResults.syntaxErrors,
         duplicateIds: htmlResults.duplicateIds,
         invalidARIA: htmlResults.invalidARIA,
-        statusMessagesProper: htmlResults.statusMessagesProper
+        statusMessagesProper: htmlResults.statusMessagesProper,
       },
       screenshotPath: scanDir,
-      visualEvidence: htmlResults.visualEvidence
+      visualEvidence: htmlResults.visualEvidence,
     };
   }
 
@@ -77,34 +77,34 @@ class HTMLValidationScanner extends BaseScanner {
     await page.screenshot({ path: initialScreenshot, fullPage: true });
 
     // PHASE 1: Enhanced CSP-Immune Rule Validation
-    
+
     // Group 1: Button and Link Naming (Critical CSP-blocked rules)
     await this.validateButtonNames(page, violations);
     await this.validateLinkNames(page, violations);
-    
+
     // Group 2: Frame and Media Accessibility
     await this.validateFrameTitles(page, violations);
     await this.validateMediaAlternatives(page, violations);
-    
+
     // Group 3: ARIA Validation (Enhanced)
     await this.validateARIAAttributes(page, violations);
     await this.validateARIARoles(page, violations);
     await this.validateARIARelationships(page, violations);
-    
+
     // Group 4: Meta Tag Analysis
     await this.validateMetaTags(page, violations);
-    
+
     // Group 5: ID and Language Validation
     await this.validateDuplicateIDs(page, violations);
     await this.validateLanguageAttributes(page, violations);
-    
+
     // Group 6: Form and Input Validation
     await this.validateFormAccessibility(page, violations);
-    
+
     // Group 7: Heading and Structure — heading-order / page-has-heading-one
     // are axe-core best-practice rules already run by axe-core-adapter.js;
     // our duplicate was removed (see note near the end of this file).
-    
+
     // Legacy validation for backward compatibility
     const duplicateIdResults = await this.checkDuplicateIds(page, violations);
     duplicateIds = duplicateIdResults.count;
@@ -136,7 +136,7 @@ class HTMLValidationScanner extends BaseScanner {
       screenshot: path.basename(initialScreenshot),
       syntaxErrors: syntaxErrors,
       duplicateIds: duplicateIds,
-      invalidARIA: invalidARIA
+      invalidARIA: invalidARIA,
     });
 
     console.log(`HTML validation complete: ${violations.length} violations found`);
@@ -147,7 +147,7 @@ class HTMLValidationScanner extends BaseScanner {
       syntaxErrors,
       duplicateIds,
       invalidARIA,
-      statusMessagesProper
+      statusMessagesProper,
     };
   }
 
@@ -162,18 +162,19 @@ class HTMLValidationScanner extends BaseScanner {
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? '#' + element.id : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? '.' + element.className.split(' ')[0] 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? '.' + element.className.split(' ')[0]
+            : '';
         return tagName + id + className;
       }
-      
+
       const allElements = document.querySelectorAll('*[id]');
       const idCounts = {};
       const duplicates = [];
 
       // Count occurrences of each ID
-      allElements.forEach(element => {
+      allElements.forEach((element) => {
         const id = element.id;
         if (idCounts[id]) {
           idCounts[id]++;
@@ -190,12 +191,15 @@ class HTMLValidationScanner extends BaseScanner {
             duplicates.push({
               id: id,
               element: element.tagName.toLowerCase(),
-              selector: element.tagName.toLowerCase() +
-                       `#${id}` +
-                       (element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : ''),
+              selector:
+                element.tagName.toLowerCase() +
+                `#${id}` +
+                (element.className && typeof element.className === 'string'
+                  ? `.${element.className.split(' ')[0]}`
+                  : ''),
               occurrence: index + 1,
               totalOccurrences: count,
-              textContent: element.textContent.trim().substring(0, 50)
+              textContent: element.textContent.trim().substring(0, 50),
             });
           });
         }
@@ -206,7 +210,7 @@ class HTMLValidationScanner extends BaseScanner {
 
     // Create violations for duplicate IDs
     const duplicateGroups = {};
-    duplicateIdInfo.forEach(dup => {
+    duplicateIdInfo.forEach((dup) => {
       if (!duplicateGroups[dup.id]) {
         duplicateGroups[dup.id] = [];
       }
@@ -215,14 +219,14 @@ class HTMLValidationScanner extends BaseScanner {
 
     Object.entries(duplicateGroups).forEach(([id, elements]) => {
       violations.push({
-        criterion: "9.4.1.1",
-        element: elements.map(e => e.selector).join(', '),
-        issue: "duplicate-id",
+        criterion: '9.4.1.1',
+        element: elements.map((e) => e.selector).join(', '),
+        issue: 'duplicate-id',
         description: `ID "${id}" is used ${elements.length} times. IDs must be unique within a document.`,
         duplicateId: id,
         occurrences: elements.length,
         severity: 'error',
-        suggestion: `Ensure each ID is unique. Consider using classes instead of IDs for styling, or add suffixes to make IDs unique.`
+        suggestion: `Ensure each ID is unique. Consider using classes instead of IDs for styling, or add suffixes to make IDs unique.`,
       });
     });
 
@@ -246,15 +250,19 @@ class HTMLValidationScanner extends BaseScanner {
 
       // Check for common HTML structure issues
       const allElements = document.querySelectorAll('*');
-      
-      allElements.forEach(element => {
+
+      allElements.forEach((element) => {
         const tagName = element.tagName.toLowerCase();
-        const className = element.className && typeof element.className === 'string' 
-          ? element.className 
-          : (element.className && element.className.baseVal ? element.className.baseVal : '');
-        const selector = tagName + 
-                        (element.id ? `#${element.id}` : '') + 
-                        (className ? `.${className.split(' ')[0]}` : '');
+        const className =
+          element.className && typeof element.className === 'string'
+            ? element.className
+            : element.className && element.className.baseVal
+              ? element.className.baseVal
+              : '';
+        const selector =
+          tagName +
+          (element.id ? `#${element.id}` : '') +
+          (className ? `.${className.split(' ')[0]}` : '');
 
         // Check for invalid nesting. <a> is NOT in the list: its content
         // model is transparent, so block-level children are valid HTML5.
@@ -263,7 +271,7 @@ class HTMLValidationScanner extends BaseScanner {
             type: 'invalid-nesting',
             element: selector,
             description: 'Block element nested inside inline element',
-            suggestion: 'Use appropriate element types or restructure markup'
+            suggestion: 'Use appropriate element types or restructure markup',
           });
         }
 
@@ -273,7 +281,8 @@ class HTMLValidationScanner extends BaseScanner {
             type: 'missing-alt',
             element: selector,
             description: 'Image missing alt attribute',
-            suggestion: 'Add alt attribute to describe the image or use alt="" for decorative images'
+            suggestion:
+              'Add alt attribute to describe the image or use alt="" for decorative images',
           });
         }
 
@@ -287,7 +296,7 @@ class HTMLValidationScanner extends BaseScanner {
               type: 'empty-heading',
               element: selector,
               description: `Heading element has no accessible name (${headingName.reason || 'no naming mechanism'})`,
-              suggestion: 'Provide meaningful heading text or remove empty heading'
+              suggestion: 'Provide meaningful heading text or remove empty heading',
             });
           }
         }
@@ -299,9 +308,12 @@ class HTMLValidationScanner extends BaseScanner {
         // to miss, reporting a perfectly-named image submit button as unlabeled.
         // A `label`/`aria-labelledby` that resolves to empty text is now
         // correctly treated as NO name (it previously counted as labelled).
-        if (['input', 'textarea', 'select'].includes(tagName) &&
-            element.type !== 'hidden' && element.type !== 'submit' && element.type !== 'button') {
-
+        if (
+          ['input', 'textarea', 'select'].includes(tagName) &&
+          element.type !== 'hidden' &&
+          element.type !== 'submit' &&
+          element.type !== 'button'
+        ) {
           const controlName = __accessibleNameInfo(element);
 
           if (!controlName.name) {
@@ -309,16 +321,20 @@ class HTMLValidationScanner extends BaseScanner {
               type: 'unlabeled-form-control',
               element: selector,
               description: `Form control has no accessible name (${controlName.reason || 'no naming mechanism'})`,
-              suggestion: 'Add label element, aria-label, or aria-labelledby attribute'
+              suggestion: 'Add label element, aria-label, or aria-labelledby attribute',
             });
           }
         }
 
         // Check for invalid attributes
         const invalidAttrs = [];
-        Array.from(element.attributes).forEach(attr => {
+        Array.from(element.attributes).forEach((attr) => {
           // Basic check for obviously invalid attributes
-          if ((attr.name.includes('invalid') || attr.name.includes('not-allowed')) && !attr.name.startsWith('aria-') && !attr.name.startsWith('data-')) {
+          if (
+            (attr.name.includes('invalid') || attr.name.includes('not-allowed')) &&
+            !attr.name.startsWith('aria-') &&
+            !attr.name.startsWith('data-')
+          ) {
             invalidAttrs.push(attr.name);
           }
         });
@@ -328,21 +344,23 @@ class HTMLValidationScanner extends BaseScanner {
             type: 'invalid-attributes',
             element: selector,
             description: `Element has invalid attributes: ${invalidAttrs.join(', ')}`,
-            suggestion: 'Remove invalid attributes or use valid HTML attributes'
+            suggestion: 'Remove invalid attributes or use valid HTML attributes',
           });
         }
 
         // Check for list structure violations
         if (tagName === 'ul' || tagName === 'ol') {
           const directChildren = Array.from(element.children);
-          const invalidChildren = directChildren.filter(child => child.tagName.toLowerCase() !== 'li');
-          
+          const invalidChildren = directChildren.filter(
+            (child) => child.tagName.toLowerCase() !== 'li'
+          );
+
           if (invalidChildren.length > 0) {
             issues.push({
               type: 'invalid-list-structure',
               element: selector,
-              description: `List contains non-list-item children: ${invalidChildren.map(c => c.tagName).join(', ')}`,
-              suggestion: 'Only <li> elements should be direct children of <ul> or <ol>'
+              description: `List contains non-list-item children: ${invalidChildren.map((c) => c.tagName).join(', ')}`,
+              suggestion: 'Only <li> elements should be direct children of <ul> or <ol>',
             });
           }
         }
@@ -355,7 +373,7 @@ class HTMLValidationScanner extends BaseScanner {
               type: 'invalid-table-structure',
               element: selector,
               description: 'Table lacks proper structure (thead, tbody, th elements)',
-              suggestion: 'Use proper table structure with thead, tbody, and th elements'
+              suggestion: 'Use proper table structure with thead, tbody, and th elements',
             });
           }
         }
@@ -365,14 +383,14 @@ class HTMLValidationScanner extends BaseScanner {
     }, accnameUtils);
 
     // Create violations for structure issues
-    structureIssues.forEach(issue => {
+    structureIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.4.1.1",
+        criterion: '9.4.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.type === 'missing-alt' ? 'error' : 'warning',
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
 
@@ -388,35 +406,123 @@ class HTMLValidationScanner extends BaseScanner {
     const ariaIssues = await page.evaluate(() => {
       const issues = [];
       const validRoles = [
-        'alert', 'alertdialog', 'application', 'article', 'banner', 'button', 'cell', 'checkbox',
-        'columnheader', 'combobox', 'complementary', 'contentinfo', 'definition', 'dialog',
-        'directory', 'document', 'feed', 'figure', 'form', 'grid', 'gridcell', 'group',
-        'heading', 'img', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee',
-        'math', 'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'navigation',
-        'none', 'note', 'option', 'presentation', 'progressbar', 'radio', 'radiogroup',
-        'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search', 'searchbox',
-        'separator', 'slider', 'spinbutton', 'status', 'switch', 'tab', 'table', 'tablist',
-        'tabpanel', 'term', 'textbox', 'timer', 'toolbar', 'tooltip', 'tree', 'treegrid',
-        'treeitem'
+        'alert',
+        'alertdialog',
+        'application',
+        'article',
+        'banner',
+        'button',
+        'cell',
+        'checkbox',
+        'columnheader',
+        'combobox',
+        'complementary',
+        'contentinfo',
+        'definition',
+        'dialog',
+        'directory',
+        'document',
+        'feed',
+        'figure',
+        'form',
+        'grid',
+        'gridcell',
+        'group',
+        'heading',
+        'img',
+        'link',
+        'list',
+        'listbox',
+        'listitem',
+        'log',
+        'main',
+        'marquee',
+        'math',
+        'menu',
+        'menubar',
+        'menuitem',
+        'menuitemcheckbox',
+        'menuitemradio',
+        'navigation',
+        'none',
+        'note',
+        'option',
+        'presentation',
+        'progressbar',
+        'radio',
+        'radiogroup',
+        'region',
+        'row',
+        'rowgroup',
+        'rowheader',
+        'scrollbar',
+        'search',
+        'searchbox',
+        'separator',
+        'slider',
+        'spinbutton',
+        'status',
+        'switch',
+        'tab',
+        'table',
+        'tablist',
+        'tabpanel',
+        'term',
+        'textbox',
+        'timer',
+        'toolbar',
+        'tooltip',
+        'tree',
+        'treegrid',
+        'treeitem',
       ];
 
       const validAriaStates = [
-        'aria-atomic', 'aria-busy', 'aria-checked', 'aria-current', 'aria-describedby',
-        'aria-disabled', 'aria-expanded', 'aria-grabbed', 'aria-haspopup', 'aria-hidden',
-        'aria-invalid', 'aria-label', 'aria-labelledby', 'aria-level', 'aria-live',
-        'aria-owns', 'aria-pressed', 'aria-readonly', 'aria-relevant', 'aria-required',
-        'aria-selected', 'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow',
-        'aria-valuetext', 'aria-controls', 'aria-flowto', 'aria-orientation', 'aria-setsize',
-        'aria-posinset'
+        'aria-atomic',
+        'aria-busy',
+        'aria-checked',
+        'aria-current',
+        'aria-describedby',
+        'aria-disabled',
+        'aria-expanded',
+        'aria-grabbed',
+        'aria-haspopup',
+        'aria-hidden',
+        'aria-invalid',
+        'aria-label',
+        'aria-labelledby',
+        'aria-level',
+        'aria-live',
+        'aria-owns',
+        'aria-pressed',
+        'aria-readonly',
+        'aria-relevant',
+        'aria-required',
+        'aria-selected',
+        'aria-sort',
+        'aria-valuemax',
+        'aria-valuemin',
+        'aria-valuenow',
+        'aria-valuetext',
+        'aria-controls',
+        'aria-flowto',
+        'aria-orientation',
+        'aria-setsize',
+        'aria-posinset',
       ];
 
       // Find all elements with ARIA attributes
-      const elementsWithAria = document.querySelectorAll('[role], [aria-label], [aria-labelledby], [aria-describedby], [aria-expanded], [aria-hidden], [aria-live], [aria-current], [aria-checked], [aria-selected], [aria-pressed], [aria-disabled], [aria-required], [aria-invalid], [class*="aria-"], [id*="aria-"]');
+      const elementsWithAria = document.querySelectorAll(
+        '[role], [aria-label], [aria-labelledby], [aria-describedby], [aria-expanded], [aria-hidden], [aria-live], [aria-current], [aria-checked], [aria-selected], [aria-pressed], [aria-disabled], [aria-required], [aria-invalid], [class*="aria-"], [id*="aria-"]'
+      );
 
-      elementsWithAria.forEach(element => {
-        const selector = element.tagName.toLowerCase() +
-                        (element.id ? `#${element.id}` : '') +
-                        (element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : '');
+      elementsWithAria.forEach((element) => {
+        const selector =
+          element.tagName.toLowerCase() +
+          (element.id ? `#${element.id}` : '') +
+          (element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '');
 
         // Check for invalid roles
         const role = element.getAttribute('role');
@@ -427,12 +533,12 @@ class HTMLValidationScanner extends BaseScanner {
             attribute: 'role',
             value: role,
             description: `Invalid ARIA role: "${role}"`,
-            suggestion: 'Use a valid ARIA role or remove the role attribute'
+            suggestion: 'Use a valid ARIA role or remove the role attribute',
           });
         }
 
         // Check for invalid ARIA attributes
-        Array.from(element.attributes).forEach(attr => {
+        Array.from(element.attributes).forEach((attr) => {
           if (attr.name.startsWith('aria-') && !validAriaStates.includes(attr.name)) {
             issues.push({
               type: 'invalid-aria-attribute',
@@ -440,36 +546,47 @@ class HTMLValidationScanner extends BaseScanner {
               attribute: attr.name,
               value: attr.value,
               description: `Invalid ARIA attribute: "${attr.name}"`,
-              suggestion: 'Use valid ARIA attributes according to the specification'
+              suggestion: 'Use valid ARIA attributes according to the specification',
             });
           }
 
           // Check for invalid ARIA values
-          if (attr.name === 'aria-current' && !['page', 'step', 'location', 'date', 'time', 'true', 'false'].includes(attr.value)) {
+          if (
+            attr.name === 'aria-current' &&
+            !['page', 'step', 'location', 'date', 'time', 'true', 'false'].includes(attr.value)
+          ) {
             issues.push({
               type: 'invalid-aria-value',
               element: selector,
               attribute: attr.name,
               value: attr.value,
               description: `Invalid value for aria-current: "${attr.value}"`,
-              suggestion: 'Use valid aria-current values: page, step, location, date, time, true, or false'
+              suggestion:
+                'Use valid aria-current values: page, step, location, date, time, true, or false',
             });
           }
 
-          if ((attr.name === 'aria-expanded' || attr.name === 'aria-hidden') && !['true', 'false'].includes(attr.value)) {
+          if (
+            (attr.name === 'aria-expanded' || attr.name === 'aria-hidden') &&
+            !['true', 'false'].includes(attr.value)
+          ) {
             issues.push({
               type: 'invalid-aria-value',
               element: selector,
               attribute: attr.name,
               value: attr.value,
               description: `Invalid boolean value for ${attr.name}: "${attr.value}"`,
-              suggestion: `Use "true" or "false" for ${attr.name}`
+              suggestion: `Use "true" or "false" for ${attr.name}`,
             });
           }
         });
 
         // Check for missing required ARIA attributes
-        if (role === 'button' && !element.hasAttribute('aria-pressed') && element.tagName.toLowerCase() !== 'button') {
+        if (
+          role === 'button' &&
+          !element.hasAttribute('aria-pressed') &&
+          element.tagName.toLowerCase() !== 'button'
+        ) {
           // This is actually optional, so we'll skip this check
         }
 
@@ -477,13 +594,14 @@ class HTMLValidationScanner extends BaseScanner {
         const ariaHidden = element.getAttribute('aria-hidden');
         const ariaExpanded = element.getAttribute('aria-expanded');
         const hidden = element.hasAttribute('hidden');
-        
+
         if (ariaHidden === 'true' && ariaExpanded === 'true') {
           issues.push({
             type: 'conflicting-aria-states',
             element: selector,
-            description: 'Element has conflicting ARIA states: aria-hidden="true" and aria-expanded="true"',
-            suggestion: 'Remove conflicting ARIA attributes or use appropriate values'
+            description:
+              'Element has conflicting ARIA states: aria-hidden="true" and aria-expanded="true"',
+            suggestion: 'Remove conflicting ARIA attributes or use appropriate values',
           });
         }
 
@@ -491,8 +609,9 @@ class HTMLValidationScanner extends BaseScanner {
           issues.push({
             type: 'conflicting-aria-states',
             element: selector,
-            description: 'Element has conflicting visibility states: aria-hidden="false" and hidden attribute',
-            suggestion: 'Remove conflicting visibility attributes'
+            description:
+              'Element has conflicting visibility states: aria-hidden="false" and hidden attribute',
+            suggestion: 'Remove conflicting visibility attributes',
           });
         }
 
@@ -500,7 +619,7 @@ class HTMLValidationScanner extends BaseScanner {
         const labelledBy = element.getAttribute('aria-labelledby');
         if (labelledBy) {
           const labelIds = labelledBy.split(/\s+/);
-          labelIds.forEach(id => {
+          labelIds.forEach((id) => {
             if (!document.getElementById(id)) {
               issues.push({
                 type: 'invalid-aria-reference',
@@ -508,7 +627,7 @@ class HTMLValidationScanner extends BaseScanner {
                 attribute: 'aria-labelledby',
                 value: id,
                 description: `aria-labelledby references non-existent element: "${id}"`,
-                suggestion: 'Ensure aria-labelledby references existing element IDs'
+                suggestion: 'Ensure aria-labelledby references existing element IDs',
               });
             }
           });
@@ -518,7 +637,7 @@ class HTMLValidationScanner extends BaseScanner {
         const describedBy = element.getAttribute('aria-describedby');
         if (describedBy) {
           const descIds = describedBy.split(/\s+/);
-          descIds.forEach(id => {
+          descIds.forEach((id) => {
             if (!document.getElementById(id)) {
               issues.push({
                 type: 'invalid-aria-reference',
@@ -526,7 +645,7 @@ class HTMLValidationScanner extends BaseScanner {
                 attribute: 'aria-describedby',
                 value: id,
                 description: `aria-describedby references non-existent element: "${id}"`,
-                suggestion: 'Ensure aria-describedby references existing element IDs'
+                suggestion: 'Ensure aria-describedby references existing element IDs',
               });
             }
           });
@@ -537,16 +656,16 @@ class HTMLValidationScanner extends BaseScanner {
     });
 
     // Create violations for ARIA issues
-    ariaIssues.forEach(issue => {
+    ariaIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.4.1.1",
+        criterion: '9.4.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         attribute: issue.attribute,
         value: issue.value,
         severity: 'error',
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
 
@@ -564,16 +683,31 @@ class HTMLValidationScanner extends BaseScanner {
 
       // Find potential status message elements
       const statusSelectors = [
-        '.status', '.alert', '.message', '.notification', '.success', '.error', '.warning', '.info',
-        '[role="status"]', '[role="alert"]', '[aria-live]', '[class*="status"]', '[class*="alert"]',
-        '[class*="message"]', '[class*="notification"]', '[id*="status"]', '[id*="alert"]', '[id*="message"]'
+        '.status',
+        '.alert',
+        '.message',
+        '.notification',
+        '.success',
+        '.error',
+        '.warning',
+        '.info',
+        '[role="status"]',
+        '[role="alert"]',
+        '[aria-live]',
+        '[class*="status"]',
+        '[class*="alert"]',
+        '[class*="message"]',
+        '[class*="notification"]',
+        '[id*="status"]',
+        '[id*="alert"]',
+        '[id*="message"]',
       ];
 
       const statusElements = [];
-      statusSelectors.forEach(selector => {
+      statusSelectors.forEach((selector) => {
         try {
           const elements = document.querySelectorAll(selector);
-          elements.forEach(element => {
+          elements.forEach((element) => {
             if (!statusElements.includes(element)) {
               statusElements.push(element);
             }
@@ -604,7 +738,8 @@ class HTMLValidationScanner extends BaseScanner {
         if (element.hasAttribute('aria-live')) return true;
         const role = element.getAttribute('role');
         if (role && ['status', 'alert', 'log'].includes(role)) return true;
-        if (element.hasAttribute('aria-atomic') || element.hasAttribute('aria-relevant')) return true;
+        if (element.hasAttribute('aria-atomic') || element.hasAttribute('aria-relevant'))
+          return true;
         return !!element.closest('[aria-live], [role="status"], [role="alert"], [role="log"]');
       }
 
@@ -639,34 +774,42 @@ class HTMLValidationScanner extends BaseScanner {
         return hasRoleEvidence(element) || isDescribedbyErrorSlot(element);
       }
 
-      statusElements.forEach(element => {
+      statusElements.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
-        const selector = element.tagName.toLowerCase() +
-                        (element.id ? `#${element.id}` : '') +
-                        (className ? `.${className.split(' ')[0]}` : '');
+        const selector =
+          element.tagName.toLowerCase() +
+          (element.id ? `#${element.id}` : '') +
+          (className ? `.${className.split(' ')[0]}` : '');
 
         const role = element.getAttribute('role');
         const ariaLive = element.getAttribute('aria-live');
-        const hasStatusClass = className.toLowerCase().includes('status') ||
-                               className.toLowerCase().includes('alert') ||
-                               className.toLowerCase().includes('message') ||
-                               className.toLowerCase().includes('error') ||
-                               className.toLowerCase().includes('success');
+        const hasStatusClass =
+          className.toLowerCase().includes('status') ||
+          className.toLowerCase().includes('alert') ||
+          className.toLowerCase().includes('message') ||
+          className.toLowerCase().includes('error') ||
+          className.toLowerCase().includes('success');
 
         // Check if status messages have proper ARIA attributes
-        if (hasStatusClass || element.id.toLowerCase().includes('status') || element.id.toLowerCase().includes('alert')) {
+        if (
+          hasStatusClass ||
+          element.id.toLowerCase().includes('status') ||
+          element.id.toLowerCase().includes('alert')
+        ) {
           // Gate on evidence, not on the className/id match that got us here.
           if (!hasLiveRegionAttributes(element) && hasStatusMessageEvidence(element)) {
             issues.push({
               type: 'missing-status-attributes',
               element: selector,
-              description: 'Status message element lacks role="status", role="alert", or aria-live attribute',
+              description:
+                'Status message element lacks role="status", role="alert", or aria-live attribute',
               evidence: {
                 roleOrState: hasRoleEvidence(element),
-                describedbyErrorSlot: isDescribedbyErrorSlot(element)
+                describedbyErrorSlot: isDescribedbyErrorSlot(element),
               },
-              suggestion: 'Add role="status" for info messages, role="alert" for errors, or aria-live="polite/assertive"'
+              suggestion:
+                'Add role="status" for info messages, role="alert" for errors, or aria-live="polite/assertive"',
             });
           }
 
@@ -677,53 +820,68 @@ class HTMLValidationScanner extends BaseScanner {
           // Eingabe"). Now it needs positive evidence that the element is a
           // NON-critical message wearing role="alert": a class/id that names
           // it as success/info/hint, in en or de.
-          const nonCriticalNaming = /(^|[-_ ])(success|info|hint|notice|tip|hinweis|erfolg|erfolgreich)([-_ ]|$)/i;
-          const namesNonCritical = nonCriticalNaming.test(className) || nonCriticalNaming.test(element.id || '');
-          const criticalWording = /(error|invalid|fail|warn|fehler|ungültig|ungueltig|warnung|achtung)/i;
-          const readsCritical = criticalWording.test(element.textContent) ||
-                                criticalWording.test(className) ||
-                                criticalWording.test(element.id || '');
+          const nonCriticalNaming =
+            /(^|[-_ ])(success|info|hint|notice|tip|hinweis|erfolg|erfolgreich)([-_ ]|$)/i;
+          const namesNonCritical =
+            nonCriticalNaming.test(className) || nonCriticalNaming.test(element.id || '');
+          const criticalWording =
+            /(error|invalid|fail|warn|fehler|ungültig|ungueltig|warnung|achtung)/i;
+          const readsCritical =
+            criticalWording.test(element.textContent) ||
+            criticalWording.test(className) ||
+            criticalWording.test(element.id || '');
 
           if (role === 'alert' && namesNonCritical && !readsCritical) {
             issues.push({
               type: 'inappropriate-alert-role',
               element: selector,
-              description: 'Element uses role="alert" but content doesn\'t appear to be an error or critical message',
+              description:
+                'Element uses role="alert" but content doesn\'t appear to be an error or critical message',
               severity: 'warning',
-              suggestion: 'Use role="alert" only for error messages and critical notifications'
+              suggestion: 'Use role="alert" only for error messages and critical notifications',
             });
           }
         }
 
         // Check for elements that change content but don't have live regions
         // Only check for actual dynamic content containers, not form fields or help text
-        const hasChangingContent = element.id && (
-          element.id.includes('loading') || 
-          (element.id.includes('status') && !element.closest('form')) || 
-          (element.id.includes('message') && !element.closest('form') && !element.hasAttribute('for') && element.tagName.toLowerCase() !== 'small')
-        );
+        const hasChangingContent =
+          element.id &&
+          (element.id.includes('loading') ||
+            (element.id.includes('status') && !element.closest('form')) ||
+            (element.id.includes('message') &&
+              !element.closest('form') &&
+              !element.hasAttribute('for') &&
+              element.tagName.toLowerCase() !== 'small'));
 
         // Exclude form elements and their associated help text
-        const isFormRelated = element.tagName.toLowerCase() === 'input' ||
-                             element.tagName.toLowerCase() === 'textarea' ||
-                             element.tagName.toLowerCase() === 'select' ||
-                             element.tagName.toLowerCase() === 'small' ||
-                             element.hasAttribute('for') ||
-                             element.closest('form');
+        const isFormRelated =
+          element.tagName.toLowerCase() === 'input' ||
+          element.tagName.toLowerCase() === 'textarea' ||
+          element.tagName.toLowerCase() === 'select' ||
+          element.tagName.toLowerCase() === 'small' ||
+          element.hasAttribute('for') ||
+          element.closest('form');
 
         // Same gate: an id containing "status"/"loading"/"message" is a
         // naming convention, not proof the element is ever updated.
-        if (hasChangingContent && !isFormRelated &&
-            !hasLiveRegionAttributes(element) && hasStatusMessageEvidence(element)) {
+        if (
+          hasChangingContent &&
+          !isFormRelated &&
+          !hasLiveRegionAttributes(element) &&
+          hasStatusMessageEvidence(element)
+        ) {
           issues.push({
             type: 'missing-live-region',
             element: selector,
-            description: 'Element that likely contains dynamic content lacks aria-live or status role',
+            description:
+              'Element that likely contains dynamic content lacks aria-live or status role',
             evidence: {
               roleOrState: hasRoleEvidence(element),
-              describedbyErrorSlot: isDescribedbyErrorSlot(element)
+              describedbyErrorSlot: isDescribedbyErrorSlot(element),
             },
-            suggestion: 'Add aria-live="polite" for status updates or aria-live="assertive" for urgent messages'
+            suggestion:
+              'Add aria-live="polite" for status updates or aria-live="assertive" for urgent messages',
           });
         }
       });
@@ -734,15 +892,15 @@ class HTMLValidationScanner extends BaseScanner {
     let statusMessagesProper = true;
 
     // Create violations for status message issues
-    statusMessageIssues.forEach(issue => {
+    statusMessageIssues.forEach((issue) => {
       statusMessagesProper = false;
       violations.push({
-        criterion: "9.4.1.3",
+        criterion: '9.4.1.3',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity || 'error',
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
 
@@ -771,7 +929,7 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateButtonNames(page, violations) {
     console.log('Validating button names...');
-    
+
     const buttonIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation — see src/utils/accessible-name.js.
       // Replaces the local attribute chain, which read only textContent for the
@@ -783,14 +941,17 @@ class HTMLValidationScanner extends BaseScanner {
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string'
-          ? `.${element.className.split(' ')[0]}`
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
 
       const issues = [];
-      const buttons = document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"], [role="button"]');
+      const buttons = document.querySelectorAll(
+        'button, input[type="button"], input[type="submit"], input[type="reset"], [role="button"]'
+      );
 
       buttons.forEach((button, index) => {
         const selector = getElementSelector(button);
@@ -802,22 +963,23 @@ class HTMLValidationScanner extends BaseScanner {
             element: selector,
             description: `Button has no accessible name (${nameInfo.reason || 'no naming mechanism'})`,
             severity: 'critical',
-            suggestion: 'Add aria-label, text content, or value attribute to provide accessible name'
+            suggestion:
+              'Add aria-label, text content, or value attribute to provide accessible name',
           });
         }
       });
 
       return issues;
     }, accnameUtils);
-    
-    buttonIssues.forEach(issue => {
+
+    buttonIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.2",
+        criterion: '4.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -827,7 +989,7 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateLinkNames(page, violations) {
     console.log('Validating link names...');
-    
+
     const linkIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation — see src/utils/accessible-name.js.
       // The local version already walked child `<img alt>`, but resolved
@@ -840,9 +1002,10 @@ class HTMLValidationScanner extends BaseScanner {
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string'
-          ? `.${element.className.split(' ')[0]}`
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
 
@@ -859,22 +1022,22 @@ class HTMLValidationScanner extends BaseScanner {
             element: selector,
             description: `Link has no accessible name (${nameInfo.reason || 'no naming mechanism'})`,
             severity: 'critical',
-            suggestion: 'Add aria-label, text content, or meaningful link text'
+            suggestion: 'Add aria-label, text content, or meaningful link text',
           });
         }
       });
 
       return issues;
     }, accnameUtils);
-    
-    linkIssues.forEach(issue => {
+
+    linkIssues.forEach((issue) => {
       violations.push({
-        criterion: "2.4.4",
+        criterion: '2.4.4',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -884,47 +1047,48 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateFrameTitles(page, violations) {
     console.log('Validating frame titles...');
-    
+
     const frameIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
       const frames = document.querySelectorAll('iframe, frame');
-      
+
       frames.forEach((frame, index) => {
         const selector = getElementSelector(frame);
         const title = frame.getAttribute('title');
-        
+
         if (!title || !title.trim()) {
           issues.push({
             type: 'frame-title',
             element: selector,
             description: 'Frame or iframe lacks a title attribute',
             severity: 'serious',
-            suggestion: 'Add a descriptive title attribute to the frame/iframe element'
+            suggestion: 'Add a descriptive title attribute to the frame/iframe element',
           });
         }
       });
-      
+
       return issues;
     });
-    
-    frameIssues.forEach(issue => {
+
+    frameIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.2",
+        criterion: '4.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -934,84 +1098,86 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateMediaAlternatives(page, violations) {
     console.log('Validating media alternatives...');
-    
+
     const mediaIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Check area elements in image maps
       const areas = document.querySelectorAll('area');
-      areas.forEach(area => {
+      areas.forEach((area) => {
         const selector = getElementSelector(area);
         const alt = area.getAttribute('alt');
-        
+
         if (!alt && alt !== '') {
           issues.push({
             type: 'area-alt',
             element: selector,
             description: 'Area element lacks alt attribute',
             severity: 'serious',
-            suggestion: 'Add alt attribute to describe the clickable area'
+            suggestion: 'Add alt attribute to describe the clickable area',
           });
         }
       });
-      
+
       // Check object elements
       const objects = document.querySelectorAll('object');
-      objects.forEach(obj => {
+      objects.forEach((obj) => {
         const selector = getElementSelector(obj);
         const hasTextContent = obj.textContent.trim().length > 0;
         const hasTitle = obj.hasAttribute('title') && obj.getAttribute('title').trim();
-        const hasAriaLabel = obj.hasAttribute('aria-label') && obj.getAttribute('aria-label').trim();
-        
+        const hasAriaLabel =
+          obj.hasAttribute('aria-label') && obj.getAttribute('aria-label').trim();
+
         if (!hasTextContent && !hasTitle && !hasAriaLabel) {
           issues.push({
             type: 'object-alt',
             element: selector,
             description: 'Object element lacks alternative text',
             severity: 'serious',
-            suggestion: 'Add text content, title, or aria-label to describe the object'
+            suggestion: 'Add text content, title, or aria-label to describe the object',
           });
         }
       });
-      
+
       // Check input type="image"
       const imageInputs = document.querySelectorAll('input[type="image"]');
-      imageInputs.forEach(input => {
+      imageInputs.forEach((input) => {
         const selector = getElementSelector(input);
         const alt = input.getAttribute('alt');
-        
+
         if (!alt || !alt.trim()) {
           issues.push({
             type: 'input-image-alt',
             element: selector,
             description: 'Image input lacks alt attribute',
             severity: 'critical',
-            suggestion: 'Add alt attribute to describe the image input purpose'
+            suggestion: 'Add alt attribute to describe the image input purpose',
           });
         }
       });
-      
+
       return issues;
     });
-    
-    mediaIssues.forEach(issue => {
+
+    mediaIssues.forEach((issue) => {
       violations.push({
-        criterion: "1.1.1",
+        criterion: '1.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1021,42 +1187,82 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateARIAAttributes(page, violations) {
     console.log('Validating ARIA attributes...');
-    
+
     const ariaIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Valid ARIA attributes
       const validAriaAttrs = [
-        'aria-atomic', 'aria-busy', 'aria-checked', 'aria-colcount', 'aria-colindex',
-        'aria-colspan', 'aria-controls', 'aria-current', 'aria-describedby', 'aria-details',
-        'aria-disabled', 'aria-dropeffect', 'aria-errormessage', 'aria-expanded', 'aria-flowto',
-        'aria-grabbed', 'aria-haspopup', 'aria-hidden', 'aria-invalid', 'aria-keyshortcuts',
-        'aria-label', 'aria-labelledby', 'aria-level', 'aria-live', 'aria-modal',
-        'aria-multiline', 'aria-multiselectable', 'aria-orientation', 'aria-owns', 'aria-placeholder',
-        'aria-posinset', 'aria-pressed', 'aria-readonly', 'aria-relevant', 'aria-required',
-        'aria-roledescription', 'aria-rowcount', 'aria-rowindex', 'aria-rowspan', 'aria-selected',
-        'aria-setsize', 'aria-sort', 'aria-valuemax', 'aria-valuemin', 'aria-valuenow', 'aria-valuetext'
+        'aria-atomic',
+        'aria-busy',
+        'aria-checked',
+        'aria-colcount',
+        'aria-colindex',
+        'aria-colspan',
+        'aria-controls',
+        'aria-current',
+        'aria-describedby',
+        'aria-details',
+        'aria-disabled',
+        'aria-dropeffect',
+        'aria-errormessage',
+        'aria-expanded',
+        'aria-flowto',
+        'aria-grabbed',
+        'aria-haspopup',
+        'aria-hidden',
+        'aria-invalid',
+        'aria-keyshortcuts',
+        'aria-label',
+        'aria-labelledby',
+        'aria-level',
+        'aria-live',
+        'aria-modal',
+        'aria-multiline',
+        'aria-multiselectable',
+        'aria-orientation',
+        'aria-owns',
+        'aria-placeholder',
+        'aria-posinset',
+        'aria-pressed',
+        'aria-readonly',
+        'aria-relevant',
+        'aria-required',
+        'aria-roledescription',
+        'aria-rowcount',
+        'aria-rowindex',
+        'aria-rowspan',
+        'aria-selected',
+        'aria-setsize',
+        'aria-sort',
+        'aria-valuemax',
+        'aria-valuemin',
+        'aria-valuenow',
+        'aria-valuetext',
       ];
-      
-      const elementsWithAria = document.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby], [class*="aria"], [id*="aria"]');
-      
+
+      const elementsWithAria = document.querySelectorAll(
+        '[aria-label], [aria-labelledby], [aria-describedby], [class*="aria"], [id*="aria"]'
+      );
+
       // Get all elements with any aria attribute
       const allElements = document.querySelectorAll('*');
-      allElements.forEach(element => {
+      allElements.forEach((element) => {
         const selector = getElementSelector(element);
-        
+
         // Check each attribute
-        Array.from(element.attributes).forEach(attr => {
+        Array.from(element.attributes).forEach((attr) => {
           if (attr.name.startsWith('aria-')) {
             // Check if valid ARIA attribute
             if (!validAriaAttrs.includes(attr.name)) {
@@ -1066,36 +1272,39 @@ class HTMLValidationScanner extends BaseScanner {
                 attribute: attr.name,
                 description: `Invalid ARIA attribute: ${attr.name}`,
                 severity: 'serious',
-                suggestion: 'Remove invalid ARIA attribute or use valid ARIA attribute'
+                suggestion: 'Remove invalid ARIA attribute or use valid ARIA attribute',
               });
             }
-            
+
             // Check for empty values where not allowed
-            if (!attr.value.trim() && !['aria-hidden', 'aria-expanded', 'aria-checked'].includes(attr.name)) {
+            if (
+              !attr.value.trim() &&
+              !['aria-hidden', 'aria-expanded', 'aria-checked'].includes(attr.name)
+            ) {
               issues.push({
                 type: 'aria-valid-attr-value',
                 element: selector,
                 attribute: attr.name,
                 description: `ARIA attribute ${attr.name} has empty value`,
                 severity: 'serious',
-                suggestion: 'Provide a meaningful value for the ARIA attribute'
+                suggestion: 'Provide a meaningful value for the ARIA attribute',
               });
             }
           }
         });
       });
-      
+
       return issues;
     });
-    
-    ariaIssues.forEach(issue => {
+
+    ariaIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.2",
+        criterion: '4.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1105,40 +1314,99 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateARIARoles(page, violations) {
     console.log('Validating ARIA roles...');
-    
+
     const roleIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Valid ARIA roles
       const validRoles = [
-        'alert', 'alertdialog', 'application', 'article', 'banner', 'button', 'cell', 'checkbox',
-        'columnheader', 'combobox', 'complementary', 'contentinfo', 'definition', 'dialog',
-        'document', 'feed', 'figure', 'form', 'grid', 'gridcell', 'group', 'heading',
-        'img', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee', 'math',
-        'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio', 'navigation',
-        'none', 'note', 'option', 'presentation', 'progressbar', 'radio', 'radiogroup',
-        'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search', 'searchbox',
-        'separator', 'slider', 'spinbutton', 'status', 'switch', 'tab', 'table',
-        'tablist', 'tabpanel', 'term', 'textbox', 'timer', 'toolbar', 'tooltip',
-        'tree', 'treegrid', 'treeitem'
+        'alert',
+        'alertdialog',
+        'application',
+        'article',
+        'banner',
+        'button',
+        'cell',
+        'checkbox',
+        'columnheader',
+        'combobox',
+        'complementary',
+        'contentinfo',
+        'definition',
+        'dialog',
+        'document',
+        'feed',
+        'figure',
+        'form',
+        'grid',
+        'gridcell',
+        'group',
+        'heading',
+        'img',
+        'link',
+        'list',
+        'listbox',
+        'listitem',
+        'log',
+        'main',
+        'marquee',
+        'math',
+        'menu',
+        'menubar',
+        'menuitem',
+        'menuitemcheckbox',
+        'menuitemradio',
+        'navigation',
+        'none',
+        'note',
+        'option',
+        'presentation',
+        'progressbar',
+        'radio',
+        'radiogroup',
+        'region',
+        'row',
+        'rowgroup',
+        'rowheader',
+        'scrollbar',
+        'search',
+        'searchbox',
+        'separator',
+        'slider',
+        'spinbutton',
+        'status',
+        'switch',
+        'tab',
+        'table',
+        'tablist',
+        'tabpanel',
+        'term',
+        'textbox',
+        'timer',
+        'toolbar',
+        'tooltip',
+        'tree',
+        'treegrid',
+        'treeitem',
       ];
-      
+
       const elementsWithRole = document.querySelectorAll('[role]');
-      
-      elementsWithRole.forEach(element => {
+
+      elementsWithRole.forEach((element) => {
         const selector = getElementSelector(element);
         const role = element.getAttribute('role');
-        
+
         if (role && !validRoles.includes(role)) {
           issues.push({
             type: 'aria-roles',
@@ -1146,22 +1414,22 @@ class HTMLValidationScanner extends BaseScanner {
             role: role,
             description: `Invalid ARIA role: ${role}`,
             severity: 'serious',
-            suggestion: 'Use a valid ARIA role from the ARIA specification'
+            suggestion: 'Use a valid ARIA role from the ARIA specification',
           });
         }
       });
-      
+
       return issues;
     });
-    
-    roleIssues.forEach(issue => {
+
+    roleIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.2",
+        criterion: '4.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1171,29 +1439,30 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateARIARelationships(page, violations) {
     console.log('Validating ARIA relationships...');
-    
+
     const relationshipIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Check aria-labelledby references
       const labelledByElements = document.querySelectorAll('[aria-labelledby]');
-      labelledByElements.forEach(element => {
+      labelledByElements.forEach((element) => {
         const selector = getElementSelector(element);
         const labelledBy = element.getAttribute('aria-labelledby');
-        
+
         if (labelledBy) {
           const ids = labelledBy.split(/\s+/);
-          ids.forEach(id => {
+          ids.forEach((id) => {
             const labelElement = document.getElementById(id);
             if (!labelElement) {
               issues.push({
@@ -1203,22 +1472,22 @@ class HTMLValidationScanner extends BaseScanner {
                 value: id,
                 description: `aria-labelledby references non-existent element with id="${id}"`,
                 severity: 'serious',
-                suggestion: 'Ensure the referenced element exists or remove the invalid reference'
+                suggestion: 'Ensure the referenced element exists or remove the invalid reference',
               });
             }
           });
         }
       });
-      
+
       // Check aria-describedby references
       const describedByElements = document.querySelectorAll('[aria-describedby]');
-      describedByElements.forEach(element => {
+      describedByElements.forEach((element) => {
         const selector = getElementSelector(element);
         const describedBy = element.getAttribute('aria-describedby');
-        
+
         if (describedBy) {
           const ids = describedBy.split(/\s+/);
-          ids.forEach(id => {
+          ids.forEach((id) => {
             const descElement = document.getElementById(id);
             if (!descElement) {
               issues.push({
@@ -1228,24 +1497,24 @@ class HTMLValidationScanner extends BaseScanner {
                 value: id,
                 description: `aria-describedby references non-existent element with id="${id}"`,
                 severity: 'serious',
-                suggestion: 'Ensure the referenced element exists or remove the invalid reference'
+                suggestion: 'Ensure the referenced element exists or remove the invalid reference',
               });
             }
           });
         }
       });
-      
+
       return issues;
     });
-    
-    relationshipIssues.forEach(issue => {
+
+    relationshipIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.2",
+        criterion: '4.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1255,36 +1524,40 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateMetaTags(page, violations) {
     console.log('Validating meta tags...');
-    
+
     const metaIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? '#' + element.id : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? '.' + element.className.split(' ')[0] 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? '.' + element.className.split(' ')[0]
+            : '';
         return tagName + id + className;
       }
-      
 
       const issues = [];
-      
+
       // Check meta viewport
       const viewportMeta = document.querySelector('meta[name="viewport"]');
       if (viewportMeta) {
         const content = viewportMeta.getAttribute('content');
-        if (content && (content.includes('user-scalable=no') || content.includes('maximum-scale=1'))) {
+        if (
+          content &&
+          (content.includes('user-scalable=no') || content.includes('maximum-scale=1'))
+        ) {
           issues.push({
             type: 'meta-viewport',
             element: 'meta[name="viewport"]',
             description: 'Viewport meta tag restricts zooming',
             severity: 'serious',
-            suggestion: 'Allow users to zoom by removing user-scalable=no or maximum-scale restrictions'
+            suggestion:
+              'Allow users to zoom by removing user-scalable=no or maximum-scale restrictions',
           });
         }
       }
-      
+
       // Check meta refresh
       const refreshMeta = document.querySelector('meta[http-equiv="refresh"]');
       if (refreshMeta) {
@@ -1297,23 +1570,24 @@ class HTMLValidationScanner extends BaseScanner {
               element: 'meta[http-equiv="refresh"]',
               description: 'Meta refresh redirects too quickly (less than 20 seconds)',
               severity: 'serious',
-              suggestion: 'Use longer refresh time (20+ seconds) or provide user control over refresh'
+              suggestion:
+                'Use longer refresh time (20+ seconds) or provide user control over refresh',
             });
           }
         }
       }
-      
+
       return issues;
     });
-    
-    metaIssues.forEach(issue => {
+
+    metaIssues.forEach((issue) => {
       violations.push({
-        criterion: "2.2.1",
+        criterion: '2.2.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1323,52 +1597,61 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateDuplicateIDs(page, violations) {
     console.log('Validating duplicate IDs...');
-    
+
     const duplicateIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? '#' + element.id : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? '.' + element.className.split(' ')[0] 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? '.' + element.className.split(' ')[0]
+            : '';
         return tagName + id + className;
       }
-      
 
       const issues = [];
       const idCounts = {};
       const activeElements = [];
       const ariaElements = [];
-      
+
       // Collect all elements with IDs
       const elementsWithId = document.querySelectorAll('[id]');
-      elementsWithId.forEach(element => {
+      elementsWithId.forEach((element) => {
         const id = element.getAttribute('id');
         if (id) {
           if (!idCounts[id]) {
             idCounts[id] = [];
           }
           idCounts[id].push(element);
-          
+
           // Track special element types
-          if (['input', 'button', 'select', 'textarea', 'a'].includes(element.tagName.toLowerCase()) ||
-              element.hasAttribute('tabindex') || element.hasAttribute('contenteditable')) {
+          if (
+            ['input', 'button', 'select', 'textarea', 'a'].includes(
+              element.tagName.toLowerCase()
+            ) ||
+            element.hasAttribute('tabindex') ||
+            element.hasAttribute('contenteditable')
+          ) {
             activeElements.push({ id, element });
           }
-          
-          if (element.hasAttribute('aria-labelledby') || element.hasAttribute('aria-describedby') ||
-              element.hasAttribute('aria-label') || element.hasAttribute('role')) {
+
+          if (
+            element.hasAttribute('aria-labelledby') ||
+            element.hasAttribute('aria-describedby') ||
+            element.hasAttribute('aria-label') ||
+            element.hasAttribute('role')
+          ) {
             ariaElements.push({ id, element });
           }
         }
       });
-      
+
       // Check for duplicates
       Object.entries(idCounts).forEach(([id, elements]) => {
         if (elements.length > 1) {
           const selector = getElementSelector(elements[0]);
-          
+
           // General duplicate ID
           issues.push({
             type: 'duplicate-id',
@@ -1377,15 +1660,17 @@ class HTMLValidationScanner extends BaseScanner {
             count: elements.length,
             description: `ID "${id}" is used ${elements.length} times`,
             severity: 'critical',
-            suggestion: 'Ensure each ID is unique within the document'
+            suggestion: 'Ensure each ID is unique within the document',
           });
-          
+
           // Check if any are active elements
-          const hasActiveElements = elements.some(el => 
-            ['input', 'button', 'select', 'textarea', 'a'].includes(el.tagName.toLowerCase()) ||
-            el.hasAttribute('tabindex') || el.hasAttribute('contenteditable')
+          const hasActiveElements = elements.some(
+            (el) =>
+              ['input', 'button', 'select', 'textarea', 'a'].includes(el.tagName.toLowerCase()) ||
+              el.hasAttribute('tabindex') ||
+              el.hasAttribute('contenteditable')
           );
-          
+
           if (hasActiveElements) {
             issues.push({
               type: 'duplicate-id-active',
@@ -1393,16 +1678,18 @@ class HTMLValidationScanner extends BaseScanner {
               id: id,
               description: `Active elements have duplicate ID "${id}"`,
               severity: 'critical',
-              suggestion: 'Active elements must have unique IDs for proper keyboard navigation'
+              suggestion: 'Active elements must have unique IDs for proper keyboard navigation',
             });
           }
-          
+
           // Check if any have ARIA references
-          const hasAriaElements = elements.some(el =>
-            el.hasAttribute('aria-labelledby') || el.hasAttribute('aria-describedby') ||
-            document.querySelector(`[aria-labelledby*="${id}"], [aria-describedby*="${id}"]`)
+          const hasAriaElements = elements.some(
+            (el) =>
+              el.hasAttribute('aria-labelledby') ||
+              el.hasAttribute('aria-describedby') ||
+              document.querySelector(`[aria-labelledby*="${id}"], [aria-describedby*="${id}"]`)
           );
-          
+
           if (hasAriaElements) {
             issues.push({
               type: 'duplicate-id-aria',
@@ -1410,23 +1697,23 @@ class HTMLValidationScanner extends BaseScanner {
               id: id,
               description: `Elements with ARIA references have duplicate ID "${id}"`,
               severity: 'critical',
-              suggestion: 'Elements referenced by ARIA attributes must have unique IDs'
+              suggestion: 'Elements referenced by ARIA attributes must have unique IDs',
             });
           }
         }
       });
-      
+
       return issues;
     });
-    
-    duplicateIssues.forEach(issue => {
+
+    duplicateIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.1",
+        criterion: '4.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1436,50 +1723,220 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateLanguageAttributes(page, violations) {
     console.log('Validating language attributes...');
-    
+
     const langIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? '#' + element.id : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? '.' + element.className.split(' ')[0] 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? '.' + element.className.split(' ')[0]
+            : '';
         return tagName + id + className;
       }
-      
 
       const issues = [];
-      
+
       // Valid language codes (ISO 639-1)
       const validLangCodes = [
-        'ab', 'aa', 'af', 'ak', 'sq', 'am', 'ar', 'an', 'hy', 'as', 'av', 'ae', 'ay', 'az',
-        'bm', 'ba', 'eu', 'be', 'bn', 'bh', 'bi', 'bs', 'br', 'bg', 'my', 'ca', 'ch', 'ce',
-        'ny', 'zh', 'cv', 'kw', 'co', 'cr', 'hr', 'cs', 'da', 'dv', 'nl', 'dz', 'en', 'eo',
-        'et', 'ee', 'fo', 'fj', 'fi', 'fr', 'ff', 'gl', 'ka', 'de', 'el', 'gn', 'gu', 'ht',
-        'ha', 'he', 'hz', 'hi', 'ho', 'hu', 'ia', 'id', 'ie', 'ga', 'ig', 'ik', 'io', 'is',
-        'it', 'iu', 'ja', 'jv', 'kl', 'kn', 'kr', 'ks', 'kk', 'km', 'ki', 'rw', 'ky', 'kv',
-        'kg', 'ko', 'ku', 'kj', 'la', 'lb', 'lg', 'li', 'ln', 'lo', 'lt', 'lu', 'lv', 'gv',
-        'mk', 'mg', 'ms', 'ml', 'mt', 'mi', 'mr', 'mh', 'mn', 'na', 'nv', 'nd', 'ne', 'ng',
-        'nb', 'nn', 'no', 'ii', 'nr', 'oc', 'oj', 'cu', 'om', 'or', 'os', 'pa', 'pi', 'fa',
-        'pl', 'ps', 'pt', 'qu', 'rm', 'rn', 'ro', 'ru', 'sa', 'sc', 'sd', 'se', 'sm', 'sg',
-        'sr', 'gd', 'sn', 'si', 'sk', 'sl', 'so', 'st', 'es', 'su', 'sw', 'ss', 'sv', 'ta',
-        'te', 'tg', 'th', 'ti', 'bo', 'tk', 'tl', 'tn', 'to', 'tr', 'ts', 'tt', 'tw', 'ty',
-        'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo', 'wa', 'cy', 'wo', 'fy', 'xh', 'yi', 'yo',
-        'za', 'zu'
+        'ab',
+        'aa',
+        'af',
+        'ak',
+        'sq',
+        'am',
+        'ar',
+        'an',
+        'hy',
+        'as',
+        'av',
+        'ae',
+        'ay',
+        'az',
+        'bm',
+        'ba',
+        'eu',
+        'be',
+        'bn',
+        'bh',
+        'bi',
+        'bs',
+        'br',
+        'bg',
+        'my',
+        'ca',
+        'ch',
+        'ce',
+        'ny',
+        'zh',
+        'cv',
+        'kw',
+        'co',
+        'cr',
+        'hr',
+        'cs',
+        'da',
+        'dv',
+        'nl',
+        'dz',
+        'en',
+        'eo',
+        'et',
+        'ee',
+        'fo',
+        'fj',
+        'fi',
+        'fr',
+        'ff',
+        'gl',
+        'ka',
+        'de',
+        'el',
+        'gn',
+        'gu',
+        'ht',
+        'ha',
+        'he',
+        'hz',
+        'hi',
+        'ho',
+        'hu',
+        'ia',
+        'id',
+        'ie',
+        'ga',
+        'ig',
+        'ik',
+        'io',
+        'is',
+        'it',
+        'iu',
+        'ja',
+        'jv',
+        'kl',
+        'kn',
+        'kr',
+        'ks',
+        'kk',
+        'km',
+        'ki',
+        'rw',
+        'ky',
+        'kv',
+        'kg',
+        'ko',
+        'ku',
+        'kj',
+        'la',
+        'lb',
+        'lg',
+        'li',
+        'ln',
+        'lo',
+        'lt',
+        'lu',
+        'lv',
+        'gv',
+        'mk',
+        'mg',
+        'ms',
+        'ml',
+        'mt',
+        'mi',
+        'mr',
+        'mh',
+        'mn',
+        'na',
+        'nv',
+        'nd',
+        'ne',
+        'ng',
+        'nb',
+        'nn',
+        'no',
+        'ii',
+        'nr',
+        'oc',
+        'oj',
+        'cu',
+        'om',
+        'or',
+        'os',
+        'pa',
+        'pi',
+        'fa',
+        'pl',
+        'ps',
+        'pt',
+        'qu',
+        'rm',
+        'rn',
+        'ro',
+        'ru',
+        'sa',
+        'sc',
+        'sd',
+        'se',
+        'sm',
+        'sg',
+        'sr',
+        'gd',
+        'sn',
+        'si',
+        'sk',
+        'sl',
+        'so',
+        'st',
+        'es',
+        'su',
+        'sw',
+        'ss',
+        'sv',
+        'ta',
+        'te',
+        'tg',
+        'th',
+        'ti',
+        'bo',
+        'tk',
+        'tl',
+        'tn',
+        'to',
+        'tr',
+        'ts',
+        'tt',
+        'tw',
+        'ty',
+        'ug',
+        'uk',
+        'ur',
+        'uz',
+        've',
+        'vi',
+        'vo',
+        'wa',
+        'cy',
+        'wo',
+        'fy',
+        'xh',
+        'yi',
+        'yo',
+        'za',
+        'zu',
       ];
-      
+
       // Check html lang attribute
       const htmlElement = document.documentElement;
       const htmlLang = htmlElement.getAttribute('lang');
-      
+
       if (!htmlLang) {
         issues.push({
           type: 'html-has-lang',
           element: 'html',
           description: 'HTML element lacks lang attribute',
           severity: 'serious',
-          suggestion: 'Add lang attribute to html element to specify the document language'
+          suggestion: 'Add lang attribute to html element to specify the document language',
         });
       } else {
         // Validate lang code
@@ -1491,17 +1948,17 @@ class HTMLValidationScanner extends BaseScanner {
             lang: htmlLang,
             description: `HTML lang attribute has invalid value: "${htmlLang}"`,
             severity: 'serious',
-            suggestion: 'Use a valid ISO 639-1 language code'
+            suggestion: 'Use a valid ISO 639-1 language code',
           });
         }
       }
-      
+
       // Check all elements with lang attributes
       const elementsWithLang = document.querySelectorAll('[lang]');
-      elementsWithLang.forEach(element => {
+      elementsWithLang.forEach((element) => {
         const selector = getElementSelector(element);
         const lang = element.getAttribute('lang');
-        
+
         if (lang) {
           const baseLang = lang.split('-')[0].toLowerCase();
           if (!validLangCodes.includes(baseLang)) {
@@ -1511,23 +1968,23 @@ class HTMLValidationScanner extends BaseScanner {
               lang: lang,
               description: `Invalid lang attribute value: "${lang}"`,
               severity: 'moderate',
-              suggestion: 'Use a valid ISO 639-1 language code'
+              suggestion: 'Use a valid ISO 639-1 language code',
             });
           }
         }
       });
-      
+
       return issues;
     });
-    
-    langIssues.forEach(issue => {
+
+    langIssues.forEach((issue) => {
       violations.push({
-        criterion: "3.1.1",
+        criterion: '3.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1537,15 +1994,16 @@ class HTMLValidationScanner extends BaseScanner {
    */
   async validateFormAccessibility(page, violations) {
     console.log('Validating form accessibility...');
-    
+
     const formIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? '#' + element.id : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? '.' + element.className.split(' ')[0] 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? '.' + element.className.split(' ')[0]
+            : '';
         return tagName + id + className;
       }
 
@@ -1580,12 +2038,15 @@ class HTMLValidationScanner extends BaseScanner {
         const unique = new Set();
         const id = control.getAttribute('id');
         if (id) {
-          const escaped = (window.CSS && typeof window.CSS.escape === 'function')
-            ? window.CSS.escape(id)
-            : id.replace(/["\\]/g, '\\$&');
+          const escaped =
+            window.CSS && typeof window.CSS.escape === 'function'
+              ? window.CSS.escape(id)
+              : id.replace(/["\\]/g, '\\$&');
           try {
-            document.querySelectorAll(`label[for="${escaped}"]`).forEach(l => unique.add(l));
-          } catch (e) { /* malformed id — no selector-based association */ }
+            document.querySelectorAll(`label[for="${escaped}"]`).forEach((l) => unique.add(l));
+          } catch (e) {
+            /* malformed id — no selector-based association */
+          }
         }
 
         const wrappingLabel = control.closest('label');
@@ -1599,30 +2060,32 @@ class HTMLValidationScanner extends BaseScanner {
       const issues = [];
 
       // Check form controls for proper labeling
-      const formControls = document.querySelectorAll('input:not([type="hidden"]), textarea, select');
-      
-      formControls.forEach(control => {
+      const formControls = document.querySelectorAll(
+        'input:not([type="hidden"]), textarea, select'
+      );
+
+      formControls.forEach((control) => {
         const selector = getElementSelector(control);
         const type = control.getAttribute('type');
-        
+
         // Skip submit, button, reset types
         if (['submit', 'button', 'reset', 'image'].includes(type)) {
           return;
         }
-        
+
         let hasLabel = false;
         let labelCount = 0;
-        
+
         // Check for aria-label
         if (control.hasAttribute('aria-label') && control.getAttribute('aria-label').trim()) {
           hasLabel = true;
         }
-        
+
         // Check for aria-labelledby
         if (control.hasAttribute('aria-labelledby')) {
           const labelIds = control.getAttribute('aria-labelledby').split(/\s+/);
           let validRefs = 0;
-          labelIds.forEach(id => {
+          labelIds.forEach((id) => {
             if (document.getElementById(id)) {
               validRefs++;
             }
@@ -1631,7 +2094,7 @@ class HTMLValidationScanner extends BaseScanner {
             hasLabel = true;
           }
         }
-        
+
         // Check for <label> associations.
         //
         // labelCount counts DISTINCT label ELEMENTS, not association mechanisms.
@@ -1654,10 +2117,10 @@ class HTMLValidationScanner extends BaseScanner {
             element: selector,
             description: 'Form control has no associated label',
             severity: 'critical',
-            suggestion: 'Add label element, aria-label, or aria-labelledby to form control'
+            suggestion: 'Add label element, aria-label, or aria-labelledby to form control',
           });
         }
-        
+
         // Check for multiple labels
         if (labelCount > 1) {
           issues.push({
@@ -1666,22 +2129,22 @@ class HTMLValidationScanner extends BaseScanner {
             labelCount: labelCount,
             description: `Form control has ${labelCount} labels`,
             severity: 'moderate',
-            suggestion: 'Ensure form control has only one label for clarity'
+            suggestion: 'Ensure form control has only one label for clarity',
           });
         }
       });
-      
+
       return issues;
     });
-    
-    formIssues.forEach(issue => {
+
+    formIssues.forEach((issue) => {
       violations.push({
-        criterion: "4.1.2",
+        criterion: '4.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1705,13 +2168,13 @@ class HTMLValidationScanner extends BaseScanner {
   getElementSelector(element) {
     const tagName = element.tagName.toLowerCase();
     const id = element.id ? `#${element.id}` : '';
-    const className = element.className && typeof element.className === 'string' 
-      ? `.${element.className.split(' ')[0]}` 
-      : '';
-    
+    const className =
+      element.className && typeof element.className === 'string'
+        ? `.${element.className.split(' ')[0]}`
+        : '';
+
     return `${tagName}${id}${className}`;
   }
-
 }
 
 module.exports = HTMLValidationScanner;

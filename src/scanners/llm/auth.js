@@ -10,17 +10,25 @@ const LLMBaseScanner = require('./base');
 
 class LLMAuthScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-auth', {
-      wcagCriteria: ['3.3.8', '3.3.9'],
-      wcagPrinciple: 'understandable',
-    }, llmClient);
+    super(
+      'llm-auth',
+      {
+        wcagCriteria: ['3.3.8', '3.3.9'],
+        wcagPrinciple: 'understandable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
     // Pre-check: does this page contain auth-related elements?
     const hasAuth = await page.evaluate(() => {
-      const inputs = document.querySelectorAll('input[type="password"], input[autocomplete*="password"], form[action*="login"], form[action*="auth"], form[action*="signin"]');
-      const captchas = document.querySelectorAll('[class*="captcha"], [id*="captcha"], [class*="recaptcha"], iframe[src*="captcha"]');
+      const inputs = document.querySelectorAll(
+        'input[type="password"], input[autocomplete*="password"], form[action*="login"], form[action*="auth"], form[action*="signin"]'
+      );
+      const captchas = document.querySelectorAll(
+        '[class*="captcha"], [id*="captcha"], [class*="recaptcha"], iframe[src*="captcha"]'
+      );
       return inputs.length > 0 || captchas.length > 0;
     });
 

@@ -168,9 +168,7 @@ const SCANNER_TESTS = {
  * destroys the violation-level ground truth this harness exists to enforce.
  */
 function matchesCriteria(violation, criteria) {
-  const fields = [violation.criterion, violation.ruleId]
-    .filter(Boolean)
-    .map(String);
+  const fields = [violation.criterion, violation.ruleId].filter(Boolean).map(String);
   return criteria.some((target) =>
     fields.some((c) => c === target || c === `9.${target}` || c.includes(target))
   );
@@ -182,7 +180,9 @@ function expectedCriteriaFor(filePath, scannerCriteria) {
   try {
     const meta = parseWcagMetadata(fs.readFileSync(filePath, 'utf-8'));
     declared = (meta && meta.criterion) || [];
-  } catch { /* file without metadata — fall back to the scanner's own list */ }
+  } catch {
+    /* file without metadata — fall back to the scanner's own list */
+  }
   const intersect = declared.filter((c) => scannerCriteria.includes(c));
   return intersect.length > 0 ? intersect : scannerCriteria;
 }
@@ -215,7 +215,10 @@ async function main() {
   }
 
   const staticServer = http.createServer((req, res) => {
-    const filePath = path.join(TEST_SITES, decodeURIComponent(req.url.replace(/^\//, '').split('?')[0]));
+    const filePath = path.join(
+      TEST_SITES,
+      decodeURIComponent(req.url.replace(/^\//, '').split('?')[0])
+    );
     if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
       res.writeHead(404);
       res.end('Not found');
@@ -285,18 +288,28 @@ async function main() {
         if (detected) totalPassed++;
         console.log(
           `  [BAD]  ${file}: ${detected ? 'PASS' : 'FAIL'} ` +
-          `(${matched.length}/${result.violations.length} matching ${expected.join(',')})`
+            `(${matched.length}/${result.violations.length} matching ${expected.join(',')})`
         );
         for (const v of matched.slice(0, 2)) {
           console.log(`         - ${v.ruleId}: ${String(v.description).slice(0, 90)}`);
         }
         if (!detected && result.violations.length > 0) {
           console.log(
-            `         off-target: ${result.violations.slice(0, 3).map((v) => v.ruleId).join(', ')}`
+            `         off-target: ${result.violations
+              .slice(0, 3)
+              .map((v) => v.ruleId)
+              .join(', ')}`
           );
         }
         results[scannerId].bad.push({ file, detected, matched: matched.length });
-        records.push({ scannerId, file, kind: 'bad', expected, matched: matched.length, pass: detected });
+        records.push({
+          scannerId,
+          file,
+          kind: 'bad',
+          expected,
+          matched: matched.length,
+          pass: detected,
+        });
       } catch (err) {
         console.log(`  [BAD]  ${file}: ERROR - ${err.message}`);
         results[scannerId].bad.push({ file, detected: false, error: err.message });
@@ -321,14 +334,21 @@ async function main() {
         const filtered = (result.violations || []).length - relevant.length;
         console.log(
           `  [GOOD] ${file}: ${clean ? 'PASS' : 'FAIL'} ` +
-          `(${relevant.length} relevant / ${(result.violations || []).length} total` +
-          `${filtered > 0 ? `, ${filtered} out-of-scope filtered` : ''})`
+            `(${relevant.length} relevant / ${(result.violations || []).length} total` +
+            `${filtered > 0 ? `, ${filtered} out-of-scope filtered` : ''})`
         );
         for (const v of relevant.slice(0, 2)) {
           console.log(`         - FALSE POS: ${v.ruleId}: ${String(v.description).slice(0, 90)}`);
         }
         results[scannerId].good.push({ file, clean, violations: relevant.length });
-        records.push({ scannerId, file, kind: 'good', expected, matched: relevant.length, pass: clean });
+        records.push({
+          scannerId,
+          file,
+          kind: 'good',
+          expected,
+          matched: relevant.length,
+          pass: clean,
+        });
       } catch (err) {
         console.log(`  [GOOD] ${file}: ERROR - ${err.message}`);
         results[scannerId].good.push({ file, clean: false, error: err.message });
@@ -347,8 +367,8 @@ async function main() {
         if (ok) totalPassed++;
         console.log(
           `  [RUNS] ${file}: ${ok ? 'PASS' : 'FAIL'} ` +
-          `(${result?.violations?.length ?? '-'} findings; ` +
-          `${JSON.stringify(result?.summary?.suppressed?.length ?? 0)} suppressed)`
+            `(${result?.violations?.length ?? '-'} findings; ` +
+            `${JSON.stringify(result?.summary?.suppressed?.length ?? 0)} suppressed)`
         );
         results[scannerId].lenient.push({ file, ok });
         records.push({ scannerId, file, kind: 'lenient', pass: ok });
@@ -415,25 +435,31 @@ async function main() {
   console.log(`Total tests: ${totalTests}`);
   console.log(
     `Passed: ${totalPassed}/${totalTests} ` +
-    `(${totalTests ? ((totalPassed / totalTests) * 100).toFixed(0) : 0}%)`
+      `(${totalTests ? ((totalPassed / totalTests) * 100).toFixed(0) : 0}%)`
   );
 
   for (const [scannerId, res] of Object.entries(results)) {
     const badDetected = res.bad.filter((r) => r.detected).length;
     const goodClean = res.good.filter((r) => r.clean).length;
-    const detectionRate = res.bad.length > 0 ? ((badDetected / res.bad.length) * 100).toFixed(0) : 'N/A';
-    const fpRate = res.good.length > 0
-      ? (((res.good.length - goodClean) / res.good.length) * 100).toFixed(0)
-      : 'N/A';
+    const detectionRate =
+      res.bad.length > 0 ? ((badDetected / res.bad.length) * 100).toFixed(0) : 'N/A';
+    const fpRate =
+      res.good.length > 0
+        ? (((res.good.length - goodClean) / res.good.length) * 100).toFixed(0)
+        : 'N/A';
     const extra = [
-      res.lenient.length ? `runs=${res.lenient.filter((r) => r.ok).length}/${res.lenient.length}` : null,
+      res.lenient.length
+        ? `runs=${res.lenient.filter((r) => r.ok).length}/${res.lenient.length}`
+        : null,
       res.robustness.length
         ? `robust=${res.robustness.filter((r) => r.pass).length}/${res.robustness.length}`
         : null,
-    ].filter(Boolean).join(', ');
+    ]
+      .filter(Boolean)
+      .join(', ');
     console.log(
       `  ${scannerId}: detection=${detectionRate}%, false_positive=${fpRate}%` +
-      (extra ? ` (${extra})` : '')
+        (extra ? ` (${extra})` : '')
     );
   }
 

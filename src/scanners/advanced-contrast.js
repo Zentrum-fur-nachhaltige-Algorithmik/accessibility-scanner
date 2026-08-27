@@ -18,7 +18,7 @@ class AdvancedContrastScanner extends BaseScanner {
   constructor() {
     super('advanced-contrast', {
       wcagCriteria: ['1.4.11', '1.4.13'],
-      wcagPrinciple: 'perceivable'
+      wcagPrinciple: 'perceivable',
     });
   }
 
@@ -31,7 +31,7 @@ class AdvancedContrastScanner extends BaseScanner {
   async scan(page, options = {}) {
     const scanOptions = {
       timeout: options.timeout || 60000,
-      ...options
+      ...options,
     };
 
     // Create timestamped scan directory
@@ -44,7 +44,7 @@ class AdvancedContrastScanner extends BaseScanner {
     // Create report according to interface
     return {
       scannerId: this.id,
-      criteria: ["9.1.4.11", "9.1.4.13"],
+      criteria: ['9.1.4.11', '9.1.4.13'],
       passed: contrastResults.violations.length === 0,
       violations: contrastResults.violations,
       // Components whose rendered contrast could not be determined from CSS
@@ -55,10 +55,10 @@ class AdvancedContrastScanner extends BaseScanner {
         hoverContentTested: contrastResults.hoverContentTested,
         graphicalObjectsCompliant: contrastResults.graphicalObjectsCompliant,
         uiComponentsCompliant: contrastResults.uiComponentsCompliant,
-        incompleteElements: contrastResults.incomplete.length
+        incompleteElements: contrastResults.incomplete.length,
       },
       screenshotPath: scanDir,
-      visualEvidence: contrastResults.visualEvidence
+      visualEvidence: contrastResults.visualEvidence,
     };
   }
 
@@ -93,12 +93,12 @@ class AdvancedContrastScanner extends BaseScanner {
 
     // Calculate summary statistics
     nonTextElementsTested = nonText.elementsTested;
-    hoverContentTested = visualEvidence.filter(e => e.type === 'hover-content').length;
-    graphicalObjectsCompliant = visualEvidence.filter(e =>
-      e.type === 'graphical-object' && e.contrastRatio >= 3
+    hoverContentTested = visualEvidence.filter((e) => e.type === 'hover-content').length;
+    graphicalObjectsCompliant = visualEvidence.filter(
+      (e) => e.type === 'graphical-object' && e.contrastRatio >= 3
     ).length;
-    uiComponentsCompliant = visualEvidence.filter(e =>
-      e.type === 'ui-component' && e.contrastRatio >= 3
+    uiComponentsCompliant = visualEvidence.filter(
+      (e) => e.type === 'ui-component' && e.contrastRatio >= 3
     ).length;
 
     console.log(`Advanced contrast analysis complete: ${violations.length} violations found`);
@@ -110,7 +110,7 @@ class AdvancedContrastScanner extends BaseScanner {
       nonTextElementsTested,
       hoverContentTested,
       graphicalObjectsCompliant,
-      uiComponentsCompliant
+      uiComponentsCompliant,
     };
   }
 
@@ -151,7 +151,9 @@ class AdvancedContrastScanner extends BaseScanner {
       const visualEvidence = [];
       let elementsTested = 0;
 
-      function rgbString(c) { return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')'; }
+      function rgbString(c) {
+        return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')';
+      }
 
       // Stable, human-findable description. Only ever used for reporting —
       // never fed back into querySelector.
@@ -163,8 +165,7 @@ class AdvancedContrastScanner extends BaseScanner {
         if (classes.length) out += '.' + classes.join('.');
         const parent = element.parentElement;
         if (parent) {
-          const sameTag = Array.from(parent.children)
-            .filter(c => c.tagName === element.tagName);
+          const sameTag = Array.from(parent.children).filter((c) => c.tagName === element.tagName);
           if (sameTag.length > 1) out += ':nth-of-type(' + (sameTag.indexOf(element) + 1) + ')';
         }
         return out;
@@ -174,8 +175,11 @@ class AdvancedContrastScanner extends BaseScanner {
         const rect = element.getBoundingClientRect();
         if (rect.width <= 0 || rect.height <= 0) return false;
         const styles = window.getComputedStyle(element);
-        return styles.visibility !== 'hidden' && styles.display !== 'none' &&
-          parseFloat(styles.opacity || '1') > 0;
+        return (
+          styles.visibility !== 'hidden' &&
+          styles.display !== 'none' &&
+          parseFloat(styles.opacity || '1') > 0
+        );
       }
 
       // Decorative graphics are outside SC 1.4.11 ("graphical objects required
@@ -186,9 +190,11 @@ class AdvancedContrastScanner extends BaseScanner {
         const role = element.getAttribute('role');
         if (role === 'presentation' || role === 'none') return false;
         if (element.closest('[aria-hidden="true"]')) return false;
-        const hasName = !!(element.getAttribute('aria-label') ||
+        const hasName = !!(
+          element.getAttribute('aria-label') ||
           element.getAttribute('aria-labelledby') ||
-          (element.tagName.toLowerCase() === 'svg' && element.querySelector('title')));
+          (element.tagName.toLowerCase() === 'svg' && element.querySelector('title'))
+        );
         return hasName || role === 'img' || role === 'graphics-document';
       }
 
@@ -209,7 +215,7 @@ class AdvancedContrastScanner extends BaseScanner {
         if (!text) return false;
         const styles = window.getComputedStyle(element);
         const own = __parseRgb(styles.backgroundColor);
-        if (own && own.a > 0) return false;          // has its own fill
+        if (own && own.a > 0) return false; // has its own fill
         const fg = __parseRgb(styles.color);
         if (!fg) return false;
         return __getContrastRatio(__blendOver(fg, backdrop), backdrop) >= threshold;
@@ -217,7 +223,8 @@ class AdvancedContrastScanner extends BaseScanner {
 
       // One element, one evaluation.
       const seen = new Set();
-      const uiSelector = 'button, input[type="button"], input[type="submit"], ' +
+      const uiSelector =
+        'button, input[type="button"], input[type="submit"], ' +
         'input[type="reset"], input[type="text"], input[type="email"], ' +
         'input[type="password"], input[type="search"], input[type="tel"], ' +
         'input[type="url"], input[type="number"], input[type="date"], ' +
@@ -254,9 +261,10 @@ class AdvancedContrastScanner extends BaseScanner {
             criterion: '9.1.4.11',
             element: selector,
             issue: elementType + '-contrast',
-            description: 'Component sits on an image or gradient background; the rendered contrast cannot be computed from CSS and needs manual review.',
+            description:
+              'Component sits on an image or gradient background; the rendered contrast cannot be computed from CSS and needs manual review.',
             backgroundImage: background.indeterminateSource,
-            elementType: elementType
+            elementType: elementType,
           });
           continue;
         }
@@ -273,12 +281,17 @@ class AdvancedContrastScanner extends BaseScanner {
             const flat = __blendOver(borderRgb, backdrop);
             const ratio = __getContrastRatio(flat, backdrop);
             visualEvidence.push({
-              element: selector, type: elementType, contrastType: 'border',
+              element: selector,
+              type: elementType,
+              contrastType: 'border',
               contrastRatio: ratio,
-              colors: { foreground: renderedBorder.color, background: rgbString(backdrop) }
+              colors: { foreground: renderedBorder.color, background: rgbString(backdrop) },
             });
-            if (ratio < THRESHOLD && elementType === 'ui-component' &&
-                identifiedByOwnLabel(element, backdrop, THRESHOLD)) {
+            if (
+              ratio < THRESHOLD &&
+              elementType === 'ui-component' &&
+              identifiedByOwnLabel(element, backdrop, THRESHOLD)
+            ) {
               // Decorative border on a text-labelled, unfilled control — see
               // identifiedByOwnLabel() above. Evidence is already recorded.
             } else if (ratio < THRESHOLD) {
@@ -290,15 +303,17 @@ class AdvancedContrastScanner extends BaseScanner {
                 contrastRatio: ratio,
                 requiredRatio: THRESHOLD,
                 elementType: elementType,
-                suggestion: `Increase border contrast to meet ${THRESHOLD}:1 minimum ratio`
+                suggestion: `Increase border contrast to meet ${THRESHOLD}:1 minimum ratio`,
               });
             }
           }
         } else if (compliantBorder) {
           visualEvidence.push({
-            element: selector, type: elementType, contrastType: 'border',
+            element: selector,
+            type: elementType,
+            contrastType: 'border',
             contrastRatio: compliantBorder.ratio,
-            colors: { foreground: compliantBorder.border.color, background: rgbString(backdrop) }
+            colors: { foreground: compliantBorder.border.color, background: rgbString(backdrop) },
           });
         }
 
@@ -314,9 +329,11 @@ class AdvancedContrastScanner extends BaseScanner {
         const flatBg = __blendOver(ownBg, backdrop);
         const ratio = __getContrastRatio(flatBg, backdrop);
         visualEvidence.push({
-          element: selector, type: elementType, contrastType: 'background',
+          element: selector,
+          type: elementType,
+          contrastType: 'background',
           contrastRatio: ratio,
-          colors: { foreground: styles.backgroundColor, background: rgbString(backdrop) }
+          colors: { foreground: styles.backgroundColor, background: rgbString(backdrop) },
         });
         if (ratio < THRESHOLD) {
           violations.push({
@@ -327,7 +344,7 @@ class AdvancedContrastScanner extends BaseScanner {
             contrastRatio: ratio,
             requiredRatio: THRESHOLD,
             elementType: elementType,
-            suggestion: `Increase background contrast to meet ${THRESHOLD}:1 minimum ratio`
+            suggestion: `Increase background contrast to meet ${THRESHOLD}:1 minimum ratio`,
           });
         }
       }
@@ -336,7 +353,7 @@ class AdvancedContrastScanner extends BaseScanner {
         violations: violations,
         incomplete: incomplete,
         visualEvidence: visualEvidence,
-        elementsTested: elementsTested
+        elementsTested: elementsTested,
       };
     }, contrastUtils);
   }
@@ -358,7 +375,7 @@ class AdvancedContrastScanner extends BaseScanner {
         '[title]',
         '[data-tooltip]',
         '.dropdown',
-        '.menu-item'
+        '.menu-item',
       ];
 
       /**
@@ -372,16 +389,24 @@ class AdvancedContrastScanner extends BaseScanner {
        * Either one aborted the whole contrast sweep on real pages.
        */
       const buildSafeSelector = (element, index) => {
-        const esc = (v) => (window.CSS && CSS.escape ? CSS.escape(v) : String(v).replace(/[^\w-]/g, '\\$&'));
+        const esc = (v) =>
+          window.CSS && CSS.escape ? CSS.escape(v) : String(v).replace(/[^\w-]/g, '\\$&');
         const rawClass = typeof element.className === 'string' ? element.className : '';
         const classes = rawClass.trim().split(/\s+/).filter(Boolean);
         let sel = element.tagName.toLowerCase();
         if (element.id) return sel + '#' + esc(element.id);
-        if (classes.length) return sel + classes.slice(0, 3).map((c) => '.' + esc(c)).join('');
+        if (classes.length)
+          return (
+            sel +
+            classes
+              .slice(0, 3)
+              .map((c) => '.' + esc(c))
+              .join('')
+          );
         return sel + `:nth-of-type(${index + 1})`;
       };
 
-      selectors.forEach(selector => {
+      selectors.forEach((selector) => {
         document.querySelectorAll(selector).forEach((element, index) => {
           const rect = element.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
@@ -397,8 +422,8 @@ class AdvancedContrastScanner extends BaseScanner {
               const parent = element.parentElement;
               if (parent) {
                 const parentSelector = buildSafeSelector(parent, 0);
-                const siblings = Array.from(parent.children).filter(child =>
-                  child.tagName.toLowerCase() === element.tagName.toLowerCase()
+                const siblings = Array.from(parent.children).filter(
+                  (child) => child.tagName.toLowerCase() === element.tagName.toLowerCase()
                 );
                 const elementIndex = siblings.indexOf(element);
                 elementSelector = `${parentSelector} > ${element.tagName.toLowerCase()}:nth-child(${elementIndex + 1})`;
@@ -409,7 +434,7 @@ class AdvancedContrastScanner extends BaseScanner {
               selector: elementSelector,
               hasTooltip: !!(element.title || element.getAttribute('data-tooltip')),
               hasHoverState: true,
-              tagName: element.tagName.toLowerCase()
+              tagName: element.tagName.toLowerCase(),
             });
           }
         });
@@ -419,7 +444,8 @@ class AdvancedContrastScanner extends BaseScanner {
     });
 
     // Test hover states
-    for (const element of interactiveElements.slice(0, 10)) { // Limit to prevent timeout
+    for (const element of interactiveElements.slice(0, 10)) {
+      // Limit to prevent timeout
       try {
         // First verify the element exists
         const elementExists = await page.evaluate((selector) => {
@@ -432,15 +458,21 @@ class AdvancedContrastScanner extends BaseScanner {
         }
 
         // Take screenshot before hover
-        const beforeScreenshot = path.join(scanDir, `hover-before-${Math.random().toString(36).substr(2, 9)}.png`);
+        const beforeScreenshot = path.join(
+          scanDir,
+          `hover-before-${Math.random().toString(36).substr(2, 9)}.png`
+        );
         await page.screenshot({ path: beforeScreenshot });
 
         // Hover over element
         await page.hover(element.selector);
-        await new Promise(resolve => setTimeout(resolve, 200)); // Allow hover effects
+        await new Promise((resolve) => setTimeout(resolve, 200)); // Allow hover effects
 
         // Take screenshot after hover
-        const afterScreenshot = path.join(scanDir, `hover-after-${Math.random().toString(36).substr(2, 9)}.png`);
+        const afterScreenshot = path.join(
+          scanDir,
+          `hover-after-${Math.random().toString(36).substr(2, 9)}.png`
+        );
         await page.screenshot({ path: afterScreenshot });
 
         // Check for new content or contrast changes
@@ -452,20 +484,26 @@ class AdvancedContrastScanner extends BaseScanner {
           const rect = el.getBoundingClientRect();
 
           // Look for tooltip or popup content
-          const tooltips = document.querySelectorAll('.tooltip-text, [role="tooltip"], .popup, .dropdown-menu');
+          const tooltips = document.querySelectorAll(
+            '.tooltip-text, [role="tooltip"], .popup, .dropdown-menu'
+          );
           let tooltipContent = null;
 
-          tooltips.forEach(tooltip => {
+          tooltips.forEach((tooltip) => {
             const tooltipRect = tooltip.getBoundingClientRect();
             const tooltipStyle = window.getComputedStyle(tooltip);
 
-            if (tooltipStyle.visibility !== 'hidden' && tooltipStyle.display !== 'none' &&
-                tooltipRect.width > 0 && tooltipRect.height > 0) {
+            if (
+              tooltipStyle.visibility !== 'hidden' &&
+              tooltipStyle.display !== 'none' &&
+              tooltipRect.width > 0 &&
+              tooltipRect.height > 0
+            ) {
               tooltipContent = {
                 backgroundColor: tooltipStyle.backgroundColor,
                 color: tooltipStyle.color,
                 borderColor: tooltipStyle.borderColor,
-                text: tooltip.textContent.trim()
+                text: tooltip.textContent.trim(),
               };
             }
           });
@@ -474,9 +512,9 @@ class AdvancedContrastScanner extends BaseScanner {
             element: {
               backgroundColor: computed.backgroundColor,
               color: computed.color,
-              borderColor: computed.borderColor
+              borderColor: computed.borderColor,
             },
-            tooltip: tooltipContent
+            tooltip: tooltipContent,
           };
         }, element.selector);
 
@@ -490,14 +528,14 @@ class AdvancedContrastScanner extends BaseScanner {
 
           if (contrastResult.contrastRatio < 4.5) {
             violations.push({
-              criterion: "9.1.4.13",
+              criterion: '9.1.4.13',
               element: element.selector,
-              issue: "hover-content-contrast",
+              issue: 'hover-content-contrast',
               description: `Hover content has insufficient contrast ratio: ${contrastResult.contrastRatio.toFixed(2)}:1`,
               contrastRatio: contrastResult.contrastRatio,
               requiredRatio: 4.5,
               elementType: 'hover-content',
-              suggestion: "Ensure hover and focus content maintains sufficient contrast"
+              suggestion: 'Ensure hover and focus content maintains sufficient contrast',
             });
           }
 
@@ -507,16 +545,14 @@ class AdvancedContrastScanner extends BaseScanner {
             contrastRatio: contrastResult.contrastRatio,
             beforeScreenshot: path.basename(beforeScreenshot),
             afterScreenshot: path.basename(afterScreenshot),
-            tooltipText: hoverAnalysis.tooltip.text
+            tooltipText: hoverAnalysis.tooltip.text,
           });
         }
-
       } catch (error) {
         console.warn(`Error testing hover state for ${element.selector}:`, error.message);
       }
     }
   }
-
 
   /**
    * Analyze tooltip contrast (SC 1.4.13 hover/focus content).
@@ -526,27 +562,30 @@ class AdvancedContrastScanner extends BaseScanner {
    * alpha-composited rather than taken at face value.
    */
   async analyzeTooltipContrast(page, tooltip, selector) {
-    const analysis = await page.evaluate((tt, contrastCode) => {
-      eval(contrastCode);
+    const analysis = await page.evaluate(
+      (tt, contrastCode) => {
+        eval(contrastCode);
 
-      const bgRgb = __parseRgb(tt.backgroundColor);
-      const fgRgb = __parseRgb(tt.color);
+        const bgRgb = __parseRgb(tt.backgroundColor);
+        const fgRgb = __parseRgb(tt.color);
 
-      if (bgRgb && fgRgb && bgRgb.a > 0) {
-        const flatBg = __blendOver(bgRgb, { r: 255, g: 255, b: 255, a: 1 });
-        return {
-          contrastRatio: __getContrastRatio(__blendOver(fgRgb, flatBg), flatBg),
-          backgroundColor: tt.backgroundColor,
-          textColor: tt.color
-        };
-      }
+        if (bgRgb && fgRgb && bgRgb.a > 0) {
+          const flatBg = __blendOver(bgRgb, { r: 255, g: 255, b: 255, a: 1 });
+          return {
+            contrastRatio: __getContrastRatio(__blendOver(fgRgb, flatBg), flatBg),
+            backgroundColor: tt.backgroundColor,
+            textColor: tt.color,
+          };
+        }
 
-      return { contrastRatio: 21 }; // Not determinable — never report a failure
-    }, tooltip, contrastUtils);
+        return { contrastRatio: 21 }; // Not determinable — never report a failure
+      },
+      tooltip,
+      contrastUtils
+    );
 
     return analysis;
   }
-
 }
 
 module.exports = AdvancedContrastScanner;

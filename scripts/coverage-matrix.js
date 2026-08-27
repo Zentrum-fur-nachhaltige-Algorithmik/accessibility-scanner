@@ -153,9 +153,14 @@ function collectScanners() {
 function collectAxeCriteria() {
   const axe = require('axe-core');
   const rules = axe.getRules([
-    'wcag2a', 'wcag2aa', 'wcag2aaa',
-    'wcag21a', 'wcag21aa', 'wcag21aaa',
-    'wcag22a', 'wcag22aa',
+    'wcag2a',
+    'wcag2aa',
+    'wcag2aaa',
+    'wcag21a',
+    'wcag21aa',
+    'wcag21aaa',
+    'wcag22a',
+    'wcag22aa',
     'best-practice',
   ]);
 
@@ -236,9 +241,9 @@ function collectHarnessCoverage(axeByCriterion, fixturesByCriterion, scanners) {
    * `wcagCriteria` at run time. Resolve both shapes the same way.
    */
   const criteriaOf = (id, def) =>
-    (def && Array.isArray(def.criteria) && def.criteria.length)
+    def && Array.isArray(def.criteria) && def.criteria.length
       ? def.criteria
-      : (byScannerId.get(id)?.criteria || []);
+      : byScannerId.get(id)?.criteria || [];
 
   const tryRequire = (rel) => {
     const p = path.join(ROOT, 'scripts', 'harness', rel);
@@ -318,7 +323,11 @@ function collectHarnessOutcomes() {
       for (const c of r.criteria || r.expected || []) {
         if (!acc.has(c)) {
           acc.set(c, {
-            badTotal: 0, badDetected: 0, goodTotal: 0, goodClean: 0, from: new Set(),
+            badTotal: 0,
+            badDetected: 0,
+            goodTotal: 0,
+            goodClean: 0,
+            from: new Set(),
           });
         }
         const a = acc.get(c);
@@ -419,8 +428,7 @@ function buildRows() {
       }
     }
 
-    const isManual =
-      mechanism === MECHANISM.MANUAL || mechanism === MECHANISM.NOT_APPLICABLE;
+    const isManual = mechanism === MECHANISM.MANUAL || mechanism === MECHANISM.NOT_APPLICABLE;
     const isExperimentalOnly = Boolean(mechanism && mechanism.startsWith('experimental:'));
 
     return {
@@ -455,7 +463,7 @@ function validate(rows) {
     if (!r.mechanism) {
       errors.push(
         `${r.sc} (${r.level}) "${r.title}" is UNMAPPED — no axe rule, no scanner, and ` +
-        `no MANUAL_OVERRIDES entry. Add a scanner or an override with a justification.`
+          `no MANUAL_OVERRIDES entry. Add a scanner or an override with a justification.`
       );
       continue;
     }
@@ -473,13 +481,13 @@ function validate(rows) {
       if (r.fixtures.bad.length === 0 || r.fixtures.good.length === 0) {
         errors.push(
           `${r.sc} (${r.level}) is automated via ${r.mechanism} but lacks a good+bad ` +
-          `fixture pair (good=${r.fixtures.good.length}, bad=${r.fixtures.bad.length}).`
+            `fixture pair (good=${r.fixtures.good.length}, bad=${r.fixtures.bad.length}).`
         );
       }
       if (r.harness.length === 0) {
         errors.push(
           `${r.sc} (${r.level}) is automated via ${r.mechanism} but no harness asserts ` +
-          `on it (exclusive/concurrent/llm/axe-e2e all absent).`
+            `on it (exclusive/concurrent/llm/axe-e2e all absent).`
         );
       }
     }
@@ -525,9 +533,9 @@ function renderMarkdown(rows, scanners, fileCount) {
   L.push('');
   L.push(
     'Every WCAG 2.2 success criterion (A, AA and AAA) is mapped to exactly one ' +
-    '**primary mechanism**. A criterion that a scanner merely *mentions* in its ' +
-    'metadata, but that no harness asserts on, is reported as unverified — the ' +
-    'generator fails the build rather than let the matrix drift from the code.'
+      '**primary mechanism**. A criterion that a scanner merely *mentions* in its ' +
+      'metadata, but that no harness asserts on, is reported as unverified — the ' +
+      'generator fails the build rather than let the matrix drift from the code.'
   );
   L.push('');
 
@@ -537,15 +545,25 @@ function renderMarkdown(rows, scanners, fileCount) {
   L.push('| Mechanism | Criteria | A | AA | AAA | Removed |');
   L.push('|---|---:|---:|---:|---:|---:|');
   const bucketOrder = [
-    'axe-core', 'hybrid', 'deterministic', 'llm',
-    'experimental-only', 'MANUAL', 'NOT-APPLICABLE-STATIC', 'UNMAPPED',
+    'axe-core',
+    'hybrid',
+    'deterministic',
+    'llm',
+    'experimental-only',
+    'MANUAL',
+    'NOT-APPLICABLE-STATIC',
+    'UNMAPPED',
   ];
   for (const b of bucketOrder) {
     if (!counts[b]) continue;
     const at = (lvl) => (countsByLevel[lvl] && countsByLevel[lvl][b]) || 0;
-    L.push(`| \`${b}\` | ${counts[b]} | ${at('A')} | ${at('AA')} | ${at('AAA')} | ${at('REMOVED')} |`);
+    L.push(
+      `| \`${b}\` | ${counts[b]} | ${at('A')} | ${at('AA')} | ${at('AAA')} | ${at('REMOVED')} |`
+    );
   }
-  L.push(`| **total** | **${rows.length}** | ${rows.filter(r => r.level === 'A').length} | ${rows.filter(r => r.level === 'AA').length} | ${rows.filter(r => r.level === 'AAA').length} | ${rows.filter(r => r.level === 'REMOVED').length} |`);
+  L.push(
+    `| **total** | **${rows.length}** | ${rows.filter((r) => r.level === 'A').length} | ${rows.filter((r) => r.level === 'AA').length} | ${rows.filter((r) => r.level === 'AAA').length} | ${rows.filter((r) => r.level === 'REMOVED').length} |`
+  );
   L.push('');
 
   const automatedAA = rows.filter(
@@ -557,17 +575,19 @@ function renderMarkdown(rows, scanners, fileCount) {
   );
   L.push(
     `**A + AA (the conformance target): ${automatedAA.length} of ` +
-    `${automatedAA.length + manualAA.length + experimentalAA.length} criteria are ` +
-    `covered by proven mechanisms**, ${manualAA.length} require manual review, and ` +
-    `${experimentalAA.length} are covered only by quarantined (experimental) scanners ` +
-    'and therefore do not count as covered.'
+      `${automatedAA.length + manualAA.length + experimentalAA.length} criteria are ` +
+      `covered by proven mechanisms**, ${manualAA.length} require manual review, and ` +
+      `${experimentalAA.length} are covered only by quarantined (experimental) scanners ` +
+      'and therefore do not count as covered.'
   );
   L.push('');
 
   // ---- the matrix ----
   L.push('## Matrix');
   L.push('');
-  L.push('`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e, `g`=golden corpus (false-positive guard on healthy real pages).');
+  L.push(
+    '`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e, `g`=golden corpus (false-positive guard on healthy real pages).'
+  );
   L.push('');
   L.push('`Detect` is the LAST RECORDED outcome from the harnesses whose results are checked in');
   L.push('at `docs/sprints/p2-quality/raw/harness-*.json` — an actual measurement, not merely the');
@@ -577,27 +597,34 @@ function renderMarkdown(rows, scanners, fileCount) {
   L.push('');
   L.push('**Scope caveat:** these recorded runs cover the CUSTOM scanners only. axe-core is not');
   L.push('part of them — its rules are exercised separately by `tests/e2e/axe-core.test.js`');
-  L.push('over every fixture. So a **`tp`** on a criterion whose primary mechanism is `axe-core` or');
+  L.push(
+    'over every fixture. So a **`tp`** on a criterion whose primary mechanism is `axe-core` or'
+  );
   L.push('`hybrid:axe-core+…` means "our custom scanner adds nothing here", not "the criterion is');
   L.push('undetected".');
   L.push('');
-  L.push('| SC | Lvl | Title | Primary mechanism | Supporting | Fixtures (bad/good) | H | Detect |');
+  L.push(
+    '| SC | Lvl | Title | Primary mechanism | Supporting | Fixtures (bad/good) | H | Detect |'
+  );
   L.push('|---|---|---|---|---|---|---|---|');
   for (const r of rows) {
     const h = r.harness
-      .map((x) => ({ exclusive: 'x', concurrent: 'c', llm: 'l', 'axe-e2e': 'a', golden: 'g' }[x] || '?'))
+      .map(
+        (x) =>
+          ({ exclusive: 'x', concurrent: 'c', llm: 'l', 'axe-e2e': 'a', golden: 'g' })[x] || '?'
+      )
       .join('');
     const mech = r.mechanism ? `\`${r.mechanism}\`` : '**UNMAPPED**';
     const sup = r.supporting.length ? r.supporting.map((s) => `\`${s}\``).join(', ') : '—';
     let detect = '—';
     if (r.outcome) {
-      const tp = r.outcome.tp === null ? '' : (r.outcome.tp ? 'TP ' : '**tp** ');
-      const fp = r.outcome.fpClean === null ? '' : (r.outcome.fpClean ? 'FP-' : '**FP!**');
+      const tp = r.outcome.tp === null ? '' : r.outcome.tp ? 'TP ' : '**tp** ';
+      const fp = r.outcome.fpClean === null ? '' : r.outcome.fpClean ? 'FP-' : '**FP!**';
       detect = `${tp}${fp}`.trim() || '—';
     }
     L.push(
       `| ${r.sc} | ${r.level} | ${r.title} | ${mech} | ${sup} | ` +
-      `${r.fixtures.bad.length}/${r.fixtures.good.length} | ${h || '—'} | ${detect} |`
+        `${r.fixtures.bad.length}/${r.fixtures.good.length} | ${h || '—'} | ${detect} |`
     );
   }
   L.push('');
@@ -612,8 +639,8 @@ function renderMarkdown(rows, scanners, fileCount) {
     L.push('');
     L.push(
       `${measured.length} criteria have recorded runs (harnesses: ${harnessesSeen.join(', ')}). ` +
-      `${tpMiss.length} have a bad fixture that the custom scanners do not detect; ` +
-      `${fpDirty.length} produce a false positive on a good fixture.`
+        `${tpMiss.length} have a bad fixture that the custom scanners do not detect; ` +
+        `${fpDirty.length} produce a false positive on a good fixture.`
     );
     L.push('');
     if (tpMiss.length) {
@@ -664,16 +691,18 @@ function renderMarkdown(rows, scanners, fileCount) {
   // ---- scanner inventory ----
   L.push('## Scanner inventory');
   L.push('');
-  L.push(`${scanners.length} registered scanners; ${fileCount} fixtures with \`WCAG-TEST\` metadata.`);
+  L.push(
+    `${scanners.length} registered scanners; ${fileCount} fixtures with \`WCAG-TEST\` metadata.`
+  );
   L.push('');
   const proven = scanners.filter((s) => s.trust === 'proven').length;
   L.push(
     `Trust tiers (derived from the recorded battery results by ` +
-    `\`tests/derive-scanner-trust.js\`): **${proven} proven**, ` +
-    `**${scanners.length - proven} experimental**. Only proven scanners are in the ` +
-    'default profiles; experimental ones are quarantined (never deleted), runnable ' +
-    'with `includeExperimental: true`, and their findings are tagged ' +
-    '`confidence: "low"`.'
+      `\`tests/derive-scanner-trust.js\`): **${proven} proven**, ` +
+      `**${scanners.length - proven} experimental**. Only proven scanners are in the ` +
+      'default profiles; experimental ones are quarantined (never deleted), runnable ' +
+      'with `includeExperimental: true`, and their findings are tagged ' +
+      '`confidence: "low"`.'
   );
   L.push('');
   L.push('| Scanner | Kind | Exclusive | Trust | Declared criteria | Quarantine evidence |');
@@ -681,9 +710,9 @@ function renderMarkdown(rows, scanners, fileCount) {
   for (const s of scanners) {
     L.push(
       `| \`${s.id}\` | ${s.kind} | ${s.exclusive ? 'yes' : 'no'} | ` +
-      `${s.trust === 'proven' ? 'proven' : '**experimental**'} | ` +
-      `${s.criteria.length ? s.criteria.join(', ') : '_dynamic / non-WCAG_'} | ` +
-      `${s.trust === 'proven' ? '—' : String(s.trustReason).replace(/\|/g, '/').slice(0, 220)} |`
+        `${s.trust === 'proven' ? 'proven' : '**experimental**'} | ` +
+        `${s.criteria.length ? s.criteria.join(', ') : '_dynamic / non-WCAG_'} | ` +
+        `${s.trust === 'proven' ? '—' : String(s.trustReason).replace(/\|/g, '/').slice(0, 220)} |`
     );
   }
   L.push('');

@@ -9,7 +9,7 @@ class ImagesOfTextScanner extends BaseScanner {
   constructor() {
     super('images-of-text', {
       wcagCriteria: ['1.4.5', '1.4.9'],
-      wcagPrinciple: 'perceivable'
+      wcagPrinciple: 'perceivable',
     });
   }
 
@@ -48,10 +48,11 @@ class ImagesOfTextScanner extends BaseScanner {
 
         // Check for decorative indicators
         const decorativeKeywords = ['decoration', 'ornament', 'separator', 'spacer', 'bullet'];
-        const isDecorative = decorativeKeywords.some(keyword =>
-          alt.toLowerCase().includes(keyword) ||
-          src.toLowerCase().includes(keyword) ||
-          className.toLowerCase().includes(keyword)
+        const isDecorative = decorativeKeywords.some(
+          (keyword) =>
+            alt.toLowerCase().includes(keyword) ||
+            src.toLowerCase().includes(keyword) ||
+            className.toLowerCase().includes(keyword)
         );
 
         // Empty alt attribute often indicates decorative image
@@ -65,10 +66,11 @@ class ImagesOfTextScanner extends BaseScanner {
         const className = img.className || '';
 
         const logoKeywords = ['logo', 'brand', 'company'];
-        return logoKeywords.some(keyword =>
-          alt.toLowerCase().includes(keyword) ||
-          src.toLowerCase().includes(keyword) ||
-          className.toLowerCase().includes(keyword)
+        return logoKeywords.some(
+          (keyword) =>
+            alt.toLowerCase().includes(keyword) ||
+            src.toLowerCase().includes(keyword) ||
+            className.toLowerCase().includes(keyword)
         );
       }
 
@@ -87,11 +89,12 @@ class ImagesOfTextScanner extends BaseScanner {
           filenameIndicatesText: /\b(text|caption|heading|title|quote|message)\b/i.test(src),
 
           // Common text image patterns in filename
-          commonTextPatterns: /\b(btn|button|banner|header|nav|menu)\b/i.test(src) &&
-                             !/\b(bg|background|decoration)\b/i.test(src),
+          commonTextPatterns:
+            /\b(btn|button|banner|header|nav|menu)\b/i.test(src) &&
+            !/\b(bg|background|decoration)\b/i.test(src),
 
           // Image dimensions suggest text (often wide and short)
-          dimensionsSuggestText: false // Will be calculated below
+          dimensionsSuggestText: false, // Will be calculated below
         };
 
         // Check image dimensions
@@ -101,7 +104,7 @@ class ImagesOfTextScanner extends BaseScanner {
           // Text images often have high aspect ratios (wider than tall)
           // or are small square buttons
           textIndicators.dimensionsSuggestText =
-            (aspectRatio > 2.5) || // Wide banners/headers
+            aspectRatio > 2.5 || // Wide banners/headers
             (rect.width < 200 && rect.height < 200 && aspectRatio > 1.5); // Small buttons
         }
 
@@ -125,7 +128,7 @@ class ImagesOfTextScanner extends BaseScanner {
       // Find all images
       const images = document.querySelectorAll('img');
 
-      images.forEach(img => {
+      images.forEach((img) => {
         totalImages++;
 
         // Skip if options indicate to skip certain types
@@ -197,7 +200,7 @@ class ImagesOfTextScanner extends BaseScanner {
             detectedText: alt || 'Text detected in image',
             confidence: Math.min(confidence, 100),
             reason: reason,
-            suggestion: getSuggestion(reason, img)
+            suggestion: getSuggestion(reason, img),
           });
         }
       });
@@ -207,7 +210,7 @@ class ImagesOfTextScanner extends BaseScanner {
       // Only flag if there's evidence this is actually text rendered as an image
       const allElements = document.querySelectorAll('*');
 
-      allElements.forEach(element => {
+      allElements.forEach((element) => {
         const computed = window.getComputedStyle(element);
         const bgImage = computed.backgroundImage;
 
@@ -234,7 +237,10 @@ class ImagesOfTextScanner extends BaseScanner {
 
           // Check if text content exactly matches common button/badge text
           const text = element.textContent.trim().toLowerCase();
-          if (text.length < 20 && /^(button|click|download|submit|login|signup|register)$/.test(text)) {
+          if (
+            text.length < 20 &&
+            /^(button|click|download|submit|login|signup|register)$/.test(text)
+          ) {
             confidence += 25;
             reasons.push('text matches common button patterns');
           }
@@ -250,7 +256,7 @@ class ImagesOfTextScanner extends BaseScanner {
               detectedText: element.textContent.trim().substring(0, 100),
               confidence: Math.min(confidence, 100),
               reason: 'contains-text',
-              suggestion: 'Replace background image text with HTML text and CSS styling'
+              suggestion: 'Replace background image text with HTML text and CSS styling',
             });
           }
         }
@@ -260,24 +266,23 @@ class ImagesOfTextScanner extends BaseScanner {
         violations,
         totalImages,
         suspectedTextImages,
-        confirmedTextImages
+        confirmedTextImages,
       };
     }, scanOptions);
 
     // Create report according to interface
     return {
       scannerId: this.id,
-      criterion: "9.1.4.5",
+      criterion: '9.1.4.5',
       passed: imageTextResults.violations.length === 0,
       violations: imageTextResults.violations,
       summary: {
         totalImages: imageTextResults.totalImages,
         suspectedTextImages: imageTextResults.suspectedTextImages,
-        confirmedTextImages: imageTextResults.confirmedTextImages
-      }
+        confirmedTextImages: imageTextResults.confirmedTextImages,
+      },
     };
   }
-
 }
 
 module.exports = ImagesOfTextScanner;

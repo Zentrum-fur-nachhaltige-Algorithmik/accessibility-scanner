@@ -8,71 +8,43 @@
   },
   "byCriterion": {
     "1.2.1": {
-      "scanners": [
-        "media-accessibility"
-      ],
+      "scanners": ["media-accessibility"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-media-alternatives.html"
-        ],
-        "good": [
-          "good-media-alternatives.html"
-        ]
+        "bad": ["bad-media-alternatives.html"],
+        "good": ["good-media-alternatives.html"]
       }
     },
     "1.2.2": {
-      "scanners": [
-        "media-accessibility"
-      ],
+      "scanners": ["media-accessibility"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-media-alternatives.html"
-        ],
-        "good": [
-          "good-media-alternatives.html"
-        ]
+        "bad": ["bad-media-alternatives.html"],
+        "good": ["good-media-alternatives.html"]
       }
     },
     "1.2.3": {
-      "scanners": [
-        "media-accessibility"
-      ],
+      "scanners": ["media-accessibility"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-media-alternatives.html"
-        ],
-        "good": [
-          "good-media-alternatives.html"
-        ]
+        "bad": ["bad-media-alternatives.html"],
+        "good": ["good-media-alternatives.html"]
       }
     },
     "1.2.5": {
-      "scanners": [
-        "media-accessibility"
-      ],
+      "scanners": ["media-accessibility"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-audio-description.html"
-        ],
-        "good": [
-          "good-audio-description.html"
-        ]
+        "bad": ["bad-audio-description.html"],
+        "good": ["good-audio-description.html"]
       }
     },
     "1.3.1": {
-      "scanners": [
-        "screen-reader",
-        "page-structure",
-        "advanced-aria"
-      ],
+      "scanners": ["screen-reader", "page-structure", "advanced-aria"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
@@ -97,343 +69,196 @@
       }
     },
     "1.3.4": {
-      "scanners": [
-        "orientation"
-      ],
+      "scanners": ["orientation"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-orientation.html"
-        ],
-        "good": [
-          "good-orientation.html"
-        ]
+        "bad": ["bad-orientation.html"],
+        "good": ["good-orientation.html"]
       }
     },
     "1.3.5": {
-      "scanners": [
-        "input-purpose"
-      ],
+      "scanners": ["input-purpose"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-autocomplete.html"
-        ],
-        "good": [
-          "good-autocomplete.html"
-        ]
+        "bad": ["bad-autocomplete.html"],
+        "good": ["good-autocomplete.html"]
       }
     },
     "1.4.1": {
-      "scanners": [
-        "use-of-color"
-      ],
+      "scanners": ["use-of-color"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
-        "bad": [
-          "bad-css-background-info.html",
-          "bad-use-of-color.html"
-        ],
-        "good": [
-          "good-css-background-accessible.html"
-        ]
+        "bad": ["bad-css-background-info.html", "bad-use-of-color.html"],
+        "good": ["good-css-background-accessible.html"]
       }
     },
     "1.4.11": {
-      "scanners": [
-        "advanced-contrast",
-        "nontext-contrast"
-      ],
+      "scanners": ["advanced-contrast", "nontext-contrast"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-nontext-contrast.html"
-        ],
-        "good": [
-          "good-nontext-contrast.html"
-        ]
+        "bad": ["bad-nontext-contrast.html"],
+        "good": ["good-nontext-contrast.html"]
       }
     },
     "1.4.3": {
-      "scanners": [
-        "color-contrast",
-        "advanced-contrast"
-      ],
+      "scanners": ["color-contrast", "advanced-contrast"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-color-contrast.html",
-          "bad-focus-visible.html"
-        ],
-        "good": [
-          "good-bootstrap-patterns.html",
-          "good-color-contrast.html"
-        ]
+        "bad": ["bad-color-contrast.html", "bad-focus-visible.html"],
+        "good": ["good-bootstrap-patterns.html", "good-color-contrast.html"]
       }
     },
     "1.4.5": {
-      "scanners": [
-        "images-of-text"
-      ],
+      "scanners": ["images-of-text"],
       "truePositive": false,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-images-of-text.html"
-        ],
-        "good": [
-          "good-images-of-text.html"
-        ]
+        "bad": ["bad-images-of-text.html"],
+        "good": ["good-images-of-text.html"]
       }
     },
     "1.4.6": {
-      "scanners": [
-        "color-contrast",
-        "advanced-contrast"
-      ],
+      "scanners": ["color-contrast", "advanced-contrast"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-color-contrast.html"
-        ],
-        "good": [
-          "good-bootstrap-patterns.html",
-          "good-contrast-enhanced.html"
-        ]
+        "bad": ["bad-color-contrast.html"],
+        "good": ["good-bootstrap-patterns.html", "good-contrast-enhanced.html"]
       }
     },
     "1.4.9": {
-      "scanners": [
-        "images-of-text"
-      ],
+      "scanners": ["images-of-text"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-images-of-text-no-exception.html",
-          "bad-images-of-text.html"
-        ],
-        "good": [
-          "good-images-of-text-no-exception.html"
-        ]
+        "bad": ["bad-images-of-text-no-exception.html", "bad-images-of-text.html"],
+        "good": ["good-images-of-text-no-exception.html"]
       }
     },
     "2.2.1": {
-      "scanners": [
-        "timing-controls"
-      ],
+      "scanners": ["timing-controls"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
-        "bad": [
-          "bad-timing-controls.html"
-        ],
-        "good": [
-          "good-timing-controls.html"
-        ]
+        "bad": ["bad-timing-controls.html"],
+        "good": ["good-timing-controls.html"]
       }
     },
     "2.2.2": {
-      "scanners": [
-        "timing-controls"
-      ],
+      "scanners": ["timing-controls"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
-        "bad": [
-          "bad-timing-controls.html"
-        ],
-        "good": [
-          "good-timing-controls.html"
-        ]
+        "bad": ["bad-timing-controls.html"],
+        "good": ["good-timing-controls.html"]
       }
     },
     "2.4.1": {
-      "scanners": [
-        "page-structure"
-      ],
+      "scanners": ["page-structure"],
       "truePositive": false,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-beeproduced-real-issues.html",
-          "bad-landmarks.html",
-          "bad-skip-links.html"
-        ],
-        "good": [
-          "good-landmarks.html",
-          "good-skip-links.html"
-        ]
+        "bad": ["bad-beeproduced-real-issues.html", "bad-landmarks.html", "bad-skip-links.html"],
+        "good": ["good-landmarks.html", "good-skip-links.html"]
       }
     },
     "2.4.2": {
-      "scanners": [
-        "page-structure"
-      ],
+      "scanners": ["page-structure"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-page-titled.html"
-        ],
-        "good": [
-          "good-page-titled.html"
-        ]
+        "bad": ["bad-page-titled.html"],
+        "good": ["good-page-titled.html"]
       }
     },
     "2.4.6": {
-      "scanners": [
-        "page-structure"
-      ],
+      "scanners": ["page-structure"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-headings-labels.html"
-        ],
-        "good": [
-          "good-headings-labels.html"
-        ]
+        "bad": ["bad-headings-labels.html"],
+        "good": ["good-headings-labels.html"]
       }
     },
     "2.5.3": {
-      "scanners": [
-        "label-in-name"
-      ],
+      "scanners": ["label-in-name"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
-        "bad": [
-          "bad-input-modalities.html",
-          "bad-label-in-name.html"
-        ],
-        "good": [
-          "good-label-in-name.html"
-        ]
+        "bad": ["bad-input-modalities.html", "bad-label-in-name.html"],
+        "good": ["good-label-in-name.html"]
       }
     },
     "3.1.1": {
-      "scanners": [
-        "language-detection"
-      ],
+      "scanners": ["language-detection"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-language.html"
-        ],
-        "good": [
-          "good-accessibility.html",
-          "good-language.html"
-        ]
+        "bad": ["bad-language.html"],
+        "good": ["good-accessibility.html", "good-language.html"]
       }
     },
     "3.1.2": {
-      "scanners": [
-        "language-detection"
-      ],
+      "scanners": ["language-detection"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-language-override.html",
-          "bad-language.html"
-        ],
-        "good": [
-          "good-language-override.html",
-          "good-language.html"
-        ]
+        "bad": ["bad-language-override.html", "bad-language.html"],
+        "good": ["good-language-override.html", "good-language.html"]
       }
     },
     "3.2.1": {
-      "scanners": [
-        "predictable-navigation"
-      ],
+      "scanners": ["predictable-navigation"],
       "truePositive": false,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-context-change.html"
-        ],
-        "good": [
-          "good-context-change.html"
-        ]
+        "bad": ["bad-context-change.html"],
+        "good": ["good-context-change.html"]
       }
     },
     "3.2.2": {
-      "scanners": [
-        "predictable-navigation"
-      ],
+      "scanners": ["predictable-navigation"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-auto-submitting-form.html",
-          "bad-context-change.html"
-        ],
-        "good": [
-          "good-auto-submitting-form.html",
-          "good-context-change.html"
-        ]
+        "bad": ["bad-auto-submitting-form.html", "bad-context-change.html"],
+        "good": ["good-auto-submitting-form.html", "good-context-change.html"]
       }
     },
     "3.2.3": {
-      "scanners": [
-        "predictable-navigation"
-      ],
+      "scanners": ["predictable-navigation"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-consistent-navigation.html"
-        ],
-        "good": [
-          "good-consistent-navigation.html"
-        ]
+        "bad": ["bad-consistent-navigation.html"],
+        "good": ["good-consistent-navigation.html"]
       }
     },
     "3.2.4": {
-      "scanners": [
-        "predictable-navigation"
-      ],
+      "scanners": ["predictable-navigation"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-consistent-identification.html"
-        ],
-        "good": [
-          "good-consistent-identification.html"
-        ]
+        "bad": ["bad-consistent-identification.html"],
+        "good": ["good-consistent-identification.html"]
       }
     },
     "3.3.1": {
-      "scanners": [
-        "error-handling",
-        "status-messages"
-      ],
+      "scanners": ["error-handling", "status-messages"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-form-errors.html"
-        ],
-        "good": [
-          "good-form-errors.html",
-          "good-js-validation.html"
-        ]
+        "bad": ["bad-form-errors.html"],
+        "good": ["good-form-errors.html", "good-js-validation.html"]
       }
     },
     "3.3.2": {
-      "scanners": [
-        "error-handling"
-      ],
+      "scanners": ["error-handling"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
@@ -451,55 +276,34 @@
       }
     },
     "3.3.3": {
-      "scanners": [
-        "error-handling"
-      ],
+      "scanners": ["error-handling"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-form-errors.html"
-        ],
-        "good": [
-          "good-form-errors.html"
-        ]
+        "bad": ["bad-form-errors.html"],
+        "good": ["good-form-errors.html"]
       }
     },
     "3.3.4": {
-      "scanners": [
-        "error-handling"
-      ],
+      "scanners": ["error-handling"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-error-prevention.html",
-          "bad-form-errors.html"
-        ],
-        "good": [
-          "good-error-prevention.html"
-        ]
+        "bad": ["bad-error-prevention.html", "bad-form-errors.html"],
+        "good": ["good-error-prevention.html"]
       }
     },
     "4.1.1": {
-      "scanners": [
-        "html-validation"
-      ],
+      "scanners": ["html-validation"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
-        "bad": [
-          "bad-html-validation.html"
-        ],
+        "bad": ["bad-html-validation.html"],
         "good": []
       }
     },
     "4.1.2": {
-      "scanners": [
-        "screen-reader",
-        "html-validation",
-        "advanced-aria"
-      ],
+      "scanners": ["screen-reader", "html-validation", "advanced-aria"],
       "truePositive": true,
       "falsePositiveClean": false,
       "files": {
@@ -522,20 +326,12 @@
       }
     },
     "4.1.3": {
-      "scanners": [
-        "screen-reader",
-        "status-messages"
-      ],
+      "scanners": ["screen-reader", "status-messages"],
       "truePositive": true,
       "falsePositiveClean": true,
       "files": {
-        "bad": [
-          "bad-aria-state-updates.html",
-          "bad-status-messages.html"
-        ],
-        "good": [
-          "good-aria-state-updates.html"
-        ]
+        "bad": ["bad-aria-state-updates.html", "bad-status-messages.html"],
+        "good": ["good-aria-state-updates.html"]
       }
     }
   },
@@ -544,9 +340,7 @@
       "file": "bad-aria-role-override.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 3,
       "status": "PASS",
       "detail": "3 violations"
@@ -555,10 +349,7 @@
       "file": "bad-aria-state-updates.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2",
-        "4.1.3"
-      ],
+      "criteria": ["4.1.2", "4.1.3"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -567,10 +358,7 @@
       "file": "bad-beeproduced-real-issues.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -579,9 +367,7 @@
       "file": "bad-cognitive-accessibility.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -590,10 +376,7 @@
       "file": "bad-complex-aria.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -602,9 +385,7 @@
       "file": "bad-complex-data-tables.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 4,
       "status": "PASS",
       "detail": "4 violations"
@@ -613,9 +394,7 @@
       "file": "bad-form-grouping.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -624,9 +403,7 @@
       "file": "bad-form-labels.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -635,9 +412,7 @@
       "file": "bad-icon-accessibility.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -646,9 +421,7 @@
       "file": "bad-landmarks.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -657,9 +430,7 @@
       "file": "bad-status-messages.html",
       "scanner": "screen-reader",
       "expectViolations": true,
-      "criteria": [
-        "4.1.3"
-      ],
+      "criteria": ["4.1.3"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -668,10 +439,7 @@
       "file": "good-accessibility.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1",
-        "4.1.2"
-      ],
+      "criteria": ["1.3.1", "4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -680,9 +448,7 @@
       "file": "good-aria-role-override.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -691,10 +457,7 @@
       "file": "good-aria-state-updates.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "4.1.3"
-      ],
+      "criteria": ["4.1.2", "4.1.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -703,9 +466,7 @@
       "file": "good-bootstrap-patterns.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 2,
       "status": "FAIL",
       "detail": "2 false positives"
@@ -714,9 +475,7 @@
       "file": "good-cognitive-accessibility.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -725,9 +484,7 @@
       "file": "good-complex-data-tables.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -736,9 +493,7 @@
       "file": "good-form-grouping.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -747,10 +502,7 @@
       "file": "good-hidden-modal.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -759,9 +511,7 @@
       "file": "good-js-validation.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -770,9 +520,7 @@
       "file": "good-landmarks.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -781,10 +529,7 @@
       "file": "good-redundant-aria.html",
       "scanner": "screen-reader",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -793,9 +538,7 @@
       "file": "bad-aria-role-override.html",
       "scanner": "html-validation",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 6,
       "status": "PASS",
       "detail": "6 violations"
@@ -804,9 +547,7 @@
       "file": "bad-aria-state-updates.html",
       "scanner": "html-validation",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -815,9 +556,7 @@
       "file": "bad-beeproduced-real-issues.html",
       "scanner": "html-validation",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 4,
       "status": "PASS",
       "detail": "4 violations"
@@ -826,9 +565,7 @@
       "file": "bad-complex-aria.html",
       "scanner": "html-validation",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -837,9 +574,7 @@
       "file": "bad-html-validation.html",
       "scanner": "html-validation",
       "expectViolations": true,
-      "criteria": [
-        "4.1.1"
-      ],
+      "criteria": ["4.1.1"],
       "matched": 22,
       "status": "PASS",
       "detail": "22 violations"
@@ -848,9 +583,7 @@
       "file": "bad-icon-accessibility.html",
       "scanner": "html-validation",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 3,
       "status": "PASS",
       "detail": "3 violations"
@@ -859,9 +592,7 @@
       "file": "good-accessibility.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -870,9 +601,7 @@
       "file": "good-aria-role-override.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 1,
       "status": "FAIL",
       "detail": "1 false positives"
@@ -881,9 +610,7 @@
       "file": "good-aria-state-updates.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -892,9 +619,7 @@
       "file": "good-bootstrap-patterns.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 2,
       "status": "FAIL",
       "detail": "2 false positives"
@@ -903,9 +628,7 @@
       "file": "good-hidden-modal.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -914,9 +637,7 @@
       "file": "good-js-validation.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -925,9 +646,7 @@
       "file": "good-redundant-aria.html",
       "scanner": "html-validation",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -936,9 +655,7 @@
       "file": "bad-aria-role-override.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 10,
       "status": "PASS",
       "detail": "10 violations"
@@ -947,9 +664,7 @@
       "file": "bad-aria-state-updates.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -958,10 +673,7 @@
       "file": "bad-beeproduced-real-issues.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 2,
       "status": "PASS",
       "detail": "2 violations"
@@ -970,9 +682,7 @@
       "file": "bad-cognitive-accessibility.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -981,10 +691,7 @@
       "file": "bad-complex-aria.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 16,
       "status": "PASS",
       "detail": "16 violations"
@@ -993,9 +700,7 @@
       "file": "bad-complex-data-tables.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1004,9 +709,7 @@
       "file": "bad-form-grouping.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1015,9 +718,7 @@
       "file": "bad-form-labels.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1026,9 +727,7 @@
       "file": "bad-icon-accessibility.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1037,9 +736,7 @@
       "file": "bad-landmarks.html",
       "scanner": "advanced-aria",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1048,10 +745,7 @@
       "file": "good-accessibility.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1",
-        "4.1.2"
-      ],
+      "criteria": ["1.3.1", "4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1060,9 +754,7 @@
       "file": "good-aria-role-override.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 2,
       "status": "FAIL",
       "detail": "2 false positives"
@@ -1071,9 +763,7 @@
       "file": "good-aria-state-updates.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1082,9 +772,7 @@
       "file": "good-bootstrap-patterns.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 1,
       "status": "FAIL",
       "detail": "1 false positives"
@@ -1093,9 +781,7 @@
       "file": "good-cognitive-accessibility.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 4,
       "status": "FAIL",
       "detail": "4 false positives"
@@ -1104,9 +790,7 @@
       "file": "good-complex-data-tables.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1115,9 +799,7 @@
       "file": "good-form-grouping.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1126,10 +808,7 @@
       "file": "good-hidden-modal.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1138,9 +817,7 @@
       "file": "good-js-validation.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
+      "criteria": ["4.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1149,9 +826,7 @@
       "file": "good-landmarks.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1160,10 +835,7 @@
       "file": "good-redundant-aria.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1172,9 +844,7 @@
       "file": "bad-aria-state-updates.html",
       "scanner": "status-messages",
       "expectViolations": true,
-      "criteria": [
-        "4.1.3"
-      ],
+      "criteria": ["4.1.3"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1183,9 +853,7 @@
       "file": "bad-form-errors.html",
       "scanner": "status-messages",
       "expectViolations": true,
-      "criteria": [
-        "3.3.1"
-      ],
+      "criteria": ["3.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1194,9 +862,7 @@
       "file": "bad-status-messages.html",
       "scanner": "status-messages",
       "expectViolations": true,
-      "criteria": [
-        "4.1.3"
-      ],
+      "criteria": ["4.1.3"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1205,9 +871,7 @@
       "file": "good-aria-state-updates.html",
       "scanner": "status-messages",
       "expectViolations": false,
-      "criteria": [
-        "4.1.3"
-      ],
+      "criteria": ["4.1.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1216,9 +880,7 @@
       "file": "good-form-errors.html",
       "scanner": "status-messages",
       "expectViolations": false,
-      "criteria": [
-        "3.3.1"
-      ],
+      "criteria": ["3.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1227,9 +889,7 @@
       "file": "good-js-validation.html",
       "scanner": "status-messages",
       "expectViolations": false,
-      "criteria": [
-        "3.3.1"
-      ],
+      "criteria": ["3.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1238,9 +898,7 @@
       "file": "bad-audio-description.html",
       "scanner": "media-accessibility",
       "expectViolations": true,
-      "criteria": [
-        "1.2.5"
-      ],
+      "criteria": ["1.2.5"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1249,11 +907,7 @@
       "file": "bad-media-alternatives.html",
       "scanner": "media-accessibility",
       "expectViolations": true,
-      "criteria": [
-        "1.2.1",
-        "1.2.2",
-        "1.2.3"
-      ],
+      "criteria": ["1.2.1", "1.2.2", "1.2.3"],
       "matched": 10,
       "status": "PASS",
       "detail": "10 violations"
@@ -1262,9 +916,7 @@
       "file": "good-audio-description.html",
       "scanner": "media-accessibility",
       "expectViolations": false,
-      "criteria": [
-        "1.2.5"
-      ],
+      "criteria": ["1.2.5"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1273,11 +925,7 @@
       "file": "good-media-alternatives.html",
       "scanner": "media-accessibility",
       "expectViolations": false,
-      "criteria": [
-        "1.2.1",
-        "1.2.2",
-        "1.2.3"
-      ],
+      "criteria": ["1.2.1", "1.2.2", "1.2.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1286,9 +934,7 @@
       "file": "bad-auto-submitting-form.html",
       "scanner": "predictable-navigation",
       "expectViolations": true,
-      "criteria": [
-        "3.2.2"
-      ],
+      "criteria": ["3.2.2"],
       "matched": 18,
       "status": "PASS",
       "detail": "18 violations"
@@ -1297,9 +943,7 @@
       "file": "bad-consistent-identification.html",
       "scanner": "predictable-navigation",
       "expectViolations": true,
-      "criteria": [
-        "3.2.4"
-      ],
+      "criteria": ["3.2.4"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1308,9 +952,7 @@
       "file": "bad-consistent-navigation.html",
       "scanner": "predictable-navigation",
       "expectViolations": true,
-      "criteria": [
-        "3.2.3"
-      ],
+      "criteria": ["3.2.3"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1319,10 +961,7 @@
       "file": "bad-context-change.html",
       "scanner": "predictable-navigation",
       "expectViolations": true,
-      "criteria": [
-        "3.2.1",
-        "3.2.2"
-      ],
+      "criteria": ["3.2.1", "3.2.2"],
       "matched": 6,
       "status": "PASS",
       "detail": "6 violations"
@@ -1331,9 +970,7 @@
       "file": "good-auto-submitting-form.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
-      "criteria": [
-        "3.2.2"
-      ],
+      "criteria": ["3.2.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1342,9 +979,7 @@
       "file": "good-consistent-identification.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
-      "criteria": [
-        "3.2.4"
-      ],
+      "criteria": ["3.2.4"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1353,9 +988,7 @@
       "file": "good-consistent-navigation.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
-      "criteria": [
-        "3.2.3"
-      ],
+      "criteria": ["3.2.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1364,10 +997,7 @@
       "file": "good-context-change.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
-      "criteria": [
-        "3.2.1",
-        "3.2.2"
-      ],
+      "criteria": ["3.2.1", "3.2.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1376,9 +1006,7 @@
       "file": "bad-autocomplete.html",
       "scanner": "input-purpose",
       "expectViolations": true,
-      "criteria": [
-        "1.3.5"
-      ],
+      "criteria": ["1.3.5"],
       "matched": 21,
       "status": "PASS",
       "detail": "21 violations"
@@ -1387,9 +1015,7 @@
       "file": "good-autocomplete.html",
       "scanner": "input-purpose",
       "expectViolations": false,
-      "criteria": [
-        "1.3.5"
-      ],
+      "criteria": ["1.3.5"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1398,9 +1024,7 @@
       "file": "bad-beeproduced-real-issues.html",
       "scanner": "error-handling",
       "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
+      "criteria": ["3.3.2"],
       "matched": 5,
       "status": "PASS",
       "detail": "5 violations"
@@ -1409,9 +1033,7 @@
       "file": "bad-cognitive-accessibility.html",
       "scanner": "error-handling",
       "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
+      "criteria": ["3.3.2"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1420,9 +1042,7 @@
       "file": "bad-error-prevention.html",
       "scanner": "error-handling",
       "expectViolations": true,
-      "criteria": [
-        "3.3.4"
-      ],
+      "criteria": ["3.3.4"],
       "matched": 2,
       "status": "PASS",
       "detail": "2 violations"
@@ -1431,11 +1051,7 @@
       "file": "bad-form-errors.html",
       "scanner": "error-handling",
       "expectViolations": true,
-      "criteria": [
-        "3.3.1",
-        "3.3.3",
-        "3.3.4"
-      ],
+      "criteria": ["3.3.1", "3.3.3", "3.3.4"],
       "matched": 16,
       "status": "PASS",
       "detail": "16 violations"
@@ -1444,9 +1060,7 @@
       "file": "bad-form-grouping.html",
       "scanner": "error-handling",
       "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
+      "criteria": ["3.3.2"],
       "matched": 6,
       "status": "PASS",
       "detail": "6 violations"
@@ -1455,9 +1069,7 @@
       "file": "bad-form-labels.html",
       "scanner": "error-handling",
       "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
+      "criteria": ["3.3.2"],
       "matched": 23,
       "status": "PASS",
       "detail": "23 violations"
@@ -1466,9 +1078,7 @@
       "file": "good-cognitive-accessibility.html",
       "scanner": "error-handling",
       "expectViolations": false,
-      "criteria": [
-        "3.3.2"
-      ],
+      "criteria": ["3.3.2"],
       "matched": 2,
       "status": "FAIL",
       "detail": "2 false positives"
@@ -1477,9 +1087,7 @@
       "file": "good-error-prevention.html",
       "scanner": "error-handling",
       "expectViolations": false,
-      "criteria": [
-        "3.3.4"
-      ],
+      "criteria": ["3.3.4"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1488,10 +1096,7 @@
       "file": "good-form-errors.html",
       "scanner": "error-handling",
       "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.3"
-      ],
+      "criteria": ["3.3.1", "3.3.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1500,9 +1105,7 @@
       "file": "good-form-grouping.html",
       "scanner": "error-handling",
       "expectViolations": false,
-      "criteria": [
-        "3.3.2"
-      ],
+      "criteria": ["3.3.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1511,10 +1114,7 @@
       "file": "good-js-validation.html",
       "scanner": "error-handling",
       "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.2"
-      ],
+      "criteria": ["3.3.1", "3.3.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1523,10 +1123,7 @@
       "file": "bad-beeproduced-real-issues.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "2.4.1",
-        "1.3.1"
-      ],
+      "criteria": ["2.4.1", "1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1535,9 +1132,7 @@
       "file": "bad-cognitive-accessibility.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1546,9 +1141,7 @@
       "file": "bad-complex-aria.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1557,9 +1150,7 @@
       "file": "bad-complex-data-tables.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1568,9 +1159,7 @@
       "file": "bad-form-grouping.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1579,9 +1168,7 @@
       "file": "bad-form-labels.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1590,9 +1177,7 @@
       "file": "bad-headings-labels.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "2.4.6"
-      ],
+      "criteria": ["2.4.6"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1601,10 +1186,7 @@
       "file": "bad-landmarks.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "1.3.1",
-        "2.4.1"
-      ],
+      "criteria": ["1.3.1", "2.4.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1613,9 +1195,7 @@
       "file": "bad-page-titled.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "2.4.2"
-      ],
+      "criteria": ["2.4.2"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1624,9 +1204,7 @@
       "file": "bad-skip-links.html",
       "scanner": "page-structure",
       "expectViolations": true,
-      "criteria": [
-        "2.4.1"
-      ],
+      "criteria": ["2.4.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1635,9 +1213,7 @@
       "file": "good-accessibility.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1646,9 +1222,7 @@
       "file": "good-cognitive-accessibility.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1657,9 +1231,7 @@
       "file": "good-complex-data-tables.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1668,9 +1240,7 @@
       "file": "good-form-grouping.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1679,9 +1249,7 @@
       "file": "good-headings-labels.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "2.4.6"
-      ],
+      "criteria": ["2.4.6"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1690,9 +1258,7 @@
       "file": "good-hidden-modal.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1701,10 +1267,7 @@
       "file": "good-landmarks.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1",
-        "2.4.1"
-      ],
+      "criteria": ["1.3.1", "2.4.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1713,9 +1276,7 @@
       "file": "good-page-titled.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "2.4.2"
-      ],
+      "criteria": ["2.4.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1724,9 +1285,7 @@
       "file": "good-redundant-aria.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
+      "criteria": ["1.3.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1735,9 +1294,7 @@
       "file": "good-skip-links.html",
       "scanner": "page-structure",
       "expectViolations": false,
-      "criteria": [
-        "2.4.1"
-      ],
+      "criteria": ["2.4.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1746,10 +1303,7 @@
       "file": "bad-color-contrast.html",
       "scanner": "color-contrast",
       "expectViolations": true,
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
+      "criteria": ["1.4.3", "1.4.6"],
       "matched": 22,
       "status": "PASS",
       "detail": "22 violations"
@@ -1758,9 +1312,7 @@
       "file": "bad-focus-visible.html",
       "scanner": "color-contrast",
       "expectViolations": true,
-      "criteria": [
-        "1.4.3"
-      ],
+      "criteria": ["1.4.3"],
       "matched": 23,
       "status": "PASS",
       "detail": "23 violations"
@@ -1769,10 +1321,7 @@
       "file": "good-bootstrap-patterns.html",
       "scanner": "color-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
+      "criteria": ["1.4.3", "1.4.6"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1781,9 +1330,7 @@
       "file": "good-color-contrast.html",
       "scanner": "color-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.3"
-      ],
+      "criteria": ["1.4.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1792,9 +1339,7 @@
       "file": "good-contrast-enhanced.html",
       "scanner": "color-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.6"
-      ],
+      "criteria": ["1.4.6"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1803,10 +1348,7 @@
       "file": "bad-color-contrast.html",
       "scanner": "advanced-contrast",
       "expectViolations": true,
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
+      "criteria": ["1.4.3", "1.4.6"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1815,9 +1357,7 @@
       "file": "bad-focus-visible.html",
       "scanner": "advanced-contrast",
       "expectViolations": true,
-      "criteria": [
-        "1.4.3"
-      ],
+      "criteria": ["1.4.3"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1826,9 +1366,7 @@
       "file": "bad-nontext-contrast.html",
       "scanner": "advanced-contrast",
       "expectViolations": true,
-      "criteria": [
-        "1.4.11"
-      ],
+      "criteria": ["1.4.11"],
       "matched": 27,
       "status": "PASS",
       "detail": "27 violations"
@@ -1837,10 +1375,7 @@
       "file": "good-bootstrap-patterns.html",
       "scanner": "advanced-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
+      "criteria": ["1.4.3", "1.4.6"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1849,9 +1384,7 @@
       "file": "good-color-contrast.html",
       "scanner": "advanced-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.3"
-      ],
+      "criteria": ["1.4.3"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1860,9 +1393,7 @@
       "file": "good-contrast-enhanced.html",
       "scanner": "advanced-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.6"
-      ],
+      "criteria": ["1.4.6"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1871,9 +1402,7 @@
       "file": "good-nontext-contrast.html",
       "scanner": "advanced-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
+      "criteria": ["1.4.11"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1882,9 +1411,7 @@
       "file": "bad-css-background-info.html",
       "scanner": "use-of-color",
       "expectViolations": true,
-      "criteria": [
-        "1.4.1"
-      ],
+      "criteria": ["1.4.1"],
       "matched": 1,
       "status": "PASS",
       "detail": "1 violations"
@@ -1893,9 +1420,7 @@
       "file": "bad-use-of-color.html",
       "scanner": "use-of-color",
       "expectViolations": true,
-      "criteria": [
-        "1.4.1"
-      ],
+      "criteria": ["1.4.1"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1904,9 +1429,7 @@
       "file": "good-css-background-accessible.html",
       "scanner": "use-of-color",
       "expectViolations": false,
-      "criteria": [
-        "1.4.1"
-      ],
+      "criteria": ["1.4.1"],
       "matched": 2,
       "status": "FAIL",
       "detail": "2 false positives"
@@ -1915,9 +1438,7 @@
       "file": "bad-images-of-text-no-exception.html",
       "scanner": "images-of-text",
       "expectViolations": true,
-      "criteria": [
-        "1.4.9"
-      ],
+      "criteria": ["1.4.9"],
       "matched": 5,
       "status": "PASS",
       "detail": "5 violations"
@@ -1926,10 +1447,7 @@
       "file": "bad-images-of-text.html",
       "scanner": "images-of-text",
       "expectViolations": true,
-      "criteria": [
-        "1.4.5",
-        "1.4.9"
-      ],
+      "criteria": ["1.4.5", "1.4.9"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1938,9 +1456,7 @@
       "file": "good-images-of-text-no-exception.html",
       "scanner": "images-of-text",
       "expectViolations": false,
-      "criteria": [
-        "1.4.9"
-      ],
+      "criteria": ["1.4.9"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1949,9 +1465,7 @@
       "file": "good-images-of-text.html",
       "scanner": "images-of-text",
       "expectViolations": false,
-      "criteria": [
-        "1.4.5"
-      ],
+      "criteria": ["1.4.5"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -1960,9 +1474,7 @@
       "file": "bad-input-modalities.html",
       "scanner": "label-in-name",
       "expectViolations": true,
-      "criteria": [
-        "2.5.3"
-      ],
+      "criteria": ["2.5.3"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -1971,9 +1483,7 @@
       "file": "bad-label-in-name.html",
       "scanner": "label-in-name",
       "expectViolations": true,
-      "criteria": [
-        "2.5.3"
-      ],
+      "criteria": ["2.5.3"],
       "matched": 19,
       "status": "PASS",
       "detail": "19 violations"
@@ -1982,9 +1492,7 @@
       "file": "good-label-in-name.html",
       "scanner": "label-in-name",
       "expectViolations": false,
-      "criteria": [
-        "2.5.3"
-      ],
+      "criteria": ["2.5.3"],
       "matched": 11,
       "status": "FAIL",
       "detail": "11 false positives"
@@ -1993,9 +1501,7 @@
       "file": "bad-language-override.html",
       "scanner": "language-detection",
       "expectViolations": true,
-      "criteria": [
-        "3.1.2"
-      ],
+      "criteria": ["3.1.2"],
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
@@ -2004,10 +1510,7 @@
       "file": "bad-language.html",
       "scanner": "language-detection",
       "expectViolations": true,
-      "criteria": [
-        "3.1.1",
-        "3.1.2"
-      ],
+      "criteria": ["3.1.1", "3.1.2"],
       "matched": 2,
       "status": "PASS",
       "detail": "2 violations"
@@ -2016,9 +1519,7 @@
       "file": "good-accessibility.html",
       "scanner": "language-detection",
       "expectViolations": false,
-      "criteria": [
-        "3.1.1"
-      ],
+      "criteria": ["3.1.1"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -2027,9 +1528,7 @@
       "file": "good-language-override.html",
       "scanner": "language-detection",
       "expectViolations": false,
-      "criteria": [
-        "3.1.2"
-      ],
+      "criteria": ["3.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -2038,10 +1537,7 @@
       "file": "good-language.html",
       "scanner": "language-detection",
       "expectViolations": false,
-      "criteria": [
-        "3.1.1",
-        "3.1.2"
-      ],
+      "criteria": ["3.1.1", "3.1.2"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -2050,9 +1546,7 @@
       "file": "bad-nontext-contrast.html",
       "scanner": "nontext-contrast",
       "expectViolations": true,
-      "criteria": [
-        "1.4.11"
-      ],
+      "criteria": ["1.4.11"],
       "matched": 30,
       "status": "PASS",
       "detail": "30 violations"
@@ -2061,9 +1555,7 @@
       "file": "good-nontext-contrast.html",
       "scanner": "nontext-contrast",
       "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
+      "criteria": ["1.4.11"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -2072,9 +1564,7 @@
       "file": "bad-orientation.html",
       "scanner": "orientation",
       "expectViolations": true,
-      "criteria": [
-        "1.3.4"
-      ],
+      "criteria": ["1.3.4"],
       "matched": 5,
       "status": "PASS",
       "detail": "5 violations"
@@ -2083,9 +1573,7 @@
       "file": "good-orientation.html",
       "scanner": "orientation",
       "expectViolations": false,
-      "criteria": [
-        "1.3.4"
-      ],
+      "criteria": ["1.3.4"],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
@@ -2094,10 +1582,7 @@
       "file": "bad-timing-controls.html",
       "scanner": "timing-controls",
       "expectViolations": true,
-      "criteria": [
-        "2.2.1",
-        "2.2.2"
-      ],
+      "criteria": ["2.2.1", "2.2.2"],
       "matched": 15,
       "status": "PASS",
       "detail": "15 violations"
@@ -2106,10 +1591,7 @@
       "file": "good-timing-controls.html",
       "scanner": "timing-controls",
       "expectViolations": false,
-      "criteria": [
-        "2.2.1",
-        "2.2.2"
-      ],
+      "criteria": ["2.2.1", "2.2.2"],
       "matched": 2,
       "status": "FAIL",
       "detail": "2 false positives"

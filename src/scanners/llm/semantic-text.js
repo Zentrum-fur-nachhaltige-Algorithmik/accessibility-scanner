@@ -14,10 +14,14 @@ const LLMBaseScanner = require('./base');
 
 class LLMSemanticTextScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-semantic-text', {
-      wcagCriteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
-      wcagPrinciple: 'understandable',
-    }, llmClient);
+    super(
+      'llm-semantic-text',
+      {
+        wcagCriteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
+        wcagPrinciple: 'understandable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {

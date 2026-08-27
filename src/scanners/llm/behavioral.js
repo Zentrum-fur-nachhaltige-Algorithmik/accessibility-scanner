@@ -14,10 +14,14 @@ const LLMBaseScanner = require('./base');
 
 class LLMBehavioralScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-behavioral', {
-      wcagCriteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
-      wcagPrinciple: 'operable',
-    }, llmClient);
+    super(
+      'llm-behavioral',
+      {
+        wcagCriteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
+        wcagPrinciple: 'operable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {

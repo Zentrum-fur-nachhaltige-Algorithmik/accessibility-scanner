@@ -57,7 +57,9 @@ async function enableFocusEmulation(page) {
     const session = await page.createCDPSession();
     await session.send('Emulation.setFocusEmulationEnabled', { enabled: true });
     focusEmulation.set(page, session);
-  } catch (e) { /* older Chrome / detached target: fall back to the hasFocus guard */ }
+  } catch (e) {
+    /* older Chrome / detached target: fall back to the hasFocus guard */
+  }
 }
 
 async function disableFocusEmulation(page) {
@@ -67,16 +69,32 @@ async function disableFocusEmulation(page) {
   try {
     await session.send('Emulation.setFocusEmulationEnabled', { enabled: false });
     await session.detach();
-  } catch (e) { /* page already gone */ }
+  } catch (e) {
+    /* page already gone */
+  }
 }
 
 const TRACKED_PROPS = [
-  'outlineStyle', 'outlineWidth', 'outlineColor', 'outlineOffset',
+  'outlineStyle',
+  'outlineWidth',
+  'outlineColor',
+  'outlineOffset',
   'boxShadow',
-  'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth',
-  'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor',
+  'borderTopWidth',
+  'borderRightWidth',
+  'borderBottomWidth',
+  'borderLeftWidth',
+  'borderTopColor',
+  'borderRightColor',
+  'borderBottomColor',
+  'borderLeftColor',
   'borderTopStyle',
-  'backgroundColor', 'backgroundImage', 'color', 'textDecorationLine', 'filter', 'transform',
+  'backgroundColor',
+  'backgroundImage',
+  'color',
+  'textDecorationLine',
+  'filter',
+  'transform',
 ];
 
 /**
@@ -196,47 +214,59 @@ const helperCode = `
  */
 async function prepareTabWalk(page) {
   await enableFocusEmulation(page);
-  return page.evaluate((helpers, ATTR) => {
-    eval(helpers);
-    if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
-    // Focus-driven scrolling honours `scroll-behavior: smooth`; measurements
-    // taken mid-animation would be wrong. Removed again by cleanupTabWalk().
-    if (!document.getElementById('__a11y-no-smooth')) {
-      const st = document.createElement('style');
-      st.id = '__a11y-no-smooth';
-      st.textContent = 'html, body { scroll-behavior: auto !important; }';
-      document.head.appendChild(st);
-    }
-    window.__a11yTabSnapshots = {};
-    const all = document.querySelectorAll('a, area, button, input, select, textarea, summary, iframe, audio, video, [tabindex], [contenteditable]');
-    let i = 0;
-    for (const el of all) {
-      // Structural focusability, NOT __isFocusableRendered: a skip link parked
-      // off-canvas (translateY(-100%)) or a reveal-on-scroll CTA is invisible
-      // while unfocused but is still reached by Tab. Skipping them here left
-      // them without an unfocused baseline, and a baseline-less step can only
-      // ever be judged by its outline — the box-shadow ring that the common
-      // "focus-visible:outline-none focus-visible:ring-2" skip link relies on
-      // was invisible to the detector. Whether an element is painted is decided
-      // per step (step.rendered), at the moment focus is actually on it.
-      if (!__isFocusable(el)) { el.removeAttribute(ATTR); continue; }
-      const id = String(i++);
-      el.setAttribute(ATTR, id);
-      window.__a11yTabSnapshots[id] = __a11ySnapshot(el);
-    }
-    return i;
-  }, helperCode, TAB_ATTR);
+  return page.evaluate(
+    (helpers, ATTR) => {
+      eval(helpers);
+      if (document.activeElement && document.activeElement !== document.body)
+        document.activeElement.blur();
+      // Focus-driven scrolling honours `scroll-behavior: smooth`; measurements
+      // taken mid-animation would be wrong. Removed again by cleanupTabWalk().
+      if (!document.getElementById('__a11y-no-smooth')) {
+        const st = document.createElement('style');
+        st.id = '__a11y-no-smooth';
+        st.textContent = 'html, body { scroll-behavior: auto !important; }';
+        document.head.appendChild(st);
+      }
+      window.__a11yTabSnapshots = {};
+      const all = document.querySelectorAll(
+        'a, area, button, input, select, textarea, summary, iframe, audio, video, [tabindex], [contenteditable]'
+      );
+      let i = 0;
+      for (const el of all) {
+        // Structural focusability, NOT __isFocusableRendered: a skip link parked
+        // off-canvas (translateY(-100%)) or a reveal-on-scroll CTA is invisible
+        // while unfocused but is still reached by Tab. Skipping them here left
+        // them without an unfocused baseline, and a baseline-less step can only
+        // ever be judged by its outline — the box-shadow ring that the common
+        // "focus-visible:outline-none focus-visible:ring-2" skip link relies on
+        // was invisible to the detector. Whether an element is painted is decided
+        // per step (step.rendered), at the moment focus is actually on it.
+        if (!__isFocusable(el)) {
+          el.removeAttribute(ATTR);
+          continue;
+        }
+        const id = String(i++);
+        el.setAttribute(ATTR, id);
+        window.__a11yTabSnapshots[id] = __a11ySnapshot(el);
+      }
+      return i;
+    },
+    helperCode,
+    TAB_ATTR
+  );
 }
 
 /** Remove the markers again (call when the page is shared with other scanners). */
 async function cleanupTabWalk(page) {
   await disableFocusEmulation(page);
-  await page.evaluate((ATTR) => {
-    for (const el of document.querySelectorAll('[' + ATTR + ']')) el.removeAttribute(ATTR);
-    const st = document.getElementById('__a11y-no-smooth');
-    if (st) st.remove();
-    delete window.__a11yTabSnapshots;
-  }, TAB_ATTR).catch(() => {});
+  await page
+    .evaluate((ATTR) => {
+      for (const el of document.querySelectorAll('[' + ATTR + ']')) el.removeAttribute(ATTR);
+      const st = document.getElementById('__a11y-no-smooth');
+      if (st) st.remove();
+      delete window.__a11yTabSnapshots;
+    }, TAB_ATTR)
+    .catch(() => {});
 }
 
 /**
@@ -249,7 +279,10 @@ async function* tabWalk(page, opts = {}) {
   const confirmMs = opts.confirmMs ?? 150;
   if (opts.prepare !== false) await prepareTabWalk(page);
 
-  await page.evaluate(() => { document.body.focus(); window.scrollTo(0, 0); });
+  await page.evaluate(() => {
+    document.body.focus();
+    window.scrollTo(0, 0);
+  });
   const seen = new Set();
   let prevId = null;
   let yielded = 0;
@@ -257,40 +290,55 @@ async function* tabWalk(page, opts = {}) {
 
   for (let step = 0; step < maxSteps; step++) {
     await page.keyboard.press('Tab');
-    if (settleMs) await new Promise(r => setTimeout(r, settleMs));
+    if (settleMs) await new Promise((r) => setTimeout(r, settleMs));
 
-    const info = await page.evaluate((helpers, ATTR) => {
-      eval(helpers);
-      const el = document.activeElement;
-      if (!el || el === document.body || el === document.documentElement) return null;
-      let id = el.getAttribute(ATTR);
-      if (id === null) {
-        // Reached something we did not stamp (revealed dynamically) — stamp it now.
-        id = 'dyn-' + Object.keys(window.__a11yTabSnapshots || {}).length;
-        el.setAttribute(ATTR, id);
-        (window.__a11yTabSnapshots = window.__a11yTabSnapshots || {})[id] = null;
-      }
-      const before = window.__a11yTabSnapshots[id];
-      const after = __a11ySnapshot(el);
-      const r = el.getBoundingClientRect();
-      return {
-        tabId: id,
-        tag: el.tagName.toLowerCase(),
-        selector: __a11ySelector(el),
-        text: (el.textContent || el.value || el.getAttribute('aria-label') || '').trim().slice(0, 60),
-        rect: { x: r.x, y: r.y, width: r.width, height: r.height, top: r.top, left: r.left, right: r.right, bottom: r.bottom },
-        rendered: __isRendered(el),
-        // A measurement taken while the document does not have focus is
-        // worthless: activeElement is set but :focus does not match, so every
-        // :focus-visible style is missing from the computed style.
-        focusValid: document.hasFocus() && el.matches(':focus'),
-        before: before || after,
-        after,
-        indicator: __a11yIndicator(el, before || after, after, !!before),
-        scrollY: window.scrollY,
-        scrollX: window.scrollX,
-      };
-    }, helperCode, TAB_ATTR);
+    const info = await page.evaluate(
+      (helpers, ATTR) => {
+        eval(helpers);
+        const el = document.activeElement;
+        if (!el || el === document.body || el === document.documentElement) return null;
+        let id = el.getAttribute(ATTR);
+        if (id === null) {
+          // Reached something we did not stamp (revealed dynamically) — stamp it now.
+          id = 'dyn-' + Object.keys(window.__a11yTabSnapshots || {}).length;
+          el.setAttribute(ATTR, id);
+          (window.__a11yTabSnapshots = window.__a11yTabSnapshots || {})[id] = null;
+        }
+        const before = window.__a11yTabSnapshots[id];
+        const after = __a11ySnapshot(el);
+        const r = el.getBoundingClientRect();
+        return {
+          tabId: id,
+          tag: el.tagName.toLowerCase(),
+          selector: __a11ySelector(el),
+          text: (el.textContent || el.value || el.getAttribute('aria-label') || '')
+            .trim()
+            .slice(0, 60),
+          rect: {
+            x: r.x,
+            y: r.y,
+            width: r.width,
+            height: r.height,
+            top: r.top,
+            left: r.left,
+            right: r.right,
+            bottom: r.bottom,
+          },
+          rendered: __isRendered(el),
+          // A measurement taken while the document does not have focus is
+          // worthless: activeElement is set but :focus does not match, so every
+          // :focus-visible style is missing from the computed style.
+          focusValid: document.hasFocus() && el.matches(':focus'),
+          before: before || after,
+          after,
+          indicator: __a11yIndicator(el, before || after, after, !!before),
+          scrollY: window.scrollY,
+          scrollX: window.scrollX,
+        };
+      },
+      helperCode,
+      TAB_ATTR
+    );
 
     if (!info) {
       // Focus on <body> AFTER at least one stop means the walk left the
@@ -303,7 +351,12 @@ async function* tabWalk(page, opts = {}) {
         entryRetries++;
         await page.bringToFront().catch(() => {});
         await enableFocusEmulation(page).catch(() => {});
-        await page.evaluate(() => { window.focus(); document.body.focus(); }).catch(() => {});
+        await page
+          .evaluate(() => {
+            window.focus();
+            document.body.focus();
+          })
+          .catch(() => {});
         step--;
         continue;
       }
@@ -319,7 +372,7 @@ async function* tabWalk(page, opts = {}) {
     // later, blur the element to obtain a REAL unfocused baseline, then put
     // focus back so the walk continues where it was. Only a step whose
     // indicator says `confirmed` may be reported as missing.
-    const isStuck = info.tabId === prevId;  // Tab did not move focus
+    const isStuck = info.tabId === prevId; // Tab did not move focus
     if (!isStuck && info.rendered && info.focusValid === false) {
       // The tab lost document focus (another tab was brought to front). Take
       // it back and leave the verdict open rather than reporting the missing
@@ -327,18 +380,38 @@ async function* tabWalk(page, opts = {}) {
       await page.bringToFront().catch(() => {});
       await enableFocusEmulation(page);
       info.indicator = { ...info.indicator, confirmed: false, focusInvalid: true };
-    } else if (!isStuck && info.rendered && !info.indicator.visible && !info.indicator.lowContrast) {
-      await new Promise(r => setTimeout(r, confirmMs));
-      const confirmed = await page.evaluate((helpers, ATTR, id) => {
-        eval(helpers);
-        const el = document.querySelector('[' + ATTR + '="' + id + '"]');
-        if (!el || el !== document.activeElement) return null;
-        const after = __a11ySnapshot(el);
-        el.blur();
-        const before = __a11ySnapshot(el);
-        try { el.focus({ preventScroll: true }); } catch (e) { try { el.focus(); } catch (e2) { /* gone */ } }
-        return { before, after, indicator: __a11yIndicator(el, before, after, true) };
-      }, helperCode, TAB_ATTR, info.tabId).catch(() => null);
+    } else if (
+      !isStuck &&
+      info.rendered &&
+      !info.indicator.visible &&
+      !info.indicator.lowContrast
+    ) {
+      await new Promise((r) => setTimeout(r, confirmMs));
+      const confirmed = await page
+        .evaluate(
+          (helpers, ATTR, id) => {
+            eval(helpers);
+            const el = document.querySelector('[' + ATTR + '="' + id + '"]');
+            if (!el || el !== document.activeElement) return null;
+            const after = __a11ySnapshot(el);
+            el.blur();
+            const before = __a11ySnapshot(el);
+            try {
+              el.focus({ preventScroll: true });
+            } catch (e) {
+              try {
+                el.focus();
+              } catch (e2) {
+                /* gone */
+              }
+            }
+            return { before, after, indicator: __a11yIndicator(el, before, after, true) };
+          },
+          helperCode,
+          TAB_ATTR,
+          info.tabId
+        )
+        .catch(() => null);
 
       if (confirmed) {
         info.before = confirmed.before;
@@ -357,7 +430,7 @@ async function* tabWalk(page, opts = {}) {
       yield { ...info, step, stuck: true };
       return;
     }
-    if (seen.has(info.tabId)) return;       // cycled back to an earlier element
+    if (seen.has(info.tabId)) return; // cycled back to an earlier element
     seen.add(info.tabId);
     prevId = info.tabId;
     yield { ...info, step, stuck: false };
@@ -372,7 +445,13 @@ async function collectTabWalk(page, opts) {
 }
 
 module.exports = {
-  tabWalk, collectTabWalk, prepareTabWalk, cleanupTabWalk,
-  enableFocusEmulation, disableFocusEmulation,
-  helperCode, TAB_ATTR, TRACKED_PROPS,
+  tabWalk,
+  collectTabWalk,
+  prepareTabWalk,
+  cleanupTabWalk,
+  enableFocusEmulation,
+  disableFocusEmulation,
+  helperCode,
+  TAB_ATTR,
+  TRACKED_PROPS,
 };

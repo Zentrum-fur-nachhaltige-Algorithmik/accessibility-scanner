@@ -44,12 +44,7 @@ class ScanPipeline {
    * @returns {Promise<PipelineResult>}
    */
   async scan(url, options = {}) {
-    const {
-      scannerIds = null,
-      timeout = 30000,
-      screenshotDir = null,
-      ...scannerOptions
-    } = options;
+    const { scannerIds = null, timeout = 30000, screenshotDir = null, ...scannerOptions } = options;
 
     await this.ensureBrowser();
 
@@ -84,13 +79,23 @@ class ScanPipeline {
       const otherIdx = [];
       concurrent.forEach((s, i) => (s.id.startsWith('llm-') ? llmIdx : otherIdx).push(i));
       const concurrentResults = new Array(concurrent.length);
-      const nonLlmDone = Promise.allSettled(otherIdx.map((i) => concurrent[i].scan(page, passedOptions)));
+      const nonLlmDone = Promise.allSettled(
+        otherIdx.map((i) => concurrent[i].scan(page, passedOptions))
+      );
       if (llmIdx.length > 0) {
-        [concurrentResults[llmIdx[0]]] = await Promise.allSettled([concurrent[llmIdx[0]].scan(page, passedOptions)]);
-        const rest = await Promise.allSettled(llmIdx.slice(1).map((i) => concurrent[i].scan(page, passedOptions)));
-        llmIdx.slice(1).forEach((i, k) => { concurrentResults[i] = rest[k]; });
+        [concurrentResults[llmIdx[0]]] = await Promise.allSettled([
+          concurrent[llmIdx[0]].scan(page, passedOptions),
+        ]);
+        const rest = await Promise.allSettled(
+          llmIdx.slice(1).map((i) => concurrent[i].scan(page, passedOptions))
+        );
+        llmIdx.slice(1).forEach((i, k) => {
+          concurrentResults[i] = rest[k];
+        });
       }
-      (await nonLlmDone).forEach((r, k) => { concurrentResults[otherIdx[k]] = r; });
+      (await nonLlmDone).forEach((r, k) => {
+        concurrentResults[otherIdx[k]] = r;
+      });
       concurrentResults.forEach((result, i) => {
         if (result.status === 'fulfilled') {
           allResults.push(result.value);
@@ -213,7 +218,9 @@ class ScanPipeline {
       };
     }
 
-    const violations = this.dedupeProcedureFindings(this.reconcileIncompleteReviews(allViolations, scannerResults));
+    const violations = this.dedupeProcedureFindings(
+      this.reconcileIncompleteReviews(allViolations, scannerResults)
+    );
     const categories = this.categorizeViolations(violations);
 
     return {

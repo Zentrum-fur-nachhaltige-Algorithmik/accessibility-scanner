@@ -33,7 +33,9 @@ function trustTier(scannerId) {
 
 /** @returns {string} the recorded evidence for a scanner's tier. */
 function trustReason(scannerId) {
-  return TRUST_DATA.scanners[scannerId]?.reason || 'No recorded evidence yet (defaults to experimental).';
+  return (
+    TRUST_DATA.scanners[scannerId]?.reason || 'No recorded evidence yet (defaults to experimental).'
+  );
 }
 
 function isProven(scannerId) {

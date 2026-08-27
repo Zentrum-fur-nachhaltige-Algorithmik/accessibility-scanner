@@ -18,7 +18,9 @@ class KeyboardNavigationScanner extends BaseScanner {
     });
   }
 
-  get needsExclusiveAccess() { return true; }
+  get needsExclusiveAccess() {
+    return true;
+  }
 
   /**
    * Core scan method — receives an already-navigated Puppeteer page.
@@ -45,18 +47,18 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.2.1.1", "9.2.1.2", "9.2.1.4"],
+      criteria: ['9.2.1.1', '9.2.1.2', '9.2.1.4'],
       passed: keyboardResults.violations.length === 0,
       violations: keyboardResults.violations,
       summary: {
         tabbableElements: keyboardResults.tabbableElements,
         keyboardInaccessible: keyboardResults.keyboardInaccessible,
         keyboardTraps: keyboardResults.keyboardTraps,
-        customShortcuts: keyboardResults.customShortcuts
+        customShortcuts: keyboardResults.customShortcuts,
       },
       tabOrder: keyboardResults.tabOrder,
       screenshotPath: scanDir,
-      visualEvidence: keyboardResults.visualEvidence
+      visualEvidence: keyboardResults.visualEvidence,
     };
   }
 
@@ -75,27 +77,40 @@ class KeyboardNavigationScanner extends BaseScanner {
     // 1. Discover all potentially interactive elements
     const interactiveElements = await page.evaluate(() => {
       const elements = [];
-      
+
       // Standard interactive elements
       const standardSelectors = [
-        'a[href]', 'button', 'input', 'textarea', 'select', 
-        'details', '[tabindex]:not([tabindex="-1"])', 
-        '[role="button"]', '[role="link"]', '[role="tab"]',
-        '[role="menuitem"]', '[role="checkbox"]', '[role="radio"]'
+        'a[href]',
+        'button',
+        'input',
+        'textarea',
+        'select',
+        'details',
+        '[tabindex]:not([tabindex="-1"])',
+        '[role="button"]',
+        '[role="link"]',
+        '[role="tab"]',
+        '[role="menuitem"]',
+        '[role="checkbox"]',
+        '[role="radio"]',
       ];
-      
-      standardSelectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
+
+      standardSelectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
           if (!el.hasAttribute('disabled') && !el.hidden) {
             const rect = el.getBoundingClientRect();
             if (rect.width > 0 && rect.height > 0) {
-              const className = el.className && typeof el.className === 'string' 
-                ? el.className 
-                : (el.className && el.className.baseVal ? el.className.baseVal : '');
+              const className =
+                el.className && typeof el.className === 'string'
+                  ? el.className
+                  : el.className && el.className.baseVal
+                    ? el.className.baseVal
+                    : '';
               elements.push({
-                selector: el.tagName.toLowerCase() + 
-                         (el.id ? `#${el.id}` : '') + 
-                         (className ? `.${className.split(' ').join('.')}` : ''),
+                selector:
+                  el.tagName.toLowerCase() +
+                  (el.id ? `#${el.id}` : '') +
+                  (className ? `.${className.split(' ').join('.')}` : ''),
                 tagName: el.tagName,
                 type: el.type || '',
                 role: el.getAttribute('role') || '',
@@ -106,14 +121,14 @@ class KeyboardNavigationScanner extends BaseScanner {
                   x: rect.x,
                   y: rect.y,
                   width: rect.width,
-                  height: rect.height
-                }
+                  height: rect.height,
+                },
               });
             }
           }
         });
       });
-      
+
       return elements;
     });
 
@@ -124,24 +139,33 @@ class KeyboardNavigationScanner extends BaseScanner {
       const issues = [];
 
       function getSelector(el) {
-        const className = el.className && typeof el.className === 'string'
-          ? el.className
-          : (el.className && el.className.baseVal ? el.className.baseVal : '');
-        return el.tagName.toLowerCase() +
+        const className =
+          el.className && typeof el.className === 'string'
+            ? el.className
+            : el.className && el.className.baseVal
+              ? el.className.baseVal
+              : '';
+        return (
+          el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (className ? `.${className.split(' ')[0]}` : '');
+          (className ? `.${className.split(' ')[0]}` : '')
+        );
       }
 
       const allElements = document.querySelectorAll('*');
       const interactiveTags = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A']);
 
-      allElements.forEach(el => {
+      allElements.forEach((el) => {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
 
         // Check if element has scrollable overflow
-        const isScrollableY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
-        const isScrollableX = (style.overflowX === 'auto' || style.overflowX === 'scroll') && el.scrollWidth > el.clientWidth;
+        const isScrollableY =
+          (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
+          el.scrollHeight > el.clientHeight;
+        const isScrollableX =
+          (style.overflowX === 'auto' || style.overflowX === 'scroll') &&
+          el.scrollWidth > el.clientWidth;
 
         if (!isScrollableY && !isScrollableX) return;
 
@@ -154,7 +178,7 @@ class KeyboardNavigationScanner extends BaseScanner {
         // Skip if element contains focusable children (users can reach content via child focus)
         const focusableChild = el.querySelector(
           'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), ' +
-          'select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            'select:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
         if (focusableChild) return;
 
@@ -163,7 +187,8 @@ class KeyboardNavigationScanner extends BaseScanner {
 
         issues.push({
           element: getSelector(el),
-          scrollableAxis: isScrollableY && isScrollableX ? 'both' : isScrollableY ? 'vertical' : 'horizontal',
+          scrollableAxis:
+            isScrollableY && isScrollableX ? 'both' : isScrollableY ? 'vertical' : 'horizontal',
           scrollHeight: el.scrollHeight,
           clientHeight: el.clientHeight,
           scrollWidth: el.scrollWidth,
@@ -176,17 +201,25 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     for (const sv of scrollableViolations) {
       violations.push({
-        criterion: "9.2.1.1",
+        criterion: '9.2.1.1',
         element: sv.element,
-        issue: "scrollable-content-not-keyboard-accessible",
+        issue: 'scrollable-content-not-keyboard-accessible',
         description: `Scrollable container (${sv.scrollableAxis} overflow) has no tabindex and no focusable children. Content is unreachable by keyboard.`,
-        suggestion: 'Add tabindex="0" and an accessible role/label to make the scrollable region keyboard-navigable.'
+        suggestion:
+          'Add tabindex="0" and an accessible role/label to make the scrollable region keyboard-navigable.',
       });
       keyboardInaccessible++;
     }
 
     // 2. Test keyboard navigation with visual analysis
-    await this.testKeyboardNavigation(page, scanDir, interactiveElements, violations, tabOrder, visualEvidence);
+    await this.testKeyboardNavigation(
+      page,
+      scanDir,
+      interactiveElements,
+      violations,
+      tabOrder,
+      visualEvidence
+    );
 
     // 3. Test for keyboard traps
     const trapResults = await this.testKeyboardTraps(page, scanDir, violations);
@@ -213,29 +246,29 @@ class KeyboardNavigationScanner extends BaseScanner {
     // Group 1: Skip Links and Bypass Mechanisms (replaces axe: skip-link, bypass)
     await this.validateSkipLinks(page, violations);
     await this.validateBypassMechanisms(page, violations);
-    
+
     // Group 2: Focusable Elements and Tab Order (replaces axe: focusable-element, focus-order-semantics)
     await this.validateFocusableElements(page, violations);
     await this.validateFocusOrderSemantics(page, tabOrder, violations);
-    
+
     // Group 3: Tabindex Management (replaces axe: tabindex)
     await this.validateTabindexUsage(page, violations);
-    
+
     // Group 4: Accesskey Management (replaces axe: accesskeys)
     await this.validateAccesskeys(page, violations);
-    
+
     // Group 5: Keyboard Event Handling (replaces axe: keyboard-navigation, keyboard)
     await this.validateKeyboardEventHandling(page, violations);
-    
+
     // Group 6: Focus Management (replaces axe: focus-trap, focus-order)
     await this.validateFocusManagement(page, violations);
-    
+
     // Group 7: Interactive Element Accessibility (replaces axe: interactive-element)
     await this.validateInteractiveElementAccessibility(page, violations);
 
     // Calculate summary
     tabbableElements = tabOrder.length;
-    keyboardInaccessible = violations.filter(v => v.issue === 'not-keyboard-accessible').length;
+    keyboardInaccessible = violations.filter((v) => v.issue === 'not-keyboard-accessible').length;
 
     return {
       violations,
@@ -244,14 +277,21 @@ class KeyboardNavigationScanner extends BaseScanner {
       tabbableElements,
       keyboardInaccessible,
       keyboardTraps,
-      customShortcuts
+      customShortcuts,
     };
   }
 
   /**
    * Test keyboard navigation with visual focus verification
    */
-  async testKeyboardNavigation(page, scanDir, interactiveElements, violations, tabOrder, visualEvidence) {
+  async testKeyboardNavigation(
+    page,
+    scanDir,
+    interactiveElements,
+    violations,
+    tabOrder,
+    visualEvidence
+  ) {
     console.log('Testing keyboard navigation with visual analysis...');
 
     // Real Tab presses via src/utils/keyboard-focus.js. Identity is the tab
@@ -265,19 +305,24 @@ class KeyboardNavigationScanner extends BaseScanner {
       for await (const step of tabWalk(page, { maxSteps, settleMs: 100 })) {
         if (step.stuck) {
           violations.push({
-            criterion: "9.2.1.2",
+            criterion: '9.2.1.2',
             element: step.selector,
-            issue: "keyboard-trap",
+            issue: 'keyboard-trap',
             description: `Focus is trapped on element and cannot move with Tab key`,
             keySequence: [`Tab (step ${step.step})`],
-            suggestion: "Ensure all interactive elements allow focus to move to next element with Tab key"
+            suggestion:
+              'Ensure all interactive elements allow focus to move to next element with Tab key',
           });
           break;
         }
         if (!step.rendered) continue;
 
         const shot = `tab-${String(stepIndex).padStart(3, '0')}-after.png`;
-        try { await page.screenshot({ path: path.join(scanDir, shot), fullPage: false }); } catch (e) { /* best-effort */ }
+        try {
+          await page.screenshot({ path: path.join(scanDir, shot), fullPage: false });
+        } catch (e) {
+          /* best-effort */
+        }
 
         const ind = step.indicator;
         tabOrder.push({
@@ -286,9 +331,14 @@ class KeyboardNavigationScanner extends BaseScanner {
           tabIndex: tabOrder.length,
           role: step.tag,
           // document coordinates, measured while the element was focused
-          rect: { x: step.rect.x + step.scrollX, y: step.rect.y + step.scrollY, width: step.rect.width, height: step.rect.height },
+          rect: {
+            x: step.rect.x + step.scrollX,
+            y: step.rect.y + step.scrollY,
+            width: step.rect.width,
+            height: step.rect.height,
+          },
           isVisible: step.rect.width > 0 && step.rect.height > 0,
-          hasVisibleFocus: ind.visible
+          hasVisibleFocus: ind.visible,
         });
 
         visualEvidence.push({
@@ -300,19 +350,20 @@ class KeyboardNavigationScanner extends BaseScanner {
           focusStyles: {
             outline: ind.outline,
             boxShadow: step.after.boxShadow,
-            backgroundColor: step.after.backgroundColor
-          }
+            backgroundColor: step.after.backgroundColor,
+          },
         });
 
         // 2.4.7 is owned by focus-management (it also checks contrast); only
         // the clear-cut "nothing changes at all" case is reported here.
         if (!ind.visible && !ind.lowContrast) {
           violations.push({
-            criterion: "9.2.4.7",
+            criterion: '9.2.4.7',
             element: step.selector,
-            issue: "no-visible-focus",
-            description: "Element receives keyboard focus but has no visible focus indicator",
-            suggestion: "Add CSS :focus-visible styles with visible outline, box-shadow, or background color change"
+            issue: 'no-visible-focus',
+            description: 'Element receives keyboard focus but has no visible focus indicator',
+            suggestion:
+              'Add CSS :focus-visible styles with visible outline, box-shadow, or background color change',
           });
         }
         stepIndex++;
@@ -329,19 +380,22 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   generateUniqueSelector(element) {
     let selector = element.tagName.toLowerCase();
-    
+
     // Add ID if available
     if (element.id) {
       selector += `#${element.id}`;
     } else {
       // Add class if available
       if (element.className) {
-        const classes = element.className.split(' ').filter(c => c.trim()).slice(0, 2);
+        const classes = element.className
+          .split(' ')
+          .filter((c) => c.trim())
+          .slice(0, 2);
         if (classes.length > 0) {
           selector += `.${classes.join('.')}`;
         }
       }
-      
+
       // If still not unique enough, add text content or position
       if (!element.id && !element.className) {
         const text = element.textContent.trim().substring(0, 20).replace(/\s+/g, '-');
@@ -357,7 +411,7 @@ class KeyboardNavigationScanner extends BaseScanner {
         }
       }
     }
-    
+
     return selector;
   }
 
@@ -372,14 +426,15 @@ class KeyboardNavigationScanner extends BaseScanner {
     const outline = focusInfo.focusStyles.outline || '';
     const outlineWidth = focusInfo.focusStyles.outlineWidth || '0px';
     const outlineColor = focusInfo.focusStyles.outlineColor || '';
-    
+
     // More robust outline detection
-    const hasVisibleOutline = outline && 
-                             !outline.includes('none') && 
-                             outlineWidth !== '0px' && 
-                             outlineColor && 
-                             outlineColor !== 'transparent';
-    
+    const hasVisibleOutline =
+      outline &&
+      !outline.includes('none') &&
+      outlineWidth !== '0px' &&
+      outlineColor &&
+      outlineColor !== 'transparent';
+
     if (hasVisibleOutline) {
       indicators.push('outline');
       visible = true;
@@ -387,12 +442,13 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     // Check box-shadow - ensure it's actually visible
     const boxShadow = focusInfo.focusStyles.boxShadow || '';
-    const hasVisibleBoxShadow = boxShadow && 
-                               boxShadow !== 'none' && 
-                               !boxShadow.includes('rgba(0, 0, 0, 0)') &&
-                               !boxShadow.includes('transparent') &&
-                               boxShadow.trim() !== '';
-    
+    const hasVisibleBoxShadow =
+      boxShadow &&
+      boxShadow !== 'none' &&
+      !boxShadow.includes('rgba(0, 0, 0, 0)') &&
+      !boxShadow.includes('transparent') &&
+      boxShadow.trim() !== '';
+
     if (hasVisibleBoxShadow) {
       indicators.push('box-shadow');
       visible = true;
@@ -401,10 +457,8 @@ class KeyboardNavigationScanner extends BaseScanner {
     // Check border - look for non-zero border width
     const border = focusInfo.focusStyles.border || '';
     const borderWidth = focusInfo.focusStyles.borderWidth || '0px';
-    const hasVisibleBorder = border && 
-                            !border.includes('none') && 
-                            borderWidth !== '0px';
-    
+    const hasVisibleBorder = border && !border.includes('none') && borderWidth !== '0px';
+
     if (hasVisibleBorder) {
       indicators.push('border');
       visible = true;
@@ -412,11 +466,12 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     // Check background color - ensure it's not transparent
     const backgroundColor = focusInfo.focusStyles.backgroundColor || '';
-    const hasVisibleBackground = backgroundColor && 
-                                backgroundColor !== 'rgba(0, 0, 0, 0)' && 
-                                backgroundColor !== 'transparent' &&
-                                backgroundColor.trim() !== '';
-    
+    const hasVisibleBackground =
+      backgroundColor &&
+      backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+      backgroundColor !== 'transparent' &&
+      backgroundColor.trim() !== '';
+
     if (hasVisibleBackground) {
       indicators.push('background-color');
       visible = true;
@@ -430,9 +485,9 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async testKeyboardTraps(page, scanDir, violations) {
     console.log('Testing for keyboard traps...');
-    
+
     let traps = 0;
-    
+
     // Test modals and overlays
     // Only things that ARE dialogs right now: rendered, and either
     // semantically a dialog (role / <dialog open> / aria-modal) or a
@@ -444,22 +499,37 @@ class KeyboardNavigationScanner extends BaseScanner {
       eval(renderedCode);
       const modals = [];
       const seen = new Set();
-      const selectors = ['[role="dialog"]', '[role="alertdialog"]', 'dialog[open]', '[aria-modal="true"]', '.modal', '.popup', '.dialog'];
+      const selectors = [
+        '[role="dialog"]',
+        '[role="alertdialog"]',
+        'dialog[open]',
+        '[aria-modal="true"]',
+        '.modal',
+        '.popup',
+        '.dialog',
+      ];
       let i = 0;
-      selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
           if (seen.has(el) || !__isRendered(el)) return;
-          const focusable = [...el.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])')]
-            .filter(f => __isFocusableRendered(f));
+          const focusable = [
+            ...el.querySelectorAll(
+              'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            ),
+          ].filter((f) => __isFocusableRendered(f));
           if (focusable.length === 0) return;
           seen.add(el);
-          const marker = 'a11y-modal-' + (i++);
+          const marker = 'a11y-modal-' + i++;
           el.setAttribute('data-a11y-modal', marker);
           modals.push({
             selector: `[data-a11y-modal="${marker}"]`,
-            label: el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') +
-              (typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/).join('.')}` : ''),
-            focusableCount: focusable.length
+            label:
+              el.tagName.toLowerCase() +
+              (el.id ? `#${el.id}` : '') +
+              (typeof el.className === 'string' && el.className.trim()
+                ? `.${el.className.trim().split(/\s+/).join('.')}`
+                : ''),
+            focusableCount: focusable.length,
           });
         });
       });
@@ -471,7 +541,9 @@ class KeyboardNavigationScanner extends BaseScanner {
       await page.evaluate((selector) => {
         const modal = document.querySelector(selector);
         if (modal) {
-          const focusable = modal.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+          const focusable = modal.querySelectorAll(
+            'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
           if (focusable.length > 0) {
             focusable[focusable.length - 1].focus();
           }
@@ -480,12 +552,12 @@ class KeyboardNavigationScanner extends BaseScanner {
 
       // Take screenshot of modal state
       await page.screenshot({
-        path: path.join(scanDir, `modal-trap-test-${traps}.png`)
+        path: path.join(scanDir, `modal-trap-test-${traps}.png`),
       });
 
       // Try to tab out of modal
       await page.keyboard.press('Tab');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const focusEscaped = await page.evaluate((selector) => {
         const modal = document.querySelector(selector);
@@ -496,31 +568,40 @@ class KeyboardNavigationScanner extends BaseScanner {
       if (!focusEscaped) {
         // Test Escape key
         await page.keyboard.press('Escape');
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
-        const modalClosed = await page.evaluate((selector, renderedCode) => {
-          eval(renderedCode);
-          const modal = document.querySelector(selector);
-          return !modal || !__isRendered(modal);
-        }, modal.selector, renderedCode);
+        const modalClosed = await page.evaluate(
+          (selector, renderedCode) => {
+            eval(renderedCode);
+            const modal = document.querySelector(selector);
+            return !modal || !__isRendered(modal);
+          },
+          modal.selector,
+          renderedCode
+        );
 
         if (!modalClosed) {
           violations.push({
-            criterion: "9.2.1.2",
+            criterion: '9.2.1.2',
             element: modal.label,
-            issue: "keyboard-trap",
-            description: "Modal or dialog traps keyboard focus without escape mechanism",
-            keySequence: ["Tab", "Escape"],
-            suggestion: "Provide Escape key handler or visible close button accessible via keyboard"
+            issue: 'keyboard-trap',
+            description: 'Modal or dialog traps keyboard focus without escape mechanism',
+            keySequence: ['Tab', 'Escape'],
+            suggestion:
+              'Provide Escape key handler or visible close button accessible via keyboard',
           });
           traps++;
         }
       }
     }
 
-    await page.evaluate(() => {
-      document.querySelectorAll('[data-a11y-modal]').forEach(el => el.removeAttribute('data-a11y-modal'));
-    }).catch(() => {});
+    await page
+      .evaluate(() => {
+        document
+          .querySelectorAll('[data-a11y-modal]')
+          .forEach((el) => el.removeAttribute('data-a11y-modal'));
+      })
+      .catch(() => {});
 
     return { traps };
   }
@@ -530,22 +611,26 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async testCustomControls(page, scanDir, violations) {
     console.log('Testing custom interactive controls...');
-    
+
     let inaccessible = 0;
 
     const customControls = await page.evaluate(() => {
       const controls = [];
-      
+
       // Look for elements that might be custom controls - focus on mouse-only elements
-      const candidates = document.querySelectorAll('[onclick], [onmousedown], [onmouseup], .btn, .button, .control, .interactive, [style*="cursor: pointer"]');
-      
-      candidates.forEach(el => {
+      const candidates = document.querySelectorAll(
+        '[onclick], [onmousedown], [onmouseup], .btn, .button, .control, .interactive, [style*="cursor: pointer"]'
+      );
+
+      candidates.forEach((el) => {
         // Skip if already a standard interactive element
-        if (el.tagName.toLowerCase() === 'button' || 
-            el.tagName.toLowerCase() === 'a' || 
-            el.tagName.toLowerCase() === 'input' ||
-            el.tagName.toLowerCase() === 'select' ||
-            el.tagName.toLowerCase() === 'textarea') {
+        if (
+          el.tagName.toLowerCase() === 'button' ||
+          el.tagName.toLowerCase() === 'a' ||
+          el.tagName.toLowerCase() === 'input' ||
+          el.tagName.toLowerCase() === 'select' ||
+          el.tagName.toLowerCase() === 'textarea'
+        ) {
           return;
         }
 
@@ -554,19 +639,25 @@ class KeyboardNavigationScanner extends BaseScanner {
           // Generate unique selector
           function generateUniqueSelector(element) {
             let selector = element.tagName.toLowerCase();
-            
+
             if (element.id) {
               selector += `#${element.id}`;
             } else {
               if (element.className) {
-                const classes = element.className.split(' ').filter(c => c.trim()).slice(0, 2);
+                const classes = element.className
+                  .split(' ')
+                  .filter((c) => c.trim())
+                  .slice(0, 2);
                 if (classes.length > 0) {
                   selector += `.${classes.join('.')}`;
                 }
               }
-              
+
               if (!element.id && !element.className) {
-                const text = element.textContent.trim().substring(0, 15).replace(/[^a-zA-Z0-9]/g, '');
+                const text = element.textContent
+                  .trim()
+                  .substring(0, 15)
+                  .replace(/[^a-zA-Z0-9]/g, '');
                 if (text) {
                   selector += `[data-text="${text}"]`;
                 } else {
@@ -578,16 +669,19 @@ class KeyboardNavigationScanner extends BaseScanner {
                 }
               }
             }
-            
+
             return selector;
           }
 
           const hasClickHandler = !!el.onclick || el.getAttribute('onclick');
-          const hasKeyHandler = !!(el.onkeydown || el.onkeyup) || 
-                               el.getAttribute('onkeydown') || 
-                               el.getAttribute('onkeyup');
+          const hasKeyHandler =
+            !!(el.onkeydown || el.onkeyup) ||
+            el.getAttribute('onkeydown') ||
+            el.getAttribute('onkeyup');
           const isFocusable = el.tabIndex >= 0;
-          const hasAriaRole = ['button', 'link', 'menuitem', 'tab'].includes(el.getAttribute('role'));
+          const hasAriaRole = ['button', 'link', 'menuitem', 'tab'].includes(
+            el.getAttribute('role')
+          );
 
           controls.push({
             selector: generateUniqueSelector(el),
@@ -599,31 +693,34 @@ class KeyboardNavigationScanner extends BaseScanner {
             isFocusable: isFocusable,
             hasAriaRole: hasAriaRole,
             text: el.textContent.trim().substring(0, 30),
-            isLikelyInteractive: hasClickHandler || hasAriaRole || el.style.cursor === 'pointer'
+            isLikelyInteractive: hasClickHandler || hasAriaRole || el.style.cursor === 'pointer',
           });
         }
       });
-      
+
       return controls;
     });
 
     console.log(`  Found ${customControls.length} potential custom controls`);
 
     for (const control of customControls) {
-      console.log(`  Testing: ${control.selector} (hasClick: ${control.hasOnClick}, focusable: ${control.isFocusable})`);
-      
+      console.log(
+        `  Testing: ${control.selector} (hasClick: ${control.hasOnClick}, focusable: ${control.isFocusable})`
+      );
+
       // Check if this is an interactive element that's not keyboard accessible
       if (control.isLikelyInteractive && !control.isFocusable && !control.hasKeyHandler) {
         violations.push({
-          criterion: "9.2.1.1",
+          criterion: '9.2.1.1',
           element: control.selector,
-          issue: "not-keyboard-accessible",
+          issue: 'not-keyboard-accessible',
           description: `Interactive element "${control.text}" with click handler is not keyboard accessible`,
-          suggestion: "Add tabindex='0' and keyboard event handlers (Enter/Space keys) or use proper semantic elements"
+          suggestion:
+            "Add tabindex='0' and keyboard event handlers (Enter/Space keys) or use proper semantic elements",
         });
         inaccessible++;
       }
-      
+
       // Also test if we can actually focus the element
       try {
         await page.evaluate((selector) => {
@@ -637,14 +734,16 @@ class KeyboardNavigationScanner extends BaseScanner {
 
         if (!actuallyFocusable && control.hasOnClick) {
           // Only add if we haven't already added this violation
-          const alreadyReported = violations.some(v => v.element === control.selector && v.issue === "not-keyboard-accessible");
+          const alreadyReported = violations.some(
+            (v) => v.element === control.selector && v.issue === 'not-keyboard-accessible'
+          );
           if (!alreadyReported) {
             violations.push({
-              criterion: "9.2.1.1",
+              criterion: '9.2.1.1',
               element: control.selector,
-              issue: "not-keyboard-accessible",
+              issue: 'not-keyboard-accessible',
               description: `Interactive element "${control.text}" cannot receive keyboard focus`,
-              suggestion: "Add tabindex='0' and keyboard event handlers (Enter/Space keys)"
+              suggestion: "Add tabindex='0' and keyboard event handlers (Enter/Space keys)",
             });
             inaccessible++;
           }
@@ -662,7 +761,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async testKeyboardShortcuts(page, violations) {
     console.log('Testing keyboard shortcuts...');
-    
+
     let conflicts = 0;
 
     // Test common browser shortcuts to see if they're overridden
@@ -670,7 +769,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       { keys: ['Control', 'KeyR'], description: 'Ctrl+R (Refresh)' },
       { keys: ['Control', 'KeyT'], description: 'Ctrl+T (New Tab)' },
       { keys: ['Control', 'KeyW'], description: 'Ctrl+W (Close Tab)' },
-      { keys: ['Control', 'KeyF'], description: 'Ctrl+F (Find)' }
+      { keys: ['Control', 'KeyF'], description: 'Ctrl+F (Find)' },
     ];
 
     for (const shortcut of testShortcuts) {
@@ -679,7 +778,7 @@ class KeyboardNavigationScanner extends BaseScanner {
         const result = await page.evaluate(async (keys) => {
           return new Promise((resolve) => {
             let prevented = false;
-            
+
             const handler = (e) => {
               if (e.ctrlKey && e.code === keys[1]) {
                 if (e.defaultPrevented || e.cancelBubble) {
@@ -687,19 +786,19 @@ class KeyboardNavigationScanner extends BaseScanner {
                 }
               }
             };
-            
+
             document.addEventListener('keydown', handler);
-            
+
             // Simulate the key combination
             const event = new KeyboardEvent('keydown', {
               ctrlKey: true,
               code: keys[1],
               bubbles: true,
-              cancelable: true
+              cancelable: true,
             });
-            
+
             document.dispatchEvent(event);
-            
+
             setTimeout(() => {
               document.removeEventListener('keydown', handler);
               resolve(prevented);
@@ -709,11 +808,12 @@ class KeyboardNavigationScanner extends BaseScanner {
 
         if (result) {
           violations.push({
-            criterion: "9.2.1.4",
-            element: "document",
-            issue: "conflicting-shortcut",
+            criterion: '9.2.1.4',
+            element: 'document',
+            issue: 'conflicting-shortcut',
             description: `Browser shortcut ${shortcut.description} is overridden without alternative`,
-            suggestion: "Provide alternative way to access functionality or use different key combination"
+            suggestion:
+              'Provide alternative way to access functionality or use different key combination',
           });
           conflicts++;
         }
@@ -731,8 +831,8 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async analyzeTabOrderLogic(page, tabOrder, violations) {
     console.log('Analyzing tab order logic (visual vs DOM order)...');
-    console.log(`  Tab order elements: ${tabOrder.map(t => t.element).join(', ')}`);
-    
+    console.log(`  Tab order elements: ${tabOrder.map((t) => t.element).join(', ')}`);
+
     if (tabOrder.length < 2) {
       console.log('  Insufficient elements for tab order analysis');
       return;
@@ -742,27 +842,34 @@ class KeyboardNavigationScanner extends BaseScanner {
       // Visual positions as measured DURING the tab walk (document
       // coordinates). Re-resolving the selector string would hit the first
       // DOM match — e.g. the off-canvas mobile nav instead of the desktop nav.
-      const positions = tabOrder.map(t => {
+      const positions = tabOrder.map((t) => {
         if (!t.rect) return null;
         return {
           selector: t.element,
-          x: t.rect.x, y: t.rect.y, width: t.rect.width, height: t.rect.height,
+          x: t.rect.x,
+          y: t.rect.y,
+          width: t.rect.width,
+          height: t.rect.height,
           center: { x: t.rect.x + t.rect.width / 2, y: t.rect.y + t.rect.height / 2 },
-          area: t.rect.width * t.rect.height
+          area: t.rect.width * t.rect.height,
         };
       });
 
       // Filter out null positions and elements that are too small
-      const validPositions = positions.filter(p => p && p.area > 10);
-      
+      const validPositions = positions.filter((p) => p && p.area > 10);
+
       console.log(`  Position check: ${positions.length} total, ${validPositions.length} valid`);
       if (positions.length !== validPositions.length) {
-        const filtered = positions.filter(p => !p || p.area <= 10);
-        console.log(`  Filtered out: ${filtered.map((p, i) => `${tabOrder[i]?.element}(${p?.area || 'null'})`).join(', ')}`);
+        const filtered = positions.filter((p) => !p || p.area <= 10);
+        console.log(
+          `  Filtered out: ${filtered.map((p, i) => `${tabOrder[i]?.element}(${p?.area || 'null'})`).join(', ')}`
+        );
       }
-      
+
       if (validPositions.length < 2) {
-        console.log(`  Insufficient valid positions for analysis (only ${validPositions.length} valid elements)`);
+        console.log(
+          `  Insufficient valid positions for analysis (only ${validPositions.length} valid elements)`
+        );
         return;
       }
 
@@ -771,39 +878,46 @@ class KeyboardNavigationScanner extends BaseScanner {
       // Sort elements by visual reading order (top-to-bottom, left-to-right)
       const visualOrder = [...validPositions].sort((a, b) => {
         const rowThreshold = 50; // Elements within 50px vertically are considered same row
-        
+
         // If elements are in different rows (significant Y difference)
         if (Math.abs(a.center.y - b.center.y) > rowThreshold) {
           return a.center.y - b.center.y; // Top to bottom
         }
-        
+
         // Same row - sort left to right
         return a.center.x - b.center.x;
       });
 
       // Get form context for each element to avoid flagging normal form flows
-      const formContexts = await page.evaluate((selectors) => {
-        return selectors.map(sel => {
-          try {
-            const el = document.querySelector(sel);
-            if (!el) return null;
-            
-            const form = el.closest('form');
-            const isSubmitButton = el.tagName.toLowerCase() === 'button' && 
-                                  (el.type === 'submit' || el.getAttribute('type') === 'submit' || 
-                                   el.classList.contains('primary-button'));
-            return {
-              selector: sel,
-              inForm: !!form,
-              formId: form?.id || form?.className || 'default',
-              isFormControl: ['input', 'textarea', 'select', 'button'].includes(el.tagName.toLowerCase()),
-              isSubmitButton: isSubmitButton
-            };
-          } catch (error) {
-            return null;
-          }
-        });
-      }, validPositions.map(p => p.selector));
+      const formContexts = await page.evaluate(
+        (selectors) => {
+          return selectors.map((sel) => {
+            try {
+              const el = document.querySelector(sel);
+              if (!el) return null;
+
+              const form = el.closest('form');
+              const isSubmitButton =
+                el.tagName.toLowerCase() === 'button' &&
+                (el.type === 'submit' ||
+                  el.getAttribute('type') === 'submit' ||
+                  el.classList.contains('primary-button'));
+              return {
+                selector: sel,
+                inForm: !!form,
+                formId: form?.id || form?.className || 'default',
+                isFormControl: ['input', 'textarea', 'select', 'button'].includes(
+                  el.tagName.toLowerCase()
+                ),
+                isSubmitButton: isSubmitButton,
+              };
+            } catch (error) {
+              return null;
+            }
+          });
+        },
+        validPositions.map((p) => p.selector)
+      );
 
       // Compare visual order vs tab order
       let significantJumps = 0;
@@ -815,46 +929,59 @@ class KeyboardNavigationScanner extends BaseScanner {
         const nextPos = validPositions[i + 1];
         const currentContext = formContexts[i];
         const nextContext = formContexts[i + 1];
-        
+
         if (!currentPos || !nextPos) continue;
 
         // Check if tab order jumps backward significantly in visual space
         const horizontalJump = Math.abs(nextPos.center.x - currentPos.center.x);
         const verticalJump = Math.abs(nextPos.center.y - currentPos.center.y);
-        
+
         // Skip normal form progressions (textarea -> submit button is expected)
-        const isNormalFormFlow = currentContext?.inForm && nextContext?.inForm && 
-                                currentContext.formId === nextContext.formId &&
-                                currentContext.isFormControl && nextContext.isFormControl;
-        
+        const isNormalFormFlow =
+          currentContext?.inForm &&
+          nextContext?.inForm &&
+          currentContext.formId === nextContext.formId &&
+          currentContext.isFormControl &&
+          nextContext.isFormControl;
+
         // Also check for submit button following form elements (relaxed form check)
-        const isSubmitFlow = currentContext?.isFormControl && 
-                            nextContext?.isSubmitButton &&
-                            currentContext.inForm;
-        
+        const isSubmitFlow =
+          currentContext?.isFormControl && nextContext?.isSubmitButton && currentContext.inForm;
+
         // Debug grid detection issue
         if (tabOrder.length <= 8) {
-          console.log(`  DEBUG: Small tab order (${tabOrder.length} elements), checking grid detection...`);
-          console.log(`    Elements in tab order: ${tabOrder.map(t => t.element).join(', ')}`);
+          console.log(
+            `  DEBUG: Small tab order (${tabOrder.length} elements), checking grid detection...`
+          );
+          console.log(`    Elements in tab order: ${tabOrder.map((t) => t.element).join(', ')}`);
         }
-        
+
         const formThreshold = isSubmitFlow ? 600 : 400; // Higher threshold for submit buttons
         if ((isNormalFormFlow || isSubmitFlow) && verticalJump < formThreshold) {
-          console.log(`  Skipping normal form flow: ${currentPos.selector} -> ${nextPos.selector} (threshold: ${formThreshold}px)`);
+          console.log(
+            `  Skipping normal form flow: ${currentPos.selector} -> ${nextPos.selector} (threshold: ${formThreshold}px)`
+          );
           continue;
         }
-        
+
         // Detect problematic patterns:
         // 1. Large backward horizontal jump (right to left)
         // 2. Large upward vertical jump (bottom to top) - but not normal form flow
         // 3. Cross-diagonal jumps
-        
+
         const sameRow = verticalJump < Math.max(currentPos.height, nextPos.height, 24);
-        const isBackwardJump = sameRow && nextPos.center.x < currentPos.center.x && horizontalJump > jumpThreshold;
-        const isUpwardJump = nextPos.center.y < currentPos.center.y && verticalJump > jumpThreshold && !isNormalFormFlow;
+        const isBackwardJump =
+          sameRow && nextPos.center.x < currentPos.center.x && horizontalJump > jumpThreshold;
+        const isUpwardJump =
+          nextPos.center.y < currentPos.center.y &&
+          verticalJump > jumpThreshold &&
+          !isNormalFormFlow;
         // Down-and-left is how every multi-column layout wraps; only up-and-left/right is suspicious.
-        const isDiagonalJump = horizontalJump > jumpThreshold && verticalJump > jumpThreshold && nextPos.center.y < currentPos.center.y;
-        
+        const isDiagonalJump =
+          horizontalJump > jumpThreshold &&
+          verticalJump > jumpThreshold &&
+          nextPos.center.y < currentPos.center.y;
+
         if (isBackwardJump || isUpwardJump || isDiagonalJump) {
           significantJumps++;
           jumpDetails.push({
@@ -863,51 +990,56 @@ class KeyboardNavigationScanner extends BaseScanner {
             fromPos: currentPos.center,
             toPos: nextPos.center,
             jumpType: isBackwardJump ? 'backward' : isUpwardJump ? 'upward' : 'diagonal',
-            distance: Math.sqrt(horizontalJump ** 2 + verticalJump ** 2)
+            distance: Math.sqrt(horizontalJump ** 2 + verticalJump ** 2),
           });
-          
-          console.log(`  Found ${isBackwardJump ? 'backward' : isUpwardJump ? 'upward' : 'diagonal'} jump: ${currentPos.selector} -> ${nextPos.selector}`);
-          console.log(`    Distance: ${Math.round(Math.sqrt(horizontalJump ** 2 + verticalJump ** 2))}px`);
+
+          console.log(
+            `  Found ${isBackwardJump ? 'backward' : isUpwardJump ? 'upward' : 'diagonal'} jump: ${currentPos.selector} -> ${nextPos.selector}`
+          );
+          console.log(
+            `    Distance: ${Math.round(Math.sqrt(horizontalJump ** 2 + verticalJump ** 2))}px`
+          );
         }
       }
 
       // Generate violations for significant tab order issues
       if (significantJumps > 0) {
         // Group violations by type for cleaner reporting
-        const backwardJumps = jumpDetails.filter(j => j.jumpType === 'backward');
-        const upwardJumps = jumpDetails.filter(j => j.jumpType === 'upward');
-        const diagonalJumps = jumpDetails.filter(j => j.jumpType === 'diagonal');
+        const backwardJumps = jumpDetails.filter((j) => j.jumpType === 'backward');
+        const upwardJumps = jumpDetails.filter((j) => j.jumpType === 'upward');
+        const diagonalJumps = jumpDetails.filter((j) => j.jumpType === 'diagonal');
 
         if (backwardJumps.length > 0) {
           violations.push({
-            criterion: "9.2.4.3",
-            element: backwardJumps.map(j => j.from).join(', '),
-            issue: "illogical-tab-order",
+            criterion: '9.2.4.3',
+            element: backwardJumps.map((j) => j.from).join(', '),
+            issue: 'illogical-tab-order',
             description: `Tab order jumps backward visually (${backwardJumps.length} instances). Users expect left-to-right, top-to-bottom navigation.`,
-            suggestion: "Adjust DOM order or use CSS order property to match visual layout sequence",
-            jumpDetails: backwardJumps
+            suggestion:
+              'Adjust DOM order or use CSS order property to match visual layout sequence',
+            jumpDetails: backwardJumps,
           });
         }
 
         if (upwardJumps.length > 0) {
           violations.push({
-            criterion: "9.2.4.3",
-            element: upwardJumps.map(j => j.from).join(', '),
-            issue: "illogical-tab-order",
+            criterion: '9.2.4.3',
+            element: upwardJumps.map((j) => j.from).join(', '),
+            issue: 'illogical-tab-order',
             description: `Tab order jumps upward visually (${upwardJumps.length} instances). Users expect top-to-bottom navigation.`,
-            suggestion: "Ensure tab order follows visual flow from top to bottom",
-            jumpDetails: upwardJumps
+            suggestion: 'Ensure tab order follows visual flow from top to bottom',
+            jumpDetails: upwardJumps,
           });
         }
 
         if (diagonalJumps.length > 0) {
           violations.push({
-            criterion: "9.2.4.3", 
-            element: diagonalJumps.map(j => j.from).join(', '),
-            issue: "illogical-tab-order",
+            criterion: '9.2.4.3',
+            element: diagonalJumps.map((j) => j.from).join(', '),
+            issue: 'illogical-tab-order',
             description: `Tab order makes confusing diagonal jumps (${diagonalJumps.length} instances). Navigation should follow predictable patterns.`,
-            suggestion: "Restructure layout or tab order to follow logical reading sequence",
-            jumpDetails: diagonalJumps
+            suggestion: 'Restructure layout or tab order to follow logical reading sequence',
+            jumpDetails: diagonalJumps,
           });
         }
 
@@ -915,7 +1047,6 @@ class KeyboardNavigationScanner extends BaseScanner {
       } else {
         console.log('  ✅ Tab order follows logical visual sequence');
       }
-
     } catch (error) {
       console.warn('Error analyzing tab order logic:', error.message);
     }
@@ -931,37 +1062,44 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateSkipLinks(page, violations) {
     console.log('Validating skip links...');
-    
+
     const skipLinkIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Find skip links
-      const potentialSkipLinks = document.querySelectorAll('a[href^="#"], a[href^="#main"], a[href*="skip"], a[href*="content"]');
-      
-      potentialSkipLinks.forEach(link => {
+      const potentialSkipLinks = document.querySelectorAll(
+        'a[href^="#"], a[href^="#main"], a[href*="skip"], a[href*="content"]'
+      );
+
+      potentialSkipLinks.forEach((link) => {
         const href = link.getAttribute('href');
         const text = link.textContent.trim().toLowerCase();
         const selector = getElementSelector(link);
-        
+
         // Check if it's actually a skip link
-        const isSkipLink = text.includes('skip') || text.includes('jump') || text.includes('main') || 
-                          href.includes('main') || href.includes('content');
-        
+        const isSkipLink =
+          text.includes('skip') ||
+          text.includes('jump') ||
+          text.includes('main') ||
+          href.includes('main') ||
+          href.includes('content');
+
         if (isSkipLink) {
           // Check if target exists
           const targetId = href.replace('#', '');
           const target = document.getElementById(targetId);
-          
+
           if (!target) {
             issues.push({
               type: 'skip-link',
@@ -969,53 +1107,55 @@ class KeyboardNavigationScanner extends BaseScanner {
               href: href,
               description: `Skip link points to non-existent target: ${href}`,
               severity: 'serious',
-              suggestion: 'Ensure skip link target exists and is accessible'
+              suggestion: 'Ensure skip link target exists and is accessible',
             });
           }
-          
+
           // Check if skip link is focusable
           const isHidden = link.offsetParent === null;
-          const hasVisibleOnFocus = getComputedStyle(link, ':focus').position !== 'absolute' ||
-                                   getComputedStyle(link, ':focus').top !== '-9999px';
-          
+          const hasVisibleOnFocus =
+            getComputedStyle(link, ':focus').position !== 'absolute' ||
+            getComputedStyle(link, ':focus').top !== '-9999px';
+
           if (isHidden && !hasVisibleOnFocus) {
             issues.push({
               type: 'skip-link',
               element: selector,
               description: 'Skip link is not accessible when focused',
               severity: 'serious',
-              suggestion: 'Ensure skip link becomes visible on focus'
+              suggestion: 'Ensure skip link becomes visible on focus',
             });
           }
         }
       });
-      
+
       // Check if page has skip links at all (for complex pages)
-      const complexPage = document.querySelectorAll('nav, header, main, section, article').length > 3;
+      const complexPage =
+        document.querySelectorAll('nav, header, main, section, article').length > 3;
       const hasSkipLinks = potentialSkipLinks.length > 0;
-      
+
       if (complexPage && !hasSkipLinks) {
         issues.push({
           type: 'skip-link',
           element: 'body',
           description: 'Complex page lacks skip links for keyboard navigation',
           severity: 'moderate',
-          suggestion: 'Add skip links to main content areas for keyboard users'
+          suggestion: 'Add skip links to main content areas for keyboard users',
         });
       }
-      
+
       return issues;
     });
 
     // Create violations for skip link issues
-    skipLinkIssues.forEach(issue => {
+    skipLinkIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.4.1",
+        criterion: '9.2.4.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1025,20 +1165,21 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateBypassMechanisms(page, violations) {
     console.log('Validating bypass mechanisms...');
-    
+
     const bypassIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Check for main landmark
       const mainLandmarks = document.querySelectorAll('main, [role="main"]');
       if (mainLandmarks.length === 0) {
@@ -1047,7 +1188,7 @@ class KeyboardNavigationScanner extends BaseScanner {
           element: 'body',
           description: 'Page lacks main landmark for content navigation',
           severity: 'serious',
-          suggestion: 'Add main element or role="main" to identify main content'
+          suggestion: 'Add main element or role="main" to identify main content',
         });
       } else if (mainLandmarks.length > 1) {
         issues.push({
@@ -1055,28 +1196,30 @@ class KeyboardNavigationScanner extends BaseScanner {
           element: getElementSelector(mainLandmarks[1]),
           description: 'Multiple main landmarks found - only one should exist',
           severity: 'moderate',
-          suggestion: 'Ensure only one main landmark per page'
+          suggestion: 'Ensure only one main landmark per page',
         });
       }
-      
+
       // Check for navigation landmarks
       const navElements = document.querySelectorAll('nav, [role="navigation"]');
-      navElements.forEach(nav => {
-        const hasAccessibleName = nav.hasAttribute('aria-label') || 
-                                 nav.hasAttribute('aria-labelledby') ||
-                                 nav.hasAttribute('title');
-        
+      navElements.forEach((nav) => {
+        const hasAccessibleName =
+          nav.hasAttribute('aria-label') ||
+          nav.hasAttribute('aria-labelledby') ||
+          nav.hasAttribute('title');
+
         if (navElements.length > 1 && !hasAccessibleName) {
           issues.push({
             type: 'bypass',
             element: getElementSelector(nav),
-            description: 'Navigation landmark lacks accessible name when multiple nav elements exist',
+            description:
+              'Navigation landmark lacks accessible name when multiple nav elements exist',
             severity: 'moderate',
-            suggestion: 'Add aria-label to distinguish between navigation areas'
+            suggestion: 'Add aria-label to distinguish between navigation areas',
           });
         }
       });
-      
+
       // Check for heading structure as bypass mechanism
       const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
       if (headings.length === 0) {
@@ -1085,22 +1228,22 @@ class KeyboardNavigationScanner extends BaseScanner {
           element: 'body',
           description: 'Page lacks heading structure for content navigation',
           severity: 'moderate',
-          suggestion: 'Add headings to create navigable page structure'
+          suggestion: 'Add headings to create navigable page structure',
         });
       }
-      
+
       return issues;
     });
 
     // Create violations for bypass mechanism issues
-    bypassIssues.forEach(issue => {
+    bypassIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.4.1",
+        criterion: '9.2.4.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1110,33 +1253,45 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateFocusableElements(page, violations) {
     console.log('Validating focusable elements...');
-    
+
     const focusableIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Find elements that should be focusable but aren't
-      const interactiveElements = document.querySelectorAll([
-        'button', 'a', 'input', 'textarea', 'select', 
-        '[role="button"]', '[role="link"]', '[role="tab"]',
-        '[role="menuitem"]', '[role="checkbox"]', '[role="radio"]'
-      ].join(', '));
-      
-      interactiveElements.forEach(element => {
+      const interactiveElements = document.querySelectorAll(
+        [
+          'button',
+          'a',
+          'input',
+          'textarea',
+          'select',
+          '[role="button"]',
+          '[role="link"]',
+          '[role="tab"]',
+          '[role="menuitem"]',
+          '[role="checkbox"]',
+          '[role="radio"]',
+        ].join(', ')
+      );
+
+      interactiveElements.forEach((element) => {
         const selector = getElementSelector(element);
         const tabIndex = element.tabIndex;
         const isHidden = element.offsetParent === null;
-        const isDisabled = element.hasAttribute('disabled') || element.getAttribute('aria-disabled') === 'true';
-        
+        const isDisabled =
+          element.hasAttribute('disabled') || element.getAttribute('aria-disabled') === 'true';
+
         // Check if interactive element is not focusable when it should be
         if (!isHidden && !isDisabled && tabIndex < 0) {
           // Exception for links without href
@@ -1144,16 +1299,16 @@ class KeyboardNavigationScanner extends BaseScanner {
             // This is OK - links without href shouldn't be focusable
             return;
           }
-          
+
           issues.push({
             type: 'focusable-element',
             element: selector,
             description: 'Interactive element is not keyboard focusable',
             severity: 'serious',
-            suggestion: 'Ensure interactive elements are keyboard accessible'
+            suggestion: 'Ensure interactive elements are keyboard accessible',
           });
         }
-        
+
         // Check for inappropriate positive tabindex
         if (tabIndex > 0) {
           issues.push({
@@ -1162,27 +1317,46 @@ class KeyboardNavigationScanner extends BaseScanner {
             tabIndex: tabIndex,
             description: `Element uses positive tabindex (${tabIndex}) which disrupts natural tab order`,
             severity: 'moderate',
-            suggestion: 'Use tabindex="0" or remove tabindex to maintain natural focus order'
+            suggestion: 'Use tabindex="0" or remove tabindex to maintain natural focus order',
           });
         }
       });
-      
+
       // Check for non-interactive elements with tabindex="0"
-      const nonInteractiveWithTabindex = document.querySelectorAll('[tabindex="0"]:not(button):not(a):not(input):not(textarea):not(select):not([role="button"]):not([role="link"]):not([role="tab"]):not([role="menuitem"]):not([role="checkbox"]):not([role="radio"])');
-      
-      nonInteractiveWithTabindex.forEach(element => {
-        const hasInteractiveRole = element.hasAttribute('role') &&
-          ['button', 'link', 'tab', 'menuitem', 'checkbox', 'radio', 'slider', 'spinbutton'].includes(element.getAttribute('role'));
+      const nonInteractiveWithTabindex = document.querySelectorAll(
+        '[tabindex="0"]:not(button):not(a):not(input):not(textarea):not(select):not([role="button"]):not([role="link"]):not([role="tab"]):not([role="menuitem"]):not([role="checkbox"]):not([role="radio"])'
+      );
+
+      nonInteractiveWithTabindex.forEach((element) => {
+        const hasInteractiveRole =
+          element.hasAttribute('role') &&
+          [
+            'button',
+            'link',
+            'tab',
+            'menuitem',
+            'checkbox',
+            'radio',
+            'slider',
+            'spinbutton',
+          ].includes(element.getAttribute('role'));
 
         // Scrollable containers with tabindex="0" are correct a11y pattern
         const style = window.getComputedStyle(element);
-        const isScrollable = (style.overflowY === 'auto' || style.overflowY === 'scroll' ||
-                              style.overflowX === 'auto' || style.overflowX === 'scroll') &&
-                             (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth);
+        const isScrollable =
+          (style.overflowY === 'auto' ||
+            style.overflowY === 'scroll' ||
+            style.overflowX === 'auto' ||
+            style.overflowX === 'scroll') &&
+          (element.scrollHeight > element.clientHeight ||
+            element.scrollWidth > element.clientWidth);
 
         // Landmark roles (region, log, etc.) with tabindex="0" are acceptable
-        const hasLandmarkRole = element.hasAttribute('role') &&
-          ['region', 'log', 'group', 'toolbar', 'tree', 'treegrid', 'grid', 'application'].includes(element.getAttribute('role'));
+        const hasLandmarkRole =
+          element.hasAttribute('role') &&
+          ['region', 'log', 'group', 'toolbar', 'tree', 'treegrid', 'grid', 'application'].includes(
+            element.getAttribute('role')
+          );
 
         if (!hasInteractiveRole && !isScrollable && !hasLandmarkRole) {
           issues.push({
@@ -1190,23 +1364,23 @@ class KeyboardNavigationScanner extends BaseScanner {
             element: getElementSelector(element),
             description: 'Non-interactive element is made focusable with tabindex',
             severity: 'moderate',
-            suggestion: 'Only make interactive elements focusable, or add appropriate ARIA role'
+            suggestion: 'Only make interactive elements focusable, or add appropriate ARIA role',
           });
         }
       });
-      
+
       return issues;
     });
 
     // Create violations for focusable element issues
-    focusableIssues.forEach(issue => {
+    focusableIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.1.1",
+        criterion: '9.2.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1216,97 +1390,107 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateFocusOrderSemantics(page, tabOrder, violations) {
     console.log('Validating focus order semantics...');
-    
+
     const semanticIssues = await page.evaluate((tabOrderData) => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Analyze semantic flow issues
       for (let i = 0; i < tabOrderData.length - 1; i++) {
         const current = tabOrderData[i];
         const next = tabOrderData[i + 1];
-        
+
         if (!current.selector || !next.selector) continue;
-        
+
         try {
           const currentEl = document.querySelector(current.selector);
           const nextEl = document.querySelector(next.selector);
-          
+
           if (!currentEl || !nextEl) continue;
-          
+
           // Check for semantic relationship violations
-          
+
           // 1. Form field followed by unrelated content (should go to next field or submit)
           if (currentEl.tagName.toLowerCase() === 'input' && currentEl.type !== 'submit') {
             const currentForm = currentEl.closest('form');
             const nextForm = nextEl.closest('form');
-            
-            if (currentForm && nextForm !== currentForm && 
-                !nextEl.closest('nav') && nextEl.tagName.toLowerCase() !== 'a') {
+
+            if (
+              currentForm &&
+              nextForm !== currentForm &&
+              !nextEl.closest('nav') &&
+              nextEl.tagName.toLowerCase() !== 'a'
+            ) {
               issues.push({
                 type: 'focus-order-semantics',
                 element: getElementSelector(nextEl),
                 description: 'Focus jumps from form field to unrelated content outside form',
                 severity: 'moderate',
-                suggestion: 'Ensure logical flow within forms before moving to other content'
+                suggestion: 'Ensure logical flow within forms before moving to other content',
               });
             }
           }
-          
+
           // 2. Menu item followed by unrelated content
-          if (currentEl.getAttribute('role') === 'menuitem' && 
-              nextEl.getAttribute('role') !== 'menuitem' &&
-              !nextEl.closest('[role="menu"], [role="menubar"]')) {
+          if (
+            currentEl.getAttribute('role') === 'menuitem' &&
+            nextEl.getAttribute('role') !== 'menuitem' &&
+            !nextEl.closest('[role="menu"], [role="menubar"]')
+          ) {
             issues.push({
               type: 'focus-order-semantics',
               element: getElementSelector(nextEl),
               description: 'Focus jumps from menu item to unrelated content',
               severity: 'moderate',
-              suggestion: 'Complete menu navigation before moving to other content'
+              suggestion: 'Complete menu navigation before moving to other content',
             });
           }
-          
+
           // 3. Tab panel content skipped when tab is focused
-          if (currentEl.getAttribute('role') === 'tab' && 
-              nextEl.getAttribute('role') === 'tab') {
-            const tabpanel = document.querySelector(`[role="tabpanel"][aria-labelledby="${currentEl.id}"]`);
-            if (tabpanel && tabpanel.querySelector('button, a, input, textarea, select, [tabindex="0"]')) {
+          if (currentEl.getAttribute('role') === 'tab' && nextEl.getAttribute('role') === 'tab') {
+            const tabpanel = document.querySelector(
+              `[role="tabpanel"][aria-labelledby="${currentEl.id}"]`
+            );
+            if (
+              tabpanel &&
+              tabpanel.querySelector('button, a, input, textarea, select, [tabindex="0"]')
+            ) {
               issues.push({
                 type: 'focus-order-semantics',
                 element: getElementSelector(currentEl),
                 description: 'Tab panel with focusable content is skipped in tab order',
                 severity: 'serious',
-                suggestion: 'Include focusable content in tab panels in the tab order'
+                suggestion: 'Include focusable content in tab panels in the tab order',
               });
             }
           }
-          
         } catch (error) {
           // Skip elements that can't be found
         }
       }
-      
+
       return issues;
     }, tabOrder);
 
     // Create violations for focus order semantic issues
-    semanticIssues.forEach(issue => {
+    semanticIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.4.3",
+        criterion: '9.2.4.3',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1316,27 +1500,28 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateTabindexUsage(page, violations) {
     console.log('Validating tabindex usage...');
-    
+
     const tabindexIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Find all elements with tabindex
       const elementsWithTabindex = document.querySelectorAll('[tabindex]');
-      
-      elementsWithTabindex.forEach(element => {
+
+      elementsWithTabindex.forEach((element) => {
         const selector = getElementSelector(element);
         const tabIndex = parseInt(element.getAttribute('tabindex'));
-        
+
         // Check for positive tabindex (anti-pattern)
         if (tabIndex > 0) {
           issues.push({
@@ -1345,25 +1530,43 @@ class KeyboardNavigationScanner extends BaseScanner {
             tabIndex: tabIndex,
             description: `Positive tabindex (${tabIndex}) disrupts natural tab order`,
             severity: 'moderate',
-            suggestion: 'Use tabindex="0" to include in natural tab order or tabindex="-1" to exclude'
+            suggestion:
+              'Use tabindex="0" to include in natural tab order or tabindex="-1" to exclude',
           });
         }
-        
+
         // Check for tabindex on inappropriate elements
-        const isInteractive = element.tagName.toLowerCase() === 'a' && element.hasAttribute('href') ||
-                             ['button', 'input', 'textarea', 'select'].includes(element.tagName.toLowerCase()) ||
-                             element.hasAttribute('role') && 
-                             ['button', 'link', 'tab', 'menuitem', 'checkbox', 'radio'].includes(element.getAttribute('role'));
-        
+        const isInteractive =
+          (element.tagName.toLowerCase() === 'a' && element.hasAttribute('href')) ||
+          ['button', 'input', 'textarea', 'select'].includes(element.tagName.toLowerCase()) ||
+          (element.hasAttribute('role') &&
+            ['button', 'link', 'tab', 'menuitem', 'checkbox', 'radio'].includes(
+              element.getAttribute('role')
+            ));
+
         if (tabIndex === 0 && !isInteractive) {
           const hasClickHandler = element.onclick || element.hasAttribute('onclick');
           // Scrollable containers and landmark roles legitimately need tabindex="0"
           const elStyle = window.getComputedStyle(element);
-          const isScrollContainer = (elStyle.overflowY === 'auto' || elStyle.overflowY === 'scroll' ||
-                                     elStyle.overflowX === 'auto' || elStyle.overflowX === 'scroll') &&
-                                    (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth);
-          const isLandmark = element.hasAttribute('role') &&
-            ['region', 'log', 'group', 'toolbar', 'tree', 'treegrid', 'grid', 'application'].includes(element.getAttribute('role'));
+          const isScrollContainer =
+            (elStyle.overflowY === 'auto' ||
+              elStyle.overflowY === 'scroll' ||
+              elStyle.overflowX === 'auto' ||
+              elStyle.overflowX === 'scroll') &&
+            (element.scrollHeight > element.clientHeight ||
+              element.scrollWidth > element.clientWidth);
+          const isLandmark =
+            element.hasAttribute('role') &&
+            [
+              'region',
+              'log',
+              'group',
+              'toolbar',
+              'tree',
+              'treegrid',
+              'grid',
+              'application',
+            ].includes(element.getAttribute('role'));
 
           if (!hasClickHandler && !isScrollContainer && !isLandmark) {
             issues.push({
@@ -1371,11 +1574,12 @@ class KeyboardNavigationScanner extends BaseScanner {
               element: selector,
               description: 'Non-interactive element made focusable with tabindex="0"',
               severity: 'minor',
-              suggestion: 'Only add tabindex to interactive elements or add appropriate role and event handlers'
+              suggestion:
+                'Only add tabindex to interactive elements or add appropriate role and event handlers',
             });
           }
         }
-        
+
         // Check for tabindex="-1" on naturally focusable elements (usually unnecessary)
         if (tabIndex === -1 && isInteractive && !element.hasAttribute('disabled')) {
           issues.push({
@@ -1383,23 +1587,24 @@ class KeyboardNavigationScanner extends BaseScanner {
             element: selector,
             description: 'Interactive element removed from tab order with tabindex="-1"',
             severity: 'moderate',
-            suggestion: 'Consider if removing interactive element from keyboard navigation is intentional'
+            suggestion:
+              'Consider if removing interactive element from keyboard navigation is intentional',
           });
         }
       });
-      
+
       return issues;
     });
 
     // Create violations for tabindex issues
-    tabindexIssues.forEach(issue => {
+    tabindexIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.1.1",
+        criterion: '9.2.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1409,28 +1614,29 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateAccesskeys(page, violations) {
     console.log('Validating accesskeys...');
-    
+
     const accesskeyIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
       const accesskeys = {};
-      
+
       // Find all elements with accesskey
       const elementsWithAccesskey = document.querySelectorAll('[accesskey]');
-      
-      elementsWithAccesskey.forEach(element => {
+
+      elementsWithAccesskey.forEach((element) => {
         const selector = getElementSelector(element);
         const accesskey = element.getAttribute('accesskey').toLowerCase();
-        
+
         // Check for duplicate accesskeys
         if (accesskeys[accesskey]) {
           issues.push({
@@ -1439,9 +1645,9 @@ class KeyboardNavigationScanner extends BaseScanner {
             accesskey: accesskey,
             description: `Duplicate accesskey "${accesskey}" found`,
             severity: 'serious',
-            suggestion: 'Ensure each accesskey is unique on the page'
+            suggestion: 'Ensure each accesskey is unique on the page',
           });
-          
+
           // Also flag the original element
           issues.push({
             type: 'accesskeys',
@@ -1449,12 +1655,12 @@ class KeyboardNavigationScanner extends BaseScanner {
             accesskey: accesskey,
             description: `Duplicate accesskey "${accesskey}" found`,
             severity: 'serious',
-            suggestion: 'Ensure each accesskey is unique on the page'
+            suggestion: 'Ensure each accesskey is unique on the page',
           });
         } else {
           accesskeys[accesskey] = selector;
         }
-        
+
         // Check for problematic accesskey values
         const problematicKeys = ['c', 'v', 'x', 'a', 'f', 'e', 'h', 't', 'w', 'r', 'l', 's'];
         if (problematicKeys.includes(accesskey)) {
@@ -1464,14 +1670,15 @@ class KeyboardNavigationScanner extends BaseScanner {
             accesskey: accesskey,
             description: `Accesskey "${accesskey}" conflicts with common browser shortcuts`,
             severity: 'moderate',
-            suggestion: 'Use accesskeys that do not conflict with browser functionality (0-9, or less common letters)'
+            suggestion:
+              'Use accesskeys that do not conflict with browser functionality (0-9, or less common letters)',
           });
         }
-        
+
         // Check if element with accesskey is not focusable
         const isHidden = element.offsetParent === null;
         const tabIndex = element.tabIndex;
-        
+
         if (!isHidden && tabIndex < 0) {
           issues.push({
             type: 'accesskeys',
@@ -1479,23 +1686,23 @@ class KeyboardNavigationScanner extends BaseScanner {
             accesskey: accesskey,
             description: 'Element with accesskey is not keyboard focusable',
             severity: 'moderate',
-            suggestion: 'Ensure elements with accesskeys are also focusable via keyboard'
+            suggestion: 'Ensure elements with accesskeys are also focusable via keyboard',
           });
         }
       });
-      
+
       return issues;
     });
 
     // Create violations for accesskey issues
-    accesskeyIssues.forEach(issue => {
+    accesskeyIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.1.4",
+        criterion: '9.2.1.4',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1505,23 +1712,24 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateKeyboardEventHandling(page, violations) {
     console.log('Validating keyboard event handling...');
-    
+
     const keyboardIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Find elements with click handlers but no keyboard support
       const clickableElements = document.querySelectorAll('*');
-      
+
       /**
        * An element that renders nothing cannot be a click target, so it cannot
        * fail "clickable but not keyboard accessible". Screen-reader-only live
@@ -1542,98 +1750,104 @@ class KeyboardNavigationScanner extends BaseScanner {
         return false;
       }
 
-      clickableElements.forEach(element => {
+      clickableElements.forEach((element) => {
         // Check if element has click handler - be more specific to avoid false
         // positives. `element.onclick` must be an actual FUNCTION: on custom
         // elements a framework can leave a non-callable value in that property.
-        const hasClickHandler = typeof element.onclick === 'function' ||
-                               element.hasAttribute('onclick') ||
-                               element.hasAttribute('ng-click') ||
-                               element.hasAttribute('@click') ||
-                               element.classList.contains('clickable') ||
-                               element.classList.contains('btn') ||
-                               element.classList.contains('fake-button') ||
-                               (element.hasAttribute('role') && element.getAttribute('role') === 'button') ||
-                               element.style.cursor === 'pointer';
+        const hasClickHandler =
+          typeof element.onclick === 'function' ||
+          element.hasAttribute('onclick') ||
+          element.hasAttribute('ng-click') ||
+          element.hasAttribute('@click') ||
+          element.classList.contains('clickable') ||
+          element.classList.contains('btn') ||
+          element.classList.contains('fake-button') ||
+          (element.hasAttribute('role') && element.getAttribute('role') === 'button') ||
+          element.style.cursor === 'pointer';
 
         if (hasClickHandler && !isNonInteractiveByRendering(element)) {
           const selector = getElementSelector(element);
           const tagName = element.tagName.toLowerCase();
           const tabIndex = element.tabIndex;
           const isHidden = element.offsetParent === null;
-          
+
           // Skip naturally keyboard accessible elements
-          const naturallyKeyboardAccessible = [
-            'button', 'a', 'input', 'textarea', 'select'
-          ].includes(tagName) && !isHidden;
-          
+          const naturallyKeyboardAccessible =
+            ['button', 'a', 'input', 'textarea', 'select'].includes(tagName) && !isHidden;
+
           if (!naturallyKeyboardAccessible && tabIndex < 0) {
             issues.push({
               type: 'keyboard-navigation',
               element: selector,
               description: 'Clickable element is not keyboard accessible',
               severity: 'serious',
-              suggestion: 'Add tabindex="0" and keyboard event handlers (Enter/Space) for custom interactive elements'
+              suggestion:
+                'Add tabindex="0" and keyboard event handlers (Enter/Space) for custom interactive elements',
             });
           }
-          
+
           // Check for custom elements that might need ARIA roles
           if (!naturallyKeyboardAccessible && tabIndex >= 0 && !element.hasAttribute('role')) {
-            const likelyButton = element.classList.contains('btn') || 
-                               element.classList.contains('button') ||
-                               element.textContent.trim().match(/^(submit|send|save|cancel|ok|yes|no)$/i);
-            
+            const likelyButton =
+              element.classList.contains('btn') ||
+              element.classList.contains('button') ||
+              element.textContent.trim().match(/^(submit|send|save|cancel|ok|yes|no)$/i);
+
             if (likelyButton) {
               issues.push({
                 type: 'keyboard-navigation',
                 element: selector,
                 description: 'Focusable clickable element lacks appropriate ARIA role',
                 severity: 'moderate',
-                suggestion: 'Add role="button" to custom button-like elements'
+                suggestion: 'Add role="button" to custom button-like elements',
               });
             }
           }
         }
       });
-      
+
       // Check for form submissions that only work with mouse
       const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
-        const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"], button:not([type])');
+      forms.forEach((form) => {
+        const submitButtons = form.querySelectorAll(
+          'button[type="submit"], input[type="submit"], button:not([type])'
+        );
         const divButtons = form.querySelectorAll('div[onclick], span[onclick]');
-        
+
         if (submitButtons.length === 0 && divButtons.length > 0) {
-          divButtons.forEach(button => {
+          divButtons.forEach((button) => {
             issues.push({
               type: 'keyboard-navigation',
               element: getElementSelector(button),
               description: 'Form submission only available via non-keyboard accessible element',
               severity: 'serious',
-              suggestion: 'Use proper button elements for form submission or add keyboard event handling'
+              suggestion:
+                'Use proper button elements for form submission or add keyboard event handling',
             });
           });
         }
       });
-      
+
       return issues;
     });
 
     // Create violations for keyboard event handling issues, avoiding duplicates
-    keyboardIssues.forEach(issue => {
+    keyboardIssues.forEach((issue) => {
       // Check if this violation already exists (avoid duplicates with other validation functions)
-      const alreadyReported = violations.some(v => 
-        v.element === issue.element && 
-        (v.issue === "not-keyboard-accessible" || v.issue === issue.type)
+      const alreadyReported = violations.some(
+        (v) =>
+          v.element === issue.element &&
+          (v.issue === 'not-keyboard-accessible' || v.issue === issue.type)
       );
-      
+
       if (!alreadyReported) {
         violations.push({
-          criterion: "9.2.1.1",
+          criterion: '9.2.1.1',
           element: issue.element,
           issue: issue.type,
           description: issue.description,
           severity: issue.severity,
-          suggestion: issue.suggestion
+          suggestion: issue.suggestion,
         });
       }
     });
@@ -1644,92 +1858,107 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateFocusManagement(page, violations) {
     console.log('Validating focus management...');
-    
+
     const focusIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Check for modal dialogs and overlays that might need focus trapping
-      const potentialModals = document.querySelectorAll([
-        '[role="dialog"]', '[role="alertdialog"]', '.modal', '.popup', 
-        '.overlay', '.dialog', '[aria-modal="true"]'
-      ].join(', '));
-      
-      potentialModals.forEach(modal => {
+      const potentialModals = document.querySelectorAll(
+        [
+          '[role="dialog"]',
+          '[role="alertdialog"]',
+          '.modal',
+          '.popup',
+          '.overlay',
+          '.dialog',
+          '[aria-modal="true"]',
+        ].join(', ')
+      );
+
+      potentialModals.forEach((modal) => {
         const selector = getElementSelector(modal);
         const isVisible = modal.offsetParent !== null;
-        
+
         if (isVisible) {
           // Check if modal has focusable content
-          const focusableInModal = modal.querySelectorAll([
-            'button', 'a[href]', 'input', 'textarea', 'select',
-            '[tabindex]:not([tabindex="-1"])'
-          ].join(', '));
-          
+          const focusableInModal = modal.querySelectorAll(
+            [
+              'button',
+              'a[href]',
+              'input',
+              'textarea',
+              'select',
+              '[tabindex]:not([tabindex="-1"])',
+            ].join(', ')
+          );
+
           if (focusableInModal.length === 0) {
             issues.push({
               type: 'focus-management',
               element: selector,
               description: 'Modal dialog lacks focusable content',
               severity: 'serious',
-              suggestion: 'Ensure modal dialogs contain focusable elements or can be dismissed'
+              suggestion: 'Ensure modal dialogs contain focusable elements or can be dismissed',
             });
           }
-          
+
           // Check for close button or escape mechanism
-          const hasCloseButton = modal.querySelector('[aria-label*="close"], [title*="close"], .close, .x-button') ||
-                                modal.hasAttribute('aria-describedby');
-          
+          const hasCloseButton =
+            modal.querySelector('[aria-label*="close"], [title*="close"], .close, .x-button') ||
+            modal.hasAttribute('aria-describedby');
+
           if (!hasCloseButton) {
             issues.push({
               type: 'focus-management',
               element: selector,
               description: 'Modal dialog lacks clear close mechanism',
               severity: 'moderate',
-              suggestion: 'Provide accessible close button or document escape key functionality'
+              suggestion: 'Provide accessible close button or document escape key functionality',
             });
           }
         }
       });
-      
+
       // Check for elements that change focus unexpectedly
       const elementsWithOnChange = document.querySelectorAll('select[onchange], input[onchange]');
-      elementsWithOnChange.forEach(element => {
+      elementsWithOnChange.forEach((element) => {
         // This is hard to detect statically, but we can warn about potential issues
         const selector = getElementSelector(element);
-        
+
         if (element.tagName.toLowerCase() === 'select') {
           issues.push({
             type: 'focus-management',
             element: selector,
             description: 'Select element may cause unexpected focus changes',
             severity: 'minor',
-            suggestion: 'Ensure onchange events do not cause unexpected context changes'
+            suggestion: 'Ensure onchange events do not cause unexpected context changes',
           });
         }
       });
-      
+
       return issues;
     });
 
     // Create violations for focus management issues
-    focusIssues.forEach(issue => {
+    focusIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.1.2",
+        criterion: '9.2.1.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
@@ -1739,7 +1968,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async validateInteractiveElementAccessibility(page, violations) {
     console.log('Validating interactive element accessibility...');
-    
+
     const interactiveIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation (__accessibleNameInfo) — see
       // src/utils/accessible-name.js.
@@ -1749,30 +1978,41 @@ class KeyboardNavigationScanner extends BaseScanner {
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
-      
+
       // Check interactive elements for accessibility issues
-      const interactiveElements = document.querySelectorAll([
-        'button', 'a', 'input', 'textarea', 'select',
-        '[role="button"]', '[role="link"]', '[role="tab"]',
-        '[role="menuitem"]', '[role="checkbox"]', '[role="radio"]',
-        '[tabindex]:not([tabindex="-1"])'
-      ].join(', '));
-      
-      interactiveElements.forEach(element => {
+      const interactiveElements = document.querySelectorAll(
+        [
+          'button',
+          'a',
+          'input',
+          'textarea',
+          'select',
+          '[role="button"]',
+          '[role="link"]',
+          '[role="tab"]',
+          '[role="menuitem"]',
+          '[role="checkbox"]',
+          '[role="radio"]',
+          '[tabindex]:not([tabindex="-1"])',
+        ].join(', ')
+      );
+
+      interactiveElements.forEach((element) => {
         const selector = getElementSelector(element);
         const tagName = element.tagName.toLowerCase();
         const role = element.getAttribute('role');
         const isHidden = element.offsetParent === null;
-        
+
         if (isHidden) return; // Skip hidden elements
-        
+
         // Check for missing accessible names.
         //
         // This used to be `element.textContent.trim()` plus a hand-rolled
@@ -1789,31 +2029,31 @@ class KeyboardNavigationScanner extends BaseScanner {
             element: selector,
             description: `Interactive element lacks accessible name (${nameInfo.reason || 'no naming mechanism'})`,
             severity: 'serious',
-            suggestion: 'Add aria-label, visible text, or other accessible name mechanism'
+            suggestion: 'Add aria-label, visible text, or other accessible name mechanism',
           });
         }
-        
+
         // Check for inappropriate use of links vs buttons
         if (tagName === 'a' && element.hasAttribute('href')) {
           const href = element.getAttribute('href');
           const text = element.textContent.trim().toLowerCase();
-          
+
           // Links that act like buttons - be more specific to avoid navigation false positives
           const actionWords = /^(click|submit|send|save|delete|edit|post|update|create|remove)$/i;
           const isJavascriptVoid = href === 'javascript:void(0)';
           const isActionLink = href === '#' && text.match(actionWords);
-          
+
           if (isJavascriptVoid || isActionLink) {
             issues.push({
               type: 'interactive-element',
               element: selector,
               description: 'Link used for action that should be a button',
               severity: 'moderate',
-              suggestion: 'Use button element for actions, links for navigation'
+              suggestion: 'Use button element for actions, links for navigation',
             });
           }
         }
-        
+
         // Check for buttons that should be links
         if (tagName === 'button' && !element.closest('form')) {
           const text = element.textContent.trim().toLowerCase();
@@ -1825,23 +2065,23 @@ class KeyboardNavigationScanner extends BaseScanner {
                 element: selector,
                 description: 'Button used for navigation that should be a link',
                 severity: 'minor',
-                suggestion: 'Use link element for navigation to other pages or sections'
+                suggestion: 'Use link element for navigation to other pages or sections',
               });
             }
           }
         }
-        
+
         // Check for missing keyboard support on custom controls
         if (role && ['button', 'tab', 'menuitem'].includes(role) && tagName !== 'button') {
           const hasKeydownHandler = element.onkeydown || element.hasAttribute('onkeydown');
-          
+
           if (!hasKeydownHandler) {
             issues.push({
               type: 'interactive-element',
               element: selector,
               description: 'Custom interactive element lacks keyboard event handling',
               severity: 'serious',
-              suggestion: 'Add keyboard event handlers for Enter and Space keys'
+              suggestion: 'Add keyboard event handlers for Enter and Space keys',
             });
           }
         }
@@ -1851,18 +2091,17 @@ class KeyboardNavigationScanner extends BaseScanner {
     }, accnameUtils);
 
     // Create violations for interactive element issues
-    interactiveIssues.forEach(issue => {
+    interactiveIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.1.1",
+        criterion: '9.2.1.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
   }
-
 }
 
 module.exports = KeyboardNavigationScanner;

@@ -56,7 +56,7 @@ const TARGETS = [
     url: 'http://localhost:3111/audit',
     fallbackUrl: 'http://localhost:3111/',
     purpose:
-      'this repo\'s own Next.js /audit route — hydration markup and the __next-route-announcer__ live region; live repro for the language-detection undefined.map crash. NOTE: this route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)',
+      "this repo's own Next.js /audit route — hydration markup and the __next-route-announcer__ live region; live repro for the language-detection undefined.map crash. NOTE: this route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
   },
   {
     name: 'med-theme',
@@ -73,7 +73,7 @@ const TARGETS = [
     name: 'wiki-medical-de',
     url: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
     purpose:
-      'long German medical article — content-rich, data tables, inline lang switches; far exceeds the LLM extractors\' old 15,000-char cutoff',
+      "long German medical article — content-rich, data tables, inline lang switches; far exceeds the LLM extractors' old 15,000-char cutoff",
   },
   {
     name: 'modern-commercial',
@@ -258,7 +258,9 @@ async function main() {
 
   const targets = only ? TARGETS.filter((t) => t.name === only) : TARGETS;
   if (targets.length === 0) {
-    console.error(`No target matching --only ${only}. Known: ${TARGETS.map((t) => t.name).join(', ')}`);
+    console.error(
+      `No target matching --only ${only}. Known: ${TARGETS.map((t) => t.name).join(', ')}`
+    );
     process.exit(1);
   }
 

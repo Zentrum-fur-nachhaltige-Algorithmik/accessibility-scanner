@@ -36,9 +36,7 @@ function SeverityBadge({ severity, count }) {
   // The label is always spelled out; the colour only reinforces it.
   return (
     <span className={`pb-sev pb-tone-${SEVERITY_TONE[severity] || 'neutral'}`}>
-      {count === undefined
-        ? SEVERITY_LABELS[severity]
-        : `${SEVERITY_LABELS[severity]} ${count}`}
+      {count === undefined ? SEVERITY_LABELS[severity] : `${SEVERITY_LABELS[severity]} ${count}`}
     </span>
   );
 }
@@ -104,9 +102,7 @@ function Finding({ violation, number }) {
             <dd>
               <a href={helpUrl} target="_blank" rel="noopener noreferrer">
                 Technical documentation
-                <span className="sr-only">
-                  {` for: ${shorten(text)} (opens in a new tab)`}
-                </span>
+                <span className="sr-only">{` for: ${shorten(text)} (opens in a new tab)`}</span>
               </a>
             </dd>
           </>
@@ -140,11 +136,7 @@ function Group({ group, mode, number }) {
           </span>
           <span className="pb-group-sev">
             {group.severities.map((entry) => (
-              <SeverityBadge
-                key={entry.severity}
-                severity={entry.severity}
-                count={entry.count}
-              />
+              <SeverityBadge key={entry.severity} severity={entry.severity} count={entry.count} />
             ))}
           </span>
         </summary>
@@ -206,8 +198,8 @@ export default function ScanResults({
 
         {meta?.restored && (
           <p className="pb-note pb-note-boxed">
-            Stored result from this browser&apos;s scan history. Start a new scan
-            for current values.
+            Stored result from this browser&apos;s scan history. Start a new scan for current
+            values.
           </p>
         )}
 
@@ -226,15 +218,13 @@ export default function ScanResults({
               <span className="pb-score-max"> / 100</span>
             </p>
             <p className={`pb-verdict-label pb-tone-${band.tone}`}>{band.label}</p>
-            <p className="pb-verdict-basis">
-              Automated check · WCAG 2.2 · EN 301 549
-            </p>
+            <p className="pb-verdict-basis">Automated check · WCAG 2.2 · EN 301 549</p>
           </div>
         </div>
 
         <p className="pb-scope-note">
-          Automated check against WCAG 2.2 AA. It does not replace a full
-          conformity assessment with manual testing.
+          Automated check against WCAG 2.2 AA. It does not replace a full conformity assessment with
+          manual testing.
         </p>
 
         <table className="pb-table pb-table-key">
@@ -309,8 +299,8 @@ export default function ScanResults({
             >
               <table className="pb-table pb-table-principles">
                 <caption>
-                  Number of findings per WCAG 2.2 principle, derived from the
-                  success criterion of each finding.
+                  Number of findings per WCAG 2.2 principle, derived from the success criterion of
+                  each finding.
                 </caption>
                 <thead>
                   <tr>
@@ -397,18 +387,13 @@ export default function ScanResults({
             </fieldset>
 
             <p className="pb-note">
-              {groups.length} {groups.length === 1 ? 'group' : 'groups'}. Open a
-              group to read its findings.
+              {groups.length} {groups.length === 1 ? 'group' : 'groups'}. Open a group to read its
+              findings.
             </p>
 
             <ul className="pb-groups" aria-labelledby="findings-heading">
               {groups.map((group, index) => (
-                <Group
-                  key={group.key}
-                  group={group}
-                  mode={mode}
-                  number={`3.${index + 1}`}
-                />
+                <Group key={group.key} group={group} mode={mode} number={`3.${index + 1}`} />
               ))}
             </ul>
           </>
@@ -420,8 +405,8 @@ export default function ScanResults({
           Scan modules
         </SectionHeading>
         <p className="pb-note">
-          Result of each scan module. Modules with errors could not fully
-          evaluate the page; their findings may be incomplete.
+          Result of each scan module. Modules with errors could not fully evaluate the page; their
+          findings may be incomplete.
         </p>
         <div
           className="pb-table-scroll"
@@ -430,9 +415,7 @@ export default function ScanResults({
           aria-label="Table: result per scan module"
         >
           <table className="pb-table pb-table-modules">
-            <caption className="sr-only">
-              Scan modules with number of findings and result
-            </caption>
+            <caption className="sr-only">Scan modules with number of findings and result</caption>
             <thead>
               <tr>
                 <th scope="col">Scan module</th>

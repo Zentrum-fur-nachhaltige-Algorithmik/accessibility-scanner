@@ -11,7 +11,7 @@ class PredictableNavigationScanner extends BaseScanner {
   constructor() {
     super('predictable-navigation', {
       wcagCriteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
-      wcagPrinciple: 'understandable'
+      wcagPrinciple: 'understandable',
     });
   }
 
@@ -27,7 +27,7 @@ class PredictableNavigationScanner extends BaseScanner {
       testOnInput: true,
       testConsistentNavigation: true,
       testConsistentIdentification: true,
-      timeout: 60000
+      timeout: 60000,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -37,21 +37,25 @@ class PredictableNavigationScanner extends BaseScanner {
     const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
     await fs.ensureDir(scanDir);
 
-    const navigationResults = await this.performPredictableNavigationAnalysis(page, scanDir, scanOptions);
+    const navigationResults = await this.performPredictableNavigationAnalysis(
+      page,
+      scanDir,
+      scanOptions
+    );
 
     return {
       scannerId: this.id,
-      criteria: ["9.3.2.1", "9.3.2.2", "9.3.2.3", "9.3.2.4"],
+      criteria: ['9.3.2.1', '9.3.2.2', '9.3.2.3', '9.3.2.4'],
       passed: navigationResults.violations.length === 0,
       violations: navigationResults.violations,
       summary: {
         onFocusPredictable: navigationResults.onFocusPredictable,
         onInputPredictable: navigationResults.onInputPredictable,
         navigationConsistent: navigationResults.navigationConsistent,
-        identificationConsistent: navigationResults.identificationConsistent
+        identificationConsistent: navigationResults.identificationConsistent,
       },
       screenshotPath: scanDir,
-      visualEvidence: navigationResults.visualEvidence
+      visualEvidence: navigationResults.visualEvidence,
     };
   }
 
@@ -103,7 +107,7 @@ class PredictableNavigationScanner extends BaseScanner {
       onFocusPredictable: onFocusPredictable,
       onInputPredictable: onInputPredictable,
       navigationConsistent: navigationConsistent,
-      identificationConsistent: identificationConsistent
+      identificationConsistent: identificationConsistent,
     });
 
     console.log(`Predictable navigation analysis complete: ${violations.length} violations found`);
@@ -114,7 +118,7 @@ class PredictableNavigationScanner extends BaseScanner {
       onFocusPredictable,
       onInputPredictable,
       navigationConsistent,
-      identificationConsistent
+      identificationConsistent,
     };
   }
 
@@ -129,31 +133,39 @@ class PredictableNavigationScanner extends BaseScanner {
       let predictable = true;
 
       // Get all focusable elements
-      const focusableElements = document.querySelectorAll('input, button, select, textarea, a[href], [tabindex], [contenteditable]');
-      
-      focusableElements.forEach(element => {
+      const focusableElements = document.querySelectorAll(
+        'input, button, select, textarea, a[href], [tabindex], [contenteditable]'
+      );
+
+      focusableElements.forEach((element) => {
         const elementInfo = {
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className ? `.${element.className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (element.className ? `.${element.className.split(' ')[0]}` : ''),
         };
 
         // Check for onfocus event handlers that might cause context changes
-        const hasFocusHandler = element.hasAttribute('onfocus') || 
-                              element.addEventListener || 
-                              element.onfocus;
+        const hasFocusHandler =
+          element.hasAttribute('onfocus') || element.addEventListener || element.onfocus;
 
         if (element.hasAttribute('onfocus')) {
           const focusCode = element.getAttribute('onfocus');
-          
+
           // Check for potentially disruptive focus actions
           const disruptiveActions = [
-            'window.open', 'location.href', 'location.replace', 'location.assign',
-            'form.submit', 'document.location', 'window.location',
-            'history.pushState', 'history.replaceState'
+            'window.open',
+            'location.href',
+            'location.replace',
+            'location.assign',
+            'form.submit',
+            'document.location',
+            'window.location',
+            'history.pushState',
+            'history.replaceState',
           ];
 
-          const hasDisruptiveAction = disruptiveActions.some(action => 
+          const hasDisruptiveAction = disruptiveActions.some((action) =>
             focusCode.includes(action)
           );
 
@@ -163,7 +175,7 @@ class PredictableNavigationScanner extends BaseScanner {
               element: elementInfo.selector,
               description: 'Focus event triggers unexpected context change without user initiation',
               severity: 'error',
-              focusCode: focusCode.substring(0, 100)
+              focusCode: focusCode.substring(0, 100),
             });
             predictable = false;
           }
@@ -172,7 +184,7 @@ class PredictableNavigationScanner extends BaseScanner {
         // Check for focus traps that might be disorienting
         if (element.hasAttribute('tabindex')) {
           const tabIndex = parseInt(element.getAttribute('tabindex'));
-          
+
           // Very high positive tabindex values can be disorienting
           if (tabIndex > 10) {
             issues.push({
@@ -180,7 +192,7 @@ class PredictableNavigationScanner extends BaseScanner {
               element: elementInfo.selector,
               description: 'High tabindex value may cause unpredictable focus behavior',
               severity: 'warning',
-              tabIndex: tabIndex
+              tabIndex: tabIndex,
             });
           }
         }
@@ -188,24 +200,26 @@ class PredictableNavigationScanner extends BaseScanner {
         // Check for elements that auto-focus and might disrupt user flow
         if (element.hasAttribute('autofocus')) {
           // Auto-focus is generally ok on landing pages but problematic in modals/dynamic content
-          const isInModal = element.closest('[role="dialog"]') || 
-                           element.closest('.modal') ||
-                           element.closest('[aria-modal="true"]');
+          const isInModal =
+            element.closest('[role="dialog"]') ||
+            element.closest('.modal') ||
+            element.closest('[aria-modal="true"]');
 
-          const isDynamicContent = element.closest('[aria-live]') ||
-                                  element.closest('[role="alert"]');
+          const isDynamicContent =
+            element.closest('[aria-live]') || element.closest('[role="alert"]');
 
           if (isInModal || isDynamicContent) {
             // Check if there's user consent for the auto-focus
-            const hasUserControl = document.querySelector('button[aria-controls]') ||
-                                  document.querySelector('[aria-expanded]');
+            const hasUserControl =
+              document.querySelector('button[aria-controls]') ||
+              document.querySelector('[aria-expanded]');
 
             if (!hasUserControl) {
               issues.push({
                 type: 'autofocus-in-dynamic-content',
                 element: elementInfo.selector,
                 description: 'Auto-focus in modal or dynamic content without user initiation',
-                severity: 'warning'
+                severity: 'warning',
               });
             }
           }
@@ -217,16 +231,20 @@ class PredictableNavigationScanner extends BaseScanner {
       let hasUnpredictableFocusStyles = false;
 
       try {
-        styleSheets.forEach(sheet => {
+        styleSheets.forEach((sheet) => {
           try {
             const rules = Array.from(sheet.cssRules || []);
-            rules.forEach(rule => {
+            rules.forEach((rule) => {
               if (rule.selectorText && rule.selectorText.includes(':focus')) {
                 const focusRule = rule.cssText;
-                
+
                 // Check for focus styles that might be disorienting
-                const problematicStyles = ['display: none', 'visibility: hidden', 'position: absolute'];
-                const hasProblematicStyle = problematicStyles.some(style => 
+                const problematicStyles = [
+                  'display: none',
+                  'visibility: hidden',
+                  'position: absolute',
+                ];
+                const hasProblematicStyle = problematicStyles.some((style) =>
                   focusRule.includes(style)
                 );
 
@@ -248,7 +266,7 @@ class PredictableNavigationScanner extends BaseScanner {
           type: 'unpredictable-focus-styles',
           element: 'document',
           description: 'CSS focus styles may cause elements to disappear or move unexpectedly',
-          severity: 'warning'
+          severity: 'warning',
         });
       }
 
@@ -256,14 +274,14 @@ class PredictableNavigationScanner extends BaseScanner {
     });
 
     // Create violations for on focus issues
-    onFocusAnalysis.issues.forEach(issue => {
+    onFocusAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.3.2.1",
+        criterion: '9.3.2.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getOnFocusSuggestion(issue.type)
+        suggestion: this.getOnFocusSuggestion(issue.type),
       });
     });
 
@@ -313,13 +331,22 @@ class PredictableNavigationScanner extends BaseScanner {
       const NAVIGATION_CONSTRUCTS = [
         { pattern: /\.\s*submit\s*\(/, what: 'submits the form' },
         { pattern: /\bwindow\s*\.\s*open\s*\(/, what: 'opens a new window' },
-        { pattern: /\blocation\s*\.\s*(?:href|replace|assign)\s*[=(]/, what: 'navigates to another URL' },
+        {
+          pattern: /\blocation\s*\.\s*(?:href|replace|assign)\s*[=(]/,
+          what: 'navigates to another URL',
+        },
         { pattern: /\b(?:window|document)\s*\.\s*location\s*=/, what: 'navigates to another URL' },
-        { pattern: /\bhistory\s*\.\s*(?:pushState|replaceState)\s*\(/, what: 'replaces the browser history entry' }
+        {
+          pattern: /\bhistory\s*\.\s*(?:pushState|replaceState)\s*\(/,
+          what: 'replaces the browser history entry',
+        },
       ];
       const DIALOG_CONSTRUCTS = [
-        { pattern: /\b(?:alert|confirm|prompt)\s*\(/, what: 'opens a modal dialog which takes focus' },
-        { pattern: /\.\s*showModal\s*\(/, what: 'opens a modal dialog which takes focus' }
+        {
+          pattern: /\b(?:alert|confirm|prompt)\s*\(/,
+          what: 'opens a modal dialog which takes focus',
+        },
+        { pattern: /\.\s*showModal\s*\(/, what: 'opens a modal dialog which takes focus' },
       ];
 
       function detectContextChange(resolvedCode) {
@@ -335,31 +362,39 @@ class PredictableNavigationScanner extends BaseScanner {
       // Check form inputs for unexpected context changes
       const formElements = document.querySelectorAll('input, select, textarea');
 
-      formElements.forEach(element => {
+      formElements.forEach((element) => {
         const elementInfo = {
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className ? `.${element.className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (element.className ? `.${element.className.split(' ')[0]}` : ''),
         };
 
         // Check for onchange/oninput handlers that might cause context changes
-        ['onchange', 'oninput', 'onblur'].forEach(eventType => {
+        ['onchange', 'oninput', 'onblur'].forEach((eventType) => {
           if (element.hasAttribute(eventType)) {
             const eventCode = element.getAttribute(eventType);
-            
+
             // Check for navigation/submission without user consent
             const contextChangeActions = [
-              'form.submit', 'window.open', 'location.href', 'location.replace',
-              'document.location', 'window.location', 'history.pushState'
+              'form.submit',
+              'window.open',
+              'location.href',
+              'location.replace',
+              'document.location',
+              'window.location',
+              'history.pushState',
             ];
 
-            const causesContextChange = contextChangeActions.some(action => 
+            const causesContextChange = contextChangeActions.some((action) =>
               eventCode.includes(action)
             );
 
             // The handler may only reference a function that performs the
             // context change - resolve it so indirect handlers are caught too.
-            const indirect = causesContextChange ? null : detectContextChange(resolveHandlerCode(eventCode));
+            const indirect = causesContextChange
+              ? null
+              : detectContextChange(resolveHandlerCode(eventCode));
 
             if (causesContextChange || indirect) {
               // Check if it's a select dropdown (which is more acceptable)
@@ -367,10 +402,11 @@ class PredictableNavigationScanner extends BaseScanner {
 
               // For select elements, check if there's a warning or submit button
               if (isSelectElement) {
-                const hasWarning = element.parentElement.textContent.toLowerCase().includes('automatically') ||
-                                 element.parentElement.textContent.toLowerCase().includes('automatisch') ||
-                                 element.parentElement.querySelector('[role="alert"]') ||
-                                 element.getAttribute('aria-describedby');
+                const hasWarning =
+                  element.parentElement.textContent.toLowerCase().includes('automatically') ||
+                  element.parentElement.textContent.toLowerCase().includes('automatisch') ||
+                  element.parentElement.querySelector('[role="alert"]') ||
+                  element.getAttribute('aria-describedby');
 
                 if (!hasWarning) {
                   issues.push({
@@ -378,7 +414,9 @@ class PredictableNavigationScanner extends BaseScanner {
                     element: elementInfo.selector,
                     description: 'Select element auto-submits form without warning to user',
                     severity: 'error',
-                    evidence: indirect ? `${eventType} handler ${indirect.what}` : `${eventType}="${eventCode.substring(0, 80)}"`
+                    evidence: indirect
+                      ? `${eventType} handler ${indirect.what}`
+                      : `${eventType}="${eventCode.substring(0, 80)}"`,
                   });
                   predictable = false;
                 }
@@ -386,9 +424,10 @@ class PredictableNavigationScanner extends BaseScanner {
                 issues.push({
                   type: 'input-opens-modal-dialog',
                   element: elementInfo.selector,
-                  description: 'Changing this control automatically opens a modal dialog, moving focus without user request',
+                  description:
+                    'Changing this control automatically opens a modal dialog, moving focus without user request',
                   severity: 'warning',
-                  evidence: `${eventType} handler ${indirect.what}`
+                  evidence: `${eventType} handler ${indirect.what}`,
                 });
                 predictable = false;
               } else {
@@ -397,7 +436,9 @@ class PredictableNavigationScanner extends BaseScanner {
                   element: elementInfo.selector,
                   description: 'Input change triggers unexpected navigation or form submission',
                   severity: 'error',
-                  evidence: indirect ? `${eventType} handler ${indirect.what}` : `${eventType}="${eventCode.substring(0, 80)}"`
+                  evidence: indirect
+                    ? `${eventType} handler ${indirect.what}`
+                    : `${eventType}="${eventCode.substring(0, 80)}"`,
                 });
                 predictable = false;
               }
@@ -409,8 +450,8 @@ class PredictableNavigationScanner extends BaseScanner {
         if (element.type === 'radio') {
           const radioGroup = document.querySelectorAll(`input[name="${element.name}"]`);
           let hasAutoSubmit = false;
-          
-          radioGroup.forEach(radio => {
+
+          radioGroup.forEach((radio) => {
             if (radio.hasAttribute('onchange') || radio.hasAttribute('onclick')) {
               const eventCode = radio.getAttribute('onchange') || radio.getAttribute('onclick');
               if (eventCode.includes('submit') || eventCode.includes('location')) {
@@ -422,16 +463,19 @@ class PredictableNavigationScanner extends BaseScanner {
           if (hasAutoSubmit) {
             // Look for submit button or warning
             const form = element.closest('form');
-            const hasSubmitButton = form && form.querySelector('input[type="submit"], button[type="submit"]');
-            const hasWarning = form && (form.textContent.toLowerCase().includes('automatically') ||
-                                       form.querySelector('[role="alert"]'));
+            const hasSubmitButton =
+              form && form.querySelector('input[type="submit"], button[type="submit"]');
+            const hasWarning =
+              form &&
+              (form.textContent.toLowerCase().includes('automatically') ||
+                form.querySelector('[role="alert"]'));
 
             if (!hasSubmitButton && !hasWarning) {
               issues.push({
                 type: 'radio-auto-submit-no-control',
                 element: elementInfo.selector,
                 description: 'Radio button auto-submits without submit button or user warning',
-                severity: 'error'
+                severity: 'error',
               });
               predictable = false;
             }
@@ -440,23 +484,26 @@ class PredictableNavigationScanner extends BaseScanner {
 
         // Check for checkboxes that immediately trigger actions
         if (element.type === 'checkbox') {
-          const hasImmediateAction = element.hasAttribute('onchange') || element.hasAttribute('onclick');
-          
+          const hasImmediateAction =
+            element.hasAttribute('onchange') || element.hasAttribute('onclick');
+
           if (hasImmediateAction) {
             const eventCode = element.getAttribute('onchange') || element.getAttribute('onclick');
-            
+
             // Allow simple UI state changes but not navigation
             const allowedActions = ['show', 'hide', 'toggle', 'addClass', 'removeClass'];
-            const hasNavigation = eventCode.includes('location') || 
-                                 eventCode.includes('submit') ||
-                                 eventCode.includes('window.open');
+            const hasNavigation =
+              eventCode.includes('location') ||
+              eventCode.includes('submit') ||
+              eventCode.includes('window.open');
 
             if (hasNavigation) {
               issues.push({
                 type: 'checkbox-causes-navigation',
                 element: elementInfo.selector,
-                description: 'Checkbox change causes immediate navigation without user confirmation',
-                severity: 'error'
+                description:
+                  'Checkbox change causes immediate navigation without user confirmation',
+                severity: 'error',
               });
               predictable = false;
             }
@@ -466,7 +513,7 @@ class PredictableNavigationScanner extends BaseScanner {
 
       // Check for forms that auto-submit on completion
       const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
+      forms.forEach((form) => {
         const inputs = form.querySelectorAll('input:required');
         let hasAutoSubmitOnComplete = false;
 
@@ -479,16 +526,17 @@ class PredictableNavigationScanner extends BaseScanner {
         }
 
         if (hasAutoSubmitOnComplete) {
-          const hasWarning = form.textContent.toLowerCase().includes('automatically submit') ||
-                           form.querySelector('[role="alert"]') ||
-                           form.querySelector('.auto-submit-warning');
+          const hasWarning =
+            form.textContent.toLowerCase().includes('automatically submit') ||
+            form.querySelector('[role="alert"]') ||
+            form.querySelector('.auto-submit-warning');
 
           if (!hasWarning) {
             issues.push({
               type: 'form-auto-submit-no-warning',
               element: 'form',
               description: 'Form auto-submits when complete without user warning',
-              severity: 'error'
+              severity: 'error',
             });
             predictable = false;
           }
@@ -499,15 +547,15 @@ class PredictableNavigationScanner extends BaseScanner {
     });
 
     // Create violations for on input issues
-    onInputAnalysis.issues.forEach(issue => {
+    onInputAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.3.2.2",
+        criterion: '9.3.2.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
         evidence: issue.evidence,
-        suggestion: this.getOnInputSuggestion(issue.type)
+        suggestion: this.getOnInputSuggestion(issue.type),
       });
     });
 
@@ -545,13 +593,15 @@ class PredictableNavigationScanner extends BaseScanner {
       // page-structure, html-validation and screen-reader scanners.
       // ----------------------------------------------------------------
 
-      const MIN_SHARED_DESTINATIONS = 3;   // below this, two blocks are not evidently the same mechanism
+      const MIN_SHARED_DESTINATIONS = 3; // below this, two blocks are not evidently the same mechanism
       const MAX_REPORTED_PAIRS = 5;
 
       function selectorFor(el) {
-        return el.tagName.toLowerCase() +
-               (el.id ? `#${el.id}` : '') +
-               (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+        return (
+          el.tagName.toLowerCase() +
+          (el.id ? `#${el.id}` : '') +
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
+        );
       }
 
       const allNavs = Array.from(
@@ -560,17 +610,18 @@ class PredictableNavigationScanner extends BaseScanner {
 
       // Drop nested duplicates (e.g. <nav class="navigation">) and hidden blocks,
       // so the same markup is never compared against itself.
-      const navigationElements = allNavs.filter(nav => {
+      const navigationElements = allNavs.filter((nav) => {
         if (nav.closest('[aria-hidden="true"]')) return false;
-        return !allNavs.some(other => other !== nav && other.contains(nav));
+        return !allNavs.some((other) => other !== nav && other.contains(nav));
       });
 
       function destinationsOf(nav) {
         const seen = new Set();
         const ordered = [];
-        nav.querySelectorAll('a[href]').forEach(link => {
-          const name = (link.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase() ||
-                       (link.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        nav.querySelectorAll('a[href]').forEach((link) => {
+          const name =
+            (link.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase() ||
+            (link.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().toLowerCase();
           if (!name || seen.has(name)) return;
           seen.add(name);
           ordered.push(name);
@@ -579,8 +630,8 @@ class PredictableNavigationScanner extends BaseScanner {
       }
 
       const navProfiles = navigationElements
-        .map(nav => ({ nav, selector: selectorFor(nav), destinations: destinationsOf(nav) }))
-        .filter(profile => profile.destinations.length >= MIN_SHARED_DESTINATIONS);
+        .map((nav) => ({ nav, selector: selectorFor(nav), destinations: destinationsOf(nav) }))
+        .filter((profile) => profile.destinations.length >= MIN_SHARED_DESTINATIONS);
 
       let reportedPairs = 0;
 
@@ -590,7 +641,7 @@ class PredictableNavigationScanner extends BaseScanner {
           const b = navProfiles[j];
 
           const setB = new Set(b.destinations);
-          const shared = a.destinations.filter(name => setB.has(name));
+          const shared = a.destinations.filter((name) => setB.has(name));
 
           if (shared.length < MIN_SHARED_DESTINATIONS) continue;
 
@@ -599,8 +650,8 @@ class PredictableNavigationScanner extends BaseScanner {
           // repeated - a footer menu that carries the main links plus
           // "Impressum"/"Datenschutz" is its own mechanism and is free to
           // order them differently, so it must not be flagged.
-          const isSameMechanism = shared.length === a.destinations.length &&
-                                  shared.length === b.destinations.length;
+          const isSameMechanism =
+            shared.length === a.destinations.length && shared.length === b.destinations.length;
           if (!isSameMechanism) continue;
 
           const orderA = a.destinations;
@@ -610,9 +661,10 @@ class PredictableNavigationScanner extends BaseScanner {
             issues.push({
               type: 'inconsistent-nav-order',
               element: `${a.selector} vs ${b.selector}`,
-              description: 'Repeated navigation blocks list the same destinations in a different relative order',
+              description:
+                'Repeated navigation blocks list the same destinations in a different relative order',
               severity: 'error',
-              evidence: `"${orderA.join(' > ')}" vs "${orderB.join(' > ')}"`
+              evidence: `"${orderA.join(' > ')}" vs "${orderB.join(' > ')}"`,
             });
             consistent = false;
             reportedPairs++;
@@ -624,15 +676,15 @@ class PredictableNavigationScanner extends BaseScanner {
     });
 
     // Create violations for navigation consistency issues
-    navigationAnalysis.issues.forEach(issue => {
+    navigationAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.3.2.3",
+        criterion: '9.3.2.3',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
         evidence: issue.evidence,
-        suggestion: this.getNavigationConsistencySuggestion(issue.type)
+        suggestion: this.getNavigationConsistencySuggestion(issue.type),
       });
     });
 
@@ -680,10 +732,12 @@ class PredictableNavigationScanner extends BaseScanner {
       }
 
       // Check for consistent button identification
-      const buttons = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]');
+      const buttons = document.querySelectorAll(
+        'button, [role="button"], input[type="button"], input[type="submit"]'
+      );
       const buttonPatterns = new Map();
 
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         const text = normalizeName(button.textContent);
         const ariaLabel = normalizeName(button.getAttribute('aria-label'));
         // Group buttons by similar function - be more specific.
@@ -697,7 +751,7 @@ class PredictableNavigationScanner extends BaseScanner {
         // label. Two forms' submit buttons are named after their own form's
         // action; they are not "the same functionality" in the sense of 3.2.4.
         const words = new Set(text.split(' ').filter(Boolean));
-        const hasWord = (...candidates) => candidates.some(w => words.has(w));
+        const hasWord = (...candidates) => candidates.some((w) => words.has(w));
 
         let functionType = 'other';
         if (hasWord('cancel', 'close', 'dismiss')) {
@@ -726,9 +780,10 @@ class PredictableNavigationScanner extends BaseScanner {
           element: button,
           text: text,
           ariaLabel: ariaLabel,
-          selector: button.tagName.toLowerCase() + 
-                   (button.id ? `#${button.id}` : '') + 
-                   (button.className ? `.${button.className.split(' ')[0]}` : '')
+          selector:
+            button.tagName.toLowerCase() +
+            (button.id ? `#${button.id}` : '') +
+            (button.className ? `.${button.className.split(' ')[0]}` : ''),
         });
       });
 
@@ -737,7 +792,7 @@ class PredictableNavigationScanner extends BaseScanner {
         // Only check specific function types, not generic "other"
         if (buttons.length > 1 && functionType !== 'other') {
           const firstButton = buttons[0];
-          const inconsistentButtons = buttons.filter(button => {
+          const inconsistentButtons = buttons.filter((button) => {
             // Allow slight variations but flag major differences
             const textSimilar = namesSimilar(button.text, firstButton.text);
             const labelSimilar = namesSimilar(button.ariaLabel, firstButton.ariaLabel);
@@ -752,7 +807,7 @@ class PredictableNavigationScanner extends BaseScanner {
               description: `Buttons with similar function "${functionType}" have inconsistent labels`,
               severity: 'warning',
               functionType: functionType,
-              variations: buttons.map(b => b.text).join(', ')
+              variations: buttons.map((b) => b.text).join(', '),
             });
             consistent = false;
           }
@@ -763,7 +818,7 @@ class PredictableNavigationScanner extends BaseScanner {
       const links = document.querySelectorAll('a[href]');
       const linkPatterns = new Map();
 
-      links.forEach(link => {
+      links.forEach((link) => {
         const href = link.getAttribute('href');
         const text = link.textContent.trim();
         const ariaLabel = link.getAttribute('aria-label') || '';
@@ -791,18 +846,19 @@ class PredictableNavigationScanner extends BaseScanner {
           text: text,
           href: href,
           ariaLabel: ariaLabel,
-          selector: `a[href="${href.substring(0, 50)}"]`
+          selector: `a[href="${href.substring(0, 50)}"]`,
         });
       });
 
       // Check for missing external link indicators
       if (linkPatterns.has('external')) {
         const externalLinks = linkPatterns.get('external');
-        const hasExternalIndicators = externalLinks.some(link => 
-          link.text.includes('(external)') ||
-          link.ariaLabel.includes('external') ||
-          link.element.querySelector('[class*="external"], [class*="icon"]') ||
-          link.element.hasAttribute('target')
+        const hasExternalIndicators = externalLinks.some(
+          (link) =>
+            link.text.includes('(external)') ||
+            link.ariaLabel.includes('external') ||
+            link.element.querySelector('[class*="external"], [class*="icon"]') ||
+            link.element.hasAttribute('target')
         );
 
         if (!hasExternalIndicators && externalLinks.length > 0) {
@@ -810,7 +866,7 @@ class PredictableNavigationScanner extends BaseScanner {
             type: 'external-links-no-identification',
             element: 'external links',
             description: 'External links lack consistent identification (visual indicator or text)',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
       }
@@ -818,12 +874,15 @@ class PredictableNavigationScanner extends BaseScanner {
       // Check for document link identification
       if (linkPatterns.has('document')) {
         const documentLinks = linkPatterns.get('document');
-        const hasDocumentIndicators = documentLinks.some(link => {
-          const hasFileType = link.text.includes('.pdf') || 
-                            link.text.includes('.doc') || 
-                            link.text.includes('PDF') ||
-                            link.text.includes('Word');
-          const hasIcon = link.element.querySelector('[class*="pdf"], [class*="doc"], [class*="file"]');
+        const hasDocumentIndicators = documentLinks.some((link) => {
+          const hasFileType =
+            link.text.includes('.pdf') ||
+            link.text.includes('.doc') ||
+            link.text.includes('PDF') ||
+            link.text.includes('Word');
+          const hasIcon = link.element.querySelector(
+            '[class*="pdf"], [class*="doc"], [class*="file"]'
+          );
           return hasFileType || hasIcon;
         });
 
@@ -832,50 +891,59 @@ class PredictableNavigationScanner extends BaseScanner {
             type: 'document-links-no-identification',
             element: 'document links',
             description: 'Document links lack file type identification',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
       }
 
       // Check for consistent form field identification
       const formFields = document.querySelectorAll('input, select, textarea');
-      const requiredFields = Array.from(formFields).filter(field => field.hasAttribute('required'));
-      
+      const requiredFields = Array.from(formFields).filter((field) =>
+        field.hasAttribute('required')
+      );
+
       if (requiredFields.length > 1) {
         // Check what identification methods are used
         const identificationMethods = {
           asterisk: 0,
           ariaRequired: 0,
           requiredText: 0,
-          cssClass: 0
+          cssClass: 0,
         };
 
-        requiredFields.forEach(field => {
+        requiredFields.forEach((field) => {
           // Check for asterisk in label
-          const hasAsterisk = field.labels && Array.from(field.labels).some(label => 
-            label.textContent.includes('*') || label.className.includes('required')
-          );
+          const hasAsterisk =
+            field.labels &&
+            Array.from(field.labels).some(
+              (label) => label.textContent.includes('*') || label.className.includes('required')
+            );
           if (hasAsterisk) identificationMethods.asterisk++;
 
           // Check for aria-required
           if (field.hasAttribute('aria-required')) identificationMethods.ariaRequired++;
 
           // Check for "required" text in label
-          const hasRequiredText = field.labels && Array.from(field.labels).some(label => 
-            label.textContent.toLowerCase().includes('required')
-          );
+          const hasRequiredText =
+            field.labels &&
+            Array.from(field.labels).some((label) =>
+              label.textContent.toLowerCase().includes('required')
+            );
           if (hasRequiredText) identificationMethods.requiredText++;
 
           // Check for CSS class indicating required
-          if (field.className.includes('required') || 
-              (field.labels && Array.from(field.labels).some(label => label.className.includes('required')))) {
+          if (
+            field.className.includes('required') ||
+            (field.labels &&
+              Array.from(field.labels).some((label) => label.className.includes('required')))
+          ) {
             identificationMethods.cssClass++;
           }
         });
 
         // At least one method should be used consistently across all required fields
-        const hasConsistentMethod = Object.values(identificationMethods).some(count => 
-          count === requiredFields.length
+        const hasConsistentMethod = Object.values(identificationMethods).some(
+          (count) => count === requiredFields.length
         );
 
         if (!hasConsistentMethod) {
@@ -883,38 +951,41 @@ class PredictableNavigationScanner extends BaseScanner {
             type: 'inconsistent-required-field-identification',
             element: 'form fields',
             description: 'Required form fields lack consistent identification method',
-            severity: 'error'
+            severity: 'error',
           });
           consistent = false;
         }
       }
 
       // Check for consistent error identification
-      const errorElements = document.querySelectorAll('[class*="error"], [role="alert"], [aria-invalid="true"]');
+      const errorElements = document.querySelectorAll(
+        '[class*="error"], [role="alert"], [aria-invalid="true"]'
+      );
       if (errorElements.length > 0) {
         const errorPatterns = [];
-        
-        errorElements.forEach(element => {
+
+        errorElements.forEach((element) => {
           const hasErrorClass = element.className.includes('error');
           const hasAriaInvalid = element.hasAttribute('aria-invalid');
           const hasRole = element.getAttribute('role') === 'alert';
           const hasErrorText = element.textContent.toLowerCase().includes('error');
-          
+
           errorPatterns.push({
             hasErrorClass,
             hasAriaInvalid,
             hasRole,
-            hasErrorText
+            hasErrorText,
           });
         });
 
         // Check if error identification is consistent
         if (errorPatterns.length > 1) {
           const firstPattern = errorPatterns[0];
-          const isConsistent = errorPatterns.every(pattern => 
-            pattern.hasErrorClass === firstPattern.hasErrorClass ||
-            pattern.hasAriaInvalid === firstPattern.hasAriaInvalid ||
-            pattern.hasRole === firstPattern.hasRole
+          const isConsistent = errorPatterns.every(
+            (pattern) =>
+              pattern.hasErrorClass === firstPattern.hasErrorClass ||
+              pattern.hasAriaInvalid === firstPattern.hasAriaInvalid ||
+              pattern.hasRole === firstPattern.hasRole
           );
 
           if (!isConsistent) {
@@ -922,7 +993,7 @@ class PredictableNavigationScanner extends BaseScanner {
               type: 'inconsistent-error-identification',
               element: 'error elements',
               description: 'Error states use inconsistent identification methods',
-              severity: 'warning'
+              severity: 'warning',
             });
           }
         }
@@ -932,14 +1003,14 @@ class PredictableNavigationScanner extends BaseScanner {
     });
 
     // Create violations for identification consistency issues
-    identificationAnalysis.issues.forEach(issue => {
+    identificationAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.3.2.4",
+        criterion: '9.3.2.4',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getIdentificationConsistencySuggestion(issue.type)
+        suggestion: this.getIdentificationConsistencySuggestion(issue.type),
       });
     });
 
@@ -951,10 +1022,13 @@ class PredictableNavigationScanner extends BaseScanner {
    */
   getOnFocusSuggestion(violationType) {
     const suggestions = {
-      'focus-causes-context-change': 'Remove automatic navigation on focus - require user action (click/enter)',
-      'high-tabindex-focus-jump': 'Use lower tabindex values or rely on natural DOM order for predictable focus flow',
-      'autofocus-in-dynamic-content': 'Remove autofocus or ensure user initiated the modal/content display',
-      'unpredictable-focus-styles': 'Ensure focus styles maintain element visibility and position'
+      'focus-causes-context-change':
+        'Remove automatic navigation on focus - require user action (click/enter)',
+      'high-tabindex-focus-jump':
+        'Use lower tabindex values or rely on natural DOM order for predictable focus flow',
+      'autofocus-in-dynamic-content':
+        'Remove autofocus or ensure user initiated the modal/content display',
+      'unpredictable-focus-styles': 'Ensure focus styles maintain element visibility and position',
     };
     return suggestions[violationType] || 'Ensure focus behavior is predictable and user-controlled';
   }
@@ -964,14 +1038,22 @@ class PredictableNavigationScanner extends BaseScanner {
    */
   getOnInputSuggestion(violationType) {
     const suggestions = {
-      'input-causes-context-change': 'Add submit button instead of automatic form submission on input change',
-      'input-opens-modal-dialog': 'Do not open dialogs from change/input/blur handlers - trigger them from an explicit user action such as a button press',
-      'select-auto-submit-no-warning': 'Add warning text about automatic submission or provide submit button',
-      'radio-auto-submit-no-control': 'Replace auto-submit with explicit submit button for user control',
-      'checkbox-causes-navigation': 'Replace immediate navigation with user-initiated action (button click)',
-      'form-auto-submit-no-warning': 'Add clear warning about automatic form submission behavior'
+      'input-causes-context-change':
+        'Add submit button instead of automatic form submission on input change',
+      'input-opens-modal-dialog':
+        'Do not open dialogs from change/input/blur handlers - trigger them from an explicit user action such as a button press',
+      'select-auto-submit-no-warning':
+        'Add warning text about automatic submission or provide submit button',
+      'radio-auto-submit-no-control':
+        'Replace auto-submit with explicit submit button for user control',
+      'checkbox-causes-navigation':
+        'Replace immediate navigation with user-initiated action (button click)',
+      'form-auto-submit-no-warning': 'Add clear warning about automatic form submission behavior',
     };
-    return suggestions[violationType] || 'Require explicit user action for context changes rather than automatic triggers';
+    return (
+      suggestions[violationType] ||
+      'Require explicit user action for context changes rather than automatic triggers'
+    );
   }
 
   /**
@@ -979,9 +1061,13 @@ class PredictableNavigationScanner extends BaseScanner {
    */
   getNavigationConsistencySuggestion(violationType) {
     const suggestions = {
-      'inconsistent-nav-order': 'List the repeated navigation links in the same relative order everywhere the navigation is repeated'
+      'inconsistent-nav-order':
+        'List the repeated navigation links in the same relative order everywhere the navigation is repeated',
     };
-    return suggestions[violationType] || 'Maintain consistent navigation patterns and structure across pages';
+    return (
+      suggestions[violationType] ||
+      'Maintain consistent navigation patterns and structure across pages'
+    );
   }
 
   /**
@@ -989,15 +1075,22 @@ class PredictableNavigationScanner extends BaseScanner {
    */
   getIdentificationConsistencySuggestion(violationType) {
     const suggestions = {
-      'inconsistent-button-identification': 'Use consistent button labels for similar functions across the site',
-      'external-links-no-identification': 'Add consistent indicators for external links (icon, text, or target="_blank")',
-      'document-links-no-identification': 'Include file type in link text or add file type icons consistently',
-      'inconsistent-required-field-identification': 'Use consistent method to identify required fields (asterisk, "required" text, or aria-required)',
-      'inconsistent-error-identification': 'Standardize error identification with consistent classes, ARIA attributes, and visual styling'
+      'inconsistent-button-identification':
+        'Use consistent button labels for similar functions across the site',
+      'external-links-no-identification':
+        'Add consistent indicators for external links (icon, text, or target="_blank")',
+      'document-links-no-identification':
+        'Include file type in link text or add file type icons consistently',
+      'inconsistent-required-field-identification':
+        'Use consistent method to identify required fields (asterisk, "required" text, or aria-required)',
+      'inconsistent-error-identification':
+        'Standardize error identification with consistent classes, ARIA attributes, and visual styling',
     };
-    return suggestions[violationType] || 'Maintain consistent identification patterns for similar interface components';
+    return (
+      suggestions[violationType] ||
+      'Maintain consistent identification patterns for similar interface components'
+    );
   }
-
 }
 
 module.exports = PredictableNavigationScanner;

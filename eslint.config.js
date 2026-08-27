@@ -5,7 +5,9 @@ const reactHooks = require('eslint-plugin-react-hooks');
 const prettier = require('eslint-config-prettier');
 
 module.exports = [
-  { ignores: ['node_modules', 'frontend/.next', 'src/agent/vendor', 'reports', 'test-sites', 'tmp'] },
+  {
+    ignores: ['node_modules', 'frontend/.next', 'src/agent/vendor', 'reports', 'test-sites', 'tmp'],
+  },
   js.configs.recommended,
   {
     files: ['src/**/*.js', 'scripts/**/*.js'],
@@ -23,7 +25,10 @@ module.exports = [
   {
     files: ['tests/**/*.js', 'vitest.config.js'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node, ...globals.browser } },
-    rules: { 'no-console': 'off', 'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }] },
+    rules: {
+      'no-console': 'off',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
+    },
   },
   {
     files: ['frontend/**/*.js'],

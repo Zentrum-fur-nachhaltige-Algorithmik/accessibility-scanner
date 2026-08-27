@@ -11,7 +11,7 @@ class TimingControlsScanner extends BaseScanner {
   constructor() {
     super('timing-controls', {
       wcagCriteria: ['2.2.1', '2.2.2'],
-      wcagPrinciple: 'operable'
+      wcagPrinciple: 'operable',
     });
   }
 
@@ -27,7 +27,7 @@ class TimingControlsScanner extends BaseScanner {
       testAutoPlay: true,
       testMovingContent: true,
       observationTime: 5000,
-      timeout: 60000
+      timeout: 60000,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -41,17 +41,17 @@ class TimingControlsScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.2.2.1", "9.2.2.2", "9.2.2.6"],
+      criteria: ['9.2.2.1', '9.2.2.2', '9.2.2.6'],
       passed: timingResults.violations.length === 0,
       violations: timingResults.violations,
       summary: {
         timeoutsAdjustable: timingResults.timeoutsAdjustable,
         autoPlayControlled: timingResults.autoPlayControlled,
         movingContentControllable: timingResults.movingContentControllable,
-        dataPreservedOnTimeout: timingResults.dataPreservedOnTimeout
+        dataPreservedOnTimeout: timingResults.dataPreservedOnTimeout,
       },
       screenshotPath: scanDir,
-      visualEvidence: timingResults.visualEvidence
+      visualEvidence: timingResults.visualEvidence,
     };
   }
 
@@ -81,13 +81,21 @@ class TimingControlsScanner extends BaseScanner {
 
     // 2. Test auto-playing content (WCAG 2.2.2)
     if (options.testAutoPlay) {
-      const autoPlayResults = await this.analyzeAutoPlayingContent(page, violations, options.observationTime);
+      const autoPlayResults = await this.analyzeAutoPlayingContent(
+        page,
+        violations,
+        options.observationTime
+      );
       autoPlayControlled = autoPlayResults.controlled;
     }
 
     // 3. Test moving/updating content (WCAG 2.2.2)
     if (options.testMovingContent) {
-      const movingContentResults = await this.analyzeMovingContent(page, violations, options.observationTime);
+      const movingContentResults = await this.analyzeMovingContent(
+        page,
+        violations,
+        options.observationTime
+      );
       movingContentControllable = movingContentResults.controllable;
     }
 
@@ -101,7 +109,7 @@ class TimingControlsScanner extends BaseScanner {
       timeoutsAdjustable: timeoutsAdjustable,
       autoPlayControlled: autoPlayControlled,
       movingContentControllable: movingContentControllable,
-      dataPreserved: dataPreservedOnTimeout
+      dataPreserved: dataPreservedOnTimeout,
     });
 
     console.log(`Timing controls analysis complete: ${violations.length} violations found`);
@@ -112,7 +120,7 @@ class TimingControlsScanner extends BaseScanner {
       timeoutsAdjustable,
       autoPlayControlled,
       movingContentControllable,
-      dataPreservedOnTimeout
+      dataPreservedOnTimeout,
     };
   }
 
@@ -130,46 +138,62 @@ class TimingControlsScanner extends BaseScanner {
       // Look for JavaScript timeouts and intervals
       const originalSetTimeout = window.setTimeout;
       const originalSetInterval = window.setInterval;
-      
+
       const detectedTimeouts = [];
-      
+
       // Override setTimeout to detect timeouts
-      window.setTimeout = function(callback, delay, ...args) {
-        if (delay && delay < 20 * 60 * 1000) { // Less than 20 minutes
+      window.setTimeout = function (callback, delay, ...args) {
+        if (delay && delay < 20 * 60 * 1000) {
+          // Less than 20 minutes
           detectedTimeouts.push({
             type: 'timeout',
             delay: delay,
-            callback: callback.toString().substring(0, 100)
+            callback: callback.toString().substring(0, 100),
           });
         }
         return originalSetTimeout.call(this, callback, delay, ...args);
       };
 
       // Look for timeout-related content
-      const timeoutKeywords = ['timeout', 'session expires', 'expires in', 'time remaining', 'will expire'];
+      const timeoutKeywords = [
+        'timeout',
+        'session expires',
+        'expires in',
+        'time remaining',
+        'will expire',
+      ];
       // innerText (rendered text only): textContent would include inline
       // <script> source, where "setTimeout" matched the "timeout" keyword.
       const pageText = (document.body.innerText || '').toLowerCase();
-      const hasTimeoutContent = timeoutKeywords.some(keyword => pageText.includes(keyword));
+      const hasTimeoutContent = timeoutKeywords.some((keyword) => pageText.includes(keyword));
 
       if (hasTimeoutContent) {
         // Look for timeout adjustment controls
-        const adjustmentControls = document.querySelectorAll('button, [role="button"], input[type="button"], a[href]');
+        const adjustmentControls = document.querySelectorAll(
+          'button, [role="button"], input[type="button"], a[href]'
+        );
         let hasExtendOption = false;
         let hasWarningMechanism = false;
 
-        adjustmentControls.forEach(control => {
-          const controlText = control.textContent.toLowerCase() + 
-                            (control.getAttribute('aria-label') || '').toLowerCase();
-          
-          if (controlText.includes('extend') || controlText.includes('more time') || 
-              controlText.includes('continue') || controlText.includes('keep session')) {
+        adjustmentControls.forEach((control) => {
+          const controlText =
+            control.textContent.toLowerCase() +
+            (control.getAttribute('aria-label') || '').toLowerCase();
+
+          if (
+            controlText.includes('extend') ||
+            controlText.includes('more time') ||
+            controlText.includes('continue') ||
+            controlText.includes('keep session')
+          ) {
             hasExtendOption = true;
           }
         });
 
         // Look for timeout warnings
-        const warningElements = document.querySelectorAll('[role="alert"], [aria-live], .warning, .timeout, .expires');
+        const warningElements = document.querySelectorAll(
+          '[role="alert"], [aria-live], .warning, .timeout, .expires'
+        );
         if (warningElements.length > 0) {
           hasWarningMechanism = true;
         }
@@ -179,7 +203,7 @@ class TimingControlsScanner extends BaseScanner {
             type: 'timeout-no-extend-option',
             element: 'document',
             description: 'Timeout detected without user control to extend time limit',
-            severity: 'error'
+            severity: 'error',
           });
           adjustable = false;
         }
@@ -189,17 +213,18 @@ class TimingControlsScanner extends BaseScanner {
             type: 'timeout-no-warning',
             element: 'document',
             description: 'Timeout detected without advance warning mechanism',
-            severity: 'error'
+            severity: 'error',
           });
         }
 
         // Check for data preservation
         const formElements = document.querySelectorAll('input, textarea, select');
         let hasAutoSave = false;
-        
-        formElements.forEach(element => {
+
+        formElements.forEach((element) => {
           if (element.hasAttribute('oninput') || element.hasAttribute('onchange')) {
-            const eventHandler = element.getAttribute('oninput') || element.getAttribute('onchange');
+            const eventHandler =
+              element.getAttribute('oninput') || element.getAttribute('onchange');
             if (eventHandler.includes('save') || eventHandler.includes('store')) {
               hasAutoSave = true;
             }
@@ -208,10 +233,13 @@ class TimingControlsScanner extends BaseScanner {
 
         // Look for auto-save indicators
         const autoSaveIndicators = document.querySelectorAll('*');
-        autoSaveIndicators.forEach(element => {
+        autoSaveIndicators.forEach((element) => {
           const text = element.textContent.toLowerCase();
-          if (text.includes('auto save') || text.includes('automatically saved') || 
-              text.includes('draft saved')) {
+          if (
+            text.includes('auto save') ||
+            text.includes('automatically saved') ||
+            text.includes('draft saved')
+          ) {
             hasAutoSave = true;
           }
         });
@@ -221,7 +249,7 @@ class TimingControlsScanner extends BaseScanner {
             type: 'timeout-no-data-preservation',
             element: 'document',
             description: 'Forms present but no data preservation mechanism detected for timeouts',
-            severity: 'warning'
+            severity: 'warning',
           });
           dataPreserved = false;
         }
@@ -234,20 +262,20 @@ class TimingControlsScanner extends BaseScanner {
     });
 
     // Create violations for timeout issues
-    timeoutAnalysis.issues.forEach(issue => {
+    timeoutAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.2.1",
+        criterion: '9.2.2.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getTimeoutSuggestion(issue.type)
+        suggestion: this.getTimeoutSuggestion(issue.type),
       });
     });
 
-    return { 
-      adjustable: timeoutAnalysis.adjustable, 
-      dataPreserved: timeoutAnalysis.dataPreserved 
+    return {
+      adjustable: timeoutAnalysis.adjustable,
+      dataPreserved: timeoutAnalysis.dataPreserved,
     };
   }
 
@@ -264,30 +292,34 @@ class TimingControlsScanner extends BaseScanner {
 
       // Check video and audio elements
       const mediaElements = document.querySelectorAll('video, audio');
-      
-      mediaElements.forEach(element => {
+
+      mediaElements.forEach((element) => {
         const elementInfo = {
           tagName: element.tagName.toLowerCase(),
           id: element.id,
           className: element.className,
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : ''),
         };
 
         // Check for autoplay attribute
         if (element.hasAttribute('autoplay') && !element.hasAttribute('muted')) {
           // Look for user controls
-          const hasControls = element.hasAttribute('controls') ||
-                            element.parentElement.querySelector('button') ||
-                            document.querySelector(`button[aria-controls="${element.id}"]`);
+          const hasControls =
+            element.hasAttribute('controls') ||
+            element.parentElement.querySelector('button') ||
+            document.querySelector(`button[aria-controls="${element.id}"]`);
 
           if (!hasControls) {
             issues.push({
               type: 'autoplay-no-controls',
               element: elementInfo.selector,
               description: 'Auto-playing media lacks user controls for pause/stop',
-              severity: 'error'
+              severity: 'error',
             });
             controlled = false;
           }
@@ -298,7 +330,7 @@ class TimingControlsScanner extends BaseScanner {
               type: 'autoplay-long-duration-no-controls',
               element: elementInfo.selector,
               description: 'Auto-playing media longer than 5 seconds lacks pause/stop controls',
-              severity: 'error'
+              severity: 'error',
             });
             controlled = false;
           }
@@ -309,49 +341,55 @@ class TimingControlsScanner extends BaseScanner {
     });
 
     // Observe page for auto-starting content
-    await new Promise(resolve => setTimeout(resolve, observationTime));
+    await new Promise((resolve) => setTimeout(resolve, observationTime));
 
     const dynamicContentAnalysis = await page.evaluate(() => {
       const issues = [];
       let controlled = true;
 
       // Look for elements with animations or auto-updating content
-      const animatedElements = document.querySelectorAll('[class*="animate"], [class*="moving"], [style*="animation"], [style*="transition"]');
-      
-      animatedElements.forEach(element => {
+      const animatedElements = document.querySelectorAll(
+        '[class*="animate"], [class*="moving"], [style*="animation"], [style*="transition"]'
+      );
+
+      animatedElements.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (className ? `.${className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : ''),
         };
 
         const computedStyle = window.getComputedStyle(element);
-        const hasInfiniteAnimation = computedStyle.animationIterationCount === 'infinite' ||
-                                   computedStyle.animationDuration !== '0s';
+        const hasInfiniteAnimation =
+          computedStyle.animationIterationCount === 'infinite' ||
+          computedStyle.animationDuration !== '0s';
 
         if (hasInfiniteAnimation) {
           // Look for pause controls
-          const hasPauseControl = element.querySelector('button') ||
-                                element.parentElement.querySelector('button') ||
-                                document.querySelector(`button[aria-controls="${element.id}"]`) ||
-                                element.hasAttribute('onclick');
+          const hasPauseControl =
+            element.querySelector('button') ||
+            element.parentElement.querySelector('button') ||
+            document.querySelector(`button[aria-controls="${element.id}"]`) ||
+            element.hasAttribute('onclick');
 
           if (!hasPauseControl) {
             // Check if it's likely distracting (moving or flashing)
-            const isDistracting = className.includes('flash') ||
-                                className.includes('blink') ||
-                                className.includes('scroll') ||
-                                computedStyle.animationName.includes('flash') ||
-                                computedStyle.animationName.includes('blink');
+            const isDistracting =
+              className.includes('flash') ||
+              className.includes('blink') ||
+              className.includes('scroll') ||
+              computedStyle.animationName.includes('flash') ||
+              computedStyle.animationName.includes('blink');
 
             if (isDistracting) {
               issues.push({
                 type: 'auto-animation-no-pause',
                 element: elementInfo.selector,
                 description: 'Auto-playing animation lacks pause or stop controls',
-                severity: 'error'
+                severity: 'error',
               });
               controlled = false;
             }
@@ -362,35 +400,38 @@ class TimingControlsScanner extends BaseScanner {
       // Check for auto-updating content (like news tickers, live feeds)
       const updateIndicators = ['live', 'updating', 'ticker', 'feed', 'refresh'];
       const allElements = document.querySelectorAll('*');
-      
-      allElements.forEach(element => {
+
+      allElements.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
         const elementText = element.textContent.toLowerCase();
-        const hasUpdateIndicator = updateIndicators.some(indicator =>
-          elementText.includes(indicator) ||
-          className.toLowerCase().includes(indicator) ||
-          element.id.toLowerCase().includes(indicator)
+        const hasUpdateIndicator = updateIndicators.some(
+          (indicator) =>
+            elementText.includes(indicator) ||
+            className.toLowerCase().includes(indicator) ||
+            element.id.toLowerCase().includes(indicator)
         );
 
         if (hasUpdateIndicator && element.textContent.trim().length > 20) {
           const elementInfo = {
-            selector: element.tagName.toLowerCase() +
-                     (element.id ? `#${element.id}` : '') +
-                     (className ? `.${className.split(' ')[0]}` : '')
+            selector:
+              element.tagName.toLowerCase() +
+              (element.id ? `#${element.id}` : '') +
+              (className ? `.${className.split(' ')[0]}` : ''),
           };
 
           // Look for pause/stop controls
-          const hasUpdateControls = element.querySelector('button') ||
-                                   element.parentElement.querySelector('button') ||
-                                   document.querySelector(`button[aria-controls="${element.id}"]`);
+          const hasUpdateControls =
+            element.querySelector('button') ||
+            element.parentElement.querySelector('button') ||
+            document.querySelector(`button[aria-controls="${element.id}"]`);
 
           if (!hasUpdateControls) {
             issues.push({
               type: 'auto-update-no-controls',
               element: elementInfo.selector,
               description: 'Auto-updating content lacks pause or stop controls',
-              severity: 'warning'
+              severity: 'warning',
             });
           }
         }
@@ -404,14 +445,14 @@ class TimingControlsScanner extends BaseScanner {
     const overallControlled = mediaAnalysis.controlled && dynamicContentAnalysis.controlled;
 
     // Create violations for auto-play issues
-    allIssues.forEach(issue => {
+    allIssues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.2.2",
+        criterion: '9.2.2.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getAutoPlaySuggestion(issue.type)
+        suggestion: this.getAutoPlaySuggestion(issue.type),
       });
     });
 
@@ -432,32 +473,34 @@ class TimingControlsScanner extends BaseScanner {
       const potentiallyMovingElements = document.querySelectorAll('*');
       const movingElements = [];
 
-      potentiallyMovingElements.forEach(element => {
+      potentiallyMovingElements.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
         const computedStyle = window.getComputedStyle(element);
-        const hasMovement = computedStyle.animationName !== 'none' ||
-                          computedStyle.transform !== 'none' ||
-                          className.includes('move') ||
-                          className.includes('slide') ||
-                          className.includes('scroll') ||
-                          className.includes('rotate');
+        const hasMovement =
+          computedStyle.animationName !== 'none' ||
+          computedStyle.transform !== 'none' ||
+          className.includes('move') ||
+          className.includes('slide') ||
+          className.includes('scroll') ||
+          className.includes('rotate');
 
         if (hasMovement) {
           movingElements.push(element);
         }
       });
 
-      movingElements.forEach(element => {
+      movingElements.forEach((element) => {
         const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (className ? `.${className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : ''),
         };
 
         const computedStyle = window.getComputedStyle(element);
-        
+
         // Check if movement lasts longer than 5 seconds
         const animationDuration = parseFloat(computedStyle.animationDuration) || 0;
         const isInfinite = computedStyle.animationIterationCount === 'infinite';
@@ -465,25 +508,28 @@ class TimingControlsScanner extends BaseScanner {
 
         if (isLongDuration) {
           // Look for pause, stop, or hide controls
-          const hasControls = element.querySelector('button') ||
-                            element.parentElement.querySelector('button') ||
-                            document.querySelector(`button[aria-controls="${element.id}"]`) ||
-                            element.hasAttribute('onclick') ||
-                            element.closest('[role="dialog"]'); // Modals often have close buttons
+          const hasControls =
+            element.querySelector('button') ||
+            element.parentElement.querySelector('button') ||
+            document.querySelector(`button[aria-controls="${element.id}"]`) ||
+            element.hasAttribute('onclick') ||
+            element.closest('[role="dialog"]'); // Modals often have close buttons
 
           if (!hasControls) {
             // Check if the movement is essential (like progress indicators)
-            const isEssential = className.includes('progress') ||
-                              className.includes('loading') ||
-                              element.getAttribute('role') === 'progressbar' ||
-                              element.tagName.toLowerCase() === 'progress';
+            const isEssential =
+              className.includes('progress') ||
+              className.includes('loading') ||
+              element.getAttribute('role') === 'progressbar' ||
+              element.tagName.toLowerCase() === 'progress';
 
             if (!isEssential) {
               issues.push({
                 type: 'moving-content-no-controls',
                 element: elementInfo.selector,
-                description: 'Moving content lasting longer than 5 seconds lacks pause, stop, or hide controls',
-                severity: 'error'
+                description:
+                  'Moving content lasting longer than 5 seconds lacks pause, stop, or hide controls',
+                severity: 'error',
               });
               controllable = false;
             }
@@ -491,17 +537,18 @@ class TimingControlsScanner extends BaseScanner {
         }
 
         // Check for blinking/flashing content
-        const isBlinking = className.includes('blink') ||
-                         className.includes('flash') ||
-                         computedStyle.animationName.includes('blink') ||
-                         computedStyle.animationName.includes('flash');
+        const isBlinking =
+          className.includes('blink') ||
+          className.includes('flash') ||
+          computedStyle.animationName.includes('blink') ||
+          computedStyle.animationName.includes('flash');
 
         if (isBlinking) {
           issues.push({
             type: 'blinking-content',
             element: elementInfo.selector,
             description: 'Blinking or flashing content detected - potential seizure risk',
-            severity: 'error'
+            severity: 'error',
           });
           controllable = false;
         }
@@ -511,14 +558,14 @@ class TimingControlsScanner extends BaseScanner {
     }, observationTime);
 
     // Create violations for moving content issues
-    movingContentAnalysis.issues.forEach(issue => {
+    movingContentAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.2.2",
+        criterion: '9.2.2.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getMovingContentSuggestion(issue.type)
+        suggestion: this.getMovingContentSuggestion(issue.type),
       });
     });
 
@@ -535,42 +582,50 @@ class TimingControlsScanner extends BaseScanner {
       const issues = [];
 
       // Look for timeout-related elements
-      const timeoutElements = document.querySelectorAll('[class*="timeout"], [class*="expire"], [id*="timeout"], [id*="expire"]');
-      
-      timeoutElements.forEach(element => {
+      const timeoutElements = document.querySelectorAll(
+        '[class*="timeout"], [class*="expire"], [id*="timeout"], [id*="expire"]'
+      );
+
+      timeoutElements.forEach((element) => {
         const elementInfo = {
-          selector: element.tagName.toLowerCase() + 
-                   (element.id ? `#${element.id}` : '') + 
-                   (element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : ''),
         };
 
         // Check if timeout warning is accessible
         const hasAriaLive = element.hasAttribute('aria-live');
-        const hasRole = element.getAttribute('role') === 'alert' || element.getAttribute('role') === 'status';
-        const isVisuallyHidden = element.style.display === 'none' ||
-                                element.style.visibility === 'hidden' ||
-                                element.getAttribute('aria-hidden') === 'true';
+        const hasRole =
+          element.getAttribute('role') === 'alert' || element.getAttribute('role') === 'status';
+        const isVisuallyHidden =
+          element.style.display === 'none' ||
+          element.style.visibility === 'hidden' ||
+          element.getAttribute('aria-hidden') === 'true';
 
         if (!hasAriaLive && !hasRole && !isVisuallyHidden) {
           issues.push({
             type: 'timeout-warning-not-accessible',
             element: elementInfo.selector,
             description: 'Timeout warning lacks proper ARIA live region or alert role',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
 
         // Check for timeout duration information
-        const hasTimeRemaining = element.textContent.includes(':') || 
-                                element.textContent.includes('minute') ||
-                                element.textContent.includes('second');
+        const hasTimeRemaining =
+          element.textContent.includes(':') ||
+          element.textContent.includes('minute') ||
+          element.textContent.includes('second');
 
         if (!hasTimeRemaining && element.textContent.toLowerCase().includes('timeout')) {
           issues.push({
             type: 'timeout-warning-no-duration',
             element: elementInfo.selector,
             description: 'Timeout warning does not specify remaining time',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
       });
@@ -579,14 +634,14 @@ class TimingControlsScanner extends BaseScanner {
     });
 
     // Create violations for timeout warning issues
-    warningAnalysis.issues.forEach(issue => {
+    warningAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.2.6",
+        criterion: '9.2.2.6',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getTimeoutWarningSuggestion(issue.type)
+        suggestion: this.getTimeoutWarningSuggestion(issue.type),
       });
     });
 
@@ -598,11 +653,16 @@ class TimingControlsScanner extends BaseScanner {
    */
   getTimeoutSuggestion(violationType) {
     const suggestions = {
-      'timeout-no-extend-option': 'Provide user controls to extend time limits (extend, continue session buttons)',
-      'timeout-no-warning': 'Implement advance warning system (20 seconds before expiry) with ARIA live regions',
-      'timeout-no-data-preservation': 'Add auto-save functionality or session storage to preserve user data'
+      'timeout-no-extend-option':
+        'Provide user controls to extend time limits (extend, continue session buttons)',
+      'timeout-no-warning':
+        'Implement advance warning system (20 seconds before expiry) with ARIA live regions',
+      'timeout-no-data-preservation':
+        'Add auto-save functionality or session storage to preserve user data',
     };
-    return suggestions[violationType] || 'Ensure timeout mechanisms are user-controllable and accessible';
+    return (
+      suggestions[violationType] || 'Ensure timeout mechanisms are user-controllable and accessible'
+    );
   }
 
   /**
@@ -611,9 +671,10 @@ class TimingControlsScanner extends BaseScanner {
   getAutoPlaySuggestion(violationType) {
     const suggestions = {
       'autoplay-no-controls': 'Add pause, stop, and volume controls for auto-playing media',
-      'autoplay-long-duration-no-controls': 'Provide pause/stop controls for media longer than 5 seconds',
+      'autoplay-long-duration-no-controls':
+        'Provide pause/stop controls for media longer than 5 seconds',
       'auto-animation-no-pause': 'Add pause or stop controls for auto-playing animations',
-      'auto-update-no-controls': 'Provide pause controls for auto-updating content like news feeds'
+      'auto-update-no-controls': 'Provide pause controls for auto-updating content like news feeds',
     };
     return suggestions[violationType] || 'Provide user controls for auto-playing content';
   }
@@ -623,8 +684,9 @@ class TimingControlsScanner extends BaseScanner {
    */
   getMovingContentSuggestion(violationType) {
     const suggestions = {
-      'moving-content-no-controls': 'Add pause, stop, or hide controls for moving content lasting over 5 seconds',
-      'blinking-content': 'Remove blinking/flashing content or provide controls to stop it'
+      'moving-content-no-controls':
+        'Add pause, stop, or hide controls for moving content lasting over 5 seconds',
+      'blinking-content': 'Remove blinking/flashing content or provide controls to stop it',
     };
     return suggestions[violationType] || 'Ensure moving content can be paused or hidden by users';
   }
@@ -634,12 +696,12 @@ class TimingControlsScanner extends BaseScanner {
    */
   getTimeoutWarningSuggestion(violationType) {
     const suggestions = {
-      'timeout-warning-not-accessible': 'Add role="alert" or aria-live="assertive" to timeout warnings',
-      'timeout-warning-no-duration': 'Include specific time remaining in timeout warnings'
+      'timeout-warning-not-accessible':
+        'Add role="alert" or aria-live="assertive" to timeout warnings',
+      'timeout-warning-no-duration': 'Include specific time remaining in timeout warnings',
     };
     return suggestions[violationType] || 'Make timeout warnings accessible with proper ARIA markup';
   }
-
 }
 
 module.exports = TimingControlsScanner;

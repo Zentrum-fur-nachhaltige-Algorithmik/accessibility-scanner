@@ -4,7 +4,7 @@ class ScreenReaderScanner extends BaseScanner {
   constructor() {
     super('screen-reader', {
       wcagCriteria: ['1.3.1', '4.1.2', '4.1.3'],
-      wcagPrinciple: 'perceivable'
+      wcagPrinciple: 'perceivable',
     });
   }
 
@@ -15,20 +15,13 @@ class ScreenReaderScanner extends BaseScanner {
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const [
-      headingStructure,
-      landmarks,
-      tables,
-      images,
-      forms,
-      ariaUsage
-    ] = await Promise.all([
+    const [headingStructure, landmarks, tables, images, forms, ariaUsage] = await Promise.all([
       this.analyzeHeadingStructure(page),
       this.analyzeLandmarks(page),
       this.analyzeTables(page),
       this.analyzeImages(page),
       this.analyzeForms(page),
-      this.analyzeAriaUsage(page)
+      this.analyzeAriaUsage(page),
     ]);
 
     const pageTitle = await page.title();
@@ -39,7 +32,7 @@ class ScreenReaderScanner extends BaseScanner {
       tables,
       images,
       forms,
-      ariaUsage
+      ariaUsage,
     });
 
     return {
@@ -61,8 +54,8 @@ class ScreenReaderScanner extends BaseScanner {
         landmarkIssues: landmarks.issues.length,
         tableIssues: tables.problematic.length,
         imageIssues: images.problematic.length,
-        ariaIssues: ariaUsage.misusedAttributes.length
-      }
+        ariaIssues: ariaUsage.misusedAttributes.length,
+      },
     };
   }
 
@@ -106,7 +99,7 @@ class ScreenReaderScanner extends BaseScanner {
           line: Math.round(line),
           tagName: heading.tagName,
           id: heading.id || '',
-          isEmpty: !text
+          isEmpty: !text,
         });
 
         if (!text) {
@@ -131,7 +124,7 @@ class ScreenReaderScanner extends BaseScanner {
         issues,
         hierarchy,
         totalHeadings: headings.length,
-        h1Count
+        h1Count,
       };
     });
   }
@@ -144,7 +137,7 @@ class ScreenReaderScanner extends BaseScanner {
         banner: document.querySelector('header, [role="banner"]') !== null,
         contentinfo: document.querySelector('footer, [role="contentinfo"]') !== null,
         complementary: document.querySelector('aside, [role="complementary"]') !== null,
-        search: document.querySelector('[role="search"]') !== null
+        search: document.querySelector('[role="search"]') !== null,
       };
 
       const issues = [];
@@ -170,12 +163,17 @@ class ScreenReaderScanner extends BaseScanner {
         issues.push('Multiple main landmarks found');
       }
 
-      const contentWithoutLandmarks = Array.from(document.querySelectorAll('body > *'))
-        .filter(el => {
-          return el.offsetParent !== null &&
-                 el.textContent.trim().length > 0 &&
-                 !el.closest('main, nav, header, footer, aside, [role="main"], [role="navigation"], [role="banner"], [role="contentinfo"], [role="complementary"]');
-        });
+      const contentWithoutLandmarks = Array.from(document.querySelectorAll('body > *')).filter(
+        (el) => {
+          return (
+            el.offsetParent !== null &&
+            el.textContent.trim().length > 0 &&
+            !el.closest(
+              'main, nav, header, footer, aside, [role="main"], [role="navigation"], [role="banner"], [role="contentinfo"], [role="complementary"]'
+            )
+          );
+        }
+      );
 
       if (contentWithoutLandmarks.length > 0) {
         issues.push('Content found outside of landmarks');
@@ -208,10 +206,11 @@ class ScreenReaderScanner extends BaseScanner {
       const REPEATED_BLOCK_MIN_LINKS = 5;
       const blockCandidates = Array.from(
         document.querySelectorAll('header, [role="banner"], nav, [role="navigation"]')
-      ).filter(el =>
-        !el.closest('main, [role="main"]') &&
-        el.querySelectorAll('a[href]').length >= REPEATED_BLOCK_MIN_LINKS &&
-        (totalText === 0 || precedingTextLength(el) <= totalText * 0.10)
+      ).filter(
+        (el) =>
+          !el.closest('main, [role="main"]') &&
+          el.querySelectorAll('a[href]').length >= REPEATED_BLOCK_MIN_LINKS &&
+          (totalText === 0 || precedingTextLength(el) <= totalText * 0.1)
       );
 
       // Bypass mechanisms, in the order WCAG accepts them.
@@ -230,10 +229,11 @@ class ScreenReaderScanner extends BaseScanner {
       const firstBlock = blockCandidates[0] || null;
       const inPageLinks = Array.from(document.querySelectorAll('a[href^="#"]'));
       const skipLinkCandidates = firstBlock
-        ? inPageLinks.filter(a =>
-            firstBlock.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING)
+        ? inPageLinks.filter(
+            (a) => firstBlock.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING
+          )
         : [];
-      const workingSkipLinks = skipLinkCandidates.filter(a => {
+      const workingSkipLinks = skipLinkCandidates.filter((a) => {
         if (!skipLinkTargetExists(a)) return false;
         const cs = getComputedStyle(a);
         return cs.display !== 'none' && cs.visibility !== 'hidden';
@@ -244,16 +244,16 @@ class ScreenReaderScanner extends BaseScanner {
           ? {
               tag: firstBlock.tagName.toLowerCase(),
               id: firstBlock.id || '',
-              linkCount: firstBlock.querySelectorAll('a[href]').length
+              linkCount: firstBlock.querySelectorAll('a[href]').length,
             }
           : null,
         hasMainLandmark: landmarks.main,
         skipLinkCandidates: skipLinkCandidates.length,
         workingSkipLinks: workingSkipLinks.length,
         brokenSkipLinks: skipLinkCandidates
-          .filter(a => !skipLinkTargetExists(a))
-          .map(a => a.getAttribute('href'))
-          .slice(0, 5)
+          .filter((a) => !skipLinkTargetExists(a))
+          .map((a) => a.getAttribute('href'))
+          .slice(0, 5),
       };
       bypass.satisfied = !firstBlock || landmarks.main || workingSkipLinks.length > 0;
 
@@ -261,7 +261,7 @@ class ScreenReaderScanner extends BaseScanner {
         ...landmarks,
         issues,
         bypass,
-        landmarkCount: landmarkElements.length
+        landmarkCount: landmarkElements.length,
       };
     });
   }
@@ -289,21 +289,21 @@ class ScreenReaderScanner extends BaseScanner {
         if (table.offsetParent === null && getComputedStyle(table).position !== 'fixed') continue;
 
         const rows = Array.from(table.rows || []);
-        if (rows.length < 3) continue;                       // too small to be a data grid
-        const maxCols = Math.max(0, ...rows.map(r => r.cells.length));
+        if (rows.length < 3) continue; // too small to be a data grid
+        const maxCols = Math.max(0, ...rows.map((r) => r.cells.length));
         if (maxCols < 2) continue;
 
         // Layout tables carry page furniture inside their cells. A genuine
         // data table's cells hold values, not sections/forms/headings.
         const cells = Array.from(table.querySelectorAll('td, th'));
-        const carriesFurniture = cells.some(c => c.querySelector(
-          'table, form, nav, header, footer, article, section, h1, h2, h3, h4, h5, h6'
-        ));
+        const carriesFurniture = cells.some((c) =>
+          c.querySelector(
+            'table, form, nav, header, footer, article, section, h1, h2, h3, h4, h5, h6'
+          )
+        );
         if (carriesFurniture) continue;
 
-        const headerCells = table.querySelectorAll(
-          'th, [role="columnheader"], [role="rowheader"]'
-        );
+        const headerCells = table.querySelectorAll('th, [role="columnheader"], [role="rowheader"]');
 
         // SC 1.3.1 only requires relationships that are CONVEYED VISUALLY to
         // be programmatically determinable. A two-column key/value table
@@ -322,22 +322,25 @@ class ScreenReaderScanner extends BaseScanner {
         //       its column, and the column's meaning is conveyed visually by
         //       the top row.
         const hasSpans = Array.from(table.querySelectorAll('td, th')).some(
-          c => c.colSpan > 1 || c.rowSpan > 1
+          (c) => c.colSpan > 1 || c.rowSpan > 1
         );
         const firstRow = rows[0];
         const firstRowCells = firstRow ? Array.from(firstRow.cells) : [];
         const bodyRowBg = rows[1]
           ? window.getComputedStyle(rows[1].cells[0] || rows[1]).backgroundColor
           : '';
-        const firstRowEmphasised = firstRowCells.length > 0 && firstRowCells.every(c => {
-          const cs = window.getComputedStyle(c);
-          const bold = parseInt(cs.fontWeight, 10) >= 600 || !!c.querySelector('strong, b');
-          const ownBg = cs.backgroundColor;
-          const rowBg = window.getComputedStyle(firstRow).backgroundColor;
-          const distinctBg = (ownBg !== bodyRowBg && ownBg !== 'rgba(0, 0, 0, 0)') ||
-            (rowBg !== bodyRowBg && rowBg !== 'rgba(0, 0, 0, 0)');
-          return bold || distinctBg;
-        });
+        const firstRowEmphasised =
+          firstRowCells.length > 0 &&
+          firstRowCells.every((c) => {
+            const cs = window.getComputedStyle(c);
+            const bold = parseInt(cs.fontWeight, 10) >= 600 || !!c.querySelector('strong, b');
+            const ownBg = cs.backgroundColor;
+            const rowBg = window.getComputedStyle(firstRow).backgroundColor;
+            const distinctBg =
+              (ownBg !== bodyRowBg && ownBg !== 'rgba(0, 0, 0, 0)') ||
+              (rowBg !== bodyRowBg && rowBg !== 'rgba(0, 0, 0, 0)');
+            return bold || distinctBg;
+          });
         const presentsHeaderAxis = hasSpans || firstRowEmphasised || maxCols >= 3;
 
         if (headerCells.length === 0 && presentsHeaderAxis) {
@@ -346,7 +349,7 @@ class ScreenReaderScanner extends BaseScanner {
             rows: rows.length,
             columns: maxCols,
             issue: 'Data table has no <th> or role="columnheader"/"rowheader" cells',
-            severity: 'high'
+            severity: 'high',
           });
         }
       }
@@ -381,7 +384,7 @@ class ScreenReaderScanner extends BaseScanner {
             type: 'image-missing-alt',
             issue: 'Missing alt attribute',
             severity: 'critical',
-            suggestion: 'Add alt="…" describing the image, or alt="" if it is decorative'
+            suggestion: 'Add alt="…" describing the image, or alt="" if it is decorative',
           });
         }
 
@@ -393,7 +396,8 @@ class ScreenReaderScanner extends BaseScanner {
             type: 'alt-text-too-long',
             issue: `Alt text too long (${alt.length} characters)`,
             severity: 'moderate',
-            suggestion: 'Keep alt short and move any long description into the page or a longdesc target'
+            suggestion:
+              'Keep alt short and move any long description into the page or a longdesc target',
           });
         }
 
@@ -405,7 +409,7 @@ class ScreenReaderScanner extends BaseScanner {
             type: 'alt-text-is-filename',
             issue: 'Alt text contains file extension',
             severity: 'minor',
-            suggestion: 'Replace the filename with a description of what the image conveys'
+            suggestion: 'Replace the filename with a description of what the image conveys',
           });
         }
       });
@@ -414,7 +418,7 @@ class ScreenReaderScanner extends BaseScanner {
         total: images.length,
         withAlt,
         decorative,
-        problematic
+        problematic,
       };
     }, ScreenReaderScanner.selectorHelperScript);
   }
@@ -434,8 +438,9 @@ class ScreenReaderScanner extends BaseScanner {
       const SELF_NAMING_TYPES = ['hidden', 'submit', 'reset', 'button', 'image'];
 
       inputs.forEach((input, index) => {
-        const label = (input.id ? document.querySelector(`label[for="${CSS.escape(input.id)}"]`) : null) ||
-                     input.closest('label');
+        const label =
+          (input.id ? document.querySelector(`label[for="${CSS.escape(input.id)}"]`) : null) ||
+          input.closest('label');
 
         const ariaLabel = input.getAttribute('aria-label');
         const ariaLabelledby = input.getAttribute('aria-labelledby');
@@ -444,24 +449,33 @@ class ScreenReaderScanner extends BaseScanner {
 
         // `aria-labelledby` is an ID-list; it only names the control if at
         // least one referenced element actually exists and has text.
-        const labelledbyResolves = !!(ariaLabelledby && ariaLabelledby.split(/\s+/).some(id => {
-          const t = document.getElementById(id);
-          return t && t.textContent.trim().length > 0;
-        }));
+        const labelledbyResolves = !!(
+          ariaLabelledby &&
+          ariaLabelledby.split(/\s+/).some((id) => {
+            const t = document.getElementById(id);
+            return t && t.textContent.trim().length > 0;
+          })
+        );
 
         // Not rendered ⇒ not exposed to assistive tech ⇒ no name required.
         // (e.g. the `display:none` file input a styled button proxies for in
         // good-pointer-cancellation.html.) Visually-hidden-but-focusable
         // controls keep a non-null offsetParent, so they are still checked.
-        const notRendered = input.offsetParent === null &&
-                            getComputedStyle(input).position !== 'fixed';
+        const notRendered =
+          input.offsetParent === null && getComputedStyle(input).position !== 'fixed';
 
-        const isExposed = !notRendered &&
-                          !input.closest('[aria-hidden="true"]') &&
-                          !SELF_NAMING_TYPES.includes(inputType);
+        const isExposed =
+          !notRendered &&
+          !input.closest('[aria-hidden="true"]') &&
+          !SELF_NAMING_TYPES.includes(inputType);
 
-        if (isExposed && !label && !(ariaLabel && ariaLabel.trim()) &&
-            !labelledbyResolves && !(titleAttr && titleAttr.trim())) {
+        if (
+          isExposed &&
+          !label &&
+          !(ariaLabel && ariaLabel.trim()) &&
+          !labelledbyResolves &&
+          !(titleAttr && titleAttr.trim())
+        ) {
           labelsCorrect = false;
           const entry = {
             index: index + 1,
@@ -469,7 +483,7 @@ class ScreenReaderScanner extends BaseScanner {
             type: inputType,
             id: input.id || '',
             hasPlaceholderOnly: !!(input.getAttribute('placeholder') || '').trim(),
-            issue: 'No associated label found'
+            issue: 'No associated label found',
           };
           unlabeled.push(entry);
           requiredFields.push(entry);
@@ -486,12 +500,14 @@ class ScreenReaderScanner extends BaseScanner {
             type: input.type || input.tagName.toLowerCase(),
             id: input.id || '',
             required: true,
-            hasIndicator: hasRequiredIndicator
+            hasIndicator: hasRequiredIndicator,
           });
         }
       });
 
-      const errorElements = document.querySelectorAll('[role="alert"], .error, .invalid, [aria-invalid="true"]');
+      const errorElements = document.querySelectorAll(
+        '[role="alert"], .error, .invalid, [aria-invalid="true"]'
+      );
       errorHandling = errorElements.length > 0;
 
       return {
@@ -500,7 +516,7 @@ class ScreenReaderScanner extends BaseScanner {
         labelsCorrect,
         errorHandling,
         unlabeled,
-        requiredFields
+        requiredFields,
       };
     }, ScreenReaderScanner.selectorHelperScript);
   }
@@ -508,23 +524,86 @@ class ScreenReaderScanner extends BaseScanner {
   async analyzeAriaUsage(page) {
     return await page.evaluate((helperScript) => {
       eval(helperScript);
-      const elementsWithAria = Array.from(document.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby], [role], [aria-expanded], [aria-hidden], [aria-live], [aria-atomic], [aria-busy]'));
+      const elementsWithAria = Array.from(
+        document.querySelectorAll(
+          '[aria-label], [aria-labelledby], [aria-describedby], [role], [aria-expanded], [aria-hidden], [aria-live], [aria-atomic], [aria-busy]'
+        )
+      );
       const misusedAttributes = [];
-      const misuse = [];   // structured twin of misusedAttributes (selector + type)
+      const misuse = []; // structured twin of misusedAttributes (selector + type)
       const recommendations = [];
       let correctUsage = 0;
 
       const validRoles = [
-        'alert', 'alertdialog', 'application', 'article', 'banner', 'button', 'cell', 'checkbox',
-        'columnheader', 'combobox', 'complementary', 'contentinfo', 'definition', 'dialog',
-        'directory', 'document', 'feed', 'figure', 'form', 'grid', 'gridcell', 'group',
-        'heading', 'img', 'link', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee',
-        'math', 'menu', 'menubar', 'menuitem', 'menuitemcheckbox', 'menuitemradio',
-        'navigation', 'none', 'note', 'option', 'presentation', 'progressbar', 'radio',
-        'radiogroup', 'region', 'row', 'rowgroup', 'rowheader', 'scrollbar', 'search',
-        'searchbox', 'separator', 'slider', 'spinbutton', 'status', 'switch', 'tab',
-        'table', 'tablist', 'tabpanel', 'term', 'textbox', 'timer', 'toolbar', 'tooltip',
-        'tree', 'treegrid', 'treeitem'
+        'alert',
+        'alertdialog',
+        'application',
+        'article',
+        'banner',
+        'button',
+        'cell',
+        'checkbox',
+        'columnheader',
+        'combobox',
+        'complementary',
+        'contentinfo',
+        'definition',
+        'dialog',
+        'directory',
+        'document',
+        'feed',
+        'figure',
+        'form',
+        'grid',
+        'gridcell',
+        'group',
+        'heading',
+        'img',
+        'link',
+        'list',
+        'listbox',
+        'listitem',
+        'log',
+        'main',
+        'marquee',
+        'math',
+        'menu',
+        'menubar',
+        'menuitem',
+        'menuitemcheckbox',
+        'menuitemradio',
+        'navigation',
+        'none',
+        'note',
+        'option',
+        'presentation',
+        'progressbar',
+        'radio',
+        'radiogroup',
+        'region',
+        'row',
+        'rowgroup',
+        'rowheader',
+        'scrollbar',
+        'search',
+        'searchbox',
+        'separator',
+        'slider',
+        'spinbutton',
+        'status',
+        'switch',
+        'tab',
+        'table',
+        'tablist',
+        'tabpanel',
+        'term',
+        'textbox',
+        'timer',
+        'toolbar',
+        'tooltip',
+        'tree',
+        'treegrid',
+        'treeitem',
       ];
 
       elementsWithAria.forEach((element, index) => {
@@ -544,7 +623,7 @@ class ScreenReaderScanner extends BaseScanner {
             attribute: 'role',
             value: role,
             issue: `Invalid role "${role}" on ${element.tagName}`,
-            suggestion: 'Use a role from the ARIA 1.2 taxonomy, or remove the attribute'
+            suggestion: 'Use a role from the ARIA 1.2 taxonomy, or remove the attribute',
           });
         } else if (role && validRoles.includes(role)) {
           correctUsage++;
@@ -561,7 +640,7 @@ class ScreenReaderScanner extends BaseScanner {
         // resolved. Resolve token by token and only report the missing ones.
         const resolveIdList = (value, attrName) => {
           const ids = String(value).split(/\s+/).filter(Boolean);
-          const missing = ids.filter(id => !document.getElementById(id));
+          const missing = ids.filter((id) => !document.getElementById(id));
           if (missing.length === 0) {
             correctUsage++;
             return;
@@ -574,7 +653,7 @@ class ScreenReaderScanner extends BaseScanner {
             attribute: attrName,
             value: missing.join(' '),
             issue: text,
-            suggestion: `Point ${attrName} at the id of an element that exists in the document`
+            suggestion: `Point ${attrName} at the id of an element that exists in the document`,
           });
         };
 
@@ -594,8 +673,9 @@ class ScreenReaderScanner extends BaseScanner {
         recommendations.push(`Add alt attributes to ${imagesWithoutAlt.length} images`);
       }
 
-      const buttonsWithoutLabels = Array.from(document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])'))
-        .filter(btn => !btn.textContent.trim());
+      const buttonsWithoutLabels = Array.from(
+        document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])')
+      ).filter((btn) => !btn.textContent.trim());
       if (buttonsWithoutLabels.length > 0) {
         recommendations.push(`Add labels to ${buttonsWithoutLabels.length} buttons`);
       }
@@ -605,7 +685,7 @@ class ScreenReaderScanner extends BaseScanner {
         correctUsage,
         misusedAttributes,
         misuse,
-        recommendations
+        recommendations,
       };
     }, ScreenReaderScanner.selectorHelperScript);
   }
@@ -626,7 +706,7 @@ class ScreenReaderScanner extends BaseScanner {
       description,
       severity,
       suggestion,
-      details: details || []
+      details: details || [],
     };
   }
 
@@ -648,16 +728,19 @@ class ScreenReaderScanner extends BaseScanner {
     // SC 1.3.1 — data tables with no programmatic header cells. This is the
     // gap axe leaves open (it has no rule for a table built purely from
     // <td>), so it is reported here rather than deferred.
-    for (const table of (analysisResults.tables?.problematic || [])) {
-      violations.push(V({
-        criterion: '9.1.3.1',
-        type: 'table-missing-header-association',
-        element: table.selector,
-        description: `Info and Relationships - data table (${table.rows}×${table.columns}) has no header cells, so no row/column association is exposed`,
-        severity: 'high',
-        suggestion: 'Mark header cells as <th> with scope="col"/"row" (or headers/id for multi-level headers); add role="presentation" if the table is only for layout',
-        details: [table.issue]
-      }));
+    for (const table of analysisResults.tables?.problematic || []) {
+      violations.push(
+        V({
+          criterion: '9.1.3.1',
+          type: 'table-missing-header-association',
+          element: table.selector,
+          description: `Info and Relationships - data table (${table.rows}×${table.columns}) has no header cells, so no row/column association is exposed`,
+          severity: 'high',
+          suggestion:
+            'Mark header cells as <th> with scope="col"/"row" (or headers/id for multi-level headers); add role="presentation" if the table is only for layout',
+          details: [table.issue],
+        })
+      );
       score -= 10;
     }
 
@@ -667,67 +750,79 @@ class ScreenReaderScanner extends BaseScanner {
     // analyzeLandmarks() for why the old "no <main>" rule was dropped.
     const bypass = analysisResults.landmarks.bypass;
     if (bypass && bypass.repeatedBlock && !bypass.satisfied) {
-      violations.push(V({
-        criterion: '9.2.4.1',
-        type: 'missing-skip-link',
-        element: bypass.repeatedBlock.tag + (bypass.repeatedBlock.id ? `#${bypass.repeatedBlock.id}` : ''),
-        description: `Bypass Blocks - a <${bypass.repeatedBlock.tag}> navigation block with ${bypass.repeatedBlock.linkCount} links precedes the page content, but there is no way to skip it`,
-        severity: 'high',
-        suggestion: 'Add a skip link whose target id exists (and is focusable), or wrap the page content in <main>',
-        details: [
-          `Navigation block: <${bypass.repeatedBlock.tag}> with ${bypass.repeatedBlock.linkCount} links`,
-          `Main landmark: ${bypass.hasMainLandmark ? 'present' : 'absent'}`,
-          `Skip links before the block: ${bypass.skipLinkCandidates} (working: ${bypass.workingSkipLinks})`,
-          ...(bypass.brokenSkipLinks.length
-            ? [`Broken skip-link targets: ${bypass.brokenSkipLinks.join(', ')}`]
-            : [])
-        ]
-      }));
+      violations.push(
+        V({
+          criterion: '9.2.4.1',
+          type: 'missing-skip-link',
+          element:
+            bypass.repeatedBlock.tag +
+            (bypass.repeatedBlock.id ? `#${bypass.repeatedBlock.id}` : ''),
+          description: `Bypass Blocks - a <${bypass.repeatedBlock.tag}> navigation block with ${bypass.repeatedBlock.linkCount} links precedes the page content, but there is no way to skip it`,
+          severity: 'high',
+          suggestion:
+            'Add a skip link whose target id exists (and is focusable), or wrap the page content in <main>',
+          details: [
+            `Navigation block: <${bypass.repeatedBlock.tag}> with ${bypass.repeatedBlock.linkCount} links`,
+            `Main landmark: ${bypass.hasMainLandmark ? 'present' : 'absent'}`,
+            `Skip links before the block: ${bypass.skipLinkCandidates} (working: ${bypass.workingSkipLinks})`,
+            ...(bypass.brokenSkipLinks.length
+              ? [`Broken skip-link targets: ${bypass.brokenSkipLinks.join(', ')}`]
+              : []),
+          ],
+        })
+      );
       score -= 10;
     }
 
     for (const img of analysisResults.images.problematic) {
-      violations.push(V({
-        criterion: '9.1.1.1',
-        type: img.type,
-        element: img.selector,
-        description: `Non-text Content - ${img.issue}`,
-        severity: img.severity,
-        suggestion: img.suggestion,
-        details: [img.src]
-      }));
+      violations.push(
+        V({
+          criterion: '9.1.1.1',
+          type: img.type,
+          element: img.selector,
+          description: `Non-text Content - ${img.issue}`,
+          severity: img.severity,
+          suggestion: img.suggestion,
+          details: [img.src],
+        })
+      );
     }
     if (analysisResults.images.problematic.length > 0) {
       score -= Math.min(20, analysisResults.images.problematic.length * 5);
     }
 
-    for (const field of (analysisResults.forms.unlabeled || [])) {
-      violations.push(V({
-        criterion: '9.3.3.2',
-        type: 'form-control-missing-label',
-        element: field.selector,
-        description: field.hasPlaceholderOnly
-          ? `Labels or Instructions - ${field.type} control is identified only by its placeholder, which is not an accessible name`
-          : `Labels or Instructions - ${field.type} control has no associated label`,
-        severity: 'high',
-        suggestion: 'Add a <label for="…">, aria-label, or aria-labelledby pointing at visible text',
-        details: [field.issue]
-      }));
+    for (const field of analysisResults.forms.unlabeled || []) {
+      violations.push(
+        V({
+          criterion: '9.3.3.2',
+          type: 'form-control-missing-label',
+          element: field.selector,
+          description: field.hasPlaceholderOnly
+            ? `Labels or Instructions - ${field.type} control is identified only by its placeholder, which is not an accessible name`
+            : `Labels or Instructions - ${field.type} control has no associated label`,
+          severity: 'high',
+          suggestion:
+            'Add a <label for="…">, aria-label, or aria-labelledby pointing at visible text',
+          details: [field.issue],
+        })
+      );
     }
     if (!analysisResults.forms.labelsCorrect) {
       score -= 15;
     }
 
-    for (const m of (analysisResults.ariaUsage.misuse || [])) {
-      violations.push(V({
-        criterion: '9.4.1.2',
-        type: m.type,
-        element: m.selector,
-        description: `Name, Role, Value - ${m.issue}`,
-        severity: 'moderate',
-        suggestion: m.suggestion,
-        details: [m.issue]
-      }));
+    for (const m of analysisResults.ariaUsage.misuse || []) {
+      violations.push(
+        V({
+          criterion: '9.4.1.2',
+          type: m.type,
+          element: m.selector,
+          description: `Name, Role, Value - ${m.issue}`,
+          severity: 'moderate',
+          suggestion: m.suggestion,
+          details: [m.issue],
+        })
+      );
     }
     if (analysisResults.ariaUsage.misusedAttributes.length > 0) {
       score -= Math.min(10, analysisResults.ariaUsage.misusedAttributes.length * 2);
@@ -740,15 +835,15 @@ class ScreenReaderScanner extends BaseScanner {
       en301549: {
         compliant: violations.length === 0,
         score: Math.max(0, score),
-        violations
+        violations,
       },
       eaaCompliance: {
         ready: accessibilityStatement && contactMechanism,
         missingRequirements: [
           ...(!accessibilityStatement ? ['No accessibility statement found'] : []),
-          ...(!contactMechanism ? ['Contact mechanism not provided'] : [])
-        ]
-      }
+          ...(!contactMechanism ? ['Contact mechanism not provided'] : []),
+        ],
+      },
     };
   }
 
@@ -772,10 +867,9 @@ class ScreenReaderScanner extends BaseScanner {
       tables: { total: 0, problematic: [] },
       images: { total: 0, withAlt: 0, decorative: 0, problematic: [] },
       forms: { labelsCorrect: false, errorHandling: false, requiredFields: [] },
-      ariaUsage: { correctUsage: 0, misusedAttributes: [], recommendations: [] }
+      ariaUsage: { correctUsage: 0, misusedAttributes: [], recommendations: [] },
     };
   }
-
 }
 
 module.exports = ScreenReaderScanner;

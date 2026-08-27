@@ -11,10 +11,14 @@ const LLMBaseScanner = require('./base');
 
 class LLMVisualPresentationScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-visual-presentation', {
-      wcagCriteria: ['1.4.7', '1.4.8', '1.4.9'],
-      wcagPrinciple: 'perceivable',
-    }, llmClient);
+    super(
+      'llm-visual-presentation',
+      {
+        wcagCriteria: ['1.4.7', '1.4.8', '1.4.9'],
+        wcagPrinciple: 'perceivable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
@@ -22,8 +26,9 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
     const styleData = await page.evaluate(() => {
       const isVisible = (el) => {
         const s = window.getComputedStyle(el);
-        return s.display !== 'none' && s.visibility !== 'hidden' &&
-          el.getBoundingClientRect().width > 0;
+        return (
+          s.display !== 'none' && s.visibility !== 'hidden' && el.getBoundingClientRect().width > 0
+        );
       };
 
       // Text blocks: measured presentation properties (1.4.8)
@@ -35,9 +40,8 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
         if (text.length < 80 || !isVisible(el)) continue;
         const s = window.getComputedStyle(el);
         const fontSize = parseFloat(s.fontSize) || 16;
-        const lineHeightPx = s.lineHeight === 'normal'
-          ? fontSize * 1.2
-          : parseFloat(s.lineHeight) || fontSize * 1.2;
+        const lineHeightPx =
+          s.lineHeight === 'normal' ? fontSize * 1.2 : parseFloat(s.lineHeight) || fontSize * 1.2;
         blocks.push({
           tag: el.tagName.toLowerCase(),
           textStart: text.slice(0, 60),
@@ -52,7 +56,7 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
       }
 
       // Media elements (1.4.7)
-      const media = Array.from(document.querySelectorAll('audio, video')).map(el => ({
+      const media = Array.from(document.querySelectorAll('audio, video')).map((el) => ({
         tag: el.tagName.toLowerCase(),
         src: el.currentSrc || el.getAttribute('src') || '',
         autoplay: el.hasAttribute('autoplay'),
@@ -65,7 +69,7 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
       const images = Array.from(document.querySelectorAll('img'))
         .filter(isVisible)
         .slice(0, 20)
-        .map(el => ({
+        .map((el) => ({
           src: (el.getAttribute('src') || '').split('/').pop(),
           alt: el.getAttribute('alt') || '',
           width: el.clientWidth,
@@ -75,9 +79,9 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
       // Color-change mechanism (1.4.8 bullet 1)
       const hasThemeMechanism = !!document.querySelector(
         '[class*="theme-toggle" i], [id*="theme-toggle" i], ' +
-        '[class*="dark-mode" i], [id*="dark-mode" i], ' +
-        '[class*="contrast" i][role="switch"], [aria-label*="contrast" i], ' +
-        '[aria-label*="dark mode" i], [aria-label*="theme" i]'
+          '[class*="dark-mode" i], [id*="dark-mode" i], ' +
+          '[class*="contrast" i][role="switch"], [aria-label*="contrast" i], ' +
+          '[aria-label*="dark mode" i], [aria-label*="theme" i]'
       );
 
       return { blocks, media, images, hasThemeMechanism };

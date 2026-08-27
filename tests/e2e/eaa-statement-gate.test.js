@@ -8,7 +8,10 @@ const AccessibilityStatementScanner = require('../../src/scanners/accessibility-
 const ComplianceMonitoringScanner = require('../../src/scanners/compliance-monitoring');
 const ContactMechanismScanner = require('../../src/scanners/contact-mechanism');
 const EAAProcedureScanner = require('../../src/scanners/eaa-procedure');
-const { matchesStatementLink, MISSING_STATEMENT_RULE } = require('../../src/utils/accessibility-statement');
+const {
+  matchesStatementLink,
+  MISSING_STATEMENT_RULE,
+} = require('../../src/utils/accessibility-statement');
 
 const rule = (v) => v.issue || v.type || v.ruleId;
 
@@ -53,7 +56,9 @@ describe('EAA statement gate', () => {
       }
     }
 
-    const statementRules = all.filter((v) => /statement|feedback|monitoring|audit|response-time|issue-tracking|improvement/.test(rule(v)));
+    const statementRules = all.filter((v) =>
+      /statement|feedback|monitoring|audit|response-time|issue-tracking|improvement/.test(rule(v))
+    );
     // Every scanner that speaks about the statement says the same one thing.
     expect([...new Set(statementRules.map(rule))]).toEqual([MISSING_STATEMENT_RULE]);
     expect(statementRules.every((v) => v.severity === 'serious')).toBe(true);

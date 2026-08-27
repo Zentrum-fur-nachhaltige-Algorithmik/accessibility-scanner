@@ -11,7 +11,7 @@ class LanguageDetectionScanner extends BaseScanner {
   constructor() {
     super('language-detection', {
       wcagCriteria: ['3.1.1', '3.1.2'],
-      wcagPrinciple: 'understandable'
+      wcagPrinciple: 'understandable',
     });
   }
 
@@ -24,7 +24,7 @@ class LanguageDetectionScanner extends BaseScanner {
   async scan(page, options = {}) {
     const scanOptions = {
       timeout: options.timeout || 60000,
-      ...options
+      ...options,
     };
 
     // Create timestamped scan directory
@@ -37,17 +37,17 @@ class LanguageDetectionScanner extends BaseScanner {
     // Create report according to interface
     return {
       scannerId: this.id,
-      criteria: ["9.3.1.1", "9.3.1.2"],
+      criteria: ['9.3.1.1', '9.3.1.2'],
       passed: languageResults.violations.length === 0,
       violations: languageResults.violations,
       summary: {
         pageLanguageSet: languageResults.pageLanguageSet,
         pageLanguageValid: languageResults.pageLanguageValid,
         multilingualContentMarked: languageResults.multilingualContentMarked,
-        languageChangesMarked: languageResults.languageChangesMarked
+        languageChangesMarked: languageResults.languageChangesMarked,
       },
       screenshotPath: scanDir,
-      visualEvidence: languageResults.visualEvidence
+      visualEvidence: languageResults.visualEvidence,
     };
   }
 
@@ -77,7 +77,11 @@ class LanguageDetectionScanner extends BaseScanner {
     const contentAnalysis = await this.analyzeContentLanguages(page, violations);
 
     // 3. Check for multilingual content marking (WCAG 3.1.2)
-    const multilingualAnalysis = await this.analyzeMultilingualContent(page, violations, contentAnalysis);
+    const multilingualAnalysis = await this.analyzeMultilingualContent(
+      page,
+      violations,
+      contentAnalysis
+    );
     multilingualContentMarked = multilingualAnalysis.contentMarked;
     languageChangesMarked = multilingualAnalysis.changesMarked;
 
@@ -87,7 +91,7 @@ class LanguageDetectionScanner extends BaseScanner {
       screenshot: path.basename(initialScreenshot),
       pageLanguage: pageLanguageAnalysis.declaredLanguage,
       detectedLanguage: contentAnalysis.primaryLanguage,
-      confidence: contentAnalysis.confidence
+      confidence: contentAnalysis.confidence,
     });
 
     console.log(`Language analysis complete: ${violations.length} violations found`);
@@ -98,7 +102,7 @@ class LanguageDetectionScanner extends BaseScanner {
       pageLanguageSet,
       pageLanguageValid,
       multilingualContentMarked,
-      languageChangesMarked
+      languageChangesMarked,
     };
   }
 
@@ -113,21 +117,26 @@ class LanguageDetectionScanner extends BaseScanner {
 
       // Same rule as above: plain serializable data only, and always the full shape.
       if (!htmlElement) {
-        return { declaredLanguage: null, hasLang: false, htmlElement: { tagName: null, attributes: [] } };
+        return {
+          declaredLanguage: null,
+          hasLang: false,
+          htmlElement: { tagName: null, attributes: [] },
+        };
       }
 
-      const declaredLanguage = htmlElement.getAttribute('lang') || htmlElement.getAttribute('xml:lang') || null;
+      const declaredLanguage =
+        htmlElement.getAttribute('lang') || htmlElement.getAttribute('xml:lang') || null;
 
       return {
         declaredLanguage: declaredLanguage,
         hasLang: !!declaredLanguage,
         htmlElement: {
           tagName: htmlElement.tagName,
-          attributes: Array.from(htmlElement.attributes).map(attr => ({
+          attributes: Array.from(htmlElement.attributes).map((attr) => ({
             name: attr.name,
-            value: attr.value
-          }))
-        }
+            value: attr.value,
+          })),
+        },
       };
     });
 
@@ -138,11 +147,12 @@ class LanguageDetectionScanner extends BaseScanner {
     // Check if page language is set
     if (!languageSet) {
       violations.push({
-        criterion: "9.3.1.1",
-        element: "html",
-        issue: "no-page-language",
-        description: "Page does not specify a language using the lang attribute on the html element",
-        suggestion: "Add lang attribute to <html> element (e.g., <html lang=\"en\">)"
+        criterion: '9.3.1.1',
+        element: 'html',
+        issue: 'no-page-language',
+        description:
+          'Page does not specify a language using the lang attribute on the html element',
+        suggestion: 'Add lang attribute to <html> element (e.g., <html lang="en">)',
       });
     } else {
       // Validate language code format
@@ -150,12 +160,13 @@ class LanguageDetectionScanner extends BaseScanner {
 
       if (!languageValid) {
         violations.push({
-          criterion: "9.3.1.1",
-          element: "html",
-          issue: "invalid-language-code",
+          criterion: '9.3.1.1',
+          element: 'html',
+          issue: 'invalid-language-code',
           declaredLanguage: pageLanguageInfo.declaredLanguage,
           description: `Page language code "${pageLanguageInfo.declaredLanguage}" is not a syntactically valid BCP 47 language tag`,
-          suggestion: "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word"
+          suggestion:
+            "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word",
         });
       }
     }
@@ -163,7 +174,7 @@ class LanguageDetectionScanner extends BaseScanner {
     return {
       languageSet,
       languageValid,
-      declaredLanguage: pageLanguageInfo.declaredLanguage
+      declaredLanguage: pageLanguageInfo.declaredLanguage,
     };
   }
 
@@ -190,39 +201,40 @@ class LanguageDetectionScanner extends BaseScanner {
         return { textElements };
       }
 
-      const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        {
-          acceptNode: function(node) {
-            // Skip script and style content
-            const parentTag = node.parentElement?.tagName.toLowerCase();
-            if (['script', 'style', 'noscript'].includes(parentTag)) {
-              return NodeFilter.FILTER_REJECT;
-            }
-
-            // Only include text nodes with meaningful content
-            const text = node.textContent.trim();
-            if (text.length > 10) { // Minimum text length for language detection
-              return NodeFilter.FILTER_ACCEPT;
-            }
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          // Skip script and style content
+          const parentTag = node.parentElement?.tagName.toLowerCase();
+          if (['script', 'style', 'noscript'].includes(parentTag)) {
             return NodeFilter.FILTER_REJECT;
           }
-        }
-      );
+
+          // Only include text nodes with meaningful content
+          const text = node.textContent.trim();
+          if (text.length > 10) {
+            // Minimum text length for language detection
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_REJECT;
+        },
+      });
 
       let node;
-      while (node = walker.nextNode()) {
+      while ((node = walker.nextNode())) {
         const text = node.textContent.trim();
         const element = node.parentElement;
         if (!element) continue;
 
         textElements.push({
           text: text,
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : ''),
-          langAttribute: element.getAttribute('lang') || element.closest('[lang]')?.getAttribute('lang') || null
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : ''),
+          langAttribute:
+            element.getAttribute('lang') || element.closest('[lang]')?.getAttribute('lang') || null,
         });
       }
 
@@ -237,11 +249,11 @@ class LanguageDetectionScanner extends BaseScanner {
 
     // Simple language detection heuristics
     const languagePatterns = {
-      'en': /\b(the|and|or|is|are|was|were|have|has|will|would|could|should|this|that|with|from|they|there|their|what|when|where|how)\b/gi,
-      'es': /\b(el|la|los|las|y|o|es|son|fue|fueron|tiene|han|será|podría|esto|eso|con|de|ellos|allí|su|qué|cuándo|dónde|cómo)\b/gi,
-      'fr': /\b(le|la|les|et|ou|est|sont|était|étaient|a|ont|sera|pourrait|ce|cette|avec|de|ils|là|leur|quoi|quand|où|comment)\b/gi,
-      'de': /\b(der|die|das|und|oder|ist|sind|war|waren|hat|haben|wird|könnte|dies|das|mit|von|sie|dort|ihr|was|wann|wo|wie)\b/gi,
-      'it': /\b(il|la|i|le|e|o|è|sono|era|erano|ha|hanno|sarà|potrebbe|questo|quella|con|di|loro|lì|il loro|cosa|quando|dove|come)\b/gi
+      en: /\b(the|and|or|is|are|was|were|have|has|will|would|could|should|this|that|with|from|they|there|their|what|when|where|how)\b/gi,
+      es: /\b(el|la|los|las|y|o|es|son|fue|fueron|tiene|han|será|podría|esto|eso|con|de|ellos|allí|su|qué|cuándo|dónde|cómo)\b/gi,
+      fr: /\b(le|la|les|et|ou|est|sont|était|étaient|a|ont|sera|pourrait|ce|cette|avec|de|ils|là|leur|quoi|quand|où|comment)\b/gi,
+      de: /\b(der|die|das|und|oder|ist|sind|war|waren|hat|haben|wird|könnte|dies|das|mit|von|sie|dort|ihr|was|wann|wo|wie)\b/gi,
+      it: /\b(il|la|i|le|e|o|è|sono|era|erano|ha|hanno|sarà|potrebbe|questo|quella|con|di|loro|lì|il loro|cosa|quando|dove|come)\b/gi,
     };
 
     let primaryLanguage = 'unknown';
@@ -249,7 +261,10 @@ class LanguageDetectionScanner extends BaseScanner {
     const languageScores = {};
 
     // Analyze all text content
-    const allText = contentAnalysis.map(item => item.text).join(' ').toLowerCase();
+    const allText = contentAnalysis
+      .map((item) => item.text)
+      .join(' ')
+      .toLowerCase();
 
     for (const [lang, pattern] of Object.entries(languagePatterns)) {
       const matches = allText.match(pattern) || [];
@@ -259,7 +274,9 @@ class LanguageDetectionScanner extends BaseScanner {
     // Find the language with the highest score
     const maxScore = Math.max(...Object.values(languageScores));
     if (maxScore > 0) {
-      primaryLanguage = Object.keys(languageScores).find(lang => languageScores[lang] === maxScore);
+      primaryLanguage = Object.keys(languageScores).find(
+        (lang) => languageScores[lang] === maxScore
+      );
       confidence = Math.min(95, Math.round((maxScore / allText.split(' ').length) * 100 * 5)); // Rough confidence calculation
     }
 
@@ -267,7 +284,7 @@ class LanguageDetectionScanner extends BaseScanner {
       primaryLanguage,
       confidence,
       textElements: contentAnalysis,
-      languageScores
+      languageScores,
     };
   }
 
@@ -296,23 +313,24 @@ class LanguageDetectionScanner extends BaseScanner {
       // Detect if text appears to be in a different language than the primary language
       const detectedLanguage = this.detectTextLanguage(text);
 
-      if (detectedLanguage &&
-          detectedLanguage !== primaryLanguage &&
-          detectedLanguage !== 'unknown') {
-
+      if (
+        detectedLanguage &&
+        detectedLanguage !== primaryLanguage &&
+        detectedLanguage !== 'unknown'
+      ) {
         // This text appears to be in a different language
         if (!declaredLang || declaredLang !== detectedLanguage) {
           // Language change not properly marked
           violations.push({
-            criterion: "9.3.1.2",
+            criterion: '9.3.1.2',
             element: textItem?.selector,
-            issue: "unmarked-language-change",
+            issue: 'unmarked-language-change',
             detectedLanguage: detectedLanguage,
             declaredLanguage: declaredLang || primaryLanguage,
             confidence: this.getDetectionConfidence(text, detectedLanguage),
             textSample: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
             description: `Text appears to be in ${detectedLanguage} but is not marked with lang="${detectedLanguage}"`,
-            suggestion: `Add lang="${detectedLanguage}" attribute to element containing foreign language text`
+            suggestion: `Add lang="${detectedLanguage}" attribute to element containing foreign language text`,
           });
 
           contentMarked = false;
@@ -327,16 +345,19 @@ class LanguageDetectionScanner extends BaseScanner {
       const elementsWithLang = document.querySelectorAll('[lang]');
       const invalid = [];
 
-      elementsWithLang.forEach(element => {
+      elementsWithLang.forEach((element) => {
         const langCode = element.getAttribute('lang');
-        const selector = element.tagName.toLowerCase() +
-                        (element.id ? `#${element.id}` : '') +
-                        (element.className && typeof element.className === 'string' ? `.${element.className.split(' ')[0]}` : '');
+        const selector =
+          element.tagName.toLowerCase() +
+          (element.id ? `#${element.id}` : '') +
+          (element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '');
 
         invalid.push({
           selector: selector,
           langCode: langCode,
-          text: element.textContent.trim().substring(0, 100)
+          text: element.textContent.trim().substring(0, 100),
         });
       });
 
@@ -349,19 +370,20 @@ class LanguageDetectionScanner extends BaseScanner {
     for (const element of invalidLangElements) {
       if (!this.isValidLanguageCode(element.langCode)) {
         violations.push({
-          criterion: "9.3.1.2",
+          criterion: '9.3.1.2',
           element: element.selector,
-          issue: "invalid-language-code",
+          issue: 'invalid-language-code',
           declaredLanguage: element.langCode,
           description: `Element has a lang attribute ("${element.langCode}") that is not a syntactically valid BCP 47 language tag`,
-          suggestion: "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word"
+          suggestion:
+            "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word",
         });
       }
     }
 
     return {
       contentMarked,
-      changesMarked
+      changesMarked,
     };
   }
 
@@ -370,10 +392,10 @@ class LanguageDetectionScanner extends BaseScanner {
    */
   detectTextLanguage(text) {
     const languagePatterns = {
-      'es': /\b(este|esta|estos|estas|pero|porque|cuando|donde|como|muy|más|también|después|antes|durante)\b/gi,
-      'fr': /\b(cette|ces|mais|parce que|quand|où|comme|très|plus|aussi|après|avant|pendant)\b/gi,
-      'de': /\b(diese|dieser|dieses|aber|weil|wenn|wo|wie|sehr|mehr|auch|nach|vor|während)\b/gi,
-      'it': /\b(questo|questa|questi|queste|ma|perché|quando|dove|come|molto|più|anche|dopo|prima|durante)\b/gi
+      es: /\b(este|esta|estos|estas|pero|porque|cuando|donde|como|muy|más|también|después|antes|durante)\b/gi,
+      fr: /\b(cette|ces|mais|parce que|quand|où|comme|très|plus|aussi|après|avant|pendant)\b/gi,
+      de: /\b(diese|dieser|dieses|aber|weil|wenn|wo|wie|sehr|mehr|auch|nach|vor|während)\b/gi,
+      it: /\b(questo|questa|questi|queste|ma|perché|quando|dove|come|molto|più|anche|dopo|prima|durante)\b/gi,
     };
 
     let maxMatches = 0;
@@ -381,7 +403,8 @@ class LanguageDetectionScanner extends BaseScanner {
 
     for (const [lang, pattern] of Object.entries(languagePatterns)) {
       const matches = (text.match(pattern) || []).length;
-      if (matches > maxMatches && matches >= 2) { // Require at least 2 matches
+      if (matches > maxMatches && matches >= 2) {
+        // Require at least 2 matches
         maxMatches = matches;
         detectedLang = lang;
       }
@@ -395,8 +418,10 @@ class LanguageDetectionScanner extends BaseScanner {
    */
   getDetectionConfidence(text, language) {
     const words = text.split(/\s+/).length;
-    const languageWords = this.detectTextLanguage(text) === language ?
-                         (text.match(this.getLanguagePattern(language)) || []).length : 0;
+    const languageWords =
+      this.detectTextLanguage(text) === language
+        ? (text.match(this.getLanguagePattern(language)) || []).length
+        : 0;
 
     return Math.min(95, Math.round((languageWords / words) * 100));
   }
@@ -406,10 +431,10 @@ class LanguageDetectionScanner extends BaseScanner {
    */
   getLanguagePattern(language) {
     const patterns = {
-      'es': /\b(este|esta|estos|estas|pero|porque|cuando|donde|como|muy|más|también|después|antes|durante|el|la|los|las|y|o|es|son)\b/gi,
-      'fr': /\b(cette|ces|mais|parce que|quand|où|comme|très|plus|aussi|après|avant|pendant|le|la|les|et|ou|est|sont)\b/gi,
-      'de': /\b(diese|dieser|dieses|aber|weil|wenn|wo|wie|sehr|mehr|auch|nach|vor|während|der|die|das|und|oder|ist|sind)\b/gi,
-      'it': /\b(questo|questa|questi|queste|ma|perché|quando|dove|come|molto|più|anche|dopo|prima|durante|il|la|i|le|e|o|è|sono)\b/gi
+      es: /\b(este|esta|estos|estas|pero|porque|cuando|donde|como|muy|más|también|después|antes|durante|el|la|los|las|y|o|es|son)\b/gi,
+      fr: /\b(cette|ces|mais|parce que|quand|où|comme|très|plus|aussi|après|avant|pendant|le|la|les|et|ou|est|sont)\b/gi,
+      de: /\b(diese|dieser|dieses|aber|weil|wenn|wo|wie|sehr|mehr|auch|nach|vor|während|der|die|das|und|oder|ist|sind)\b/gi,
+      it: /\b(questo|questa|questi|queste|ma|perché|quando|dove|come|molto|più|anche|dopo|prima|durante|il|la|i|le|e|o|è|sono)\b/gi,
     };
 
     return patterns[language] || /\w+/gi;
@@ -461,12 +486,33 @@ class LanguageDetectionScanner extends BaseScanner {
     // registry lookup.
     const GRANDFATHERED = new Set([
       // irregular
-      'en-gb-oed', 'i-ami', 'i-bnn', 'i-default', 'i-enochian', 'i-hak',
-      'i-klingon', 'i-lux', 'i-mingo', 'i-navajo', 'i-pwn', 'i-tao', 'i-tay',
-      'i-tsu', 'sgn-be-fr', 'sgn-be-nl', 'sgn-ch-de',
+      'en-gb-oed',
+      'i-ami',
+      'i-bnn',
+      'i-default',
+      'i-enochian',
+      'i-hak',
+      'i-klingon',
+      'i-lux',
+      'i-mingo',
+      'i-navajo',
+      'i-pwn',
+      'i-tao',
+      'i-tay',
+      'i-tsu',
+      'sgn-be-fr',
+      'sgn-be-nl',
+      'sgn-ch-de',
       // regular
-      'art-lojban', 'cel-gaulish', 'no-bok', 'no-nyn', 'zh-guoyu', 'zh-hakka',
-      'zh-min', 'zh-min-nan', 'zh-xiang',
+      'art-lojban',
+      'cel-gaulish',
+      'no-bok',
+      'no-nyn',
+      'zh-guoyu',
+      'zh-hakka',
+      'zh-min',
+      'zh-min-nan',
+      'zh-xiang',
     ]);
     if (GRANDFATHERED.has(tag.toLowerCase())) return true;
 
@@ -488,7 +534,6 @@ class LanguageDetectionScanner extends BaseScanner {
 
     return langtagPattern.test(tag) || privateUseOnlyPattern.test(tag);
   }
-
 }
 
 module.exports = LanguageDetectionScanner;

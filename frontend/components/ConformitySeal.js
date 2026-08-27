@@ -67,9 +67,7 @@ function MilledRing() {
 export default function ConformitySeal({ size = 104, label = null }) {
   // Decorative unless it is given a label: the letterhead mark sits next to
   // the app name and would only repeat it.
-  const semantics = label
-    ? { role: 'img', 'aria-label': label }
-    : { 'aria-hidden': 'true' };
+  const semantics = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true' };
 
   return (
     <svg

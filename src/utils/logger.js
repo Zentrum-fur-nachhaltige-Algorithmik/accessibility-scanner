@@ -15,7 +15,9 @@ function threshold() {
 
 function write(stream, scope, args) {
   const line = args
-    .map((a) => (a instanceof Error ? a.stack || a.message : typeof a === 'string' ? a : JSON.stringify(a)))
+    .map((a) =>
+      a instanceof Error ? a.stack || a.message : typeof a === 'string' ? a : JSON.stringify(a)
+    )
     .join(' ');
   stream.write(`[${scope}] ${line}\n`);
 }

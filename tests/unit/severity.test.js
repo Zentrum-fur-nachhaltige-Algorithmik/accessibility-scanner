@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeSeverity, severityWeight, violationPenalty, scoreFromPenalty } from '../../src/core/severity';
+import {
+  normalizeSeverity,
+  severityWeight,
+  violationPenalty,
+  scoreFromPenalty,
+} from '../../src/core/severity';
 import ScanPipeline from '../../src/core/scan-pipeline';
 
 describe('severity', () => {
@@ -16,15 +21,21 @@ describe('severity', () => {
     expect(severityWeight({ severity: 'violation' })).toBe(2);
     const p = new ScanPipeline();
     expect(p.computeViolationWeightedScore([{ severity: 'violation' }])).toBe(98);
-    expect(p.computeViolationWeightedScore([{ severity: 'info' }, { severity: 'best-practice' }])).toBe(100);
+    expect(
+      p.computeViolationWeightedScore([{ severity: 'info' }, { severity: 'best-practice' }])
+    ).toBe(100);
   });
   it('an AAA-only finding is downgraded to info and weighs 0', () => {
     const p = new ScanPipeline();
     const result = p.assembleResult('http://x', [
-      { scannerId: 'axe-core', passed: false, violations: [
-        { ruleId: 'x', severity: 'serious', wcagCriteria: ['2.5.5'] },
-        { ruleId: 'y', severity: 'serious', wcagCriteria: ['2.5.8'] },
-      ] },
+      {
+        scannerId: 'axe-core',
+        passed: false,
+        violations: [
+          { ruleId: 'x', severity: 'serious', wcagCriteria: ['2.5.5'] },
+          { ruleId: 'y', severity: 'serious', wcagCriteria: ['2.5.8'] },
+        ],
+      },
     ]);
     const [aaa, aa] = result.violations;
     expect(aaa.wcagLevel).toBe('AAA');
@@ -37,8 +48,7 @@ describe('severity', () => {
   });
 
   describe('score aggregation', () => {
-    const repeat = (issue, severity, n) =>
-      Array.from({ length: n }, () => ({ issue, severity }));
+    const repeat = (issue, severity, n) => Array.from({ length: n }, () => ({ issue, severity }));
 
     it('counts n instances of one rule as one defect with a capped surcharge', () => {
       const one = violationPenalty(repeat('focus-ring', 'serious', 1));
@@ -52,8 +62,10 @@ describe('severity', () => {
     it('ranks breadth worse than depth', () => {
       const deep = violationPenalty(repeat('a', 'serious', 50));
       const broad = violationPenalty([
-        ...repeat('a', 'serious', 1), ...repeat('b', 'serious', 1),
-        ...repeat('c', 'serious', 1), ...repeat('d', 'serious', 1),
+        ...repeat('a', 'serious', 1),
+        ...repeat('b', 'serious', 1),
+        ...repeat('c', 'serious', 1),
+        ...repeat('d', 'serious', 1),
       ]);
       expect(broad).toBeGreaterThan(deep);
     });
@@ -61,9 +73,11 @@ describe('severity', () => {
     it('keeps the score discriminating instead of clipping to 0', () => {
       // The old 100 - sum(weights) returned 0 for both of these.
       const bad = scoreFromPenalty(violationPenalty(repeat('a', 'critical', 30)));
-      const worse = scoreFromPenalty(violationPenalty(
-        Array.from({ length: 30 }, (_, i) => ({ issue: `rule-${i}`, severity: 'critical' }))
-      ));
+      const worse = scoreFromPenalty(
+        violationPenalty(
+          Array.from({ length: 30 }, (_, i) => ({ issue: `rule-${i}`, severity: 'critical' }))
+        )
+      );
       expect(bad).toBeGreaterThan(worse);
       expect(worse).toBeGreaterThan(0);
     });
@@ -77,12 +91,30 @@ describe('severity', () => {
     it('collapses one procedural finding reported by two scanners', () => {
       const p = new ScanPipeline();
       const result = p.assembleResult('http://x', [
-        { scannerId: 'accessibility-statement', passed: false, violations: [
-          { criterion: 'EAA-Statement', element: 'website', issue: 'missing-accessibility-statement', severity: 'serious' },
-        ] },
-        { scannerId: 'eaa-procedure', passed: false, violations: [
-          { criterion: 'EAA-Statement', element: 'website', issue: 'missing-accessibility-statement', severity: 'serious' },
-        ] },
+        {
+          scannerId: 'accessibility-statement',
+          passed: false,
+          violations: [
+            {
+              criterion: 'EAA-Statement',
+              element: 'website',
+              issue: 'missing-accessibility-statement',
+              severity: 'serious',
+            },
+          ],
+        },
+        {
+          scannerId: 'eaa-procedure',
+          passed: false,
+          violations: [
+            {
+              criterion: 'EAA-Statement',
+              element: 'website',
+              issue: 'missing-accessibility-statement',
+              severity: 'serious',
+            },
+          ],
+        },
       ]);
       expect(result.totalViolations).toBe(1);
       expect(result.accessibilityScore).toBe(95);

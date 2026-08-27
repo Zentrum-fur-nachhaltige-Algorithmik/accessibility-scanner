@@ -90,9 +90,11 @@ function matchesCriteria(violation, criteria) {
   // `ruleId`, or a per-violation `wcagCriteria` string/array.
   const wc = violation.wcagCriteria;
   const fields = [violation.criterion, violation.ruleId, ...(Array.isArray(wc) ? wc : [wc])]
-    .filter(Boolean).map(String);
-  return criteria.some(target =>
-    fields.some(c => c === target || c === `9.${target}` || c.includes(target)));
+    .filter(Boolean)
+    .map(String);
+  return criteria.some((target) =>
+    fields.some((c) => c === target || c === `9.${target}` || c.includes(target))
+  );
 }
 
 async function main() {
@@ -107,7 +109,7 @@ async function main() {
   const testDir = TEST_SITES;
 
   // Parse all test files and route to scanners
-  const allFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.html'));
+  const allFiles = fs.readdirSync(testDir).filter((f) => f.endsWith('.html'));
   const testPlan = []; // { file, scanner, criteria, expectViolations }
 
   for (const file of allFiles) {
@@ -142,7 +144,9 @@ async function main() {
     }
   }
 
-  console.log(`Test plan: ${testPlan.length} tests across ${new Set(testPlan.map(t => t.scanner)).size} scanners\n`);
+  console.log(
+    `Test plan: ${testPlan.length} tests across ${new Set(testPlan.map((t) => t.scanner)).size} scanners\n`
+  );
 
   // Start static server
   const server = http.createServer((req, res) => {
@@ -155,7 +159,7 @@ async function main() {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(fs.readFileSync(filePath));
   });
-  const port = await new Promise(resolve => {
+  const port = await new Promise((resolve) => {
     server.listen(0, () => resolve(server.address().port));
   });
 
@@ -178,8 +182,14 @@ async function main() {
   // Suppress verbose scanner output
   const origLog = console.log;
   const origWarn = console.warn;
-  function silence() { console.log = () => {}; console.warn = () => {}; }
-  function restore() { console.log = origLog; console.warn = origWarn; }
+  function silence() {
+    console.log = () => {};
+    console.warn = () => {};
+  }
+  function restore() {
+    console.log = origLog;
+    console.warn = origWarn;
+  }
 
   let passed = 0;
   let failed = 0;
@@ -227,8 +237,8 @@ async function main() {
         // that declares "2.1.1, 2.5.1" — 2.1.1 findings belong to
         // keyboard-navigation and do not count here).
         const allViolations = result.violations || [];
-        const targetCriteria = t.criteria.filter(c => scannerDef.criteria.includes(c));
-        const relevant = allViolations.filter(v => matchesCriteria(v, targetCriteria));
+        const targetCriteria = t.criteria.filter((c) => scannerDef.criteria.includes(c));
+        const relevant = allViolations.filter((v) => matchesCriteria(v, targetCriteria));
 
         const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
         const label = t.expectViolations ? 'TRUE-POS' : 'FALSE-POS';
@@ -251,12 +261,22 @@ async function main() {
         } else {
           origLog(`  FAIL [${label}] ${t.file}: ${detail}`);
           if (relevant.length > 0) {
-            relevant.slice(0, 3).forEach(v =>
-              origLog(`    - [${v.criterion}] ${v.issue}: ${(v.description || '').substring(0, 100)}`)
-            );
+            relevant
+              .slice(0, 3)
+              .forEach((v) =>
+                origLog(
+                  `    - [${v.criterion}] ${v.issue}: ${(v.description || '').substring(0, 100)}`
+                )
+              );
           }
           failed++;
-          failures.push({ file: t.file, scanner: scannerId, label, detail, relevant: relevant.slice(0, 3) });
+          failures.push({
+            file: t.file,
+            scanner: scannerId,
+            label,
+            detail,
+            relevant: relevant.slice(0, 3),
+          });
         }
       } catch (err) {
         restore();
@@ -267,7 +287,7 @@ async function main() {
           file: t.file,
           scanner: scannerId,
           expectViolations: t.expectViolations,
-          criteria: t.criteria.filter(c => scannerDef.criteria.includes(c)),
+          criteria: t.criteria.filter((c) => scannerDef.criteria.includes(c)),
           matched: 0,
           status: 'ERROR',
           detail: err.message,
@@ -292,7 +312,10 @@ async function main() {
       }
       const page = await browser.newPage();
       try {
-        await page.goto(`http://localhost:${port}/${file}`, { waitUntil: 'networkidle0', timeout: 30000 });
+        await page.goto(`http://localhost:${port}/${file}`, {
+          waitUntil: 'networkidle0',
+          timeout: 30000,
+        });
         silence();
         // Full mode: no heuristicOnly
         const result = await Promise.race([
@@ -304,37 +327,59 @@ async function main() {
         const violations = result.violations || [];
         // Viewport-tested violations (from responsive analysis) should have affectedViewports;
         // CSS heuristic violations don't — only check structure on viewport violations
-        const viewportViolations = violations.filter(v => Array.isArray(v.affectedViewports));
-        const hasAffectedViewports = viewportViolations.length > 0 &&
-          viewportViolations.every(v => Array.isArray(v.affectedViewports));
+        const viewportViolations = violations.filter((v) => Array.isArray(v.affectedViewports));
+        const hasAffectedViewports =
+          viewportViolations.length > 0 &&
+          viewportViolations.every((v) => Array.isArray(v.affectedViewports));
 
         if (expectZero) {
           if (violations.length === 0) {
             origLog(`  PASS [FULL-MATRIX] ${file}: 0 violations`);
             passed++;
           } else {
-            origLog(`  FAIL [FULL-MATRIX] ${file}: expected 0 violations, got ${violations.length}`);
+            origLog(
+              `  FAIL [FULL-MATRIX] ${file}: expected 0 violations, got ${violations.length}`
+            );
             failed++;
-            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MATRIX', detail: `${violations.length} violations` });
+            failures.push({
+              file,
+              scanner: 'responsive-design',
+              label: 'FULL-MATRIX',
+              detail: `${violations.length} violations`,
+            });
           }
         } else {
           // Bad file: should have violations but deduped (< 20, not 800+), each with affectedViewports
           const dedupOk = violations.length > 0 && violations.length < 50;
           const structureOk = hasAffectedViewports;
           if (dedupOk && structureOk) {
-            origLog(`  PASS [FULL-MATRIX DEDUP] ${file}: ${violations.length} deduplicated violations, all have affectedViewports`);
+            origLog(
+              `  PASS [FULL-MATRIX DEDUP] ${file}: ${violations.length} deduplicated violations, all have affectedViewports`
+            );
             passed++;
           } else {
-            origLog(`  FAIL [FULL-MATRIX DEDUP] ${file}: ${violations.length} violations, affectedViewports=${structureOk}`);
+            origLog(
+              `  FAIL [FULL-MATRIX DEDUP] ${file}: ${violations.length} violations, affectedViewports=${structureOk}`
+            );
             failed++;
-            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MATRIX-DEDUP', detail: `${violations.length} violations, structure=${structureOk}` });
+            failures.push({
+              file,
+              scanner: 'responsive-design',
+              label: 'FULL-MATRIX-DEDUP',
+              detail: `${violations.length} violations, structure=${structureOk}`,
+            });
           }
         }
       } catch (err) {
         restore();
         origLog(`  ERROR [FULL-MATRIX] ${file}: ${err.message}`);
         failed++;
-        failures.push({ file, scanner: 'responsive-design', label: 'FULL-MATRIX-ERROR', detail: err.message });
+        failures.push({
+          file,
+          scanner: 'responsive-design',
+          label: 'FULL-MATRIX-ERROR',
+          detail: err.message,
+        });
       } finally {
         await page.close().catch(() => {});
       }
@@ -356,7 +401,10 @@ async function main() {
       }
       const page = await browser.newPage();
       try {
-        await page.goto(`http://localhost:${port}/${file}`, { waitUntil: 'networkidle0', timeout: 30000 });
+        await page.goto(`http://localhost:${port}/${file}`, {
+          waitUntil: 'networkidle0',
+          timeout: 30000,
+        });
         silence();
         const result = await Promise.race([
           responsiveScanner.scan(page, { heuristicOnly: false }),
@@ -371,32 +419,53 @@ async function main() {
 
         const allViolations = result.violations || [];
         // Filter to only violations matching the target criteria
-        const relevant = allViolations.filter(v => matchesCriteria(v, criteria));
+        const relevant = allViolations.filter((v) => matchesCriteria(v, criteria));
 
         if (expectViolations) {
           if (relevant.length > 0) {
-            origLog(`  PASS [FULL-MODE] ${file}: ${relevant.length} violations for ${criteria.join(',')}`);
+            origLog(
+              `  PASS [FULL-MODE] ${file}: ${relevant.length} violations for ${criteria.join(',')}`
+            );
             passed++;
           } else {
-            origLog(`  FAIL [FULL-MODE TRUE-POS] ${file}: 0 violations for ${criteria.join(',')} (${allViolations.length} total)`);
+            origLog(
+              `  FAIL [FULL-MODE TRUE-POS] ${file}: 0 violations for ${criteria.join(',')} (${allViolations.length} total)`
+            );
             failed++;
-            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MODE-TRUE-POS', detail: `0 relevant violations for ${criteria.join(',')}` });
+            failures.push({
+              file,
+              scanner: 'responsive-design',
+              label: 'FULL-MODE-TRUE-POS',
+              detail: `0 relevant violations for ${criteria.join(',')}`,
+            });
           }
         } else {
           if (relevant.length === 0) {
             origLog(`  PASS [FULL-MODE] ${file}: 0 violations for ${criteria.join(',')}`);
             passed++;
           } else {
-            origLog(`  FAIL [FULL-MODE FALSE-POS] ${file}: ${relevant.length} spurious violations for ${criteria.join(',')}`);
+            origLog(
+              `  FAIL [FULL-MODE FALSE-POS] ${file}: ${relevant.length} spurious violations for ${criteria.join(',')}`
+            );
             failed++;
-            failures.push({ file, scanner: 'responsive-design', label: 'FULL-MODE-FALSE-POS', detail: `${relevant.length} spurious violations` });
+            failures.push({
+              file,
+              scanner: 'responsive-design',
+              label: 'FULL-MODE-FALSE-POS',
+              detail: `${relevant.length} spurious violations`,
+            });
           }
         }
       } catch (err) {
         restore();
         origLog(`  ERROR [FULL-MODE] ${file}: ${err.message}`);
         failed++;
-        failures.push({ file, scanner: 'responsive-design', label: 'FULL-MODE-ERROR', detail: err.message });
+        failures.push({
+          file,
+          scanner: 'responsive-design',
+          label: 'FULL-MODE-ERROR',
+          detail: err.message,
+        });
       } finally {
         await page.close().catch(() => {});
       }
@@ -407,12 +476,19 @@ async function main() {
   server.close();
 
   if (jsonPath) {
-    fs.writeFileSync(jsonPath, JSON.stringify({
-      generatedAt: new Date().toISOString(),
-      harness: 'exclusive',
-      totals: { passed, failed },
-      results: jsonResults,
-    }, null, 2));
+    fs.writeFileSync(
+      jsonPath,
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          harness: 'exclusive',
+          totals: { passed, failed },
+          results: jsonResults,
+        },
+        null,
+        2
+      )
+    );
     origLog(`\nWrote ${jsonPath}`);
   }
 
@@ -434,7 +510,7 @@ async function main() {
 module.exports = { EXCLUSIVE_SCANNERS, CRITERION_TO_SCANNER, matchesCriteria };
 
 if (require.main === module) {
-  main().catch(err => {
+  main().catch((err) => {
     console.error('Fatal:', err);
     process.exit(1);
   });

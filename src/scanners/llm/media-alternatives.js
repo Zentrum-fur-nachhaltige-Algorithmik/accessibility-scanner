@@ -12,16 +12,22 @@ const LLMBaseScanner = require('./base');
 
 class LLMMediaAlternativesScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-media-alternatives', {
-      wcagCriteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
-      wcagPrinciple: 'perceivable',
-    }, llmClient);
+    super(
+      'llm-media-alternatives',
+      {
+        wcagCriteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
+        wcagPrinciple: 'perceivable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
     // Pre-check: does this page contain media elements or media-related content?
     const hasMedia = await page.evaluate(() => {
-      const media = document.querySelectorAll('video, audio, iframe[src*="youtube"], iframe[src*="vimeo"], [class*="player"], [class*="stream"], [class*="media"], [class*="video"], [class*="audio"]');
+      const media = document.querySelectorAll(
+        'video, audio, iframe[src*="youtube"], iframe[src*="vimeo"], [class*="player"], [class*="stream"], [class*="media"], [class*="video"], [class*="audio"]'
+      );
       if (media.length > 0) return true;
       // Also check for text references to media content
       const text = document.body?.textContent || '';

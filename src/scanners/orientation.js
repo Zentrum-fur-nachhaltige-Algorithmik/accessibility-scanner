@@ -13,16 +13,20 @@ class OrientationScanner extends BaseScanner {
     });
   }
 
-  get needsExclusiveAccess() { return false; }
+  get needsExclusiveAccess() {
+    return false;
+  }
 
   async scan(page, options = {}) {
     const orientationResults = await page.evaluate(() => {
       const violations = [];
 
       function getSelector(el) {
-        return el.tagName.toLowerCase() +
+        return (
+          el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
+        );
       }
 
       // 1. Check CSS @media orientation rules
@@ -56,11 +60,15 @@ class OrientationScanner extends BaseScanner {
                 const height = style.getPropertyValue('height');
                 const maxHeight = style.getPropertyValue('max-height');
 
-                const hidesContent = display === 'none' ||
+                const hidesContent =
+                  display === 'none' ||
                   visibility === 'hidden' ||
-                  width === '0' || width === '0px' ||
-                  height === '0' || height === '0px' ||
-                  maxHeight === '0' || maxHeight === '0px';
+                  width === '0' ||
+                  width === '0px' ||
+                  height === '0' ||
+                  height === '0px' ||
+                  maxHeight === '0' ||
+                  maxHeight === '0px';
 
                 if (hidesContent) {
                   // Verify the selector targets real elements
@@ -69,8 +77,12 @@ class OrientationScanner extends BaseScanner {
                     orientationMediaViolations.push({
                       selector: innerRule.selectorText,
                       lockedOrientation,
-                      property: display === 'none' ? 'display:none' :
-                                visibility === 'hidden' ? 'visibility:hidden' : 'dimension:0',
+                      property:
+                        display === 'none'
+                          ? 'display:none'
+                          : visibility === 'hidden'
+                            ? 'visibility:hidden'
+                            : 'dimension:0',
                     });
                   }
                 }
@@ -99,14 +111,15 @@ class OrientationScanner extends BaseScanner {
             severity: 'serious',
             lockedOrientation: orientation,
             affectedSelectors: selectors,
-            suggestion: 'Remove orientation-dependent display:none/visibility:hidden rules. Use responsive layout that works in both orientations.',
+            suggestion:
+              'Remove orientation-dependent display:none/visibility:hidden rules. Use responsive layout that works in both orientations.',
           });
         }
       }
 
       // 2. Check for forced fixed dimensions that only work in one orientation
       const forcedLandscape = document.querySelectorAll('[style*="min-width"]');
-      forcedLandscape.forEach(el => {
+      forcedLandscape.forEach((el) => {
         const style = window.getComputedStyle(el);
         const minWidth = parseFloat(style.minWidth);
         const overflow = style.overflow;
@@ -117,14 +130,15 @@ class OrientationScanner extends BaseScanner {
             issue: 'forced-dimensions',
             description: `Element has min-width: ${Math.round(minWidth)}px with overflow:hidden — forces landscape-only viewing`,
             severity: 'serious',
-            suggestion: 'Use responsive width (max-width, %, vw) and allow overflow:auto or remove overflow:hidden.',
+            suggestion:
+              'Use responsive width (max-width, %, vw) and allow overflow:auto or remove overflow:hidden.',
           });
         }
       });
 
       // Also check CSS classes with forced dimensions
       const allElements = document.querySelectorAll('*');
-      allElements.forEach(el => {
+      allElements.forEach((el) => {
         const style = window.getComputedStyle(el);
         const minWidth = parseFloat(style.minWidth);
         const overflow = style.overflow;
@@ -146,7 +160,7 @@ class OrientationScanner extends BaseScanner {
 
       // 3. Check JavaScript for orientation lock calls
       const scripts = document.querySelectorAll('script:not([src])');
-      scripts.forEach(script => {
+      scripts.forEach((script) => {
         const code = script.textContent || '';
 
         if (/screen\.orientation\.lock/i.test(code) || /screen\.lockOrientation/i.test(code)) {
@@ -154,19 +168,22 @@ class OrientationScanner extends BaseScanner {
             criterion: '9.1.3.4',
             element: 'script',
             issue: 'orientation-lock-js',
-            description: 'JavaScript calls screen.orientation.lock() to force a specific orientation',
+            description:
+              'JavaScript calls screen.orientation.lock() to force a specific orientation',
             severity: 'critical',
-            suggestion: 'Remove screen.orientation.lock() calls. Allow users to view content in any orientation.',
+            suggestion:
+              'Remove screen.orientation.lock() calls. Allow users to view content in any orientation.',
           });
         }
       });
 
       // 4. Check for "rotate your device" messages
-      const rotatePatterns = /\b(rotate|drehen|drehung).{0,30}(device|phone|tablet|gerät|bildschirm)/i;
+      const rotatePatterns =
+        /\b(rotate|drehen|drehung).{0,30}(device|phone|tablet|gerät|bildschirm)/i;
       const landscapeOnly = /\b(landscape|querformat)\s+(only|mode|modus|required|erforderlich)\b/i;
       const portraitOnly = /\b(portrait|hochformat)\s+(only|mode|modus|required|erforderlich)\b/i;
 
-      allElements.forEach(el => {
+      allElements.forEach((el) => {
         if (el.children.length > 0) return; // only leaf text nodes
         const text = el.textContent.trim();
         if (!text || text.length > 200) return;
@@ -181,7 +198,8 @@ class OrientationScanner extends BaseScanner {
               issue: 'rotate-device-message',
               description: `"Rotate your device" message detected: "${text.substring(0, 80)}..."`,
               severity: 'serious',
-              suggestion: 'Design a responsive layout that works in both orientations instead of asking users to rotate.',
+              suggestion:
+                'Design a responsive layout that works in both orientations instead of asking users to rotate.',
             });
           }
         }
@@ -189,9 +207,11 @@ class OrientationScanner extends BaseScanner {
 
       return {
         violations,
-        hasOrientationLock: violations.some(v => v.issue === 'orientation-lock-js' || v.issue === 'orientation-lock-css'),
-        hasForcedDimensions: violations.some(v => v.issue === 'forced-dimensions'),
-        hasRotateMessage: violations.some(v => v.issue === 'rotate-device-message'),
+        hasOrientationLock: violations.some(
+          (v) => v.issue === 'orientation-lock-js' || v.issue === 'orientation-lock-css'
+        ),
+        hasForcedDimensions: violations.some((v) => v.issue === 'forced-dimensions'),
+        hasRotateMessage: violations.some((v) => v.issue === 'rotate-device-message'),
       };
     });
 

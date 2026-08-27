@@ -94,7 +94,10 @@ function derive() {
     for (const r of data.results || []) {
       if (r.status === 'PASS') continue;
       const what = r.expectViolations ? 'missed' : 'false positive on';
-      add(r.scanner, `${harness} harness: ${r.status} — ${what} ${r.file} (${(r.criteria || []).join(',')})`);
+      add(
+        r.scanner,
+        `${harness} harness: ${r.status} — ${what} ${r.file} (${(r.criteria || []).join(',')})`
+      );
     }
   }
 
@@ -105,7 +108,10 @@ function derive() {
       for (const err of f.scannerErrors || []) {
         const id = err.scanner || err.scannerId;
         if (!id) continue;
-        add(id, `realworld: crashed on ${f.file} — ${String(err.error || err.message || '').slice(0, 160)}`);
+        add(
+          id,
+          `realworld: crashed on ${f.file} — ${String(err.error || err.message || '').slice(0, 160)}`
+        );
       }
     }
   }
@@ -121,7 +127,10 @@ function derive() {
     }
     for (const [id, count] of totals) {
       if (count > NOISE_LIMIT) {
-        add(id, `good-file noise: ${count} violations across the good-* corpus (limit ${NOISE_LIMIT})`);
+        add(
+          id,
+          `good-file noise: ${count} violations across the good-* corpus (limit ${NOISE_LIMIT})`
+        );
       }
     }
   }
@@ -150,20 +159,23 @@ function derive() {
     }
 
     const failures = evidence.get(id) || [];
-    trust[id] = failures.length === 0
-      ? {
-          tier: 'proven',
-          kind,
-          reason:
-            'Clean record: every deterministic-harness assertion on its own criteria passed, ' +
-            'no crashes across the five real-world fixtures, not a top noise source.',
-        }
-      : {
-          tier: 'experimental',
-          kind,
-          reason: failures.slice(0, 6).join(' | ') + (failures.length > 6 ? ` | (+${failures.length - 6} more)` : ''),
-          failureCount: failures.length,
-        };
+    trust[id] =
+      failures.length === 0
+        ? {
+            tier: 'proven',
+            kind,
+            reason:
+              'Clean record: every deterministic-harness assertion on its own criteria passed, ' +
+              'no crashes across the five real-world fixtures, not a top noise source.',
+          }
+        : {
+            tier: 'experimental',
+            kind,
+            reason:
+              failures.slice(0, 6).join(' | ') +
+              (failures.length > 6 ? ` | (+${failures.length - 6} more)` : ''),
+            failureCount: failures.length,
+          };
   }
 
   return {
@@ -201,14 +213,19 @@ function main() {
       console.error('scanner-trust.json is stale — re-run: node scripts/derive-scanner-trust.js');
       process.exit(1);
     }
-    console.log(`scanner-trust: up to date (${counts.proven} proven, ${counts.experimental} experimental)`);
+    console.log(
+      `scanner-trust: up to date (${counts.proven} proven, ${counts.experimental} experimental)`
+    );
     return;
   }
 
   fs.writeFileSync(OUT, JSON.stringify(derived, null, 2) + '\n');
-  console.log(`Wrote ${path.relative(ROOT, OUT)}: ${counts.proven} proven, ${counts.experimental} experimental`);
+  console.log(
+    `Wrote ${path.relative(ROOT, OUT)}: ${counts.proven} proven, ${counts.experimental} experimental`
+  );
   for (const [id, v] of Object.entries(derived.scanners)) {
-    if (v.tier === 'experimental') console.log(`  experimental  ${id}  — ${v.reason.slice(0, 120)}`);
+    if (v.tier === 'experimental')
+      console.log(`  experimental  ${id}  — ${v.reason.slice(0, 120)}`);
   }
 }
 

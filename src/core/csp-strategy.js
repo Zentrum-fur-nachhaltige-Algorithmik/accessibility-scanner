@@ -36,10 +36,7 @@ async function navigateWithCSPFallback(page, url, options = {}) {
 
   // Strategy 2: evaluateOnNewDocument — inject axe before CSP loads
   try {
-    const axeSource = await fs.readFile(
-      path.resolve('./node_modules/axe-core/axe.min.js'),
-      'utf8'
-    );
+    const axeSource = await fs.readFile(path.resolve('./node_modules/axe-core/axe.min.js'), 'utf8');
     await page.evaluateOnNewDocument(axeSource);
     await page.goto(url, { waitUntil: 'networkidle0', timeout });
 
@@ -65,10 +62,7 @@ async function navigateWithCSPFallback(page, url, options = {}) {
 
   // Strategy 4: Content injection (inline axe source)
   try {
-    const axeSource = await fs.readFile(
-      path.resolve('./node_modules/axe-core/axe.min.js'),
-      'utf8'
-    );
+    const axeSource = await fs.readFile(path.resolve('./node_modules/axe-core/axe.min.js'), 'utf8');
     await page.goto(url, { waitUntil: 'networkidle0', timeout });
     await page.addScriptTag({ content: axeSource });
 

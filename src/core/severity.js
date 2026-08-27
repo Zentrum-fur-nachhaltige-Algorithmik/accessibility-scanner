@@ -9,7 +9,14 @@
  */
 const KNOWN = ['critical', 'serious', 'moderate', 'minor', 'best-practice', 'info'];
 
-const SEVERITY_WEIGHTS = { critical: 10, serious: 5, moderate: 2, minor: 1, 'best-practice': 0, info: 0 };
+const SEVERITY_WEIGHTS = {
+  critical: 10,
+  serious: 5,
+  moderate: 2,
+  minor: 1,
+  'best-practice': 0,
+  info: 0,
+};
 
 function mapWord(raw) {
   if (raw == null) return null;
@@ -41,7 +48,9 @@ function isHardViolation(violation) {
 /** Rule identity, using the same field order as the golden-corpus harness. */
 function ruleKey(violation) {
   if (!violation) return 'unclassified';
-  return String(violation.issue || violation.type || violation.ruleId || violation.axeRuleId || 'unclassified');
+  return String(
+    violation.issue || violation.type || violation.ruleId || violation.axeRuleId || 'unclassified'
+  );
 }
 
 /**

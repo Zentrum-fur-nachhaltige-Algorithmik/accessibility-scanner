@@ -12,11 +12,11 @@ const TEST_SITES_DIR = join(__dirname, '../../test-sites');
 
 // Discover all good-*.html and bad-*.html files on disk
 const goodFiles = readdirSync(TEST_SITES_DIR)
-  .filter(f => f.startsWith('good-') && f.endsWith('.html'))
+  .filter((f) => f.startsWith('good-') && f.endsWith('.html'))
   .sort();
 
 const badFiles = readdirSync(TEST_SITES_DIR)
-  .filter(f => f.startsWith('bad-') && f.endsWith('.html'))
+  .filter((f) => f.startsWith('bad-') && f.endsWith('.html'))
   .sort();
 
 /**
@@ -39,7 +39,12 @@ function isWcagViolation(v) {
 const KNOWN_FIXTURE_ISSUES = {
   'good-character-key-shortcuts.html': ['color-contrast'],
   'good-cognitive-accessibility.html': ['color-contrast', 'select-name'],
-  'good-concurrent-input.html': ['color-contrast', 'aria-required-parent', 'nested-interactive', 'aria-prohibited-attr'],
+  'good-concurrent-input.html': [
+    'color-contrast',
+    'aria-required-parent',
+    'nested-interactive',
+    'aria-prohibited-attr',
+  ],
   'good-consistent-help.html': ['color-contrast'],
   'good-css-background-accessible.html': ['color-contrast', 'aria-prohibited-attr'],
   'good-dragging-movements.html': ['color-contrast'],
@@ -76,47 +81,62 @@ describe('axe-core E2E', () => {
   });
 
   describe('good files — no unexpected WCAG violations', () => {
-    it.each(goodFiles)('%s', async (fileName) => {
-      const url = `${getBaseUrl()}/${fileName}`;
-      const page = await getPage(url);
-      try {
-        const result = await adapter.scan(page);
-        const wcagViolations = result.violations.filter(isWcagViolation);
-        const allowed = new Set(KNOWN_FIXTURE_ISSUES[fileName] || []);
-        const unexpected = wcagViolations.filter(v => !allowed.has(v.ruleId));
+    it.each(goodFiles)(
+      '%s',
+      async (fileName) => {
+        const url = `${getBaseUrl()}/${fileName}`;
+        const page = await getPage(url);
+        try {
+          const result = await adapter.scan(page);
+          const wcagViolations = result.violations.filter(isWcagViolation);
+          const allowed = new Set(KNOWN_FIXTURE_ISSUES[fileName] || []);
+          const unexpected = wcagViolations.filter((v) => !allowed.has(v.ruleId));
 
-        if (unexpected.length > 0) {
-          const summary = unexpected.map(v =>
-            `  ${v.ruleId} [${v.wcagCriteria}] (${v.impact}): ${v.description} [${v.nodes[0]?.selector}]`
-          ).join('\n');
-          expect(unexpected, `Unexpected WCAG violations in ${fileName}:\n${summary}`).toEqual([]);
+          if (unexpected.length > 0) {
+            const summary = unexpected
+              .map(
+                (v) =>
+                  `  ${v.ruleId} [${v.wcagCriteria}] (${v.impact}): ${v.description} [${v.nodes[0]?.selector}]`
+              )
+              .join('\n');
+            expect(unexpected, `Unexpected WCAG violations in ${fileName}:\n${summary}`).toEqual(
+              []
+            );
+          }
+          expect(unexpected).toEqual([]);
+        } finally {
+          await page.close();
         }
-        expect(unexpected).toEqual([]);
-      } finally {
-        await page.close();
-      }
-    }, 60000);
+      },
+      60000
+    );
   });
 
   describe('bad files — adapter runs without crashing', () => {
-    it.each(badFiles)('%s', async (fileName) => {
-      const url = `${getBaseUrl()}/${fileName}`;
-      const page = await getPage(url);
-      try {
-        const result = await adapter.scan(page);
-        const wcagViolations = result.violations.filter(isWcagViolation);
-        // Log for baseline
-        if (wcagViolations.length === 0) {
-          console.log(`  [INFO] ${fileName}: axe-core found 0 WCAG violations — needs interaction/LLM scanner`);
+    it.each(badFiles)(
+      '%s',
+      async (fileName) => {
+        const url = `${getBaseUrl()}/${fileName}`;
+        const page = await getPage(url);
+        try {
+          const result = await adapter.scan(page);
+          const wcagViolations = result.violations.filter(isWcagViolation);
+          // Log for baseline
+          if (wcagViolations.length === 0) {
+            console.log(
+              `  [INFO] ${fileName}: axe-core found 0 WCAG violations — needs interaction/LLM scanner`
+            );
+          }
+          // Many bad files target interaction-based or LLM criteria axe-core can't detect.
+          // We just verify the adapter doesn't crash.
+          expect(result).toBeDefined();
+          expect(result.scannerId).toBe('axe-core');
+          expect(Array.isArray(result.violations)).toBe(true);
+        } finally {
+          await page.close();
         }
-        // Many bad files target interaction-based or LLM criteria axe-core can't detect.
-        // We just verify the adapter doesn't crash.
-        expect(result).toBeDefined();
-        expect(result.scannerId).toBe('axe-core');
-        expect(Array.isArray(result.violations)).toBe(true);
-      } finally {
-        await page.close();
-      }
-    }, 60000);
+      },
+      60000
+    );
   });
 });

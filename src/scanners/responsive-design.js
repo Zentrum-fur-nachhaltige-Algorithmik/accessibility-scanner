@@ -17,7 +17,9 @@ class ResponsiveDesignScanner extends BaseScanner {
     });
   }
 
-  get needsExclusiveAccess() { return true; }
+  get needsExclusiveAccess() {
+    return true;
+  }
 
   /**
    * Core scan method — receives an already-navigated Puppeteer page.
@@ -29,10 +31,10 @@ class ResponsiveDesignScanner extends BaseScanner {
   async scan(page, options = {}) {
     const scanOptions = {
       viewports: [
-        { width: 320, height: 568, devicePixelRatio: 2, name: "iPhone SE" },
-        { width: 375, height: 667, devicePixelRatio: 2, name: "iPhone 8" },
-        { width: 768, height: 1024, devicePixelRatio: 2, name: "iPad" },
-        { width: 1920, height: 1080, devicePixelRatio: 1, name: "Desktop" }
+        { width: 320, height: 568, devicePixelRatio: 2, name: 'iPhone SE' },
+        { width: 375, height: 667, devicePixelRatio: 2, name: 'iPhone 8' },
+        { width: 768, height: 1024, devicePixelRatio: 2, name: 'iPad' },
+        { width: 1920, height: 1080, devicePixelRatio: 1, name: 'Desktop' },
       ],
       testZoomLevels: [100, 200, 320, 400],
       testOrientation: false,
@@ -64,7 +66,7 @@ class ResponsiveDesignScanner extends BaseScanner {
 
       return {
         scannerId: this.id,
-        criteria: ["9.1.4.4", "9.1.4.10", "9.1.4.12"],
+        criteria: ['9.1.4.4', '9.1.4.10', '9.1.4.12'],
         passed: allViolations.length === 0,
         violations: allViolations,
         summary: {
@@ -100,7 +102,7 @@ class ResponsiveDesignScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.1.4.4", "9.1.4.10", "9.1.4.12"],
+      criteria: ['9.1.4.4', '9.1.4.10', '9.1.4.12'],
       passed: allViolations.length === 0,
       violations: allViolations,
       summary: {
@@ -109,10 +111,10 @@ class ResponsiveDesignScanner extends BaseScanner {
         textSpacingOk: responsiveResults.textSpacingOk,
         contentLossAt320px: responsiveResults.contentLossAt320px,
         viewportsTested: scanOptions.viewports.length,
-        zoomLevelsTested: scanOptions.testZoomLevels.length
+        zoomLevelsTested: scanOptions.testZoomLevels.length,
       },
       screenshotPath: scanDir,
-      visualEvidence: responsiveResults.visualEvidence
+      visualEvidence: responsiveResults.visualEvidence,
     };
   }
 
@@ -135,26 +137,35 @@ class ResponsiveDesignScanner extends BaseScanner {
     // 1. Test each viewport
     for (const viewport of options.viewports) {
       console.log(`Testing viewport: ${viewport.name} (${viewport.width}x${viewport.height})`);
-      
+
       await page.setViewport({
         width: viewport.width,
         height: viewport.height,
-        deviceScaleFactor: viewport.devicePixelRatio || 1
+        deviceScaleFactor: viewport.devicePixelRatio || 1,
       });
 
       // Wait for layout to settle
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Take baseline screenshot
-      const baselineScreenshot = path.join(scanDir, `${viewport.name.replace(/\s+/g, '-')}-baseline.png`);
+      const baselineScreenshot = path.join(
+        scanDir,
+        `${viewport.name.replace(/\s+/g, '-')}-baseline.png`
+      );
       await page.screenshot({ path: baselineScreenshot, fullPage: true });
 
       // 2. Test zoom levels for this viewport
       for (const zoomLevel of options.testZoomLevels) {
         console.log(`  Testing ${zoomLevel}% zoom...`);
-        
-        const zoomResults = await this.testZoomLevel(page, scanDir, viewport, zoomLevel, violations);
-        
+
+        const zoomResults = await this.testZoomLevel(
+          page,
+          scanDir,
+          viewport,
+          zoomLevel,
+          violations
+        );
+
         if (zoomLevel === 400 && viewport.width === 320) {
           // Critical test: 320px width at 400% zoom should not have horizontal scroll
           if (zoomResults.hasHorizontalScroll) {
@@ -162,7 +173,7 @@ class ResponsiveDesignScanner extends BaseScanner {
             contentLossAt320px = zoomResults.contentLoss;
           }
         }
-        
+
         if (zoomLevel === 200 && zoomResults.textNotReadable) {
           textResizable = false;
         }
@@ -173,7 +184,7 @@ class ResponsiveDesignScanner extends BaseScanner {
           screenshot: zoomResults.screenshot,
           hasHorizontalScroll: zoomResults.hasHorizontalScroll,
           contentLoss: zoomResults.contentLoss,
-          textReadable: !zoomResults.textNotReadable
+          textReadable: !zoomResults.textNotReadable,
         });
       }
 
@@ -181,10 +192,10 @@ class ResponsiveDesignScanner extends BaseScanner {
       await page.setViewport({
         width: viewport.width,
         height: viewport.height,
-        deviceScaleFactor: viewport.devicePixelRatio || 1
+        deviceScaleFactor: viewport.devicePixelRatio || 1,
       });
       await page.reload({ waitUntil: 'networkidle0' });
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // 3. Test text spacing at this viewport
       const textSpacingResult = await this.testTextSpacing(page, scanDir, viewport, violations);
@@ -199,7 +210,9 @@ class ResponsiveDesignScanner extends BaseScanner {
     // Deduplicate violations by element + issue type across viewport/zoom combos
     const dedupedViolations = this.deduplicateViolations(violations);
 
-    console.log(`Responsive analysis complete: ${violations.length} raw → ${dedupedViolations.length} deduplicated violations`);
+    console.log(
+      `Responsive analysis complete: ${violations.length} raw → ${dedupedViolations.length} deduplicated violations`
+    );
 
     return {
       violations: dedupedViolations,
@@ -207,7 +220,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       reflowWorks,
       textResizable,
       textSpacingOk,
-      contentLossAt320px
+      contentLossAt320px,
     };
   }
 
@@ -223,20 +236,29 @@ class ResponsiveDesignScanner extends BaseScanner {
    */
   async testZoomLevel(page, scanDir, viewport, zoomLevel, violations) {
     const MIN_REFLOW_WIDTH = 320;
-    const rawWidth = Math.round(viewport.width * 100 / zoomLevel);
-    const rawHeight = Math.round(viewport.height * 100 / zoomLevel);
+    const rawWidth = Math.round((viewport.width * 100) / zoomLevel);
+    const rawHeight = Math.round((viewport.height * 100) / zoomLevel);
     const cssWidth = Math.max(MIN_REFLOW_WIDTH, rawWidth);
-    const cssHeight = Math.max(Math.round(rawHeight * cssWidth / Math.max(rawWidth, 1)), 256);
+    const cssHeight = Math.max(Math.round((rawHeight * cssWidth) / Math.max(rawWidth, 1)), 256);
 
     // Below 320 CSS px everything clamps to the same 320px layout. Measure it
     // once (the canonical 320px @ 400% check) and skip the other combinations.
-    if (rawWidth < MIN_REFLOW_WIDTH && !(viewport.width === MIN_REFLOW_WIDTH && zoomLevel === 400)) {
-      return { screenshot: null, hasHorizontalScroll: false, contentLoss: false, textNotReadable: false, skipped: true };
+    if (
+      rawWidth < MIN_REFLOW_WIDTH &&
+      !(viewport.width === MIN_REFLOW_WIDTH && zoomLevel === 400)
+    ) {
+      return {
+        screenshot: null,
+        hasHorizontalScroll: false,
+        contentLoss: false,
+        textNotReadable: false,
+        skipped: true,
+      };
     }
 
     await page.setViewport({ width: cssWidth, height: cssHeight, deviceScaleFactor: 1 });
     await page.reload({ waitUntil: 'networkidle0' });
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     // Take screenshot
     const screenshotName = `${viewport.name.replace(/\s+/g, '-')}-zoom-${zoomLevel}.png`;
@@ -247,27 +269,31 @@ class ResponsiveDesignScanner extends BaseScanner {
     const scrollAnalysis = await page.evaluate(() => {
       const body = document.body;
       const html = document.documentElement;
-      
+
       const scrollWidth = Math.max(body.scrollWidth, html.scrollWidth);
       const clientWidth = window.innerWidth;
 
       // 1px tolerance: sub-pixel rounding of borders/shadows is not a reflow failure
       const hasHorizontalScroll = scrollWidth > clientWidth + 1;
-      
+
       // Check for content that might be cut off or overlapping
       const elements = document.querySelectorAll('*');
       let contentLoss = false;
       let overlappingElements = 0;
 
-      elements.forEach(el => {
+      elements.forEach((el) => {
         const rect = el.getBoundingClientRect();
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
         if (rect.width === 0 || rect.height === 0) return;
 
         // Check for elements that overflow beyond viewport AND clip content
-        if (rect.right > clientWidth && style.overflow === 'hidden' &&
-            el.scrollWidth > el.clientWidth && el.textContent.trim().length > 0) {
+        if (
+          rect.right > clientWidth &&
+          style.overflow === 'hidden' &&
+          el.scrollWidth > el.clientWidth &&
+          el.textContent.trim().length > 0
+        ) {
           contentLoss = true;
         }
 
@@ -283,22 +309,27 @@ class ResponsiveDesignScanner extends BaseScanner {
           if (style.pointerEvents === 'none' && parseFloat(style.opacity) < 1) return;
           const ownText = (el.textContent || '').trim().length > 0;
           const bg = style.backgroundColor;
-          const opaqueBg = bg && !/rgba\(\s*\d+,\s*\d+,\s*\d+,\s*0\s*\)/.test(bg) && bg !== 'transparent';
+          const opaqueBg =
+            bg && !/rgba\(\s*\d+,\s*\d+,\s*\d+,\s*0\s*\)/.test(bg) && bg !== 'transparent';
           if (!ownText && !opaqueBg && style.backgroundImage === 'none') return; // invisible box
           const area = rect.width * rect.height;
 
           const siblings = Array.from(el.parentElement?.children || []);
-          siblings.forEach(sibling => {
+          siblings.forEach((sibling) => {
             if (sibling === el) return;
             const siblingStyle = window.getComputedStyle(sibling);
             if (siblingStyle.display === 'none' || siblingStyle.visibility === 'hidden') return;
             if (siblingStyle.position === 'absolute' || siblingStyle.position === 'fixed') return;
-            const hasText = Array.from(sibling.childNodes).some(n => n.nodeType === 3 && n.textContent.trim());
+            const hasText = Array.from(sibling.childNodes).some(
+              (n) => n.nodeType === 3 && n.textContent.trim()
+            );
             if (!hasText) return;
             const siblingRect = sibling.getBoundingClientRect();
             if (siblingRect.width === 0 || siblingRect.height === 0) return;
-            const ix = Math.min(rect.right, siblingRect.right) - Math.max(rect.left, siblingRect.left);
-            const iy = Math.min(rect.bottom, siblingRect.bottom) - Math.max(rect.top, siblingRect.top);
+            const ix =
+              Math.min(rect.right, siblingRect.right) - Math.max(rect.left, siblingRect.left);
+            const iy =
+              Math.min(rect.bottom, siblingRect.bottom) - Math.max(rect.top, siblingRect.top);
             if (ix <= 0 || iy <= 0) return;
             const overlap = ix * iy;
             // Meaningful only when a substantial part of the text block is covered
@@ -310,10 +341,12 @@ class ResponsiveDesignScanner extends BaseScanner {
       });
 
       // Check text readability — only flag if actual text content is affected
-      const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, li, td, th, label, a');
+      const textElements = document.querySelectorAll(
+        'p, h1, h2, h3, h4, h5, h6, span, li, td, th, label, a'
+      );
       let textNotReadable = false;
 
-      textElements.forEach(el => {
+      textElements.forEach((el) => {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
         const text = el.textContent.trim();
@@ -332,56 +365,57 @@ class ResponsiveDesignScanner extends BaseScanner {
         overlappingElements,
         textNotReadable,
         scrollWidth,
-        clientWidth
+        clientWidth,
       };
     });
 
     // Generate violations for issues found
     if (scrollAnalysis.hasHorizontalScroll) {
       violations.push({
-        criterion: "9.1.4.10",
+        criterion: '9.1.4.10',
         viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
         zoomLevel: zoomLevel,
-        issue: "horizontal-scroll",
+        issue: 'horizontal-scroll',
         description: `Horizontal scrolling required at ${zoomLevel}% zoom`,
         screenshot: screenshotName,
-        suggestion: "Implement responsive design to eliminate horizontal scrolling at all zoom levels"
+        suggestion:
+          'Implement responsive design to eliminate horizontal scrolling at all zoom levels',
       });
     }
 
     if (scrollAnalysis.contentLoss) {
       violations.push({
-        criterion: "9.1.4.10",
+        criterion: '9.1.4.10',
         viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
         zoomLevel: zoomLevel,
-        issue: "content-loss",
+        issue: 'content-loss',
         description: `Content is cut off or hidden at ${zoomLevel}% zoom`,
         screenshot: screenshotName,
-        suggestion: "Ensure all content remains accessible when zoomed"
+        suggestion: 'Ensure all content remains accessible when zoomed',
       });
     }
 
     if (scrollAnalysis.overlappingElements > 0) {
       violations.push({
-        criterion: "9.1.4.10",
+        criterion: '9.1.4.10',
         viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
         zoomLevel: zoomLevel,
-        issue: "overlapping-content",
+        issue: 'overlapping-content',
         description: `${scrollAnalysis.overlappingElements} elements overlap at ${zoomLevel}% zoom`,
         screenshot: screenshotName,
-        suggestion: "Adjust layout to prevent content overlap when zoomed"
+        suggestion: 'Adjust layout to prevent content overlap when zoomed',
       });
     }
 
     if (scrollAnalysis.textNotReadable) {
       violations.push({
-        criterion: "9.1.4.4",
+        criterion: '9.1.4.4',
         viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
         zoomLevel: zoomLevel,
-        issue: "non-resizable-text",
+        issue: 'non-resizable-text',
         description: `Text becomes unreadable at ${zoomLevel}% zoom`,
         screenshot: screenshotName,
-        suggestion: "Use relative units (em, rem, %) for font sizes to support text scaling"
+        suggestion: 'Use relative units (em, rem, %) for font sizes to support text scaling',
       });
     }
 
@@ -389,7 +423,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       screenshot: screenshotName,
       hasHorizontalScroll: scrollAnalysis.hasHorizontalScroll,
       contentLoss: scrollAnalysis.contentLoss,
-      textNotReadable: scrollAnalysis.textNotReadable
+      textNotReadable: scrollAnalysis.textNotReadable,
     };
   }
 
@@ -415,143 +449,175 @@ class ResponsiveDesignScanner extends BaseScanner {
         }
     `;
 
-    const spacingResult = await page.evaluate((renderedCode, css) => {
-      eval(renderedCode);
+    const spacingResult = await page.evaluate(
+      (renderedCode, css) => {
+        eval(renderedCode);
 
-      function selectorOf(el) {
-        return el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' && el.className.trim()
-            ? `.${el.className.trim().split(/\s+/).slice(0, 2).join('.')}` : '');
-      }
-
-      function hasDirectText(el) {
-        for (const n of el.childNodes) {
-          if (n.nodeType === 3 && n.textContent.trim().length > 0) return true;
+        function selectorOf(el) {
+          return (
+            el.tagName.toLowerCase() +
+            (el.id ? `#${el.id}` : '') +
+            (el.className && typeof el.className === 'string' && el.className.trim()
+              ? `.${el.className.trim().split(/\s+/).slice(0, 2).join('.')}`
+              : '')
+          );
         }
-        return false;
-      }
 
-      /** Nearest ancestor (or self) that clips on the given axis. */
-      function clipperOf(el) {
-        let n = el;
-        while (n && n !== document.documentElement) {
-          const cs = window.getComputedStyle(n);
-          const cx = cs.overflowX === 'hidden' || cs.overflowX === 'clip';
-          const cy = cs.overflowY === 'hidden' || cs.overflowY === 'clip';
-          if (cx || cy) return { el: n, cx, cy };
-          n = n.parentElement;
-        }
-        return null;
-      }
-
-      /** Union rect of the element's direct text nodes. */
-      function textRect(el) {
-        const range = document.createRange();
-        let out = null;
-        for (const n of el.childNodes) {
-          if (n.nodeType !== 3 || !n.textContent.trim()) continue;
-          range.selectNodeContents(n);
-          for (const r of range.getClientRects()) {
-            if (r.width === 0 || r.height === 0) continue;
-            out = out
-              ? { left: Math.min(out.left, r.left), top: Math.min(out.top, r.top), right: Math.max(out.right, r.right), bottom: Math.max(out.bottom, r.bottom) }
-              : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+        function hasDirectText(el) {
+          for (const n of el.childNodes) {
+            if (n.nodeType === 3 && n.textContent.trim().length > 0) return true;
           }
+          return false;
         }
-        return out;
-      }
 
-      /** Pixels of the element's text lying outside its clipping container (0 = not clipped). */
-      function clippedPx(el, clipper) {
-        if (!clipper) return 0;
-        const t = textRect(el);
-        if (!t) return 0;
-        const c = clipper.el.getBoundingClientRect();
-        let px = 0;
-        if (clipper.cx) px = Math.max(px, t.right - c.right, c.left - t.left);
-        if (clipper.cy) px = Math.max(px, t.bottom - c.bottom, c.top - t.top);
-        return px > 1 ? px : 0; // sub-pixel rounding is not clipping
-      }
+        /** Nearest ancestor (or self) that clips on the given axis. */
+        function clipperOf(el) {
+          let n = el;
+          while (n && n !== document.documentElement) {
+            const cs = window.getComputedStyle(n);
+            const cx = cs.overflowX === 'hidden' || cs.overflowX === 'clip';
+            const cy = cs.overflowY === 'hidden' || cs.overflowY === 'clip';
+            if (cx || cy) return { el: n, cx, cy };
+            n = n.parentElement;
+          }
+          return null;
+        }
 
-      function verticallyClipped(el, clipper) {
-        const t = textRect(el);
-        if (!t) return false;
-        const c = clipper.el.getBoundingClientRect();
-        return t.bottom - c.bottom > 1 || c.top - t.top > 1;
-      }
-
-      const candidates = [];
-      document.querySelectorAll('body *').forEach(el => {
-        const tag = el.tagName.toLowerCase();
-        if (tag === 'script' || tag === 'style' || tag === 'noscript' || tag === 'svg') return;
-        if (!hasDirectText(el) || !__isRendered(el)) return;
-        const clipper = clipperOf(el);
-        if (!clipper) return;
-        const cs = window.getComputedStyle(el);
-        const fs = parseFloat(cs.fontSize) || 16;
-        const lh = cs.lineHeight === 'normal' ? 1.2 * fs : parseFloat(cs.lineHeight);
-        const ls = cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing);
-        const ws = cs.wordSpacing === 'normal' ? 0 : parseFloat(cs.wordSpacing);
-        // Already at (or beyond) the 1.4.12 values: baseline clipping IS the 1.4.12 state.
-        const alreadySpaced = lh >= 1.5 * fs - 0.5 && ls >= 0.12 * fs - 0.1 && ws >= 0.16 * fs - 0.1;
-        const truncated = cs.whiteSpace === 'nowrap' || cs.textOverflow === 'ellipsis';
-        candidates.push({ el, clipper, before: clippedPx(el, clipper), alreadySpaced, truncated });
-      });
-
-      const style = document.createElement('style');
-      style.setAttribute('data-a11y-text-spacing', '');
-      style.textContent = css;
-      document.head.appendChild(style);
-
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const issues = [];
-          for (const c of candidates) {
-            const after = clippedPx(c.el, c.clipper);
-            if (!__isRendered(c.el)) continue;
-            // Text that WAS fully visible and is clipped by the injected spacing, or already clipped on a page
-            // that already applies 1.4.12 spacing (vertical clipping only — a
-            // horizontally clipped baseline is a carousel/marquee/ellipsis, not 1.4.12).
-            const newlyClipped = c.before === 0 && after > 0;
-            const clippedAtSpec = after > 0 && c.alreadySpaced && !c.truncated && c.clipper.cy && verticallyClipped(c.el, c.clipper);
-            if (newlyClipped || clippedAtSpec) {
-              issues.push({
-                element: selectorOf(c.el),
-                container: selectorOf(c.clipper.el),
-                clippedPx: Math.round(after),
-                text: c.el.textContent.trim().slice(0, 60),
-              });
+        /** Union rect of the element's direct text nodes. */
+        function textRect(el) {
+          const range = document.createRange();
+          let out = null;
+          for (const n of el.childNodes) {
+            if (n.nodeType !== 3 || !n.textContent.trim()) continue;
+            range.selectNodeContents(n);
+            for (const r of range.getClientRects()) {
+              if (r.width === 0 || r.height === 0) continue;
+              out = out
+                ? {
+                    left: Math.min(out.left, r.left),
+                    top: Math.min(out.top, r.top),
+                    right: Math.max(out.right, r.right),
+                    bottom: Math.max(out.bottom, r.bottom),
+                  }
+                : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
             }
           }
-          document.head.removeChild(style);
-          resolve({ issues, candidates: candidates.length });
-        }, 500);
-      });
-    }, renderedCode, SPACING_CSS);
+          return out;
+        }
+
+        /** Pixels of the element's text lying outside its clipping container (0 = not clipped). */
+        function clippedPx(el, clipper) {
+          if (!clipper) return 0;
+          const t = textRect(el);
+          if (!t) return 0;
+          const c = clipper.el.getBoundingClientRect();
+          let px = 0;
+          if (clipper.cx) px = Math.max(px, t.right - c.right, c.left - t.left);
+          if (clipper.cy) px = Math.max(px, t.bottom - c.bottom, c.top - t.top);
+          return px > 1 ? px : 0; // sub-pixel rounding is not clipping
+        }
+
+        function verticallyClipped(el, clipper) {
+          const t = textRect(el);
+          if (!t) return false;
+          const c = clipper.el.getBoundingClientRect();
+          return t.bottom - c.bottom > 1 || c.top - t.top > 1;
+        }
+
+        const candidates = [];
+        document.querySelectorAll('body *').forEach((el) => {
+          const tag = el.tagName.toLowerCase();
+          if (tag === 'script' || tag === 'style' || tag === 'noscript' || tag === 'svg') return;
+          if (!hasDirectText(el) || !__isRendered(el)) return;
+          const clipper = clipperOf(el);
+          if (!clipper) return;
+          const cs = window.getComputedStyle(el);
+          const fs = parseFloat(cs.fontSize) || 16;
+          const lh = cs.lineHeight === 'normal' ? 1.2 * fs : parseFloat(cs.lineHeight);
+          const ls = cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing);
+          const ws = cs.wordSpacing === 'normal' ? 0 : parseFloat(cs.wordSpacing);
+          // Already at (or beyond) the 1.4.12 values: baseline clipping IS the 1.4.12 state.
+          const alreadySpaced =
+            lh >= 1.5 * fs - 0.5 && ls >= 0.12 * fs - 0.1 && ws >= 0.16 * fs - 0.1;
+          const truncated = cs.whiteSpace === 'nowrap' || cs.textOverflow === 'ellipsis';
+          candidates.push({
+            el,
+            clipper,
+            before: clippedPx(el, clipper),
+            alreadySpaced,
+            truncated,
+          });
+        });
+
+        const style = document.createElement('style');
+        style.setAttribute('data-a11y-text-spacing', '');
+        style.textContent = css;
+        document.head.appendChild(style);
+
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const issues = [];
+            for (const c of candidates) {
+              const after = clippedPx(c.el, c.clipper);
+              if (!__isRendered(c.el)) continue;
+              // Text that WAS fully visible and is clipped by the injected spacing, or already clipped on a page
+              // that already applies 1.4.12 spacing (vertical clipping only — a
+              // horizontally clipped baseline is a carousel/marquee/ellipsis, not 1.4.12).
+              const newlyClipped = c.before === 0 && after > 0;
+              const clippedAtSpec =
+                after > 0 &&
+                c.alreadySpaced &&
+                !c.truncated &&
+                c.clipper.cy &&
+                verticallyClipped(c.el, c.clipper);
+              if (newlyClipped || clippedAtSpec) {
+                issues.push({
+                  element: selectorOf(c.el),
+                  container: selectorOf(c.clipper.el),
+                  clippedPx: Math.round(after),
+                  text: c.el.textContent.trim().slice(0, 60),
+                });
+              }
+            }
+            document.head.removeChild(style);
+            resolve({ issues, candidates: candidates.length });
+          }, 500);
+        });
+      },
+      renderedCode,
+      SPACING_CSS
+    );
 
     // Screenshot with the spacing applied, then restore the page state
     const screenshotName = `${viewport.name.replace(/\s+/g, '-')}-text-spacing.png`;
-    await page.addStyleTag({ content: SPACING_CSS }).then(h => h && h.evaluate(el => el.setAttribute('data-a11y-text-spacing', '')).catch(() => {}));
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await page
+      .addStyleTag({ content: SPACING_CSS })
+      .then(
+        (h) =>
+          h && h.evaluate((el) => el.setAttribute('data-a11y-text-spacing', '')).catch(() => {})
+      );
+    await new Promise((resolve) => setTimeout(resolve, 300));
     await page.screenshot({ path: path.join(scanDir, screenshotName), fullPage: true });
     await page.evaluate(() => {
-      document.querySelectorAll('style[data-a11y-text-spacing]').forEach(el => el.remove());
+      document.querySelectorAll('style[data-a11y-text-spacing]').forEach((el) => el.remove());
     });
 
     for (const issue of spacingResult.issues.slice(0, 20)) {
       violations.push({
-        criterion: "9.1.4.12",
+        criterion: '9.1.4.12',
         element: issue.element,
         viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
-        issue: "text-spacing-failure",
+        issue: 'text-spacing-failure',
         description: `Text in ${issue.element} is clipped by ${issue.clippedPx}px inside ${issue.container} when WCAG 1.4.12 text spacing is applied ("${issue.text}")`,
         screenshot: screenshotName,
-        suggestion: "Let the container grow with its content (avoid fixed heights with overflow:hidden on text) so user text-spacing overrides do not clip text"
+        suggestion:
+          'Let the container grow with its content (avoid fixed heights with overflow:hidden on text) so user text-spacing overrides do not clip text',
       });
     }
     if (spacingResult.issues.length > 20) {
-      console.log(`  text-spacing: ${spacingResult.issues.length} clipped elements, reporting first 20`);
+      console.log(
+        `  text-spacing: ${spacingResult.issues.length} clipped elements, reporting first 20`
+      );
     }
 
     return { spacingOk: spacingResult.issues.length === 0 };
@@ -571,7 +637,7 @@ class ResponsiveDesignScanner extends BaseScanner {
 
     // Test the critical 320px width requirement
     await page.setViewport({ width: 320, height: 568 });
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const reflowAnalysis = await page.evaluate(() => {
       const body = document.body;
@@ -599,7 +665,11 @@ class ResponsiveDesignScanner extends BaseScanner {
       try {
         for (const sheet of document.styleSheets) {
           let rules;
-          try { rules = sheet.cssRules; } catch (e) { continue; } // cross-origin
+          try {
+            rules = sheet.cssRules;
+          } catch (e) {
+            continue;
+          } // cross-origin
           if (!rules) continue;
           const walk = (list) => {
             for (const rule of list) {
@@ -608,7 +678,10 @@ class ResponsiveDesignScanner extends BaseScanner {
                 if (window.matchMedia(rule.media.mediaText).matches) walk(rule.cssRules);
                 continue;
               }
-              if (rule.cssRules && !rule.selectorText) { walk(rule.cssRules); continue; }
+              if (rule.cssRules && !rule.selectorText) {
+                walk(rule.cssRules);
+                continue;
+              }
               if (!rule.selectorText || !rule.style) continue;
               const w = rule.style.getPropertyValue('width');
               const mw = rule.style.getPropertyValue('min-width');
@@ -618,7 +691,9 @@ class ResponsiveDesignScanner extends BaseScanner {
           };
           walk(rules);
         }
-      } catch (e) { /* no stylesheets */ }
+      } catch (e) {
+        /* no stylesheets */
+      }
 
       function authoredWidths(el) {
         let width = null;
@@ -629,7 +704,11 @@ class ResponsiveDesignScanner extends BaseScanner {
         };
         for (const r of styleRules) {
           let matches = false;
-          try { matches = el.matches(r.selector); } catch (e) { continue; } // ::pseudo etc.
+          try {
+            matches = el.matches(r.selector);
+          } catch (e) {
+            continue;
+          } // ::pseudo etc.
           if (matches) take(r.width, r.minWidth);
         }
         take(el.style.width, el.style.minWidth); // inline style wins
@@ -640,10 +719,17 @@ class ResponsiveDesignScanner extends BaseScanner {
       const fixedElements = [];
       const allElements = document.querySelectorAll('*');
 
-      allElements.forEach(el => {
+      allElements.forEach((el) => {
         // Skip structural elements that naturally match viewport width
         const tag = el.tagName.toLowerCase();
-        if (tag === 'html' || tag === 'body' || tag === 'head' || tag === 'script' || tag === 'style') return;
+        if (
+          tag === 'html' ||
+          tag === 'body' ||
+          tag === 'head' ||
+          tag === 'script' ||
+          tag === 'style'
+        )
+          return;
 
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
@@ -664,22 +750,25 @@ class ResponsiveDesignScanner extends BaseScanner {
         // Skip elements properly contained in a scrollable ancestor
         if (isInsideScrollableContainer(el)) return;
 
-        const selector = el.tagName.toLowerCase() +
-                        (el.id ? `#${el.id}` : '') +
-                        (el.className && typeof el.className === 'string' ? `.${el.className.split(' ').join('.')}` : '');
+        const selector =
+          el.tagName.toLowerCase() +
+          (el.id ? `#${el.id}` : '') +
+          (el.className && typeof el.className === 'string'
+            ? `.${el.className.split(' ').join('.')}`
+            : '');
 
         fixedElements.push({
           selector,
           width: Math.round(rect.width),
           fixedWidth: hasFixedCssWidth ? authored.width : null,
-          minWidth: hasFixedMinWidth ? authored.minWidth : null
+          minWidth: hasFixedMinWidth ? authored.minWidth : null,
         });
       });
 
       return {
         // 1px tolerance for sub-pixel rounding of borders/shadows
         hasHorizontalScroll: Math.max(body.scrollWidth, html.scrollWidth) > viewportWidth + 1,
-        fixedElements: fixedElements.slice(0, 10) // Limit to first 10
+        fixedElements: fixedElements.slice(0, 10), // Limit to first 10
       };
     });
 
@@ -689,24 +778,25 @@ class ResponsiveDesignScanner extends BaseScanner {
 
     if (reflowAnalysis.hasHorizontalScroll) {
       violations.push({
-        criterion: "9.1.4.10",
-        viewport: "320px width",
-        issue: "reflow-failure",
-        description: "Content does not reflow properly at 320px width - horizontal scrolling required",
-        screenshot: "reflow-test-320px.png",
-        suggestion: "Use responsive design techniques to ensure content reflows at 320px width"
+        criterion: '9.1.4.10',
+        viewport: '320px width',
+        issue: 'reflow-failure',
+        description:
+          'Content does not reflow properly at 320px width - horizontal scrolling required',
+        screenshot: 'reflow-test-320px.png',
+        suggestion: 'Use responsive design techniques to ensure content reflows at 320px width',
       });
     }
 
     // Report specific fixed-width elements
-    reflowAnalysis.fixedElements.forEach(element => {
+    reflowAnalysis.fixedElements.forEach((element) => {
       violations.push({
-        criterion: "9.1.4.10",
+        criterion: '9.1.4.10',
         element: element.selector,
-        viewport: "320px width",
-        issue: "fixed-width-element",
+        viewport: '320px width',
+        issue: 'fixed-width-element',
         description: `Element declares ${element.fixedWidth ? `width: ${element.fixedWidth}` : `min-width: ${element.minWidth}`} and renders ${element.width}px wide, exceeding the 320px reflow viewport`,
-        suggestion: "Use relative units (%, em, rem) or responsive design for element widths"
+        suggestion: 'Use relative units (%, em, rem) or responsive design for element widths',
       });
     });
   }
@@ -724,9 +814,11 @@ class ResponsiveDesignScanner extends BaseScanner {
       let importantOverrides = 0;
 
       function getSelector(el) {
-        return el.tagName.toLowerCase() +
+        return (
+          el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
+        );
       }
 
       function hasTextContent(el) {
@@ -742,16 +834,18 @@ class ResponsiveDesignScanner extends BaseScanner {
       function isSrOnly(el) {
         if (!el || el.nodeType !== 1) return false;
         const cls = el.className || '';
-        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
+        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls)))
+          return true;
         const s = window.getComputedStyle(el);
         if (s.position !== 'absolute' && s.position !== 'fixed') return false;
-        const w = parseFloat(s.width), h = parseFloat(s.height);
+        const w = parseFloat(s.width),
+          h = parseFloat(s.height);
         if (w > 1 || h > 1) return false;
         if (s.overflow !== 'hidden') return false;
         return true;
       }
 
-      allElements.forEach(el => {
+      allElements.forEach((el) => {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
         if (isSrOnly(el)) return;
@@ -759,7 +853,8 @@ class ResponsiveDesignScanner extends BaseScanner {
         const overflow = style.overflow;
         const overflowY = style.overflowY;
         const overflowX = style.overflowX;
-        const isOverflowHidden = overflow === 'hidden' || overflowY === 'hidden' || overflowX === 'hidden';
+        const isOverflowHidden =
+          overflow === 'hidden' || overflowY === 'hidden' || overflowX === 'hidden';
 
         if (!isOverflowHidden) return;
 
@@ -771,7 +866,8 @@ class ResponsiveDesignScanner extends BaseScanner {
         const maxHeight = style.maxHeight;
         const whiteSpace = style.whiteSpace;
         const textOverflow = style.textOverflow;
-        const webkitLineClamp = style.webkitLineClamp || style.getPropertyValue('-webkit-line-clamp');
+        const webkitLineClamp =
+          style.webkitLineClamp || style.getPropertyValue('-webkit-line-clamp');
 
         const hasFixedHeight = height && height !== 'auto' && height.includes('px');
         const hasMaxHeight = maxHeight && maxHeight !== 'none' && maxHeight.includes('px');
@@ -787,7 +883,8 @@ class ResponsiveDesignScanner extends BaseScanner {
             issue: 'text-spacing-clip-risk',
             description: `Element with overflow:hidden and ${hasFixedHeight ? `fixed height (${height})` : `max-height (${maxHeight})`} will clip text when spacing is increased`,
             severity: 'serious',
-            suggestion: 'Use min-height instead of fixed height, or remove overflow:hidden to allow content to expand.',
+            suggestion:
+              'Use min-height instead of fixed height, or remove overflow:hidden to allow content to expand.',
           });
         }
 
@@ -797,7 +894,8 @@ class ResponsiveDesignScanner extends BaseScanner {
             criterion: '9.1.4.12',
             element: getSelector(el),
             issue: 'text-spacing-nowrap-clip',
-            description: 'Element with white-space:nowrap and overflow:hidden will clip text when letter/word spacing increases',
+            description:
+              'Element with white-space:nowrap and overflow:hidden will clip text when letter/word spacing increases',
             severity: 'serious',
             suggestion: 'Remove white-space:nowrap or change overflow to auto/visible.',
           });
@@ -809,9 +907,11 @@ class ResponsiveDesignScanner extends BaseScanner {
             criterion: '9.1.4.12',
             element: getSelector(el),
             issue: 'text-spacing-line-clamp',
-            description: '-webkit-line-clamp restricts visible lines and will clip content when line-height increases',
+            description:
+              '-webkit-line-clamp restricts visible lines and will clip content when line-height increases',
             severity: 'moderate',
-            suggestion: 'Allow content to expand by removing line-clamp, or use a "show more" toggle.',
+            suggestion:
+              'Allow content to expand by removing line-clamp, or use a "show more" toggle.',
           });
         }
       });
@@ -867,7 +967,9 @@ class ResponsiveDesignScanner extends BaseScanner {
       return { violations, clippingContainers, importantOverrides };
     });
 
-    console.log(`Heuristic text spacing check complete: ${result.violations.length} violations found`);
+    console.log(
+      `Heuristic text spacing check complete: ${result.violations.length} violations found`
+    );
     return result;
   }
 
@@ -894,10 +996,12 @@ class ResponsiveDesignScanner extends BaseScanner {
       function isSrOnly(el) {
         if (!el || el.nodeType !== 1) return false;
         const cls = el.className || '';
-        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
+        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls)))
+          return true;
         const s = window.getComputedStyle(el);
         if (s.position !== 'absolute' && s.position !== 'fixed') return false;
-        const w = parseFloat(s.width), h = parseFloat(s.height);
+        const w = parseFloat(s.width),
+          h = parseFloat(s.height);
         if (w > 1 || h > 1) return false;
         if (s.overflow !== 'hidden') return false;
         return true;
@@ -918,29 +1022,53 @@ class ResponsiveDesignScanner extends BaseScanner {
 
               if (widthVal && widthVal.endsWith('px') && parseFloat(widthVal) > 320) {
                 const matched = document.querySelectorAll(sel);
-                const validMatches = Array.from(matched).filter(el => {
+                const validMatches = Array.from(matched).filter((el) => {
                   const s = window.getComputedStyle(el);
-                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el) && !isSrOnly(el);
+                  return (
+                    s.display !== 'none' &&
+                    s.visibility !== 'hidden' &&
+                    !isInsideScrollableContainer(el) &&
+                    !isSrOnly(el)
+                  );
                 });
                 if (validMatches.length > 0) {
-                  pxWidthRules.push({ selector: sel, property: 'width', value: widthVal, count: validMatches.length });
+                  pxWidthRules.push({
+                    selector: sel,
+                    property: 'width',
+                    value: widthVal,
+                    count: validMatches.length,
+                  });
                 }
               }
 
               if (minWidthVal && minWidthVal.endsWith('px') && parseFloat(minWidthVal) > 320) {
                 const matched = document.querySelectorAll(sel);
-                const validMatches = Array.from(matched).filter(el => {
+                const validMatches = Array.from(matched).filter((el) => {
                   const s = window.getComputedStyle(el);
-                  return s.display !== 'none' && s.visibility !== 'hidden' && !isInsideScrollableContainer(el) && !isSrOnly(el);
+                  return (
+                    s.display !== 'none' &&
+                    s.visibility !== 'hidden' &&
+                    !isInsideScrollableContainer(el) &&
+                    !isSrOnly(el)
+                  );
                 });
                 if (validMatches.length > 0) {
-                  pxWidthRules.push({ selector: sel, property: 'min-width', value: minWidthVal, count: validMatches.length });
+                  pxWidthRules.push({
+                    selector: sel,
+                    property: 'min-width',
+                    value: minWidthVal,
+                    count: validMatches.length,
+                  });
                 }
               }
             }
-          } catch (e) { /* cross-origin */ }
+          } catch (e) {
+            /* cross-origin */
+          }
         }
-      } catch (e) { /* no stylesheets */ }
+      } catch (e) {
+        /* no stylesheets */
+      }
 
       for (const rule of pxWidthRules) {
         violations.push({
@@ -949,13 +1077,14 @@ class ResponsiveDesignScanner extends BaseScanner {
           issue: rule.property === 'width' ? 'reflow-fixed-width' : 'reflow-min-width',
           description: `CSS rule "${rule.selector}" sets ${rule.property}: ${rule.value} which exceeds 320px reflow threshold, affecting ${rule.count} element(s)`,
           severity: 'serious',
-          suggestion: 'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
+          suggestion:
+            'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
         });
       }
 
       // Also check inline styles on elements
       const allElements = document.querySelectorAll('[style]');
-      allElements.forEach(el => {
+      allElements.forEach((el) => {
         const inlineWidth = el.style.width;
         const inlineMinWidth = el.style.minWidth;
         const style = window.getComputedStyle(el);
@@ -963,7 +1092,8 @@ class ResponsiveDesignScanner extends BaseScanner {
         if (isInsideScrollableContainer(el)) return;
         if (isSrOnly(el)) return;
 
-        const getSelector = (e) => e.tagName.toLowerCase() +
+        const getSelector = (e) =>
+          e.tagName.toLowerCase() +
           (e.id ? `#${e.id}` : '') +
           (e.className && typeof e.className === 'string' ? `.${e.className.split(' ')[0]}` : '');
 
@@ -974,7 +1104,8 @@ class ResponsiveDesignScanner extends BaseScanner {
             issue: 'reflow-fixed-width',
             description: `Element has inline style width: ${inlineWidth} which exceeds 320px reflow threshold`,
             severity: 'serious',
-            suggestion: 'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
+            suggestion:
+              'Use max-width with relative units (%, vw, rem) instead of fixed pixel width.',
           });
         }
 
@@ -985,7 +1116,8 @@ class ResponsiveDesignScanner extends BaseScanner {
             issue: 'reflow-min-width',
             description: `Element has inline style min-width: ${inlineMinWidth} which prevents reflow below 320px`,
             severity: 'serious',
-            suggestion: 'Remove or reduce min-width to allow content to reflow at narrow viewports.',
+            suggestion:
+              'Remove or reduce min-width to allow content to reflow at narrow viewports.',
           });
         }
       });
@@ -1019,36 +1151,46 @@ class ResponsiveDesignScanner extends BaseScanner {
   async heuristicTextResizeCheck(page) {
     console.log('Running heuristic text resize check...');
 
-    const result = await page.evaluate((renderedCode, clipCode) => {
-      eval(renderedCode);
-      eval(clipCode);
+    const result = await page.evaluate(
+      (renderedCode, clipCode) => {
+        eval(renderedCode);
+        eval(clipCode);
 
-      const violations = [];
-      const clipped = window.__findClippedText({ minChars: 3 }) || [];
+        const violations = [];
+        const clipped = window.__findClippedText({ minChars: 3 }) || [];
 
-      for (const c of clipped) {
-        // Author-declared truncation (ellipsis / -webkit-line-clamp) is a design
-        // decision that applies at every size; the full text stays in the DOM.
-        if (c.truncationDeclared) continue;
+        for (const c of clipped) {
+          // Author-declared truncation (ellipsis / -webkit-line-clamp) is a design
+          // decision that applies at every size; the full text stays in the DOM.
+          if (c.truncationDeclared) continue;
 
-        const axis = c.axis === 'both'
-          ? `${c.overshootX}px horizontally and ${c.overshootY}px vertically`
-          : (c.axis === 'horizontal' ? `${c.overshootX}px horizontally` : `${c.overshootY}px vertically`);
+          const axis =
+            c.axis === 'both'
+              ? `${c.overshootX}px horizontally and ${c.overshootY}px vertically`
+              : c.axis === 'horizontal'
+                ? `${c.overshootX}px horizontally`
+                : `${c.overshootY}px vertically`;
 
-        violations.push({
-          criterion: '9.1.4.4',
-          element: c.selector,
-          issue: 'text-resize-clip-risk',
-          description: `Text is cut off inside ${c.selector} (overflow: ${c.overflow}, height: ${c.height}): ${c.clippedChars} characters extend ${axis} beyond the visible box, e.g. "${c.samples[0]}"`,
-          severity: 'serious',
-          suggestion: 'Use min-height instead of a fixed height, or change overflow to auto/visible, so the text stays visible when it is enlarged.',
-        });
-      }
+          violations.push({
+            criterion: '9.1.4.4',
+            element: c.selector,
+            issue: 'text-resize-clip-risk',
+            description: `Text is cut off inside ${c.selector} (overflow: ${c.overflow}, height: ${c.height}): ${c.clippedChars} characters extend ${axis} beyond the visible box, e.g. "${c.samples[0]}"`,
+            severity: 'serious',
+            suggestion:
+              'Use min-height instead of a fixed height, or change overflow to auto/visible, so the text stays visible when it is enlarged.',
+          });
+        }
 
-      return { violations };
-    }, renderedCode, textClippingCode);
+        return { violations };
+      },
+      renderedCode,
+      textClippingCode
+    );
 
-    console.log(`Heuristic text resize check complete: ${result.violations.length} violations found`);
+    console.log(
+      `Heuristic text resize check complete: ${result.violations.length} violations found`
+    );
     return result;
   }
 
@@ -1102,7 +1244,6 @@ class ResponsiveDesignScanner extends BaseScanner {
 
     return Array.from(map.values());
   }
-
 }
 
 module.exports = ResponsiveDesignScanner;

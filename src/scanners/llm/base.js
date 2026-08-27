@@ -84,7 +84,10 @@ class LLMBaseScanner extends BaseScanner {
       let text = content;
       if (typeof text === 'string') {
         // Strip markdown code fences if present
-        text = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+        text = text
+          .replace(/^```(?:json)?\s*\n?/i, '')
+          .replace(/\n?```\s*$/i, '')
+          .trim();
         try {
           parsed = JSON.parse(text);
         } catch {
@@ -97,7 +100,9 @@ class LLMBaseScanner extends BaseScanner {
           if (balanced) {
             try {
               parsed = JSON.parse(balanced);
-              console.warn(`${this.id}: Recovered JSON by discarding trailing garbage after a complete response`);
+              console.warn(
+                `${this.id}: Recovered JSON by discarding trailing garbage after a complete response`
+              );
             } catch {
               // fall through to truncation recovery below
             }
@@ -266,8 +271,14 @@ class LLMBaseScanner extends BaseScanner {
     let quoteCount = 0;
     let escaped = false;
     for (const ch of fixed) {
-      if (escaped) { escaped = false; continue; }
-      if (ch === '\\') { escaped = true; continue; }
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (ch === '\\') {
+        escaped = true;
+        continue;
+      }
       if (ch === '"') quoteCount++;
     }
     if (quoteCount % 2 !== 0) fixed += '"';
@@ -394,18 +405,20 @@ class LLMBaseScanner extends BaseScanner {
         this.droppedViolationCount++;
         console.warn(
           `${this.id}: dropping off-list violation for criterion "${v.criterion ?? 'undefined'}" ` +
-          `(scanner covers: ${this.wcagCriteria.join(', ') || 'none'})`
+            `(scanner covers: ${this.wcagCriteria.join(', ') || 'none'})`
         );
         continue;
       }
 
-      converted.push(this.formatViolation(
-        normalized,
-        v.impact || 'moderate',
-        v.description || 'LLM-detected accessibility issue',
-        v.selector ? [{ selector: v.selector }] : [],
-        v.helpUrl || ''
-      ));
+      converted.push(
+        this.formatViolation(
+          normalized,
+          v.impact || 'moderate',
+          v.description || 'LLM-detected accessibility issue',
+          v.selector ? [{ selector: v.selector }] : [],
+          v.helpUrl || ''
+        )
+      );
     }
 
     return converted;

@@ -28,11 +28,13 @@ describe('MobileSpecificScanner', () => {
       expect(result).toBeDefined();
 
       // Filter to touch-target violations on standard form controls
-      const touchFPs = (result.violations || []).filter(v =>
-        v.type === 'touch-target-too-small' &&
-        v.details &&
-        ['input', 'select', 'textarea', 'button'].includes(v.details.elementType) &&
-        v.details.width >= 24 && v.details.height >= 24
+      const touchFPs = (result.violations || []).filter(
+        (v) =>
+          v.type === 'touch-target-too-small' &&
+          v.details &&
+          ['input', 'select', 'textarea', 'button'].includes(v.details.elementType) &&
+          v.details.width >= 24 &&
+          v.details.height >= 24
       );
       expect(touchFPs).toEqual([]);
     } finally {
@@ -47,8 +49,8 @@ describe('MobileSpecificScanner', () => {
       const result = await scanner.scan(page);
       expect(result).toBeDefined();
 
-      const fixedWidthFPs = (result.violations || []).filter(v =>
-        v.type === 'mobile-fixed-width-400-zoom'
+      const fixedWidthFPs = (result.violations || []).filter(
+        (v) => v.type === 'mobile-fixed-width-400-zoom'
       );
       expect(fixedWidthFPs).toEqual([]);
     } finally {
@@ -80,7 +82,7 @@ describe('MobileSpecificScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const types = (result.violations || []).map(v => v.type);
+      const types = (result.violations || []).map((v) => v.type);
       expect(types).not.toContain('mobile-small-text-400-zoom');
       expect(types).not.toContain('landscape-excessive-height');
     } finally {
@@ -93,7 +95,9 @@ describe('MobileSpecificScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const clips = (result.violations || []).filter(v => v.type === 'mobile-overflow-hidden-400-zoom');
+      const clips = (result.violations || []).filter(
+        (v) => v.type === 'mobile-overflow-hidden-400-zoom'
+      );
       expect(clips.length).toBeGreaterThan(0);
       for (const v of clips) {
         // measured evidence, not scrollWidth > clientWidth
@@ -101,7 +105,7 @@ describe('MobileSpecificScanner', () => {
         expect(v.details.clippedTextSamples.length).toBeGreaterThan(0);
       }
       // one finding per element across all five device profiles
-      const keys = clips.map(v => v.element);
+      const keys = clips.map((v) => v.element);
       expect(new Set(keys).size).toBe(keys.length);
     } finally {
       await page.close();
@@ -113,7 +117,7 @@ describe('MobileSpecificScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const tableFPs = (result.violations || []).filter(v => v.type === 'table-not-responsive');
+      const tableFPs = (result.violations || []).filter((v) => v.type === 'table-not-responsive');
       expect(tableFPs).toEqual([]);
     } finally {
       await page.close();
@@ -129,7 +133,7 @@ describe('MobileSpecificScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const types = (result.violations || []).map(v => v.type);
+      const types = (result.violations || []).map((v) => v.type);
       expect(types).not.toContain('touch-target-too-small');
       expect(types).not.toContain('touch-targets-too-close');
     } finally {
@@ -142,7 +146,7 @@ describe('MobileSpecificScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const real = (result.violations || []).filter(v => v.severity !== 'info');
+      const real = (result.violations || []).filter((v) => v.severity !== 'info');
       expect(real.length).toBeGreaterThan(0);
     } finally {
       await page.close();

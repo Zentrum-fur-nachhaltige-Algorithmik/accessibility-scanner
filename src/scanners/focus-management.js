@@ -17,7 +17,9 @@ class FocusManagementScanner extends BaseScanner {
     });
   }
 
-  get needsExclusiveAccess() { return true; }
+  get needsExclusiveAccess() {
+    return true;
+  }
 
   /**
    * Core scan method — receives an already-navigated Puppeteer page.
@@ -37,18 +39,18 @@ class FocusManagementScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.2.4.3", "9.2.4.7", "9.2.4.11"],
+      criteria: ['9.2.4.3', '9.2.4.7', '9.2.4.11'],
       passed: focusResults.violations.length === 0,
       violations: focusResults.violations,
       summary: {
         logicalTabOrder: focusResults.logicalTabOrder,
         allElementsHaveVisibleFocus: focusResults.allElementsHaveVisibleFocus,
         focusTraps: focusResults.focusTraps,
-        focusNotObscured: focusResults.focusNotObscured
+        focusNotObscured: focusResults.focusNotObscured,
       },
       screenshotPath: scanDir,
       focusSequence: focusResults.focusSequence,
-      visualAnalysis: focusResults.visualAnalysis
+      visualAnalysis: focusResults.visualAnalysis,
     };
   }
 
@@ -67,7 +69,7 @@ class FocusManagementScanner extends BaseScanner {
 
     // 1. Analyze reading order vs. tab order
     const readingOrderAnalysis = await this.analyzeReadingOrder(page, scanDir);
-    
+
     // 1b. Check for global CSS rules that suppress focus indicators
     const globalFocusSuppression = await page.evaluate(() => {
       const suppressions = [];
@@ -78,7 +80,8 @@ class FocusManagementScanner extends BaseScanner {
               if (rule instanceof CSSStyleRule && rule.selectorText) {
                 const sel = rule.selectorText;
                 // Detect broad :focus selectors that suppress outlines
-                const isBroadFocus = /^(\*)?:focus$/.test(sel.trim()) ||
+                const isBroadFocus =
+                  /^(\*)?:focus$/.test(sel.trim()) ||
                   /^:focus$/.test(sel.trim()) ||
                   sel.trim() === '*:focus' ||
                   sel.trim() === ':focus';
@@ -86,48 +89,59 @@ class FocusManagementScanner extends BaseScanner {
                   const outline = rule.style.outline || rule.style.outlineStyle || '';
                   const outlineWidth = rule.style.outlineWidth || '';
                   const outlineColor = rule.style.outlineColor || '';
-                  if (outline === 'none' || outline === '0' ||
-                      outlineWidth === '0' || outlineWidth === '0px' ||
-                      outlineColor === 'transparent') {
+                  if (
+                    outline === 'none' ||
+                    outline === '0' ||
+                    outlineWidth === '0' ||
+                    outlineWidth === '0px' ||
+                    outlineColor === 'transparent'
+                  ) {
                     suppressions.push({
                       selector: sel,
-                      property: outline ? `outline: ${outline}` :
-                        outlineWidth ? `outline-width: ${outlineWidth}` :
-                        `outline-color: ${outlineColor}`,
-                      source: sheet.href || 'inline'
+                      property: outline
+                        ? `outline: ${outline}`
+                        : outlineWidth
+                          ? `outline-width: ${outlineWidth}`
+                          : `outline-color: ${outlineColor}`,
+                      source: sheet.href || 'inline',
                     });
                   }
                 }
               }
             }
-          } catch (e) { /* cross-origin stylesheet */ }
+          } catch (e) {
+            /* cross-origin stylesheet */
+          }
         }
-      } catch (e) { /* no stylesheets */ }
+      } catch (e) {
+        /* no stylesheets */
+      }
       return suppressions;
     });
 
     for (const suppression of globalFocusSuppression) {
       violations.push({
-        criterion: "9.2.4.7",
+        criterion: '9.2.4.7',
         element: suppression.selector,
-        issue: "global-focus-outline-removed",
+        issue: 'global-focus-outline-removed',
         description: `Global CSS rule "${suppression.selector} { ${suppression.property} }" removes focus indicators from all elements`,
-        suggestion: "Remove the global focus suppression or replace with custom visible focus styles"
+        suggestion:
+          'Remove the global focus suppression or replace with custom visible focus styles',
       });
     }
 
     // 2. Test focus sequence with visual validation
     const focusTestResults = await this.testFocusSequence(page, scanDir);
-    
+
     // 3. Check for logical tab order violations
     logicalTabOrder = this.validateTabOrder(focusTestResults.sequence);
     if (!logicalTabOrder) {
       violations.push({
-        criterion: "9.2.4.3",
-        element: "document",
-        issue: "illogical-tab-order",
-        description: "Tab order does not follow a logical sequence",
-        suggestion: "Adjust tabindex values or DOM order to match visual layout"
+        criterion: '9.2.4.3',
+        element: 'document',
+        issue: 'illogical-tab-order',
+        description: 'Tab order does not follow a logical sequence',
+        suggestion: 'Adjust tabindex values or DOM order to match visual layout',
       });
     }
 
@@ -136,14 +150,19 @@ class FocusManagementScanner extends BaseScanner {
     //    nontext-contrast — a low-contrast ring is visible, so it is not a
     //    2.4.7 failure and must not be double-counted here.
     for (const focusItem of focusTestResults.sequence) {
-      if (!focusItem.hasVisibleFocus && !focusItem.lowContrastFocus && focusItem.indicatorConfirmed) {
+      if (
+        !focusItem.hasVisibleFocus &&
+        !focusItem.lowContrastFocus &&
+        focusItem.indicatorConfirmed
+      ) {
         allElementsHaveVisibleFocus = false;
         violations.push({
-          criterion: "9.2.4.7",
+          criterion: '9.2.4.7',
           element: focusItem.element,
-          issue: "no-visible-focus",
-          description: "Element receives focus but has no visible focus indicator",
-          suggestion: "Add CSS :focus-visible styles with visible outline, box-shadow, or background color"
+          issue: 'no-visible-focus',
+          description: 'Element receives focus but has no visible focus indicator',
+          suggestion:
+            'Add CSS :focus-visible styles with visible outline, box-shadow, or background color',
         });
       }
     }
@@ -151,7 +170,11 @@ class FocusManagementScanner extends BaseScanner {
     // 5. Test focus not obscured (WCAG 2.4.11) — BEFORE the modal tests below
     //    open dialogs and leave fixed overlays on the page
     let focusNotObscured = true;
-    const obscuredResults = await this.analyzeFocusObscured(page, focusTestResults.sequence, violations);
+    const obscuredResults = await this.analyzeFocusObscured(
+      page,
+      focusTestResults.sequence,
+      violations
+    );
     focusNotObscured = obscuredResults.notObscured;
 
     // 6. Test focus management in dynamic content
@@ -162,7 +185,6 @@ class FocusManagementScanner extends BaseScanner {
     const focusRestorationResults = await this.testFocusRestoration(page, scanDir);
     violations.push(...focusRestorationResults.violations);
 
-
     return {
       violations,
       logicalTabOrder,
@@ -171,7 +193,7 @@ class FocusManagementScanner extends BaseScanner {
       focusNotObscured,
       focusSequence: focusTestResults.sequence,
       visualAnalysis: focusTestResults.visualAnalysis,
-      readingOrderAnalysis
+      readingOrderAnalysis,
     };
   }
 
@@ -184,32 +206,34 @@ class FocusManagementScanner extends BaseScanner {
     // Take full page screenshot for layout analysis
     await page.screenshot({
       path: path.join(scanDir, 'layout-analysis.png'),
-      fullPage: true
+      fullPage: true,
     });
 
     const layoutAnalysis = await page.evaluate(() => {
       const elements = [];
-      const focusableSelector = 'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])';
-      
+      const focusableSelector =
+        'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])';
+
       document.querySelectorAll(focusableSelector).forEach((el, index) => {
         if (!el.hasAttribute('disabled') && !el.hidden) {
           const rect = el.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
             elements.push({
               index,
-              element: el.tagName.toLowerCase() + 
-                      (el.id ? `#${el.id}` : '') + 
-                      (el.className ? `.${el.className.split(' ').join('.')}` : ''),
+              element:
+                el.tagName.toLowerCase() +
+                (el.id ? `#${el.id}` : '') +
+                (el.className ? `.${el.className.split(' ').join('.')}` : ''),
               rect: {
                 x: rect.x,
                 y: rect.y,
                 width: rect.width,
                 height: rect.height,
                 top: rect.top,
-                left: rect.left
+                left: rect.left,
               },
               tabIndex: el.tabIndex,
-              text: el.textContent.trim().substring(0, 30)
+              text: el.textContent.trim().substring(0, 30),
             });
           }
         }
@@ -218,7 +242,8 @@ class FocusManagementScanner extends BaseScanner {
       // Sort by visual position (top to bottom, left to right)
       const visualOrder = [...elements].sort((a, b) => {
         const yDiff = a.rect.top - b.rect.top;
-        if (Math.abs(yDiff) > 10) { // If elements are on different lines
+        if (Math.abs(yDiff) > 10) {
+          // If elements are on different lines
           return yDiff;
         }
         return a.rect.left - b.rect.left; // Same line, sort by left position
@@ -227,13 +252,14 @@ class FocusManagementScanner extends BaseScanner {
       // Compare DOM order vs visual order
       const orderMismatches = [];
       elements.forEach((el, domIndex) => {
-        const visualIndex = visualOrder.findIndex(vel => vel.element === el.element);
-        if (Math.abs(domIndex - visualIndex) > 2) { // Allow some tolerance
+        const visualIndex = visualOrder.findIndex((vel) => vel.element === el.element);
+        if (Math.abs(domIndex - visualIndex) > 2) {
+          // Allow some tolerance
           orderMismatches.push({
             element: el.element,
             domOrder: domIndex,
             visualOrder: visualIndex,
-            suggestion: 'Consider reordering elements in DOM to match visual layout'
+            suggestion: 'Consider reordering elements in DOM to match visual layout',
           });
         }
       });
@@ -242,7 +268,7 @@ class FocusManagementScanner extends BaseScanner {
         totalElements: elements.length,
         domOrder: elements,
         visualOrder,
-        orderMismatches
+        orderMismatches,
       };
     });
 
@@ -274,14 +300,26 @@ class FocusManagementScanner extends BaseScanner {
         }
         if (!step.rendered) continue;
 
-        const afterPath = path.join(scanDir, `focus-step-${String(stepIndex).padStart(3, '0')}.png`);
-        try { await page.screenshot({ path: afterPath }); } catch (e) { /* screenshots are best-effort */ }
+        const afterPath = path.join(
+          scanDir,
+          `focus-step-${String(stepIndex).padStart(3, '0')}.png`
+        );
+        try {
+          await page.screenshot({ path: afterPath });
+        } catch (e) {
+          /* screenshots are best-effort */
+        }
 
         const ind = step.indicator;
         const item = {
           element: step.selector,
           tabId: step.tabId,
-          rect: { x: step.rect.x + step.scrollX, y: step.rect.y + step.scrollY, width: step.rect.width, height: step.rect.height },
+          rect: {
+            x: step.rect.x + step.scrollX,
+            y: step.rect.y + step.scrollY,
+            width: step.rect.width,
+            height: step.rect.height,
+          },
           text: step.text,
           hasVisibleFocus: ind.visible,
           lowContrastFocus: ind.lowContrast,
@@ -294,7 +332,9 @@ class FocusManagementScanner extends BaseScanner {
             boxShadow: ind.reasons.includes('box-shadow'),
             borderChange: ind.reasons.includes('border'),
             backgroundChange: ind.reasons.includes('background'),
-            other: ind.reasons.filter(r => !['outline', 'outline-auto', 'box-shadow', 'border', 'background'].includes(r)),
+            other: ind.reasons.filter(
+              (r) => !['outline', 'outline-auto', 'box-shadow', 'border', 'background'].includes(r)
+            ),
           },
           styles: {
             outline: ind.outline,
@@ -343,9 +383,11 @@ class FocusManagementScanner extends BaseScanner {
       }
 
       // If on same row, check left-to-right order
-      if (Math.abs(yDiff) <= 20) { // Same row (within 20px)
+      if (Math.abs(yDiff) <= 20) {
+        // Same row (within 20px)
         const xDiff = curr.rect.x - prev.rect.x;
-        if (xDiff < -100) { // Current element is 100px+ to the left
+        if (xDiff < -100) {
+          // Current element is 100px+ to the left
           return false;
         }
       }
@@ -359,7 +401,7 @@ class FocusManagementScanner extends BaseScanner {
    */
   async testDynamicFocusManagement(page, scanDir) {
     console.log('Testing dynamic focus management...');
-    
+
     const violations = [];
 
     // Look for modal triggers (expanded selectors + text matching)
@@ -367,11 +409,16 @@ class FocusManagementScanner extends BaseScanner {
       const triggers = [];
       const seen = new Set();
       const selectors = [
-        '[data-toggle="modal"]', '[data-target*="modal"]',
-        '[data-bs-toggle="modal"]', 'button[data-modal]',
-        '.modal-trigger', '.open-modal', '.show-modal',
-        'button[aria-haspopup="dialog"]', '[aria-haspopup="true"]',
-        '[aria-haspopup="dialog"]'
+        '[data-toggle="modal"]',
+        '[data-target*="modal"]',
+        '[data-bs-toggle="modal"]',
+        'button[data-modal]',
+        '.modal-trigger',
+        '.open-modal',
+        '.show-modal',
+        'button[aria-haspopup="dialog"]',
+        '[aria-haspopup="true"]',
+        '[aria-haspopup="dialog"]',
       ];
 
       function addTrigger(el) {
@@ -382,22 +429,24 @@ class FocusManagementScanner extends BaseScanner {
         if (rect.width > 0 && rect.height > 0) {
           const className = el.className && typeof el.className === 'string' ? el.className : '';
           triggers.push({
-            element: el.tagName.toLowerCase() +
-                    (el.id ? `#${el.id}` : '') +
-                    (className ? `.${className.split(' ').join('.')}` : ''),
-            text: el.textContent.trim().substring(0, 30)
+            element:
+              el.tagName.toLowerCase() +
+              (el.id ? `#${el.id}` : '') +
+              (className ? `.${className.split(' ').join('.')}` : ''),
+            text: el.textContent.trim().substring(0, 30),
           });
         }
       }
 
-      selectors.forEach(selector => {
+      selectors.forEach((selector) => {
         document.querySelectorAll(selector).forEach(addTrigger);
       });
 
       // Text-based matching for buttons
       const modalTextPattern = /modal|dialog|öffnen|open|popup/i;
-      document.querySelectorAll('button, [role="button"]').forEach(el => {
-        const text = (el.textContent || '').trim() +
+      document.querySelectorAll('button, [role="button"]').forEach((el) => {
+        const text =
+          (el.textContent || '').trim() +
           (el.getAttribute('aria-label') || '') +
           (el.getAttribute('title') || '');
         if (modalTextPattern.test(text)) {
@@ -419,23 +468,23 @@ class FocusManagementScanner extends BaseScanner {
 
         // Take screenshot before activation
         await page.screenshot({
-          path: path.join(scanDir, `modal-test-${index}-before.png`)
+          path: path.join(scanDir, `modal-test-${index}-before.png`),
         });
 
         // Activate modal (try click and Enter key)
         await page.keyboard.press('Enter');
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Take screenshot after activation
         await page.screenshot({
-          path: path.join(scanDir, `modal-test-${index}-after.png`)
+          path: path.join(scanDir, `modal-test-${index}-after.png`),
         });
 
         // Check if focus moved to modal
         const focusInModal = await page.evaluate(() => {
           const modals = document.querySelectorAll('.modal, [role="dialog"], [role="alertdialog"]');
           const focused = document.activeElement;
-          
+
           for (const modal of modals) {
             const modalRect = modal.getBoundingClientRect();
             if (modalRect.width > 0 && modalRect.height > 0) {
@@ -443,31 +492,31 @@ class FocusManagementScanner extends BaseScanner {
                 return {
                   modalFound: true,
                   focusInModal: true,
-                  modalSelector: modal.tagName.toLowerCase() + 
-                                (modal.id ? `#${modal.id}` : '') + 
-                                (modal.className ? `.${modal.className.split(' ').join('.')}` : '')
+                  modalSelector:
+                    modal.tagName.toLowerCase() +
+                    (modal.id ? `#${modal.id}` : '') +
+                    (modal.className ? `.${modal.className.split(' ').join('.')}` : ''),
                 };
               }
             }
           }
-          
+
           return { modalFound: false, focusInModal: false };
         });
 
         if (focusInModal.modalFound && !focusInModal.focusInModal) {
           violations.push({
-            criterion: "9.2.4.3",
+            criterion: '9.2.4.3',
             element: trigger.element,
-            issue: "focus-lost",
-            description: "Focus is not properly managed when modal opens",
-            suggestion: "Move focus to first focusable element in modal when opened"
+            issue: 'focus-lost',
+            description: 'Focus is not properly managed when modal opens',
+            suggestion: 'Move focus to first focusable element in modal when opened',
           });
         }
 
         // Try to close modal with Escape
         await page.keyboard.press('Escape');
-        await new Promise(resolve => setTimeout(resolve, 500));
-
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (error) {
         console.warn(`Error testing modal trigger ${trigger.element}:`, error.message);
       }
@@ -477,8 +526,9 @@ class FocusManagementScanner extends BaseScanner {
     const deleteButtons = await page.evaluate(() => {
       const buttons = [];
       const deletePattern = /delete|remove|löschen|entfernen|close|schließen/i;
-      document.querySelectorAll('button, [role="button"]').forEach(el => {
-        const text = (el.textContent || '').trim() +
+      document.querySelectorAll('button, [role="button"]').forEach((el) => {
+        const text =
+          (el.textContent || '').trim() +
           (el.getAttribute('aria-label') || '') +
           (el.getAttribute('title') || '');
         if (deletePattern.test(text)) {
@@ -486,7 +536,8 @@ class FocusManagementScanner extends BaseScanner {
           if (rect.width > 0 && rect.height > 0) {
             const className = el.className && typeof el.className === 'string' ? el.className : '';
             buttons.push({
-              element: el.tagName.toLowerCase() +
+              element:
+                el.tagName.toLowerCase() +
                 (el.id ? `#${el.id}` : '') +
                 (className ? `.${className.split(' ')[0]}` : ''),
               text: el.textContent.trim().substring(0, 30),
@@ -516,12 +567,15 @@ class FocusManagementScanner extends BaseScanner {
         // Click the delete button
         const clicked = await page.evaluate((sel) => {
           const el = document.querySelector(sel);
-          if (el) { el.click(); return true; }
+          if (el) {
+            el.click();
+            return true;
+          }
           return false;
         }, btn.element);
 
         if (!clicked) continue;
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Check if focus fell to body (bad) or stayed on a meaningful element (good)
         const after = await page.evaluate(() => {
@@ -541,11 +595,12 @@ class FocusManagementScanner extends BaseScanner {
 
         if (domChanged && after.isBody) {
           violations.push({
-            criterion: "9.2.4.3",
+            criterion: '9.2.4.3',
             element: btn.element,
-            issue: "focus-lost-after-deletion",
+            issue: 'focus-lost-after-deletion',
             description: `After clicking "${btn.text}", an element was removed and focus fell to document body instead of moving to a sibling or parent`,
-            suggestion: "After removing an element, move focus to the next sibling, previous sibling, or parent container"
+            suggestion:
+              'After removing an element, move focus to the next sibling, previous sibling, or parent container',
           });
         }
       } catch (error) {
@@ -557,15 +612,15 @@ class FocusManagementScanner extends BaseScanner {
     const loadMoreButtons = await page.evaluate(() => {
       const buttons = [];
       const loadPattern = /load more|mehr laden|show more|mehr anzeigen|weitere/i;
-      document.querySelectorAll('button, [role="button"], a[href]').forEach(el => {
-        const text = (el.textContent || '').trim() +
-          (el.getAttribute('aria-label') || '');
+      document.querySelectorAll('button, [role="button"], a[href]').forEach((el) => {
+        const text = (el.textContent || '').trim() + (el.getAttribute('aria-label') || '');
         if (loadPattern.test(text)) {
           const rect = el.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
             const className = el.className && typeof el.className === 'string' ? el.className : '';
             buttons.push({
-              element: el.tagName.toLowerCase() +
+              element:
+                el.tagName.toLowerCase() +
                 (el.id ? `#${el.id}` : '') +
                 (className ? `.${className.split(' ')[0]}` : ''),
               text: el.textContent.trim().substring(0, 30),
@@ -582,12 +637,15 @@ class FocusManagementScanner extends BaseScanner {
 
         const clicked = await page.evaluate((sel) => {
           const el = document.querySelector(sel);
-          if (el) { el.click(); return true; }
+          if (el) {
+            el.click();
+            return true;
+          }
           return false;
         }, btn.element);
 
         if (!clicked) continue;
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const after = await page.evaluate((prevCount) => {
           const newCount = document.body.querySelectorAll('*').length;
@@ -599,11 +657,12 @@ class FocusManagementScanner extends BaseScanner {
 
         if (after.contentAdded && after.isBody) {
           violations.push({
-            criterion: "9.2.4.3",
+            criterion: '9.2.4.3',
             element: btn.element,
-            issue: "focus-lost-after-load-more",
+            issue: 'focus-lost-after-load-more',
             description: `After clicking "${btn.text}", new content was added but focus fell to document body instead of moving to the new content`,
-            suggestion: "After loading more content, move focus to the first new element or announce the addition to screen readers"
+            suggestion:
+              'After loading more content, move focus to the first new element or announce the addition to screen readers',
           });
         }
       } catch (error) {
@@ -619,30 +678,34 @@ class FocusManagementScanner extends BaseScanner {
    */
   async testFocusRestoration(page, scanDir) {
     console.log('Testing focus restoration...');
-    
+
     const violations = [];
 
     // Test dropdown focus restoration
     const dropdownTriggers = await page.evaluate(() => {
       const triggers = [];
       const selectors = [
-        '[aria-haspopup="menu"]', '[aria-haspopup="listbox"]',
-        '.dropdown-trigger', '.dropdown-toggle', 'select'
+        '[aria-haspopup="menu"]',
+        '[aria-haspopup="listbox"]',
+        '.dropdown-trigger',
+        '.dropdown-toggle',
+        'select',
       ];
-      
-      selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(el => {
+
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
           const rect = el.getBoundingClientRect();
           if (rect.width > 0 && rect.height > 0) {
             triggers.push({
-              element: el.tagName.toLowerCase() + 
-                      (el.id ? `#${el.id}` : '') + 
-                      (el.className ? `.${el.className.split(' ').join('.')}` : '')
+              element:
+                el.tagName.toLowerCase() +
+                (el.id ? `#${el.id}` : '') +
+                (el.className ? `.${el.className.split(' ').join('.')}` : ''),
             });
           }
         });
       });
-      
+
       return triggers;
     });
 
@@ -655,23 +718,23 @@ class FocusManagementScanner extends BaseScanner {
         }, trigger.element);
 
         await page.screenshot({
-          path: path.join(scanDir, `dropdown-focus-${index}-initial.png`)
+          path: path.join(scanDir, `dropdown-focus-${index}-initial.png`),
         });
 
         // Open dropdown
         await page.keyboard.press('Enter');
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         await page.screenshot({
-          path: path.join(scanDir, `dropdown-focus-${index}-opened.png`)
+          path: path.join(scanDir, `dropdown-focus-${index}-opened.png`),
         });
 
         // Close with Escape
         await page.keyboard.press('Escape');
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         await page.screenshot({
-          path: path.join(scanDir, `dropdown-focus-${index}-closed.png`)
+          path: path.join(scanDir, `dropdown-focus-${index}-closed.png`),
         });
 
         // Check if focus returned to trigger
@@ -682,14 +745,13 @@ class FocusManagementScanner extends BaseScanner {
 
         if (!focusRestored) {
           violations.push({
-            criterion: "9.2.4.3",
+            criterion: '9.2.4.3',
             element: trigger.element,
-            issue: "focus-not-restored",
-            description: "Focus is not restored to trigger element after dropdown closes",
-            suggestion: "Return focus to the element that opened the dropdown when it closes"
+            issue: 'focus-not-restored',
+            description: 'Focus is not restored to trigger element after dropdown closes',
+            suggestion: 'Return focus to the element that opened the dropdown when it closes',
           });
         }
-
       } catch (error) {
         console.warn(`Error testing dropdown ${trigger.element}:`, error.message);
       }
@@ -738,44 +800,69 @@ class FocusManagementScanner extends BaseScanner {
         if (step.stuck) break;
         if (!step.rendered) continue;
 
-        const result = await page.evaluate((ATTR, tabId) => {
-          const el = document.querySelector(`[${ATTR}="${tabId}"]`);
-          if (!el) return null;
-          const rect = el.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return null;
-          const inset = Math.min(2, rect.width / 4, rect.height / 4);
-          const points = [
-            [rect.left + rect.width / 2, rect.top + rect.height / 2],
-            [rect.left + inset, rect.top + inset],
-            [rect.right - inset, rect.top + inset],
-            [rect.left + inset, rect.bottom - inset],
-            [rect.right - inset, rect.bottom - inset],
-          ];
-          const vw = window.innerWidth, vh = window.innerHeight;
-          let covered = 0, coverer = null, position = null, offscreen = 0;
-          for (const [x, y] of points) {
-            if (x < 0 || y < 0 || x >= vw || y >= vh) { offscreen++; continue; }
-            const hit = document.elementFromPoint(x, y);
-            if (!hit || hit === el || el.contains(hit) || hit.contains(el)) continue;
-            // Is the covering element (or an ancestor of it) fixed/sticky and NOT an ancestor of el?
-            let n = hit, overlay = null;
-            while (n && n !== document.body) {
-              const pos = window.getComputedStyle(n).position;
-              if ((pos === 'fixed' || pos === 'sticky') && !n.contains(el)) { overlay = n; break; }
-              n = n.parentElement;
+        const result = await page.evaluate(
+          (ATTR, tabId) => {
+            const el = document.querySelector(`[${ATTR}="${tabId}"]`);
+            if (!el) return null;
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return null;
+            const inset = Math.min(2, rect.width / 4, rect.height / 4);
+            const points = [
+              [rect.left + rect.width / 2, rect.top + rect.height / 2],
+              [rect.left + inset, rect.top + inset],
+              [rect.right - inset, rect.top + inset],
+              [rect.left + inset, rect.bottom - inset],
+              [rect.right - inset, rect.bottom - inset],
+            ];
+            const vw = window.innerWidth,
+              vh = window.innerHeight;
+            let covered = 0,
+              coverer = null,
+              position = null,
+              offscreen = 0;
+            for (const [x, y] of points) {
+              if (x < 0 || y < 0 || x >= vw || y >= vh) {
+                offscreen++;
+                continue;
+              }
+              const hit = document.elementFromPoint(x, y);
+              if (!hit || hit === el || el.contains(hit) || hit.contains(el)) continue;
+              // Is the covering element (or an ancestor of it) fixed/sticky and NOT an ancestor of el?
+              let n = hit,
+                overlay = null;
+              while (n && n !== document.body) {
+                const pos = window.getComputedStyle(n).position;
+                if ((pos === 'fixed' || pos === 'sticky') && !n.contains(el)) {
+                  overlay = n;
+                  break;
+                }
+                n = n.parentElement;
+              }
+              if (!overlay) continue;
+              covered++;
+              if (!coverer) {
+                position = window.getComputedStyle(overlay).position;
+                coverer =
+                  overlay.tagName.toLowerCase() +
+                  (overlay.id ? '#' + overlay.id : '') +
+                  (typeof overlay.className === 'string' && overlay.className.trim()
+                    ? '.' + overlay.className.trim().split(/\s+/)[0]
+                    : '');
+              }
             }
-            if (!overlay) continue;
-            covered++;
-            if (!coverer) {
-              position = window.getComputedStyle(overlay).position;
-              coverer = overlay.tagName.toLowerCase() + (overlay.id ? '#' + overlay.id : '') +
-                (typeof overlay.className === 'string' && overlay.className.trim() ? '.' + overlay.className.trim().split(/\s+/)[0] : '');
-            }
-          }
-          // Entirely hidden = every on-screen sample point is behind an overlay.
-          const sampled = points.length - offscreen;
-          return { sampled, covered, coverer, position, entirely: sampled > 0 && covered === sampled };
-        }, TAB_ATTR, step.tabId);
+            // Entirely hidden = every on-screen sample point is behind an overlay.
+            const sampled = points.length - offscreen;
+            return {
+              sampled,
+              covered,
+              coverer,
+              position,
+              entirely: sampled > 0 && covered === sampled,
+            };
+          },
+          TAB_ATTR,
+          step.tabId
+        );
 
         if (!result || !result.entirely) continue;
         const key = `${result.position}|${result.coverer}`;
@@ -811,7 +898,6 @@ class FocusManagementScanner extends BaseScanner {
 
     return { notObscured };
   }
-
 }
 
 module.exports = FocusManagementScanner;

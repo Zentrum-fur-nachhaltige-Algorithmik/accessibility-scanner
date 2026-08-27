@@ -12,10 +12,14 @@ const LLMBaseScanner = require('./base');
 
 class LLMSensoryCharacteristicsScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-sensory-characteristics', {
-      wcagCriteria: ['1.3.3'],
-      wcagPrinciple: 'perceivable',
-    }, llmClient);
+    super(
+      'llm-sensory-characteristics',
+      {
+        wcagCriteria: ['1.3.3'],
+        wcagPrinciple: 'perceivable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {

@@ -100,9 +100,7 @@ export default function Home() {
   const blobUrlRef = useRef(null);
 
   const isBusy = BUSY_PHASES.includes(phase);
-  const elapsed = activeScan
-    ? Math.max(0, Math.floor((nowTs - activeScan.startedAt) / 1000))
-    : 0;
+  const elapsed = activeScan ? Math.max(0, Math.floor((nowTs - activeScan.startedAt) / 1000)) : 0;
 
   // Startup: restore token and history from this browser.
   useEffect(() => {
@@ -175,9 +173,7 @@ export default function Home() {
   const finishScan = useCallback((context, scanResult) => {
     const scannedAt = scanResult?.timestamp || new Date().toISOString();
     const score =
-      typeof scanResult?.accessibilityScore === 'number'
-        ? scanResult.accessibilityScore
-        : null;
+      typeof scanResult?.accessibilityScore === 'number' ? scanResult.accessibilityScore : null;
     const violationCount =
       typeof scanResult?.totalViolations === 'number'
         ? scanResult.totalViolations
@@ -431,11 +427,9 @@ export default function Home() {
         ? 'Scan in progress: waiting for a free scan slot.'
         : `Scan in progress: position ${queuePosition} in the queue.`;
   } else if (phase === 'running') {
-    statusMessage =
-      'Scan in progress: a full scan usually takes 1 to 4 minutes.';
+    statusMessage = 'Scan in progress: a full scan usually takes 1 to 4 minutes.';
   } else if (phase === 'stopped') {
-    statusMessage =
-      'Stopped watching. The scan may still be running on the server.';
+    statusMessage = 'Stopped watching. The scan may still be running on the server.';
   } else if (phase === 'done' && result) {
     const findings = result.totalViolations ?? (result.violations || []).length;
     const scoreText = Number.isFinite(Number(result.accessibilityScore))
@@ -448,9 +442,7 @@ export default function Home() {
 
   const reportNumber = resultMeta?.jobId || activeScan?.jobId || null;
   const documentDate = resultMeta?.scannedAt || todayIso;
-  const moduleCount = result?.scanners
-    ? Object.keys(result.scanners).length
-    : registeredModules;
+  const moduleCount = result?.scanners ? Object.keys(result.scanners).length : registeredModules;
 
   return (
     <>
@@ -543,8 +535,7 @@ export default function Home() {
               <form className="pb-form" onSubmit={handleSubmit} noValidate>
                 <div className="pb-field">
                   <label htmlFor="url">
-                    Address of the page to scan{' '}
-                    <span aria-hidden="true">*</span>
+                    Address of the page to scan <span aria-hidden="true">*</span>
                     <span className="sr-only">(required)</span>
                   </label>
                   <input
@@ -568,8 +559,7 @@ export default function Home() {
                   {/* One description target: hint and error together. */}
                   <div className="pb-field-help" id="url-help">
                     <p className="pb-hint">
-                      Full address including https://. The page must be publicly
-                      reachable.
+                      Full address including https://. The page must be publicly reachable.
                     </p>
                     <p className="error error-text" id="url-error" aria-live="polite">
                       {fieldError}
@@ -597,10 +587,7 @@ export default function Home() {
                           checked={profile === option.id}
                           onChange={() => setProfile(option.id)}
                         />
-                        <label
-                          className="pb-profile-label"
-                          htmlFor={`profile-${option.id}`}
-                        >
+                        <label className="pb-profile-label" htmlFor={`profile-${option.id}`}>
                           <span className="pb-profile-name">{option.label}</span>
                           <span className="pb-profile-desc">{option.description}</span>
                         </label>
@@ -617,9 +604,8 @@ export default function Home() {
                   <summary>API access token (optional)</summary>
                   <div className="pb-disclosure-body">
                     <p className="pb-hint" id="token-hint">
-                      Only needed when this server requires authentication. The
-                      token is stored in this browser only and sent in the
-                      Authorization header with every request.
+                      Only needed when this server requires authentication. The token is stored in
+                      this browser only and sent in the Authorization header with every request.
                     </p>
                     <div className="pb-field">
                       <label htmlFor="api-token">Access token</label>
@@ -645,11 +631,7 @@ export default function Home() {
                         Show token
                       </button>
                       {token && (
-                        <button
-                          type="button"
-                          className="pb-btn"
-                          onClick={handleRemoveToken}
-                        >
+                        <button type="button" className="pb-btn" onClick={handleRemoveToken}>
                           Remove stored token
                         </button>
                       )}
@@ -667,11 +649,7 @@ export default function Home() {
                     Start scan
                   </button>
                   {isBusy && (
-                    <button
-                      type="button"
-                      className="pb-btn"
-                      onClick={handleStopWatching}
-                    >
+                    <button type="button" className="pb-btn" onClick={handleStopWatching}>
                       Stop watching this scan
                     </button>
                   )}
@@ -699,8 +677,7 @@ export default function Home() {
                 {isBusy && (
                   <p className="pb-elapsed">
                     <span className="pb-busy" aria-hidden="true" />
-                    Elapsed time:{' '}
-                    <span className="pb-elapsed-value">{formatElapsed(elapsed)}</span>
+                    Elapsed time: <span className="pb-elapsed-value">{formatElapsed(elapsed)}</span>
                   </p>
                 )}
               </div>
@@ -725,12 +702,10 @@ export default function Home() {
                   <span className="pb-eyebrow">Section 2</span>
                   Assessment result
                 </h2>
-                <p className="pb-body">
-                  No scan result yet. Start a scan in section 1.
-                </p>
+                <p className="pb-body">No scan result yet. Start a scan in section 1.</p>
                 <p className="pb-scope-note">
-                  Automated check against WCAG 2.2 AA. It does not replace a full
-                  conformity assessment with manual testing.
+                  Automated check against WCAG 2.2 AA. It does not replace a full conformity
+                  assessment with manual testing.
                 </p>
               </section>
             )}
@@ -750,8 +725,7 @@ export default function Home() {
           <footer className="pb-footer">
             <p>{APP_NAME}: automated WCAG 2.2 conformity assessment</p>
             <p>
-              <a href="/">Report</a> ·{' '}
-              <a href="/accessibility">Accessibility statement</a>
+              <a href="/">Report</a> · <a href="/accessibility">Accessibility statement</a>
             </p>
           </footer>
         </div>

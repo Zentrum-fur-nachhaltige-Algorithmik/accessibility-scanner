@@ -386,9 +386,7 @@
                 "description": "Labels or Instructions - search control is identified only by its placeholder, which is not an accessible name",
                 "severity": "high",
                 "suggestion": "Add a <label for=\"…\">, aria-label, or aria-labelledby pointing at visible text",
-                "details": [
-                  "No associated label found"
-                ],
+                "details": ["No associated label found"],
                 "experimental": true,
                 "confidence": "low"
               }

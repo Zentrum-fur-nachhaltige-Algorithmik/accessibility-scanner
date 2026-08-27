@@ -34,7 +34,10 @@ function parseWcagMetadata(html) {
 
     switch (key) {
       case 'criterion':
-        metadata.criterion = value.split(',').map(c => c.trim()).filter(Boolean);
+        metadata.criterion = value
+          .split(',')
+          .map((c) => c.trim())
+          .filter(Boolean);
         break;
       case 'level':
         metadata.level = value;
@@ -49,10 +52,16 @@ function parseWcagMetadata(html) {
         metadata.expectedViolations = parseInt(value, 10);
         break;
       case 'testable_by':
-        metadata.testableBy = value.split(',').map(t => t.trim()).filter(Boolean);
+        metadata.testableBy = value
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean);
         break;
       case 'scanners':
-        metadata.scanners = value.split(',').map(s => s.trim()).filter(Boolean);
+        metadata.scanners = value
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
         break;
       case 'description':
         metadata.description = value;
@@ -64,7 +73,7 @@ function parseWcagMetadata(html) {
 
   // Validate required fields
   const required = ['criterion', 'level', 'title', 'testType'];
-  const missing = required.filter(f => !metadata[f]);
+  const missing = required.filter((f) => !metadata[f]);
   if (missing.length > 0) {
     throw new Error(`WCAG-TEST block missing required fields: ${missing.join(', ')}`);
   }
@@ -95,8 +104,9 @@ function parseFile(filePath) {
  * @returns {{ parsed: Object[], unparsed: string[] }}
  */
 function parseDirectory(dir) {
-  const files = fs.readdirSync(dir)
-    .filter(f => f.endsWith('.html'))
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.html'))
     .sort();
 
   const parsed = [];
@@ -141,7 +151,9 @@ function buildWcagTestBlock(meta) {
     lines.push(`testable_by: ${Array.isArray(val) ? val.join(', ') : val}`);
   }
   if (meta.scanners) {
-    lines.push(`scanners: ${Array.isArray(meta.scanners) ? meta.scanners.join(', ') : meta.scanners}`);
+    lines.push(
+      `scanners: ${Array.isArray(meta.scanners) ? meta.scanners.join(', ') : meta.scanners}`
+    );
   }
   if (meta.description) {
     lines.push(`description: ${meta.description}`);

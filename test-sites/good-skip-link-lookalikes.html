@@ -1,0 +1,89 @@
+<!-- WCAG-TEST
+criterion: 2.4.1, 2.4.7
+level: A
+title: Bypass Blocks, Focus Visible
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: keyboard-navigation
+description: A working skip link next to ordinary navigation links whose paths contain skip and content, plus an embedded iframe whose focus indicator the user agent draws inside the frame
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skip link and lookalikes</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: auto;
+        background: #ffdd00;
+        color: #0b0c0c;
+        padding: 0.75rem 1rem;
+      }
+      .skip-link:focus {
+        position: static;
+        left: auto;
+      }
+      a:focus,
+      button:focus {
+        outline: 3px solid #0b57d0;
+        outline-offset: 2px;
+      }
+      nav,
+      main,
+      footer {
+        padding: 1rem 2rem;
+      }
+      nav a {
+        display: inline-block;
+        padding: 0.75rem 1rem;
+      }
+      iframe {
+        width: 100%;
+        height: 8rem;
+        border: 1px solid #666;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header>
+      <nav aria-label="Component documentation">
+        <!-- Ordinary page links. Their paths carry the words skip and content,
+             which does not make them skip links. -->
+        <a href="/components/skip-link/">Skip link component</a>
+        <a href="/patterns/content-design/">Content design</a>
+        <a href="/help/main-navigation/">Main navigation guidance</a>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <h1>Skip link and lookalikes</h1>
+      <p>
+        The first link in the document moves focus to this heading's container. The three links
+        above it lead to other pages and are not skip links.
+      </p>
+      <h2>Embedded example</h2>
+      <iframe
+        title="Live example of a text input"
+        src="data:text/html,%3Cp%3EEmbedded%20example%3C/p%3E"
+      ></iframe>
+    </main>
+
+    <footer>
+      <nav aria-label="Footer">
+        <a href="/help/accessibility/">Accessibility</a>
+      </nav>
+    </footer>
+  </body>
+</html>

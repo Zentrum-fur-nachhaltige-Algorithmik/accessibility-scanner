@@ -7,7 +7,12 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
-const { tabWalk, cleanupTabWalk, TAB_ATTR } = require('../utils/keyboard-focus');
+const {
+  tabWalk,
+  cleanupTabWalk,
+  TAB_ATTR,
+  EMBEDDED_CONTENT_TAGS,
+} = require('../utils/keyboard-focus');
 const log = require('../utils/logger').createLogger('focus-management');
 
 class FocusManagementScanner extends BaseScanner {
@@ -152,7 +157,8 @@ class FocusManagementScanner extends BaseScanner {
       if (
         !focusItem.hasVisibleFocus &&
         !focusItem.lowContrastFocus &&
-        focusItem.indicatorConfirmed
+        focusItem.indicatorConfirmed &&
+        !EMBEDDED_CONTENT_TAGS.has(focusItem.tag)
       ) {
         allElementsHaveVisibleFocus = false;
         violations.push({
@@ -320,6 +326,7 @@ class FocusManagementScanner extends BaseScanner {
             height: step.rect.height,
           },
           text: step.text,
+          tag: step.tag,
           hasVisibleFocus: ind.visible,
           lowContrastFocus: ind.lowContrast,
           // tabWalk re-measures every "no indicator" candidate (blur/refocus

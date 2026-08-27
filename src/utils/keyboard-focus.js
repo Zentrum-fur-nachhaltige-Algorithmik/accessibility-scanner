@@ -423,7 +423,15 @@ async function collectTabWalk(page, opts) {
   return out;
 }
 
+/**
+ * Elements that host a separate document or plug-in. The user agent draws
+ * their focus indicator inside that embedded content, where the host page's
+ * computed styles cannot see it, so "no indicator" is unknowable from here.
+ */
+const EMBEDDED_CONTENT_TAGS = new Set(['iframe', 'frame', 'object', 'embed']);
+
 module.exports = {
+  EMBEDDED_CONTENT_TAGS,
   tabWalk,
   collectTabWalk,
   prepareTabWalk,

@@ -234,8 +234,20 @@ class UseOfColorScanner extends BaseScanner {
       // 4. Check charts and data visualizations. A bare <svg> is almost always
       // an icon; only treat it as a chart when it is large and uses several
       // fill colours (i.e. could encode data series by colour).
+      // "chart" and "graph" have to be whole words in a class name: a substring
+      // match calls every BEM class ending in "-paragraph" a data visualisation.
+      const namesAChart = (el) => {
+        const cls = typeof el.className === 'string' ? el.className.toLowerCase() : '';
+        return cls
+          .split(/\s+/)
+          .flatMap((token) => token.split(/[-_]+/))
+          .some((word) => word.startsWith('chart') || word.startsWith('graph'));
+      };
       const chartCandidates = [
-        ...document.querySelectorAll('canvas, .chart, .graph, [class*="chart"], [class*="graph"]'),
+        ...new Set([
+          ...document.querySelectorAll('canvas'),
+          ...[...document.querySelectorAll('[class]')].filter(namesAChart),
+        ]),
       ];
       document.querySelectorAll('svg').forEach((svg) => {
         if (chartCandidates.includes(svg)) return;

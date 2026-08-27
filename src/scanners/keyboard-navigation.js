@@ -6,7 +6,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
-const { tabWalk, cleanupTabWalk } = require('../utils/keyboard-focus');
+const { tabWalk, cleanupTabWalk, EMBEDDED_CONTENT_TAGS } = require('../utils/keyboard-focus');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('keyboard-navigation');
@@ -350,8 +350,9 @@ class KeyboardNavigationScanner extends BaseScanner {
         });
 
         // 2.4.7 is owned by focus-management (it also checks contrast); only
-        // the clear-cut "nothing changes at all" case is reported here.
-        if (!ind.visible && !ind.lowContrast) {
+        // the clear-cut "nothing changes at all" case is reported here, and
+        // never for embedded content whose indicator is drawn out of reach.
+        if (!ind.visible && !ind.lowContrast && !EMBEDDED_CONTENT_TAGS.has(step.tag)) {
           violations.push({
             criterion: '9.2.4.7',
             element: step.selector,
@@ -1057,28 +1058,33 @@ class KeyboardNavigationScanner extends BaseScanner {
 
       const issues = [];
 
-      // Find skip links
-      const potentialSkipLinks = document.querySelectorAll(
-        'a[href^="#"], a[href^="#main"], a[href*="skip"], a[href*="content"]'
+      // A skip link moves focus within the same document, so only a fragment
+      // link can be one. A link to another page whose path happens to contain
+      // "skip" or "content" is ordinary navigation.
+      const potentialSkipLinks = Array.from(document.querySelectorAll('a[href^="#"]')).filter(
+        (link) => {
+          const href = link.getAttribute('href') || '';
+          const text = link.textContent.trim().toLowerCase();
+          return (
+            /skip|jump|bypass|springe|zum inhalt|direkt zum/.test(text) ||
+            /^#(main|content|maincontent|main-content|inhalt)/i.test(href)
+          );
+        }
       );
 
       potentialSkipLinks.forEach((link) => {
         const href = link.getAttribute('href');
-        const text = link.textContent.trim().toLowerCase();
         const selector = getElementSelector(link);
 
-        // Check if it's actually a skip link
-        const isSkipLink =
-          text.includes('skip') ||
-          text.includes('jump') ||
-          text.includes('main') ||
-          href.includes('main') ||
-          href.includes('content');
-
-        if (isSkipLink) {
-          // Check if target exists
-          const targetId = href.replace('#', '');
-          const target = document.getElementById(targetId);
+        {
+          // Check if target exists. `#top` and an empty fragment are defined by
+          // HTML as the top of the document, and a named anchor is a target too.
+          const targetId = decodeURIComponent(href.slice(1));
+          const target =
+            targetId === '' ||
+            targetId.toLowerCase() === 'top' ||
+            document.getElementById(targetId) ||
+            document.querySelector(`a[name="${CSS.escape(targetId)}"]`);
 
           if (!target) {
             issues.push({

@@ -370,7 +370,7 @@ description: Poor focus management in dynamic content and modals
         <div class="violation-title">VIOLATION 1: Modal ohne Fokus-Verschiebung</div>
         <p><strong>Problem:</strong> Modal öffnet sich, aber Fokus verbleibt auf öffnendem Button</p>
         <div class="interactive-area">
-            <button onclick="badOpenModal()">Modal öffnen</button>
+            <button aria-haspopup="dialog" onclick="badOpenModal()">Modal öffnen</button>
             <div class="status-display">
                 Aktueller Fokus: <span id="focusStatus1">Unbekannt</span>
             </div>
@@ -379,9 +379,9 @@ description: Poor focus management in dynamic content and modals
     
     <!-- Modal for violation 1 -->
     <div class="bad-modal-overlay" id="badModalOverlay">
-        <div class="bad-modal">
+        <div class="bad-modal" role="dialog" aria-modal="true" aria-labelledby="badModalTitle">
             <!-- SCHLECHT: Kein Fokus auf Modal-Inhalt -->
-            <h3>Modal Dialog</h3>
+            <h3 id="badModalTitle">Modal Dialog</h3>
             <p>Dies ist ein Modal-Dialog. Der Fokus sollte automatisch hierher verschoben werden, ist es aber nicht.</p>
             <p>Benutzer können mit Tab weiter durch die Hintergrund-Seite navigieren, obwohl sie das Modal verwenden sollten.</p>
             <button onclick="badCloseModal()">Schließen</button>

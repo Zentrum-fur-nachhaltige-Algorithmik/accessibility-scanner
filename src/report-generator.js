@@ -9,24 +9,7 @@ const DEFAULT_ORG_NAME = 'Abraham Nemeth Society for Accessible Algorithmics e.V
 // without pulling this module's PDF stack into the scan path.
 const { classifyWcagPrinciple } = require('./utils/wcag-principle');
 
-function normalizeSeverity(violation) {
-  const raw = (violation.severity || violation.impact || 'moderate').toLowerCase();
-  if (raw === 'critical' || raw === 'error') return 'critical';
-  if (raw === 'serious' || raw === 'major' || raw === 'high') return 'serious';
-  if (raw === 'moderate' || raw === 'warning') return 'moderate';
-  if (raw === 'minor') return 'minor';
-  if (raw === 'best-practice') return 'best-practice';
-  if (raw === 'info') return 'info';
-  return 'moderate';
-}
-
-/**
- * Returns true if the violation is a hard WCAG failure (not best-practice or info).
- */
-function isHardViolation(violation) {
-  const sev = normalizeSeverity(violation);
-  return sev !== 'best-practice' && sev !== 'info';
-}
+const { normalizeSeverity, isHardViolation } = require('./severity');
 
 const SEVERITY_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3, 'best-practice': 4, info: 5 };
 const SEVERITY_LABELS = { critical: 'Critical', serious: 'Serious', moderate: 'Moderate', minor: 'Minor', 'best-practice': 'Best Practice', info: 'Info' };
@@ -825,7 +808,8 @@ class ReportGenerator {
 
   generateMethodologySection(data) {
     const hasLlm = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
-    const levelLabel = hasLlm ? 'Level AAA' : 'Level AA';
+    const hasAaa = (data.violations || []).some(v => v.wcagLevel === 'AAA');
+    const levelLabel = hasAaa ? 'Level AA (with AAA advisories)' : 'Level AA';
     let html = `<p>Assessment conducted via automated scanning against WCAG 2.2 ${levelLabel} success criteria per EN 301 549.</p>`;
     if (hasLlm) {
       html += '<p>This audit includes LLM-powered semantic analysis for AAA-level criteria. Findings marked <span class="method-badge method-llm" aria-label="Large Language Model analysis">LLM</span> were identified using large language model analysis and should be verified by manual review.</p>';
@@ -865,8 +849,10 @@ class ReportGenerator {
       return '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>';
     }
 
-    const groups = this.groupViolationsByPrinciple(data.violations);
-    const totalViolations = data.violations.length;
+    const aaa = data.violations.filter(v => v.wcagLevel === 'AAA');
+    const conformance = data.violations.filter(v => v.wcagLevel !== 'AAA');
+    const groups = this.groupViolationsByPrinciple(conformance);
+    const totalViolations = conformance.length;
     let html = '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>';
     html += `<p>The following ${totalViolations} findings are grouped by WCAG 2.2 principle. Each sub-section lists violations ordered by severity.</p>`;
 
@@ -896,6 +882,13 @@ class ReportGenerator {
     if (meaningfulOther.length > 0) {
       html += `<h3 id="s-4-5"><span class="sn">4.5</span> Other Findings</h3>`;
       html += this.renderViolationTable(meaningfulOther, tableCounter, 'Other findings');
+      tableCounter++;
+    }
+
+    if (aaa.length > 0) {
+      html += `<h3 id="s-4-6"><span class="sn">4.6</span> Hinweise (AAA)</h3>`;
+      html += `<p>${aaa.length} findings concern WCAG 2.2 Level AAA criteria. They are advisory for an AA conformance target and do not affect the score.</p>`;
+      html += this.renderViolationTable(aaa, tableCounter, 'Level AAA advisories');
       tableCounter++;
     }
 
@@ -978,7 +971,7 @@ class ReportGenerator {
       return '<h2 id="s-6"><span class="sn">6</span> Recommended Actions</h2>\n<p>No actions required.</p>';
     }
 
-    const groups = this.groupViolationsByPrinciple(data.violations);
+    const groups = this.groupViolationsByPrinciple(data.violations.filter(v => v.wcagLevel !== 'AAA'));
 
     const collectCriteria = (violations) => {
       const c = new Set();

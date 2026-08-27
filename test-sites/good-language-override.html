@@ -332,7 +332,8 @@ WHERE orders.date > '2023-01-01';</code></pre>
         <div class="good-title">GOOD 9: Suchergebnisse mit korrekter Sprachkennzeichnung</div>
         <p><strong>Lösung:</strong> Mehrsprachige Suchergebnisse mit entsprechenden Sprachattributen</p>
         <div class="interactive-area">
-            <input type="search" style="width: 100%; max-width: 300px; padding: 10px; margin-bottom: 10px;" 
+            <label for="goodSearchInput" class="sr-only">Internationale Suche</label>
+            <input type="search" id="goodSearchInput" style="width: 100%; max-width: 300px; padding: 10px; margin-bottom: 10px;"
                    placeholder="Suchen Sie international..." onkeyup="goodPerformSearch(this.value)">
             
             <div style="border: 1px solid #327d36; background: #f8f9fa; border-radius: 4px; max-height: 200px; overflow-y: auto;" id="goodSearchResults">

@@ -148,7 +148,9 @@ class TimingControlsScanner extends BaseScanner {
 
       // Look for timeout-related content
       const timeoutKeywords = ['timeout', 'session expires', 'expires in', 'time remaining', 'will expire'];
-      const pageText = document.body.textContent.toLowerCase();
+      // innerText (rendered text only): textContent would include inline
+      // <script> source, where "setTimeout" matched the "timeout" keyword.
+      const pageText = (document.body.innerText || '').toLowerCase();
       const hasTimeoutContent = timeoutKeywords.some(keyword => pageText.includes(keyword));
 
       if (hasTimeoutContent) {

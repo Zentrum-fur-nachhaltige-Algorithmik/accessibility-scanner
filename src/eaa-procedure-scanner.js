@@ -1,6 +1,10 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const {
+  findStatementLink,
+  missingStatementViolation,
+} = require('./utils/accessibility-statement');
 
 /**
  * EAA Procedure Scanner for EU European Accessibility Act 2025 compliance
@@ -47,7 +51,8 @@ class EAAProcedureScanner extends BaseScanner {
         contactMechanismAvailable: eaaResults.contactMechanismAvailable,
         feedbackProcessImplemented: eaaResults.feedbackProcessImplemented,
         complianceMonitoringActive: eaaResults.complianceMonitoringActive,
-        euLegalCompliance: eaaResults.euLegalCompliance
+        euLegalCompliance: eaaResults.euLegalCompliance,
+        gatedOnMissingStatement: !eaaResults.accessibilityStatementPresent
       },
       visualEvidence: eaaResults.visualEvidence
     };
@@ -135,20 +140,28 @@ class EAAProcedureScanner extends BaseScanner {
       accessibilityStatementPresent = statementResults.present;
     }
 
+    // Steps 2-4 all judge what the accessibility statement declares (feedback
+    // process, accessibility contact point, monitoring procedure — EN 301 549
+    // clause 12.2.2). With no statement published they have nothing to read,
+    // and step 1 has already reported the single root cause. Running them
+    // anyway is what turned one missing statement into four findings here and
+    // twelve across the EAA scanner group.
+    const statementGate = accessibilityStatementPresent || !options.testAccessibilityStatement;
+
     // 2. Test contact mechanism availability
-    if (options.testContactMechanism) {
+    if (options.testContactMechanism && statementGate) {
       const contactResults = await this.analyzeContactMechanism(page, scanDir, violations, options);
       contactMechanismAvailable = contactResults.available;
     }
 
     // 3. Test feedback process implementation
-    if (options.testFeedbackProcess) {
+    if (options.testFeedbackProcess && statementGate) {
       const feedbackResults = await this.analyzeFeedbackProcess(page, scanDir, violations, options);
       feedbackProcessImplemented = feedbackResults.implemented;
     }
 
     // 4. Test compliance monitoring procedures
-    if (options.testComplianceMonitoring) {
+    if (options.testComplianceMonitoring && statementGate) {
       const monitoringResults = await this.analyzeComplianceMonitoring(page, scanDir, violations, options);
       complianceMonitoringActive = monitoringResults.active;
     }
@@ -189,77 +202,49 @@ class EAAProcedureScanner extends BaseScanner {
   async analyzeAccessibilityStatement(page, scanDir, violations, options) {
     console.log('Analyzing accessibility statement compliance...');
 
-    // Look for accessibility statement on current page
-    const currentPageAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let statementFound = false;
-      let statementContent = null;
+    // Detection of the LINK is shared with the other three EAA scanners
+    // (src/utils/accessibility-statement.js) so they cannot disagree about
+    // whether a statement exists. A statement may also live inline on the page,
+    // which is what the embedded check below covers — narrowly: the old version
+    // treated any 200-character block containing the word "accessible" as a
+    // statement.
+    const statementLink = await findStatementLink(page);
 
-      // Search for accessibility statement content on current page
-      const accessibilityKeywords = [
+    const currentPageAnalysis = await page.evaluate(() => {
+      const statementKeywords = [
         'accessibility statement', 'accessibility policy', 'accessibility information',
-        'wcag', 'web content accessibility guidelines', 'accessibility compliance',
-        'accessible', 'disability access', 'accessibility features'
+        'erklärung zur barrierefreiheit', 'barrierefreiheitserklärung'
       ];
 
       const pageText = document.body.textContent.toLowerCase();
-      const hasAccessibilityContent = accessibilityKeywords.some(keyword =>
-        pageText.includes(keyword)
-      );
+      const hasAccessibilityContent = statementKeywords.some((k) => pageText.includes(k));
 
-      // Look for accessibility statement sections
-      const statementElements = document.querySelectorAll('section, div, article, main');
-      statementElements.forEach(element => {
+      let statementFound = false;
+      let statementContent = null;
+
+      for (const element of document.querySelectorAll('section, div, article, main')) {
         const elementText = element.textContent.toLowerCase();
-        const hasStatementKeywords = accessibilityKeywords.some(keyword =>
-          elementText.includes(keyword) && elementText.length > 200
-        );
-
-        if (hasStatementKeywords) {
-          statementFound = true;
-          statementContent = {
-            type: 'embedded',
-            length: elementText.length,
-            hasWCAG: elementText.includes('wcag'),
-            hasContactInfo: elementText.includes('contact') || elementText.includes('email'),
-            hasComplianceDate: elementText.includes('20') && elementText.includes('date'),
-            hasKnownIssues: elementText.includes('known') || elementText.includes('limitation')
-          };
-        }
-      });
-
-      // Look for accessibility statement links
-      const links = document.querySelectorAll('a[href]');
-      const statementLinks = [];
-
-      links.forEach(link => {
-        const linkText = link.textContent.toLowerCase();
-        const href = link.getAttribute('href');
-
-        const isAccessibilityLink = accessibilityKeywords.some(keyword =>
-          linkText.includes(keyword) || href.toLowerCase().includes('accessibility')
-        );
-
-        if (isAccessibilityLink) {
-          statementLinks.push({
-            text: linkText,
-            href: href,
-            isExternal: href.startsWith('http') && !href.includes(window.location.hostname)
-          });
-        }
-      });
-
-      if (statementLinks.length > 0 && !statementFound) {
+        if (elementText.length <= 200) continue;
+        if (!statementKeywords.some((k) => elementText.includes(k))) continue;
         statementFound = true;
         statementContent = {
-          type: 'linked',
-          linkCount: statementLinks.length,
-          links: statementLinks
+          type: 'embedded',
+          length: elementText.length,
+          hasWCAG: elementText.includes('wcag'),
+          hasContactInfo: elementText.includes('contact') || elementText.includes('email'),
+          hasComplianceDate: elementText.includes('20') && elementText.includes('date'),
+          hasKnownIssues: elementText.includes('known') || elementText.includes('limitation')
         };
+        break;
       }
 
-      return { issues, statementFound, statementContent, hasAccessibilityContent };
+      return { issues: [], statementFound, statementContent, hasAccessibilityContent };
     });
+
+    if (!currentPageAnalysis.statementFound && statementLink.found) {
+      currentPageAnalysis.statementFound = true;
+      currentPageAnalysis.statementContent = { type: 'linked', links: [statementLink] };
+    }
 
     let present = currentPageAnalysis.statementFound;
 
@@ -370,16 +355,12 @@ class EAAProcedureScanner extends BaseScanner {
       }
     }
 
-    // Check for required statement components if not found
+    // One finding, `serious`, shared shape with the accessibility-statement
+    // scanner so ScanPipeline can collapse the duplicate (see
+    // src/utils/accessibility-statement.js). `severity: 'error'` used to map to
+    // `critical` in src/severity.js.
     if (!present) {
-      violations.push({
-        criterion: "EAA-Statement",
-        element: 'website',
-        issue: 'missing-accessibility-statement',
-        description: 'No accessibility statement found - required for EU EAA compliance',
-        severity: 'error',
-        suggestion: 'Create comprehensive accessibility statement with WCAG compliance details'
-      });
+      violations.push(missingStatementViolation());
     }
 
     return { present };

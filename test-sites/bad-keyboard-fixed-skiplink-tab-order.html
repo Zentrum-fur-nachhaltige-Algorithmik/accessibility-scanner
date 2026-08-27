@@ -1,0 +1,109 @@
+<!-- WCAG-TEST
+criterion: 2.1.1
+level: A
+title: Keyboard failure hidden behind an off-canvas fixed skip link
+test_type: bad
+expected_violations: 2
+testable_by: dom
+scanners: keyboard-navigation
+description: First tab stop is a position:fixed skip link parked off-canvas with translateY(-100%) (the gsunde.website a.fixed.top-0.left-0.z-[100] pattern). Behind it sit 15 more reachable controls plus two seeded keyboard defects - a div with an onclick handler and cursor:pointer but no tabindex/role (2.1.1, not-keyboard-accessible) and a tabindex="5" control at the bottom of the page that pulls the tab order upward (2.4.3, illogical-tab-order). Guard for the gsunde.website report of "0 elements in tab order" with 41 focusable elements: tabWalk() ends the whole walk when the first Tab lands on <body> (src/utils/keyboard-focus.js:293), which happens whenever document.hasFocus() is still false at step 0. Both defects must stay detected.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminvereinbarung</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  header, main, footer { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.4rem; }
+  section { min-height: 26rem; padding-bottom: 2rem; }
+  /* Skip link parked off-canvas until focused (position:fixed, z-index 100). */
+  .skip-link {
+    position: fixed; top: 0; left: 0; z-index: 100;
+    transform: translateY(-100%);
+    background: #24483a; color: #ffffff; padding: .6rem 1rem; text-decoration: underline;
+  }
+  .skip-link:focus { transform: translateY(0); }
+  nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; }
+  a { color: #24483a; }
+  button, input, select, textarea { font: inherit; color: #1a1a1a; background: #ffffff; border: 1px solid #5a5a5a; border-radius: .25rem; padding: .4rem .6rem; }
+  button { background: #24483a; color: #ffffff; border: 0; padding: .6rem 1.2rem; cursor: pointer; }
+  label { display: block; font-weight: 600; margin-top: 1rem; }
+  /* The real 2.1.1 defect: looks and behaves like a button, is not reachable. */
+  .fake-button { display: inline-block; margin-top: 1rem; padding: .6rem 1.2rem; border-radius: .25rem; background: #cfe6c8; color: #24483a; font-weight: 700; cursor: pointer; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+<header>
+  <nav aria-label="Hauptnavigation">
+    <ul>
+      <li><a href="#leistungen">Leistungen</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#ordination">Ordinationszeiten</a></li>
+      <li><a href="#termin">Termin</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+  </nav>
+</header>
+<main id="inhalt">
+  <h1>Terminvereinbarung</h1>
+
+  <section id="leistungen">
+    <h2>Leistungen</h2>
+    <p>Vorsorge, Impfungen und Laboruntersuchungen.</p>
+    <button type="button">Leistungen anzeigen</button>
+    <a href="#kontakt">Zur Kontaktseite</a>
+  </section>
+
+  <section id="team">
+    <h2>Team</h2>
+    <p>Zwei Aerztinnen und drei Ordinationsassistentinnen.</p>
+    <button type="button">Team anzeigen</button>
+    <a href="#ordination">Zu den Ordinationszeiten</a>
+  </section>
+
+  <section id="ordination">
+    <h2>Ordinationszeiten</h2>
+    <p>Montag bis Freitag von 8 bis 13 Uhr.</p>
+    <button type="button">Zeiten als PDF</button>
+    <!-- REAL DEFECT 1 (2.1.1): click handler, pointer cursor, no tabindex, no role -->
+    <div class="fake-button" onclick="document.getElementById('termin').scrollIntoView()">Jetzt Termin buchen</div>
+  </section>
+
+  <section id="termin">
+    <h2>Termin anfragen</h2>
+    <form action="#">
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" autocomplete="name">
+      <label for="mail">E-Mail-Adresse</label>
+      <input id="mail" name="mail" type="email" autocomplete="email">
+      <label for="grund">Anliegen</label>
+      <select id="grund" name="grund">
+        <option>Vorsorgeuntersuchung</option>
+        <option>Impfung</option>
+      </select>
+      <label for="text">Nachricht</label>
+      <textarea id="text" name="text" rows="3"></textarea>
+      <p><button type="submit">Anfrage senden</button></p>
+    </form>
+  </section>
+
+  <section id="kontakt">
+    <h2>Kontakt</h2>
+    <p>Telefon 01 234 56 78</p>
+    <a href="#inhalt">Zurueck nach oben</a>
+    <!-- REAL DEFECT 2 (2.4.3): positive tabindex pulls this bottom control to the front of the tab order -->
+    <p><button type="button" tabindex="5">Rueckruf anfordern</button></p>
+  </section>
+</main>
+<footer>
+  <p>Musterpraxis, Musterstrasse 1, 1010 Wien — <a href="#inhalt">Seitenanfang</a></p>
+</footer>
+</body>
+</html>

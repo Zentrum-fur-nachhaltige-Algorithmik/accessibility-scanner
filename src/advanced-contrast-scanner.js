@@ -1,16 +1,23 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: contrastUtils } = require('./utils/browser-contrast');
 
 /**
  * Advanced Contrast Scanner for WCAG 2.2 compliance testing
  * Implements EN 301 549 criteria 9.1.4.11, 9.1.4.13 (Non-text Contrast, Content on Hover or Focus)
  * Tests UI components, graphical objects, and hover/focus content contrast
+ *
+ * Declared criteria note: this scanner only ever emits `9.1.4.11` and
+ * `9.1.4.13` findings. It previously ALSO claimed 1.4.3/1.4.6 (text contrast),
+ * which it does not test at all — that is `color-contrast-scanner.js`'s remit —
+ * so every harness run routed 1.4.3/1.4.6 fixtures here and recorded a miss.
+ * The metadata now matches what the scanner actually produces.
  */
 class AdvancedContrastScanner extends BaseScanner {
   constructor() {
     super('advanced-contrast', {
-      wcagCriteria: ['1.4.3', '1.4.6', '1.4.11'],
+      wcagCriteria: ['1.4.11', '1.4.13'],
       wcagPrinciple: 'perceivable'
     });
     this.screenshotDir = path.join(__dirname, '../tmp/contrast-screenshots');
@@ -41,11 +48,15 @@ class AdvancedContrastScanner extends BaseScanner {
       criteria: ["9.1.4.11", "9.1.4.13"],
       passed: contrastResults.violations.length === 0,
       violations: contrastResults.violations,
+      // Components whose rendered contrast could not be determined from CSS
+      // (gradient / background-image backdrops). An unknown is not a failure.
+      incomplete: contrastResults.incomplete,
       summary: {
         nonTextElementsTested: contrastResults.nonTextElementsTested,
         hoverContentTested: contrastResults.hoverContentTested,
         graphicalObjectsCompliant: contrastResults.graphicalObjectsCompliant,
-        uiComponentsCompliant: contrastResults.uiComponentsCompliant
+        uiComponentsCompliant: contrastResults.uiComponentsCompliant,
+        incompleteElements: contrastResults.incomplete.length
       },
       screenshotPath: scanDir,
       visualEvidence: contrastResults.visualEvidence
@@ -57,6 +68,7 @@ class AdvancedContrastScanner extends BaseScanner {
    */
   async performAdvancedContrastAnalysis(page, scanDir, options) {
     const violations = [];
+    const incomplete = [];
     const visualEvidence = [];
     let nonTextElementsTested = 0;
     let hoverContentTested = 0;
@@ -65,52 +77,23 @@ class AdvancedContrastScanner extends BaseScanner {
 
     console.log('Starting advanced contrast analysis...');
 
-    // Inject contrast analysis utilities
-    await page.evaluate(() => {
-      // Helper function to parse RGB values
-      window.parseRgb = function(rgbString) {
-        const match = rgbString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-        if (!match) return null;
+    // Contrast maths comes from the shared, WCAG-correct helpers in
+    // src/utils/browser-contrast.js, injected per page.evaluate call. The old
+    // private window.parseRgb/getLuminance/getContrastRatio globals are gone:
+    // they duplicated the formula, could not parse hex or CSS Color 4 syntax,
+    // and did no alpha compositing or ancestor background resolution.
 
-        return {
-          r: parseInt(match[1]),
-          g: parseInt(match[2]),
-          b: parseInt(match[3]),
-          a: match[4] ? parseFloat(match[4]) : 1
-        };
-      };
+    // 1. Test UI component + graphical object contrast (WCAG 1.4.11)
+    const nonText = await this.testNonTextContrast(page);
+    violations.push(...nonText.violations);
+    incomplete.push(...nonText.incomplete);
+    visualEvidence.push(...nonText.visualEvidence);
 
-      // Calculate relative luminance
-      window.getLuminance = function(rgb) {
-        const { r, g, b } = rgb;
-        const [rs, gs, bs] = [r, g, b].map(c => {
-          c = c / 255;
-          return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-        });
-        return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-      };
-
-      // Calculate contrast ratio
-      window.getContrastRatio = function(color1, color2) {
-        const lum1 = window.getLuminance(color1);
-        const lum2 = window.getLuminance(color2);
-        const brightest = Math.max(lum1, lum2);
-        const darkest = Math.min(lum1, lum2);
-        return (brightest + 0.05) / (darkest + 0.05);
-      };
-    });
-
-    // 1. Test UI component contrast (WCAG 1.4.11)
-    await this.testUIComponentContrast(page, scanDir, violations, visualEvidence);
-
-    // 2. Test graphical object contrast
-    await this.testGraphicalObjectContrast(page, scanDir, violations, visualEvidence);
-
-    // 3. Test hover and focus content contrast (WCAG 1.4.13)
+    // 2. Test hover and focus content contrast (WCAG 1.4.13)
     await this.testHoverFocusContent(page, scanDir, violations, visualEvidence);
 
     // Calculate summary statistics
-    nonTextElementsTested = visualEvidence.length;
+    nonTextElementsTested = nonText.elementsTested;
     hoverContentTested = visualEvidence.filter(e => e.type === 'hover-content').length;
     graphicalObjectsCompliant = visualEvidence.filter(e =>
       e.type === 'graphical-object' && e.contrastRatio >= 3
@@ -123,6 +106,7 @@ class AdvancedContrastScanner extends BaseScanner {
 
     return {
       violations,
+      incomplete,
       visualEvidence,
       nonTextElementsTested,
       hoverContentTested,
@@ -132,172 +116,230 @@ class AdvancedContrastScanner extends BaseScanner {
   }
 
   /**
-   * Test UI component contrast (buttons, inputs, etc.)
+   * Test UI component and graphical object contrast (WCAG 1.4.11) in a single
+   * in-page pass.
+   *
+   * Rewritten wholesale. The previous implementation:
+   *  - enumerated elements once per entry in a selector list whose entries
+   *    overlap (`button` / `.btn` / `.button`, `.icon` / `[class*="icon"]`), so
+   *    the same element was measured and reported up to four times;
+   *  - serialised each element to a CSS selector string and then RE-SELECTED it
+   *    with `document.querySelector` in a second `page.evaluate`. The generated
+   *    selector was a class list (matches every sibling with those classes) or
+   *    `tagName:nth-of-type(n)` where n was the element's index within a
+   *    `querySelectorAll` result, not among its siblings — so the second lookup
+   *    routinely measured a DIFFERENT element than the one enumerated, or none;
+   *  - read `element.parentElement`'s own computed background and fell back to
+   *    white, so a transparent parent produced bogus ratios;
+   *  - never alpha-composited translucent fills;
+   *  - applied invented leniency tiers (1.5:1 / 2.5:1 for inputs) gated on a
+   *    "has focus indicator" probe that was true for almost every element.
+   *
+   * Everything now runs against live element references inside one evaluate,
+   * uses the shared WCAG helpers, and applies the SC 1.4.11 exceptions
+   * (inactive components, decorative graphics, boundary already identified by
+   * a compliant border).
    */
-  async testUIComponentContrast(page, scanDir, violations, visualEvidence) {
+  async testNonTextContrast(page) {
     console.log('Testing UI component contrast...');
 
-    const uiComponents = await page.evaluate(() => {
-      const components = [];
+    return await page.evaluate((contrastCode) => {
+      eval(contrastCode);
 
-      // Find UI components that need contrast testing
-      const selectors = [
-        'button',
-        'input[type="button"]',
-        'input[type="submit"]',
-        'input[type="reset"]',
-        'input[type="text"]',
-        'input[type="email"]',
-        'input[type="password"]',
-        'input[type="search"]',
-        'textarea',
-        'select',
-        '[role="button"]',
-        '.btn',
-        '.button'
-      ];
+      const THRESHOLD = 3.0;
+      const violations = [];
+      const incomplete = [];
+      const visualEvidence = [];
+      let elementsTested = 0;
 
-      /**
-       * Build a selector that is actually valid CSS.
-       *
-       * Two real-world traps this closes, both found on live sites:
-       *  - React's `useId()` produces ids like ":Rbaqrlaupgqop:" — the colons
-       *    MUST be escaped or `document.querySelector` throws.
-       *  - `class="mzp-c-button "` (trailing space) split naively yields an
-       *    empty token, producing a dangling "." — also a SyntaxError.
-       * Either one aborted the whole contrast sweep on real pages.
-       */
-      const buildSafeSelector = (element, index) => {
-        const esc = (v) => (window.CSS && CSS.escape ? CSS.escape(v) : String(v).replace(/[^\w-]/g, '\\$&'));
-        const rawClass = typeof element.className === 'string' ? element.className : '';
-        const classes = rawClass.trim().split(/\s+/).filter(Boolean);
-        let sel = element.tagName.toLowerCase();
-        if (element.id) return sel + '#' + esc(element.id);
-        if (classes.length) return sel + classes.slice(0, 3).map((c) => '.' + esc(c)).join('');
-        return sel + `:nth-of-type(${index + 1})`;
-      };
+      function rgbString(c) { return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')'; }
 
-      selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach((element, index) => {
-          const rect = element.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const computed = window.getComputedStyle(element);
-            // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-            const className = typeof element.className === 'string' ? element.className : '';
+      // Stable, human-findable description. Only ever used for reporting —
+      // never fed back into querySelector.
+      function describe(element) {
+        let out = element.tagName.toLowerCase();
+        if (element.id) return out + '#' + element.id;
+        const raw = typeof element.className === 'string' ? element.className : '';
+        const classes = raw.trim().split(/\s+/).filter(Boolean).slice(0, 3);
+        if (classes.length) out += '.' + classes.join('.');
+        const parent = element.parentElement;
+        if (parent) {
+          const sameTag = Array.from(parent.children)
+            .filter(c => c.tagName === element.tagName);
+          if (sameTag.length > 1) out += ':nth-of-type(' + (sameTag.indexOf(element) + 1) + ')';
+        }
+        return out;
+      }
 
-            // Generate unique selector (escaped — see buildSafeSelector above)
-            const elementSelector = buildSafeSelector(element, index);
+      function isVisible(element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return false;
+        const styles = window.getComputedStyle(element);
+        return styles.visibility !== 'hidden' && styles.display !== 'none' &&
+          parseFloat(styles.opacity || '1') > 0;
+      }
 
-            // Get colors for contrast calculation
-            const backgroundColor = computed.backgroundColor;
-            const borderColor = computed.borderColor;
-            const outlineColor = computed.outlineColor;
+      // Decorative graphics are outside SC 1.4.11 ("graphical objects required
+      // to understand the content"). An icon sitting next to its own text label
+      // is redundant, not required.
+      function isMeaningfulGraphic(element) {
+        if (element.getAttribute('aria-hidden') === 'true') return false;
+        const role = element.getAttribute('role');
+        if (role === 'presentation' || role === 'none') return false;
+        if (element.closest('[aria-hidden="true"]')) return false;
+        const hasName = !!(element.getAttribute('aria-label') ||
+          element.getAttribute('aria-labelledby') ||
+          (element.tagName.toLowerCase() === 'svg' && element.querySelector('title')));
+        return hasName || role === 'img' || role === 'graphics-document';
+      }
 
-            components.push({
-              selector: elementSelector,
-              type: element.tagName.toLowerCase(),
-              backgroundColor: backgroundColor,
-              borderColor: borderColor,
-              outlineColor: outlineColor,
-              borderWidth: computed.borderWidth,
-              outlineWidth: computed.outlineWidth,
-              rect: {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height
-              }
+      // SC 1.4.11 covers "the visual information required to identify user
+      // interface components". When a control carries its own visible text
+      // label at sufficient contrast AND paints no fill of its own, the label
+      // is what identifies the control: the hairline border around it is
+      // decoration, and WCAG does not require a visual boundary at all (a
+      // borderless text button passes). Reporting the border would mean that
+      // ADDING a faint border to an otherwise-passing control creates a
+      // failure. The exception is deliberately narrow — it does not apply when
+      // the control has its own background fill (then the fill/border is the
+      // shape that delineates the control, and it is measured as before), nor
+      // when the label itself is below 3:1 (an icon glyph or greyed-out text
+      // cannot identify anything either).
+      function identifiedByOwnLabel(element, backdrop, threshold) {
+        const text = (element.textContent || '').replace(/\s+/g, ' ').trim();
+        if (!text) return false;
+        const styles = window.getComputedStyle(element);
+        const own = __parseRgb(styles.backgroundColor);
+        if (own && own.a > 0) return false;          // has its own fill
+        const fg = __parseRgb(styles.color);
+        if (!fg) return false;
+        return __getContrastRatio(__blendOver(fg, backdrop), backdrop) >= threshold;
+      }
+
+      // One element, one evaluation.
+      const seen = new Set();
+      const uiSelector = 'button, input[type="button"], input[type="submit"], ' +
+        'input[type="reset"], input[type="text"], input[type="email"], ' +
+        'input[type="password"], input[type="search"], input[type="tel"], ' +
+        'input[type="url"], input[type="number"], input[type="date"], ' +
+        'textarea, select, [role="button"], .btn, .button';
+      const graphicSelector = 'svg, canvas, [role="img"], img[role="img"]';
+
+      const targets = [];
+      for (const element of document.querySelectorAll(uiSelector)) {
+        if (seen.has(element)) continue;
+        seen.add(element);
+        targets.push({ element: element, kind: 'ui-component' });
+      }
+      for (const element of document.querySelectorAll(graphicSelector)) {
+        if (seen.has(element)) continue;
+        seen.add(element);
+        targets.push({ element: element, kind: 'graphical-object' });
+      }
+
+      for (const target of targets) {
+        const element = target.element;
+        const elementType = target.kind;
+
+        if (!isVisible(element)) continue;
+        // SC 1.4.11 exception: inactive user interface components.
+        if (__isInactive(element)) continue;
+        if (elementType === 'graphical-object' && !isMeaningfulGraphic(element)) continue;
+
+        const selector = describe(element);
+        const styles = window.getComputedStyle(element);
+        const background = __resolveBackground(element.parentElement || element);
+
+        if (background.indeterminate) {
+          incomplete.push({
+            criterion: '9.1.4.11',
+            element: selector,
+            issue: elementType + '-contrast',
+            description: 'Component sits on an image or gradient background; the rendered contrast cannot be computed from CSS and needs manual review.',
+            backgroundImage: background.indeterminateSource,
+            elementType: elementType
+          });
+          continue;
+        }
+
+        elementsTested++;
+        const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
+        const compliantBorder = __hasCompliantBorder(styles, backdrop, THRESHOLD);
+        const renderedBorder = __getRenderedBorder(styles);
+
+        // Border: only a border that is actually painted can fail.
+        if (renderedBorder && !compliantBorder) {
+          const borderRgb = __parseRgb(renderedBorder.color);
+          if (borderRgb) {
+            const flat = __blendOver(borderRgb, backdrop);
+            const ratio = __getContrastRatio(flat, backdrop);
+            visualEvidence.push({
+              element: selector, type: elementType, contrastType: 'border',
+              contrastRatio: ratio,
+              colors: { foreground: renderedBorder.color, background: rgbString(backdrop) }
             });
+            if (ratio < THRESHOLD && elementType === 'ui-component' &&
+                identifiedByOwnLabel(element, backdrop, THRESHOLD)) {
+              // Decorative border on a text-labelled, unfilled control — see
+              // identifiedByOwnLabel() above. Evidence is already recorded.
+            } else if (ratio < THRESHOLD) {
+              violations.push({
+                criterion: '9.1.4.11',
+                element: selector,
+                issue: elementType + '-contrast',
+                description: `${elementType.replace('-', ' ')} border has insufficient contrast: ${ratio.toFixed(2)}:1`,
+                contrastRatio: ratio,
+                requiredRatio: THRESHOLD,
+                elementType: elementType,
+                suggestion: `Increase border contrast to meet ${THRESHOLD}:1 minimum ratio`
+              });
+            }
           }
+        } else if (compliantBorder) {
+          visualEvidence.push({
+            element: selector, type: elementType, contrastType: 'border',
+            contrastRatio: compliantBorder.ratio,
+            colors: { foreground: compliantBorder.border.color, background: rgbString(backdrop) }
+          });
+        }
+
+        // Fill: SC 1.4.11 covers the visual information REQUIRED to identify
+        // the component. When a compliant border already provides that
+        // boundary, the fill carries no additional requirement — otherwise the
+        // canonical accessible form control (white field, white page, dark
+        // border) fails for no reason.
+        if (compliantBorder) continue;
+
+        const ownBg = __parseRgb(styles.backgroundColor);
+        if (!ownBg || ownBg.a === 0) continue;
+        const flatBg = __blendOver(ownBg, backdrop);
+        const ratio = __getContrastRatio(flatBg, backdrop);
+        visualEvidence.push({
+          element: selector, type: elementType, contrastType: 'background',
+          contrastRatio: ratio,
+          colors: { foreground: styles.backgroundColor, background: rgbString(backdrop) }
         });
-      });
+        if (ratio < THRESHOLD) {
+          violations.push({
+            criterion: '9.1.4.11',
+            element: selector,
+            issue: elementType + '-contrast',
+            description: `${elementType.replace('-', ' ')} background has insufficient contrast: ${ratio.toFixed(2)}:1`,
+            contrastRatio: ratio,
+            requiredRatio: THRESHOLD,
+            elementType: elementType,
+            suggestion: `Increase background contrast to meet ${THRESHOLD}:1 minimum ratio`
+          });
+        }
+      }
 
-      return components;
-    });
-
-    // Test each UI component
-    for (const component of uiComponents) {
-      await this.testComponentContrast(page, scanDir, component, violations, visualEvidence, 'ui-component');
-    }
-  }
-
-  /**
-   * Test graphical object contrast (icons, charts, etc.)
-   */
-  async testGraphicalObjectContrast(page, scanDir, violations, visualEvidence) {
-    console.log('Testing graphical object contrast...');
-
-    const graphicalObjects = await page.evaluate(() => {
-      const objects = [];
-
-      // Find graphical objects
-      const selectors = [
-        'svg',
-        'canvas',
-        '.icon',
-        '.chart',
-        '.graph',
-        '[class*="icon"]',
-        '[class*="chart"]',
-        '[class*="graph"]',
-        'img[role="img"]'
-      ];
-
-      /**
-       * Build a selector that is actually valid CSS.
-       *
-       * Two real-world traps this closes, both found on live sites:
-       *  - React's `useId()` produces ids like ":Rbaqrlaupgqop:" — the colons
-       *    MUST be escaped or `document.querySelector` throws.
-       *  - `class="mzp-c-button "` (trailing space) split naively yields an
-       *    empty token, producing a dangling "." — also a SyntaxError.
-       * Either one aborted the whole contrast sweep on real pages.
-       */
-      const buildSafeSelector = (element, index) => {
-        const esc = (v) => (window.CSS && CSS.escape ? CSS.escape(v) : String(v).replace(/[^\w-]/g, '\\$&'));
-        const rawClass = typeof element.className === 'string' ? element.className : '';
-        const classes = rawClass.trim().split(/\s+/).filter(Boolean);
-        let sel = element.tagName.toLowerCase();
-        if (element.id) return sel + '#' + esc(element.id);
-        if (classes.length) return sel + classes.slice(0, 3).map((c) => '.' + esc(c)).join('');
-        return sel + `:nth-of-type(${index + 1})`;
+      return {
+        violations: violations,
+        incomplete: incomplete,
+        visualEvidence: visualEvidence,
+        elementsTested: elementsTested
       };
-
-      selectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach((element, index) => {
-          const rect = element.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const computed = window.getComputedStyle(element);
-            // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-            const className = typeof element.className === 'string' ? element.className : '';
-
-            const elementSelector = buildSafeSelector(element, index);
-
-            objects.push({
-              selector: elementSelector,
-              type: element.tagName.toLowerCase(),
-              backgroundColor: computed.backgroundColor,
-              color: computed.color,
-              fill: element.getAttribute('fill') || computed.fill,
-              stroke: element.getAttribute('stroke') || computed.stroke,
-              rect: {
-                x: rect.x,
-                y: rect.y,
-                width: rect.width,
-                height: rect.height
-              }
-            });
-          }
-        });
-      });
-
-      return objects;
-    });
-
-    // Test each graphical object
-    for (const object of graphicalObjects) {
-      await this.testComponentContrast(page, scanDir, object, violations, visualEvidence, 'graphical-object');
-    }
+    }, contrastUtils);
   }
 
   /**
@@ -476,174 +518,32 @@ class AdvancedContrastScanner extends BaseScanner {
     }
   }
 
-  /**
-   * Test individual component contrast
-   */
-  async testComponentContrast(page, scanDir, component, violations, visualEvidence, elementType) {
-    const contrastAnalysis = await page.evaluate((comp) => {
-      // Get parent background for comparison
-      let parentBg = 'rgb(255, 255, 255)'; // Default white
-      const element = document.querySelector(comp.selector);
-
-      if (element && element.parentElement) {
-        const parentStyle = window.getComputedStyle(element.parentElement);
-        const parentBgColor = parentStyle.backgroundColor;
-        if (parentBgColor && parentBgColor !== 'rgba(0, 0, 0, 0)') {
-          parentBg = parentBgColor;
-        }
-      }
-
-      // Analyze component colors
-      const results = [];
-
-      // Test background vs parent background
-      if (comp.backgroundColor && comp.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-        const bgRgb = window.parseRgb(comp.backgroundColor);
-        const parentRgb = window.parseRgb(parentBg);
-
-        if (bgRgb && parentRgb) {
-          const ratio = window.getContrastRatio(bgRgb, parentRgb);
-
-          // Skip if background is identical to parent (this is normal for input fields)
-          const colorsDifferent = Math.abs(bgRgb.r - parentRgb.r) > 5 ||
-                                 Math.abs(bgRgb.g - parentRgb.g) > 5 ||
-                                 Math.abs(bgRgb.b - parentRgb.b) > 5;
-
-          if (colorsDifferent) {
-            results.push({
-              type: 'background',
-              ratio: ratio,
-              color1: comp.backgroundColor,
-              color2: parentBg,
-              significant: true
-            });
-          } else {
-            // Still record but mark as non-significant
-            results.push({
-              type: 'background',
-              ratio: ratio,
-              color1: comp.backgroundColor,
-              color2: parentBg,
-              significant: false
-            });
-          }
-        }
-      }
-
-      // Test border contrast - only for visible borders
-      if (comp.borderColor && comp.borderColor !== 'rgba(0, 0, 0, 0)' &&
-          comp.borderWidth && comp.borderWidth !== '0px') {
-        const borderRgb = window.parseRgb(comp.borderColor);
-        const parentRgb = window.parseRgb(parentBg);
-
-        if (borderRgb && parentRgb) {
-          const ratio = window.getContrastRatio(borderRgb, parentRgb);
-          const borderWidthPx = parseFloat(comp.borderWidth);
-
-          results.push({
-            type: 'border',
-            ratio: ratio,
-            color1: comp.borderColor,
-            color2: parentBg,
-            borderWidth: borderWidthPx,
-            significant: borderWidthPx >= 1 // Only significant if border is at least 1px
-          });
-        }
-      }
-
-      return results;
-    }, component);
-
-    // Check if input has good focus indicators (for input border leniency)
-    let hasFocusIndicator = false;
-    if (component.type === 'input' || component.type === 'textarea') {
-      hasFocusIndicator = await page.evaluate((selector) => {
-        const el = document.querySelector(selector);
-        if (!el) return false;
-
-        // Get original border color
-        const originalBorderColor = window.getComputedStyle(el).borderColor;
-
-        // Simulate focus to check focus styles
-        el.focus();
-        const focusStyle = window.getComputedStyle(el);
-        const hasFocusOutline = focusStyle.outline && focusStyle.outline !== 'none';
-        const hasFocusBoxShadow = focusStyle.boxShadow && focusStyle.boxShadow !== 'none';
-        const hasFocusBorderChange = focusStyle.borderColor !== originalBorderColor;
-
-        el.blur(); // Remove focus
-        return hasFocusOutline || hasFocusBoxShadow || hasFocusBorderChange;
-      }, component.selector);
-    }
-
-    // Check contrast ratios and create violations
-    contrastAnalysis.forEach(analysis => {
-      // Different thresholds for different component types
-      let requiredRatio = 3.0; // WCAG 1.4.11 requires 3:1 for UI components
-      let tolerance = 0.05; // Allow small rounding differences
-
-      // For input fields, be more lenient with subtle borders if they have good focus indicators
-      if (component.type === 'input' || component.type === 'textarea') {
-        if (analysis.type === 'border') {
-          if (hasFocusIndicator && analysis.borderWidth < 3) {
-            requiredRatio = 1.5; // Very lenient for inputs with excellent focus indicators
-          } else if (analysis.borderWidth < 2) {
-            requiredRatio = 2.5; // More lenient for thin borders
-          }
-        }
-      }
-
-      // Only flag significant contrast issues
-      const actualRatio = analysis.ratio + tolerance; // Account for rounding
-      const isSignificantIssue = analysis.significant && (actualRatio < requiredRatio);
-
-      if (isSignificantIssue) {
-        violations.push({
-          criterion: "9.1.4.11",
-          element: component.selector,
-          issue: `${elementType}-contrast`,
-          description: `${elementType.replace('-', ' ')} ${analysis.type} has insufficient contrast: ${analysis.ratio.toFixed(2)}:1`,
-          contrastRatio: analysis.ratio,
-          requiredRatio: requiredRatio,
-          elementType: elementType,
-          suggestion: `Increase ${analysis.type} contrast to meet ${requiredRatio}:1 minimum ratio`
-        });
-      }
-
-      // Only add to visual evidence if it's significant
-      if (analysis.significant) {
-        visualEvidence.push({
-          element: component.selector,
-          type: elementType,
-          contrastType: analysis.type,
-          contrastRatio: analysis.ratio,
-          colors: {
-            foreground: analysis.color1,
-            background: analysis.color2
-          }
-        });
-      }
-    });
-  }
 
   /**
-   * Analyze tooltip contrast
+   * Analyze tooltip contrast (SC 1.4.13 hover/focus content).
+   *
+   * A tooltip's own background is frequently transparent (the visible panel is
+   * a child), so the backdrop is resolved through the ancestor chain and
+   * alpha-composited rather than taken at face value.
    */
   async analyzeTooltipContrast(page, tooltip, selector) {
-    const analysis = await page.evaluate((tt) => {
-      const bgRgb = window.parseRgb(tt.backgroundColor);
-      const fgRgb = window.parseRgb(tt.color);
+    const analysis = await page.evaluate((tt, contrastCode) => {
+      eval(contrastCode);
 
-      if (bgRgb && fgRgb) {
+      const bgRgb = __parseRgb(tt.backgroundColor);
+      const fgRgb = __parseRgb(tt.color);
+
+      if (bgRgb && fgRgb && bgRgb.a > 0) {
+        const flatBg = __blendOver(bgRgb, { r: 255, g: 255, b: 255, a: 1 });
         return {
-          contrastRatio: window.getContrastRatio(fgRgb, bgRgb),
+          contrastRatio: __getContrastRatio(__blendOver(fgRgb, flatBg), flatBg),
           backgroundColor: tt.backgroundColor,
           textColor: tt.color
         };
       }
 
-      return { contrastRatio: 21 }; // Perfect contrast if can't parse
-    }, tooltip);
+      return { contrastRatio: 21 }; // Not determinable — never report a failure
+    }, tooltip, contrastUtils);
 
     return analysis;
   }

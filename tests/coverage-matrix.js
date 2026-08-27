@@ -70,6 +70,15 @@ const MANUAL_OVERRIDES = {
       'meaning; DOM-vs-visual order mismatches are routinely intentional, so any ' +
       'static heuristic is a noise generator. axe-core likewise ships no 1.3.2 rule.',
   },
+  '2.5.5': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Target Size (Enhanced) (AAA) — the 44x44 check was removed from ' +
+      'mobile-specific because it was reported as an AA failure on every ' +
+      'healthy page (false-positive-reports/2026-08-09, FP-1). The AA minimum ' +
+      '(2.5.8, 24x24 with the spacing exception) is automated in ' +
+      'input-modalities; the AAA size is a design review item.',
+  },
   '2.4.8': {
     mechanism: MECHANISM.MANUAL,
     justification:
@@ -280,6 +289,11 @@ function collectHarnessCoverage(axeByCriterion, fixturesByCriterion, scanners) {
   for (const [id, def] of Object.entries(llm?.SCANNER_TESTS || {})) {
     for (const c of criteriaOf(id, def)) add(c, 'llm');
   }
+
+  // Golden corpus: real, healthy pages on which the listed criteria's rules
+  // must stay silent (false-positive guard, not a detection guard).
+  const golden = tryRequire('test-golden-corpus.js');
+  for (const c of golden?.GOLDEN_CRITERIA || []) add(c, 'golden');
 
   for (const sc of axeByCriterion.keys()) {
     const fx = fixturesByCriterion.get(sc);
@@ -577,7 +591,7 @@ function renderMarkdown(rows, scanners, fileCount) {
   // ---- the matrix ----
   L.push('## Matrix');
   L.push('');
-  L.push('`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e.');
+  L.push('`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e, `g`=golden corpus (false-positive guard on healthy real pages).');
   L.push('');
   L.push('`Detect` is the LAST RECORDED outcome from the harnesses whose results are checked in');
   L.push('at `docs/sprints/p2-quality/raw/harness-*.json` — an actual measurement, not merely the');
@@ -595,7 +609,7 @@ function renderMarkdown(rows, scanners, fileCount) {
   L.push('|---|---|---|---|---|---|---|---|');
   for (const r of rows) {
     const h = r.harness
-      .map((x) => ({ exclusive: 'x', concurrent: 'c', llm: 'l', 'axe-e2e': 'a' }[x] || '?'))
+      .map((x) => ({ exclusive: 'x', concurrent: 'c', llm: 'l', 'axe-e2e': 'a', golden: 'g' }[x] || '?'))
       .join('');
     const mech = r.mechanism ? `\`${r.mechanism}\`` : '**UNMAPPED**';
     const sup = r.supporting.length ? r.supporting.map((s) => `\`${s}\``).join(', ') : '—';

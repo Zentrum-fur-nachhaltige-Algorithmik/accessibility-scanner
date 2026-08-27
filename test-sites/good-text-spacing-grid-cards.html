@@ -1,0 +1,65 @@
+<!-- WCAG-TEST
+criterion: 1.4.12
+level: AA
+title: Grid cards with overflow:hidden survive 1.4.12 text spacing
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: responsive-design
+description: article.grid.grid-cols-1 with overflow:hidden holds cards whose meta line is an inline-flex row with a span.text-xs ("erfahrungsgemaess 8-16 Wochen Wartezeit"). The row wraps, so with the 1.4.12 overrides (line-height 1.5, letter-spacing .12em, word-spacing .16em, paragraph 2em) nothing is clipped at 320/375/768/1920 px - verified to 0px. Mirrors the gsunde.website card structure that produced text-spacing-failure.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behandlungspakete im Vergleich</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  main, header, footer { max-width: 68rem; margin: 0 auto; padding: .5rem; }
+  h1 { font-size: 1.4rem; overflow-wrap: anywhere; hyphens: auto; }
+  /* The clipping container from the original: a grid that hides overflow. */
+  .grid { display: grid; grid-template-columns: 1fr; gap: 1rem; overflow: hidden; align-items: stretch; }
+  @media (min-width: 64rem) { .grid { grid-template-columns: 1fr auto 1fr; } }
+  .card { position: relative; padding: 1rem; overflow-wrap: anywhere; hyphens: auto; border-radius: .75rem; background: #f1f4f2; display: flex; flex-direction: column; }
+  .divider { width: 1px; background: #c9cfcb; }
+  .meta { margin-top: auto; display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+  h2 { font-size: 1.1rem; overflow-wrap: anywhere; }
+  .text-xs { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: #454b47; }
+  .price { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+</header>
+<main id="inhalt">
+  <h1>Behandlungspakete im Vergleich</h1>
+  <article class="grid" aria-label="Vergleich Kassenleistung und Wahlarzt">
+    <div class="card">
+      <h2>Kassenleistung</h2>
+      <p>Termin uber die Landesstelle, Abrechnung direkt mit der Krankenkasse.</p>
+      <div class="meta">
+        <span class="price">0 Euro</span>
+        <span class="text-xs">erfahrungsgemass 8-16 Wochen Wartezeit</span>
+      </div>
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="card">
+      <h2>Wahlarztleistung</h2>
+      <p>Termin innerhalb weniger Tage, Teilrefundierung durch die Kasse moglich.</p>
+      <div class="meta">
+        <span class="price">120 Euro</span>
+        <span class="text-xs">Termin meist innerhalb von 5 Werktagen</span>
+      </div>
+    </div>
+  </article>
+</main>
+<footer>
+  <p>Musterpraxis, Musterstrasse 1, 1010 Wien</p>
+</footer>
+</body>
+</html>

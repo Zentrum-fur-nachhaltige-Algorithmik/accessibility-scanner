@@ -1,4 +1,5 @@
 const BaseScanner = require('./base-scanner');
+const { findStatementLink } = require('./utils/accessibility-statement');
 
 /**
  * Compliance Monitoring Scanner for EAA Procedural Requirements
@@ -41,7 +42,8 @@ class ComplianceMonitoringScanner extends BaseScanner {
         regularAuditsScheduled: monitoringResults.regularAuditsScheduled,
         issueTrackingSystem: monitoringResults.issueTrackingSystem,
         userFeedbackIntegrated: monitoringResults.userFeedbackIntegrated,
-        continuousImprovementEvidence: monitoringResults.continuousImprovementEvidence
+        continuousImprovementEvidence: monitoringResults.continuousImprovementEvidence,
+        gatedOnMissingStatement: monitoringResults.gatedOnMissingStatement || false
       }
     };
   }
@@ -85,6 +87,26 @@ class ComplianceMonitoringScanner extends BaseScanner {
     console.log('Analyzing compliance monitoring procedures...');
 
     const violations = [];
+
+    // Every rule below asks whether the PUBLISHED accessibility statement
+    // documents a monitoring procedure, an audit schedule, issue tracking,
+    // feedback integration or improvement evidence (EN 301 549 clause 12.2.2).
+    // With no statement on the site there is nothing to judge, and
+    // `accessibility-statement` already reports the one real defect — so stay
+    // silent instead of adding five more findings for the same root cause.
+    const statementLink = await findStatementLink(page);
+    if (!statementLink.found) {
+      return {
+        violations: [],
+        gatedOnMissingStatement: true,
+        monitoringProcedureDocumented: false,
+        regularAuditsScheduled: false,
+        issueTrackingSystem: false,
+        userFeedbackIntegrated: false,
+        continuousImprovementEvidence: false
+      };
+    }
+
     let monitoringProcedureDocumented = false;
     let regularAuditsScheduled = false;
     let issueTrackingSystem = false;

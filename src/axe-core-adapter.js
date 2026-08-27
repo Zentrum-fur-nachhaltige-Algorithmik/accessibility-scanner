@@ -8,10 +8,14 @@
 
 const BaseScanner = require('./base-scanner');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
+const { isHardViolation } = require('./severity');
 
 /**
  * Map axe-core tags to WCAG success criteria strings.
- * Tags like 'wcag143' → '1.4.3', 'wcag2a' → null (level tag, not criterion).
+ * Tags like 'wcag143' → '1.4.3'. Level tags ('wcag2a', 'wcag2aa', 'wcag2aaa',
+ * 'wcag21aa', 'wcag22aa') are not criteria and are skipped here — they stay on
+ * the violation as `axeTags`, where src/wcag-levels.js levelOfViolation() reads
+ * them as the conformance-level fallback.
  */
 function extractWcagCriteria(tags) {
   const criteria = [];
@@ -22,6 +26,25 @@ function extractWcagCriteria(tags) {
     }
   }
   return criteria;
+}
+
+/**
+ * True for axe rules that are Deque best practices rather than WCAG failures.
+ *
+ * axe-core ships ~30 such rules ('region', 'landmark-one-main',
+ * 'page-has-heading-one', 'scrollable-region-focusable', …). They carry the
+ * 'best-practice' tag and NO 'wcag*' tag, and axe's own UI renders them in a
+ * separate "Best practices" bucket. We used to map their impact straight to
+ * a violation severity, so 'region' ("All page content should be contained by
+ * landmarks") arrived as a moderate WCAG violation and cost score points on
+ * every page of the golden corpus, next to real 1.4.3 failures.
+ *
+ * Note the guard is "has best-practice AND no wcag tag": a handful of rules
+ * (e.g. 'aria-allowed-role') are tagged both, and those stay violations.
+ */
+function isBestPracticeOnly(tags) {
+  const t = tags || [];
+  return t.includes('best-practice') && !t.some((tag) => /^wcag/.test(tag));
 }
 
 /**
@@ -117,7 +140,9 @@ class AxeCoreAdapter extends BaseScanner {
 
     return {
       scannerId: this.id,
-      passed: violations.filter(v => v.severity !== 'info').length === 0,
+      // 'info' (axe incomplete) and 'best-practice' (Deque advice, not a WCAG
+      // failure) do not make a page fail — same rule the score uses.
+      passed: violations.filter(isHardViolation).length === 0,
       violations,
       summary: {
         engine: 'axe-core',
@@ -145,7 +170,11 @@ class AxeCoreAdapter extends BaseScanner {
       scannerId: this.id,
       ruleId: rule.id,
       impact: isIncomplete ? 'minor' : (node.impact || rule.impact || 'moderate'),
-      severity: isIncomplete ? 'info' : mapImpactToSeverity(node.impact || rule.impact),
+      severity: isIncomplete
+        ? 'info'
+        : (isBestPracticeOnly(rule.tags)
+            ? 'best-practice'
+            : mapImpactToSeverity(node.impact || rule.impact)),
       description: isIncomplete
         ? `[Needs manual review] ${rule.help}`
         : rule.help,

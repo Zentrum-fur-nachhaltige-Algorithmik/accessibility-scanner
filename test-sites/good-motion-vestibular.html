@@ -159,7 +159,12 @@ description: Motion features with static alternatives
         .video-controls button {
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            border: none;
+            /* WCAG 1.4.11: the 70%-opaque black scrim composites to pure #000
+               over the black video container, so these controls had no visible
+               boundary at all (1.00:1) — only floating white text. A light
+               border restores the boundary at ~14.9:1 without changing the
+               look of the control. */
+            border: 1px solid rgba(255, 255, 255, 0.85);
             padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;

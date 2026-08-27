@@ -1,4 +1,8 @@
 const BaseScanner = require('./base-scanner');
+const {
+  findStatementLink,
+  missingStatementViolation,
+} = require('./utils/accessibility-statement');
 
 /**
  * Accessibility Statement Scanner for EAA Procedural Requirements
@@ -103,13 +107,13 @@ class AccessibilityStatementScanner extends BaseScanner {
     const statementLinkResults = await this.findAccessibilityStatementLink(page);
 
     if (!statementLinkResults.found) {
-      violations.push({
-        criterion: "EAA-Statement",
-        issue: "missing-statement",
-        description: "No accessibility statement found on the website",
-        suggestion: "Create an accessibility statement page and link it from the main navigation or footer",
-        severity: "critical"
-      });
+      // Exactly ONE finding, and not `critical`. Every other rule in this
+      // scanner (and in eaa-procedure / contact-mechanism /
+      // compliance-monitoring) describes a property OF the statement — missing
+      // contact, missing review date, missing monitoring procedure — and is
+      // undecidable while no statement exists. See
+      // src/utils/accessibility-statement.js.
+      violations.push(missingStatementViolation());
 
       return {
         violations,
@@ -138,7 +142,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         description: `Accessibility statement link found but page is not accessible: ${error.message}`,
         element: statementLinkResults.selector,
         suggestion: "Ensure accessibility statement page loads correctly and is accessible",
-        severity: "critical"
+        severity: "serious"
       });
 
       return {
@@ -192,7 +196,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         description: "No contact mechanism provided for accessibility issues",
         element: "main",
         suggestion: "Add contact information (email, phone, or feedback form) for accessibility issues",
-        severity: "critical"
+        severity: "serious"
       });
     }
 
@@ -223,51 +227,10 @@ class AccessibilityStatementScanner extends BaseScanner {
    */
   async findAccessibilityStatementLink(page) {
     console.log('  Looking for accessibility statement link...');
-
-    const linkResults = await page.evaluate(() => {
-      // Common patterns for accessibility statement links
-      const patterns = [
-        // Direct text matches
-        'accessibility statement',
-        'accessibility',
-        'barrierefreiheit',
-        'zugänglichkeit',
-        'erklärung zur barrierefreiheit',
-
-        // Partial matches
-        'statement',
-        'compliance',
-        'a11y'
-      ];
-
-      const links = Array.from(document.querySelectorAll('a[href]'));
-
-      for (const link of links) {
-        const text = link.textContent.toLowerCase().trim();
-        const href = link.getAttribute('href').toLowerCase();
-
-        // Check if link text or href contains accessibility statement patterns
-        for (const pattern of patterns) {
-          if (text.includes(pattern) || href.includes(pattern)) {
-            const fullUrl = link.href; // Gets absolute URL
-            const selector = link.id ? `a#${link.id}` :
-                           link.className ? `a.${link.className.split(' ').join('.')}` :
-                           `a[href="${link.getAttribute('href')}"]`;
-
-            return {
-              found: true,
-              url: fullUrl,
-              text: link.textContent.trim(),
-              selector: selector
-            };
-          }
-        }
-      }
-
-      return { found: false };
-    });
-
-    return linkResults;
+    // Detection lives in src/utils/accessibility-statement.js so that all four
+    // EAA scanners agree on whether a statement exists — they used to disagree,
+    // which is how one missing statement became a dozen findings.
+    return findStatementLink(page);
   }
 
   /**

@@ -1,0 +1,95 @@
+<!-- WCAG-TEST
+criterion: EN 301 549 12.1, EN 301 549 12.2, EN 301 549 12.4
+level: AA
+title: Complete accessibility statement (EN 301 549 clause 12.2.2)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: accessibility-statement, eaa-procedure, contact-mechanism, compliance-monitoring
+description: A full declaration for THIS site - conformance status (WCAG 2.2 AA, partially compliant), the non-accessible content with reasons, the preparation and last review date, a feedback mechanism with e-mail plus a response commitment, a documented review/audit schedule and the enforcement procedure (Sozialministeriumservice / Schlichtungsstelle). Linked from its own footer, so the statement-detection step finds it. Counterpart to good-accessibility-marketing-page.html.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erklaerung zur Barrierefreiheit</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  header, main, footer { max-width: 58rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.35rem; margin-top: 2rem; }
+  dl { margin: 0; }
+  dt { font-weight: 700; margin-top: .75rem; }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+</header>
+<main id="inhalt">
+  <h1>Erklaerung zur Barrierefreiheit</h1>
+  <p>
+    Die Musterpraxis ist bemueht, diese Website barrierefrei zugaenglich zu machen.
+    Rechtsgrundlagen sind das Barrierefreiheitsgesetz (BaFG) und das Bundes-Behindertengleichstellungsgesetz (BGStG).
+  </p>
+
+  <h2>Konformitaetsstatus</h2>
+  <p>
+    Diese Website ist mit WCAG 2.2 Stufe AA (WCAG AA) teilweise konform / partially compliant.
+    Teilweise konform bedeutet, dass einzelne Inhalte die Anforderungen noch nicht vollstaendig erfuellen.
+  </p>
+
+  <h2>Nicht barrierefreie Inhalte (known issues / bekannte Einschraenkungen)</h2>
+  <ul>
+    <li>Aeltere Befund-PDFs vor 2024 sind nicht getaggt und daher nicht vollstaendig vorlesbar. Sie werden bis Ende 2026 ersetzt.</li>
+    <li>Das eingebettete Terminbuchungs-Widget eines Drittanbieters erfuellt Kriterium 2.4.7 (Fokus sichtbar) nicht. Ein Ersatz ist beauftragt.</li>
+    <li>Zwei Erklaervideos aus 2022 haben noch keine Audiodeskription.</li>
+  </ul>
+
+  <h2>Erstellung und Ueberpruefung dieser Erklaerung</h2>
+  <p>
+    Diese Erklaerung wurde am <time datetime="2026-06-01">01.06.2026</time> erstellt.
+    Grundlage war eine externe Pruefung (accessibility audit / accessibility review) nach WCAG 2.2 AA.
+    Letzte Ueberpruefung: <time datetime="2026-06-01">01.06.2026</time> (last updated 01.06.2026).
+  </p>
+
+  <h2>Monitoring, Audit-Plan und Verbesserungen</h2>
+  <p>
+    Wir betreiben ein laufendes accessibility monitoring: ein regular audit findet jaehrlich statt
+    (annual audit, schedule: Juni), zusaetzlich pruefen wir jede groessere Aenderung.
+    Gemeldete accessibility issues werden in einem oeffentlichen issue tracker erfasst und nach
+    Schweregrad abgearbeitet; der Verbesserungsplan (improvement roadmap) wird jaehrlich
+    aktualisiert. User feedback fliesst direkt in diese Planung ein (user feedback integration).
+  </p>
+
+  <h2>Feedback und Kontakt (accessibility feedback)</h2>
+  <p>
+    Sie haben eine Barriere gefunden? Melden Sie das Problem (report accessibility issue) an
+    <a href="mailto:barrierefreiheit@musterpraxis.at">barrierefreiheit@musterpraxis.at</a>
+    oder telefonisch unter <a href="tel:+4312345678">01 234 56 78</a>.
+    Wir antworten within 5 business days (Antwort innerhalb von fuenf Werktagen).
+  </p>
+
+  <h2>Durchsetzungsverfahren</h2>
+  <p>
+    Sind Sie mit unserer Antwort nicht zufrieden, koennen Sie ein Schlichtungsverfahren beim
+    Sozialministeriumservice beantragen. Die Schlichtungsstelle ist unter
+    <a href="mailto:schlichtung@beispiel-sms.at">schlichtung@beispiel-sms.at</a> erreichbar.
+  </p>
+
+  <h2>Kontakt der Ordination</h2>
+  <address>
+    Musterpraxis, Musterstrasse 1, 1010 Wien<br>
+    <a href="mailto:ordination@musterpraxis.at">ordination@musterpraxis.at</a>
+  </address>
+</main>
+<footer>
+  <p><a href="good-accessibility-statement-complete.html">Barrierefreiheit</a> — Musterpraxis, Musterstrasse 1, 1010 Wien</p>
+</footer>
+</body>
+</html>

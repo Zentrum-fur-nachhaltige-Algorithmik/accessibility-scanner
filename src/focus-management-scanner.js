@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { tabWalk, cleanupTabWalk, TAB_ATTR } = require('./utils/keyboard-focus');
 const { injectableCode: contrastUtils } = require('./utils/browser-contrast');
 
 /**
@@ -131,42 +132,37 @@ class FocusManagementScanner extends BaseScanner {
       });
     }
 
-    // 4. Validate focus visibility for all elements
+    // 4. Validate focus visibility for all elements (SC 2.4.7: an indicator
+    //    must exist). Indicator CONTRAST is SC 1.4.11 and is reported once, by
+    //    nontext-contrast — a low-contrast ring is visible, so it is not a
+    //    2.4.7 failure and must not be double-counted here.
     for (const focusItem of focusTestResults.sequence) {
-      if (!focusItem.hasVisibleFocus) {
+      if (!focusItem.hasVisibleFocus && !focusItem.lowContrastFocus && focusItem.indicatorConfirmed) {
         allElementsHaveVisibleFocus = false;
-        if (focusItem.lowContrastFocus) {
-          violations.push({
-            criterion: "9.2.4.7",
-            element: focusItem.element,
-            issue: "low-contrast-focus-indicator",
-            description: `Focus indicator has insufficient contrast against background (requires 3:1 minimum). Outline: ${focusItem.styles?.outlineColor || 'unknown'}, Background: ${focusItem.styles?.backgroundColor || 'unknown'}`,
-            suggestion: "Use a focus indicator color with at least 3:1 contrast ratio against the background"
-          });
-        } else {
-          violations.push({
-            criterion: "9.2.4.7",
-            element: focusItem.element,
-            issue: "no-visible-focus",
-            description: "Element receives focus but has no visible focus indicator",
-            suggestion: "Add CSS :focus styles with visible outline, box-shadow, or background color"
-          });
-        }
+        violations.push({
+          criterion: "9.2.4.7",
+          element: focusItem.element,
+          issue: "no-visible-focus",
+          description: "Element receives focus but has no visible focus indicator",
+          suggestion: "Add CSS :focus-visible styles with visible outline, box-shadow, or background color"
+        });
       }
     }
 
-    // 5. Test focus management in dynamic content
-    const dynamicFocusResults = await this.testDynamicFocusManagement(page, scanDir);
-    violations.push(...dynamicFocusResults.violations);
-
-    // 6. Test focus restoration
-    const focusRestorationResults = await this.testFocusRestoration(page, scanDir);
-    violations.push(...focusRestorationResults.violations);
-
-    // 7. Test focus not obscured (WCAG 2.4.11)
+    // 5. Test focus not obscured (WCAG 2.4.11) — BEFORE the modal tests below
+    //    open dialogs and leave fixed overlays on the page
     let focusNotObscured = true;
     const obscuredResults = await this.analyzeFocusObscured(page, focusTestResults.sequence, violations);
     focusNotObscured = obscuredResults.notObscured;
+
+    // 6. Test focus management in dynamic content
+    const dynamicFocusResults = await this.testDynamicFocusManagement(page, scanDir);
+    violations.push(...dynamicFocusResults.violations);
+
+    // 7. Test focus restoration
+    const focusRestorationResults = await this.testFocusRestoration(page, scanDir);
+    violations.push(...focusRestorationResults.violations);
+
 
     return {
       violations,
@@ -260,155 +256,71 @@ class FocusManagementScanner extends BaseScanner {
   async testFocusSequence(page, scanDir) {
     console.log('Testing focus sequence with visual validation...');
 
+    // Real keyboard Tab via src/utils/keyboard-focus.js: element identity by
+    // tab id (two `a.nav__link`s are two elements, not a "trap"), focus
+    // styles read from the live computed style after a genuine keyboard
+    // focus so `:focus-visible` rules apply. The old loop compared
+    // `getComputedStyle(el, ':focus')` (a pseudo-ELEMENT query that returns
+    // the plain style) against itself, so border/background changes were
+    // never detected.
     const sequence = [];
     const visualAnalysis = [];
-    
-    // Reset focus to body
-    await page.evaluate(() => document.body.focus());
-    
     let stepIndex = 0;
-    const maxSteps = 30;
-    const seenElements = new Set();
 
-    while (stepIndex < maxSteps) {
-      // Take before screenshot
-      const beforePath = path.join(scanDir, `focus-step-${stepIndex.toString().padStart(3, '0')}-before.png`);
-      await page.screenshot({ path: beforePath });
-
-      // Get current focus state
-      const beforeFocus = await page.evaluate(() => {
-        const active = document.activeElement;
-        if (!active || active === document.body) return null;
-
-        const rect = active.getBoundingClientRect();
-        return {
-          element: active.tagName.toLowerCase() + 
-                  (active.id ? `#${active.id}` : '') + 
-                  (active.className ? `.${active.className.split(' ').join('.')}` : ''),
-          rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-          text: active.textContent.trim().substring(0, 30)
-        };
-      });
-
-      // Press Tab
-      await page.keyboard.press('Tab');
-      await new Promise(resolve => setTimeout(resolve, 200)); // Allow focus transition
-
-      // Take after screenshot
-      const afterPath = path.join(scanDir, `focus-step-${stepIndex.toString().padStart(3, '0')}-after.png`);
-      await page.screenshot({ path: afterPath });
-
-      // Get new focus state and analyze visibility
-      const afterFocus = await page.evaluate((contrastCode) => {
-        // Inject contrast utilities
-        eval(contrastCode);
-
-        const active = document.activeElement;
-        if (!active || active === document.body) return null;
-
-        const rect = active.getBoundingClientRect();
-        const computed = window.getComputedStyle(active);
-        // Note: getComputedStyle(el, ':focus') does NOT return pseudo-class styles,
-        // but the element IS focused right now, so computed styles reflect the focus state.
-        const focusComputed = window.getComputedStyle(active, ':focus');
-
-        // Analyze focus visibility — tightened checks for transparent/invisible outlines
-        const outlineColor = computed.outlineColor || '';
-        const isOutlineTransparent = __isColorTransparent(outlineColor);
-
-        let hasOutline = focusComputed.outline &&
-                          focusComputed.outline !== 'none' &&
-                          focusComputed.outlineWidth !== '0px' &&
-                          !isOutlineTransparent;
-
-        // Check outline-to-background contrast ratio (minimum 3:1 per WCAG 2.4.7)
-        let lowContrastFocus = false;
-        if (hasOutline) {
-          const outlineParsed = __parseRgb(outlineColor);
-          const bgParsed = __getEffectiveBackgroundColor(active);
-          if (outlineParsed && bgParsed) {
-            const ratio = __getContrastRatio(outlineParsed, bgParsed);
-            if (ratio < 3) {
-              hasOutline = false;
-              lowContrastFocus = true;
-            }
-          }
-        }
-
-        const hasBoxShadow = focusComputed.boxShadow &&
-                            focusComputed.boxShadow !== 'none';
-
-        const hasBorderChange = focusComputed.border !== computed.border;
-
-        const hasBackgroundChange = focusComputed.backgroundColor !== computed.backgroundColor &&
-                                   focusComputed.backgroundColor !== 'rgba(0, 0, 0, 0)';
-
-        const hasVisibleFocus = hasOutline || hasBoxShadow || hasBorderChange || hasBackgroundChange;
-
-        return {
-          element: active.tagName.toLowerCase() +
-                  (active.id ? `#${active.id}` : '') +
-                  (active.className ? `.${active.className.split(' ').join('.')}` : ''),
-          rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-          text: active.textContent.trim().substring(0, 30),
-          tabIndex: active.tabIndex,
-          hasVisibleFocus,
-          lowContrastFocus,
-          focusIndicators: {
-            outline: hasOutline,
-            boxShadow: hasBoxShadow,
-            borderChange: hasBorderChange,
-            backgroundChange: hasBackgroundChange
-          },
-          styles: {
-            outline: focusComputed.outline,
-            outlineColor: outlineColor,
-            boxShadow: focusComputed.boxShadow,
-            border: focusComputed.border,
-            backgroundColor: focusComputed.backgroundColor
-          }
-        };
-      }, contrastUtils);
-
-      if (afterFocus) {
-        const elementKey = afterFocus.element;
-        
-        // Check for focus trap (same element focused twice)
-        if (beforeFocus && beforeFocus.element === afterFocus.element) {
+    try {
+      for await (const step of tabWalk(page, { maxSteps: 60, settleMs: 120 })) {
+        if (step.stuck) {
           console.log('Focus trap detected, ending sequence');
           break;
         }
+        if (!step.rendered) continue;
 
-        // Check for cycle (element seen before)
-        if (seenElements.has(elementKey)) {
-          console.log('Focus cycle detected, ending sequence');
-          break;
-        }
+        const afterPath = path.join(scanDir, `focus-step-${String(stepIndex).padStart(3, '0')}.png`);
+        try { await page.screenshot({ path: afterPath }); } catch (e) { /* screenshots are best-effort */ }
 
-        seenElements.add(elementKey);
-        sequence.push(afterFocus);
-
-        // Record visual analysis
+        const ind = step.indicator;
+        const item = {
+          element: step.selector,
+          tabId: step.tabId,
+          rect: { x: step.rect.x + step.scrollX, y: step.rect.y + step.scrollY, width: step.rect.width, height: step.rect.height },
+          text: step.text,
+          hasVisibleFocus: ind.visible,
+          lowContrastFocus: ind.lowContrast,
+          // tabWalk re-measures every "no indicator" candidate (blur/refocus
+          // comparison). Without that confirmation the verdict rests on the
+          // absence of evidence in a single sample and must not be reported.
+          indicatorConfirmed: ind.confirmed !== false,
+          focusIndicators: {
+            outline: ind.reasons.includes('outline') || ind.reasons.includes('outline-auto'),
+            boxShadow: ind.reasons.includes('box-shadow'),
+            borderChange: ind.reasons.includes('border'),
+            backgroundChange: ind.reasons.includes('background'),
+            other: ind.reasons.filter(r => !['outline', 'outline-auto', 'box-shadow', 'border', 'background'].includes(r)),
+          },
+          styles: {
+            outline: ind.outline,
+            outlineColor: step.after.outlineColor,
+            boxShadow: step.after.boxShadow,
+            backgroundColor: step.after.backgroundColor,
+            contrastRatio: ind.ratio,
+          },
+        };
+        sequence.push(item);
         visualAnalysis.push({
           step: stepIndex,
-          element: afterFocus.element,
-          beforeScreenshot: `focus-step-${stepIndex.toString().padStart(3, '0')}-before.png`,
-          afterScreenshot: `focus-step-${stepIndex.toString().padStart(3, '0')}-after.png`,
-          focusVisible: afterFocus.hasVisibleFocus,
-          focusIndicators: afterFocus.focusIndicators,
-          position: afterFocus.rect
+          element: item.element,
+          afterScreenshot: path.basename(afterPath),
+          focusVisible: item.hasVisibleFocus,
+          focusIndicators: item.focusIndicators,
+          position: item.rect,
         });
-
-      } else {
-        // No focusable element, end of sequence
-        break;
+        stepIndex++;
       }
-
-      stepIndex++;
+    } finally {
+      await cleanupTabWalk(page);
     }
 
     console.log(`Focus sequence analysis complete: ${sequence.length} focusable elements`);
-    
     return { sequence, visualAnalysis };
   }
 
@@ -423,9 +335,11 @@ class FocusManagementScanner extends BaseScanner {
       const prev = sequence[i - 1];
       const curr = sequence[i];
 
-      // If current element is significantly above previous element, might be illogical
+      // Moving UP is only illogical if we did not also move to a new column
+      // on the right (multi-column footers, sidebars, card grids all do that).
       const yDiff = curr.rect.y - prev.rect.y;
-      if (yDiff < -50) { // Current element is 50px+ above previous
+      const xDiff = curr.rect.x - prev.rect.x;
+      if (yDiff < -50 && xDiff < 50) {
         return false;
       }
 
@@ -792,162 +706,108 @@ class FocusManagementScanner extends BaseScanner {
   async analyzeFocusObscured(page, focusSequence, violations) {
     console.log('Analyzing focus obscured by fixed/sticky elements...');
 
-    // First, collect all fixed/sticky elements and their rects
-    const fixedElements = await page.evaluate(() => {
-      const fixed = [];
-      const allElements = document.querySelectorAll('*');
-
-      allElements.forEach(el => {
-        const style = window.getComputedStyle(el);
-        if (style.position !== 'fixed' && style.position !== 'sticky') return;
-        if (style.display === 'none' || style.visibility === 'hidden') return;
-
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
-
-        const zIndex = parseInt(style.zIndex) || 0;
-        const selector = el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
-
-        fixed.push({
-          selector,
-          position: style.position,
-          rect: { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right,
-                  width: rect.width, height: rect.height },
-          zIndex,
-        });
-      });
-
-      return fixed;
-    });
-
-    if (fixedElements.length === 0) {
-      return { notObscured: true };
-    }
-
-    // Check heuristic: scroll-padding compensation
-    const scrollPaddingCheck = await page.evaluate((fixedEls) => {
-      const htmlStyle = window.getComputedStyle(document.documentElement);
-      const bodyStyle = window.getComputedStyle(document.body);
-
-      const scrollPaddingTop = parseFloat(htmlStyle.scrollPaddingTop) || parseFloat(bodyStyle.scrollPaddingTop) || 0;
-      const scrollPaddingBottom = parseFloat(htmlStyle.scrollPaddingBottom) || parseFloat(bodyStyle.scrollPaddingBottom) || 0;
-
-      // Find top-most fixed header and bottom-most fixed footer
-      let maxHeaderHeight = 0;
-      let maxFooterHeight = 0;
-
-      for (const el of fixedEls) {
-        if (el.rect.top <= 10) maxHeaderHeight = Math.max(maxHeaderHeight, el.rect.height);
-        if (el.rect.bottom >= window.innerHeight - 10) maxFooterHeight = Math.max(maxFooterHeight, el.rect.height);
+    // SC 2.4.11 is about the OUTCOME: when an element receives keyboard focus,
+    // is it entirely hidden behind author-created content? So we tab through
+    // the page for real and hit-test the focused element where it actually
+    // ended up, instead of guessing from scroll-padding vs. header height
+    // (which flagged closed mobile menus and position:static footers, FP-7)
+    // or from stale rectangles that ignored that a link INSIDE a sticky header
+    // is not obscured BY that header (FP-9).
+    const hasFixed = await page.evaluate(() => {
+      for (const el of document.querySelectorAll('*')) {
+        const p = window.getComputedStyle(el).position;
+        if (p === 'fixed' || p === 'sticky') return true;
       }
-
-      return {
-        scrollPaddingTop,
-        scrollPaddingBottom,
-        maxHeaderHeight,
-        maxFooterHeight,
-        missingTopPadding: maxHeaderHeight > 0 && scrollPaddingTop < maxHeaderHeight,
-        missingBottomPadding: maxFooterHeight > 0 && scrollPaddingBottom < maxFooterHeight,
-      };
-    }, fixedElements);
+      return false;
+    });
+    if (!hasFixed) return { notObscured: true };
 
     let notObscured = true;
+    // One overlay, one defect: a fixed call-to-action bar that swallows the
+    // footer links hides ALL of them for the same reason and is fixed once.
+    // Grouped by the covering element, reported with the full element list.
+    const byOverlay = new Map();
 
-    if (scrollPaddingCheck.missingTopPadding) {
-      violations.push({
-        criterion: '9.2.4.11',
-        element: 'html',
-        issue: 'missing-scroll-padding',
-        description: `Fixed header is ${Math.round(scrollPaddingCheck.maxHeaderHeight)}px tall but scroll-padding-top is only ${Math.round(scrollPaddingCheck.scrollPaddingTop)}px — focused elements may scroll behind the header`,
-        severity: 'serious',
-        suggestion: `Add scroll-padding-top: ${Math.round(scrollPaddingCheck.maxHeaderHeight + 10)}px to html or body to prevent focused elements from being hidden behind the fixed header.`,
-      });
-      notObscured = false;
-    }
+    // A 1920x1080 tab fits most pages without scrolling, so nothing can be
+    // scrolled behind a fixed bar. Test at a common laptop viewport instead
+    // and restore afterwards.
+    const prevViewport = page.viewport();
+    await page.setViewport({ width: 1280, height: 720 });
 
-    if (scrollPaddingCheck.missingBottomPadding) {
-      violations.push({
-        criterion: '9.2.4.11',
-        element: 'html',
-        issue: 'missing-scroll-padding',
-        description: `Fixed footer/banner is ${Math.round(scrollPaddingCheck.maxFooterHeight)}px tall but scroll-padding-bottom is only ${Math.round(scrollPaddingCheck.scrollPaddingBottom)}px — focused elements may be hidden behind it`,
-        severity: 'serious',
-        suggestion: `Add scroll-padding-bottom: ${Math.round(scrollPaddingCheck.maxFooterHeight + 10)}px to html or body.`,
-      });
-      notObscured = false;
-    }
+    try {
+      for await (const step of tabWalk(page, { maxSteps: 80, settleMs: 120 })) {
+        if (step.stuck) break;
+        if (!step.rendered) continue;
 
-    // Interactive check: Tab through focusable elements and check overlap with fixed elements
-    // Reset focus to beginning
-    await page.evaluate(() => document.body.focus());
-
-    const maxSteps = 20;
-    const seenElements = new Set();
-
-    for (let i = 0; i < maxSteps; i++) {
-      await page.keyboard.press('Tab');
-      await new Promise(resolve => setTimeout(resolve, 150));
-
-      const overlapResult = await page.evaluate((fixedEls) => {
-        const active = document.activeElement;
-        if (!active || active === document.body) return null;
-
-        const rect = active.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return null;
-
-        const selector = active.tagName.toLowerCase() +
-          (active.id ? `#${active.id}` : '') +
-          (active.className && typeof active.className === 'string' ? `.${active.className.split(' ')[0]}` : '');
-
-        // Check overlap with each fixed element
-        for (const fixedEl of fixedEls) {
-          const f = fixedEl.rect;
-
-          // Calculate overlap area
-          const overlapLeft = Math.max(rect.left, f.left);
-          const overlapRight = Math.min(rect.right, f.right);
-          const overlapTop = Math.max(rect.top, f.top);
-          const overlapBottom = Math.min(rect.bottom, f.bottom);
-
-          if (overlapLeft < overlapRight && overlapTop < overlapBottom) {
-            const overlapArea = (overlapRight - overlapLeft) * (overlapBottom - overlapTop);
-            const elementArea = rect.width * rect.height;
-            const overlapRatio = elementArea > 0 ? overlapArea / elementArea : 0;
-
-            // WCAG 2.4.11 (minimum): violation only if element is ENTIRELY hidden
-            if (overlapRatio >= 0.99) {
-              return {
-                obscured: true,
-                focusedElement: selector,
-                obscuredBy: fixedEl.selector,
-                overlapRatio: Math.round(overlapRatio * 100),
-                fixedPosition: fixedEl.position,
-              };
+        const result = await page.evaluate((ATTR, tabId) => {
+          const el = document.querySelector(`[${ATTR}="${tabId}"]`);
+          if (!el) return null;
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) return null;
+          const inset = Math.min(2, rect.width / 4, rect.height / 4);
+          const points = [
+            [rect.left + rect.width / 2, rect.top + rect.height / 2],
+            [rect.left + inset, rect.top + inset],
+            [rect.right - inset, rect.top + inset],
+            [rect.left + inset, rect.bottom - inset],
+            [rect.right - inset, rect.bottom - inset],
+          ];
+          const vw = window.innerWidth, vh = window.innerHeight;
+          let covered = 0, coverer = null, position = null, offscreen = 0;
+          for (const [x, y] of points) {
+            if (x < 0 || y < 0 || x >= vw || y >= vh) { offscreen++; continue; }
+            const hit = document.elementFromPoint(x, y);
+            if (!hit || hit === el || el.contains(hit) || hit.contains(el)) continue;
+            // Is the covering element (or an ancestor of it) fixed/sticky and NOT an ancestor of el?
+            let n = hit, overlay = null;
+            while (n && n !== document.body) {
+              const pos = window.getComputedStyle(n).position;
+              if ((pos === 'fixed' || pos === 'sticky') && !n.contains(el)) { overlay = n; break; }
+              n = n.parentElement;
+            }
+            if (!overlay) continue;
+            covered++;
+            if (!coverer) {
+              position = window.getComputedStyle(overlay).position;
+              coverer = overlay.tagName.toLowerCase() + (overlay.id ? '#' + overlay.id : '') +
+                (typeof overlay.className === 'string' && overlay.className.trim() ? '.' + overlay.className.trim().split(/\s+/)[0] : '');
             }
           }
+          // Entirely hidden = every on-screen sample point is behind an overlay.
+          const sampled = points.length - offscreen;
+          return { sampled, covered, coverer, position, entirely: sampled > 0 && covered === sampled };
+        }, TAB_ATTR, step.tabId);
+
+        if (!result || !result.entirely) continue;
+        const key = `${result.position}|${result.coverer}`;
+        let group = byOverlay.get(key);
+        if (!group) {
+          group = { coverer: result.coverer, position: result.position, elements: [] };
+          byOverlay.set(key, group);
         }
-
-        return { obscured: false, focusedElement: selector };
-      }, fixedElements);
-
-      if (!overlapResult) break;
-
-      if (seenElements.has(overlapResult.focusedElement)) break;
-      seenElements.add(overlapResult.focusedElement);
-
-      if (overlapResult.obscured) {
-        violations.push({
-          criterion: '9.2.4.11',
-          element: overlapResult.focusedElement,
-          issue: `focus-obscured-by-${overlapResult.fixedPosition}-element`,
-          description: `Focused element "${overlapResult.focusedElement}" is ${overlapResult.overlapRatio}% covered by ${overlapResult.fixedPosition} element "${overlapResult.obscuredBy}"`,
-          severity: 'serious',
-          suggestion: `Add scroll-padding to compensate for ${overlapResult.fixedPosition} elements, or reduce the z-index/size of the overlapping element.`,
-        });
+        if (!group.elements.some((e) => e.selector === step.selector)) {
+          group.elements.push({ selector: step.selector, text: step.text });
+        }
         notObscured = false;
       }
+    } finally {
+      await cleanupTabWalk(page);
+      if (prevViewport) await page.setViewport(prevViewport).catch(() => {});
+    }
+
+    for (const group of byOverlay.values()) {
+      const first = group.elements[0];
+      const more = group.elements.length > 1 ? ` (and ${group.elements.length - 1} more)` : '';
+      violations.push({
+        criterion: '9.2.4.11',
+        element: first.selector,
+        issue: `focus-obscured-by-${group.position}-element`,
+        description: `Focused element "${first.selector}"${more} is entirely hidden behind ${group.position} element "${group.coverer}"`,
+        severity: 'serious',
+        occurrences: group.elements.length,
+        affectedElements: group.elements.slice(0, 25).map((e) => e.selector),
+        suggestion: `Add scroll-padding (or scroll-margin on focus targets) so focused elements scroll clear of "${group.coverer}", or reduce that element's size/z-index.`,
+      });
     }
 
     return { notObscured };

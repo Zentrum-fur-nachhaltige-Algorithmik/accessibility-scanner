@@ -1,17 +1,19 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: renderedCode } = require('./utils/rendered');
+const { injectableCode: clipCode } = require('./utils/text-clipping');
 
 /**
  * Phase 6D: Mobile Specific Accessibility Scanner
- * Implements mobile-specific WCAG criteria: 400% zoom, orientation, touch targets
+ * Implements mobile-specific WCAG criteria: 400% zoom, orientation, viewport meta (touch targets live in input-modalities)
  * Critical for mobile accessibility compliance and responsive design testing
  * CSP-independent implementation using Puppeteer viewport simulation
  */
 class MobileSpecificScanner extends BaseScanner {
     constructor() {
         super('mobile-specific', {
-            wcagCriteria: ['1.4.10', '2.5.5'],
+            wcagCriteria: ['1.4.10'],
             wcagPrinciple: 'operable',
         });
         this.screenshotDir = path.join(__dirname, '../tmp/mobile-screenshots');
@@ -37,7 +39,6 @@ class MobileSpecificScanner extends BaseScanner {
         const scanOptions = {
             test400PercentZoom: true,
             testOrientation: true,
-            testTouchTargets: true,
             testViewportMeta: true,
             testScrollHorizontal: true,
             testInteractionSize: true,
@@ -56,7 +57,7 @@ class MobileSpecificScanner extends BaseScanner {
         // Get the current URL from the already-navigated page for internal re-navigation
         const url = page.url();
 
-        const violations = [];
+        let violations = [];
         const viewportResults = {};
 
         // Auto-dismiss JS dialogs (alert/confirm/prompt). A page that opens a native
@@ -71,6 +72,7 @@ class MobileSpecificScanner extends BaseScanner {
         try {
             // Test on different mobile viewports
             const viewports = scanOptions.mobileViewports || this.mobileViewports;
+            let viewportMetaChecked = false;
             for (const [deviceName, viewport] of Object.entries(viewports)) {
                 console.log(`Testing on ${deviceName}...`);
 
@@ -92,14 +94,9 @@ class MobileSpecificScanner extends BaseScanner {
                     deviceViolations.push(...zoomViolations);
                 }
 
-                // Test touch target sizes
-                if (scanOptions.testTouchTargets) {
-                    const touchViolations = await this.testTouchTargets(page, deviceName);
-                    deviceViolations.push(...touchViolations);
-                }
-
                 // Test viewport meta tag
-                if (scanOptions.testViewportMeta) {
+                if (scanOptions.testViewportMeta && !viewportMetaChecked) {
+                    viewportMetaChecked = true;
                     const viewportViolations = await this.testViewportMeta(page, deviceName);
                     deviceViolations.push(...viewportViolations);
                 }
@@ -134,16 +131,17 @@ class MobileSpecificScanner extends BaseScanner {
             page.off('dialog', dialogHandler);
         }
 
+        violations = this.deduplicateAcrossDevices(violations);
+
         return {
             scannerId: this.id,
-            criteria: ["1.4.4", "1.4.10", "2.5.5"],
+            criteria: ["1.4.4", "1.4.10"],
             passed: violations.length === 0,
             violations: violations,
             summary: {
                 totalDevicesTested: Object.keys(this.mobileViewports).length,
                 zoom400PercentIssues: violations.filter(v => v.category === '400-percent-zoom').length,
-                touchTargetIssues: violations.filter(v => v.category === 'touch-targets').length,
-                orientationIssues: violations.filter(v => v.category === 'orientation').length,
+                                orientationIssues: violations.filter(v => v.category === 'orientation').length,
                 viewportIssues: violations.filter(v => v.category === 'viewport-meta').length,
                 horizontalScrollIssues: violations.filter(v => v.category === 'horizontal-scroll').length,
                 deviceAdaptationIssues: violations.filter(v => v.category === 'device-adaptation').length
@@ -159,7 +157,9 @@ class MobileSpecificScanner extends BaseScanner {
      * Test 400% zoom compliance on mobile devices
      */
     async test400PercentZoom(page, deviceName, viewport) {
-        return await page.evaluate((device, viewportInfo) => {
+        return await page.evaluate((device, viewportInfo, renderedSrc, clipSrc) => {
+            eval(renderedSrc);
+            eval(clipSrc);
             const violations = [];
 
             function getElementSelector(element) {
@@ -282,170 +282,80 @@ class MobileSpecificScanner extends BaseScanner {
                     }
                 }
 
-                // Check for elements with overflow hidden that might hide content at zoom
-                if (computedStyle.overflow === 'hidden' && element.scrollWidth > element.clientWidth) {
-                    violations.push({
-                        type: 'mobile-overflow-hidden-400-zoom',
-                        category: '400-percent-zoom',
-                        severity: 'moderate',
-                        element: getElementSelector(element),
-                        description: 'Element with overflow:hidden may hide content at 400% zoom on mobile',
-                        details: {
-                            device: device,
-                            scrollWidth: element.scrollWidth,
-                            clientWidth: element.clientWidth,
-                            overflow: computedStyle.overflow
-                        },
-                        wcagCriteria: '1.4.4',
-                        impact: 'Content may be hidden at 400% zoom on mobile devices',
-                        recommendation: 'Use overflow: auto or overflow: visible for scalable content'
-                    });
-                }
+                // `mobile-small-text-400-zoom` (font-size < 12px) was removed: browser
+                // and pinch zoom scale px text, so a small px font is never by itself a
+                // 1.4.4 failure — it produced 215 findings on a WCAG-AA-conformant
+                // corpus. The readability hint still exists once, viewport-independently,
+                // as `small-fixed-font` (severity info) in phase6a-text-resize-scanner.
+            }
 
-                // Check for small text that becomes unreadable at mobile zoom
-                const fontSize = computedStyle.fontSize;
-                if (fontSize && fontSize.endsWith('px')) {
-                    const fontSizeValue = parseInt(fontSize);
-                    if (fontSizeValue < 12) { // Very small text on mobile
-                        violations.push({
-                            type: 'mobile-small-text-400-zoom',
-                            category: '400-percent-zoom',
-                            severity: 'moderate',
-                            element: getElementSelector(element),
-                            description: 'Very small text may be unreadable at 400% zoom on mobile',
-                            details: {
-                                device: device,
-                                fontSize: fontSize,
-                                textContent: element.textContent.trim().substring(0, 50)
-                            },
-                            wcagCriteria: '1.4.4',
-                            impact: 'Text may be too small to read comfortably at 400% zoom',
-                            recommendation: 'Use minimum 14px font size for mobile or relative units'
-                        });
-                    }
-                }
+            // Content that is actually clipped away at this viewport. Measured on the
+            // painted glyph boxes (src/utils/text-clipping.js) instead of
+            // `scrollWidth > clientWidth`, which fires on any container whose child
+            // box sticks out by a few rounded pixels while all text stays visible.
+            for (const clip of window.__findClippedText({ minChars: 3 })) {
+                violations.push({
+                    type: 'mobile-overflow-hidden-400-zoom',
+                    category: '400-percent-zoom',
+                    // line-clamp/ellipsis is authored truncation, identical at every
+                    // width, with the full text still in the accessibility tree.
+                    severity: clip.truncationDeclared ? 'info' : 'moderate',
+                    element: clip.selector,
+                    description: clip.truncationDeclared
+                        ? `Element truncates text on purpose (line-clamp/ellipsis) at ${viewportInfo.width}px viewport width`
+                        : `Element with overflow:hidden clips text at ${viewportInfo.width}px viewport width`,
+                    details: {
+                        device: device,
+                        truncationDeclared: clip.truncationDeclared,
+                        lineClamp: clip.lineClamp,
+                        viewportWidth: viewportInfo.width,
+                        axis: clip.axis,
+                        overshootX: clip.overshootX,
+                        overshootY: clip.overshootY,
+                        clippedCharacters: clip.clippedChars,
+                        clippedTextSamples: clip.samples,
+                        scrollWidth: clip.scrollWidth,
+                        clientWidth: clip.clientWidth,
+                        overflow: clip.overflow
+                    },
+                    wcagCriteria: '1.4.10',
+                    impact: 'Text is cut off and cannot be revealed by scrolling on this device width',
+                    recommendation: 'Use overflow: auto/visible or let the container reflow instead of clipping'
+                });
             }
 
             return violations;
-        }, deviceName, viewport);
+        }, deviceName, viewport, renderedCode, clipCode);
     }
 
     /**
-     * Test touch target sizes for mobile accessibility
+     * Touch-target size (WCAG 2.5.8, 24x24 CSS px with the spacing exception) is
+     * checked ONCE, viewport-independently, by input-modalities-scanner.js
+     * (analyzeTargetSize). The former per-device 44px check here applied the
+     * AAA threshold (2.5.5), counted non-interactive elements, and multiplied
+     * every hit by five device profiles — ~1000 false positives per healthy
+     * page (false-positive-reports/2026-08-09, FP-1/FP-14).
      */
-    async testTouchTargets(page, deviceName) {
-        return await page.evaluate((device) => {
-            const violations = [];
 
-            function getElementSelector(element) {
-                const tagName = element.tagName.toLowerCase();
-                const id = element.id ? `#${element.id}` : '';
-                const className = element.className && typeof element.className === 'string' 
-                    ? `.${element.className.split(' ')[0]}` 
-                    : '';
-                return `${tagName}${id}${className}`;
+    /**
+     * One finding per (type, element) across all device profiles. The same
+     * overflowing element measured on five devices is one defect, not five;
+     * the devices it was seen on are kept in `affectedDevices`.
+     */
+    deduplicateAcrossDevices(violations) {
+        const map = new Map();
+        for (const v of violations) {
+            const key = `${v.type}::${v.element || ''}`;
+            const device = v.details && v.details.device;
+            if (map.has(key)) {
+                const existing = map.get(key);
+                if (device && !existing.affectedDevices.includes(device)) existing.affectedDevices.push(device);
+                continue;
             }
-
-            // Find all interactive elements
-            const interactiveElements = document.querySelectorAll(
-                'button, input, select, textarea, a, [role="button"], [role="link"], ' +
-                '[tabindex], [onclick], [ontouch], .btn, .button, .link'
-            );
-
-            function isSrOnlyTouch(el) {
-                if (!el || el.nodeType !== 1) return false;
-                const cls = el.className || '';
-                if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
-                const s = window.getComputedStyle(el);
-                if (s.position !== 'absolute' && s.position !== 'fixed') return false;
-                const w = parseFloat(s.width), h = parseFloat(s.height);
-                if (w > 1 || h > 1) return false;
-                if (s.overflow !== 'hidden') return false;
-                return true;
-            }
-
-            for (let i = 0; i < interactiveElements.length; i++) {
-                const element = interactiveElements[i];
-                if (isSrOnlyTouch(element)) continue;
-                const rect = element.getBoundingClientRect();
-
-                // WCAG 2.5.8 (AA) requires minimum 24x24 CSS pixels for touch targets
-                // WCAG 2.5.5 (AAA) recommends 44x44 CSS pixels
-                const tag = element.tagName.toLowerCase();
-                const isStandardControl = ['input', 'select', 'textarea', 'button'].includes(tag);
-                // Standard form controls use 24px (WCAG 2.5.8 AA); custom elements use 44px (WCAG 2.5.5 AAA)
-                const minSize = isStandardControl ? 24 : 44;
-
-                if (rect.width > 0 && rect.height > 0) { // Element is visible
-                    if (rect.width < minSize || rect.height < minSize) {
-                        violations.push({
-                            type: 'touch-target-too-small',
-                            category: 'touch-targets',
-                            severity: rect.width < 24 || rect.height < 24 ? 'serious' : 'moderate',
-                            element: getElementSelector(element),
-                            description: `Touch target smaller than minimum ${minSize}x${minSize} CSS pixels`,
-                            details: {
-                                device: device,
-                                width: Math.round(rect.width),
-                                height: Math.round(rect.height),
-                                minRequiredSize: minSize,
-                                elementType: tag,
-                                elementText: element.textContent.trim().substring(0, 30),
-                                role: element.getAttribute('role'),
-                                isButton: element.tagName === 'BUTTON' || element.getAttribute('role') === 'button',
-                                isLink: element.tagName === 'A' || element.getAttribute('role') === 'link'
-                            },
-                            wcagCriteria: isStandardControl ? '2.5.8' : '2.5.5',
-                            impact: 'Touch target may be difficult to activate on mobile devices',
-                            recommendation: `Increase touch target size to minimum ${minSize}x${minSize} CSS pixels`
-                        });
-                    }
-
-                    // Check spacing between touch targets
-                    const nearbyElements = Array.from(interactiveElements).filter(other => {
-                        if (other === element) return false;
-                        const otherRect = other.getBoundingClientRect();
-                        
-                        // Check if elements are close to each other
-                        const horizontalOverlap = Math.max(0, Math.min(rect.right, otherRect.right) - Math.max(rect.left, otherRect.left));
-                        const verticalOverlap = Math.max(0, Math.min(rect.bottom, otherRect.bottom) - Math.max(rect.top, otherRect.top));
-                        
-                        // Elements are close if they're within 8px of each other
-                        const horizontalDistance = horizontalOverlap > 0 ? 0 : Math.min(
-                            Math.abs(rect.right - otherRect.left),
-                            Math.abs(otherRect.right - rect.left)
-                        );
-                        const verticalDistance = verticalOverlap > 0 ? 0 : Math.min(
-                            Math.abs(rect.bottom - otherRect.top),
-                            Math.abs(otherRect.bottom - rect.top)
-                        );
-                        
-                        return horizontalDistance < 8 || verticalDistance < 8;
-                    });
-
-                    if (nearbyElements.length > 0) {
-                        violations.push({
-                            type: 'touch-targets-too-close',
-                            category: 'touch-targets',
-                            severity: 'moderate',
-                            element: getElementSelector(element),
-                            description: 'Touch targets are too close together (less than 8px spacing)',
-                            details: {
-                                device: device,
-                                elementText: element.textContent.trim().substring(0, 30),
-                                nearbyTargetsCount: nearbyElements.length,
-                                recommendedSpacing: '8px minimum'
-                            },
-                            wcagCriteria: '2.5.5',
-                            impact: 'Users may accidentally activate wrong touch targets',
-                            recommendation: 'Add minimum 8px spacing between touch targets'
-                        });
-                    }
-                }
-            }
-
-            return violations;
-        }, deviceName);
+            const copy = { ...v, affectedDevices: device ? [device] : [] };
+            map.set(key, copy);
+        }
+        return [...map.values()];
     }
 
     /**
@@ -543,7 +453,7 @@ class MobileSpecificScanner extends BaseScanner {
             const bodyScrollWidth = document.body.scrollWidth;
             const windowWidth = window.innerWidth;
             
-            if (bodyScrollWidth > windowWidth) {
+            if (bodyScrollWidth > windowWidth + 1) {
                 violations.push({
                     type: 'horizontal-scroll-mobile',
                     category: 'horizontal-scroll',
@@ -563,13 +473,27 @@ class MobileSpecificScanner extends BaseScanner {
                 });
             }
 
-            // Find elements that cause horizontal overflow
-            const allElements = document.querySelectorAll('*');
+            // Find elements that cause horizontal overflow. Only meaningful when the
+            // document itself overflows: an element sticking out of an
+            // overflow:hidden ancestor never produces a scrollbar (it is clipped,
+            // which the 400%-zoom check reports separately), and a 0x0 or
+            // display:none element has no box to overflow with.
+            const allElements = bodyScrollWidth > windowWidth + 1 ? document.querySelectorAll('body *') : [];
+            function clippedByAncestor(el) {
+                let p = el.parentElement;
+                while (p && p !== document.body) {
+                    const ox = window.getComputedStyle(p).overflowX;
+                    if (ox === 'hidden' || ox === 'clip' || ox === 'auto' || ox === 'scroll') return true;
+                    p = p.parentElement;
+                }
+                return false;
+            }
             for (let i = 0; i < allElements.length; i++) {
                 const element = allElements[i];
                 const rect = element.getBoundingClientRect();
-                
-                if (rect.right > windowWidth + 10) { // 10px tolerance
+                if (rect.width === 0 || rect.height === 0) continue;
+
+                if (rect.right > windowWidth + 10 && !clippedByAncestor(element)) { // 10px tolerance
                     const computedStyle = window.getComputedStyle(element);
                     
                     violations.push({
@@ -620,7 +544,7 @@ class MobileSpecificScanner extends BaseScanner {
                 const img = images[i];
                 const rect = img.getBoundingClientRect();
                 
-                if (rect.width > viewportInfo.width) {
+                if (rect.width > viewportInfo.width + 1) {
                     violations.push({
                         type: 'image-not-responsive',
                         category: 'device-adaptation',
@@ -646,11 +570,19 @@ class MobileSpecificScanner extends BaseScanner {
             for (let i = 0; i < tables.length; i++) {
                 const table = tables[i];
                 const rect = table.getBoundingClientRect();
-                
-                if (rect.width > viewportInfo.width) {
-                    const hasResponsiveContainer = table.closest('.table-responsive, .overflow-auto, [style*="overflow"]');
-                    
-                    if (!hasResponsiveContainer) {
+
+                if (rect.width > viewportInfo.width + 1) {
+                    // A table wider than the viewport is only a problem if the user
+                    // cannot scroll to it: class-name matching missed every
+                    // `overflow-x: auto` wrapper that was styled without one of the
+                    // three hard-coded class names.
+                    let scrollableAncestor = null;
+                    for (let p = table.parentElement; p && p !== document.body; p = p.parentElement) {
+                        const ox = window.getComputedStyle(p).overflowX;
+                        if (ox === 'auto' || ox === 'scroll') { scrollableAncestor = p; break; }
+                    }
+
+                    if (!scrollableAncestor) {
                         violations.push({
                             type: 'table-not-responsive',
                             category: 'device-adaptation',
@@ -696,24 +628,13 @@ class MobileSpecificScanner extends BaseScanner {
                 const bodyHeight = document.body.scrollHeight;
                 const windowHeight = window.innerHeight;
 
-                if (bodyHeight > windowHeight * 3) { // Very tall content in landscape
-                    violations.push({
-                        type: 'landscape-excessive-height',
-                        category: 'orientation',
-                        severity: 'moderate',
-                        element: 'body',
-                        description: 'Content is excessively tall in landscape orientation',
-                        details: {
-                            orientation: 'landscape',
-                            bodyHeight: bodyHeight,
-                            windowHeight: windowHeight,
-                            ratio: Math.round(bodyHeight / windowHeight * 10) / 10
-                        },
-                        wcagCriteria: '1.4.10',
-                        impact: 'Poor user experience in landscape orientation',
-                        recommendation: 'Optimize content layout for landscape viewing'
-                    });
-                }
+                // `landscape-excessive-height` was removed: no WCAG criterion limits
+                // page length, and 1.3.4 (Orientation) is about *locking* an
+                // orientation, not about vertical scrolling. Every long landing page
+                // in the golden corpus tripped it (8/8 routes). What 1.3.4/1.4.10
+                // actually require in landscape — no horizontal scrolling, no content
+                // loss — is measured by the checks below and by test400PercentZoom.
+                void bodyHeight; void windowHeight;
 
                 return violations;
             });
@@ -772,15 +693,6 @@ class MobileSpecificScanner extends BaseScanner {
         const recommendations = [];
         const issueTypes = [...new Set(violations.map(v => v.type))];
 
-        if (issueTypes.some(type => type.includes('touch-target'))) {
-            recommendations.push({
-                priority: 'critical',
-                issue: 'Touch targets too small or too close together',
-                solution: 'Ensure all touch targets are minimum 44x44 CSS pixels with 8px spacing',
-                implementation: 'Use CSS to set min-width: 44px; min-height: 44px; and add margin between interactive elements'
-            });
-        }
-
         if (issueTypes.some(type => type.includes('viewport'))) {
             recommendations.push({
                 priority: 'critical',
@@ -827,7 +739,7 @@ class MobileSpecificScanner extends BaseScanner {
         return {
             overview: {
                 purpose: 'Mobile accessibility ensures content is usable on smartphones and tablets',
-                keyRequirements: ['44px touch targets', '400% zoom support', 'No horizontal scrolling', 'Orientation flexibility'],
+                keyRequirements: ['400% zoom support', 'No horizontal scrolling', 'Orientation flexibility'],
                 testingDevices: ['iPhone', 'Android phones', 'Tablets in both orientations']
             },
             testingProcedures: {
@@ -841,17 +753,6 @@ class MobileSpecificScanner extends BaseScanner {
                     ],
                     tools: ['Real mobile devices', 'Browser dev tools device simulation'],
                     wcagCriteria: '1.4.4 - Resize text'
-                },
-                touchTargets: {
-                    steps: [
-                        '1. Identify all interactive elements',
-                        '2. Measure touch target sizes',
-                        '3. Test activation with finger touch',
-                        '4. Verify 44x44px minimum size',
-                        '5. Check spacing between targets'
-                    ],
-                    tools: ['Touch target measurement tools', 'Mobile device testing'],
-                    wcagCriteria: '2.5.5 - Target Size'
                 },
                 orientation: {
                     steps: [

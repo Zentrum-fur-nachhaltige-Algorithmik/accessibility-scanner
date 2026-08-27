@@ -175,6 +175,7 @@ class ScanPipeline {
     const scannerSummaries = {};
 
     const { trustTier, trustReason } = require('./scanner-trust');
+    const { levelOfViolation } = require('./wcag-levels');
 
     for (const result of scannerResults) {
       const tier = trustTier(result.scannerId);
@@ -187,6 +188,16 @@ class ScanPipeline {
           if (tier === 'experimental') {
             v.experimental = true;
             v.confidence = 'low';
+          }
+          // Conformance level. A finding whose every criterion is AAA is
+          // advisory for an AA audit: it is kept, but as 'info' so it neither
+          // drives the score nor sits among the AA failures in the report.
+          const level = levelOfViolation(v);
+          if (level) v.wcagLevel = level;
+          if (level === 'AAA' && v.severity !== 'info') {
+            v.originalSeverity = v.severity ?? null;
+            v.severity = 'info';
+            v.aaa = true;
           }
           allViolations.push(v);
         }
@@ -202,7 +213,7 @@ class ScanPipeline {
       };
     }
 
-    const violations = this.reconcileIncompleteReviews(allViolations, scannerResults);
+    const violations = this.dedupeProcedureFindings(this.reconcileIncompleteReviews(allViolations, scannerResults));
     const categories = this.categorizeViolations(violations);
 
     return {
@@ -245,27 +256,54 @@ class ScanPipeline {
   }
 
   /**
-   * Violation-weighted score: start at 100, deduct per violation by severity.
-   * - critical: -10
-   * - serious:  -5
-   * - moderate: -2
-   * - minor:    -1
-   * - info, best-practice: 0 (incomplete results, advisory only)
-   * Floor at 0.
+   * Violation-weighted score, 0..100.
+   *
+   * Severity weights and the aggregation both live in src/severity.js: repeated
+   * instances of ONE rule count sub-linearly (they are one defect with one fix)
+   * and the penalty is mapped through exponential decay instead of being
+   * subtracted and clipped at 0 — the old `100 - sum(weights)` returned 0 for
+   * every page with more than a handful of findings, which is why the golden
+   * corpus scored 0 across the board.
    */
   computeViolationWeightedScore(violations) {
-    const weights = { critical: 10, serious: 5, moderate: 2, minor: 1 };
-    let penalty = 0;
+    const { violationPenalty, scoreFromPenalty } = require('./severity');
+    return scoreFromPenalty(violationPenalty(violations));
+  }
+
+  /**
+   * Collapse the EAA/EN 301 549 procedural findings that several scanners
+   * report about the same site-wide fact.
+   *
+   * `accessibility-statement`, `eaa-procedure`, `contact-mechanism` and
+   * `compliance-monitoring` overlap by design — they all read the same footer
+   * and the same statement page. A missing statement is one defect, but it
+   * arrived from two scanners as two findings; these rules carry no element
+   * identity (they are about the website, not a node), so identity is
+   * (criterion, rule, element).
+   */
+  dedupeProcedureFindings(violations) {
+    const { ruleKey } = require('./severity');
+    const seen = new Map();
+    const out = [];
+
     for (const v of violations) {
-      const raw = (v.severity || v.impact || 'moderate').toLowerCase();
-      let sev = raw;
-      if (raw === 'error') sev = 'critical';
-      else if (raw === 'major' || raw === 'high') sev = 'serious';
-      else if (raw === 'warning') sev = 'moderate';
-      const w = weights[sev];
-      if (w) penalty += w;
+      const criterion = String(v.criterion || '');
+      const isProcedural = criterion.startsWith('EAA-') || criterion.startsWith('EN 301 549');
+      if (!isProcedural) {
+        out.push(v);
+        continue;
+      }
+      const key = `${criterion}|${ruleKey(v)}|${v.element || ''}`;
+      const first = seen.get(key);
+      if (first) {
+        first.alsoReportedBy = [...(first.alsoReportedBy || []), v.scannerId].filter(Boolean);
+        continue;
+      }
+      seen.set(key, v);
+      out.push(v);
     }
-    return Math.max(0, 100 - penalty);
+
+    return out;
   }
 
   /**

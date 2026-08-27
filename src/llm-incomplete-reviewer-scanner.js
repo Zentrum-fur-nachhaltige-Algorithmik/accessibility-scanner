@@ -34,6 +34,7 @@
 
 const LLMBaseScanner = require('./llm-base-scanner');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
+const { injectableCode: contrastCode } = require('./utils/browser-contrast');
 
 /** Cost/latency guards. */
 const MAX_NODES = 24;      // hard cap on reviewed nodes per page
@@ -97,7 +98,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
     }
 
     const capped = reviewable.slice(0, MAX_NODES);
-    const dossiers = await this._buildDossiers(page, capped);
+    const allDossiers = await this._buildDossiers(page, capped);
 
     const violations = [];
     const suppressed = [];
@@ -105,6 +106,62 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
     const criteriaSeen = new Set();
     let llmModel = 'unknown';
     let failedBatches = 0;
+    let decidedInCode = 0;
+
+    // Gradient backgrounds are decided arithmetically, never by the model:
+    // an LLM "estimating" a gradient's contrast produced confirmed false
+    // positives (FP-13). min ratio passes → pass; max ratio fails → fail;
+    // anything in between stays uncertain.
+    const dossiers = [];
+    for (const d of allDossiers) {
+      const g = d.measured && d.measured.contrast && d.measured.contrast.gradientRatio;
+      const hasGradient = d.measured && d.measured.contrast && d.measured.contrast.hasBackgroundImageInChain;
+      if (d.evidenceKind !== 'contrast' || !hasGradient) { dossiers.push(d); continue; }
+      decidedInCode++;
+      const criteria = this._criteriaFor(d.tags);
+      criteria.forEach((c) => criteriaSeen.add(c));
+      const enhanced = d.axeRuleId === 'color-contrast-enhanced';
+      const large = !!d.measured.contrast.largeText;
+      const threshold = enhanced ? (large ? 4.5 : 7) : (large ? 3 : 4.5);
+      const common = {
+        scannerId: this.id,
+        ruleId: d.axeRuleId,
+        nodes: [{ selector: d.selector }],
+        helpUrl: d.helpUrl,
+        wcagCriteria: criteria,
+        source: 'llm-incomplete-reviewer',
+        reviewedAxeRule: d.axeRuleId,
+        reviewedSelector: d.selector,
+      };
+      if (g && g.min >= threshold) {
+        suppressed.push({
+          axeRuleId: d.axeRuleId,
+          selector: d.selector,
+          reason: `gradient background: worst-stop contrast ${g.min}:1 >= ${threshold}:1 (computed, ${g.stops} stops)`,
+        });
+      } else if (g && g.max < threshold) {
+        violations.push({
+          ...common,
+          impact: d.impact || 'moderate',
+          severity: 'violation',
+          confidence: 'high',
+          description:
+            `${d.help} — text colour ${d.measured.contrast.color} against every stop of the gradient ` +
+            `background is below ${threshold}:1 (best stop ${g.max}:1, computed).`,
+        });
+      } else {
+        uncertain.push({ axeRuleId: d.axeRuleId, selector: d.selector });
+        violations.push({
+          ...common,
+          impact: 'minor',
+          severity: 'info',
+          confidence: 'low',
+          description:
+            `[Needs human review] ${d.help} — gradient/image background` +
+            (g ? ` (contrast ranges ${g.min}:1 – ${g.max}:1 across stops, threshold ${threshold}:1)` : ' could not be resolved') + '.',
+        });
+      }
+    }
 
     for (let i = 0; i < dossiers.length; i += BATCH_SIZE) {
       const batch = dossiers.slice(i, i + BATCH_SIZE);
@@ -191,7 +248,8 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
         llmModel,
         incompleteRules: incomplete.length,
         incompleteNodes: reviewable.length,
-        reviewedNodes: dossiers.length,
+        reviewedNodes: allDossiers.length,
+        decidedInCode,
         cappedAt: reviewable.length > MAX_NODES ? MAX_NODES : null,
         promoted: violations.filter((v) => v.severity !== 'info').length,
         suppressed,
@@ -236,23 +294,21 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
       failureSummary: (node.failureSummary || '').slice(0, 400),
     }));
 
-    const measured = await page.evaluate((reqs, maxHtml) => {
-      function parseRgb(s) {
-        if (!s) return null;
-        const m = s.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
-        if (!m) return null;
-        return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
-      }
-      function lum(c) {
-        const [r, g, b] = [c.r, c.g, c.b].map((v) => {
-          v /= 255;
-          return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-        });
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      }
-      function ratio(a, b) {
-        const l1 = lum(a), l2 = lum(b);
-        return ((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05));
+    const measured = await page.evaluate((reqs, maxHtml, contrastCode) => {
+      eval(contrastCode);
+      const parseRgb = __parseRgb;
+      const ratio = __getContrastRatio;
+      /** Colour stops of linear-/radial-/conic-gradient() values (first layer only). */
+      function gradientStops(bgImage) {
+        if (!bgImage || !/gradient\(/.test(bgImage)) return [];
+        const stops = [];
+        const re = /(rgba?\([^)]*\)|#[0-9a-f]{3,8}|\b(?:transparent|white|black|red|blue|green|gray|grey|silver|navy|teal|maroon|olive|purple|yellow|orange|aqua|fuchsia|lime)\b)/gi;
+        let m;
+        while ((m = re.exec(bgImage))) {
+          const c = parseRgb(m[1].toLowerCase());
+          if (c) stops.push(c);
+        }
+        return stops;
       }
       function bgChain(el) {
         const chain = [];
@@ -263,6 +319,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
             tag: cur.tagName.toLowerCase(),
             backgroundColor: cs.backgroundColor,
             backgroundImage: cs.backgroundImage === 'none' ? null : cs.backgroundImage.slice(0, 120),
+            backgroundImageFull: cs.backgroundImage === 'none' ? null : cs.backgroundImage,
             opacity: cs.opacity,
           });
           if (chain.length >= 6) break;
@@ -309,7 +366,25 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
             return p && p.a > 0;
           });
           const bg = solid ? parseRgb(solid.backgroundColor) : null;
+          // Gradient backgrounds: ratio range of the text against every colour
+          // stop (composited over the first solid colour when translucent).
+          let gradientRatio = null;
+          const gradientLayer = chain.find((c) => c.backgroundImageFull && /gradient\(/.test(c.backgroundImageFull));
+          if (fg && gradientLayer) {
+            const stops = gradientStops(gradientLayer.backgroundImageFull);
+            const base = bg || { r: 255, g: 255, b: 255, a: 1 };
+            const ratios = stops.map((st) => ratio(fg, st.a < 1 ? __blendOver(st, base) : st));
+            if (ratios.length) {
+              gradientRatio = {
+                min: Math.round(Math.min(...ratios) * 100) / 100,
+                max: Math.round(Math.max(...ratios) * 100) / 100,
+                stops: stops.length,
+              };
+            }
+          }
           out.contrast = {
+            largeText: __isLargeText(cs),
+            gradientRatio,
             color: cs.color,
             fontSize: cs.fontSize,
             fontWeight: cs.fontWeight,
@@ -383,8 +458,11 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
 
         return out;
       });
-    }, requests, MAX_HTML_CHARS);
+    }, requests, MAX_HTML_CHARS, contrastCode);
 
+    for (const m of measured) {
+      for (const c of (m.contrast && m.contrast.backgroundChain) || []) delete c.backgroundImageFull;
+    }
     const byRef = new Map(measured.map((m) => [m.ref, m]));
     return requests
       .map((r) => ({ ...r, measured: byRef.get(r.ref) }))

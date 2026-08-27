@@ -304,7 +304,43 @@ class ScreenReaderScanner extends BaseScanner {
         const headerCells = table.querySelectorAll(
           'th, [role="columnheader"], [role="rowheader"]'
         );
-        if (headerCells.length === 0) {
+
+        // SC 1.3.1 only requires relationships that are CONVEYED VISUALLY to
+        // be programmatically determinable. A two-column key/value table
+        // (opening hours, price list, contact facts) conveys exactly one
+        // relationship — "the two cells on this line belong together" — and
+        // that relationship is already exposed by the row itself. There is no
+        // visually marked header to lose. Requiring <th> there flags healthy
+        // markup, so a missing header is only a defect when the table
+        // actually presents a header axis:
+        //   (a) merged cells (colspan/rowspan) — the layout only parses with
+        //       headers to anchor the spans;
+        //   (b) a visually emphasised first row (bold/strong or its own
+        //       background) — a header row the author drew but did not mark up
+        //       (WCAG F91);
+        //   (c) three or more columns — each cell's meaning then depends on
+        //       its column, and the column's meaning is conveyed visually by
+        //       the top row.
+        const hasSpans = Array.from(table.querySelectorAll('td, th')).some(
+          c => c.colSpan > 1 || c.rowSpan > 1
+        );
+        const firstRow = rows[0];
+        const firstRowCells = firstRow ? Array.from(firstRow.cells) : [];
+        const bodyRowBg = rows[1]
+          ? window.getComputedStyle(rows[1].cells[0] || rows[1]).backgroundColor
+          : '';
+        const firstRowEmphasised = firstRowCells.length > 0 && firstRowCells.every(c => {
+          const cs = window.getComputedStyle(c);
+          const bold = parseInt(cs.fontWeight, 10) >= 600 || !!c.querySelector('strong, b');
+          const ownBg = cs.backgroundColor;
+          const rowBg = window.getComputedStyle(firstRow).backgroundColor;
+          const distinctBg = (ownBg !== bodyRowBg && ownBg !== 'rgba(0, 0, 0, 0)') ||
+            (rowBg !== bodyRowBg && rowBg !== 'rgba(0, 0, 0, 0)');
+          return bold || distinctBg;
+        });
+        const presentsHeaderAxis = hasSpans || firstRowEmphasised || maxCols >= 3;
+
+        if (headerCells.length === 0 && presentsHeaderAxis) {
           problematic.push({
             selector: getElementSelector(table),
             rows: rows.length,

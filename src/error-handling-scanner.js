@@ -360,7 +360,15 @@ class ErrorHandlingScanner extends BaseScanner {
         const hasAriaLabelledBy = field.hasAttribute('aria-labelledby');
         const hasPlaceholder = field.hasAttribute('placeholder');
 
-        if (!hasLabel && !hasAriaLabel && !hasAriaLabelledBy) {
+        // `<input type="image">` takes its accessible name from `alt` and
+        // `<input type="reset">` from `value` — those ARE names, so a
+        // correctly-named image submit button is not an unlabelled field.
+        // (hidden/submit/button are already returned above.)
+        const hasNativeAttributeName =
+          (fieldType === 'image' && !!(field.getAttribute('alt') || '').trim()) ||
+          (fieldType === 'reset' && !!(field.getAttribute('value') || '').trim());
+
+        if (!hasLabel && !hasAriaLabel && !hasAriaLabelledBy && !hasNativeAttributeName) {
           issues.push({
             type: 'field-no-label',
             element: elementInfo.selector,
@@ -372,7 +380,7 @@ class ErrorHandlingScanner extends BaseScanner {
         }
 
         // Check if placeholder is used as the only label (problematic)
-        if (hasPlaceholder && !hasLabel && !hasAriaLabel && !hasAriaLabelledBy) {
+        if (hasPlaceholder && !hasLabel && !hasAriaLabel && !hasAriaLabelledBy && !hasNativeAttributeName) {
           issues.push({
             type: 'placeholder-only-label',
             element: elementInfo.selector,

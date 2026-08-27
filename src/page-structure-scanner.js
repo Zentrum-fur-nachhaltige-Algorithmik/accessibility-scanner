@@ -1,4 +1,5 @@
 const BaseScanner = require('./base-scanner');
+const { injectableCode: accnameUtils } = require('./utils/accessible-name');
 
 /**
  * Page Structure Scanner for WCAG compliance testing
@@ -153,43 +154,55 @@ class PageStructureScanner extends BaseScanner {
     console.log('  Testing link purpose...');
     const violations = [];
 
-    const linkResults = await page.evaluate((visScript) => {
+    const linkResults = await page.evaluate((visScript, accnameCode) => {
       eval(visScript);
+      // Shared ACCNAME implementation (__accessibleNameInfo). SC 2.4.4 is about
+      // the link's ACCESSIBLE NAME, not its textContent: `<a><img alt="Home"></a>`
+      // announces "Home" and is not an empty link.
+      eval(accnameCode);
       const links = Array.from(document.querySelectorAll('a[href]')).filter(isElementVisible);
       const problematicLinks = [];
 
       links.forEach((link, index) => {
         const href = link.getAttribute('href');
-        const text = link.textContent.trim();
+        const nameInfo = __accessibleNameInfo(link);
+        const text = nameInfo.name;
         const ariaLabel = link.getAttribute('aria-label');
         const title = link.getAttribute('title');
-        const ariaLabelledBy = link.getAttribute('aria-labelledby');
-        
+
         // Skip skip links and anchors
         if (href.startsWith('#') || link.classList.contains('skip-link')) {
           return;
         }
 
         // Generate selector
-        const selector = link.id ? `a#${link.id}` : 
+        const selector = link.id ? `a#${link.id}` :
                         link.className ? `a.${link.className.split(' ').join('.')}` :
                         `a:nth-child(${index + 1})`;
 
         // Check if link has meaningful text
         const genericTexts = ['click here', 'here', 'read more', 'more', 'link', 'this', 'continue'];
         const isGeneric = genericTexts.some(generic => text.toLowerCase() === generic);
-        const isEmpty = !text && !ariaLabel && !title && !ariaLabelledBy;
+        const isEmpty = !text;
         const isOnlySymbols = text && /^[^\w\s]+$/.test(text);
-        const isVague = text.length > 0 && text.length < 3 && !ariaLabel;
+        // A short name that was AUTHORED (aria-label/aria-labelledby/title) is a
+        // deliberate choice, not an accident of the markup — only a short name
+        // taken from the link's own content counts as vague.
+        const isAuthoredName = nameInfo.source === 'aria-label' ||
+                               nameInfo.source === 'aria-labelledby' ||
+                               nameInfo.source === 'title';
+        const isVague = text.length > 0 && text.length < 3 && !isAuthoredName;
 
         if (isEmpty || isGeneric || isOnlySymbols || isVague) {
           problematicLinks.push({
             selector,
             text: text || '[empty]',
             href: href.substring(0, 50),
-            issue: isEmpty ? 'empty-link-text' : 
-                   isGeneric ? 'generic-link-text' : 
+            issue: isEmpty ? 'empty-link-text' :
+                   isGeneric ? 'generic-link-text' :
                    isOnlySymbols ? 'symbol-only-link' : 'vague-link-text',
+            nameSource: nameInfo.source,
+            nameReason: nameInfo.reason,
             hasAriaLabel: !!ariaLabel,
             hasTitle: !!title
           });
@@ -200,7 +213,7 @@ class PageStructureScanner extends BaseScanner {
         totalLinks: links.length,
         problematicLinks
       };
-    }, BaseScanner.visibilityFilterScript);
+    }, BaseScanner.visibilityFilterScript, accnameUtils);
 
     const allLinksHavePurpose = linkResults.problematicLinks.length === 0;
 
@@ -209,8 +222,11 @@ class PageStructureScanner extends BaseScanner {
         criterion: "9.2.4.4",
         element: link.selector,
         issue: "ambiguous-link",
-        description: `Link text "${link.text}" does not clearly describe the link's purpose`,
-        suggestion: link.issue === 'empty-link-text' ? 
+        description: link.issue === 'empty-link-text'
+          ? `Link has no accessible name (${link.nameReason || 'no naming mechanism'})`
+          : `Link text "${link.text}" does not clearly describe the link's purpose`,
+        nameSource: link.nameSource,
+        suggestion: link.issue === 'empty-link-text' ?
           "Add descriptive text content, aria-label, or title attribute" :
           "Use more specific, descriptive link text that explains where the link goes or what it does"
       });
@@ -237,15 +253,20 @@ class PageStructureScanner extends BaseScanner {
         breadcrumbs: false,
         sitemap: false,
         searchFunction: false,
-        tableOfContents: false
+        tableOfContents: false,
+        footerNavigation: false,
+        siteIndex: false
       };
 
       // Check for main navigation
       const navElements = document.querySelectorAll('nav, [role="navigation"], .navigation, .nav-menu, .main-nav');
       ways.mainNavigation = navElements.length > 0;
 
-      // Check for breadcrumbs
-      const breadcrumbSelectors = ['.breadcrumb', '.breadcrumbs', '[aria-label*="breadcrumb"]', '[role="navigation"] ol', '[role="navigation"] ul'];
+      // Check for breadcrumbs. NOTE: `[role="navigation"] ol|ul` used to be in
+      // this list — that matches the <ul> of any ordinary nav menu, so the main
+      // navigation was counted a second time as a "breadcrumb". Only markup
+      // that actually identifies itself as a breadcrumb counts.
+      const breadcrumbSelectors = ['.breadcrumb', '.breadcrumbs', '[class*="breadcrumb"]', '[aria-label*="breadcrumb" i]'];
       ways.breadcrumbs = breadcrumbSelectors.some(selector => document.querySelector(selector));
 
       // Check for sitemap links
@@ -262,6 +283,26 @@ class PageStructureScanner extends BaseScanner {
       // Check for table of contents
       const tocSelectors = ['.toc', '.table-of-contents', '#toc', '#table-of-contents'];
       ways.tableOfContents = tocSelectors.some(selector => document.querySelector(selector));
+
+      // A footer link block that lists the site's pages is technique G126
+      // ("providing a list of links to all other web pages") / G125 and is one
+      // of the mechanisms WCAG names for 2.4.5 — the dedicated multiple-ways
+      // scanner already counts it. Omitting it here made every site whose
+      // second way is a footer sitemap fail the criterion.
+      const footers = document.querySelectorAll('footer, [role="contentinfo"]');
+      for (const footer of footers) {
+        const internal = Array.from(footer.querySelectorAll('a[href]')).filter(a => {
+          const raw = (a.getAttribute('href') || '').trim();
+          if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) return false;
+          try { return new URL(raw, document.baseURI).origin === location.origin; } catch (e) { return false; }
+        });
+        if (internal.length > 3) { ways.footerNavigation = true; break; }
+      }
+
+      // A-Z / index links (technique G63/G64 neighbours).
+      ways.siteIndex = Array.from(document.querySelectorAll('a[href]')).some(a =>
+        /\b(index|a[\s-]?z|alle seiten|all pages)\b/i.test(a.textContent || '')
+      );
 
       const availableWays = Object.values(ways).filter(Boolean).length;
 
@@ -338,15 +379,19 @@ class PageStructureScanner extends BaseScanner {
     console.log('  Testing headings and labels...');
     const violations = [];
 
-    const headingResults = await page.evaluate((visScript) => {
+    const headingResults = await page.evaluate((visScript, accnameCode) => {
       eval(visScript);
+      // Shared ACCNAME implementation (__accessibleNameInfo). A heading whose
+      // only child is `<img alt="…">` has textContent "" but is NOT empty —
+      // its accessible name is the image's alt text.
+      eval(accnameCode);
       const problematicHeadings = [];
       const problematicLabels = [];
 
       // Check headings (h1-h6) — skip hidden
       const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).filter(isElementVisible);
       headings.forEach((heading, index) => {
-        const text = heading.textContent.trim();
+        const text = __accessibleNameInfo(heading).name;
         const level = heading.tagName.toLowerCase();
         
         const selector = heading.id ? `${level}#${heading.id}` : 
@@ -374,21 +419,6 @@ class PageStructureScanner extends BaseScanner {
       // Check form labels — skip hidden
       const formControls = Array.from(document.querySelectorAll('input, textarea, select')).filter(isElementVisible);
 
-      // Build a lookup of ids that have a non-empty `label[for]` association, once,
-      // up front. Interpolating an arbitrary control `id` into a CSS selector string
-      // (the old `document.querySelector(\`label[for="${id}"]\`)` per-control) throws
-      // at runtime for ids containing CSS-special characters (e.g. "a.b", an id
-      // starting with a digit, etc.) — iterating label[for] once and comparing the
-      // raw attribute value sidesteps selector injection entirely. A `label[for]`
-      // whose text is empty provides no accessible name and is NOT a valid label.
-      const explicitlyLabeledIds = new Set();
-      Array.from(document.querySelectorAll('label[for]')).forEach(label => {
-        const forId = label.getAttribute('for');
-        if (forId && label.textContent.trim()) {
-          explicitlyLabeledIds.add(forId);
-        }
-      });
-
       formControls.forEach((control, index) => {
         const type = control.type || control.tagName.toLowerCase();
         const id = control.id;
@@ -396,8 +426,7 @@ class PageStructureScanner extends BaseScanner {
 
         // Skip hidden inputs and buttons. Native `submit`/`button` inputs always carry
         // a browser-supplied default accessible name (e.g. "Submit Query") even with
-        // no `value`/text, so they're exempt outright; `type="reset"` isn't skipped —
-        // it's handled below via its `value` attribute like the other button types.
+        // no `value`/text, so they're exempt outright.
         if (type === 'hidden' || type === 'submit' || type === 'button') {
           return;
         }
@@ -406,54 +435,22 @@ class PageStructureScanner extends BaseScanner {
                         name ? `${control.tagName.toLowerCase()}[name="${name}"]` :
                         `${control.tagName.toLowerCase()}:nth-child(${index + 1})`;
 
-        // Check for an associated accessible name via any valid HTML/ARIA mechanism:
-        //  1. explicit `label[for=id]` with non-empty text (looked up above)
-        //  2. implicit wrapping `<label>...control...</label>` — the second, equally
-        //     valid HTML label-association mechanism. Valid only if the label's own
-        //     text — excluding the control's own subtree (e.g. a <select>'s <option>
-        //     text, or a <textarea>'s value/content) — is non-empty after trimming.
-        //     (Note: a <fieldset>+<legend> wrapper does NOT name individual controls
-        //     inside it and is deliberately not treated as a label here.)
-        //  3. `aria-labelledby` pointing at an existing element with non-empty text
-        //  4. `aria-label` with non-empty text
-        //  5. `title` with non-empty text
-        //  6. for type="reset" inputs (submit/button are already skipped above), the
-        //     `value` attribute IS the accessible name
-        const hasLabel = !!(id && explicitlyLabeledIds.has(id));
-
-        let hasImplicitLabel = false;
-        const wrappingLabel = control.closest('label');
-        if (wrappingLabel) {
-          const clone = wrappingLabel.cloneNode(true);
-          clone.querySelectorAll('input, textarea, select').forEach(el => el.remove());
-          hasImplicitLabel = clone.textContent.trim().length > 0;
-        }
-
-        const ariaLabelledBy = control.getAttribute('aria-labelledby');
-        let hasAriaLabelledBy = false;
-        if (ariaLabelledBy) {
-          hasAriaLabelledBy = ariaLabelledBy.split(/\s+/).some(refId => {
-            const refEl = document.getElementById(refId);
-            return !!(refEl && refEl.textContent.trim());
-          });
-        }
-
-        const hasAriaLabel = !!(control.getAttribute('aria-label') || '').trim();
-        const hasTitle = !!(control.getAttribute('title') || '').trim();
-
-        const isValueLabeledType = type === 'reset';
-        const hasValueAsName = isValueLabeledType && !!(control.getAttribute('value') || '').trim();
-
+        // The accessible name is computed by the shared ACCNAME helper, which
+        // covers every mechanism this check used to enumerate by hand —
+        // `label[for]`, wrapping `<label>` (implicit association),
+        // `aria-labelledby`, `aria-label`, `title`, `value` on reset buttons —
+        // PLUS the one it was missing: `alt` on `<input type="image">`.
+        // `placeholder` is deliberately NOT a naming mechanism here: a
+        // placeholder-only field is a real 2.4.6/3.3.2 failure.
+        const nameInfo = __accessibleNameInfo(control);
         const placeholder = control.getAttribute('placeholder');
 
-        const hasAnyLabel = hasLabel || hasImplicitLabel || hasAriaLabelledBy ||
-                             hasAriaLabel || hasTitle || hasValueAsName;
-
-        if (!hasAnyLabel) {
+        if (!nameInfo.name) {
           problematicLabels.push({
             selector,
             type,
             hasPlaceholder: !!placeholder,
+            nameReason: nameInfo.reason,
             issue: 'missing-label'
           });
         }
@@ -465,7 +462,7 @@ class PageStructureScanner extends BaseScanner {
         totalFormControls: formControls.length,
         problematicLabels
       };
-    }, BaseScanner.visibilityFilterScript);
+    }, BaseScanner.visibilityFilterScript, accnameUtils);
 
     // Add heading violations
     headingResults.problematicHeadings.forEach(heading => {
@@ -484,8 +481,8 @@ class PageStructureScanner extends BaseScanner {
         criterion: "9.2.4.6",
         element: label.selector,
         issue: "missing-label",
-        description: `Form control (${label.type}) lacks a proper label`,
-        suggestion: label.hasPlaceholder ? 
+        description: `Form control (${label.type}) has no accessible name (${label.nameReason || 'no naming mechanism'})`,
+        suggestion: label.hasPlaceholder ?
           "Add a proper <label> element in addition to placeholder text" :
           "Add a <label> element, aria-label, aria-labelledby, or title attribute"
       });

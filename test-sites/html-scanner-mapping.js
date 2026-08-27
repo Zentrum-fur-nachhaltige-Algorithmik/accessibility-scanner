@@ -717,9 +717,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Bootstrap-like CDN CSS patterns, collapsed components hidden by default — tests computed style contrast'
   },
 
-  // === FALSE-POSITIVE FIXTURES FROM THE gsunde.website SCAN (2026-08-24) ===
-  // Each reproduces one FP class observed on https://gsunde.website/ ; see
-  // false-positive-reports/ for the measured numbers.
+  // Fixtures reproducing false-positive classes observed on real sites.
 
   'good-error-tokens-not-error-messages.html': {
     expectedScanners: [],

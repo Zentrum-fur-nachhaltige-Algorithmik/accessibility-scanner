@@ -1,0 +1,437 @@
+[
+  {
+    "sc": "1.1.1",
+    "level": "A",
+    "title": "Non-text Content"
+  },
+  {
+    "sc": "1.2.1",
+    "level": "A",
+    "title": "Audio-only and Video-only (Prerecorded)"
+  },
+  {
+    "sc": "1.2.2",
+    "level": "A",
+    "title": "Captions (Prerecorded)"
+  },
+  {
+    "sc": "1.2.3",
+    "level": "A",
+    "title": "Audio Description or Media Alternative (Prerecorded)"
+  },
+  {
+    "sc": "1.2.4",
+    "level": "AA",
+    "title": "Captions (Live)"
+  },
+  {
+    "sc": "1.2.5",
+    "level": "AA",
+    "title": "Audio Description (Prerecorded)"
+  },
+  {
+    "sc": "1.2.6",
+    "level": "AAA",
+    "title": "Sign Language (Prerecorded)"
+  },
+  {
+    "sc": "1.2.7",
+    "level": "AAA",
+    "title": "Extended Audio Description (Prerecorded)"
+  },
+  {
+    "sc": "1.2.8",
+    "level": "AAA",
+    "title": "Media Alternative (Prerecorded)"
+  },
+  {
+    "sc": "1.2.9",
+    "level": "AAA",
+    "title": "Audio-only (Live)"
+  },
+  {
+    "sc": "1.3.1",
+    "level": "A",
+    "title": "Info and Relationships"
+  },
+  {
+    "sc": "1.3.2",
+    "level": "A",
+    "title": "Meaningful Sequence"
+  },
+  {
+    "sc": "1.3.3",
+    "level": "A",
+    "title": "Sensory Characteristics"
+  },
+  {
+    "sc": "1.3.4",
+    "level": "AA",
+    "title": "Orientation"
+  },
+  {
+    "sc": "1.3.5",
+    "level": "AA",
+    "title": "Identify Input Purpose"
+  },
+  {
+    "sc": "1.3.6",
+    "level": "AAA",
+    "title": "Identify Purpose"
+  },
+  {
+    "sc": "1.4.1",
+    "level": "A",
+    "title": "Use of Color"
+  },
+  {
+    "sc": "1.4.2",
+    "level": "A",
+    "title": "Audio Control"
+  },
+  {
+    "sc": "1.4.3",
+    "level": "AA",
+    "title": "Contrast (Minimum)"
+  },
+  {
+    "sc": "1.4.4",
+    "level": "AA",
+    "title": "Resize Text"
+  },
+  {
+    "sc": "1.4.5",
+    "level": "AA",
+    "title": "Images of Text"
+  },
+  {
+    "sc": "1.4.6",
+    "level": "AAA",
+    "title": "Contrast (Enhanced)"
+  },
+  {
+    "sc": "1.4.7",
+    "level": "AAA",
+    "title": "Low or No Background Audio"
+  },
+  {
+    "sc": "1.4.8",
+    "level": "AAA",
+    "title": "Visual Presentation"
+  },
+  {
+    "sc": "1.4.9",
+    "level": "AAA",
+    "title": "Images of Text (No Exception)"
+  },
+  {
+    "sc": "1.4.10",
+    "level": "AA",
+    "title": "Reflow"
+  },
+  {
+    "sc": "1.4.11",
+    "level": "AA",
+    "title": "Non-text Contrast"
+  },
+  {
+    "sc": "1.4.12",
+    "level": "AA",
+    "title": "Text Spacing"
+  },
+  {
+    "sc": "1.4.13",
+    "level": "AA",
+    "title": "Content on Hover or Focus"
+  },
+  {
+    "sc": "2.1.1",
+    "level": "A",
+    "title": "Keyboard"
+  },
+  {
+    "sc": "2.1.2",
+    "level": "A",
+    "title": "No Keyboard Trap"
+  },
+  {
+    "sc": "2.1.3",
+    "level": "AAA",
+    "title": "Keyboard (No Exception)"
+  },
+  {
+    "sc": "2.1.4",
+    "level": "A",
+    "title": "Character Key Shortcuts"
+  },
+  {
+    "sc": "2.2.1",
+    "level": "A",
+    "title": "Timing Adjustable"
+  },
+  {
+    "sc": "2.2.2",
+    "level": "A",
+    "title": "Pause, Stop, Hide"
+  },
+  {
+    "sc": "2.2.3",
+    "level": "AAA",
+    "title": "No Timing"
+  },
+  {
+    "sc": "2.2.4",
+    "level": "AAA",
+    "title": "Interruptions"
+  },
+  {
+    "sc": "2.2.5",
+    "level": "AAA",
+    "title": "Re-authenticating"
+  },
+  {
+    "sc": "2.2.6",
+    "level": "AAA",
+    "title": "Timeouts"
+  },
+  {
+    "sc": "2.3.1",
+    "level": "A",
+    "title": "Three Flashes or Below Threshold"
+  },
+  {
+    "sc": "2.3.2",
+    "level": "AAA",
+    "title": "Three Flashes"
+  },
+  {
+    "sc": "2.3.3",
+    "level": "AAA",
+    "title": "Animation from Interactions"
+  },
+  {
+    "sc": "2.4.1",
+    "level": "A",
+    "title": "Bypass Blocks"
+  },
+  {
+    "sc": "2.4.2",
+    "level": "A",
+    "title": "Page Titled"
+  },
+  {
+    "sc": "2.4.3",
+    "level": "A",
+    "title": "Focus Order"
+  },
+  {
+    "sc": "2.4.4",
+    "level": "A",
+    "title": "Link Purpose (In Context)"
+  },
+  {
+    "sc": "2.4.5",
+    "level": "AA",
+    "title": "Multiple Ways"
+  },
+  {
+    "sc": "2.4.6",
+    "level": "AA",
+    "title": "Headings and Labels"
+  },
+  {
+    "sc": "2.4.7",
+    "level": "AA",
+    "title": "Focus Visible"
+  },
+  {
+    "sc": "2.4.8",
+    "level": "AAA",
+    "title": "Location"
+  },
+  {
+    "sc": "2.4.9",
+    "level": "AAA",
+    "title": "Link Purpose (Link Only)"
+  },
+  {
+    "sc": "2.4.10",
+    "level": "AAA",
+    "title": "Section Headings"
+  },
+  {
+    "sc": "2.4.11",
+    "level": "AA",
+    "title": "Focus Not Obscured (Minimum)"
+  },
+  {
+    "sc": "2.4.12",
+    "level": "AAA",
+    "title": "Focus Not Obscured (Enhanced)"
+  },
+  {
+    "sc": "2.4.13",
+    "level": "AAA",
+    "title": "Focus Appearance"
+  },
+  {
+    "sc": "2.5.1",
+    "level": "A",
+    "title": "Pointer Gestures"
+  },
+  {
+    "sc": "2.5.2",
+    "level": "A",
+    "title": "Pointer Cancellation"
+  },
+  {
+    "sc": "2.5.3",
+    "level": "A",
+    "title": "Label in Name"
+  },
+  {
+    "sc": "2.5.4",
+    "level": "A",
+    "title": "Motion Actuation"
+  },
+  {
+    "sc": "2.5.5",
+    "level": "AAA",
+    "title": "Target Size (Enhanced)"
+  },
+  {
+    "sc": "2.5.6",
+    "level": "AAA",
+    "title": "Concurrent Input Mechanisms"
+  },
+  {
+    "sc": "2.5.7",
+    "level": "AA",
+    "title": "Dragging Movements"
+  },
+  {
+    "sc": "2.5.8",
+    "level": "AA",
+    "title": "Target Size (Minimum)"
+  },
+  {
+    "sc": "3.1.1",
+    "level": "A",
+    "title": "Language of Page"
+  },
+  {
+    "sc": "3.1.2",
+    "level": "AA",
+    "title": "Language of Parts"
+  },
+  {
+    "sc": "3.1.3",
+    "level": "AAA",
+    "title": "Unusual Words"
+  },
+  {
+    "sc": "3.1.4",
+    "level": "AAA",
+    "title": "Abbreviations"
+  },
+  {
+    "sc": "3.1.5",
+    "level": "AAA",
+    "title": "Reading Level"
+  },
+  {
+    "sc": "3.1.6",
+    "level": "AAA",
+    "title": "Pronunciation"
+  },
+  {
+    "sc": "3.2.1",
+    "level": "A",
+    "title": "On Focus"
+  },
+  {
+    "sc": "3.2.2",
+    "level": "A",
+    "title": "On Input"
+  },
+  {
+    "sc": "3.2.3",
+    "level": "AA",
+    "title": "Consistent Navigation"
+  },
+  {
+    "sc": "3.2.4",
+    "level": "AA",
+    "title": "Consistent Identification"
+  },
+  {
+    "sc": "3.2.5",
+    "level": "AAA",
+    "title": "Change on Request"
+  },
+  {
+    "sc": "3.2.6",
+    "level": "A",
+    "title": "Consistent Help"
+  },
+  {
+    "sc": "3.3.1",
+    "level": "A",
+    "title": "Error Identification"
+  },
+  {
+    "sc": "3.3.2",
+    "level": "A",
+    "title": "Labels or Instructions"
+  },
+  {
+    "sc": "3.3.3",
+    "level": "AA",
+    "title": "Error Suggestion"
+  },
+  {
+    "sc": "3.3.4",
+    "level": "AA",
+    "title": "Error Prevention (Legal, Financial, Data)"
+  },
+  {
+    "sc": "3.3.5",
+    "level": "AAA",
+    "title": "Help"
+  },
+  {
+    "sc": "3.3.6",
+    "level": "AAA",
+    "title": "Error Prevention (All)"
+  },
+  {
+    "sc": "3.3.7",
+    "level": "A",
+    "title": "Redundant Entry"
+  },
+  {
+    "sc": "3.3.8",
+    "level": "AA",
+    "title": "Accessible Authentication (Minimum)"
+  },
+  {
+    "sc": "3.3.9",
+    "level": "AAA",
+    "title": "Accessible Authentication (Enhanced)"
+  },
+  {
+    "sc": "4.1.1",
+    "level": "REMOVED",
+    "title": "Parsing"
+  },
+  {
+    "sc": "4.1.2",
+    "level": "A",
+    "title": "Name, Role, Value"
+  },
+  {
+    "sc": "4.1.3",
+    "level": "AA",
+    "title": "Status Messages"
+  }
+]

@@ -331,10 +331,8 @@ class MobileSpecificScanner extends BaseScanner {
     /**
      * Touch-target size (WCAG 2.5.8, 24x24 CSS px with the spacing exception) is
      * checked ONCE, viewport-independently, by input-modalities-scanner.js
-     * (analyzeTargetSize). The former per-device 44px check here applied the
-     * AAA threshold (2.5.5), counted non-interactive elements, and multiplied
-     * every hit by five device profiles — ~1000 false positives per healthy
-     * page (false-positive-reports/2026-08-09, FP-1/FP-14).
+     * (analyzeTargetSize). A per-device check here would multiply every hit
+     * by the number of device profiles.
      */
 
     /**

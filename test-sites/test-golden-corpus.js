@@ -7,9 +7,8 @@
  * `test-sites/realworld/med-templates/`, built to be WCAG 2.2 AA compliant)
  * with the FULL profile and asserts two things per route:
  *
- *   1. FORBIDDEN rules (the false-positive classes FP-1 … FP-14 from
- *      `false-positive-reports/2026-08-09-med-template-themes-scan.md`) fire
- *      at most `max` times (default 0).
+ *   1. FORBIDDEN rules (known false-positive classes) fire at most `max`
+ *      times (default 0).
  *   2. EXPECTED rules (the real defects the report verified by hand) still
  *      fire — so the fixes cannot "pass" by going blind.
  *

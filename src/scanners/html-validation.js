@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
+const log = require('../utils/logger').createLogger('html-validation');
 
 /**
  * Enhanced HTML Validation Scanner for WCAG 2.2 compliance testing
@@ -70,7 +71,7 @@ class HTMLValidationScanner extends BaseScanner {
     let invalidARIA = 0;
     let statusMessagesProper = true;
 
-    console.log('Starting enhanced HTML validation analysis...');
+    log.debug('Starting enhanced HTML validation analysis...');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'html-validation.png');
@@ -139,7 +140,7 @@ class HTMLValidationScanner extends BaseScanner {
       invalidARIA: invalidARIA,
     });
 
-    console.log(`HTML validation complete: ${violations.length} violations found`);
+    log.debug(`HTML validation complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -155,20 +156,9 @@ class HTMLValidationScanner extends BaseScanner {
    * Check for duplicate IDs
    */
   async checkDuplicateIds(page, violations) {
-    console.log('Checking for duplicate IDs...');
+    log.debug('Checking for duplicate IDs...');
 
     const duplicateIdInfo = await page.evaluate(() => {
-      // Helper function for element selector generation (browser context)
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? '#' + element.id : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? '.' + element.className.split(' ')[0]
-            : '';
-        return tagName + id + className;
-      }
-
       const allElements = document.querySelectorAll('*[id]');
       const idCounts = {};
       const duplicates = [];
@@ -237,7 +227,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate HTML structure and syntax
    */
   async validateHTMLStructure(page, violations) {
-    console.log('Validating HTML structure...');
+    log.debug('Validating HTML structure...');
 
     const structureIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation (__accessibleNameInfo) — see
@@ -401,7 +391,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate ARIA usage
    */
   async validateARIAUsage(page, violations) {
-    console.log('Validating ARIA usage...');
+    log.debug('Validating ARIA usage...');
 
     const ariaIssues = await page.evaluate(() => {
       const issues = [];
@@ -676,7 +666,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate status messages
    */
   async validateStatusMessages(page, violations) {
-    console.log('Validating status messages...');
+    log.debug('Validating status messages...');
 
     const statusMessageIssues = await page.evaluate(() => {
       const issues = [];
@@ -783,7 +773,6 @@ class HTMLValidationScanner extends BaseScanner {
           (className ? `.${className.split(' ')[0]}` : '');
 
         const role = element.getAttribute('role');
-        const ariaLive = element.getAttribute('aria-live');
         const hasStatusClass =
           className.toLowerCase().includes('status') ||
           className.toLowerCase().includes('alert') ||
@@ -911,7 +900,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate accessibility-specific markup
    */
   async validateAccessibilityMarkup(page, violations) {
-    console.log('Validating accessibility markup...');
+    log.debug('Validating accessibility markup...');
 
     await page.evaluate(() => {
       // Additional accessibility checks can go here
@@ -928,7 +917,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate button names (replaces axe: button-name)
    */
   async validateButtonNames(page, violations) {
-    console.log('Validating button names...');
+    log.debug('Validating button names...');
 
     const buttonIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation — see src/utils/accessible-name.js.
@@ -988,7 +977,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate link names (replaces axe: link-name)
    */
   async validateLinkNames(page, violations) {
-    console.log('Validating link names...');
+    log.debug('Validating link names...');
 
     const linkIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation — see src/utils/accessible-name.js.
@@ -1046,7 +1035,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate frame titles (replaces axe: frame-title)
    */
   async validateFrameTitles(page, violations) {
-    console.log('Validating frame titles...');
+    log.debug('Validating frame titles...');
 
     const frameIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1097,7 +1086,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate media alternatives (replaces axe: object-alt, area-alt, input-image-alt)
    */
   async validateMediaAlternatives(page, violations) {
-    console.log('Validating media alternatives...');
+    log.debug('Validating media alternatives...');
 
     const mediaIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1186,7 +1175,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Enhanced ARIA attribute validation (multiple axe rules)
    */
   async validateARIAAttributes(page, violations) {
-    console.log('Validating ARIA attributes...');
+    log.debug('Validating ARIA attributes...');
 
     const ariaIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1252,10 +1241,6 @@ class HTMLValidationScanner extends BaseScanner {
         'aria-valuetext',
       ];
 
-      const elementsWithAria = document.querySelectorAll(
-        '[aria-label], [aria-labelledby], [aria-describedby], [class*="aria"], [id*="aria"]'
-      );
-
       // Get all elements with any aria attribute
       const allElements = document.querySelectorAll('*');
       allElements.forEach((element) => {
@@ -1313,7 +1298,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate ARIA roles (replaces axe: aria-allowed-role, aria-roles)
    */
   async validateARIARoles(page, violations) {
-    console.log('Validating ARIA roles...');
+    log.debug('Validating ARIA roles...');
 
     const roleIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1438,7 +1423,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate ARIA relationships (replaces axe: aria-labelledby, aria-describedby)
    */
   async validateARIARelationships(page, violations) {
-    console.log('Validating ARIA relationships...');
+    log.debug('Validating ARIA relationships...');
 
     const relationshipIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1523,20 +1508,9 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate meta tags (replaces axe: meta-viewport, meta-refresh)
    */
   async validateMetaTags(page, violations) {
-    console.log('Validating meta tags...');
+    log.debug('Validating meta tags...');
 
     const metaIssues = await page.evaluate(() => {
-      // Helper function for element selector generation (browser context)
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? '#' + element.id : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? '.' + element.className.split(' ')[0]
-            : '';
-        return tagName + id + className;
-      }
-
       const issues = [];
 
       // Check meta viewport
@@ -1596,7 +1570,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Enhanced duplicate ID validation (replaces axe: duplicate-id-*)
    */
   async validateDuplicateIDs(page, violations) {
-    console.log('Validating duplicate IDs...');
+    log.debug('Validating duplicate IDs...');
 
     const duplicateIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1722,7 +1696,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate language attributes (replaces axe: html-has-lang, html-lang-valid, valid-lang)
    */
   async validateLanguageAttributes(page, violations) {
-    console.log('Validating language attributes...');
+    log.debug('Validating language attributes...');
 
     const langIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1993,7 +1967,7 @@ class HTMLValidationScanner extends BaseScanner {
    * Validate form accessibility (replaces axe: label, form-field-multiple-labels)
    */
   async validateFormAccessibility(page, violations) {
-    console.log('Validating form accessibility...');
+    log.debug('Validating form accessibility...');
 
     const formIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)

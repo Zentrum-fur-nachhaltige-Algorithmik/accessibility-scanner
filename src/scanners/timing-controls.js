@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('timing-controls');
 
 /**
  * Timing Controls Scanner for WCAG 2.2 compliance testing
@@ -66,7 +67,7 @@ class TimingControlsScanner extends BaseScanner {
     let movingContentControllable = true;
     let dataPreservedOnTimeout = true;
 
-    console.log('Starting timing controls analysis...');
+    log.debug('Starting timing controls analysis...');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'timing-controls-analysis.png');
@@ -100,7 +101,7 @@ class TimingControlsScanner extends BaseScanner {
     }
 
     // 4. Test timeout warnings (WCAG 2.2.6)
-    const timeoutWarningResults = await this.analyzeTimeoutWarnings(page, violations);
+    await this.analyzeTimeoutWarnings(page, violations);
 
     // Generate visual evidence
     visualEvidence.push({
@@ -112,7 +113,7 @@ class TimingControlsScanner extends BaseScanner {
       dataPreserved: dataPreservedOnTimeout,
     });
 
-    console.log(`Timing controls analysis complete: ${violations.length} violations found`);
+    log.debug(`Timing controls analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -128,7 +129,7 @@ class TimingControlsScanner extends BaseScanner {
    * Analyze timeout adjustability (WCAG 2.2.1)
    */
   async analyzeTimeoutAdjustability(page, violations) {
-    console.log('Analyzing timeout adjustability...');
+    log.debug('Analyzing timeout adjustability...');
 
     const timeoutAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -137,7 +138,6 @@ class TimingControlsScanner extends BaseScanner {
 
       // Look for JavaScript timeouts and intervals
       const originalSetTimeout = window.setTimeout;
-      const originalSetInterval = window.setInterval;
 
       const detectedTimeouts = [];
 
@@ -283,7 +283,7 @@ class TimingControlsScanner extends BaseScanner {
    * Analyze auto-playing content (WCAG 2.2.2)
    */
   async analyzeAutoPlayingContent(page, violations, observationTime) {
-    console.log('Analyzing auto-playing content...');
+    log.debug('Analyzing auto-playing content...');
 
     // First, check for auto-playing media elements
     const mediaAnalysis = await page.evaluate(() => {
@@ -463,7 +463,7 @@ class TimingControlsScanner extends BaseScanner {
    * Analyze moving content (WCAG 2.2.2)
    */
   async analyzeMovingContent(page, violations, observationTime) {
-    console.log('Analyzing moving content...');
+    log.debug('Analyzing moving content...');
 
     const movingContentAnalysis = await page.evaluate((observationTime) => {
       const issues = [];
@@ -576,7 +576,7 @@ class TimingControlsScanner extends BaseScanner {
    * Analyze timeout warnings (WCAG 2.2.6)
    */
   async analyzeTimeoutWarnings(page, violations) {
-    console.log('Analyzing timeout warnings...');
+    log.debug('Analyzing timeout warnings...');
 
     const warningAnalysis = await page.evaluate(() => {
       const issues = [];

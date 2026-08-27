@@ -1,5 +1,6 @@
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('status-messages');
 
 /**
  * Status Messages Scanner for WCAG 4.1.3 compliance testing
@@ -650,7 +651,7 @@ class StatusMessagesScanner extends BaseScanner {
         }
       }
     } catch (error) {
-      console.warn('Error during dynamic interaction testing:', error.message);
+      log.warn('Error during dynamic interaction testing:', error.message);
     }
 
     // Fix A: let the MutationObserver installed in scan() finish

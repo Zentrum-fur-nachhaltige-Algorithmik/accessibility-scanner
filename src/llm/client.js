@@ -6,6 +6,7 @@
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const config = require('../config');
+const log = require('../utils/logger').createLogger('client');
 
 class LLMClient {
   /**
@@ -197,7 +198,7 @@ class LLMClient {
     };
 
     if (process.env.LLM_DEBUG) {
-      console.log(
+      log.info(
         `[LLMClient] model=${data.model || this.model} prompt=${usage.promptTokens} ` +
           `cached=${usage.cachedPromptTokens} completion=${usage.completionTokens} ` +
           `reasoning=${usage.reasoningTokens} cost=${usage.cost ?? 'n/a'}`
@@ -238,7 +239,7 @@ class LLMClient {
         // 402 (no credits), 401/403 (bad key) and 400 (malformed body) cannot
         // change on retry. 408, 409 and 429 stay retryable.
         if (err.type === 'client_error' && LLMClient.isTerminalStatus(err.statusCode)) {
-          console.warn(
+          log.warn(
             `[LLMClient] Terminal client error ${err.statusCode}, not retrying: ${err.message}`
           );
           return {
@@ -292,7 +293,7 @@ class LLMClient {
             break;
         }
 
-        console.warn(
+        log.warn(
           `[LLMClient] Attempt ${attempt + 1}/${this.maxRetries} failed (${err.type}): ${err.message} | retry in ${delayMs}ms`
         );
         await this._sleep(delayMs);

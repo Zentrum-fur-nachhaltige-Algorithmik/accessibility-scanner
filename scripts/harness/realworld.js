@@ -901,7 +901,6 @@ async function main() {
 
     // ---- (a) NO-CRASH INVARIANT ----
     if (outcome.timedOut) {
-      const msg = `${fx.file}: ${outcome.error}`;
       failures.push({ layer: 'no-crash', file: fx.file, detail: outcome.error });
       entry.error = outcome.error;
       report.files.push(entry);

@@ -19,6 +19,8 @@
  * @module auth
  */
 
+const log = require('../utils/logger').createLogger('auth');
+
 const crypto = require('crypto');
 
 /** Routes reachable without a token even when API_TOKEN is configured. */
@@ -114,9 +116,9 @@ function createAuthMiddleware(options = {}) {
  * @param {string} [token] default: `process.env.API_TOKEN`
  * @param {Console} [logger]
  */
-function logAuthStartupState(token = process.env.API_TOKEN, logger = console) {
+function logAuthStartupState(token = process.env.API_TOKEN, logger = log) {
   if (typeof token === 'string' && token.length > 0) {
-    logger.log(
+    logger.info(
       'Auth: API_TOKEN set — /api/* and /reports/* require Authorization: Bearer <token> (except /api/health)'
     );
     return true;

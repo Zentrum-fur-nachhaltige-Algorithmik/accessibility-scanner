@@ -4,6 +4,7 @@ const BaseScanner = require('../core/base-scanner');
 const { tabWalk, cleanupTabWalk } = require('../utils/keyboard-focus');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
+const log = require('../utils/logger').createLogger('keyboard-navigation');
 
 /**
  * Keyboard Navigation Scanner for WCAG compliance testing
@@ -132,7 +133,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       return elements;
     });
 
-    console.log(`Found ${interactiveElements.length} potentially interactive elements`);
+    log.debug(`Found ${interactiveElements.length} potentially interactive elements`);
 
     // 1b. Detect scrollable containers without keyboard access (WCAG 2.1.1)
     const scrollableViolations = await page.evaluate(() => {
@@ -292,7 +293,7 @@ class KeyboardNavigationScanner extends BaseScanner {
     tabOrder,
     visualEvidence
   ) {
-    console.log('Testing keyboard navigation with visual analysis...');
+    log.debug('Testing keyboard navigation with visual analysis...');
 
     // Real Tab presses via src/utils/keyboard-focus.js. Identity is the tab
     // id stamped on each element — the old loop compared two differently
@@ -372,7 +373,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       await cleanupTabWalk(page);
     }
 
-    console.log(`Completed keyboard navigation test: ${tabOrder.length} elements in tab order`);
+    log.debug(`Completed keyboard navigation test: ${tabOrder.length} elements in tab order`);
   }
 
   /**
@@ -484,7 +485,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Test for keyboard traps
    */
   async testKeyboardTraps(page, scanDir, violations) {
-    console.log('Testing for keyboard traps...');
+    log.debug('Testing for keyboard traps...');
 
     let traps = 0;
 
@@ -610,7 +611,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Test custom interactive controls
    */
   async testCustomControls(page, scanDir, violations) {
-    console.log('Testing custom interactive controls...');
+    log.debug('Testing custom interactive controls...');
 
     let inaccessible = 0;
 
@@ -701,10 +702,10 @@ class KeyboardNavigationScanner extends BaseScanner {
       return controls;
     });
 
-    console.log(`  Found ${customControls.length} potential custom controls`);
+    log.debug(`  Found ${customControls.length} potential custom controls`);
 
     for (const control of customControls) {
-      console.log(
+      log.debug(
         `  Testing: ${control.selector} (hasClick: ${control.hasOnClick}, focusable: ${control.isFocusable})`
       );
 
@@ -749,7 +750,7 @@ class KeyboardNavigationScanner extends BaseScanner {
           }
         }
       } catch (error) {
-        console.warn(`Error testing control ${control.selector}:`, error.message);
+        log.warn(`Error testing control ${control.selector}:`, error.message);
       }
     }
 
@@ -760,7 +761,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Test for conflicting keyboard shortcuts
    */
   async testKeyboardShortcuts(page, violations) {
-    console.log('Testing keyboard shortcuts...');
+    log.debug('Testing keyboard shortcuts...');
 
     let conflicts = 0;
 
@@ -818,7 +819,7 @@ class KeyboardNavigationScanner extends BaseScanner {
           conflicts++;
         }
       } catch (error) {
-        console.warn(`Error testing shortcut ${shortcut.description}:`, error.message);
+        log.warn(`Error testing shortcut ${shortcut.description}:`, error.message);
       }
     }
 
@@ -830,11 +831,11 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Implements EN 301 549 criterion 9.2.4.3 (Focus Order)
    */
   async analyzeTabOrderLogic(page, tabOrder, violations) {
-    console.log('Analyzing tab order logic (visual vs DOM order)...');
-    console.log(`  Tab order elements: ${tabOrder.map((t) => t.element).join(', ')}`);
+    log.debug('Analyzing tab order logic (visual vs DOM order)...');
+    log.debug(`  Tab order elements: ${tabOrder.map((t) => t.element).join(', ')}`);
 
     if (tabOrder.length < 2) {
-      console.log('  Insufficient elements for tab order analysis');
+      log.debug('  Insufficient elements for tab order analysis');
       return;
     }
 
@@ -858,35 +859,24 @@ class KeyboardNavigationScanner extends BaseScanner {
       // Filter out null positions and elements that are too small
       const validPositions = positions.filter((p) => p && p.area > 10);
 
-      console.log(`  Position check: ${positions.length} total, ${validPositions.length} valid`);
+      log.debug(`  Position check: ${positions.length} total, ${validPositions.length} valid`);
       if (positions.length !== validPositions.length) {
         const filtered = positions.filter((p) => !p || p.area <= 10);
-        console.log(
+        log.debug(
           `  Filtered out: ${filtered.map((p, i) => `${tabOrder[i]?.element}(${p?.area || 'null'})`).join(', ')}`
         );
       }
 
       if (validPositions.length < 2) {
-        console.log(
+        log.debug(
           `  Insufficient valid positions for analysis (only ${validPositions.length} valid elements)`
         );
         return;
       }
 
-      console.log(`  Analyzing ${validPositions.length} element positions`);
+      log.debug(`  Analyzing ${validPositions.length} element positions`);
 
       // Sort elements by visual reading order (top-to-bottom, left-to-right)
-      const visualOrder = [...validPositions].sort((a, b) => {
-        const rowThreshold = 50; // Elements within 50px vertically are considered same row
-
-        // If elements are in different rows (significant Y difference)
-        if (Math.abs(a.center.y - b.center.y) > rowThreshold) {
-          return a.center.y - b.center.y; // Top to bottom
-        }
-
-        // Same row - sort left to right
-        return a.center.x - b.center.x;
-      });
 
       // Get form context for each element to avoid flagging normal form flows
       const formContexts = await page.evaluate(
@@ -950,15 +940,15 @@ class KeyboardNavigationScanner extends BaseScanner {
 
         // Debug grid detection issue
         if (tabOrder.length <= 8) {
-          console.log(
+          log.debug(
             `  DEBUG: Small tab order (${tabOrder.length} elements), checking grid detection...`
           );
-          console.log(`    Elements in tab order: ${tabOrder.map((t) => t.element).join(', ')}`);
+          log.debug(`    Elements in tab order: ${tabOrder.map((t) => t.element).join(', ')}`);
         }
 
         const formThreshold = isSubmitFlow ? 600 : 400; // Higher threshold for submit buttons
         if ((isNormalFormFlow || isSubmitFlow) && verticalJump < formThreshold) {
-          console.log(
+          log.debug(
             `  Skipping normal form flow: ${currentPos.selector} -> ${nextPos.selector} (threshold: ${formThreshold}px)`
           );
           continue;
@@ -993,10 +983,10 @@ class KeyboardNavigationScanner extends BaseScanner {
             distance: Math.sqrt(horizontalJump ** 2 + verticalJump ** 2),
           });
 
-          console.log(
+          log.debug(
             `  Found ${isBackwardJump ? 'backward' : isUpwardJump ? 'upward' : 'diagonal'} jump: ${currentPos.selector} -> ${nextPos.selector}`
           );
-          console.log(
+          log.debug(
             `    Distance: ${Math.round(Math.sqrt(horizontalJump ** 2 + verticalJump ** 2))}px`
           );
         }
@@ -1043,12 +1033,12 @@ class KeyboardNavigationScanner extends BaseScanner {
           });
         }
 
-        console.log(`  Found ${significantJumps} significant tab order violations`);
+        log.debug(`  Found ${significantJumps} significant tab order violations`);
       } else {
-        console.log('  ✅ Tab order follows logical visual sequence');
+        log.debug('Tab order follows the visual sequence');
       }
     } catch (error) {
-      console.warn('Error analyzing tab order logic:', error.message);
+      log.warn('Error analyzing tab order logic:', error.message);
     }
   }
 
@@ -1061,7 +1051,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate skip links (replaces axe: skip-link)
    */
   async validateSkipLinks(page, violations) {
-    console.log('Validating skip links...');
+    log.debug('Validating skip links...');
 
     const skipLinkIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1164,7 +1154,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate bypass mechanisms (replaces axe: bypass)
    */
   async validateBypassMechanisms(page, violations) {
-    console.log('Validating bypass mechanisms...');
+    log.debug('Validating bypass mechanisms...');
 
     const bypassIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1252,7 +1242,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate focusable elements (replaces axe: focusable-element)
    */
   async validateFocusableElements(page, violations) {
-    console.log('Validating focusable elements...');
+    log.debug('Validating focusable elements...');
 
     const focusableIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1389,7 +1379,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate focus order semantics (replaces axe: focus-order-semantics)
    */
   async validateFocusOrderSemantics(page, tabOrder, violations) {
-    console.log('Validating focus order semantics...');
+    log.debug('Validating focus order semantics...');
 
     const semanticIssues = await page.evaluate((tabOrderData) => {
       // Helper function for element selector generation (browser context)
@@ -1499,7 +1489,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate tabindex usage (replaces axe: tabindex)
    */
   async validateTabindexUsage(page, violations) {
-    console.log('Validating tabindex usage...');
+    log.debug('Validating tabindex usage...');
 
     const tabindexIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1613,7 +1603,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate accesskeys (replaces axe: accesskeys)
    */
   async validateAccesskeys(page, violations) {
-    console.log('Validating accesskeys...');
+    log.debug('Validating accesskeys...');
 
     const accesskeyIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1711,7 +1701,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate keyboard event handling (replaces axe: keyboard-navigation, keyboard)
    */
   async validateKeyboardEventHandling(page, violations) {
-    console.log('Validating keyboard event handling...');
+    log.debug('Validating keyboard event handling...');
 
     const keyboardIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1857,7 +1847,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate focus management (replaces axe: focus-trap, focus-order)
    */
   async validateFocusManagement(page, violations) {
-    console.log('Validating focus management...');
+    log.debug('Validating focus management...');
 
     const focusIssues = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -1967,7 +1957,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    * Validate interactive element accessibility (replaces axe: interactive-element)
    */
   async validateInteractiveElementAccessibility(page, violations) {
-    console.log('Validating interactive element accessibility...');
+    log.debug('Validating interactive element accessibility...');
 
     const interactiveIssues = await page.evaluate((accnameCode) => {
       // Shared ACCNAME implementation (__accessibleNameInfo) — see

@@ -3,6 +3,7 @@ const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: clipCode } = require('../utils/text-clipping');
+const log = require('../utils/logger').createLogger('mobile-specific');
 
 /**
  * Phase 6D: Mobile Specific Accessibility Scanner
@@ -77,7 +78,7 @@ class MobileSpecificScanner extends BaseScanner {
       const viewports = scanOptions.mobileViewports || this.mobileViewports;
       let viewportMetaChecked = false;
       for (const [deviceName, viewport] of Object.entries(viewports)) {
-        console.log(`Testing on ${deviceName}...`);
+        log.debug(`Testing on ${deviceName}...`);
 
         await page.setViewport(viewport);
         await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
@@ -732,7 +733,7 @@ class MobileSpecificScanner extends BaseScanner {
 
       violations.push(...portraitViolations);
     } catch (error) {
-      console.warn('Orientation testing error:', error.message);
+      log.warn('Orientation testing error:', error.message);
     }
 
     return violations;

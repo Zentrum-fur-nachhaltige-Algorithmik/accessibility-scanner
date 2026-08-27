@@ -1,4 +1,3 @@
-const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 
@@ -578,7 +577,6 @@ class LabelInNameScanner extends BaseScanner {
 
           const imgAlt = img.getAttribute('alt') || '';
           const buttonText = button.textContent || '';
-          const buttonAriaLabel = button.getAttribute('aria-label') || '';
 
           // The accessible name of `<a><img alt="Logo">Home</a>` is
           // "Logo Home", not "Home": name-from-content folds in the

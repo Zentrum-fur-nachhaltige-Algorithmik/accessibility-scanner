@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('seizure-prevention');
 
 /**
  * Seizure Prevention Scanner for WCAG 2.2 compliance testing
@@ -70,7 +71,7 @@ class SeizurePreventionScanner extends BaseScanner {
     let motionSensitivitySupported = true;
     let seizureRiskLevel = 'LOW';
 
-    console.log('🚨 Starting CRITICAL seizure prevention analysis...');
+    log.debug('Starting seizure prevention analysis');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'seizure-prevention-analysis.png');
@@ -110,8 +111,8 @@ class SeizurePreventionScanner extends BaseScanner {
       safetyWarning: seizureRiskLevel === 'HIGH' ? 'DANGER: High seizure risk detected!' : null,
     });
 
-    console.log(`🚨 Seizure prevention analysis complete: ${violations.length} violations found`);
-    console.log(`🚨 SAFETY RISK LEVEL: ${seizureRiskLevel}`);
+    log.debug(`Seizure prevention analysis complete: ${violations.length} violations found`);
+    log.debug(`Seizure risk level: ${seizureRiskLevel}`);
 
     return {
       violations,
@@ -127,7 +128,7 @@ class SeizurePreventionScanner extends BaseScanner {
    * Analyze flashing content - CRITICAL SAFETY CHECK (WCAG 2.3.1)
    */
   async analyzeFlashingContent(page, violations, observationTime) {
-    console.log('🚨 CRITICAL: Analyzing flashing content for seizure risk...');
+    log.debug('Analyzing flashing content');
 
     // Set up flash detection monitoring
     await page.evaluate(() => {
@@ -210,7 +211,7 @@ class SeizurePreventionScanner extends BaseScanner {
     });
 
     // Wait and observe for flashing content
-    console.log(`Observing page for ${observationTime}ms to detect flashing...`);
+    log.debug(`Observing page for ${observationTime}ms to detect flashing...`);
     await new Promise((resolve) => setTimeout(resolve, observationTime));
 
     // Analyze detected flashing
@@ -313,12 +314,12 @@ class SeizurePreventionScanner extends BaseScanner {
         riskLevel: issue.riskLevel,
         suggestion: this.getFlashingSuggestion(issue.type),
         safetyWarning:
-          issue.severity === 'critical' ? '⚠️ IMMEDIATE ACTION REQUIRED - SEIZURE RISK' : null,
+          issue.severity === 'critical' ? 'Immediate action required: seizure risk' : null,
       });
     });
 
-    console.log(
-      `🚨 Flashing analysis complete: ${flashingAnalysis.issues.length} issues, Risk: ${flashingAnalysis.riskLevel}`
+    log.debug(
+      `Flashing analysis complete: ${flashingAnalysis.issues.length} issues, Risk: ${flashingAnalysis.riskLevel}`
     );
 
     return {
@@ -331,14 +332,13 @@ class SeizurePreventionScanner extends BaseScanner {
    * Analyze animation from interactions (WCAG 2.3.3)
    */
   async analyzeAnimationFromInteractions(page, violations) {
-    console.log('Analyzing animation from interactions...');
+    log.debug('Analyzing animation from interactions...');
 
     const animationAnalysis = await page.evaluate(() => {
       const issues = [];
       let controlled = true;
 
       // Check for prefers-reduced-motion support
-      const supportsReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // Look for elements that trigger animations on interaction
       const interactiveElements = document.querySelectorAll(
@@ -465,7 +465,7 @@ class SeizurePreventionScanner extends BaseScanner {
    * Analyze motion sensitivity support
    */
   async analyzeMotionSensitivity(page, violations) {
-    console.log('Analyzing motion sensitivity support...');
+    log.debug('Analyzing motion sensitivity support...');
 
     const motionAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -574,16 +574,14 @@ class SeizurePreventionScanner extends BaseScanner {
    */
   getFlashingSuggestion(violationType) {
     const suggestions = {
-      'dangerous-flash-frequency':
-        '🚨 CRITICAL: Remove or reduce flashing to under 3 Hz immediately - SEIZURE RISK',
+      'dangerous-flash-frequency': 'Critical: remove or reduce flashing to under 3 Hz',
       'css-flashing-class':
-        '🚨 Remove CSS flashing/blinking classes - replace with static alternatives',
+        'Remove CSS flashing or blinking classes and replace them with static alternatives',
       'infinite-animation-risk':
         'Limit animation duration or provide pause controls for infinite animations',
-      'red-flashing-content':
-        '🚨 CRITICAL: Remove red flashing content immediately - highest seizure risk',
+      'red-flashing-content': 'Critical: remove red flashing content, the highest seizure risk',
     };
-    return suggestions[violationType] || '🚨 Review flashing content for seizure safety';
+    return suggestions[violationType] || 'Review flashing content for seizure safety';
   }
 
   /**

@@ -9,6 +9,7 @@ const config = require('../config');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
 const { normalizeSeverity, isHardViolation } = require('../core/severity');
+const log = require('../utils/logger').createLogger('report-generator');
 
 const SEVERITY_ORDER = {
   critical: 0,
@@ -92,7 +93,7 @@ class ReportGenerator {
         timestamp,
       };
     } catch (error) {
-      console.error('Error generating report:', error);
+      log.error('Error generating report:', error);
       throw new Error(`Failed to generate report: ${error.message}`);
     }
   }
@@ -143,7 +144,7 @@ class ReportGenerator {
       await fs.writeFile(pdfPath, pdfBuffer);
       return pdfPath;
     } catch (error) {
-      console.error('PDF generation error:', error);
+      log.error('PDF generation error:', error);
       throw new Error(`PDF generation failed: ${error.message}`);
     } finally {
       if (browser) await browser.close().catch(() => {});
@@ -645,7 +646,6 @@ class ReportGenerator {
     });
     const allFindings = data.violations || [];
     const violationsCount = allFindings.filter(isHardViolation).length;
-    const bestPracticeCount = allFindings.filter((v) => !isHardViolation(v)).length;
     const passes = data.passes || 0;
 
     // Scalar placeholders — every value is scan-controlled, so every value is escaped.
@@ -758,6 +758,7 @@ class ReportGenerator {
     if (value === null || value === undefined) return '';
     const raw = String(value).trim();
     // Control characters / whitespace / quotes have no place in an attribute URL.
+    // eslint-disable-next-line no-control-regex
     if (/[\s"'<>`\\]|[\x00-\x1f]/.test(raw)) return '';
     if (
       /^https?:\/\//i.test(raw) ||
@@ -793,7 +794,7 @@ class ReportGenerator {
 
     let sub = '';
     let i = 1;
-    for (const [key, label] of [
+    for (const [, label] of [
       ['perceivable', 'Perceivable'],
       ['operable', 'Operable'],
       ['understandable', 'Understandable'],
@@ -1216,7 +1217,7 @@ class ReportGenerator {
       await Promise.all(files.map((f) => fs.remove(f).catch(() => {})));
       return true;
     } catch (error) {
-      console.error('Error deleting report:', error);
+      log.error('Error deleting report:', error);
       return false;
     }
   }
@@ -1245,7 +1246,7 @@ class ReportGenerator {
       );
       return reports.filter(Boolean).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     } catch (error) {
-      console.error('Error listing reports:', error);
+      log.error('Error listing reports:', error);
       return [];
     }
   }

@@ -53,24 +53,6 @@ function postJSON(url, body) {
   });
 }
 
-function getJSON(url) {
-  return new Promise((resolve, reject) => {
-    http
-      .get(url, (res) => {
-        let chunks = '';
-        res.on('data', (c) => (chunks += c));
-        res.on('end', () => {
-          try {
-            resolve({ status: res.statusCode, body: JSON.parse(chunks) });
-          } catch {
-            resolve({ status: res.statusCode, body: chunks });
-          }
-        });
-      })
-      .on('error', reject);
-  });
-}
-
 function waitForServer(url, timeoutMs = 60_000) {
   const start = Date.now();
   return new Promise((resolve, reject) => {

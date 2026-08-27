@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('error-handling');
 
 /**
  * Error Handling Scanner for WCAG 2.2 compliance testing
@@ -67,7 +68,7 @@ class ErrorHandlingScanner extends BaseScanner {
     let suggestionsProvided = true;
     let preventionImplemented = true;
 
-    console.log('Starting error handling analysis...');
+    log.debug('Starting error handling analysis...');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'error-handling-analysis.png');
@@ -112,7 +113,7 @@ class ErrorHandlingScanner extends BaseScanner {
       preventionImplemented: preventionImplemented,
     });
 
-    console.log(`Error handling analysis complete: ${violations.length} violations found`);
+    log.debug(`Error handling analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -128,7 +129,7 @@ class ErrorHandlingScanner extends BaseScanner {
    * Analyze error identification (WCAG 3.3.1)
    */
   async analyzeErrorIdentification(page, violations) {
-    console.log('Analyzing error identification...');
+    log.debug('Analyzing error identification...');
 
     const errorIdAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -272,7 +273,7 @@ class ErrorHandlingScanner extends BaseScanner {
    * Analyze labels and instructions (WCAG 3.3.2)
    */
   async analyzeLabelsInstructions(page, violations) {
-    console.log('Analyzing labels and instructions...');
+    log.debug('Analyzing labels and instructions...');
 
     const labelsAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -587,7 +588,7 @@ class ErrorHandlingScanner extends BaseScanner {
    * Analyze error suggestions (WCAG 3.3.3)
    */
   async analyzeErrorSuggestions(page, violations) {
-    console.log('Analyzing error suggestions...');
+    log.debug('Analyzing error suggestions...');
 
     const suggestionsAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -751,7 +752,7 @@ class ErrorHandlingScanner extends BaseScanner {
    * Analyze error prevention (WCAG 3.3.4)
    */
   async analyzeErrorPrevention(page, violations) {
-    console.log('Analyzing error prevention...');
+    log.debug('Analyzing error prevention...');
 
     const preventionAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -983,7 +984,7 @@ class ErrorHandlingScanner extends BaseScanner {
    * Simulate form errors for testing
    */
   async simulateFormErrors(page, scanDir, violations) {
-    console.log('Simulating form errors for testing...');
+    log.debug('Simulating form errors for testing...');
 
     try {
       // Find forms and try to trigger validation errors
@@ -1034,7 +1035,7 @@ class ErrorHandlingScanner extends BaseScanner {
         });
       }
     } catch (error) {
-      console.log('Error simulation failed:', error.message);
+      log.debug('Error simulation failed:', error.message);
     }
   }
 

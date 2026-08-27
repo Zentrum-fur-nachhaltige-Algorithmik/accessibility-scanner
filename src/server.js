@@ -13,6 +13,7 @@ const { assertScannableUrl, UrlGuardError } = require('./api/url-guard');
 const { ScanJobStore } = require('./api/scan-jobs');
 const { createAuthMiddleware, logAuthStartupState } = require('./api/auth');
 const config = require('./config');
+const log = require('./utils/logger').createLogger('server');
 
 const app = express();
 const port = config.port;
@@ -126,7 +127,7 @@ app.post('/api/scan', scanLimiter, async (req, res) => {
     if (error instanceof UrlGuardError) {
       return res.status(error.statusCode).json({ error: error.message, code: error.code });
     }
-    console.error('URL validation error:', error.message);
+    log.error('URL validation error:', error.message);
     return res.status(500).json({ error: 'URL validation failed' });
   }
 
@@ -145,7 +146,7 @@ app.post('/api/scan', scanLimiter, async (req, res) => {
       const result = await queue.add(() => pipeline.scan(url, scanOptions));
       return res.json(result);
     } catch (error) {
-      console.error('Scan error:', error.message);
+      log.error('Scan error:', error.message);
       return res.status(500).json({ error: error.message });
     }
   }
@@ -190,7 +191,7 @@ app.post('/api/report', async (req, res) => {
     const report = await reportGenerator.generate(scanResult, options);
     res.json(report);
   } catch (error) {
-    console.error('Report generation error:', error.message);
+    log.error('Report generation error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -266,7 +267,7 @@ app.get('/api/health', (req, res) => {
 
 // Graceful shutdown
 async function shutdown() {
-  console.log('Shutting down...');
+  log.info('Shutting down...');
   await pipeline.close();
   process.exit(0);
 }
@@ -277,8 +278,8 @@ process.on('SIGINT', shutdown);
 // Start server
 if (require.main === module) {
   app.listen(port, () => {
-    console.log(`Accessibility checker server running on port ${port}`);
-    console.log(`${pipeline.scanners.size} scanners registered`);
+    log.info(`Accessibility checker server running on port ${port}`);
+    log.info(`${pipeline.scanners.size} scanners registered`);
   });
 }
 

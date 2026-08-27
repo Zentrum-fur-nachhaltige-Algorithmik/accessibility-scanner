@@ -35,6 +35,7 @@
 const LLMBaseScanner = require('./base');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
 const { injectableCode: contrastCode } = require('../../utils/browser-contrast');
+const log = require('../../utils/logger').createLogger('llm-incomplete-reviewer');
 
 /** Cost/latency guards. */
 const MAX_NODES = 24; // hard cap on reviewed nodes per page
@@ -185,7 +186,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
         );
       } catch (e) {
         failedBatches++;
-        console.warn(`${this.id}: batch ${i / BATCH_SIZE + 1} failed: ${e.message}`);
+        log.warn(`${this.id}: batch ${i / BATCH_SIZE + 1} failed: ${e.message}`);
         continue;
       }
       llmModel = parsed.model || llmModel;

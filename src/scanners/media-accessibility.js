@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('media-accessibility');
 
 /**
  * Media Accessibility Scanner for WCAG compliance testing
@@ -72,7 +73,7 @@ class MediaAccessibilityScanner extends BaseScanner {
     const violations = [];
     const visualEvidence = [];
 
-    console.log('Starting optimized media accessibility analysis...');
+    log.debug('Starting optimized media accessibility analysis...');
 
     // Take initial screenshot (async, don't wait) - skip for performance testing
     const initialScreenshot = path.join(scanDir, 'media-accessibility.png');
@@ -821,7 +822,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       svgsWithoutAlt: mediaAnalysis.mediaCounts.svgsWithoutAlt,
     });
 
-    console.log(
+    log.debug(
       `Optimized media accessibility analysis complete: ${violations.length} violations found`
     );
 

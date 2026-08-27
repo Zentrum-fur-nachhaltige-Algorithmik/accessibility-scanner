@@ -26,6 +26,7 @@
 
 const LLMBaseScanner = require('./base');
 const { analyzeCompat } = require('./analyze-compat');
+const log = require('../../utils/logger').createLogger('llm-consistent-help');
 
 const MAX_SUBPAGES = 2;
 
@@ -69,7 +70,7 @@ class LLMConsistentHelpScanner extends LLMBaseScanner {
           await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
           views.push({ view: url, help: await this._inventory(page) });
         } catch (e) {
-          console.warn(`${this.id}: could not load sub-page ${url}: ${e.message}`);
+          log.warn(`${this.id}: could not load sub-page ${url}: ${e.message}`);
         }
       }
       try {

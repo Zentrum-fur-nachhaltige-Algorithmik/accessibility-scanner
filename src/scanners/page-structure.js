@@ -1,5 +1,6 @@
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
+const log = require('../utils/logger').createLogger('page-structure');
 
 /**
  * Page Structure Scanner for WCAG compliance testing
@@ -49,7 +50,7 @@ class PageStructureScanner extends BaseScanner {
     let multipleWaysAvailable = false;
     let headingsDescriptive = true;
 
-    console.log('Analyzing page structure...');
+    log.debug('Analyzing page structure...');
 
     // 1. Test Page Title (9.2.4.2)
     const titleResults = await this.testPageTitle(page);
@@ -94,7 +95,7 @@ class PageStructureScanner extends BaseScanner {
    * Test page title compliance (9.2.4.2)
    */
   async testPageTitle(page) {
-    console.log('  Testing page title...');
+    log.debug('  Testing page title...');
     const violations = [];
 
     const titleInfo = await page.evaluate(() => {
@@ -154,7 +155,7 @@ class PageStructureScanner extends BaseScanner {
    * Test link purpose compliance (9.2.4.4)
    */
   async testLinkPurpose(page) {
-    console.log('  Testing link purpose...');
+    log.debug('  Testing link purpose...');
     const violations = [];
 
     const linkResults = await page.evaluate(
@@ -256,7 +257,7 @@ class PageStructureScanner extends BaseScanner {
       });
     });
 
-    console.log(
+    log.debug(
       `    Found ${linkResults.totalLinks} links, ${linkResults.problematicLinks.length} problematic`
     );
 
@@ -270,7 +271,7 @@ class PageStructureScanner extends BaseScanner {
    * Test multiple ways to locate content (9.2.4.5)
    */
   async testMultipleWays(page, options = {}) {
-    console.log('  Testing multiple ways to locate content...');
+    log.debug('  Testing multiple ways to locate content...');
     const violations = [];
 
     const navigationResults = await page.evaluate(() => {
@@ -410,7 +411,7 @@ class PageStructureScanner extends BaseScanner {
       });
     }
 
-    console.log(`    Found ${navigationResults.availableWays} ways to locate content`);
+    log.debug(`    Found ${navigationResults.availableWays} ways to locate content`);
 
     return {
       hasMultipleWays: navigationResults.hasMultipleWays,
@@ -422,7 +423,7 @@ class PageStructureScanner extends BaseScanner {
    * Test headings and labels (9.2.4.6)
    */
   async testHeadingsAndLabels(page) {
-    console.log('  Testing headings and labels...');
+    log.debug('  Testing headings and labels...');
     const violations = [];
 
     const headingResults = await page.evaluate(
@@ -554,10 +555,10 @@ class PageStructureScanner extends BaseScanner {
       headingResults.problematicHeadings.length === 0 &&
       headingResults.problematicLabels.length === 0;
 
-    console.log(
+    log.debug(
       `    Analyzed ${headingResults.totalHeadings} headings, ${headingResults.totalFormControls} form controls`
     );
-    console.log(
+    log.debug(
       `    Found ${headingResults.problematicHeadings.length} heading issues, ${headingResults.problematicLabels.length} label issues`
     );
 

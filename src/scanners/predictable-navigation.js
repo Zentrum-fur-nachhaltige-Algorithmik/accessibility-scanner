@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('predictable-navigation');
 
 /**
  * Predictable Navigation Scanner for WCAG 2.2 compliance testing
@@ -70,7 +71,7 @@ class PredictableNavigationScanner extends BaseScanner {
     let navigationConsistent = true;
     let identificationConsistent = true;
 
-    console.log('Starting predictable navigation analysis...');
+    log.debug('Starting predictable navigation analysis...');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'predictable-navigation-analysis.png');
@@ -110,7 +111,7 @@ class PredictableNavigationScanner extends BaseScanner {
       identificationConsistent: identificationConsistent,
     });
 
-    console.log(`Predictable navigation analysis complete: ${violations.length} violations found`);
+    log.debug(`Predictable navigation analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -126,7 +127,7 @@ class PredictableNavigationScanner extends BaseScanner {
    * Analyze on focus behavior (WCAG 3.2.1)
    */
   async analyzeOnFocusBehavior(page, violations) {
-    console.log('Analyzing on focus behavior...');
+    log.debug('Analyzing on focus behavior...');
 
     const onFocusAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -146,8 +147,6 @@ class PredictableNavigationScanner extends BaseScanner {
         };
 
         // Check for onfocus event handlers that might cause context changes
-        const hasFocusHandler =
-          element.hasAttribute('onfocus') || element.addEventListener || element.onfocus;
 
         if (element.hasAttribute('onfocus')) {
           const focusCode = element.getAttribute('onfocus');
@@ -292,7 +291,7 @@ class PredictableNavigationScanner extends BaseScanner {
    * Analyze on input behavior (WCAG 3.2.2)
    */
   async analyzeOnInputBehavior(page, violations) {
-    console.log('Analyzing on input behavior...');
+    log.debug('Analyzing on input behavior...');
 
     const onInputAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -491,7 +490,6 @@ class PredictableNavigationScanner extends BaseScanner {
             const eventCode = element.getAttribute('onchange') || element.getAttribute('onclick');
 
             // Allow simple UI state changes but not navigation
-            const allowedActions = ['show', 'hide', 'toggle', 'addClass', 'removeClass'];
             const hasNavigation =
               eventCode.includes('location') ||
               eventCode.includes('submit') ||
@@ -514,7 +512,6 @@ class PredictableNavigationScanner extends BaseScanner {
       // Check for forms that auto-submit on completion
       const forms = document.querySelectorAll('form');
       forms.forEach((form) => {
-        const inputs = form.querySelectorAll('input:required');
         let hasAutoSubmitOnComplete = false;
 
         // Check if form has script that monitors completion
@@ -566,7 +563,7 @@ class PredictableNavigationScanner extends BaseScanner {
    * Analyze consistent navigation (WCAG 3.2.3)
    */
   async analyzeConsistentNavigation(page, violations) {
-    console.log('Analyzing consistent navigation...');
+    log.debug('Analyzing consistent navigation...');
 
     const navigationAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -695,7 +692,7 @@ class PredictableNavigationScanner extends BaseScanner {
    * Analyze consistent identification (WCAG 3.2.4)
    */
   async analyzeConsistentIdentification(page, violations) {
-    console.log('Analyzing consistent identification...');
+    log.debug('Analyzing consistent identification...');
 
     const identificationAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -703,7 +700,7 @@ class PredictableNavigationScanner extends BaseScanner {
 
       /**
        * Normalise an accessible name for comparison: drop icon glyphs,
-       * punctuation and whitespace noise so "🔍 Search" and "Search" compare
+       * punctuation and whitespace noise so "* Search" and "Search" compare
        * equal while "Search" and "Find" do not.
        */
       function normalizeName(value) {

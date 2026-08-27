@@ -38,6 +38,7 @@ const InputPurposeScanner = require('../scanners/input-purpose');
 const HoverFocusContentScanner = require('../scanners/hover-focus-content');
 const ConcurrentInputScanner = require('../scanners/concurrent-input');
 const AxeCoreAdapter = require('../scanners/axe-core');
+const log = require('../utils/logger').createLogger('scanner-registry');
 
 /**
  * Create LLM scanner instances if OPENROUTER_API_KEY is available.
@@ -64,7 +65,7 @@ function createLLMScanners({ llmClient } = {}) {
   const LLMAltQualityScanner = require('../scanners/llm/alt-quality');
 
   const client = llmClient || new LLMClient({ apiKey });
-  if (!llmClient) console.log('LLM scanners enabled (OPENROUTER_API_KEY detected)');
+  if (!llmClient) log.info('LLM scanners enabled (OPENROUTER_API_KEY detected)');
 
   return [
     new LLMSemanticTextScanner(client),
@@ -265,7 +266,7 @@ function allScannerIds() {
  * @returns {{ scannerIds: string[], options: object, excluded: string[] }}
  */
 function getProfile(name, opts = {}) {
-  if (!PROFILES.hasOwnProperty(name)) {
+  if (!Object.hasOwn(PROFILES, name)) {
     throw new Error(
       `Unknown scan profile: "${name}". Valid profiles: ${Object.keys(PROFILES).join(', ')}`
     );

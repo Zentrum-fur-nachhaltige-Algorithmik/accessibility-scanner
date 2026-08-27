@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS, DEVICES } = require('../core/constants');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: clipCode } = require('../utils/text-clipping');
 const log = require('../utils/logger').createLogger('mobile-specific');
@@ -18,11 +19,11 @@ class MobileSpecificScanner extends BaseScanner {
       wcagPrinciple: 'operable',
     });
     this.mobileViewports = {
-      'iPhone SE': { width: 375, height: 667, deviceScaleFactor: 2, isMobile: true },
-      'iPhone 12': { width: 390, height: 844, deviceScaleFactor: 3, isMobile: true },
-      'Samsung Galaxy S21': { width: 360, height: 800, deviceScaleFactor: 3, isMobile: true },
-      iPad: { width: 768, height: 1024, deviceScaleFactor: 2, isMobile: true },
-      'Tablet Landscape': { width: 1024, height: 768, deviceScaleFactor: 2, isMobile: true },
+      [DEVICES.iphoneSe.name]: DEVICES.iphoneSe,
+      [DEVICES.iphone12.name]: DEVICES.iphone12,
+      [DEVICES.galaxyS21.name]: DEVICES.galaxyS21,
+      [DEVICES.ipad.name]: DEVICES.ipad,
+      [DEVICES.ipadLandscape.name]: DEVICES.ipadLandscape,
     };
   }
 
@@ -45,7 +46,7 @@ class MobileSpecificScanner extends BaseScanner {
       testScrollHorizontal: true,
       testInteractionSize: true,
       testDeviceAdaptation: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
       ...options,
     };
 
@@ -668,7 +669,11 @@ class MobileSpecificScanner extends BaseScanner {
 
     try {
       // Test landscape orientation
-      await page.setViewport({ width: 844, height: 390, deviceScaleFactor: 3, isMobile: true });
+      await page.setViewport({
+        ...DEVICES.iphone12,
+        width: DEVICES.iphone12.height,
+        height: DEVICES.iphone12.width,
+      });
       await page.screenshot({
         path: path.join(scanDir, 'landscape-orientation.png'),
         fullPage: true,
@@ -696,7 +701,7 @@ class MobileSpecificScanner extends BaseScanner {
       violations.push(...landscapeViolations);
 
       // Test portrait orientation
-      await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 3, isMobile: true });
+      await page.setViewport(DEVICES.iphone12);
       await page.screenshot({
         path: path.join(scanDir, 'portrait-orientation.png'),
         fullPage: true,

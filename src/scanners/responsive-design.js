@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS, DEVICES } = require('../core/constants');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: textClippingCode } = require('../utils/text-clipping');
 const log = require('../utils/logger').createLogger('responsive-design');
@@ -31,15 +32,10 @@ class ResponsiveDesignScanner extends BaseScanner {
    */
   async scan(page, options = {}) {
     const scanOptions = {
-      viewports: [
-        { width: 320, height: 568, devicePixelRatio: 2, name: 'iPhone SE' },
-        { width: 375, height: 667, devicePixelRatio: 2, name: 'iPhone 8' },
-        { width: 768, height: 1024, devicePixelRatio: 2, name: 'iPad' },
-        { width: 1920, height: 1080, devicePixelRatio: 1, name: 'Desktop' },
-      ],
+      viewports: [DEVICES.reflow320, DEVICES.iphoneSe, DEVICES.ipad, DEVICES.desktop],
       testZoomLevels: [100, 200, 320, 400],
       testOrientation: false,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
       ...options,
     };
 
@@ -142,7 +138,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       await page.setViewport({
         width: viewport.width,
         height: viewport.height,
-        deviceScaleFactor: viewport.devicePixelRatio || 1,
+        deviceScaleFactor: viewport.deviceScaleFactor || 1,
       });
 
       // Wait for layout to settle
@@ -193,7 +189,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       await page.setViewport({
         width: viewport.width,
         height: viewport.height,
-        deviceScaleFactor: viewport.devicePixelRatio || 1,
+        deviceScaleFactor: viewport.deviceScaleFactor || 1,
       });
       await page.reload({ waitUntil: 'networkidle0' });
       await new Promise((resolve) => setTimeout(resolve, 300));

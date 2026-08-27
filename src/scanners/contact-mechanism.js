@@ -1,4 +1,5 @@
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const { findStatementLink } = require('../utils/accessibility-statement');
 const log = require('../utils/logger').createLogger('contact-mechanism');
 
@@ -25,7 +26,7 @@ class ContactMechanismScanner extends BaseScanner {
    */
   async scan(page, options = {}) {
     const defaultOptions = {
-      timeout: 30000,
+      timeout: TIMEOUTS.navigation,
       searchDepth: 3,
     };
 

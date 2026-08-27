@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('media-accessibility');
 
 /**
@@ -33,7 +34,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       analyzeVideo: true,
       analyzeAudio: true,
       analyzeSVG: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

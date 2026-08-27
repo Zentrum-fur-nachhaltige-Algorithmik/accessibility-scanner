@@ -1,5 +1,6 @@
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('eaa-procedure');
 const {
   findStatementLink,
@@ -33,7 +34,7 @@ class EAAProcedureScanner extends BaseScanner {
       testFeedbackProcess: true,
       testComplianceMonitoring: true,
       searchDepth: 3,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

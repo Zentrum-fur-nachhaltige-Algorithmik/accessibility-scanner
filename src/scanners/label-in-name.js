@@ -1,4 +1,5 @@
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 
 /**
@@ -29,7 +30,7 @@ class LabelInNameScanner extends BaseScanner {
       checkCustomControls: true,
       caseSensitive: false,
       ignoreWhitespace: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

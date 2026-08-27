@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('html-validation');
 
@@ -32,7 +33,7 @@ class HTMLValidationScanner extends BaseScanner {
       strictValidation: true,
       checkAccessibilityMarkup: true,
       validateARIA: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

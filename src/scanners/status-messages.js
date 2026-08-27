@@ -1,5 +1,6 @@
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('status-messages');
 
 /**
@@ -52,7 +53,7 @@ class StatusMessagesScanner extends BaseScanner {
       checkSuccessMessages: true,
       checkProgressIndicators: true,
       simulateInteractions: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

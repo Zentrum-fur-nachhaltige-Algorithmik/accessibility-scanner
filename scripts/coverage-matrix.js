@@ -1,30 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * WCAG 2.2 Coverage Matrix generator.
- *
- * Answers, from data rather than memory: "which success criteria do we detect,
- * how, and how well?"
- *
- * Inputs (all checked in, none hand-maintained except the MANUAL justifications):
- *   1. `wcag2.2.md`                      — the authoritative criterion list (87 SC)
- *   2. `src/scanner-registry.js`         — scanner instances → their `wcagCriteria`
- *   3. `axe-core`                        — `axe.getRules()` tags → criteria axe covers
- *   4. `test-sites/*.html`               — `WCAG-TEST` metadata → good/bad fixture pairs
- *   5. the three harnesses               — which criteria are actually asserted on
- *   6. `MANUAL_OVERRIDES` below          — criteria no static scan can decide
- *
- * Output: `docs/sprints/p2-quality/coverage-matrix.md`
- *
- * Truth over optimism: a criterion that a scanner *mentions* in its metadata but
- * that no harness asserts on is reported as NOT verified. The script exits
- * non-zero when the matrix is structurally incomplete (see `validate()`), so the
- * checked-in matrix can never silently drift from the code.
+ * WCAG 2.2 coverage matrix generator.
+ * Maps every success criterion to one primary mechanism (axe-core, deterministic
+ * scanner, LLM scanner, manual review) and to the fixtures and harness results
+ * that prove it. Exits non-zero when a criterion is mapped but not evidenced.
  *
  * Usage:
- *   node scripts/coverage-matrix.js            # regenerate the markdown
- *   node scripts/coverage-matrix.js --check    # validate only, write nothing
- *   node scripts/coverage-matrix.js --json <p> # also emit machine-readable JSON
+ *   node scripts/coverage-matrix.js            # update README.md and tests/data/coverage-matrix.json
+ *   node scripts/coverage-matrix.js --check    # fail if either is stale
  */
 
 const fs = require('fs');
@@ -32,7 +16,8 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const TEST_SITES = path.join(ROOT, 'test-sites');
-const OUT_MD = path.join(ROOT, 'docs', 'sprints', 'p2-quality', 'coverage-matrix.md');
+const README = path.join(ROOT, 'README.md');
+const OUT_JSON = path.join(ROOT, 'tests', 'data', 'coverage-matrix.json');
 
 // ---------------------------------------------------------------------------
 // Mechanism vocabulary
@@ -50,50 +35,47 @@ const MECHANISM = {
 /**
  * Criteria that no single-page static scan can decide, with the one-line
  * justification the matrix is required to carry. Anything listed here is
- * deliberately NOT counted as automated coverage.
+ * not counted as automated coverage.
  *
- * Keep this list as short as the truth allows — every entry is an audit gap a
- * human has to close by hand.
+ * Keep this list short: every entry is an audit gap a human has to close by hand.
  */
 const MANUAL_OVERRIDES = {
   '1.2.4': {
     mechanism: MECHANISM.MANUAL,
     justification:
-      'Captions (Live) — requires an actually-running live stream; a static page ' +
+      'Captions (Live): requires a running live stream; a static page ' +
       'exposes no signal about whether a future broadcast will be captioned.',
   },
   '1.3.2': {
     mechanism: MECHANISM.MANUAL,
     justification:
-      'Meaningful Sequence — "correct" reading order is defined by authorial ' +
+      'Meaningful Sequence: the correct reading order is defined by authorial ' +
       'meaning; DOM-vs-visual order mismatches are routinely intentional, so any ' +
       'static heuristic is a noise generator. axe-core likewise ships no 1.3.2 rule.',
   },
   '2.5.5': {
     mechanism: MECHANISM.MANUAL,
     justification:
-      'Target Size (Enhanced) (AAA) — the 44x44 check was removed from ' +
-      'mobile-specific because it was reported as an AA failure on every ' +
-      'healthy page. The AA minimum ' +
-      '(2.5.8, 24x24 with the spacing exception) is automated in ' +
-      'input-modalities; the AAA size is a design review item.',
+      'Target Size (Enhanced) (AAA): the AA minimum (2.5.8, 24x24 with the ' +
+      'spacing exception) is automated in input-modalities; the 44x44 AAA size ' +
+      'is a design review item.',
   },
   '2.4.8': {
     mechanism: MECHANISM.MANUAL,
     justification:
-      'Location (AAA) — whether a user can determine their position requires the ' +
+      'Location (AAA): whether a user can determine their position requires the ' +
       'surrounding set of pages and its information architecture, not one page.',
   },
   '3.3.6': {
     mechanism: MECHANISM.MANUAL,
     justification:
-      'Error Prevention (All) (AAA) — reversibility/checkability/confirmation of a ' +
+      'Error Prevention (All) (AAA): reversibility, checkability and confirmation of a ' +
       'submission is server-side behaviour that is not observable from the page.',
   },
   '4.1.1': {
     mechanism: MECHANISM.NOT_APPLICABLE,
     justification:
-      'Parsing — removed from WCAG 2.2 (obsolete); retained in the list only so the ' +
+      'Parsing: removed from WCAG 2.2; retained in the list only so the ' +
       'numbering stays complete. Not a conformance requirement any more.',
   },
 };
@@ -116,7 +98,7 @@ function parseCriteria() {
 /**
  * Instantiate every scanner and read its declared `wcagCriteria`.
  * LLM scanners are only registered when an API key is present, so a placeholder
- * is injected — the registry never makes a network call at construction time.
+ * is injected; the registry never makes a network call at construction time.
  */
 function collectScanners() {
   const hadKey = Boolean(process.env.OPENROUTER_API_KEY);
@@ -287,7 +269,7 @@ function collectHarnessCoverage(axeByCriterion, fixturesByCriterion, scanners) {
 }
 
 // ---------------------------------------------------------------------------
-// 6. Recorded harness OUTCOMES — "how well", not just "is it tested"
+// 6. Recorded harness outcomes: how well, not only whether it is tested
 // ---------------------------------------------------------------------------
 
 const RAW_DIR = path.join(ROOT, 'tests', 'data', 'harness');
@@ -387,7 +369,7 @@ function buildRows() {
     } else {
       // Trust-tiered coverage: an EXPERIMENTAL scanner does not count towards
       // completeness (it is quarantined out of the default profiles), but it is
-      // never silently dropped — a criterion covered only by experimental
+      // never silently dropped: a criterion covered only by experimental
       // scanners is reported as `experimental:<ids>` with the quarantine reason,
       // so the gap is visible instead of vanishing.
       const provenDet = det.filter((s) => s.trust === 'proven');
@@ -401,7 +383,7 @@ function buildRows() {
       if (!hasAxe && detIds.length === 0 && llmIds.length === 0 && quarantined.length > 0) {
         mechanism = `experimental:${quarantined.map((s) => s.id).join('+')}`;
         justification =
-          `Only experimental scanners cover this criterion — ` +
+          `Only experimental scanners cover this criterion: ` +
           quarantined.map((s) => `${s.id}: ${s.trustReason}`).join(' ;; ');
         supporting = [];
       } else if (hasAxe && (detIds.length || llmIds.length)) {
@@ -420,7 +402,7 @@ function buildRows() {
         mechanism = `${MECHANISM.LLM}:${llmIds[0]}`;
         supporting = llmIds.slice(1);
       } else {
-        mechanism = null; // UNMAPPED — validate() turns this into a build failure
+        mechanism = null; // UNMAPPED: validate() turns this into a build failure
       }
 
       if (mechanism && !mechanism.startsWith('experimental:') && quarantined.length > 0) {
@@ -453,7 +435,7 @@ function buildRows() {
 }
 
 // ---------------------------------------------------------------------------
-// Validation — these are build failures
+// Validation: these are build failures
 // ---------------------------------------------------------------------------
 
 function validate(rows) {
@@ -462,7 +444,7 @@ function validate(rows) {
   for (const r of rows) {
     if (!r.mechanism) {
       errors.push(
-        `${r.sc} (${r.level}) "${r.title}" is UNMAPPED — no axe rule, no scanner, and ` +
+        `${r.sc} (${r.level}) "${r.title}" is UNMAPPED: no axe rule, no scanner, and ` +
           `no MANUAL_OVERRIDES entry. Add a scanner or an override with a justification.`
       );
       continue;
@@ -473,10 +455,10 @@ function validate(rows) {
       continue;
     }
 
-    // Automatable A/AA criteria carry the full evidence burden (mission §2).
+    // Automatable A and AA criteria carry the full evidence burden.
     // Experimental-only criteria are explicitly NOT counted as covered, so they
-    // are exempt from the harness/fixture burden — the quarantine reason IS the
-    // evidence, and the gap is reported in the summary instead.
+    // are exempt from the harness and fixture burden; the quarantine reason is
+    // the evidence, and the gap is reported in the summary instead.
     if (!r.isManual && !r.isExperimentalOnly && (r.level === 'A' || r.level === 'AA')) {
       if (r.fixtures.bad.length === 0 || r.fixtures.good.length === 0) {
         errors.push(
@@ -512,7 +494,11 @@ function mechanismBucket(mechanism) {
   return 'UNKNOWN';
 }
 
-function renderMarkdown(rows, scanners, fileCount) {
+const START = '<!-- coverage-matrix:start -->';
+const END = '<!-- coverage-matrix:end -->';
+
+/** Summary block spliced into README.md between the marker comments. */
+function renderSummary(rows) {
   const counts = {};
   const countsByLevel = {};
   for (const r of rows) {
@@ -521,29 +507,7 @@ function renderMarkdown(rows, scanners, fileCount) {
     countsByLevel[r.level] = countsByLevel[r.level] || {};
     countsByLevel[r.level][b] = (countsByLevel[r.level][b] || 0) + 1;
   }
-
-  const L = [];
-  L.push('# WCAG 2.2 Coverage Matrix');
-  L.push('');
-  L.push('<!-- GENERATED FILE — do not edit by hand.');
-  L.push('     Regenerate with: node scripts/coverage-matrix.js');
-  L.push('     Validate in CI with: node scripts/coverage-matrix.js --check -->');
-  L.push('');
-  L.push(`Generated: ${new Date().toISOString()}`);
-  L.push('');
-  L.push(
-    'Every WCAG 2.2 success criterion (A, AA and AAA) is mapped to exactly one ' +
-      '**primary mechanism**. A criterion that a scanner merely *mentions* in its ' +
-      'metadata, but that no harness asserts on, is reported as unverified — the ' +
-      'generator fails the build rather than let the matrix drift from the code.'
-  );
-  L.push('');
-
-  // ---- summary ----
-  L.push('## Summary');
-  L.push('');
-  L.push('| Mechanism | Criteria | A | AA | AAA | Removed |');
-  L.push('|---|---:|---:|---:|---:|---:|');
+  const at = (lvl, b) => (countsByLevel[lvl] && countsByLevel[lvl][b]) || 0;
   const bucketOrder = [
     'axe-core',
     'hybrid',
@@ -554,201 +518,62 @@ function renderMarkdown(rows, scanners, fileCount) {
     'NOT-APPLICABLE-STATIC',
     'UNMAPPED',
   ];
+  const L = [];
+  L.push('| Mechanism | Criteria | A | AA | AAA | Removed |');
+  L.push('|---|---:|---:|---:|---:|---:|');
   for (const b of bucketOrder) {
     if (!counts[b]) continue;
-    const at = (lvl) => (countsByLevel[lvl] && countsByLevel[lvl][b]) || 0;
-    L.push(
-      `| \`${b}\` | ${counts[b]} | ${at('A')} | ${at('AA')} | ${at('AAA')} | ${at('REMOVED')} |`
-    );
+    L.push(`| ${b} | ${counts[b]} | ${at('A', b)} | ${at('AA', b)} | ${at('AAA', b)} | ${at('REMOVED', b)} |`);
   }
+  const n = (lvl) => rows.filter((r) => r.level === lvl).length;
+  L.push(`| total | ${rows.length} | ${n('A')} | ${n('AA')} | ${n('AAA')} | ${n('REMOVED')} |`);
+  L.push('');
+  const aa = rows.filter((r) => r.level === 'A' || r.level === 'AA');
+  const automated = aa.filter((r) => !r.isManual && !r.isExperimentalOnly).length;
+  const manual = aa.filter((r) => r.isManual).length;
+  const experimental = aa.filter((r) => r.isExperimentalOnly).length;
   L.push(
-    `| **total** | **${rows.length}** | ${rows.filter((r) => r.level === 'A').length} | ${rows.filter((r) => r.level === 'AA').length} | ${rows.filter((r) => r.level === 'AAA').length} | ${rows.filter((r) => r.level === 'REMOVED').length} |`
+    `A and AA: ${automated} of ${aa.length} criteria are covered by proven mechanisms, ` +
+      `${manual} need manual review, ${experimental} are covered only by experimental scanners ` +
+      'and do not count as covered.'
   );
   L.push('');
-
-  const automatedAA = rows.filter(
-    (r) => (r.level === 'A' || r.level === 'AA') && !r.isManual && !r.isExperimentalOnly
-  );
-  const manualAA = rows.filter((r) => (r.level === 'A' || r.level === 'AA') && r.isManual);
-  const experimentalAA = rows.filter(
-    (r) => (r.level === 'A' || r.level === 'AA') && r.isExperimentalOnly
-  );
-  L.push(
-    `**A + AA (the conformance target): ${automatedAA.length} of ` +
-      `${automatedAA.length + manualAA.length + experimentalAA.length} criteria are ` +
-      `covered by proven mechanisms**, ${manualAA.length} require manual review, and ` +
-      `${experimentalAA.length} are covered only by quarantined (experimental) scanners ` +
-      'and therefore do not count as covered.'
-  );
-  L.push('');
-
-  // ---- the matrix ----
-  L.push('## Matrix');
-  L.push('');
-  L.push(
-    '`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e, `g`=golden corpus (false-positive guard on healthy real pages).'
-  );
-  L.push('');
-  L.push('`Detect` is the LAST RECORDED outcome from the harnesses whose results are checked in');
-  L.push('at `docs/sprints/p2-quality/raw/harness-*.json` — an actual measurement, not merely the');
-  L.push('existence of a test. `TP` = at least one bad fixture was detected; **`tp`** = bad');
-  L.push('fixture(s) exist but none was detected; `FP-` = every good fixture stayed clean;');
-  L.push('**`FP!`** = at least one good fixture produced a false positive; `—` = no recorded run.');
-  L.push('');
-  L.push('**Scope caveat:** these recorded runs cover the CUSTOM scanners only. axe-core is not');
-  L.push('part of them — its rules are exercised separately by `tests/e2e/axe-core.test.js`');
-  L.push(
-    'over every fixture. So a **`tp`** on a criterion whose primary mechanism is `axe-core` or'
-  );
-  L.push('`hybrid:axe-core+…` means "our custom scanner adds nothing here", not "the criterion is');
-  L.push('undetected".');
-  L.push('');
-  L.push(
-    '| SC | Lvl | Title | Primary mechanism | Supporting | Fixtures (bad/good) | H | Detect |'
-  );
-  L.push('|---|---|---|---|---|---|---|---|');
-  for (const r of rows) {
-    const h = r.harness
-      .map(
-        (x) =>
-          ({ exclusive: 'x', concurrent: 'c', llm: 'l', 'axe-e2e': 'a', golden: 'g' })[x] || '?'
-      )
-      .join('');
-    const mech = r.mechanism ? `\`${r.mechanism}\`` : '**UNMAPPED**';
-    const sup = r.supporting.length ? r.supporting.map((s) => `\`${s}\``).join(', ') : '—';
-    let detect = '—';
-    if (r.outcome) {
-      const tp = r.outcome.tp === null ? '' : r.outcome.tp ? 'TP ' : '**tp** ';
-      const fp = r.outcome.fpClean === null ? '' : r.outcome.fpClean ? 'FP-' : '**FP!**';
-      detect = `${tp}${fp}`.trim() || '—';
-    }
-    L.push(
-      `| ${r.sc} | ${r.level} | ${r.title} | ${mech} | ${sup} | ` +
-        `${r.fixtures.bad.length}/${r.fixtures.good.length} | ${h || '—'} | ${detect} |`
-    );
-  }
-  L.push('');
-
-  // ---- detection scoreboard ----
-  const measured = rows.filter((r) => r.outcome);
-  if (measured.length > 0) {
-    const tpMiss = measured.filter((r) => r.outcome.tp === false);
-    const fpDirty = measured.filter((r) => r.outcome.fpClean === false);
-    const harnessesSeen = [...new Set(measured.flatMap((r) => r.outcome.from))].sort();
-    L.push('### Recorded detection gaps');
-    L.push('');
-    L.push(
-      `${measured.length} criteria have recorded runs (harnesses: ${harnessesSeen.join(', ')}). ` +
-        `${tpMiss.length} have a bad fixture that the custom scanners do not detect; ` +
-        `${fpDirty.length} produce a false positive on a good fixture.`
-    );
-    L.push('');
-    if (tpMiss.length) {
-      L.push('**Not detected by the custom scanners** (axe-core may still cover them — check the');
-      L.push('Primary mechanism column):');
-      L.push('');
-      for (const r of tpMiss) {
-        L.push(`- ${r.sc} (${r.level}) — primary \`${r.mechanism}\``);
-      }
-      L.push('');
-    }
-    if (fpDirty.length) {
-      L.push('**False positives on good fixtures:**');
-      L.push('');
-      for (const r of fpDirty) {
-        L.push(`- ${r.sc} (${r.level}) — primary \`${r.mechanism}\``);
-      }
-      L.push('');
-    }
-  }
-
-  // ---- manual justifications ----
-  L.push('## MANUAL / NOT-APPLICABLE-STATIC / experimental-only justifications');
-  L.push('');
-  const manual = rows.filter((r) => r.isManual || r.isExperimentalOnly);
-  if (manual.length === 0) {
-    L.push('_None._');
-  } else {
-    L.push('| SC | Lvl | Mechanism | Justification |');
-    L.push('|---|---|---|---|');
-    for (const r of manual) {
-      L.push(`| ${r.sc} | ${r.level} | \`${r.mechanism}\` | ${r.justification} |`);
-    }
-  }
-  L.push('');
-
-  // ---- axe rule detail ----
-  L.push('## axe-core rule coverage');
-  L.push('');
-  L.push('| SC | axe-core rules |');
-  L.push('|---|---|');
-  for (const r of rows) {
-    if (r.axeRules.length === 0) continue;
-    L.push(`| ${r.sc} | ${r.axeRules.map((x) => `\`${x}\``).join(', ')} |`);
-  }
-  L.push('');
-
-  // ---- scanner inventory ----
-  L.push('## Scanner inventory');
-  L.push('');
-  L.push(
-    `${scanners.length} registered scanners; ${fileCount} fixtures with \`WCAG-TEST\` metadata.`
-  );
-  L.push('');
-  const proven = scanners.filter((s) => s.trust === 'proven').length;
-  L.push(
-    `Trust tiers (derived from the recorded battery results by ` +
-      `\`tests/derive-scanner-trust.js\`): **${proven} proven**, ` +
-      `**${scanners.length - proven} experimental**. Only proven scanners are in the ` +
-      'default profiles; experimental ones are quarantined (never deleted), runnable ' +
-      'with `includeExperimental: true`, and their findings are tagged ' +
-      '`confidence: "low"`.'
-  );
-  L.push('');
-  L.push('| Scanner | Kind | Exclusive | Trust | Declared criteria | Quarantine evidence |');
-  L.push('|---|---|---|---|---|---|');
-  for (const s of scanners) {
-    L.push(
-      `| \`${s.id}\` | ${s.kind} | ${s.exclusive ? 'yes' : 'no'} | ` +
-        `${s.trust === 'proven' ? 'proven' : '**experimental**'} | ` +
-        `${s.criteria.length ? s.criteria.join(', ') : '_dynamic / non-WCAG_'} | ` +
-        `${s.trust === 'proven' ? '—' : String(s.trustReason).replace(/\|/g, '/').slice(0, 220)} |`
-    );
-  }
-  L.push('');
-  L.push('EN 301 549 clause 12 (accessibility statement, contact mechanism, monitoring,');
-  L.push('enforcement procedure) is covered by the four EAA scanners and is outside the');
-  L.push('WCAG success-criterion numbering, so it does not appear in the matrix above.');
-  L.push('');
-
+  L.push('Full matrix with fixtures, harness evidence and justifications: tests/data/coverage-matrix.json.');
   return L.join('\n');
 }
 
-// ---------------------------------------------------------------------------
-// main
-// ---------------------------------------------------------------------------
+function spliceReadme(readme, summary) {
+  const i = readme.indexOf(START);
+  const j = readme.indexOf(END);
+  if (i === -1 || j === -1 || j < i) {
+    throw new Error(`README.md is missing the ${START} / ${END} markers`);
+  }
+  return readme.slice(0, i + START.length) + '\n' + summary + '\n' + readme.slice(j);
+}
+
+function renderJson(rows, scanners, fileCount) {
+  return JSON.stringify({ fixtureCount: fileCount, scanners, rows }, null, 2) + '\n';
+}
 
 function main() {
-  const argv = process.argv.slice(2);
-  const checkOnly = argv.includes('--check');
-  const jsonIdx = argv.indexOf('--json');
-  const jsonPath = jsonIdx !== -1 ? argv[jsonIdx + 1] : null;
-
+  const checkOnly = process.argv.slice(2).includes('--check');
   const { rows, scanners, fileCount } = buildRows();
   const errors = validate(rows);
 
-  if (jsonPath) {
-    fs.writeFileSync(
-      jsonPath,
-      JSON.stringify({ generatedAt: new Date().toISOString(), rows, errors }, null, 2)
-    );
-    console.log(`Wrote ${jsonPath}`);
-  }
+  const readme = fs.readFileSync(README, 'utf-8');
+  const nextReadme = spliceReadme(readme, renderSummary(rows));
+  const json = renderJson(rows, scanners, fileCount);
+  const currentJson = fs.existsSync(OUT_JSON) ? fs.readFileSync(OUT_JSON, 'utf-8') : '';
 
-  if (!checkOnly) {
-    fs.mkdirSync(path.dirname(OUT_MD), { recursive: true });
-    fs.writeFileSync(OUT_MD, renderMarkdown(rows, scanners, fileCount));
-    console.log(`Wrote ${path.relative(ROOT, OUT_MD)} (${rows.length} criteria)`);
+  if (checkOnly) {
+    if (nextReadme !== readme || json !== currentJson) {
+      console.error('coverage-matrix: README.md or tests/data/coverage-matrix.json is stale; run: npm run coverage-matrix');
+      process.exit(1);
+    }
+  } else {
+    fs.writeFileSync(README, nextReadme);
+    fs.writeFileSync(OUT_JSON, json);
+    console.log(`Updated README.md and ${path.relative(ROOT, OUT_JSON)} (${rows.length} criteria)`);
   }
 
   const buckets = {};
@@ -763,8 +588,7 @@ function main() {
     for (const e of errors) console.error(`  - ${e}`);
     process.exit(1);
   }
-
-  console.log('coverage-matrix: complete — every criterion mapped and evidenced.');
+  console.log('coverage-matrix: complete, every criterion mapped and evidenced.');
 }
 
 if (require.main === module) {

@@ -1,0 +1,55 @@
+<!-- WCAG-TEST
+criterion: 2.4.7
+level: AA
+title: Focus Visible, indicator painted on a related element
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: Focus indicators that the page draws next to the focused control instead of on it: a search bar with input {outline:none} and .searchbar:focus-within {box-shadow}, a custom checkbox whose visually hidden input is styled through input:focus-visible + label, and a modern reset that removes the outline on :focus and paints one on :focus-visible. no-visible-focus and global-focus-outline-removed must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Focus rings on related elements (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button { color: #0b4f6c; font: inherit; }
+
+  /* The reset every design system ships. */
+  :focus { outline: none; }
+  a:focus-visible, button:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+
+  .searchbar { display: flex; gap: 8px; border: 1px solid #767676; border-radius: 8px; padding: 6px; max-width: 420px; }
+  .searchbar input { border: 0; flex: 1; font: inherit; }
+  .searchbar:focus-within { box-shadow: 0 0 0 3px #0b4f6c; }
+
+  .check input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .check label { display: inline-block; padding-left: 28px; position: relative; }
+  .check label::before { content: ""; position: absolute; left: 0; top: 2px; width: 18px; height: 18px; border: 2px solid #1b1b1b; }
+  .check input:focus-visible + label::before { border-color: #0b4f6c; box-shadow: 0 0 0 3px #0b4f6c; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Focus indicators outside the focused element</h1>
+
+  <div class="searchbar">
+    <label for="q">Search</label>
+    <input type="search" id="q">
+    <button type="submit">Go</button>
+  </div>
+
+  <p class="check">
+    <input type="checkbox" id="terms">
+    <label for="terms">I accept the terms</label>
+  </p>
+
+  <p><a href="#end">A plain link with a focus-visible ring</a></p>
+  <p id="end">End of page.</p>
+</main>
+</body>
+</html>

@@ -969,10 +969,9 @@ class KeyboardNavigationScanner extends BaseScanner {
         });
       });
 
-      // Plain elements put into the tab order. A role plus an accessible name
-      // makes a focus stop meaningful (a named region used as a route-change
-      // target, a tabpanel, a dialog), and a scroll container needs the stop
-      // to be scrollable by keyboard at all.
+      // Plain elements put into the tab order with nothing to operate and
+      // nothing to announce. A scroll container is exempt: the stop is what
+      // makes it scrollable by keyboard.
       const nonInteractiveWithTabindex = document.querySelectorAll(
         '[tabindex="0"]:not(button):not(a):not(input):not(textarea):not(select):not(summary)'
       );
@@ -982,9 +981,10 @@ class KeyboardNavigationScanner extends BaseScanner {
         if (__isInteractiveTarget(element) && element.hasAttribute('role')) return;
         if (element.isContentEditable) return;
 
-        const role = (element.getAttribute('role') || '').trim();
-        const named = role && !!__accessibleName(element);
-        if (named) return;
+        // An accessible name is what makes a focus stop meaningful: a named
+        // region used as a route change target, a labelled tabpanel, a
+        // figure a screen reader announces when focus lands on it.
+        if (__accessibleName(element)) return;
 
         const style = window.getComputedStyle(element);
         const isScrollable =

@@ -818,6 +818,96 @@ const HTML_SCANNER_MAPPING = {
     description:
       'Off-canvas fixed skip link as first tab stop, then a div[onclick] without tabindex and a tabindex="5" jump: both defects must survive the tab walk',
   },
+
+  'good-clickable-wrappers.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.1'],
+    description:
+      'span.btn inside a link, label.btn for a radio, a card with cursor:pointer around a link, a td with cursor:pointer next to a sorting header button, and a wrapper that forwards its click to the button inside it: not-keyboard-accessible must stay silent',
+  },
+
+  'good-scrollable-wrappers.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.1'],
+    description:
+      'Table wrapper with a two pixel overflow, a scroller full of links, a pre with tabindex="0" and a display:none drawer: scrollable-content-not-keyboard-accessible must stay silent',
+  },
+
+  'good-composite-widget-tabindex.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.1'],
+    description:
+      'Menu items all at tabindex="-1", a tabpanel and a named section at tabindex="0", and a tabindex="-1" chevron inside a card link: focusable-element must stay silent',
+  },
+
+  'good-accesskeys-and-widget-keys.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.4'],
+    description:
+      'Unique accesskeys on links, an accesskey on a label, single character keys scoped to a focused listbox, and a counter that mutates the DOM every 100ms: character-key-shortcut and accesskeys must stay silent',
+  },
+
+  'good-bypass-landmarks-only.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.4.1', '2.1.1'],
+    description:
+      'Landmarks, headings and a German skip link reading "Zum Hauptbereich": the deleted bypass and skip-link count rules must not come back',
+  },
+
+  'good-focus-within-indicator.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.7'],
+    description:
+      'Rings painted by :focus-within on a wrapper and by input:focus-visible + label, plus the :focus {outline:none} / :focus-visible reset: no-visible-focus must stay silent',
+  },
+
+  'good-rtl-tab-order.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'dir="rtl" page whose header navigation steps leftwards and whose menu opens upwards: illogical-tab-order must stay silent',
+  },
+
+  'good-dismiss-and-load-more.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A banner that removes itself, a show-more button that appends items, a select and a dropdown toggle: the deleted focus-lost-after-deletion, focus-lost-after-load-more and focus-not-restored rules must not come back',
+  },
+
+  'good-dialog-already-open.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A consent dialog on screen from the first paint next to buttons reading "PDF oeffnen" and "Popup Vorschau": focus-lost needs a dialog that opened as a result of the activation',
+  },
+
+  'good-transparent-fixed-overlay.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.11'],
+    description:
+      'A transparent full viewport fixed layer that takes the hit test above a form: focus-obscured-by-fixed-element must stay silent',
+  },
 };
 
 /**

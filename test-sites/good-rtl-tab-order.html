@@ -1,0 +1,52 @@
+<!-- WCAG-TEST
+criterion: 2.4.3
+level: A
+title: Focus Order on a right to left page
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: An Arabic page with dir="rtl". Every horizontal step through the header navigation moves focus to the left, which the old geometry rule (xDiff below minus 100 on the same row) reported on the first row of every RTL page. The document order and the tab order agree, so illogical-tab-order must stay silent. The page also opens a menu upwards above its trigger, the second geometry false positive.
+-->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اختبار: ترتيب التركيز من اليمين إلى اليسار</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  header, main, footer { max-width: 900px; margin: 0 auto; padding: 24px; }
+  nav { display: flex; gap: 40px; }
+  nav a { padding: 12px 40px; border: 1px solid #767676; }
+  a, button { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .menu-wrap { position: relative; margin-top: 240px; }
+  .menu { position: absolute; bottom: 100%; border: 1px solid #767676; padding: 8px; background: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="التنقل الرئيسي">
+    <a href="#main">الصفحة الرئيسية</a>
+    <a href="#services">الخدمات</a>
+    <a href="#contact">اتصل بنا</a>
+  </nav>
+</header>
+<main id="main">
+  <h1>ترتيب التركيز</h1>
+  <h2 id="services">الخدمات</h2>
+  <p>نص تجريبي.</p>
+  <div class="menu-wrap">
+    <div class="menu">
+      <a href="#contact">فتح لأعلى</a>
+    </div>
+    <button type="button">القائمة</button>
+  </div>
+</main>
+<footer id="contact">
+  <h2>اتصل بنا</h2>
+  <p><a href="#main">إلى الأعلى</a></p>
+</footer>
+</body>
+</html>

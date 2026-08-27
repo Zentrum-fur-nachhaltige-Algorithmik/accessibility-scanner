@@ -1,0 +1,41 @@
+<!-- WCAG-TEST
+criterion: 2.4.3
+level: A
+title: Focus Order, a dialog that was already open
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: A consent dialog that is on screen from the first paint, next to a button reading "PDF oeffnen" that only jumps to a section. The old probe collected triggers by matching modal, dialog, oeffnen, open and popup in the text, pressed Enter, and blamed the consent dialog on the PDF button because the dialog did not contain focus. A finding now needs a dialog that appeared as a result of the activation, so nothing is reported here.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Bereits geoeffneter Dialog (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .consent { border: 2px solid #0b4f6c; padding: 16px; max-width: 480px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="consent" role="dialog" aria-modal="false" aria-labelledby="consentTitle">
+    <h2 id="consentTitle">Cookies</h2>
+    <p>Diese Seite verwendet nur technisch notwendige Cookies.</p>
+    <button type="button" onclick="this.closest('.consent').remove()">Verstanden</button>
+  </div>
+
+  <h1>Befunde</h1>
+  <p><button type="button" class="pdf-button" onclick="location.hash = 'befund'">PDF oeffnen</button></p>
+  <p><button type="button" class="popup-preview">Popup Vorschau</button></p>
+
+  <h2 id="befund">Befund</h2>
+  <p>Ein Abschnitt, auf den der Link zeigt.</p>
+</main>
+</body>
+</html>

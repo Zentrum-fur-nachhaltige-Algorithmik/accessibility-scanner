@@ -11,6 +11,32 @@ const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('keyboard-navigation');
 
+/**
+ * Roving tabindex helper, injected into the page. Inside a composite widget
+ * exactly one item is in the tab order and the others carry tabindex="-1";
+ * arrow keys move between them, which is what the ARIA practices prescribe.
+ */
+const rovingTabindexCode = `
+  var __COMPOSITE_ROLES = [
+    'tablist', 'menu', 'menubar', 'radiogroup', 'toolbar', 'tree', 'treegrid',
+    'grid', 'listbox', 'combobox', 'application'
+  ];
+  function isRovingTabindexItem(element) {
+    var selector = __COMPOSITE_ROLES.map(function (r) { return '[role="' + r + '"]'; }).join(', ');
+    var composite = element.closest(selector);
+    if (!composite) return false;
+    // Some other item of the same widget is in the tab order, so the widget is
+    // reachable and this item is reached with the arrow keys.
+    var items = composite.querySelectorAll(
+      'a[href], button, input, select, textarea, summary, [tabindex]'
+    );
+    for (var i = 0; i < items.length; i++) {
+      if (items[i] !== element && items[i].tabIndex >= 0) return true;
+    }
+    return false;
+  }
+`;
+
 class KeyboardNavigationScanner extends BaseScanner {
   constructor() {
     super('keyboard-navigation', {
@@ -881,6 +907,17 @@ class KeyboardNavigationScanner extends BaseScanner {
               if (!el) return null;
 
               const form = el.closest('form');
+              // Nearest multi-column ancestor. Inside one, the tab order runs
+              // down a column and then up to the top of the next, which is the
+              // reading order, not a scrambled one.
+              let columnGroup = null;
+              for (let node = el.parentElement; node; node = node.parentElement) {
+                const cs = window.getComputedStyle(node);
+                if (cs.columnCount !== 'auto' || cs.columnWidth !== 'auto') {
+                  columnGroup = node.id || node.className || node.tagName;
+                  break;
+                }
+              }
               const isSubmitButton =
                 el.tagName.toLowerCase() === 'button' &&
                 (el.type === 'submit' ||
@@ -890,6 +927,7 @@ class KeyboardNavigationScanner extends BaseScanner {
                 selector: sel,
                 inForm: !!form,
                 formId: form?.id || form?.className || 'default',
+                columnGroup,
                 isFormControl: ['input', 'textarea', 'select', 'button'].includes(
                   el.tagName.toLowerCase()
                 ),
@@ -938,6 +976,21 @@ class KeyboardNavigationScanner extends BaseScanner {
             `  DEBUG: Small tab order (${tabOrder.length} elements), checking grid detection...`
           );
           log.debug(`    Elements in tab order: ${tabOrder.map((t) => t.element).join(', ')}`);
+        }
+
+        // Advancing to the next column. Down-and-left is how a layout wraps to
+        // the next row; up-and-right is how it wraps to the next column, in a
+        // CSS multi-column container or in a grid of stacked columns. Both
+        // follow the reading order.
+        const inSameColumnContainer =
+          !!currentContext?.columnGroup && currentContext.columnGroup === nextContext?.columnGroup;
+        const movesRight = nextPos.center.x > currentPos.center.x + jumpThreshold;
+        const movesUp = nextPos.center.y < currentPos.center.y;
+        if (
+          movesUp &&
+          (movesRight || (inSameColumnContainer && nextPos.center.x > currentPos.center.x))
+        ) {
+          continue;
         }
 
         const formThreshold = isSubmitFlow ? 600 : 400; // Higher threshold for submit buttons
@@ -1240,8 +1293,8 @@ class KeyboardNavigationScanner extends BaseScanner {
   async validateFocusableElements(page, violations) {
     log.debug('Validating focusable elements...');
 
-    const focusableIssues = await page.evaluate((renderedCode) => {
-      eval(renderedCode);
+    const focusableIssues = await page.evaluate((injectedCode) => {
+      eval(injectedCode);
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -1282,7 +1335,7 @@ class KeyboardNavigationScanner extends BaseScanner {
           element.hasAttribute('disabled') || element.getAttribute('aria-disabled') === 'true';
 
         // Check if interactive element is not focusable when it should be
-        if (!isHidden && !isDisabled && tabIndex < 0) {
+        if (!isHidden && !isDisabled && tabIndex < 0 && !isRovingTabindexItem(element)) {
           // Exception for links without href
           if (element.tagName.toLowerCase() === 'a' && !element.hasAttribute('href')) {
             // This is OK - links without href shouldn't be focusable
@@ -1359,7 +1412,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       });
 
       return issues;
-    }, renderedCode);
+    }, `${renderedCode}\n${rovingTabindexCode}`);
 
     // Create violations for focusable element issues
     focusableIssues.forEach((issue) => {
@@ -1490,8 +1543,8 @@ class KeyboardNavigationScanner extends BaseScanner {
   async validateTabindexUsage(page, violations) {
     log.debug('Validating tabindex usage...');
 
-    const tabindexIssues = await page.evaluate((renderedCode) => {
-      eval(renderedCode);
+    const tabindexIssues = await page.evaluate((injectedCode) => {
+      eval(injectedCode);
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -1575,7 +1628,12 @@ class KeyboardNavigationScanner extends BaseScanner {
         }
 
         // Check for tabindex="-1" on naturally focusable elements (usually unnecessary)
-        if (tabIndex === -1 && isInteractive && !element.hasAttribute('disabled')) {
+        if (
+          tabIndex === -1 &&
+          isInteractive &&
+          !element.hasAttribute('disabled') &&
+          !isRovingTabindexItem(element)
+        ) {
           issues.push({
             type: 'tabindex',
             element: selector,
@@ -1588,7 +1646,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       });
 
       return issues;
-    }, renderedCode);
+    }, `${renderedCode}\n${rovingTabindexCode}`);
 
     // Create violations for tabindex issues
     tabindexIssues.forEach((issue) => {

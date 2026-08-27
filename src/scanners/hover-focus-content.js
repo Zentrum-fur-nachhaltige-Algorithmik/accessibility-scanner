@@ -222,6 +222,29 @@ class HoverFocusContentScanner extends BaseScanner {
         const name = (__accessibleName(el) || '').trim();
         if (name !== title) return;
 
+        // A wiki link is <a href="/wiki/X" title="X">X</a>: its name comes
+        // from its own text and merely happens to read like the title. The
+        // failure is a control with no other source of a name at all.
+        const labelledby = (el.getAttribute('aria-labelledby') || '')
+          .split(/\s+/)
+          .filter(Boolean)
+          .some((id) => document.getElementById(id));
+        const labelled = !!(el.labels && el.labels.length > 0);
+        const namedByImage = Array.from(el.querySelectorAll('img[alt], svg title')).some(
+          (child) => (child.getAttribute('alt') || child.textContent || '').trim().length > 0
+        );
+        // Visible text only: content marked aria-hidden, such as an icon glyph
+        // inside a button, contributes nothing to the name.
+        const visible = __visibleLabelText(el);
+        const hasOtherName =
+          (visible && visible.full && visible.full.length > 0) ||
+          (el.getAttribute('aria-label') || '').trim().length > 0 ||
+          (el.getAttribute('value') || '').trim().length > 0 ||
+          labelledby ||
+          labelled ||
+          namedByImage;
+        if (hasOtherName) return;
+
         violations.push({
           criterion: '9.1.4.13',
           element: getSelector(el),

@@ -835,6 +835,48 @@ class ResponsiveDesignScanner extends BaseScanner {
         return true;
       }
 
+      /**
+       * Height the author declared in px, from the inline style or from any
+       * matching rule whose media query applies. getComputedStyle reports the
+       * used height in px for every rendered box, so it cannot tell a box that
+       * is pinned to a height from one that simply has one.
+       */
+      function authoredPxHeight(el, property) {
+        const inline = el.style.getPropertyValue(property);
+        if (inline && inline.endsWith('px')) return parseFloat(inline);
+        for (const sheet of document.styleSheets) {
+          try {
+            for (const rule of sheet.cssRules || []) {
+              const apply = (styleRule) => {
+                const value = styleRule.style.getPropertyValue(property);
+                if (!value || !value.endsWith('px')) return null;
+                try {
+                  return el.matches(styleRule.selectorText) ? parseFloat(value) : null;
+                } catch (e) {
+                  return null;
+                }
+              };
+              if (rule instanceof CSSStyleRule) {
+                const hit = apply(rule);
+                if (hit !== null) return hit;
+              } else if (
+                rule instanceof CSSMediaRule &&
+                window.matchMedia(rule.conditionText).matches
+              ) {
+                for (const inner of rule.cssRules) {
+                  if (!(inner instanceof CSSStyleRule)) continue;
+                  const hit = apply(inner);
+                  if (hit !== null) return hit;
+                }
+              }
+            }
+          } catch (e) {
+            /* cross-origin */
+          }
+        }
+        return null;
+      }
+
       allElements.forEach((el) => {
         const style = window.getComputedStyle(el);
         if (style.display === 'none' || style.visibility === 'hidden') return;
@@ -858,8 +900,10 @@ class ResponsiveDesignScanner extends BaseScanner {
         const webkitLineClamp =
           style.webkitLineClamp || style.getPropertyValue('-webkit-line-clamp');
 
-        const hasFixedHeight = height && height !== 'auto' && height.includes('px');
-        const hasMaxHeight = maxHeight && maxHeight !== 'none' && maxHeight.includes('px');
+        const declaredHeight = authoredPxHeight(el, 'height');
+        const declaredMaxHeight = authoredPxHeight(el, 'max-height');
+        const hasFixedHeight = declaredHeight !== null;
+        const hasMaxHeight = declaredMaxHeight !== null;
         const hasNowrap = whiteSpace === 'nowrap';
         const hasLineClamp = webkitLineClamp && webkitLineClamp !== 'none';
 
@@ -971,11 +1015,13 @@ class ResponsiveDesignScanner extends BaseScanner {
     const result = await page.evaluate(() => {
       const violations = [];
 
+      // An ancestor that scrolls or clips absorbs a wide child: it never
+      // reaches the document and cannot force the page to scroll sideways.
       function isInsideScrollableContainer(el) {
         let parent = el.parentElement;
         while (parent && parent !== document.documentElement) {
           const ps = window.getComputedStyle(parent);
-          if (ps.overflowX === 'auto' || ps.overflowX === 'scroll') return true;
+          if (['auto', 'scroll', 'hidden', 'clip'].includes(ps.overflowX)) return true;
           parent = parent.parentElement;
         }
         return false;
@@ -995,6 +1041,30 @@ class ResponsiveDesignScanner extends BaseScanner {
         return true;
       }
 
+      // Selectors the author also styles inside a media query. Their width at
+      // the reflow viewport is decided by the cascade, which reading one rule
+      // cannot tell; testContentReflow measures those at 320px instead.
+      const responsiveSelectors = new Set();
+      const collectMediaSelectors = (rules) => {
+        for (const rule of rules) {
+          if (rule.cssRules) {
+            if (rule instanceof CSSMediaRule) {
+              for (const inner of rule.cssRules) {
+                if (inner.selectorText) responsiveSelectors.add(inner.selectorText);
+              }
+            }
+            collectMediaSelectors(Array.from(rule.cssRules));
+          }
+        }
+      };
+      for (const sheet of document.styleSheets) {
+        try {
+          collectMediaSelectors(Array.from(sheet.cssRules || []));
+        } catch (e) {
+          /* cross-origin */
+        }
+      }
+
       // Scan stylesheets for explicit px width/min-width declarations > 320px
       const pxWidthRules = [];
       try {
@@ -1004,6 +1074,7 @@ class ResponsiveDesignScanner extends BaseScanner {
               if (!(rule instanceof CSSStyleRule)) continue;
               const sel = rule.selectorText || '';
               if (sel.includes('::')) continue;
+              if (responsiveSelectors.has(sel)) continue;
 
               const widthVal = rule.style.width;
               const minWidthVal = rule.style.minWidth;

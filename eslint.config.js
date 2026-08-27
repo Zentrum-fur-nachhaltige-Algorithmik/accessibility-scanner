@@ -30,6 +30,7 @@ const pageGlobals = Object.fromEntries(
     '__hasAlternativeIdentifier',
     '__isFocusable',
     '__isKeyboardReachable',
+    'isRovingTabindexItem',
     '__a11ySnapshot',
     '__a11ySelector',
     '__a11yIndicator',

@@ -978,18 +978,24 @@ const FIXTURES = [
         },
       },
       {
-        name: 'REAL: three iframes have no title',
-        kind: 'must-detect',
-        // The page embeds three <iframe> elements with no title attribute, so
-        // a screen reader announces them as unnamed frames. WCAG 4.1.2.
+        name: 'REGRESSION: a display:none iframe needs no title',
+        kind: 'must-not-flag',
+        // The snapshot holds four <iframe> elements. The two without a title
+        // are the consent library's `__tcfapiLocator` and `__gppLocator`
+        // frames, both `style="display: none"`, so they are not in the
+        // accessibility tree and a name would never be announced. The two that
+        // are exposed both carry a title. This spot-truth was recorded as
+        // "three iframes have no title" from html-validation, whose frame-title
+        // rule demanded a literal title attribute on every frame including the
+        // hidden ones; axe-core frame-title exempts them, which is correct.
         check: ({ violations }) => {
           const hits = violations.filter((v) =>
             /frame-title|frame or iframe lacks a title/i.test(
               `${v.issue || ''} ${v.ruleId || ''} ${v.description || ''}`
             )
           );
-          if (hits.length > 0) return null;
-          return 'no frame-title finding despite three untitled iframes';
+          if (hits.length === 0) return null;
+          return `${hits.length} hidden iframe(s) reported as lacking a title`;
         },
       },
     ],

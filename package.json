@@ -1,8 +1,13 @@
 {
-  "name": "web-accessibility-checker",
+  "name": "accessibility-scanner",
   "version": "1.0.0",
-  "description": "Web accessibility checker with focus on screen reader support and EU compliance",
-  "main": "index.js",
+  "description": "WCAG 2.2 scanner: axe-core, deterministic Puppeteer checks and optional LLM review behind an Express API and a Next.js UI",
+  "private": true,
+  "main": "src/server.js",
+  "author": "Aaron Berman",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --env-file=.env --watch src/server.js",
@@ -23,17 +28,12 @@
     "harness:concurrent": "node scripts/harness/concurrent.js",
     "harness:llm": "node scripts/harness/llm.js",
     "harness:golden": "node scripts/harness/golden.js",
-    "harness:realworld": "node scripts/harness/realworld.js"
+    "harness:realworld": "node scripts/harness/realworld.js",
+    "lint": "eslint . && scripts/check-no-emdash.sh",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
-  "keywords": [
-    "accessibility",
-    "a11y",
-    "wcag",
-    "eu-compliance",
-    "screen-reader"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@axe-core/puppeteer": "^4.11.1",
     "axe-core": "^4.10.3",

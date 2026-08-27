@@ -78,7 +78,6 @@ class ImagesOfTextScanner extends BaseScanner {
       function analyzeImageForText(img) {
         const alt = img.getAttribute('alt') || '';
         const src = img.src || '';
-        const title = img.getAttribute('title') || '';
 
         // Heuristics for text detection (without actual OCR)
         const textIndicators = {

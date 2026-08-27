@@ -1,5 +1,6 @@
 const BaseScanner = require('../core/base-scanner');
 const { findStatementLink } = require('../utils/accessibility-statement');
+const log = require('../utils/logger').createLogger('compliance-monitoring');
 
 /**
  * Compliance Monitoring Scanner for EAA Procedural Requirements
@@ -52,7 +53,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
    * Analyze compliance monitoring procedures
    */
   async analyzeComplianceMonitoring(page, options) {
-    console.log('Analyzing compliance monitoring procedures...');
+    log.debug('Analyzing compliance monitoring procedures...');
 
     const violations = [];
 
@@ -175,7 +176,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
    * Analyze current page for monitoring information
    */
   async analyzePageForMonitoring(page) {
-    console.log('  Analyzing current page for monitoring procedures...');
+    log.debug('  Analyzing current page for monitoring procedures...');
 
     const analysis = await page.evaluate(() => {
       const pageText = document.body.textContent.toLowerCase();
@@ -313,7 +314,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
    * Find and analyze dedicated monitoring/compliance pages
    */
   async findAndAnalyzeMonitoringPages(page, options) {
-    console.log('  Looking for dedicated monitoring/compliance pages...');
+    log.debug('  Looking for dedicated monitoring/compliance pages...');
 
     // Find potential monitoring pages
     const monitoringPages = await this.findMonitoringPages(page);
@@ -329,7 +330,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
     // Analyze each found page
     for (const pageInfo of monitoringPages) {
       try {
-        console.log(`  Analyzing monitoring page: ${pageInfo.url}`);
+        log.debug(`  Analyzing monitoring page: ${pageInfo.url}`);
         await page.goto(pageInfo.url, { waitUntil: 'networkidle0', timeout: options.timeout });
 
         const pageAnalysis = await this.analyzePageForMonitoring(page);
@@ -345,7 +346,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         combinedAnalysis.continuousImprovement =
           combinedAnalysis.continuousImprovement || pageAnalysis.continuousImprovement;
       } catch (error) {
-        console.log(`  Could not analyze ${pageInfo.url}: ${error.message}`);
+        log.debug(`  Could not analyze ${pageInfo.url}: ${error.message}`);
       }
     }
 

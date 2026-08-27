@@ -1,5 +1,6 @@
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
+const log = require('../utils/logger').createLogger('color-contrast');
 
 /**
  * Color Contrast Scanner for WCAG compliance testing
@@ -171,7 +172,7 @@ class ColorContrastScanner extends BaseScanner {
               passedElements++;
             }
           } catch (error) {
-            console.warn('Error checking contrast for element:', error);
+            log.warn('Error checking contrast for element:', error);
           }
         });
 

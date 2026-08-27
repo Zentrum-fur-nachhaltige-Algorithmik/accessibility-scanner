@@ -1,4 +1,5 @@
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('accessibility-statement');
 const {
   findStatementLink,
   missingStatementViolation,
@@ -58,7 +59,7 @@ class AccessibilityStatementScanner extends BaseScanner {
    * Analyze accessibility statement presence and completeness
    */
   async analyzeAccessibilityStatement(page, options) {
-    console.log('Analyzing accessibility statement...');
+    log.debug('Analyzing accessibility statement...');
 
     const violations = [];
     let statementExists = false;
@@ -104,7 +105,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         timeout: options.timeout,
       });
       statementAccessible = true;
-      console.log(`  Found accessibility statement at: ${statementLinkResults.url}`);
+      log.debug(`  Found accessibility statement at: ${statementLinkResults.url}`);
     } catch (error) {
       violations.push({
         criterion: 'EAA-Statement',
@@ -197,7 +198,7 @@ class AccessibilityStatementScanner extends BaseScanner {
    * Find accessibility statement link on the page
    */
   async findAccessibilityStatementLink(page) {
-    console.log('  Looking for accessibility statement link...');
+    log.debug('  Looking for accessibility statement link...');
     // Detection lives in src/utils/accessibility-statement.js so that all four
     // EAA scanners agree on whether a statement exists — they used to disagree,
     // which is how one missing statement became a dozen findings.
@@ -208,7 +209,7 @@ class AccessibilityStatementScanner extends BaseScanner {
    * Analyze content of accessibility statement page
    */
   async analyzeStatementContent(page) {
-    console.log('  Analyzing statement content...');
+    log.debug('  Analyzing statement content...');
 
     const contentAnalysis = await page.evaluate(() => {
       const pageText = document.body.textContent.toLowerCase();
@@ -216,10 +217,10 @@ class AccessibilityStatementScanner extends BaseScanner {
       // Look for last updated date
       let lastUpdated = null;
       const datePatterns = [
-        /last updated[:\s]*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i,
-        /updated[:\s]*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i,
-        /([0-9]{4}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{1,2})/i,
-        /([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i,
+        /last updated[:\s]*([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})/i,
+        /updated[:\s]*([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})/i,
+        /([0-9]{4}[/.-][0-9]{1,2}[/.-][0-9]{1,2})/i,
+        /([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})/i,
       ];
 
       // Check time elements first

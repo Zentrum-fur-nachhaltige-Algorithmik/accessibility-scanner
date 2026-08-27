@@ -163,7 +163,6 @@ class UseOfColorScanner extends BaseScanner {
         );
         errorElements.forEach((errorElement) => {
           const errorColor = getComputedColor(errorElement, 'color');
-          const errorBgColor = getComputedColor(errorElement, 'background-color');
           const text = errorElement.textContent.trim();
 
           // Check if element has red-like color (simple detection)

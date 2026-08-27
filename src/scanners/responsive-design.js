@@ -3,6 +3,7 @@ const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: textClippingCode } = require('../utils/text-clipping');
+const log = require('../utils/logger').createLogger('responsive-design');
 
 /**
  * Responsive Design Scanner for WCAG 2.2 compliance testing
@@ -129,14 +130,14 @@ class ResponsiveDesignScanner extends BaseScanner {
     let textSpacingOk = true;
     let contentLossAt320px = false;
 
-    console.log('Starting responsive design analysis...');
+    log.debug('Starting responsive design analysis...');
 
     // Load the page initially
     await page.goto(url, { waitUntil: 'networkidle0', timeout: options.timeout });
 
     // 1. Test each viewport
     for (const viewport of options.viewports) {
-      console.log(`Testing viewport: ${viewport.name} (${viewport.width}x${viewport.height})`);
+      log.debug(`Testing viewport: ${viewport.name} (${viewport.width}x${viewport.height})`);
 
       await page.setViewport({
         width: viewport.width,
@@ -156,7 +157,7 @@ class ResponsiveDesignScanner extends BaseScanner {
 
       // 2. Test zoom levels for this viewport
       for (const zoomLevel of options.testZoomLevels) {
-        console.log(`  Testing ${zoomLevel}% zoom...`);
+        log.debug(`  Testing ${zoomLevel}% zoom...`);
 
         const zoomResults = await this.testZoomLevel(
           page,
@@ -210,7 +211,7 @@ class ResponsiveDesignScanner extends BaseScanner {
     // Deduplicate violations by element + issue type across viewport/zoom combos
     const dedupedViolations = this.deduplicateViolations(violations);
 
-    console.log(
+    log.debug(
       `Responsive analysis complete: ${violations.length} raw → ${dedupedViolations.length} deduplicated violations`
     );
 
@@ -436,7 +437,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    * before the injection are not 1.4.12 failures. One finding per element.
    */
   async testTextSpacing(page, scanDir, viewport, violations) {
-    console.log(`  Testing text spacing for ${viewport.name}...`);
+    log.debug(`  Testing text spacing for ${viewport.name}...`);
 
     const SPACING_CSS = `
         * {
@@ -615,7 +616,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       });
     }
     if (spacingResult.issues.length > 20) {
-      console.log(
+      log.debug(
         `  text-spacing: ${spacingResult.issues.length} clipped elements, reporting first 20`
       );
     }
@@ -633,7 +634,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    * as "fixed width".
    */
   async testContentReflow(page, scanDir, violations, options) {
-    console.log('Testing content reflow at 320px...');
+    log.debug('Testing content reflow at 320px...');
 
     // Test the critical 320px width requirement
     await page.setViewport({ width: 320, height: 568 });
@@ -806,7 +807,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    * Detects CSS patterns that would cause clipping when text spacing is increased
    */
   async heuristicTextSpacingCheck(page) {
-    console.log('Running heuristic text spacing check...');
+    log.debug('Running heuristic text spacing check...');
 
     const result = await page.evaluate(() => {
       const violations = [];
@@ -819,14 +820,6 @@ class ResponsiveDesignScanner extends BaseScanner {
           (el.id ? `#${el.id}` : '') +
           (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
         );
-      }
-
-      function hasTextContent(el) {
-        // Check if element directly contains text (not just child elements)
-        for (const child of el.childNodes) {
-          if (child.nodeType === Node.TEXT_NODE && child.textContent.trim().length > 0) return true;
-        }
-        return false;
       }
 
       const allElements = document.querySelectorAll('*');
@@ -865,14 +858,12 @@ class ResponsiveDesignScanner extends BaseScanner {
         const height = style.height;
         const maxHeight = style.maxHeight;
         const whiteSpace = style.whiteSpace;
-        const textOverflow = style.textOverflow;
         const webkitLineClamp =
           style.webkitLineClamp || style.getPropertyValue('-webkit-line-clamp');
 
         const hasFixedHeight = height && height !== 'auto' && height.includes('px');
         const hasMaxHeight = maxHeight && maxHeight !== 'none' && maxHeight.includes('px');
         const hasNowrap = whiteSpace === 'nowrap';
-        const hasEllipsis = textOverflow === 'ellipsis';
         const hasLineClamp = webkitLineClamp && webkitLineClamp !== 'none';
 
         if (hasFixedHeight || hasMaxHeight) {
@@ -967,7 +958,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       return { violations, clippingContainers, importantOverrides };
     });
 
-    console.log(
+    log.debug(
       `Heuristic text spacing check complete: ${result.violations.length} violations found`
     );
     return result;
@@ -978,7 +969,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    * Scans CSS rules (not computed styles) to avoid false positives from responsive layouts.
    */
   async heuristicReflowCheck(page) {
-    console.log('Running heuristic reflow check...');
+    log.debug('Running heuristic reflow check...');
 
     const result = await page.evaluate(() => {
       const violations = [];
@@ -1125,7 +1116,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       return { violations };
     });
 
-    console.log(`Heuristic reflow check complete: ${result.violations.length} violations found`);
+    log.debug(`Heuristic reflow check complete: ${result.violations.length} violations found`);
     return result;
   }
 
@@ -1149,7 +1140,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    *     zero clipped characters) was reported as a clipping risk.
    */
   async heuristicTextResizeCheck(page) {
-    console.log('Running heuristic text resize check...');
+    log.debug('Running heuristic text resize check...');
 
     const result = await page.evaluate(
       (renderedCode, clipCode) => {
@@ -1188,9 +1179,7 @@ class ResponsiveDesignScanner extends BaseScanner {
       textClippingCode
     );
 
-    console.log(
-      `Heuristic text resize check complete: ${result.violations.length} violations found`
-    );
+    log.debug(`Heuristic text resize check complete: ${result.violations.length} violations found`);
     return result;
   }
 

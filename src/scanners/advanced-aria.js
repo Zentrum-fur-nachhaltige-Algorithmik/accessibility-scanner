@@ -1,4 +1,3 @@
-const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 
 /**

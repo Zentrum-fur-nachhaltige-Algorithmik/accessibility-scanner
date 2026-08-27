@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('dynamic-spa');
 
 /**
  * Phase 6E: Dynamic Content & Single Page Application (SPA) Scanner
@@ -212,7 +213,7 @@ class DynamicSpaScanner extends BaseScanner {
         return violations; // No apparent SPA navigation
       }
 
-      console.log(`🔄 Testing ${navLinks.length} navigation links...`);
+      log.debug(`Testing ${navLinks.length} navigation links`);
 
       for (let i = 0; i < Math.min(navLinks.length, 5); i++) {
         // Limit to 5 links
@@ -221,7 +222,6 @@ class DynamicSpaScanner extends BaseScanner {
         try {
           // Get initial page state
           const initialUrl = await page.url();
-          const initialTitle = await page.title();
 
           // Take screenshot before navigation
           await page.screenshot({
@@ -378,11 +378,11 @@ class DynamicSpaScanner extends BaseScanner {
             await new Promise((resolve) => setTimeout(resolve, 1000));
           }
         } catch (error) {
-          console.warn(`Error testing navigation link ${i}:`, error.message);
+          log.warn(`Error testing navigation link ${i}:`, error.message);
         }
       }
     } catch (error) {
-      console.warn('Error during route change testing:', error.message);
+      log.warn('Error during route change testing:', error.message);
     }
 
     return violations;
@@ -719,11 +719,11 @@ class DynamicSpaScanner extends BaseScanner {
             violations.push(...formViolations);
           }
         } catch (error) {
-          console.warn(`Error testing form ${i}:`, error.message);
+          log.warn(`Error testing form ${i}:`, error.message);
         }
       }
     } catch (error) {
-      console.warn('Error during form submission testing:', error.message);
+      log.warn('Error during form submission testing:', error.message);
     }
 
     return violations;
@@ -851,11 +851,11 @@ class DynamicSpaScanner extends BaseScanner {
             await new Promise((resolve) => setTimeout(resolve, 500));
           }
         } catch (error) {
-          console.warn(`Error testing modal ${i}:`, error.message);
+          log.warn(`Error testing modal ${i}:`, error.message);
         }
       }
     } catch (error) {
-      console.warn('Error during modal dialog testing:', error.message);
+      log.warn('Error during modal dialog testing:', error.message);
     }
 
     return violations;
@@ -1020,11 +1020,11 @@ class DynamicSpaScanner extends BaseScanner {
           await searchInput.press('Backspace');
           await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (error) {
-          console.warn(`Error testing search input ${i}:`, error.message);
+          log.warn(`Error testing search input ${i}:`, error.message);
         }
       }
     } catch (error) {
-      console.warn('Error during search filter testing:', error.message);
+      log.warn('Error during search filter testing:', error.message);
     }
 
     return violations;

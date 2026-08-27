@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
+const log = require('../utils/logger').createLogger('advanced-contrast');
 
 /**
  * Advanced Contrast Scanner for WCAG 2.2 compliance testing
@@ -74,7 +75,7 @@ class AdvancedContrastScanner extends BaseScanner {
     let graphicalObjectsCompliant = 0;
     let uiComponentsCompliant = 0;
 
-    console.log('Starting advanced contrast analysis...');
+    log.debug('Starting advanced contrast analysis...');
 
     // Contrast maths comes from the shared, WCAG-correct helpers in
     // src/utils/browser-contrast.js, injected per page.evaluate call. The old
@@ -101,7 +102,7 @@ class AdvancedContrastScanner extends BaseScanner {
       (e) => e.type === 'ui-component' && e.contrastRatio >= 3
     ).length;
 
-    console.log(`Advanced contrast analysis complete: ${violations.length} violations found`);
+    log.debug(`Advanced contrast analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -140,7 +141,7 @@ class AdvancedContrastScanner extends BaseScanner {
    * a compliant border).
    */
   async testNonTextContrast(page) {
-    console.log('Testing UI component contrast...');
+    log.debug('Testing UI component contrast...');
 
     return await page.evaluate((contrastCode) => {
       eval(contrastCode);
@@ -362,7 +363,7 @@ class AdvancedContrastScanner extends BaseScanner {
    * Test hover and focus content contrast
    */
   async testHoverFocusContent(page, scanDir, violations, visualEvidence) {
-    console.log('Testing hover and focus content contrast...');
+    log.debug('Testing hover and focus content contrast...');
 
     // Find elements with hover/focus states
     const interactiveElements = await page.evaluate(() => {
@@ -453,7 +454,7 @@ class AdvancedContrastScanner extends BaseScanner {
         }, element.selector);
 
         if (!elementExists) {
-          console.warn(`Skipping hover test for ${element.selector} - element not found`);
+          log.warn(`Skipping hover test for ${element.selector} - element not found`);
           continue;
         }
 
@@ -481,7 +482,6 @@ class AdvancedContrastScanner extends BaseScanner {
           if (!el) return null;
 
           const computed = window.getComputedStyle(el);
-          const rect = el.getBoundingClientRect();
 
           // Look for tooltip or popup content
           const tooltips = document.querySelectorAll(
@@ -549,7 +549,7 @@ class AdvancedContrastScanner extends BaseScanner {
           });
         }
       } catch (error) {
-        console.warn(`Error testing hover state for ${element.selector}:`, error.message);
+        log.warn(`Error testing hover state for ${element.selector}:`, error.message);
       }
     }
   }

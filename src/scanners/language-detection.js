@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('language-detection');
 
 /**
  * Language Detection Scanner for WCAG 2.2 compliance testing
@@ -62,7 +63,7 @@ class LanguageDetectionScanner extends BaseScanner {
     let multilingualContentMarked = false;
     let languageChangesMarked = 0;
 
-    console.log('Starting language detection analysis...');
+    log.debug('Starting language detection analysis...');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'language-analysis.png');
@@ -94,7 +95,7 @@ class LanguageDetectionScanner extends BaseScanner {
       confidence: contentAnalysis.confidence,
     });
 
-    console.log(`Language analysis complete: ${violations.length} violations found`);
+    log.debug(`Language analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -110,7 +111,7 @@ class LanguageDetectionScanner extends BaseScanner {
    * Analyze page language declaration
    */
   async analyzePageLanguage(page, violations) {
-    console.log('Analyzing page language declaration...');
+    log.debug('Analyzing page language declaration...');
 
     const rawPageLanguageInfo = await page.evaluate(() => {
       const htmlElement = document.documentElement;
@@ -182,7 +183,7 @@ class LanguageDetectionScanner extends BaseScanner {
    * Analyze content languages using simple heuristics
    */
   async analyzeContentLanguages(page, violations) {
-    console.log('Analyzing content languages...');
+    log.debug('Analyzing content languages...');
 
     // NOTE: everything returned from page.evaluate() must be structured-cloneable.
     // Never put live DOM nodes (or anything holding a reference to one) into the
@@ -292,7 +293,7 @@ class LanguageDetectionScanner extends BaseScanner {
    * Analyze multilingual content marking
    */
   async analyzeMultilingualContent(page, violations, contentAnalysis) {
-    console.log('Analyzing multilingual content marking...');
+    log.debug('Analyzing multilingual content marking...');
 
     let contentMarked = true;
     let changesMarked = 0;

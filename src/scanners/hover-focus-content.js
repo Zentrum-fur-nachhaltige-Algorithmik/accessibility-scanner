@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
+const log = require('../utils/logger').createLogger('hover-focus-content');
 
 /**
  * Hover/Focus Content Scanner for WCAG 2.2 compliance testing
@@ -32,7 +33,7 @@ class HoverFocusContentScanner extends BaseScanner {
    * Heuristic scan — concurrent-compatible, pure CSS/DOM analysis
    */
   async heuristicScan(page) {
-    console.log('Running heuristic hover/focus content check...');
+    log.debug('Running heuristic hover/focus content check...');
 
     const result = await page.evaluate((renderedCode) => {
       eval(renderedCode);
@@ -304,7 +305,7 @@ class HoverFocusContentScanner extends BaseScanner {
     const scanDir = path.join(screenshotDir, `hover-focus-scan-${timestamp}`);
     await fs.ensureDir(scanDir);
 
-    console.log('Running full interactive hover/focus content check...');
+    log.debug('Running full interactive hover/focus content check...');
 
     // Run heuristic first to collect violations and identify hover content
     const heuristicResult = await this.heuristicScan(page);
@@ -366,7 +367,7 @@ class HoverFocusContentScanner extends BaseScanner {
     `;
 
     // Test each hover trigger interactively
-    for (const [i, trigger] of hoverTriggers.entries()) {
+    for (const trigger of hoverTriggers) {
       try {
         // Pre/post diff: which elements became rendered because of the hover?
         await page.mouse.move(0, 0);
@@ -546,7 +547,7 @@ class HoverFocusContentScanner extends BaseScanner {
           }
         }
       } catch (error) {
-        console.warn(`Error testing hover trigger ${trigger.selector}:`, error.message);
+        log.warn(`Error testing hover trigger ${trigger.selector}:`, error.message);
       }
     }
 

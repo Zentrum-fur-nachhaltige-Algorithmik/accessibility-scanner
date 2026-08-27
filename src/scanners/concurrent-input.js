@@ -1,4 +1,5 @@
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('concurrent-input');
 
 /**
  * Concurrent Input Mechanisms Scanner — WCAG 2.5.6 (AAA),
@@ -84,7 +85,7 @@ class ConcurrentInputScanner extends BaseScanner {
         instrumented = await page.evaluate(() => Boolean(window.__a11yInputLog));
       }
     } catch (e) {
-      console.warn(
+      log.warn(
         `concurrent-input: listener instrumentation unavailable (${e.message}); ` +
           'falling back to inline-attribute analysis'
       );

@@ -1,5 +1,6 @@
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const log = require('../utils/logger').createLogger('eaa-procedure');
 const {
   findStatementLink,
   missingStatementViolation,
@@ -67,7 +68,7 @@ class EAAProcedureScanner extends BaseScanner {
     let feedbackProcessImplemented = false;
     let complianceMonitoringActive = false;
 
-    console.log('Starting EAA procedural analysis...');
+    log.debug('Starting EAA procedural analysis...');
 
     // Take initial screenshot (only if scanDir provided)
     if (scanDir) {
@@ -132,8 +133,8 @@ class EAAProcedureScanner extends BaseScanner {
       euLegalCompliance: euLegalCompliance,
     });
 
-    console.log(`EAA procedural analysis complete: ${violations.length} violations found`);
-    console.log(`EU Legal Compliance Status: ${euLegalCompliance ? 'COMPLIANT' : 'NON-COMPLIANT'}`);
+    log.debug(`EAA procedural analysis complete: ${violations.length} violations found`);
+    log.debug(`EU Legal Compliance Status: ${euLegalCompliance ? 'COMPLIANT' : 'NON-COMPLIANT'}`);
 
     return {
       violations,
@@ -150,7 +151,7 @@ class EAAProcedureScanner extends BaseScanner {
    * Analyze accessibility statement presence and compliance
    */
   async analyzeAccessibilityStatement(page, scanDir, violations, options) {
-    console.log('Analyzing accessibility statement compliance...');
+    log.debug('Analyzing accessibility statement compliance...');
 
     // Detection of the LINK is shared with the other three EAA scanners
     // (src/utils/accessibility-statement.js) so they cannot disagree about
@@ -204,7 +205,7 @@ class EAAProcedureScanner extends BaseScanner {
     // If no statement found on current page, search linked pages
     if (!present && options.searchDepth > 0) {
       try {
-        console.log('Searching linked pages for accessibility statement...');
+        log.debug('Searching linked pages for accessibility statement...');
 
         const linkedPageResults = await page.evaluate(async () => {
           const links = document.querySelectorAll('a[href]');
@@ -305,11 +306,11 @@ class EAAProcedureScanner extends BaseScanner {
               break; // Found statement, stop searching
             }
           } catch (error) {
-            console.log(`Failed to load statement page: ${error.message}`);
+            log.debug(`Failed to load statement page: ${error.message}`);
           }
         }
       } catch (error) {
-        console.log(`Statement search failed: ${error.message}`);
+        log.debug(`Statement search failed: ${error.message}`);
       }
     }
 
@@ -328,7 +329,7 @@ class EAAProcedureScanner extends BaseScanner {
    * Analyze contact mechanism availability
    */
   async analyzeContactMechanism(page, scanDir, violations, options) {
-    console.log('Analyzing contact mechanism availability...');
+    log.debug('Analyzing contact mechanism availability...');
 
     const contactAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -449,7 +450,7 @@ class EAAProcedureScanner extends BaseScanner {
    * Analyze feedback process implementation
    */
   async analyzeFeedbackProcess(page, scanDir, violations, options) {
-    console.log('Analyzing feedback process implementation...');
+    log.debug('Analyzing feedback process implementation...');
 
     const feedbackAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -566,7 +567,7 @@ class EAAProcedureScanner extends BaseScanner {
    * Analyze compliance monitoring procedures
    */
   async analyzeComplianceMonitoring(page, scanDir, violations, options) {
-    console.log('Analyzing compliance monitoring procedures...');
+    log.debug('Analyzing compliance monitoring procedures...');
 
     const monitoringAnalysis = await page.evaluate(() => {
       const issues = [];

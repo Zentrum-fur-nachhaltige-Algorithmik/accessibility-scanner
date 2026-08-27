@@ -9,6 +9,7 @@
 const BaseScanner = require('../core/base-scanner');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
 const { isHardViolation } = require('../core/severity');
+const log = require('../utils/logger').createLogger('axe-core');
 
 /**
  * Map axe-core tags to WCAG success criteria strings.
@@ -102,7 +103,7 @@ class AxeCoreAdapter extends BaseScanner {
         .catch(() => null);
 
       const ready = await isComplete();
-      console.warn(
+      log.warn(
         '[axe-core] Page never reached readyState "complete" (stalled subresource); ' +
           `aborted pending loads and ${ready ? 'continued' : 'proceeding anyway'}.`
       );

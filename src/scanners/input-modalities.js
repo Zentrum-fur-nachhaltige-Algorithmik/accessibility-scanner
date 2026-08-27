@@ -3,6 +3,7 @@ const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: accnameCode } = require('../utils/accessible-name');
+const log = require('../utils/logger').createLogger('input-modalities');
 
 /**
  * Input Modalities Scanner for WCAG 2.2 compliance testing
@@ -75,7 +76,7 @@ class InputModalitiesScanner extends BaseScanner {
     let draggingAlternativesProvided = true;
     let targetSizingAdequate = true;
 
-    console.log('Starting input modalities analysis...');
+    log.debug('Starting input modalities analysis...');
 
     // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'input-modalities-analysis.png');
@@ -123,7 +124,7 @@ class InputModalitiesScanner extends BaseScanner {
       targetSizingAdequate,
     });
 
-    console.log(`Input modalities analysis complete: ${violations.length} violations found`);
+    log.debug(`Input modalities analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
@@ -141,7 +142,7 @@ class InputModalitiesScanner extends BaseScanner {
    * Analyze pointer gestures (WCAG 2.5.1)
    */
   async analyzePointerGestures(page, violations) {
-    console.log('Analyzing pointer gestures...');
+    log.debug('Analyzing pointer gestures...');
 
     const gestureAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -288,7 +289,7 @@ class InputModalitiesScanner extends BaseScanner {
    * Analyze pointer cancellation (WCAG 2.5.2)
    */
   async analyzePointerCancellation(page, violations) {
-    console.log('Analyzing pointer cancellation...');
+    log.debug('Analyzing pointer cancellation...');
 
     const cancellationAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -426,7 +427,7 @@ class InputModalitiesScanner extends BaseScanner {
    * Analyze label in name (WCAG 2.5.3)
    */
   async analyzeLabelInName(page, violations) {
-    console.log('Analyzing label in name consistency...');
+    log.debug('Analyzing label in name consistency...');
 
     const labelAnalysis = await page.evaluate(
       (accnameCode, renderedCode) => {
@@ -499,7 +500,7 @@ class InputModalitiesScanner extends BaseScanner {
    * Analyze motion actuation (WCAG 2.5.4)
    */
   async analyzeMotionActuation(page, violations) {
-    console.log('Analyzing motion actuation...');
+    log.debug('Analyzing motion actuation...');
 
     const motionAnalysis = await page.evaluate(() => {
       const issues = [];
@@ -617,7 +618,6 @@ class InputModalitiesScanner extends BaseScanner {
         };
 
         // Check if element responds to device orientation
-        const style = window.getComputedStyle(element);
         const hasOrientationCSS =
           className.includes('orientation') || element.style.transform.includes('rotate');
 
@@ -747,7 +747,7 @@ class InputModalitiesScanner extends BaseScanner {
    * Flags interactive elements smaller than 24x24 CSS pixels
    */
   async analyzeTargetSize(page, violations) {
-    console.log('Analyzing target size minimum...');
+    log.debug('Analyzing target size minimum...');
 
     const targetAnalysis = await page.evaluate((renderedCode) => {
       eval(renderedCode);
@@ -917,7 +917,7 @@ class InputModalitiesScanner extends BaseScanner {
    * Checks that drag operations have single-pointer alternatives
    */
   async analyzeDraggingMovements(page, violations) {
-    console.log('Analyzing dragging movements...');
+    log.debug('Analyzing dragging movements...');
 
     const dragAnalysis = await page.evaluate(() => {
       const issues = [];

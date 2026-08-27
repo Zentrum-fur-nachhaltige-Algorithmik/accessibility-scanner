@@ -1,5 +1,6 @@
 const BaseScanner = require('../core/base-scanner');
 const { findStatementLink } = require('../utils/accessibility-statement');
+const log = require('../utils/logger').createLogger('contact-mechanism');
 
 /**
  * Contact Mechanism Scanner for EAA Procedural Requirements
@@ -53,7 +54,7 @@ class ContactMechanismScanner extends BaseScanner {
    * Analyze contact mechanisms on the page
    */
   async analyzeContactMechanisms(page, options) {
-    console.log('Analyzing contact mechanisms...');
+    log.debug('Analyzing contact mechanisms...');
 
     const violations = [];
     let emailContactAvailable = false;
@@ -189,7 +190,7 @@ class ContactMechanismScanner extends BaseScanner {
    * Analyze contact mechanisms on current page
    */
   async analyzePageContactMechanisms(page) {
-    console.log('  Analyzing contact mechanisms on current page...');
+    log.debug('  Analyzing contact mechanisms on current page...');
 
     const analysis = await page.evaluate(() => {
       const pageText = document.body.textContent.toLowerCase();
@@ -255,7 +256,7 @@ class ContactMechanismScanner extends BaseScanner {
    * Find and analyze dedicated contact page
    */
   async findAndAnalyzeContactPage(page, options) {
-    console.log('  Looking for dedicated contact page...');
+    log.debug('  Looking for dedicated contact page...');
 
     // Find contact page link
     const contactLinkResult = await page.evaluate(() => {
@@ -306,7 +307,7 @@ class ContactMechanismScanner extends BaseScanner {
         waitUntil: 'networkidle0',
         timeout: options.timeout,
       });
-      console.log(`  Found contact page at: ${contactLinkResult.url}`);
+      log.debug(`  Found contact page at: ${contactLinkResult.url}`);
 
       // Analyze contact page
       const contactPageAnalysis = await this.analyzePageContactMechanisms(page);
@@ -320,7 +321,7 @@ class ContactMechanismScanner extends BaseScanner {
         accessible: true,
       };
     } catch (error) {
-      console.log(`  Contact page not accessible: ${error.message}`);
+      log.debug(`  Contact page not accessible: ${error.message}`);
       return {
         found: true,
         emailContact: false,
@@ -398,7 +399,7 @@ class ContactMechanismScanner extends BaseScanner {
           const phone = href.replace('tel:', '');
 
           // Basic phone validation - should contain only numbers, spaces, +, -, ()
-          const phoneRegex = /^[\+]?[0-9\s\-()]+$/;
+          const phoneRegex = /^[+]?[0-9\s()-]+$/;
           if (!phoneRegex.test(phone) || phone.replace(/[^0-9]/g, '').length < 7) {
             const selector = link.id
               ? `a#${link.id}`

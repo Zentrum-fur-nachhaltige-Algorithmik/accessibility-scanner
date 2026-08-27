@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { tabWalk, cleanupTabWalk, TAB_ATTR } = require('../utils/keyboard-focus');
-const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
+const log = require('../utils/logger').createLogger('focus-management');
 
 /**
  * Focus Management Scanner for WCAG compliance testing
@@ -59,13 +59,11 @@ class FocusManagementScanner extends BaseScanner {
    */
   async performFocusAnalysis(page, scanDir) {
     const violations = [];
-    const focusSequence = [];
-    const visualAnalysis = [];
     let logicalTabOrder = true;
     let allElementsHaveVisibleFocus = true;
     let focusTraps = 0;
 
-    console.log('Analyzing focus management with visual validation...');
+    log.debug('Analyzing focus management with visual validation...');
 
     // 1. Analyze reading order vs. tab order
     const readingOrderAnalysis = await this.analyzeReadingOrder(page, scanDir);
@@ -201,7 +199,7 @@ class FocusManagementScanner extends BaseScanner {
    * Analyze reading order vs. visual layout
    */
   async analyzeReadingOrder(page, scanDir) {
-    console.log('Analyzing reading order vs. visual layout...');
+    log.debug('Analyzing reading order vs. visual layout...');
 
     // Take full page screenshot for layout analysis
     await page.screenshot({
@@ -279,7 +277,7 @@ class FocusManagementScanner extends BaseScanner {
    * Test focus sequence with visual validation
    */
   async testFocusSequence(page, scanDir) {
-    console.log('Testing focus sequence with visual validation...');
+    log.debug('Testing focus sequence with visual validation...');
 
     // Real keyboard Tab via src/utils/keyboard-focus.js: element identity by
     // tab id (two `a.nav__link`s are two elements, not a "trap"), focus
@@ -295,7 +293,7 @@ class FocusManagementScanner extends BaseScanner {
     try {
       for await (const step of tabWalk(page, { maxSteps: 60, settleMs: 120 })) {
         if (step.stuck) {
-          console.log('Focus trap detected, ending sequence');
+          log.debug('Focus trap detected, ending sequence');
           break;
         }
         if (!step.rendered) continue;
@@ -359,7 +357,7 @@ class FocusManagementScanner extends BaseScanner {
       await cleanupTabWalk(page);
     }
 
-    console.log(`Focus sequence analysis complete: ${sequence.length} focusable elements`);
+    log.debug(`Focus sequence analysis complete: ${sequence.length} focusable elements`);
     return { sequence, visualAnalysis };
   }
 
@@ -400,7 +398,7 @@ class FocusManagementScanner extends BaseScanner {
    * Test focus management in dynamic content (modals, dropdowns, etc.)
    */
   async testDynamicFocusManagement(page, scanDir) {
-    console.log('Testing dynamic focus management...');
+    log.debug('Testing dynamic focus management...');
 
     const violations = [];
 
@@ -518,7 +516,7 @@ class FocusManagementScanner extends BaseScanner {
         await page.keyboard.press('Escape');
         await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (error) {
-        console.warn(`Error testing modal trigger ${trigger.element}:`, error.message);
+        log.warn(`Error testing modal trigger ${trigger.element}:`, error.message);
       }
     }
 
@@ -549,7 +547,7 @@ class FocusManagementScanner extends BaseScanner {
     });
 
     // Test first few delete buttons (avoid testing too many)
-    for (const [idx, btn] of deleteButtons.slice(0, 3).entries()) {
+    for (const btn of deleteButtons.slice(0, 3)) {
       try {
         // Record DOM state before
         const before = await page.evaluate((sel) => {
@@ -604,7 +602,7 @@ class FocusManagementScanner extends BaseScanner {
           });
         }
       } catch (error) {
-        console.warn(`Error testing delete button ${btn.element}:`, error.message);
+        log.warn(`Error testing delete button ${btn.element}:`, error.message);
       }
     }
 
@@ -631,7 +629,7 @@ class FocusManagementScanner extends BaseScanner {
       return buttons;
     });
 
-    for (const [idx, btn] of loadMoreButtons.slice(0, 2).entries()) {
+    for (const btn of loadMoreButtons.slice(0, 2)) {
       try {
         const beforeCount = await page.evaluate(() => document.body.querySelectorAll('*').length);
 
@@ -666,7 +664,7 @@ class FocusManagementScanner extends BaseScanner {
           });
         }
       } catch (error) {
-        console.warn(`Error testing load-more button ${btn.element}:`, error.message);
+        log.warn(`Error testing load-more button ${btn.element}:`, error.message);
       }
     }
 
@@ -677,7 +675,7 @@ class FocusManagementScanner extends BaseScanner {
    * Test focus restoration after interactions
    */
   async testFocusRestoration(page, scanDir) {
-    console.log('Testing focus restoration...');
+    log.debug('Testing focus restoration...');
 
     const violations = [];
 
@@ -753,7 +751,7 @@ class FocusManagementScanner extends BaseScanner {
           });
         }
       } catch (error) {
-        console.warn(`Error testing dropdown ${trigger.element}:`, error.message);
+        log.warn(`Error testing dropdown ${trigger.element}:`, error.message);
       }
     }
 
@@ -765,7 +763,7 @@ class FocusManagementScanner extends BaseScanner {
    * Checks if focused elements are covered by fixed/sticky positioned elements
    */
   async analyzeFocusObscured(page, focusSequence, violations) {
-    console.log('Analyzing focus obscured by fixed/sticky elements...');
+    log.debug('Analyzing focus obscured by fixed/sticky elements...');
 
     // SC 2.4.11 is about the OUTCOME: when an element receives keyboard focus,
     // is it entirely hidden behind author-created content? So we tab through

@@ -7,6 +7,7 @@
 
 const BaseScanner = require('../../core/base-scanner');
 const { getPageContextPack } = require('./page-context');
+const log = require('../../utils/logger').createLogger('llm-base');
 
 /**
  * The system prompt shared by BOTH the legacy `analyzeWithLLM` path and the
@@ -100,7 +101,7 @@ class LLMBaseScanner extends BaseScanner {
           if (balanced) {
             try {
               parsed = JSON.parse(balanced);
-              console.warn(
+              log.warn(
                 `${this.id}: Recovered JSON by discarding trailing garbage after a complete response`
               );
             } catch {
@@ -126,7 +127,7 @@ class LLMBaseScanner extends BaseScanner {
               try {
                 const repaired = this._repairTruncatedJson(candidate);
                 parsed = JSON.parse(repaired);
-                console.warn(
+                log.warn(
                   cut === 0
                     ? `${this.id}: Recovered truncated JSON response`
                     : `${this.id}: Recovered JSON after trimming ${cut} trailing corrupted line(s)`
@@ -145,7 +146,7 @@ class LLMBaseScanner extends BaseScanner {
         parsed = text;
       }
     } catch (e) {
-      console.error(`${this.id}: Failed to parse LLM response: ${e.message}`);
+      log.error(`${this.id}: Failed to parse LLM response: ${e.message}`);
       // Return empty violations rather than crashing the scan
       parsed = { violations: [], summary: 'LLM response could not be parsed' };
     }
@@ -204,7 +205,7 @@ class LLMBaseScanner extends BaseScanner {
       if (!result || !result.success) {
         failedChunks++;
         lastError = (result && result.error) || 'unknown error';
-        console.warn(
+        log.warn(
           `${this.id}: LLM analysis failed for context part ${i + 1}/${pack.chunks.length}: ${lastError}`
         );
         continue;
@@ -403,7 +404,7 @@ class LLMBaseScanner extends BaseScanner {
 
       if (!normalized || !allowed.has(normalized)) {
         this.droppedViolationCount++;
-        console.warn(
+        log.warn(
           `${this.id}: dropping off-list violation for criterion "${v.criterion ?? 'undefined'}" ` +
             `(scanner covers: ${this.wcagCriteria.join(', ') || 'none'})`
         );

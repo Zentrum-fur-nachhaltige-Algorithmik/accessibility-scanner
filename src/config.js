@@ -13,7 +13,12 @@ function int(name, fallback) {
 
 function list(name) {
   const v = process.env[name];
-  return v ? v.split(',').map((s) => s.trim()).filter(Boolean) : [];
+  return v
+    ? v
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
 }
 
 const config = {

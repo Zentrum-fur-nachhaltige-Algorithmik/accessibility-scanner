@@ -17,7 +17,9 @@ class InputModalitiesScanner extends BaseScanner {
     });
   }
 
-  get needsExclusiveAccess() { return true; }
+  get needsExclusiveAccess() {
+    return true;
+  }
 
   /**
    * Core scan method — receives an already-navigated Puppeteer page.
@@ -44,7 +46,7 @@ class InputModalitiesScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.2.5.1", "9.2.5.2", "9.2.5.3", "9.2.5.4", "9.2.5.7", "9.2.5.8"],
+      criteria: ['9.2.5.1', '9.2.5.2', '9.2.5.3', '9.2.5.4', '9.2.5.7', '9.2.5.8'],
       passed: inputResults.violations.length === 0,
       violations: inputResults.violations,
       summary: {
@@ -53,10 +55,10 @@ class InputModalitiesScanner extends BaseScanner {
         labelNamesConsistent: inputResults.labelNamesConsistent,
         motionAlternativesProvided: inputResults.motionAlternativesProvided,
         draggingAlternativesProvided: inputResults.draggingAlternativesProvided,
-        targetSizingAdequate: inputResults.targetSizingAdequate
+        targetSizingAdequate: inputResults.targetSizingAdequate,
       },
       screenshotPath: scanDir,
-      visualEvidence: inputResults.visualEvidence
+      visualEvidence: inputResults.visualEvidence,
     };
   }
 
@@ -118,7 +120,7 @@ class InputModalitiesScanner extends BaseScanner {
       labelsConsistent: labelNamesConsistent,
       motionAlternatives: motionAlternativesProvided,
       draggingAlternatives: draggingAlternativesProvided,
-      targetSizingAdequate
+      targetSizingAdequate,
     });
 
     console.log(`Input modalities analysis complete: ${violations.length} violations found`);
@@ -131,7 +133,7 @@ class InputModalitiesScanner extends BaseScanner {
       labelNamesConsistent,
       motionAlternativesProvided,
       draggingAlternativesProvided,
-      targetSizingAdequate
+      targetSizingAdequate,
     };
   }
 
@@ -147,90 +149,98 @@ class InputModalitiesScanner extends BaseScanner {
 
       // Find elements with complex gesture requirements
       const allElements = document.querySelectorAll('*');
-      
-      allElements.forEach(element => {
+
+      allElements.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
           tagName: element.tagName.toLowerCase(),
           id: element.id,
           className: className,
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (className ? `.${className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : ''),
         };
 
         // Check for drag and drop without keyboard alternatives
         if (element.hasAttribute('draggable') && element.getAttribute('draggable') === 'true') {
-          const hasKeyboardAlternative = (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1') ||
-                                        element.querySelector('[tabindex]:not([tabindex="-1"])') ||
-                                        element.closest('[role="button"]') ||
-                                        document.querySelector(`button[aria-controls="${element.id}"]`);
+          const hasKeyboardAlternative =
+            (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1') ||
+            element.querySelector('[tabindex]:not([tabindex="-1"])') ||
+            element.closest('[role="button"]') ||
+            document.querySelector(`button[aria-controls="${element.id}"]`);
 
           if (!hasKeyboardAlternative) {
             issues.push({
               type: 'drag-without-alternative',
               element: elementInfo.selector,
               description: 'Draggable element lacks keyboard alternative',
-              severity: 'error'
+              severity: 'error',
             });
             accessible = false;
           }
         }
 
         // Check for multi-touch gestures without alternatives
-        const hasMultiTouchListeners = element.ontouchstart || element.ontouchmove ||
-                                     element.getAttribute('ontouchstart') || 
-                                     element.getAttribute('ontouchmove');
+        const hasMultiTouchListeners =
+          element.ontouchstart ||
+          element.ontouchmove ||
+          element.getAttribute('ontouchstart') ||
+          element.getAttribute('ontouchmove');
 
         if (hasMultiTouchListeners) {
           // Check for simple touch/click alternatives
-          const hasSimpleAlternative = element.onclick || element.onmouseup ||
-                                      element.getAttribute('onclick') ||
-                                      element.getAttribute('onmouseup') ||
-                                      (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
+          const hasSimpleAlternative =
+            element.onclick ||
+            element.onmouseup ||
+            element.getAttribute('onclick') ||
+            element.getAttribute('onmouseup') ||
+            (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
 
           if (!hasSimpleAlternative) {
             issues.push({
               type: 'multitouch-without-alternative',
               element: elementInfo.selector,
               description: 'Multi-touch gesture lacks simple activation alternative',
-              severity: 'error'
+              severity: 'error',
             });
             accessible = false;
           }
         }
 
         // Check for swipe-only interfaces (only for interactive elements)
-        const isInteractiveElement = element.tagName.toLowerCase() === 'button' ||
-                                   element.hasAttribute('onclick') ||
-                                   element.hasAttribute('role') ||
-                                   (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
+        const isInteractiveElement =
+          element.tagName.toLowerCase() === 'button' ||
+          element.hasAttribute('onclick') ||
+          element.hasAttribute('role') ||
+          (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
 
         if (isInteractiveElement) {
           const swipeIndicators = ['swipe', 'slide'];
           const elementText = element.textContent.toLowerCase();
           const ariaLabel = element.getAttribute('aria-label')?.toLowerCase() || '';
-          
-          const hasSwipeIndication = swipeIndicators.some(indicator => 
-            elementText.includes(indicator) || ariaLabel.includes(indicator)
+
+          const hasSwipeIndication = swipeIndicators.some(
+            (indicator) => elementText.includes(indicator) || ariaLabel.includes(indicator)
           );
 
           if (hasSwipeIndication) {
             // Look for alternative navigation controls
-            const hasAlternativeNavigation = document.querySelector('button[aria-label*="next"]') ||
-                                           document.querySelector('button[aria-label*="previous"]') ||
-                                           document.querySelector('.pagination') ||
-                                           document.querySelector('[role="tablist"]') ||
-                                           element.closest('form') ||
-                                           (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
+            const hasAlternativeNavigation =
+              document.querySelector('button[aria-label*="next"]') ||
+              document.querySelector('button[aria-label*="previous"]') ||
+              document.querySelector('.pagination') ||
+              document.querySelector('[role="tablist"]') ||
+              element.closest('form') ||
+              (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
 
             if (!hasAlternativeNavigation) {
               issues.push({
                 type: 'swipe-without-alternative',
                 element: elementInfo.selector,
                 description: 'Swipe gesture interface lacks alternative navigation controls',
-                severity: 'warning'
+                severity: 'warning',
               });
             }
           }
@@ -238,16 +248,18 @@ class InputModalitiesScanner extends BaseScanner {
 
         // Check for path-based gestures (complex gestures)
         if (element.hasAttribute('ongesturestart') || element.hasAttribute('ongesturechange')) {
-          const hasSimpleActivation = element.onclick || element.onkeydown ||
-                                     element.hasAttribute('onclick') ||
-                                     element.hasAttribute('onkeydown');
+          const hasSimpleActivation =
+            element.onclick ||
+            element.onkeydown ||
+            element.hasAttribute('onclick') ||
+            element.hasAttribute('onkeydown');
 
           if (!hasSimpleActivation) {
             issues.push({
               type: 'complex-gesture-only',
               element: elementInfo.selector,
               description: 'Complex path-based gesture lacks simple activation method',
-              severity: 'error'
+              severity: 'error',
             });
             accessible = false;
           }
@@ -258,14 +270,14 @@ class InputModalitiesScanner extends BaseScanner {
     });
 
     // Create violations for gesture issues
-    gestureAnalysis.issues.forEach(issue => {
+    gestureAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.5.1",
+        criterion: '9.2.5.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getGestureSuggestion(issue.type)
+        suggestion: this.getGestureSuggestion(issue.type),
       });
     });
 
@@ -283,57 +295,80 @@ class InputModalitiesScanner extends BaseScanner {
       let available = true;
 
       // Find interactive elements that might have cancellation issues
-      const interactiveElements = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"], a[href], [onclick], [onmousedown], [ontouchstart]');
+      const interactiveElements = document.querySelectorAll(
+        'button, [role="button"], input[type="button"], input[type="submit"], a[href], [onclick], [onmousedown], [ontouchstart]'
+      );
 
-      interactiveElements.forEach(element => {
+      interactiveElements.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
           tagName: element.tagName.toLowerCase(),
           id: element.id,
           className: className,
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (className ? `.${className.split(' ')[0]}` : ''),
-          textContent: element.textContent.trim().substring(0, 50)
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : ''),
+          textContent: element.textContent.trim().substring(0, 50),
         };
 
         // Check for down-event activation without cancellation
-        const hasDownEvent = element.onmousedown || element.ontouchstart ||
-                            element.getAttribute('onmousedown') ||
-                            element.getAttribute('ontouchstart');
+        const hasDownEvent =
+          element.onmousedown ||
+          element.ontouchstart ||
+          element.getAttribute('onmousedown') ||
+          element.getAttribute('ontouchstart');
 
         if (hasDownEvent) {
           // Check if there's corresponding up-event or cancellation mechanism
-          const hasUpEvent = element.onmouseup || element.ontouchend ||
-                           element.getAttribute('onmouseup') ||
-                           element.getAttribute('ontouchend') ||
-                           element.onclick || element.getAttribute('onclick');
+          const hasUpEvent =
+            element.onmouseup ||
+            element.ontouchend ||
+            element.getAttribute('onmouseup') ||
+            element.getAttribute('ontouchend') ||
+            element.onclick ||
+            element.getAttribute('onclick');
 
-          const hasLeaveEvent = element.onmouseleave || element.ontouchcancel ||
-                              element.getAttribute('onmouseleave') ||
-                              element.getAttribute('ontouchcancel');
+          const hasLeaveEvent =
+            element.onmouseleave ||
+            element.ontouchcancel ||
+            element.getAttribute('onmouseleave') ||
+            element.getAttribute('ontouchcancel');
 
           // Elements with keydown/keyup handlers likely have JS-registered up events too
-          const hasKeyboardHandler = element.onkeydown || element.getAttribute('onkeydown') ||
-                                    element.getAttribute('role') === 'slider' ||
-                                    element.getAttribute('role') === 'scrollbar';
+          const hasKeyboardHandler =
+            element.onkeydown ||
+            element.getAttribute('onkeydown') ||
+            element.getAttribute('role') === 'slider' ||
+            element.getAttribute('role') === 'scrollbar';
 
           if (!hasUpEvent && !hasLeaveEvent && !hasKeyboardHandler) {
             // Check if it's a critical action that requires cancellation
-            const criticalKeywords = ['delete', 'remove', 'buy', 'purchase', 'pay', 'submit', 'send', 'confirm'];
-            const isCritical = criticalKeywords.some(keyword => 
-              elementInfo.textContent.toLowerCase().includes(keyword) ||
-              element.getAttribute('aria-label')?.toLowerCase().includes(keyword)
+            const criticalKeywords = [
+              'delete',
+              'remove',
+              'buy',
+              'purchase',
+              'pay',
+              'submit',
+              'send',
+              'confirm',
+            ];
+            const isCritical = criticalKeywords.some(
+              (keyword) =>
+                elementInfo.textContent.toLowerCase().includes(keyword) ||
+                element.getAttribute('aria-label')?.toLowerCase().includes(keyword)
             );
 
             if (isCritical) {
               issues.push({
                 type: 'critical-action-no-cancellation',
                 element: elementInfo.selector,
-                description: 'Critical action activates on down-event without cancellation mechanism',
+                description:
+                  'Critical action activates on down-event without cancellation mechanism',
                 textContent: elementInfo.textContent,
-                severity: 'error'
+                severity: 'error',
               });
               available = false;
             } else {
@@ -342,7 +377,7 @@ class InputModalitiesScanner extends BaseScanner {
                 element: elementInfo.selector,
                 description: 'Action activates on down-event without cancellation option',
                 textContent: elementInfo.textContent,
-                severity: 'warning'
+                severity: 'warning',
               });
             }
           }
@@ -350,9 +385,10 @@ class InputModalitiesScanner extends BaseScanner {
 
         // Check for immediate actions that can't be cancelled
         const immediateActionIndicators = ['immediate', 'instant', 'auto'];
-        const hasImmediateAction = immediateActionIndicators.some(indicator =>
-          elementInfo.textContent.toLowerCase().includes(indicator) ||
-          element.getAttribute('aria-label')?.toLowerCase().includes(indicator)
+        const hasImmediateAction = immediateActionIndicators.some(
+          (indicator) =>
+            elementInfo.textContent.toLowerCase().includes(indicator) ||
+            element.getAttribute('aria-label')?.toLowerCase().includes(indicator)
         );
 
         if (hasImmediateAction) {
@@ -361,7 +397,7 @@ class InputModalitiesScanner extends BaseScanner {
             element: elementInfo.selector,
             description: 'Immediate action cannot be cancelled or undone',
             textContent: elementInfo.textContent,
-            severity: 'error'
+            severity: 'error',
           });
           available = false;
         }
@@ -371,15 +407,15 @@ class InputModalitiesScanner extends BaseScanner {
     });
 
     // Create violations for cancellation issues
-    cancellationAnalysis.issues.forEach(issue => {
+    cancellationAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.5.2",
+        criterion: '9.2.5.2',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         textContent: issue.textContent,
         severity: issue.severity,
-        suggestion: this.getCancellationSuggestion(issue.type)
+        suggestion: this.getCancellationSuggestion(issue.type),
       });
     });
 
@@ -392,58 +428,67 @@ class InputModalitiesScanner extends BaseScanner {
   async analyzeLabelInName(page, violations) {
     console.log('Analyzing label in name consistency...');
 
-    const labelAnalysis = await page.evaluate((accnameCode, renderedCode) => {
-      eval(accnameCode);
-      eval(renderedCode);
-      const issues = [];
-      let consistent = true;
+    const labelAnalysis = await page.evaluate(
+      (accnameCode, renderedCode) => {
+        eval(accnameCode);
+        eval(renderedCode);
+        const issues = [];
+        let consistent = true;
 
-      // Visible label, normalisation and the containment test all come from
-      // src/utils/accessible-name.js (__visibleLabelText / __nameContainsLabel
-      // / __labelInNameOk) so this scanner and phase6a-label-in-name cannot
-      // disagree about what "the visible label" is. The local copy that used
-      // to live here concatenated every rendered text node, which made a
-      // branding link's monogram and tagline part of the label and failed
-      // every one of them — see the header comment in that file.
-      const norm = __visibleLabelNormalize;
+        // Visible label, normalisation and the containment test all come from
+        // src/utils/accessible-name.js (__visibleLabelText / __nameContainsLabel
+        // / __labelInNameOk) so this scanner and phase6a-label-in-name cannot
+        // disagree about what "the visible label" is. The local copy that used
+        // to live here concatenated every rendered text node, which made a
+        // branding link's monogram and tagline part of the label and failed
+        // every one of them — see the header comment in that file.
+        const norm = __visibleLabelNormalize;
 
-      const controls = document.querySelectorAll('button, [role="button"], [role="link"], [role="menuitem"], [role="tab"], a[href], input[type="button"], input[type="submit"], input[type="reset"]');
-      controls.forEach(element => {
-        if (!__isRendered(element)) return;
-        const tag = element.tagName.toLowerCase();
-        const visible = __visibleLabelText(element);
-        const vis = visible.full;
-        if (!vis) return; // icon-only control: 2.5.3 does not apply (4.1.2 covers naming)
-        const name = norm(__accessibleName(element));
-        if (!name) return; // missing name is 4.1.2, reported elsewhere
-        if (__labelInNameOk(element, __accessibleName(element))) return;
+        const controls = document.querySelectorAll(
+          'button, [role="button"], [role="link"], [role="menuitem"], [role="tab"], a[href], input[type="button"], input[type="submit"], input[type="reset"]'
+        );
+        controls.forEach((element) => {
+          if (!__isRendered(element)) return;
+          const tag = element.tagName.toLowerCase();
+          const visible = __visibleLabelText(element);
+          const vis = visible.full;
+          if (!vis) return; // icon-only control: 2.5.3 does not apply (4.1.2 covers naming)
+          const name = norm(__accessibleName(element));
+          if (!name) return; // missing name is 4.1.2, reported elsewhere
+          if (__labelInNameOk(element, __accessibleName(element))) return;
 
-        const className = typeof element.className === 'string' ? element.className.trim() : '';
-        issues.push({
-          type: 'label-name-mismatch',
-          element: tag + (element.id ? `#${element.id}` : '') + (className ? `.${className.split(/\s+/)[0]}` : ''),
-          visibleText: vis.substring(0, 50),
-          accessibleName: name.substring(0, 50),
-          description: 'Accessible name does not contain the visible label text',
-          severity: 'serious'
+          const className = typeof element.className === 'string' ? element.className.trim() : '';
+          issues.push({
+            type: 'label-name-mismatch',
+            element:
+              tag +
+              (element.id ? `#${element.id}` : '') +
+              (className ? `.${className.split(/\s+/)[0]}` : ''),
+            visibleText: vis.substring(0, 50),
+            accessibleName: name.substring(0, 50),
+            description: 'Accessible name does not contain the visible label text',
+            severity: 'serious',
+          });
+          consistent = false;
         });
-        consistent = false;
-      });
 
-      return { issues, consistent };
-    }, accnameCode, renderedCode);
+        return { issues, consistent };
+      },
+      accnameCode,
+      renderedCode
+    );
 
     // Create violations for label consistency issues
-    labelAnalysis.issues.forEach(issue => {
+    labelAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.5.3",
+        criterion: '9.2.5.3',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         visibleText: issue.visibleText,
         accessibleName: issue.accessibleName,
         severity: issue.severity,
-        suggestion: this.getLabelSuggestion(issue.type)
+        suggestion: this.getLabelSuggestion(issue.type),
       });
     });
 
@@ -466,51 +511,72 @@ class InputModalitiesScanner extends BaseScanner {
 
       if (hasDeviceMotion || hasDeviceOrientation) {
         // Look for motion-related keywords in visible page content (exclude script/style)
-        const motionKeywords = ['shake', 'tilt', 'rotate', 'motion', 'gesture', 'device orientation'];
+        const motionKeywords = [
+          'shake',
+          'tilt',
+          'rotate',
+          'motion',
+          'gesture',
+          'device orientation',
+        ];
         const clone = document.body.cloneNode(true);
-        clone.querySelectorAll('script, style, noscript').forEach(el => el.remove());
+        clone.querySelectorAll('script, style, noscript').forEach((el) => el.remove());
         const pageText = clone.textContent.toLowerCase();
-        
-        const hasMotionFeatures = motionKeywords.some(keyword => pageText.includes(keyword));
+
+        const hasMotionFeatures = motionKeywords.some((keyword) => pageText.includes(keyword));
 
         if (hasMotionFeatures) {
           // Check for disable/alternative controls
-          const disableControls = document.querySelectorAll('input[type="checkbox"], button, [role="switch"]');
+          const disableControls = document.querySelectorAll(
+            'input[type="checkbox"], button, [role="switch"]'
+          );
           let hasDisableOption = false;
           let hasAlternativeMethod = false;
 
-          disableControls.forEach(control => {
-            const controlText = control.textContent.toLowerCase() + 
-                              (control.getAttribute('aria-label') || '').toLowerCase() +
-                              (control.getAttribute('placeholder') || '').toLowerCase();
+          disableControls.forEach((control) => {
+            const controlText =
+              control.textContent.toLowerCase() +
+              (control.getAttribute('aria-label') || '').toLowerCase() +
+              (control.getAttribute('placeholder') || '').toLowerCase();
 
-            if ((controlText.includes('motion') && (controlText.includes('enable') || controlText.includes('disable'))) ||
-                (controlText.includes('shake') && (controlText.includes('enable') || controlText.includes('disable'))) || 
-                controlText.includes('tilt') || 
-                controlText.includes('disable motion') ||
-                controlText.includes('enable motion') ||
-                controlText.includes('motion controls')) {
+            if (
+              (controlText.includes('motion') &&
+                (controlText.includes('enable') || controlText.includes('disable'))) ||
+              (controlText.includes('shake') &&
+                (controlText.includes('enable') || controlText.includes('disable'))) ||
+              controlText.includes('tilt') ||
+              controlText.includes('disable motion') ||
+              controlText.includes('enable motion') ||
+              controlText.includes('motion controls')
+            ) {
               hasDisableOption = true;
             }
           });
 
           // Look for alternative methods (buttons for same functionality)
           const actionButtons = document.querySelectorAll('button, [role="button"]');
-          actionButtons.forEach(button => {
-            const buttonText = button.textContent.toLowerCase() + 
-                             (button.getAttribute('aria-label') || '').toLowerCase();
+          actionButtons.forEach((button) => {
+            const buttonText =
+              button.textContent.toLowerCase() +
+              (button.getAttribute('aria-label') || '').toLowerCase();
 
-            if (buttonText.includes('refresh') || buttonText.includes('reload') || 
-                buttonText.includes('update') || buttonText.includes('manual') ||
-                buttonText.includes('alternative')) {
+            if (
+              buttonText.includes('refresh') ||
+              buttonText.includes('reload') ||
+              buttonText.includes('update') ||
+              buttonText.includes('manual') ||
+              buttonText.includes('alternative')
+            ) {
               hasAlternativeMethod = true;
             }
           });
 
           // Only flag as violations if no controls found AND motion features are explicitly mentioned
-          const explicitMotionFeatures = motionKeywords.some(keyword => 
-            pageText.includes(`${keyword} to `) || pageText.includes(`${keyword} device`) ||
-            pageText.includes(`${keyword} your phone`)
+          const explicitMotionFeatures = motionKeywords.some(
+            (keyword) =>
+              pageText.includes(`${keyword} to `) ||
+              pageText.includes(`${keyword} device`) ||
+              pageText.includes(`${keyword} your phone`)
           );
 
           if (explicitMotionFeatures && !hasDisableOption) {
@@ -518,7 +584,7 @@ class InputModalitiesScanner extends BaseScanner {
               type: 'motion-no-disable-option',
               element: 'document',
               description: 'Motion-activated features lack user control to disable them',
-              severity: 'error'
+              severity: 'error',
             });
             alternativesProvided = false;
           }
@@ -528,7 +594,7 @@ class InputModalitiesScanner extends BaseScanner {
               type: 'motion-no-alternative-method',
               element: 'document',
               description: 'Motion-activated functionality lacks alternative input method',
-              severity: 'error'
+              severity: 'error',
             });
             alternativesProvided = false;
           }
@@ -536,34 +602,38 @@ class InputModalitiesScanner extends BaseScanner {
       }
 
       // Check for CSS motion controls that might be problematic
-      const elementsWithTransform = document.querySelectorAll('[style*="transform"], [class*="rotate"], [class*="shake"]');
-      
-      elementsWithTransform.forEach(element => {
+      const elementsWithTransform = document.querySelectorAll(
+        '[style*="transform"], [class*="rotate"], [class*="shake"]'
+      );
+
+      elementsWithTransform.forEach((element) => {
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (className ? `.${className.split(' ')[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : ''),
         };
 
         // Check if element responds to device orientation
         const style = window.getComputedStyle(element);
-        const hasOrientationCSS = className.includes('orientation') ||
-                                element.style.transform.includes('rotate');
+        const hasOrientationCSS =
+          className.includes('orientation') || element.style.transform.includes('rotate');
 
         if (hasOrientationCSS) {
           // Look for alternative controls for this element
-          const hasControlButton = document.querySelector(`button[aria-controls="${element.id}"]`) ||
-                                  element.querySelector('button') ||
-                                  element.parentElement.querySelector('button');
+          const hasControlButton =
+            document.querySelector(`button[aria-controls="${element.id}"]`) ||
+            element.querySelector('button') ||
+            element.parentElement.querySelector('button');
 
           if (!hasControlButton) {
             issues.push({
               type: 'orientation-css-no-alternative',
               element: elementInfo.selector,
               description: 'Element responds to device orientation without alternative controls',
-              severity: 'warning'
+              severity: 'warning',
             });
           }
         }
@@ -575,22 +645,29 @@ class InputModalitiesScanner extends BaseScanner {
         for (const sheet of document.styleSheets) {
           try {
             for (const rule of sheet.cssRules || []) {
-              if (rule instanceof CSSMediaRule &&
-                  rule.conditionText && rule.conditionText.includes('prefers-reduced-motion')) {
+              if (
+                rule instanceof CSSMediaRule &&
+                rule.conditionText &&
+                rule.conditionText.includes('prefers-reduced-motion')
+              ) {
                 hasReducedMotionQuery = true;
                 break;
               }
             }
-          } catch (e) { /* cross-origin */ }
+          } catch (e) {
+            /* cross-origin */
+          }
           if (hasReducedMotionQuery) break;
         }
-      } catch (e) { /* no stylesheets */ }
+      } catch (e) {
+        /* no stylesheets */
+      }
 
       if (!hasReducedMotionQuery) {
         const allElements = document.querySelectorAll('*');
         const animatedElements = [];
 
-        allElements.forEach(el => {
+        allElements.forEach((el) => {
           const style = window.getComputedStyle(el);
           if (style.display === 'none' || style.visibility === 'hidden') return;
 
@@ -598,12 +675,18 @@ class InputModalitiesScanner extends BaseScanner {
           const duration = style.animationDuration;
           const animName = style.animationName;
 
-          if (iterationCount === 'infinite' && animName && animName !== 'none' &&
-              duration && duration !== '0s' && duration !== '0ms') {
-            const className = el.className && typeof el.className === 'string'
-              ? el.className : '';
+          if (
+            iterationCount === 'infinite' &&
+            animName &&
+            animName !== 'none' &&
+            duration &&
+            duration !== '0s' &&
+            duration !== '0ms'
+          ) {
+            const className = el.className && typeof el.className === 'string' ? el.className : '';
             animatedElements.push({
-              selector: el.tagName.toLowerCase() +
+              selector:
+                el.tagName.toLowerCase() +
                 (el.id ? `#${el.id}` : '') +
                 (className ? `.${className.split(' ')[0]}` : ''),
               animation: animName,
@@ -614,11 +697,14 @@ class InputModalitiesScanner extends BaseScanner {
 
         if (animatedElements.length > 0) {
           // Check for pause/stop controls
-          const pauseControls = document.querySelectorAll('button, [role="button"], input[type="checkbox"], [role="switch"]');
+          const pauseControls = document.querySelectorAll(
+            'button, [role="button"], input[type="checkbox"], [role="switch"]'
+          );
           let hasPauseControl = false;
           const pauseKeywords = /pause|stop|disable|reduce|animation|motion/i;
-          pauseControls.forEach(ctrl => {
-            const text = (ctrl.textContent || '') +
+          pauseControls.forEach((ctrl) => {
+            const text =
+              (ctrl.textContent || '') +
               (ctrl.getAttribute('aria-label') || '') +
               (ctrl.getAttribute('title') || '');
             if (pauseKeywords.test(text)) hasPauseControl = true;
@@ -642,14 +728,14 @@ class InputModalitiesScanner extends BaseScanner {
     });
 
     // Create violations for motion actuation issues
-    motionAnalysis.issues.forEach(issue => {
+    motionAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.5.4",
+        criterion: '9.2.5.4',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getMotionSuggestion(issue.type)
+        suggestion: this.getMotionSuggestion(issue.type),
       });
     });
 
@@ -668,16 +754,40 @@ class InputModalitiesScanner extends BaseScanner {
       const issues = [];
       let adequate = true;
 
-      const MIN_SIZE = 24;          // WCAG 2.5.8 AA minimum
-      const RADIUS = MIN_SIZE / 2;  // spacing exception: 24px-diameter circle
+      const MIN_SIZE = 24; // WCAG 2.5.8 AA minimum
+      const RADIUS = MIN_SIZE / 2; // spacing exception: 24px-diameter circle
 
-      const INLINE_TEXT_PARENTS = new Set(['p', 'li', 'td', 'th', 'dd', 'dt', 'span', 'label',
-        'figcaption', 'blockquote', 'cite', 'em', 'strong', 'small', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
+      const INLINE_TEXT_PARENTS = new Set([
+        'p',
+        'li',
+        'td',
+        'th',
+        'dd',
+        'dt',
+        'span',
+        'label',
+        'figcaption',
+        'blockquote',
+        'cite',
+        'em',
+        'strong',
+        'small',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+      ]);
 
       function selectorOf(el) {
-        return el.tagName.toLowerCase() +
+        return (
+          el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/)[0]}` : '');
+          (el.className && typeof el.className === 'string' && el.className.trim()
+            ? `.${el.className.trim().split(/\s+/)[0]}`
+            : '')
+        );
       }
 
       /** 2.5.8 "Inline" exception: the target is in a sentence or its size is constrained by line-height of non-target text. */
@@ -685,7 +795,11 @@ class InputModalitiesScanner extends BaseScanner {
         if (style.display !== 'inline') return false;
         const parent = el.parentElement;
         if (!parent) return false;
-        if (!INLINE_TEXT_PARENTS.has(parent.tagName.toLowerCase()) && !parent.closest('p, li, td, th, dd, figcaption, blockquote')) return false;
+        if (
+          !INLINE_TEXT_PARENTS.has(parent.tagName.toLowerCase()) &&
+          !parent.closest('p, li, td, th, dd, figcaption, blockquote')
+        )
+          return false;
         const own = (el.textContent || '').trim().length;
         const all = (parent.textContent || '').trim().length;
         return all > own + 2; // surrounded by other text
@@ -703,21 +817,35 @@ class InputModalitiesScanner extends BaseScanner {
 
       // Collect every rendered pointer target ONCE (each element, not each selector match)
       const candidates = new Set();
-      document.querySelectorAll('a, area, button, input, select, textarea, summary, [role], [tabindex], [contenteditable], audio[controls], video[controls]')
-        .forEach(el => { if (__isInteractiveTarget(el) && __isRendered(el)) candidates.add(el); });
+      document
+        .querySelectorAll(
+          'a, area, button, input, select, textarea, summary, [role], [tabindex], [contenteditable], audio[controls], video[controls]'
+        )
+        .forEach((el) => {
+          if (__isInteractiveTarget(el) && __isRendered(el)) candidates.add(el);
+        });
 
       const targets = [];
       for (const el of candidates) {
         // A target nested in another target (icon inside a button) is the same target.
-        let p = el.parentElement, nested = false;
-        while (p && p !== document.body) { if (candidates.has(p)) { nested = true; break; } p = p.parentElement; }
+        let p = el.parentElement,
+          nested = false;
+        while (p && p !== document.body) {
+          if (candidates.has(p)) {
+            nested = true;
+            break;
+          }
+          p = p.parentElement;
+        }
         if (nested) continue;
         const rect = el.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) continue;
         targets.push({ el, rect, selector: selectorOf(el), style: window.getComputedStyle(el) });
       }
 
-      function center(r) { return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+      function center(r) {
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }
       function circleIntersectsRect(c, r) {
         const dx = Math.max(r.left - c.x, 0, c.x - r.right);
         const dy = Math.max(r.top - c.y, 0, c.y - r.bottom);
@@ -736,11 +864,17 @@ class InputModalitiesScanner extends BaseScanner {
         let blocker = null;
         for (const o of targets) {
           if (o === t) continue;
-          if (circleIntersectsRect(c, o.rect)) { blocker = o; break; }
+          if (circleIntersectsRect(c, o.rect)) {
+            blocker = o;
+            break;
+          }
           if (o.rect.width < MIN_SIZE || o.rect.height < MIN_SIZE) {
             const oc = center(o.rect);
             const d = Math.hypot(c.x - oc.x, c.y - oc.y);
-            if (d < MIN_SIZE) { blocker = o; break; }
+            if (d < MIN_SIZE) {
+              blocker = o;
+              break;
+            }
           }
         }
         if (!blocker) continue; // undersized but sufficiently spaced — passes 2.5.8
@@ -760,7 +894,7 @@ class InputModalitiesScanner extends BaseScanner {
       return { issues, adequate };
     }, renderedCode);
 
-    targetAnalysis.issues.forEach(issue => {
+    targetAnalysis.issues.forEach((issue) => {
       violations.push({
         criterion: '9.2.5.8',
         element: issue.element,
@@ -790,9 +924,11 @@ class InputModalitiesScanner extends BaseScanner {
       let alternativesProvided = true;
 
       function getSelector(el) {
-        return el.tagName.toLowerCase() +
+        return (
+          el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
+        );
       }
 
       function hasAlternativeControls(el) {
@@ -808,7 +944,12 @@ class InputModalitiesScanner extends BaseScanner {
         }
 
         // Check if element itself also has click/keyboard handlers
-        if (el.getAttribute('onclick') || el.getAttribute('onkeydown') || el.getAttribute('onkeyup')) return true;
+        if (
+          el.getAttribute('onclick') ||
+          el.getAttribute('onkeydown') ||
+          el.getAttribute('onkeyup')
+        )
+          return true;
 
         // Check for ARIA listbox/grid patterns
         const parentRole = parent.getAttribute('role');
@@ -816,7 +957,8 @@ class InputModalitiesScanner extends BaseScanner {
         if (parent.getAttribute('aria-sort')) return true;
 
         // Check for keyboard-accessible role on the draggable itself
-        if (el.getAttribute('role') === 'option' || el.getAttribute('role') === 'gridcell') return true;
+        if (el.getAttribute('role') === 'option' || el.getAttribute('role') === 'gridcell')
+          return true;
 
         // Traverse up one more level for move buttons in a wrapper
         const grandparent = parent.parentElement;
@@ -833,12 +975,13 @@ class InputModalitiesScanner extends BaseScanner {
 
       // 1. Find elements with draggable="true"
       const draggables = document.querySelectorAll('[draggable="true"]');
-      draggables.forEach(el => {
+      draggables.forEach((el) => {
         if (!hasAlternativeControls(el)) {
           issues.push({
             type: 'drag-only-no-alternative',
             element: getSelector(el),
-            description: 'Draggable element has no single-pointer or keyboard alternative for repositioning',
+            description:
+              'Draggable element has no single-pointer or keyboard alternative for repositioning',
             severity: 'serious',
           });
           alternativesProvided = false;
@@ -849,13 +992,14 @@ class InputModalitiesScanner extends BaseScanner {
       const dragHandlerElements = document.querySelectorAll(
         '[ondragstart], [ondrag], [ondragend], [ondragover], [ondrop]'
       );
-      dragHandlerElements.forEach(el => {
+      dragHandlerElements.forEach((el) => {
         // Don't double-count if already flagged as draggable
         if (el.getAttribute('draggable') === 'true') return;
 
         if (el.hasAttribute('ondrop') || el.hasAttribute('ondragover')) {
           // This is a drop zone — check if it also has click-to-add or similar
-          const hasClickAlternative = el.getAttribute('onclick') ||
+          const hasClickAlternative =
+            el.getAttribute('onclick') ||
             el.querySelector('button, [role="button"], input[type="file"]');
           if (!hasClickAlternative) {
             issues.push({
@@ -883,13 +1027,13 @@ class InputModalitiesScanner extends BaseScanner {
       const sortableContainers = document.querySelectorAll(
         '[data-sortable], [class*="sortable"], [class*="draggable-list"], [class*="drag-list"]'
       );
-      sortableContainers.forEach(container => {
+      sortableContainers.forEach((container) => {
         const items = container.querySelectorAll('li, [role="listitem"], [data-sortable-item]');
         if (items.length < 2) return;
 
         // Check if any item has move buttons
         let hasButtons = false;
-        items.forEach(item => {
+        items.forEach((item) => {
           if (hasAlternativeControls(item)) hasButtons = true;
         });
 
@@ -897,7 +1041,8 @@ class InputModalitiesScanner extends BaseScanner {
           issues.push({
             type: 'sortable-no-buttons',
             element: getSelector(container),
-            description: 'Sortable list uses drag-only reordering without up/down buttons or keyboard alternative',
+            description:
+              'Sortable list uses drag-only reordering without up/down buttons or keyboard alternative',
             severity: 'serious',
           });
           alternativesProvided = false;
@@ -907,7 +1052,7 @@ class InputModalitiesScanner extends BaseScanner {
       return { issues, alternativesProvided };
     });
 
-    dragAnalysis.issues.forEach(issue => {
+    dragAnalysis.issues.forEach((issue) => {
       violations.push({
         criterion: '9.2.5.7',
         element: issue.element,
@@ -926,10 +1071,15 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getTargetSizeSuggestion(violationType) {
     const suggestions = {
-      'target-too-small': 'Increase target dimensions to at least 24x24 CSS pixels using min-width/min-height or padding',
-      'target-underspaced': 'Increase spacing between small targets to at least 24px, or increase target size to 24x24px minimum',
+      'target-too-small':
+        'Increase target dimensions to at least 24x24 CSS pixels using min-width/min-height or padding',
+      'target-underspaced':
+        'Increase spacing between small targets to at least 24px, or increase target size to 24x24px minimum',
     };
-    return suggestions[violationType] || 'Ensure interactive targets meet the 24x24px minimum size requirement';
+    return (
+      suggestions[violationType] ||
+      'Ensure interactive targets meet the 24x24px minimum size requirement'
+    );
   }
 
   /**
@@ -937,11 +1087,17 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getDraggingSuggestion(violationType) {
     const suggestions = {
-      'drag-only-no-alternative': 'Add move up/down buttons, click-to-select, or keyboard arrow key support as alternatives to drag',
-      'drop-zone-no-alternative': 'Add a click/tap mechanism (button, file input) to add content to the drop zone',
-      'sortable-no-buttons': 'Add up/down or move buttons to each list item for single-pointer reordering',
+      'drag-only-no-alternative':
+        'Add move up/down buttons, click-to-select, or keyboard arrow key support as alternatives to drag',
+      'drop-zone-no-alternative':
+        'Add a click/tap mechanism (button, file input) to add content to the drop zone',
+      'sortable-no-buttons':
+        'Add up/down or move buttons to each list item for single-pointer reordering',
     };
-    return suggestions[violationType] || 'Provide single-pointer and keyboard alternatives for drag operations';
+    return (
+      suggestions[violationType] ||
+      'Provide single-pointer and keyboard alternatives for drag operations'
+    );
   }
 
   /**
@@ -949,12 +1105,18 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getGestureSuggestion(violationType) {
     const suggestions = {
-      'drag-without-alternative': 'Provide keyboard-accessible controls (arrow keys, buttons) as alternatives to drag and drop',
-      'multitouch-without-alternative': 'Ensure multi-touch gestures have single-point alternatives (buttons, keyboard shortcuts)',
-      'swipe-without-alternative': 'Add navigation buttons or keyboard controls alongside swipe gestures',
-      'complex-gesture-only': 'Provide simple click/tap alternatives for complex path-based gestures'
+      'drag-without-alternative':
+        'Provide keyboard-accessible controls (arrow keys, buttons) as alternatives to drag and drop',
+      'multitouch-without-alternative':
+        'Ensure multi-touch gestures have single-point alternatives (buttons, keyboard shortcuts)',
+      'swipe-without-alternative':
+        'Add navigation buttons or keyboard controls alongside swipe gestures',
+      'complex-gesture-only':
+        'Provide simple click/tap alternatives for complex path-based gestures',
     };
-    return suggestions[violationType] || 'Provide accessible alternatives to complex pointer gestures';
+    return (
+      suggestions[violationType] || 'Provide accessible alternatives to complex pointer gestures'
+    );
   }
 
   /**
@@ -962,11 +1124,17 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getCancellationSuggestion(violationType) {
     const suggestions = {
-      'critical-action-no-cancellation': 'Implement completion on up-event with ability to cancel by moving pointer away',
-      'down-event-no-cancellation': 'Use click (up-event) for activation instead of mousedown/touchstart',
-      'immediate-action-no-cancel': 'Add confirmation dialogs or undo mechanisms for immediate actions'
+      'critical-action-no-cancellation':
+        'Implement completion on up-event with ability to cancel by moving pointer away',
+      'down-event-no-cancellation':
+        'Use click (up-event) for activation instead of mousedown/touchstart',
+      'immediate-action-no-cancel':
+        'Add confirmation dialogs or undo mechanisms for immediate actions',
     };
-    return suggestions[violationType] || 'Implement pointer cancellation mechanisms for better user control';
+    return (
+      suggestions[violationType] ||
+      'Implement pointer cancellation mechanisms for better user control'
+    );
   }
 
   /**
@@ -974,9 +1142,13 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getLabelSuggestion(violationType) {
     const suggestions = {
-      'label-name-mismatch': 'Ensure accessible name contains the visible label text as a substring',
+      'label-name-mismatch':
+        'Ensure accessible name contains the visible label text as a substring',
     };
-    return suggestions[violationType] || 'Ensure visible labels match accessible names for voice control users';
+    return (
+      suggestions[violationType] ||
+      'Ensure visible labels match accessible names for voice control users'
+    );
   }
 
   /**
@@ -985,13 +1157,18 @@ class InputModalitiesScanner extends BaseScanner {
   getMotionSuggestion(violationType) {
     const suggestions = {
       'motion-no-disable-option': 'Provide user controls to disable motion-activated features',
-      'motion-no-alternative-method': 'Add button or keyboard alternatives to motion-triggered actions',
-      'orientation-css-no-alternative': 'Provide manual controls for orientation-dependent functionality',
-      'infinite-animation-no-pause': 'Add a pause/stop control and a @media (prefers-reduced-motion: reduce) CSS rule to disable or reduce animations'
+      'motion-no-alternative-method':
+        'Add button or keyboard alternatives to motion-triggered actions',
+      'orientation-css-no-alternative':
+        'Provide manual controls for orientation-dependent functionality',
+      'infinite-animation-no-pause':
+        'Add a pause/stop control and a @media (prefers-reduced-motion: reduce) CSS rule to disable or reduce animations',
     };
-    return suggestions[violationType] || 'Ensure motion-based features can be disabled and have alternatives';
+    return (
+      suggestions[violationType] ||
+      'Ensure motion-based features can be disabled and have alternatives'
+    );
   }
-
 }
 
 module.exports = InputModalitiesScanner;

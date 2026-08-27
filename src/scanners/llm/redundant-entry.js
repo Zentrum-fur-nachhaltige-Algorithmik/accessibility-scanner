@@ -25,10 +25,14 @@ const { analyzeCompat } = require('./analyze-compat');
 
 class LLMRedundantEntryScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-redundant-entry', {
-      wcagCriteria: ['3.3.7'],
-      wcagPrinciple: 'understandable',
-    }, llmClient);
+    super(
+      'llm-redundant-entry',
+      {
+        wcagCriteria: ['3.3.7'],
+        wcagPrinciple: 'understandable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
@@ -104,7 +108,8 @@ Return violations as JSON.`;
         if (al) return al.trim();
         const lb = el.getAttribute('aria-labelledby');
         if (lb) {
-          const t = lb.split(/\s+/)
+          const t = lb
+            .split(/\s+/)
             .map((id) => document.getElementById(id))
             .filter(Boolean)
             .map((n) => n.textContent.trim())
@@ -185,8 +190,9 @@ Return violations as JSON.`;
             return label.replace(/\s+/g, ' ').trim();
           })
           .filter((t) =>
-            /(same as|gleich wie|wie oben|übernehmen|copy from|use (my|the) (previous|saved|billing)|aus schritt|identisch)/i
-              .test(t)
+            /(same as|gleich wie|wie oben|übernehmen|copy from|use (my|the) (previous|saved|billing)|aus schritt|identisch)/i.test(
+              t
+            )
           )
           .slice(0, 5);
 
@@ -196,7 +202,8 @@ Return violations as JSON.`;
       return {
         sections: out,
         totalFields,
-        pageHasAutofillTokens: document.querySelectorAll('[autocomplete]:not([autocomplete="off"])').length,
+        pageHasAutofillTokens: document.querySelectorAll('[autocomplete]:not([autocomplete="off"])')
+          .length,
       };
     });
   }

@@ -62,7 +62,7 @@ class LLMClient {
 
   _buildHeaders() {
     const headers = {
-      'Authorization': `Bearer ${this.apiKey}`,
+      Authorization: `Bearer ${this.apiKey}`,
       'Content-Type': 'application/json',
     };
     if (this.siteUrl) headers['HTTP-Referer'] = this.siteUrl;
@@ -188,18 +188,19 @@ class LLMClient {
       completionTokens: data.usage?.completion_tokens ?? 0,
       totalTokens: data.usage?.total_tokens ?? 0,
       cost: data.usage?.cost ?? null,
-      cachedPromptTokens: data.usage?.prompt_tokens_details?.cached_tokens
-                       ?? data.usage?.cached_tokens
-                       ?? data.usage?.cache_read_input_tokens
-                       ?? 0,
+      cachedPromptTokens:
+        data.usage?.prompt_tokens_details?.cached_tokens ??
+        data.usage?.cached_tokens ??
+        data.usage?.cache_read_input_tokens ??
+        0,
       reasoningTokens: data.usage?.completion_tokens_details?.reasoning_tokens ?? 0,
     };
 
     if (process.env.LLM_DEBUG) {
       console.log(
         `[LLMClient] model=${data.model || this.model} prompt=${usage.promptTokens} ` +
-        `cached=${usage.cachedPromptTokens} completion=${usage.completionTokens} ` +
-        `reasoning=${usage.reasoningTokens} cost=${usage.cost ?? 'n/a'}`
+          `cached=${usage.cachedPromptTokens} completion=${usage.completionTokens} ` +
+          `reasoning=${usage.reasoningTokens} cost=${usage.cost ?? 'n/a'}`
       );
     }
 
@@ -213,8 +214,14 @@ class LLMClient {
 
   /** 4xx statuses that will not change on retry. */
   static isTerminalStatus(status) {
-    return typeof status === 'number' && status >= 400 && status < 500 &&
-      status !== 408 && status !== 409 && status !== 429;
+    return (
+      typeof status === 'number' &&
+      status >= 400 &&
+      status < 500 &&
+      status !== 408 &&
+      status !== 409 &&
+      status !== 429
+    );
   }
 
   /**
@@ -231,7 +238,9 @@ class LLMClient {
         // 402 (no credits), 401/403 (bad key) and 400 (malformed body) cannot
         // change on retry. 408, 409 and 429 stay retryable.
         if (err.type === 'client_error' && LLMClient.isTerminalStatus(err.statusCode)) {
-          console.warn(`[LLMClient] Terminal client error ${err.statusCode}, not retrying: ${err.message}`);
+          console.warn(
+            `[LLMClient] Terminal client error ${err.statusCode}, not retrying: ${err.message}`
+          );
           return {
             success: false,
             error: err.message,

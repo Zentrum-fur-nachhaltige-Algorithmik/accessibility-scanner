@@ -10,7 +10,7 @@ class ContactMechanismScanner extends BaseScanner {
   constructor() {
     super('contact-mechanism', {
       wcagCriteria: ['EN 301 549 12.2'],
-      wcagPrinciple: 'robust'
+      wcagPrinciple: 'robust',
     });
   }
 
@@ -25,7 +25,7 @@ class ContactMechanismScanner extends BaseScanner {
   async scan(page, options = {}) {
     const defaultOptions = {
       timeout: 30000,
-      searchDepth: 3
+      searchDepth: 3,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -34,7 +34,7 @@ class ContactMechanismScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["EAA-Contact", "EN-301-549-12.1.2"],
+      criteria: ['EAA-Contact', 'EN-301-549-12.1.2'],
       passed: contactResults.violations.length === 0,
       violations: contactResults.violations,
       summary: {
@@ -44,8 +44,8 @@ class ContactMechanismScanner extends BaseScanner {
         contactAccessible: contactResults.contactAccessible,
         responseTimeStated: contactResults.responseTimeStated,
         multipleOptionsAvailable: contactResults.multipleOptionsAvailable,
-        gatedOnMissingStatement: !contactResults.statementPresent
-      }
+        gatedOnMissingStatement: !contactResults.statementPresent,
+      },
     };
   }
 
@@ -88,17 +88,22 @@ class ContactMechanismScanner extends BaseScanner {
     }
 
     // Calculate if multiple options are available
-    const contactMethodCount = [emailContactAvailable, phoneContactAvailable, onlineFormAvailable].filter(Boolean).length;
+    const contactMethodCount = [
+      emailContactAvailable,
+      phoneContactAvailable,
+      onlineFormAvailable,
+    ].filter(Boolean).length;
     multipleOptionsAvailable = contactMethodCount >= 2;
 
     // Generate violations
     if (!emailContactAvailable && !phoneContactAvailable && !onlineFormAvailable) {
       violations.push({
-        criterion: "EAA-Contact",
-        issue: "no-contact-methods",
-        description: "No accessibility contact mechanisms found",
-        suggestion: "Provide at least one contact method (email, phone, or online form) for accessibility issues",
-        severity: "serious"
+        criterion: 'EAA-Contact',
+        issue: 'no-contact-methods',
+        description: 'No accessibility contact mechanisms found',
+        suggestion:
+          'Provide at least one contact method (email, phone, or online form) for accessibility issues',
+        severity: 'serious',
       });
     } else {
       // Check individual contact methods quality
@@ -106,12 +111,12 @@ class ContactMechanismScanner extends BaseScanner {
         const emailValidation = await this.validateEmailContacts(page);
         if (!emailValidation.valid) {
           violations.push({
-            criterion: "EAA-Contact",
-            issue: "invalid-email",
+            criterion: 'EAA-Contact',
+            issue: 'invalid-email',
             description: `Email contact found but appears invalid: ${emailValidation.reason}`,
             element: emailValidation.element,
-            suggestion: "Ensure email addresses are valid and functional",
-            severity: "major"
+            suggestion: 'Ensure email addresses are valid and functional',
+            severity: 'major',
           });
         }
       }
@@ -120,33 +125,34 @@ class ContactMechanismScanner extends BaseScanner {
         const phoneValidation = await this.validatePhoneContacts(page);
         if (!phoneValidation.valid) {
           violations.push({
-            criterion: "EAA-Contact",
-            issue: "invalid-phone",
+            criterion: 'EAA-Contact',
+            issue: 'invalid-phone',
             description: `Phone contact found but appears invalid: ${phoneValidation.reason}`,
             element: phoneValidation.element,
-            suggestion: "Ensure phone numbers are valid and properly formatted",
-            severity: "major"
+            suggestion: 'Ensure phone numbers are valid and properly formatted',
+            severity: 'major',
           });
         }
       }
 
       if (!contactAccessible) {
         violations.push({
-          criterion: "EAA-Contact",
-          issue: "inaccessible-contact",
-          description: "Contact information found but contact page is not accessible",
-          suggestion: "Ensure contact page loads correctly and is accessible to all users",
-          severity: "major"
+          criterion: 'EAA-Contact',
+          issue: 'inaccessible-contact',
+          description: 'Contact information found but contact page is not accessible',
+          suggestion: 'Ensure contact page loads correctly and is accessible to all users',
+          severity: 'major',
         });
       }
 
       if (contactMethodCount === 1) {
         violations.push({
-          criterion: "EAA-Contact",
-          issue: "insufficient-methods",
-          description: "Only one contact method available. Multiple options recommended for better accessibility",
-          suggestion: "Provide multiple contact options (email, phone, and/or online form)",
-          severity: "minor"
+          criterion: 'EAA-Contact',
+          issue: 'insufficient-methods',
+          description:
+            'Only one contact method available. Multiple options recommended for better accessibility',
+          suggestion: 'Provide multiple contact options (email, phone, and/or online form)',
+          severity: 'minor',
         });
       }
 
@@ -157,11 +163,12 @@ class ContactMechanismScanner extends BaseScanner {
       // the consequence too would double-count one defect.
       if (!responseTimeStated && statementPresent) {
         violations.push({
-          criterion: "EAA-Contact",
-          issue: "no-response-time",
-          description: "No response time commitment stated for accessibility inquiries",
-          suggestion: "State expected response time for accessibility-related contact (e.g., '2 business days')",
-          severity: "minor"
+          criterion: 'EAA-Contact',
+          issue: 'no-response-time',
+          description: 'No response time commitment stated for accessibility inquiries',
+          suggestion:
+            "State expected response time for accessibility-related contact (e.g., '2 business days')",
+          severity: 'minor',
         });
       }
     }
@@ -174,7 +181,7 @@ class ContactMechanismScanner extends BaseScanner {
       contactAccessible,
       responseTimeStated,
       multipleOptionsAvailable,
-      statementPresent
+      statementPresent,
     };
   }
 
@@ -201,12 +208,14 @@ class ContactMechanismScanner extends BaseScanner {
 
       // Check for online forms
       const forms = document.querySelectorAll('form');
-      const contactForms = Array.from(forms).filter(form => {
+      const contactForms = Array.from(forms).filter((form) => {
         const formText = form.textContent.toLowerCase();
-        return formText.includes('contact') ||
-               formText.includes('feedback') ||
-               formText.includes('accessibility') ||
-               formText.includes('support');
+        return (
+          formText.includes('contact') ||
+          formText.includes('feedback') ||
+          formText.includes('accessibility') ||
+          formText.includes('support')
+        );
       });
       const onlineForm = contactForms.length > 0;
 
@@ -216,7 +225,7 @@ class ContactMechanismScanner extends BaseScanner {
         /response\s+time[:\s]*\d+/i,
         /within\s+\d+\s+(business\s+)?days?/i,
         /\d+\s+(business\s+)?days?\s+to\s+respond/i,
-        /reply\s+within/i
+        /reply\s+within/i,
       ];
 
       let responseTime = false;
@@ -235,7 +244,7 @@ class ContactMechanismScanner extends BaseScanner {
         phoneContact,
         onlineForm,
         responseTime,
-        hasContactMechanisms
+        hasContactMechanisms,
       };
     });
 
@@ -257,7 +266,7 @@ class ContactMechanismScanner extends BaseScanner {
         'support',
         'help',
         'feedback',
-        'accessibility contact'
+        'accessibility contact',
       ];
 
       const links = Array.from(document.querySelectorAll('a[href]'));
@@ -271,7 +280,7 @@ class ContactMechanismScanner extends BaseScanner {
             return {
               found: true,
               url: link.href,
-              text: link.textContent.trim()
+              text: link.textContent.trim(),
             };
           }
         }
@@ -287,13 +296,16 @@ class ContactMechanismScanner extends BaseScanner {
         phoneContact: false,
         onlineForm: false,
         responseTime: false,
-        accessible: false
+        accessible: false,
       };
     }
 
     // Navigate to contact page
     try {
-      await page.goto(contactLinkResult.url, { waitUntil: 'networkidle0', timeout: options.timeout });
+      await page.goto(contactLinkResult.url, {
+        waitUntil: 'networkidle0',
+        timeout: options.timeout,
+      });
       console.log(`  Found contact page at: ${contactLinkResult.url}`);
 
       // Analyze contact page
@@ -305,9 +317,8 @@ class ContactMechanismScanner extends BaseScanner {
         phoneContact: contactPageAnalysis.phoneContact,
         onlineForm: contactPageAnalysis.onlineForm,
         responseTime: contactPageAnalysis.responseTime,
-        accessible: true
+        accessible: true,
       };
-
     } catch (error) {
       console.log(`  Contact page not accessible: ${error.message}`);
       return {
@@ -316,7 +327,7 @@ class ContactMechanismScanner extends BaseScanner {
         phoneContact: false,
         onlineForm: false,
         responseTime: false,
-        accessible: false
+        accessible: false,
       };
     }
   }
@@ -341,7 +352,7 @@ class ContactMechanismScanner extends BaseScanner {
             return {
               valid: false,
               reason: `Invalid email format: ${email}`,
-              element: 'text content'
+              element: 'text content',
             };
           }
         }
@@ -354,13 +365,15 @@ class ContactMechanismScanner extends BaseScanner {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
           if (!emailRegex.test(email)) {
-            const selector = link.id ? `a#${link.id}` :
-                           link.className ? `a.${link.className.split(' ')[0]}` :
-                           'a[href^="mailto:"]';
+            const selector = link.id
+              ? `a#${link.id}`
+              : link.className
+                ? `a.${link.className.split(' ')[0]}`
+                : 'a[href^="mailto:"]';
             return {
               valid: false,
               reason: `Invalid mailto link: ${href}`,
-              element: selector
+              element: selector,
             };
           }
         }
@@ -387,13 +400,15 @@ class ContactMechanismScanner extends BaseScanner {
           // Basic phone validation - should contain only numbers, spaces, +, -, ()
           const phoneRegex = /^[\+]?[0-9\s\-()]+$/;
           if (!phoneRegex.test(phone) || phone.replace(/[^0-9]/g, '').length < 7) {
-            const selector = link.id ? `a#${link.id}` :
-                           link.className ? `a.${link.className.split(' ')[0]}` :
-                           'a[href^="tel:"]';
+            const selector = link.id
+              ? `a#${link.id}`
+              : link.className
+                ? `a.${link.className.split(' ')[0]}`
+                : 'a[href^="tel:"]';
             return {
               valid: false,
               reason: `Invalid phone format: ${href}`,
-              element: selector
+              element: selector,
             };
           }
         }
@@ -408,7 +423,6 @@ class ContactMechanismScanner extends BaseScanner {
   get needsExclusiveAccess() {
     return true;
   }
-
 }
 
 module.exports = ContactMechanismScanner;

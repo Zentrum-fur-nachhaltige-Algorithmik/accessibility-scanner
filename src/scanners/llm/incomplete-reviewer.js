@@ -37,8 +37,8 @@ const { AxePuppeteer } = require('@axe-core/puppeteer');
 const { injectableCode: contrastCode } = require('../../utils/browser-contrast');
 
 /** Cost/latency guards. */
-const MAX_NODES = 24;      // hard cap on reviewed nodes per page
-const BATCH_SIZE = 6;      // nodes per LLM call
+const MAX_NODES = 24; // hard cap on reviewed nodes per page
+const BATCH_SIZE = 6; // nodes per LLM call
 const MAX_HTML_CHARS = 700;
 
 /**
@@ -63,11 +63,15 @@ const REVIEWABLE_RULES = {
 
 class LLMIncompleteReviewerScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-incomplete-reviewer', {
-      // Populated per-run from the reviewed axe rules' own WCAG tags.
-      wcagCriteria: [],
-      wcagPrinciple: 'robust',
-    }, llmClient);
+    super(
+      'llm-incomplete-reviewer',
+      {
+        // Populated per-run from the reviewed axe rules' own WCAG tags.
+        wcagCriteria: [],
+        wcagPrinciple: 'robust',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
@@ -115,14 +119,18 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
     const dossiers = [];
     for (const d of allDossiers) {
       const g = d.measured && d.measured.contrast && d.measured.contrast.gradientRatio;
-      const hasGradient = d.measured && d.measured.contrast && d.measured.contrast.hasBackgroundImageInChain;
-      if (d.evidenceKind !== 'contrast' || !hasGradient) { dossiers.push(d); continue; }
+      const hasGradient =
+        d.measured && d.measured.contrast && d.measured.contrast.hasBackgroundImageInChain;
+      if (d.evidenceKind !== 'contrast' || !hasGradient) {
+        dossiers.push(d);
+        continue;
+      }
       decidedInCode++;
       const criteria = this._criteriaFor(d.tags);
       criteria.forEach((c) => criteriaSeen.add(c));
       const enhanced = d.axeRuleId === 'color-contrast-enhanced';
       const large = !!d.measured.contrast.largeText;
-      const threshold = enhanced ? (large ? 4.5 : 7) : (large ? 3 : 4.5);
+      const threshold = enhanced ? (large ? 4.5 : 7) : large ? 3 : 4.5;
       const common = {
         scannerId: this.id,
         ruleId: d.axeRuleId,
@@ -158,7 +166,10 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
           confidence: 'low',
           description:
             `[Needs human review] ${d.help} — gradient/image background` +
-            (g ? ` (contrast ranges ${g.min}:1 – ${g.max}:1 across stops, threshold ${threshold}:1)` : ' could not be resolved') + '.',
+            (g
+              ? ` (contrast ranges ${g.min}:1 – ${g.max}:1 across stops, threshold ${threshold}:1)`
+              : ' could not be resolved') +
+            '.',
         });
       }
     }
@@ -294,181 +305,196 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
       failureSummary: (node.failureSummary || '').slice(0, 400),
     }));
 
-    const measured = await page.evaluate((reqs, maxHtml, contrastCode) => {
-      eval(contrastCode);
-      const parseRgb = __parseRgb;
-      const ratio = __getContrastRatio;
-      /** Colour stops of linear-/radial-/conic-gradient() values (first layer only). */
-      function gradientStops(bgImage) {
-        if (!bgImage || !/gradient\(/.test(bgImage)) return [];
-        const stops = [];
-        const re = /(rgba?\([^)]*\)|#[0-9a-f]{3,8}|\b(?:transparent|white|black|red|blue|green|gray|grey|silver|navy|teal|maroon|olive|purple|yellow|orange|aqua|fuchsia|lime)\b)/gi;
-        let m;
-        while ((m = re.exec(bgImage))) {
-          const c = parseRgb(m[1].toLowerCase());
-          if (c) stops.push(c);
-        }
-        return stops;
-      }
-      function bgChain(el) {
-        const chain = [];
-        let cur = el;
-        while (cur && cur !== document.documentElement.parentElement) {
-          const cs = getComputedStyle(cur);
-          chain.push({
-            tag: cur.tagName.toLowerCase(),
-            backgroundColor: cs.backgroundColor,
-            backgroundImage: cs.backgroundImage === 'none' ? null : cs.backgroundImage.slice(0, 120),
-            backgroundImageFull: cs.backgroundImage === 'none' ? null : cs.backgroundImage,
-            opacity: cs.opacity,
-          });
-          if (chain.length >= 6) break;
-          cur = cur.parentElement;
-        }
-        return chain;
-      }
-      function openTag(el) {
-        if (!el) return null;
-        const attrs = [...el.attributes]
-          .map((a) => `${a.name}="${String(a.value).slice(0, 80)}"`)
-          .join(' ');
-        return `<${el.tagName.toLowerCase()}${attrs ? ' ' + attrs : ''}>`;
-      }
-
-      return reqs.map((req) => {
-        let el = null;
-        try {
-          el = document.querySelector(req.selector);
-        } catch { /* selector not resolvable from this frame */ }
-
-        if (!el) {
-          return { ref: req.ref, resolved: false };
-        }
-
-        const cs = getComputedStyle(el);
-        const out = {
-          ref: req.ref,
-          resolved: true,
-          html: el.outerHTML.slice(0, maxHtml),
-          ancestors: [openTag(el.parentElement), openTag(el.parentElement?.parentElement)]
-            .filter(Boolean),
-          rect: (() => {
-            const r = el.getBoundingClientRect();
-            return { w: Math.round(r.width), h: Math.round(r.height) };
-          })(),
-        };
-
-        if (req.evidenceKind === 'contrast') {
-          const fg = parseRgb(cs.color);
-          const chain = bgChain(el);
-          const solid = chain.find((c) => {
-            const p = parseRgb(c.backgroundColor);
-            return p && p.a > 0;
-          });
-          const bg = solid ? parseRgb(solid.backgroundColor) : null;
-          // Gradient backgrounds: ratio range of the text against every colour
-          // stop (composited over the first solid colour when translucent).
-          let gradientRatio = null;
-          const gradientLayer = chain.find((c) => c.backgroundImageFull && /gradient\(/.test(c.backgroundImageFull));
-          if (fg && gradientLayer) {
-            const stops = gradientStops(gradientLayer.backgroundImageFull);
-            const base = bg || { r: 255, g: 255, b: 255, a: 1 };
-            const ratios = stops.map((st) => ratio(fg, st.a < 1 ? __blendOver(st, base) : st));
-            if (ratios.length) {
-              gradientRatio = {
-                min: Math.round(Math.min(...ratios) * 100) / 100,
-                max: Math.round(Math.max(...ratios) * 100) / 100,
-                stops: stops.length,
-              };
-            }
+    const measured = await page.evaluate(
+      (reqs, maxHtml, contrastCode) => {
+        eval(contrastCode);
+        const parseRgb = __parseRgb;
+        const ratio = __getContrastRatio;
+        /** Colour stops of linear-/radial-/conic-gradient() values (first layer only). */
+        function gradientStops(bgImage) {
+          if (!bgImage || !/gradient\(/.test(bgImage)) return [];
+          const stops = [];
+          const re =
+            /(rgba?\([^)]*\)|#[0-9a-f]{3,8}|\b(?:transparent|white|black|red|blue|green|gray|grey|silver|navy|teal|maroon|olive|purple|yellow|orange|aqua|fuchsia|lime)\b)/gi;
+          let m;
+          while ((m = re.exec(bgImage))) {
+            const c = parseRgb(m[1].toLowerCase());
+            if (c) stops.push(c);
           }
-          out.contrast = {
-            largeText: __isLargeText(cs),
-            gradientRatio,
-            color: cs.color,
-            fontSize: cs.fontSize,
-            fontWeight: cs.fontWeight,
-            backgroundChain: chain,
-            firstSolidBackground: solid ? solid.backgroundColor : null,
-            hasBackgroundImageInChain: chain.some((c) => c.backgroundImage),
-            computedRatioAgainstFirstSolid:
-              fg && bg ? Math.round(ratio(fg, bg) * 100) / 100 : null,
-            textShadow: cs.textShadow === 'none' ? null : cs.textShadow,
-          };
+          return stops;
         }
-
-        if (req.evidenceKind === 'linkDistinction') {
-          const parent = el.parentElement;
-          const pcs = parent ? getComputedStyle(parent) : null;
-          out.linkDistinction = {
-            linkColor: cs.color,
-            surroundingColor: pcs ? pcs.color : null,
-            textDecorationLine: cs.textDecorationLine,
-            fontWeight: cs.fontWeight,
-            surroundingFontWeight: pcs ? pcs.fontWeight : null,
-            borderBottom: cs.borderBottomWidth + ' ' + cs.borderBottomStyle,
-            surroundingText: (parent ? parent.textContent : '').trim().slice(0, 240),
-          };
-        }
-
-        if (req.evidenceKind === 'subtree') {
-          out.subtree = [...el.children].slice(0, 12).map((c) => openTag(c));
-        }
-
-        if (req.evidenceKind === 'ancestry') {
+        function bgChain(el) {
           const chain = [];
-          let cur = el.parentElement;
-          while (cur && chain.length < 6) {
-            chain.push(openTag(cur));
+          let cur = el;
+          while (cur && cur !== document.documentElement.parentElement) {
+            const cs = getComputedStyle(cur);
+            chain.push({
+              tag: cur.tagName.toLowerCase(),
+              backgroundColor: cs.backgroundColor,
+              backgroundImage:
+                cs.backgroundImage === 'none' ? null : cs.backgroundImage.slice(0, 120),
+              backgroundImageFull: cs.backgroundImage === 'none' ? null : cs.backgroundImage,
+              opacity: cs.opacity,
+            });
+            if (chain.length >= 6) break;
             cur = cur.parentElement;
           }
-          out.ancestry = chain;
+          return chain;
+        }
+        function openTag(el) {
+          if (!el) return null;
+          const attrs = [...el.attributes]
+            .map((a) => `${a.name}="${String(a.value).slice(0, 80)}"`)
+            .join(' ');
+          return `<${el.tagName.toLowerCase()}${attrs ? ' ' + attrs : ''}>`;
         }
 
-        if (req.evidenceKind === 'scrollable') {
-          out.scrollable = {
-            overflowX: cs.overflowX,
-            overflowY: cs.overflowY,
-            scrollHeight: el.scrollHeight,
-            clientHeight: el.clientHeight,
-            scrollWidth: el.scrollWidth,
-            clientWidth: el.clientWidth,
-            tabIndex: el.tabIndex,
-            focusableDescendants: el.querySelectorAll(
-              'a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])'
-            ).length,
+        return reqs.map((req) => {
+          let el = null;
+          try {
+            el = document.querySelector(req.selector);
+          } catch {
+            /* selector not resolvable from this frame */
+          }
+
+          if (!el) {
+            return { ref: req.ref, resolved: false };
+          }
+
+          const cs = getComputedStyle(el);
+          const out = {
+            ref: req.ref,
+            resolved: true,
+            html: el.outerHTML.slice(0, maxHtml),
+            ancestors: [openTag(el.parentElement), openTag(el.parentElement?.parentElement)].filter(
+              Boolean
+            ),
+            rect: (() => {
+              const r = el.getBoundingClientRect();
+              return { w: Math.round(r.width), h: Math.round(r.height) };
+            })(),
           };
-        }
 
-        if (req.evidenceKind === 'nameAndText') {
-          out.nameAndText = {
-            visibleText: (el.textContent || '').trim().slice(0, 200),
-            ariaLabel: el.getAttribute('aria-label'),
-            ariaLabelledby: el.getAttribute('aria-labelledby'),
-            title: el.getAttribute('title'),
-          };
-        }
+          if (req.evidenceKind === 'contrast') {
+            const fg = parseRgb(cs.color);
+            const chain = bgChain(el);
+            const solid = chain.find((c) => {
+              const p = parseRgb(c.backgroundColor);
+              return p && p.a > 0;
+            });
+            const bg = solid ? parseRgb(solid.backgroundColor) : null;
+            // Gradient backgrounds: ratio range of the text against every colour
+            // stop (composited over the first solid colour when translucent).
+            let gradientRatio = null;
+            const gradientLayer = chain.find(
+              (c) => c.backgroundImageFull && /gradient\(/.test(c.backgroundImageFull)
+            );
+            if (fg && gradientLayer) {
+              const stops = gradientStops(gradientLayer.backgroundImageFull);
+              const base = bg || { r: 255, g: 255, b: 255, a: 1 };
+              const ratios = stops.map((st) => ratio(fg, st.a < 1 ? __blendOver(st, base) : st));
+              if (ratios.length) {
+                gradientRatio = {
+                  min: Math.round(Math.min(...ratios) * 100) / 100,
+                  max: Math.round(Math.max(...ratios) * 100) / 100,
+                  stops: stops.length,
+                };
+              }
+            }
+            out.contrast = {
+              largeText: __isLargeText(cs),
+              gradientRatio,
+              color: cs.color,
+              fontSize: cs.fontSize,
+              fontWeight: cs.fontWeight,
+              backgroundChain: chain,
+              firstSolidBackground: solid ? solid.backgroundColor : null,
+              hasBackgroundImageInChain: chain.some((c) => c.backgroundImage),
+              computedRatioAgainstFirstSolid:
+                fg && bg ? Math.round(ratio(fg, bg) * 100) / 100 : null,
+              textShadow: cs.textShadow === 'none' ? null : cs.textShadow,
+            };
+          }
 
-        if (req.evidenceKind === 'attributes') {
-          out.attributes = [...el.attributes].reduce((acc, a) => {
-            acc[a.name] = String(a.value).slice(0, 120);
-            return acc;
-          }, {});
-        }
+          if (req.evidenceKind === 'linkDistinction') {
+            const parent = el.parentElement;
+            const pcs = parent ? getComputedStyle(parent) : null;
+            out.linkDistinction = {
+              linkColor: cs.color,
+              surroundingColor: pcs ? pcs.color : null,
+              textDecorationLine: cs.textDecorationLine,
+              fontWeight: cs.fontWeight,
+              surroundingFontWeight: pcs ? pcs.fontWeight : null,
+              borderBottom: cs.borderBottomWidth + ' ' + cs.borderBottomStyle,
+              surroundingText: (parent ? parent.textContent : '').trim().slice(0, 240),
+            };
+          }
 
-        return out;
-      });
-    }, requests, MAX_HTML_CHARS, contrastCode);
+          if (req.evidenceKind === 'subtree') {
+            out.subtree = [...el.children].slice(0, 12).map((c) => openTag(c));
+          }
+
+          if (req.evidenceKind === 'ancestry') {
+            const chain = [];
+            let cur = el.parentElement;
+            while (cur && chain.length < 6) {
+              chain.push(openTag(cur));
+              cur = cur.parentElement;
+            }
+            out.ancestry = chain;
+          }
+
+          if (req.evidenceKind === 'scrollable') {
+            out.scrollable = {
+              overflowX: cs.overflowX,
+              overflowY: cs.overflowY,
+              scrollHeight: el.scrollHeight,
+              clientHeight: el.clientHeight,
+              scrollWidth: el.scrollWidth,
+              clientWidth: el.clientWidth,
+              tabIndex: el.tabIndex,
+              focusableDescendants: el.querySelectorAll(
+                'a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])'
+              ).length,
+            };
+          }
+
+          if (req.evidenceKind === 'nameAndText') {
+            out.nameAndText = {
+              visibleText: (el.textContent || '').trim().slice(0, 200),
+              ariaLabel: el.getAttribute('aria-label'),
+              ariaLabelledby: el.getAttribute('aria-labelledby'),
+              title: el.getAttribute('title'),
+            };
+          }
+
+          if (req.evidenceKind === 'attributes') {
+            out.attributes = [...el.attributes].reduce((acc, a) => {
+              acc[a.name] = String(a.value).slice(0, 120);
+              return acc;
+            }, {});
+          }
+
+          return out;
+        });
+      },
+      requests,
+      MAX_HTML_CHARS,
+      contrastCode
+    );
 
     for (const m of measured) {
-      for (const c of (m.contrast && m.contrast.backgroundChain) || []) delete c.backgroundImageFull;
+      for (const c of (m.contrast && m.contrast.backgroundChain) || [])
+        delete c.backgroundImageFull;
     }
     const byRef = new Map(measured.map((m) => [m.ref, m]));
-    return requests
-      .map((r) => ({ ...r, measured: byRef.get(r.ref) }))
-      // A node whose selector no longer resolves (DOM changed, cross-frame
-      // target) cannot be reviewed on evidence — leave it to a human.
-      .filter((r) => r.measured && r.measured.resolved);
+    return (
+      requests
+        .map((r) => ({ ...r, measured: byRef.get(r.ref) }))
+        // A node whose selector no longer resolves (DOM changed, cross-frame
+        // target) cannot be reviewed on evidence — leave it to a human.
+        .filter((r) => r.measured && r.measured.resolved)
+    );
   }
 
   /** Render a batch of dossiers as the shared "context first" block. */
@@ -486,8 +512,13 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
         if (m.ancestors?.length) parts.push(`ancestors (outermost last): ${m.ancestors.join(' ')}`);
         if (m.rect) parts.push(`rendered size: ${m.rect.w}x${m.rect.h}px`);
         for (const key of [
-          'contrast', 'linkDistinction', 'subtree', 'ancestry',
-          'scrollable', 'nameAndText', 'attributes',
+          'contrast',
+          'linkDistinction',
+          'subtree',
+          'ancestry',
+          'scrollable',
+          'nameAndText',
+          'attributes',
         ]) {
           if (m[key]) parts.push(`${key} measurements:\n${JSON.stringify(m[key], null, 1)}`);
         }

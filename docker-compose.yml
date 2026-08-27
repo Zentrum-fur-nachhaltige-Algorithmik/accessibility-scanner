@@ -10,9 +10,9 @@ services:
     image: accessibility-scanner:latest
     restart: unless-stopped
     ports:
-      - "${HOST_PORT:-3000}:3000"
+      - '${HOST_PORT:-3000}:3000'
     environment:
-      PORT: "3000"
+      PORT: '3000'
       # Bearer token required on /api/* and /reports/* when set (src/api/auth.js).
       API_TOKEN: ${API_TOKEN:-}
       # Server side only; enables the LLM scanners.
@@ -29,13 +29,13 @@ services:
       - reports:/app/reports
     mem_limit: 2g
     # Chrome uses /dev/shm heavily; Docker's 64 MB default crashes it under load.
-    shm_size: "1gb"
+    shm_size: '1gb'
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
+          'CMD',
+          'node',
+          '-e',
           "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
         ]
       interval: 30s
@@ -50,9 +50,9 @@ services:
       args:
         API_ORIGIN: http://app:3000
     image: accessibility-scanner:latest
-    command: ["node_modules/.bin/next", "start", "frontend", "-p", "3001"]
+    command: ['node_modules/.bin/next', 'start', 'frontend', '-p', '3001']
     ports:
-      - "${FRONTEND_HOST_PORT:-3001}:3001"
+      - '${FRONTEND_HOST_PORT:-3001}:3001'
     environment:
       API_ORIGIN: http://app:3000
     depends_on:
@@ -63,9 +63,9 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
+          'CMD',
+          'node',
+          '-e',
           "fetch('http://localhost:3001/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
         ]
       interval: 30s

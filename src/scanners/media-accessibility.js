@@ -16,7 +16,7 @@ class MediaAccessibilityScanner extends BaseScanner {
   constructor() {
     super('media-accessibility', {
       wcagCriteria: ['1.2.1', '1.2.2', '1.2.3', '1.2.5'],
-      wcagPrinciple: 'perceivable'
+      wcagPrinciple: 'perceivable',
     });
   }
 
@@ -32,7 +32,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       analyzeVideo: true,
       analyzeAudio: true,
       analyzeSVG: true,
-      timeout: 60000
+      timeout: 60000,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -46,7 +46,7 @@ class MediaAccessibilityScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.1.1.1", "9.1.3.1", "9.1.4.5"],
+      criteria: ['9.1.1.1', '9.1.3.1', '9.1.4.5'],
       passed: mediaResults.violations.length === 0,
       violations: mediaResults.violations,
       summary: {
@@ -57,10 +57,10 @@ class MediaAccessibilityScanner extends BaseScanner {
         totalAudio: mediaResults.totalAudio,
         audioWithoutTranscripts: mediaResults.audioWithoutTranscripts,
         totalSVGs: mediaResults.totalSVGs,
-        svgsWithoutAlt: mediaResults.svgsWithoutAlt
+        svgsWithoutAlt: mediaResults.svgsWithoutAlt,
       },
       screenshotPath: scanDir,
-      visualEvidence: mediaResults.visualEvidence
+      visualEvidence: mediaResults.visualEvidence,
     };
   }
 
@@ -77,7 +77,7 @@ class MediaAccessibilityScanner extends BaseScanner {
     // Take initial screenshot (async, don't wait) - skip for performance testing
     const initialScreenshot = path.join(scanDir, 'media-accessibility.png');
     let screenshotPromise;
-    
+
     if (options.skipScreenshot) {
       screenshotPromise = Promise.resolve();
     } else {
@@ -94,12 +94,13 @@ class MediaAccessibilityScanner extends BaseScanner {
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
-          : '';
+        const className =
+          element.className && typeof element.className === 'string'
+            ? `.${element.className.split(' ')[0]}`
+            : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       /**
        * A media element ships an "alternative for time-based media" when a
        * substantive text description is programmatically associated with it
@@ -111,16 +112,24 @@ class MediaAccessibilityScanner extends BaseScanner {
       function hasTimeBasedTextAlternative(el) {
         const MIN_ALT_LENGTH = 80; // a real description, not a caption/label
 
-        const describedBy = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+        const describedBy = (el.getAttribute('aria-describedby') || '')
+          .split(/\s+/)
+          .filter(Boolean);
         for (const id of describedBy) {
           const target = document.getElementById(id);
-          if (target && !el.contains(target) && target.textContent.trim().length >= MIN_ALT_LENGTH) {
+          if (
+            target &&
+            !el.contains(target) &&
+            target.textContent.trim().length >= MIN_ALT_LENGTH
+          ) {
             return true;
           }
         }
 
         // Transcript / text-alternative container in the same content block.
-        const scope = el.closest('section, article, figure, .media-section, .media-container') || el.parentElement;
+        const scope =
+          el.closest('section, article, figure, .media-section, .media-container') ||
+          el.parentElement;
         if (scope) {
           const candidates = scope.querySelectorAll(
             '[class*="transcript"], [id*="transcript"], [class*="text-alternative"], [id*="text-alternative"], [class*="audiodesc"], [class*="audio-desc"]'
@@ -160,21 +169,21 @@ class MediaAccessibilityScanner extends BaseScanner {
         totalAudio: 0,
         audioWithoutTranscripts: 0,
         totalSVGs: 0,
-        svgsWithoutAlt: 0
+        svgsWithoutAlt: 0,
       };
 
       // ========== IMAGE ANALYSIS ==========
       const images = document.querySelectorAll('img');
       mediaCounts.totalImages = images.length;
-      
-      images.forEach(img => {
+
+      images.forEach((img) => {
         const selector = getElementSelector(img);
         const alt = img.getAttribute('alt');
         const src = img.getAttribute('src');
         const className = img.className || '';
         const id = img.id || '';
         const isHidden = img.offsetParent === null;
-        
+
         if (isHidden) return;
 
         // Image alt validation
@@ -186,39 +195,49 @@ class MediaAccessibilityScanner extends BaseScanner {
             src: src,
             description: 'Image lacks alt attribute',
             severity: 'serious',
-            suggestion: 'Add alt attribute to describe the image content or use alt="" for decorative images'
+            suggestion:
+              'Add alt attribute to describe the image content or use alt="" for decorative images',
           });
         }
-        
+
         if (alt !== null && alt !== undefined) {
           const altLower = alt.toLowerCase();
-          
+
           // Redundant alt text
-          if (altLower.includes('image of') || altLower.includes('picture of') || 
-              altLower.includes('graphic of') || altLower.includes('photo of')) {
+          if (
+            altLower.includes('image of') ||
+            altLower.includes('picture of') ||
+            altLower.includes('graphic of') ||
+            altLower.includes('photo of')
+          ) {
             allIssues.push({
               type: 'image-alt',
               element: selector,
               alt: alt,
               description: 'Alt text contains redundant phrases like "image of"',
               severity: 'moderate',
-              suggestion: 'Remove redundant phrases and describe the image content directly'
+              suggestion: 'Remove redundant phrases and describe the image content directly',
             });
           }
-          
+
           // Filename as alt text
-          if (src && (altLower.includes('.jpg') || altLower.includes('.png') || 
-                     altLower.includes('.gif') || altLower.includes('.jpeg'))) {
+          if (
+            src &&
+            (altLower.includes('.jpg') ||
+              altLower.includes('.png') ||
+              altLower.includes('.gif') ||
+              altLower.includes('.jpeg'))
+          ) {
             allIssues.push({
               type: 'image-alt',
               element: selector,
               alt: alt,
               description: 'Alt text appears to be a filename',
               severity: 'serious',
-              suggestion: 'Replace filename with meaningful description of image content'
+              suggestion: 'Replace filename with meaningful description of image content',
             });
           }
-          
+
           // Long alt text
           if (alt.length > 125) {
             allIssues.push({
@@ -227,11 +246,11 @@ class MediaAccessibilityScanner extends BaseScanner {
               alt: alt.substring(0, 50) + '...',
               description: `Alt text is too long (${alt.length} characters)`,
               severity: 'moderate',
-              suggestion: 'Consider using longdesc or aria-describedby for detailed descriptions'
+              suggestion: 'Consider using longdesc or aria-describedby for detailed descriptions',
             });
           }
         }
-        
+
         // Missing src
         if (!src || src.trim() === '') {
           allIssues.push({
@@ -239,27 +258,28 @@ class MediaAccessibilityScanner extends BaseScanner {
             element: selector,
             description: 'Image has missing or empty src attribute',
             severity: 'serious',
-            suggestion: 'Provide valid image source or remove the img element'
+            suggestion: 'Provide valid image source or remove the img element',
           });
         }
 
         // Complex image analysis
-        const isLikelyComplex = (src && src.toLowerCase().includes('chart')) ||
-                              (src && src.toLowerCase().includes('graph')) ||
-                              (src && src.toLowerCase().includes('diagram')) ||
-                              (alt && alt.toLowerCase().includes('chart')) ||
-                              (alt && alt.toLowerCase().includes('graph')) ||
-                              (alt && alt.toLowerCase().includes('diagram')) ||
-                              className.toLowerCase().includes('chart') ||
-                              className.toLowerCase().includes('graph') ||
-                              id.toLowerCase().includes('chart') ||
-                              id.toLowerCase().includes('graph');
-        
+        const isLikelyComplex =
+          (src && src.toLowerCase().includes('chart')) ||
+          (src && src.toLowerCase().includes('graph')) ||
+          (src && src.toLowerCase().includes('diagram')) ||
+          (alt && alt.toLowerCase().includes('chart')) ||
+          (alt && alt.toLowerCase().includes('graph')) ||
+          (alt && alt.toLowerCase().includes('diagram')) ||
+          className.toLowerCase().includes('chart') ||
+          className.toLowerCase().includes('graph') ||
+          id.toLowerCase().includes('chart') ||
+          id.toLowerCase().includes('graph');
+
         if (isLikelyComplex) {
           const hasLongdesc = img.hasAttribute('longdesc');
           const hasAriaDescribedby = img.hasAttribute('aria-describedby');
           const hasDetailedAlt = alt && alt.length > 50;
-          
+
           if (!hasLongdesc && !hasAriaDescribedby && !hasDetailedAlt) {
             allIssues.push({
               type: 'complex-img-alt',
@@ -267,10 +287,11 @@ class MediaAccessibilityScanner extends BaseScanner {
               alt: alt ? alt.substring(0, 50) : '',
               description: 'Complex image lacks detailed description',
               severity: 'moderate',
-              suggestion: 'Add longdesc, aria-describedby, or provide detailed alt text for complex images like charts or diagrams'
+              suggestion:
+                'Add longdesc, aria-describedby, or provide detailed alt text for complex images like charts or diagrams',
             });
           }
-          
+
           if (alt && alt.length < 10 && !hasLongdesc && !hasAriaDescribedby) {
             allIssues.push({
               type: 'complex-img-alt',
@@ -278,22 +299,24 @@ class MediaAccessibilityScanner extends BaseScanner {
               alt: alt,
               description: 'Complex image has insufficient alt text',
               severity: 'serious',
-              suggestion: 'Provide comprehensive description of the data, trends, or information shown in the complex image'
+              suggestion:
+                'Provide comprehensive description of the data, trends, or information shown in the complex image',
             });
           }
         }
 
         // Decorative image analysis
-        const isLikelyDecorative = (src && src.toLowerCase().includes('decoration')) ||
-                                  (src && src.toLowerCase().includes('spacer')) ||
-                                  (src && src.toLowerCase().includes('divider')) ||
-                                  (src && src.toLowerCase().includes('border')) ||
-                                  className.toLowerCase().includes('decoration') ||
-                                  className.toLowerCase().includes('spacer') ||
-                                  id.toLowerCase().includes('decoration') ||
-                                  img.getAttribute('role') === 'presentation' ||
-                                  img.getAttribute('role') === 'none';
-        
+        const isLikelyDecorative =
+          (src && src.toLowerCase().includes('decoration')) ||
+          (src && src.toLowerCase().includes('spacer')) ||
+          (src && src.toLowerCase().includes('divider')) ||
+          (src && src.toLowerCase().includes('border')) ||
+          className.toLowerCase().includes('decoration') ||
+          className.toLowerCase().includes('spacer') ||
+          id.toLowerCase().includes('decoration') ||
+          img.getAttribute('role') === 'presentation' ||
+          img.getAttribute('role') === 'none';
+
         if (isLikelyDecorative && alt !== '') {
           allIssues.push({
             type: 'decorative-img',
@@ -301,21 +324,27 @@ class MediaAccessibilityScanner extends BaseScanner {
             alt: alt,
             description: 'Decorative image has non-empty alt text',
             severity: 'minor',
-            suggestion: 'Use alt="" for decorative images or add role="presentation"'
+            suggestion: 'Use alt="" for decorative images or add role="presentation"',
           });
         }
-        
+
         if (alt) {
           const altLower = alt.toLowerCase();
-          if (altLower === 'decoration' || altLower === 'spacer' || altLower === 'divider' || 
-              altLower === 'line' || altLower === 'bullet' || altLower === 'separator') {
+          if (
+            altLower === 'decoration' ||
+            altLower === 'spacer' ||
+            altLower === 'divider' ||
+            altLower === 'line' ||
+            altLower === 'bullet' ||
+            altLower === 'separator'
+          ) {
             allIssues.push({
               type: 'decorative-img',
               element: selector,
               alt: alt,
               description: 'Image with decorative alt text should use empty alt instead',
               severity: 'minor',
-              suggestion: 'Use alt="" instead of describing decorative elements'
+              suggestion: 'Use alt="" instead of describing decorative elements',
             });
           }
         }
@@ -324,8 +353,8 @@ class MediaAccessibilityScanner extends BaseScanner {
       // ========== SVG ANALYSIS ==========
       const svgs = document.querySelectorAll('svg');
       mediaCounts.totalSVGs = svgs.length;
-      
-      svgs.forEach(svg => {
+
+      svgs.forEach((svg) => {
         const selector = getElementSelector(svg);
 
         // Visibility gate. `offsetParent` is an HTMLElement property: on an
@@ -336,7 +365,8 @@ class MediaAccessibilityScanner extends BaseScanner {
         // actually presented, so measure the rendered box instead.
         const rect = svg.getBoundingClientRect();
         const svgStyle = window.getComputedStyle(svg);
-        const isHidden = (rect.width === 0 && rect.height === 0) ||
+        const isHidden =
+          (rect.width === 0 && rect.height === 0) ||
           svgStyle.visibility === 'hidden' ||
           svgStyle.display === 'none' ||
           parseFloat(svgStyle.opacity) === 0;
@@ -345,24 +375,26 @@ class MediaAccessibilityScanner extends BaseScanner {
 
         const hasTitle = svg.querySelector('title');
         const hasDesc = svg.querySelector('desc');
-        const hasAriaLabel = svg.hasAttribute('aria-label') && svg.getAttribute('aria-label').trim();
+        const hasAriaLabel =
+          svg.hasAttribute('aria-label') && svg.getAttribute('aria-label').trim();
         const hasAriaLabelledby = svg.hasAttribute('aria-labelledby');
         const hasRole = svg.getAttribute('role');
         const hasAriaHidden = svg.getAttribute('aria-hidden') === 'true';
-        
+
         if (hasAriaHidden || hasRole === 'presentation' || hasRole === 'none') {
           return;
         }
-        
+
         if (!hasTitle && !hasDesc && !hasAriaLabel && !hasAriaLabelledby) {
           // An icon inside a link/button that is already named by its own text
           // or aria-label conveys nothing on its own: the fix is aria-hidden,
           // and the impact is a stray "graphic" announcement, not missing info.
           const control = svg.closest('a, button, [role="button"], [role="link"], summary, label');
-          const controlNamed = control && (
-            (control.textContent || '').replace(/\s+/g, ' ').trim().length > 0 ||
-            (control.getAttribute('aria-label') || '').trim().length > 0 ||
-            control.hasAttribute('aria-labelledby'));
+          const controlNamed =
+            control &&
+            ((control.textContent || '').replace(/\s+/g, ' ').trim().length > 0 ||
+              (control.getAttribute('aria-label') || '').trim().length > 0 ||
+              control.hasAttribute('aria-labelledby'));
           mediaCounts.svgsWithoutAlt++;
           allIssues.push({
             type: 'svg-img-alt',
@@ -373,20 +405,20 @@ class MediaAccessibilityScanner extends BaseScanner {
             severity: controlNamed ? 'minor' : 'serious',
             suggestion: controlNamed
               ? 'Add aria-hidden="true" (and focusable="false") to the decorative icon'
-              : 'Add <title> element, aria-label, or aria-labelledby to describe the SVG content'
+              : 'Add <title> element, aria-label, or aria-labelledby to describe the SVG content',
           });
         }
-        
+
         if (hasTitle && !hasTitle.textContent.trim()) {
           allIssues.push({
             type: 'svg-img-alt',
             element: selector,
             description: 'SVG has empty title element',
             severity: 'moderate',
-            suggestion: 'Provide meaningful text in the title element or remove it'
+            suggestion: 'Provide meaningful text in the title element or remove it',
           });
         }
-        
+
         if ((hasTitle || hasDesc) && !hasRole) {
           const hasInteractiveElements = svg.querySelectorAll('a, button, [onclick]').length > 0;
           if (hasInteractiveElements) {
@@ -395,7 +427,8 @@ class MediaAccessibilityScanner extends BaseScanner {
               element: selector,
               description: 'Interactive SVG lacks appropriate role',
               severity: 'moderate',
-              suggestion: 'Add role="img" for informative SVGs or role="application" for interactive SVGs'
+              suggestion:
+                'Add role="img" for informative SVGs or role="application" for interactive SVGs',
             });
           }
         }
@@ -404,8 +437,8 @@ class MediaAccessibilityScanner extends BaseScanner {
       // ========== VIDEO ANALYSIS ==========
       const videos = document.querySelectorAll('video');
       mediaCounts.totalVideos = videos.length;
-      
-      videos.forEach(video => {
+
+      videos.forEach((video) => {
         const selector = getElementSelector(video);
 
         if (!isEvaluableMedia(video)) return;
@@ -430,7 +463,8 @@ class MediaAccessibilityScanner extends BaseScanner {
             element: selector,
             description: 'Video provides neither a captions/subtitles track nor a text alternative',
             severity: 'serious',
-            suggestion: 'Add <track> elements with kind="captions" or kind="subtitles", or provide a full transcript linked via aria-describedby'
+            suggestion:
+              'Add <track> elements with kind="captions" or kind="subtitles", or provide a full transcript linked via aria-describedby',
           });
         }
 
@@ -445,9 +479,11 @@ class MediaAccessibilityScanner extends BaseScanner {
             type: 'video-description',
             criterion: '9.1.2.3',
             element: selector,
-            description: 'Video provides neither an audio description nor an alternative for time-based media',
+            description:
+              'Video provides neither an audio description nor an alternative for time-based media',
             severity: 'serious',
-            suggestion: 'Provide a full text alternative for the video, or add audio description via <track kind="descriptions">'
+            suggestion:
+              'Provide a full text alternative for the video, or add audio description via <track kind="descriptions">',
           });
           allIssues.push({
             type: 'video-audio-description',
@@ -455,7 +491,8 @@ class MediaAccessibilityScanner extends BaseScanner {
             element: selector,
             description: 'Video lacks an audio description track for its visual content',
             severity: 'moderate',
-            suggestion: 'Add audio descriptions via <track kind="descriptions"> or supply an audio-described version of the video'
+            suggestion:
+              'Add audio descriptions via <track kind="descriptions"> or supply an audio-described version of the video',
           });
         }
 
@@ -465,10 +502,10 @@ class MediaAccessibilityScanner extends BaseScanner {
             element: selector,
             description: 'Video lacks user controls',
             severity: 'moderate',
-            suggestion: 'Add controls attribute to allow users to control video playback'
+            suggestion: 'Add controls attribute to allow users to control video playback',
           });
         }
-        
+
         if (hasAutoplay) {
           const isMuted = video.hasAttribute('muted');
           if (!isMuted) {
@@ -477,7 +514,7 @@ class MediaAccessibilityScanner extends BaseScanner {
               element: selector,
               description: 'Autoplaying video with sound can be disorienting',
               severity: 'moderate',
-              suggestion: 'Add muted attribute to autoplay videos or remove autoplay'
+              suggestion: 'Add muted attribute to autoplay videos or remove autoplay',
             });
           }
         }
@@ -486,28 +523,29 @@ class MediaAccessibilityScanner extends BaseScanner {
       // ========== AUDIO ANALYSIS ==========
       const audioElements = document.querySelectorAll('audio');
       mediaCounts.totalAudio = audioElements.length;
-      
-      audioElements.forEach(audio => {
+
+      audioElements.forEach((audio) => {
         const selector = getElementSelector(audio);
 
         if (!isEvaluableMedia(audio)) return;
 
         const hasControls = audio.hasAttribute('controls');
         const hasAutoplay = audio.hasAttribute('autoplay');
-        
+
         const parent = audio.parentElement;
         const parentText = parent ? parent.textContent.toLowerCase() : '';
-        const hasTranscriptLink = hasTimeBasedTextAlternative(audio) || (parent && (
-          parent.querySelector('a[href*="transcript"]') ||
-          parent.querySelector('a[href*="transkript"]') ||
-          parent.querySelector('[class*="transcript"]') ||
-          parent.querySelector('[id*="transcript"]') ||
-          parent.querySelector('[class*="transkript"]') ||
-          parent.querySelector('[id*="transkript"]') ||
-          parentText.includes('transcript') ||
-          parentText.includes('transkript') ||
-          parentText.includes('abschrift')
-        ));
+        const hasTranscriptLink =
+          hasTimeBasedTextAlternative(audio) ||
+          (parent &&
+            (parent.querySelector('a[href*="transcript"]') ||
+              parent.querySelector('a[href*="transkript"]') ||
+              parent.querySelector('[class*="transcript"]') ||
+              parent.querySelector('[id*="transcript"]') ||
+              parent.querySelector('[class*="transkript"]') ||
+              parent.querySelector('[id*="transkript"]') ||
+              parentText.includes('transcript') ||
+              parentText.includes('transkript') ||
+              parentText.includes('abschrift')));
 
         if (!hasTranscriptLink) {
           mediaCounts.audioWithoutTranscripts++;
@@ -516,29 +554,30 @@ class MediaAccessibilityScanner extends BaseScanner {
             element: selector,
             description: 'Audio content lacks transcript',
             severity: 'serious',
-            suggestion: 'Provide a transcript link or text near the audio element'
+            suggestion: 'Provide a transcript link or text near the audio element',
           });
         }
-        
+
         if (!hasControls && !hasAutoplay) {
           allIssues.push({
             type: 'audio-caption',
             element: selector,
             description: 'Audio element lacks user controls',
             severity: 'moderate',
-            suggestion: 'Add controls attribute to allow users to control audio playback'
+            suggestion: 'Add controls attribute to allow users to control audio playback',
           });
         }
-        
+
         if (hasAutoplay) {
           const isMuted = audio.hasAttribute('muted');
           if (!isMuted) {
             allIssues.push({
               type: 'audio-caption',
               element: selector,
-              description: 'Autoplaying audio can be disorienting and interfere with screen readers',
+              description:
+                'Autoplaying audio can be disorienting and interfere with screen readers',
               severity: 'serious',
-              suggestion: 'Remove autoplay or add user controls to stop audio'
+              suggestion: 'Remove autoplay or add user controls to stop audio',
             });
           }
         }
@@ -547,27 +586,28 @@ class MediaAccessibilityScanner extends BaseScanner {
       // ========== REMAINING MEDIA ELEMENTS ==========
       // Objects and embeds
       const objects = document.querySelectorAll('object, embed');
-      objects.forEach(obj => {
+      objects.forEach((obj) => {
         const selector = getElementSelector(obj);
         const isHidden = obj.offsetParent === null;
-        
+
         if (isHidden) return;
-        
+
         const hasTextContent = obj.textContent.trim().length > 0;
         const hasTitle = obj.hasAttribute('title') && obj.getAttribute('title').trim();
-        const hasAriaLabel = obj.hasAttribute('aria-label') && obj.getAttribute('aria-label').trim();
+        const hasAriaLabel =
+          obj.hasAttribute('aria-label') && obj.getAttribute('aria-label').trim();
         const hasAriaLabelledby = obj.hasAttribute('aria-labelledby');
-        
+
         if (!hasTextContent && !hasTitle && !hasAriaLabel && !hasAriaLabelledby) {
           allIssues.push({
             type: 'object-alt',
             element: selector,
             description: 'Object/embed element lacks accessible name',
             severity: 'serious',
-            suggestion: 'Add title, aria-label, or text content to describe the embedded object'
+            suggestion: 'Add title, aria-label, or text content to describe the embedded object',
           });
         }
-        
+
         if (hasTitle) {
           const title = obj.getAttribute('title').toLowerCase();
           if (title === 'object' || title === 'embed' || title === 'plugin') {
@@ -575,9 +615,9 @@ class MediaAccessibilityScanner extends BaseScanner {
               type: 'object-alt',
               element: selector,
               title: obj.getAttribute('title'),
-              description: 'Object has generic title that doesn\'t describe content',
+              description: "Object has generic title that doesn't describe content",
               severity: 'moderate',
-              suggestion: 'Provide descriptive title that explains the object\'s purpose'
+              suggestion: "Provide descriptive title that explains the object's purpose",
             });
           }
         }
@@ -585,11 +625,11 @@ class MediaAccessibilityScanner extends BaseScanner {
 
       // Image maps
       const areas = document.querySelectorAll('area');
-      areas.forEach(area => {
+      areas.forEach((area) => {
         const selector = getElementSelector(area);
         const alt = area.getAttribute('alt');
         const href = area.getAttribute('href');
-        
+
         if (alt === null) {
           allIssues.push({
             type: 'area-alt',
@@ -597,10 +637,10 @@ class MediaAccessibilityScanner extends BaseScanner {
             href: href,
             description: 'Image map area lacks alt attribute',
             severity: 'serious',
-            suggestion: 'Add alt attribute to describe the clickable area'
+            suggestion: 'Add alt attribute to describe the clickable area',
           });
         }
-        
+
         if (href && alt === '') {
           allIssues.push({
             type: 'area-alt',
@@ -608,68 +648,80 @@ class MediaAccessibilityScanner extends BaseScanner {
             href: href,
             description: 'Linked image map area has empty alt text',
             severity: 'serious',
-            suggestion: 'Provide alt text that describes the link destination'
+            suggestion: 'Provide alt text that describes the link destination',
           });
         }
-        
-        if (alt && (alt.toLowerCase() === 'link' || alt.toLowerCase() === 'area' || alt.toLowerCase() === 'clickable')) {
+
+        if (
+          alt &&
+          (alt.toLowerCase() === 'link' ||
+            alt.toLowerCase() === 'area' ||
+            alt.toLowerCase() === 'clickable')
+        ) {
           allIssues.push({
             type: 'area-alt',
             element: selector,
             alt: alt,
             description: 'Image map area has generic alt text',
             severity: 'moderate',
-            suggestion: 'Provide specific description of what the area links to'
+            suggestion: 'Provide specific description of what the area links to',
           });
         }
       });
 
       // Canvas elements
       const canvases = document.querySelectorAll('canvas');
-      canvases.forEach(canvas => {
+      canvases.forEach((canvas) => {
         const selector = getElementSelector(canvas);
         const isHidden = canvas.offsetParent === null;
-        
+
         if (isHidden) return;
-        
-        const hasAriaLabel = canvas.hasAttribute('aria-label') && canvas.getAttribute('aria-label').trim();
+
+        const hasAriaLabel =
+          canvas.hasAttribute('aria-label') && canvas.getAttribute('aria-label').trim();
         const hasAriaLabelledby = canvas.hasAttribute('aria-labelledby');
         const hasRole = canvas.getAttribute('role');
         const hasFallbackContent = canvas.textContent.trim().length > 0;
         const hasTitle = canvas.hasAttribute('title') && canvas.getAttribute('title').trim();
-        
+
         if (!hasAriaLabel && !hasAriaLabelledby && !hasFallbackContent && !hasTitle) {
           allIssues.push({
             type: 'canvas',
             element: selector,
             description: 'Canvas element lacks accessible name or fallback content',
             severity: 'serious',
-            suggestion: 'Add aria-label, fallback text content, or alternative text representation'
+            suggestion: 'Add aria-label, fallback text content, or alternative text representation',
           });
         }
-        
+
         const hasClickHandler = canvas.onclick || canvas.hasAttribute('onclick');
         const hasTabindex = canvas.hasAttribute('tabindex');
-        
+
         if ((hasClickHandler || hasTabindex) && !hasRole) {
           allIssues.push({
             type: 'canvas',
             element: selector,
             description: 'Interactive canvas lacks appropriate ARIA role',
             severity: 'moderate',
-            suggestion: 'Add role="application", role="img", or appropriate role for interactive canvas'
+            suggestion:
+              'Add role="application", role="img", or appropriate role for interactive canvas',
           });
         }
-        
+
         if (hasFallbackContent) {
           const content = canvas.textContent.trim().toLowerCase();
-          if (content === 'canvas' || content === 'canvas element' || content.includes('not supported')) {
+          if (
+            content === 'canvas' ||
+            content === 'canvas element' ||
+            content.includes('not supported')
+          ) {
             allIssues.push({
               type: 'canvas',
               element: selector,
               description: 'Canvas has generic fallback content',
               severity: 'moderate',
-              suggestion: 'Provide meaningful description of canvas content instead of generic text'
+              suggestion:
+                'Provide meaningful description of canvas content instead of generic text',
             });
           }
         }
@@ -677,40 +729,45 @@ class MediaAccessibilityScanner extends BaseScanner {
 
       // Input image buttons
       const imageInputs = document.querySelectorAll('input[type="image"]');
-      imageInputs.forEach(input => {
+      imageInputs.forEach((input) => {
         const selector = getElementSelector(input);
         const alt = input.getAttribute('alt');
         const value = input.getAttribute('value');
         const title = input.getAttribute('title');
-        
+
         if (!alt && !value && !title) {
           allIssues.push({
             type: 'input-image-alt',
             element: selector,
             description: 'Image input button lacks alternative text',
             severity: 'serious',
-            suggestion: 'Add alt attribute, value, or title to describe the button\'s function'
+            suggestion: "Add alt attribute, value, or title to describe the button's function",
           });
         }
-        
-        if (alt && (alt.toLowerCase() === 'submit' || alt.toLowerCase() === 'button' || alt.toLowerCase() === 'image')) {
+
+        if (
+          alt &&
+          (alt.toLowerCase() === 'submit' ||
+            alt.toLowerCase() === 'button' ||
+            alt.toLowerCase() === 'image')
+        ) {
           allIssues.push({
             type: 'input-image-alt',
             element: selector,
             alt: alt,
             description: 'Image input has generic alt text',
             severity: 'moderate',
-            suggestion: 'Provide specific description of what the button does'
+            suggestion: 'Provide specific description of what the button does',
           });
         }
       });
 
       // Media iframes
       const iframes = document.querySelectorAll('iframe');
-      iframes.forEach(iframe => {
+      iframes.forEach((iframe) => {
         const src = iframe.getAttribute('src');
         const title = iframe.getAttribute('title');
-        
+
         if (src && (src.includes('youtube') || src.includes('vimeo') || src.includes('video'))) {
           if (!title || !title.trim()) {
             allIssues.push({
@@ -719,7 +776,7 @@ class MediaAccessibilityScanner extends BaseScanner {
               src: src,
               description: 'Media iframe lacks descriptive title',
               severity: 'moderate',
-              suggestion: 'Add title attribute describing the embedded media content'
+              suggestion: 'Add title attribute describing the embedded media content',
             });
           }
         }
@@ -732,13 +789,13 @@ class MediaAccessibilityScanner extends BaseScanner {
     await screenshotPromise;
 
     // Create violations from analyzed issues
-    mediaAnalysis.allIssues.forEach(issue => {
+    mediaAnalysis.allIssues.forEach((issue) => {
       // Issues may carry an explicit criterion (audio description belongs to
       // 1.2.3/1.2.5, not to 1.2.2 Captions); otherwise fall back to the
       // media-type default.
-      let criterion = issue.criterion || "9.1.1.1"; // Default criterion
-      if (!issue.criterion && issue.type.includes('video')) criterion = "9.1.2.2";
-      if (!issue.criterion && issue.type.includes('audio')) criterion = "9.1.2.1";
+      let criterion = issue.criterion || '9.1.1.1'; // Default criterion
+      if (!issue.criterion && issue.type.includes('video')) criterion = '9.1.2.2';
+      if (!issue.criterion && issue.type.includes('audio')) criterion = '9.1.2.1';
 
       violations.push({
         criterion: criterion,
@@ -746,7 +803,7 @@ class MediaAccessibilityScanner extends BaseScanner {
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: issue.suggestion
+        suggestion: issue.suggestion,
       });
     });
 
@@ -761,10 +818,12 @@ class MediaAccessibilityScanner extends BaseScanner {
       totalAudio: mediaAnalysis.mediaCounts.totalAudio,
       audioWithoutTranscripts: mediaAnalysis.mediaCounts.audioWithoutTranscripts,
       totalSVGs: mediaAnalysis.mediaCounts.totalSVGs,
-      svgsWithoutAlt: mediaAnalysis.mediaCounts.svgsWithoutAlt
+      svgsWithoutAlt: mediaAnalysis.mediaCounts.svgsWithoutAlt,
     });
 
-    console.log(`Optimized media accessibility analysis complete: ${violations.length} violations found`);
+    console.log(
+      `Optimized media accessibility analysis complete: ${violations.length} violations found`
+    );
 
     return {
       violations,
@@ -776,7 +835,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       totalAudio: mediaAnalysis.mediaCounts.totalAudio,
       audioWithoutTranscripts: mediaAnalysis.mediaCounts.audioWithoutTranscripts,
       totalSVGs: mediaAnalysis.mediaCounts.totalSVGs,
-      svgsWithoutAlt: mediaAnalysis.mediaCounts.svgsWithoutAlt
+      svgsWithoutAlt: mediaAnalysis.mediaCounts.svgsWithoutAlt,
     };
   }
 
@@ -785,7 +844,6 @@ class MediaAccessibilityScanner extends BaseScanner {
   // optimized performMediaAnalysis method above for better performance.
   // This single DOM pass approach reduces execution time from ~10s to <2s.
   // ============================================================================
-
 }
 
 module.exports = MediaAccessibilityScanner;

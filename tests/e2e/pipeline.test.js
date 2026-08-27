@@ -44,9 +44,7 @@ class MockExclusiveScanner extends BaseScanner {
     return {
       scannerId: this.id,
       passed: false,
-      violations: [
-        this.formatViolation('mock-rule', 'minor', 'Mock violation'),
-      ],
+      violations: [this.formatViolation('mock-rule', 'minor', 'Mock violation')],
       summary: { pageTitle: title },
     };
   }
@@ -90,9 +88,7 @@ describe('ScanPipeline', () => {
 
   it('throws when no scanners match', async () => {
     const emptyPipeline = new ScanPipeline();
-    await expect(
-      emptyPipeline.scan('http://localhost:1/nope')
-    ).rejects.toThrow('No scanners');
+    await expect(emptyPipeline.scan('http://localhost:1/nope')).rejects.toThrow('No scanners');
     await emptyPipeline.close();
   });
 });

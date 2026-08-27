@@ -10,8 +10,22 @@ const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
 const { normalizeSeverity, isHardViolation } = require('../core/severity');
 
-const SEVERITY_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3, 'best-practice': 4, info: 5 };
-const SEVERITY_LABELS = { critical: 'Critical', serious: 'Serious', moderate: 'Moderate', minor: 'Minor', 'best-practice': 'Best Practice', info: 'Info' };
+const SEVERITY_ORDER = {
+  critical: 0,
+  serious: 1,
+  moderate: 2,
+  minor: 3,
+  'best-practice': 4,
+  info: 5,
+};
+const SEVERITY_LABELS = {
+  critical: 'Critical',
+  serious: 'Serious',
+  moderate: 'Moderate',
+  minor: 'Minor',
+  'best-practice': 'Best Practice',
+  info: 'Info',
+};
 
 function formatDocNumber(id) {
   const short = id.split('-')[0].toUpperCase();
@@ -69,7 +83,14 @@ class ReportGenerator {
       const metadataPath = path.join(this.reportsDir, `${reportId}.json`);
       await fs.writeFile(metadataPath, JSON.stringify(reportData, null, 2));
 
-      return { reportId, htmlPath, pdfPath, reportUrl: `/api/report/${reportId}`, pdfUrl: pdfPath ? `/api/report/${reportId}/pdf` : null, timestamp };
+      return {
+        reportId,
+        htmlPath,
+        pdfPath,
+        reportUrl: `/api/report/${reportId}`,
+        pdfUrl: pdfPath ? `/api/report/${reportId}/pdf` : null,
+        timestamp,
+      };
     } catch (error) {
       console.error('Error generating report:', error);
       throw new Error(`Failed to generate report: ${error.message}`);
@@ -107,7 +128,10 @@ class ReportGenerator {
       // htmlContent is the already-escaped output of generateHTMLReport — the
       // PDF renderer must never be handed raw scan data.
       const puppeteer = require('puppeteer');
-      browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+      browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
       const pdfBuffer = await page.pdf({
@@ -128,8 +152,10 @@ class ReportGenerator {
 
   async getHTMLTemplate(reportData) {
     let templateName = 'basic-report.html';
-    if (reportData.headingStructure && reportData.euCompliance) templateName = 'screen-reader-report.html';
-    else if (reportData.categories && reportData.wcagCompliance) templateName = 'enhanced-report.html';
+    if (reportData.headingStructure && reportData.euCompliance)
+      templateName = 'screen-reader-report.html';
+    else if (reportData.categories && reportData.wcagCompliance)
+      templateName = 'enhanced-report.html';
 
     const templatePath = path.join(this.templatesDir, templateName);
     try {
@@ -612,14 +638,22 @@ class ReportGenerator {
       return 'score-poor';
     };
 
-    const reportDate = new Date(data.timestamp).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+    const reportDate = new Date(data.timestamp).toLocaleDateString('en-GB', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
     const allFindings = data.violations || [];
     const violationsCount = allFindings.filter(isHardViolation).length;
-    const bestPracticeCount = allFindings.filter(v => !isHardViolation(v)).length;
+    const bestPracticeCount = allFindings.filter((v) => !isHardViolation(v)).length;
     const passes = data.passes || 0;
 
     // Scalar placeholders — every value is scan-controlled, so every value is escaped.
-    html = this.fill(html, /{{pageTitle}}/g, this.esc(data.pageTitle || data.url || 'Unknown Page'));
+    html = this.fill(
+      html,
+      /{{pageTitle}}/g,
+      this.esc(data.pageTitle || data.url || 'Unknown Page')
+    );
     html = this.fill(html, /{{url}}/g, this.esc(data.url || ''));
     html = this.fill(html, /{{reportDate}}/g, this.esc(reportDate));
     html = this.fill(html, /{{accessibilityScore}}/g, this.esc(data.accessibilityScore || 0));
@@ -629,33 +663,57 @@ class ReportGenerator {
     html = this.fill(html, /{{violationsCount}}/g, this.esc(violationsCount));
 
     // Determine conformance target based on whether LLM scanners were used
-    const hasLlmScanners = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
+    const hasLlmScanners =
+      data.scanners && Object.keys(data.scanners).some((s) => s.startsWith('llm-'));
     const conformanceTarget = hasLlmScanners ? 'WCAG 2.2 Level AAA' : 'WCAG 2.2 Level AA';
     html = this.fill(html, /{{conformanceTarget}}/g, conformanceTarget);
     html = this.fill(html, /{{orgName}}/g, this.esc(data.orgName || config.reportOrgName));
-    html = this.fill(html, /{{generatedBy}}/g, this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0'));
+    html = this.fill(
+      html,
+      /{{generatedBy}}/g,
+      this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')
+    );
 
     // Passes row (only if passes > 0)
-    const passesRow = passes > 0
-      ? `<tr><th scope="row" class="col-label">Checks Passed</th><td>${this.esc(passes)}</td></tr>`
-      : '';
+    const passesRow =
+      passes > 0
+        ? `<tr><th scope="row" class="col-label">Checks Passed</th><td>${this.esc(passes)}</td></tr>`
+        : '';
     html = this.fill(html, /{{passesRow}}/g, passesRow);
 
     // Org logo
     const orgLogoSrc = this.escUrl(data.orgLogo);
-    html = this.fill(html, /{{orgLogoHtml}}/g, orgLogoSrc ? `<img class="org-logo" src="${orgLogoSrc}" alt="${this.esc(data.orgName || 'Organization')} logo">` : '');
+    html = this.fill(
+      html,
+      /{{orgLogoHtml}}/g,
+      orgLogoSrc
+        ? `<img class="org-logo" src="${orgLogoSrc}" alt="${this.esc(data.orgName || 'Organization')} logo">`
+        : ''
+    );
 
     // Org contact
-    html = this.fill(html, /{{orgContactHtml}}/g, data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : '');
+    html = this.fill(
+      html,
+      /{{orgContactHtml}}/g,
+      data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : ''
+    );
 
     // Sections — each generator escapes its own scan-derived values.
     html = this.fill(html, /{{tocSection}}/g, this.generateTocSection(data));
     html = this.fill(html, /{{severityDistribution}}/g, this.generateSeverityDistribution(data));
-    html = this.fill(html, /{{principleScoresTable}}/g, this.generatePrincipleScoresTable(data, getScoreClass));
+    html = this.fill(
+      html,
+      /{{principleScoresTable}}/g,
+      this.generatePrincipleScoresTable(data, getScoreClass)
+    );
     html = this.fill(html, /{{methodologySection}}/g, this.generateMethodologySection(data));
     html = this.fill(html, /{{findingsSection}}/g, this.generateFindingsSection(data));
     html = this.fill(html, /{{euComplianceSection}}/g, this.generateEuComplianceSection(data));
-    html = this.fill(html, /{{recommendationsSection}}/g, this.generateRecommendationsSection(data));
+    html = this.fill(
+      html,
+      /{{recommendationsSection}}/g,
+      this.generateRecommendationsSection(data)
+    );
     html = this.fill(html, /{{appendixSection}}/g, this.generateAppendixSection(data));
 
     return html;
@@ -701,7 +759,10 @@ class ReportGenerator {
     const raw = String(value).trim();
     // Control characters / whitespace / quotes have no place in an attribute URL.
     if (/[\s"'<>`\\]|[\x00-\x1f]/.test(raw)) return '';
-    if (/^https?:\/\//i.test(raw) || /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/=]+$/i.test(raw)) {
+    if (
+      /^https?:\/\//i.test(raw) ||
+      /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/=]+$/i.test(raw)
+    ) {
       return this.esc(raw);
     }
     return '';
@@ -732,11 +793,18 @@ class ReportGenerator {
 
     let sub = '';
     let i = 1;
-    for (const [key, label] of [['perceivable', 'Perceivable'], ['operable', 'Operable'], ['understandable', 'Understandable'], ['robust', 'Robust']]) {
+    for (const [key, label] of [
+      ['perceivable', 'Perceivable'],
+      ['operable', 'Operable'],
+      ['understandable', 'Understandable'],
+      ['robust', 'Robust'],
+    ]) {
       sub += `<li><a href="#s-4-${i}">4.${i} ${label}</a></li>\n`;
       i++;
     }
-    const meaningfulOther = (groups.other || []).filter(v => (v.description || v.type || v.issue || '').trim());
+    const meaningfulOther = (groups.other || []).filter((v) =>
+      (v.description || v.type || v.issue || '').trim()
+    );
     if (meaningfulOther.length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
 
     return `
@@ -760,7 +828,9 @@ class ReportGenerator {
     if (!data.violations || data.violations.length === 0) return '';
 
     const counts = { critical: 0, serious: 0, moderate: 0, minor: 0 };
-    data.violations.forEach(v => { counts[normalizeSeverity(v)]++; });
+    data.violations.forEach((v) => {
+      counts[normalizeSeverity(v)]++;
+    });
     const total = data.violations.length;
 
     let html = `<table>
@@ -775,7 +845,8 @@ class ReportGenerator {
     }
     html += `<tr><th scope="row"><strong>Total</strong></th><td><strong>${total}</strong></td><td></td></tr>`;
     html += '</tbody></table>';
-    html += '<p class="table-note">Severity classification per WCAG 2.2 impact assessment. Critical: barriers preventing access. Serious: significant obstacles. Moderate: degraded experience. Minor: best-practice deviations.</p>';
+    html +=
+      '<p class="table-note">Severity classification per WCAG 2.2 impact assessment. Critical: barriers preventing access. Serious: significant obstacles. Moderate: degraded experience. Minor: best-practice deviations.</p>';
 
     return html;
   }
@@ -783,10 +854,16 @@ class ReportGenerator {
   generatePrincipleScoresTable(data, getScoreClass) {
     const groups = this.groupViolationsByPrinciple(data.violations || []);
     const cats = data.categories || {};
-    const principles = [['Perceivable', 'perceivable'], ['Operable', 'operable'], ['Understandable', 'understandable'], ['Robust', 'robust']];
+    const principles = [
+      ['Perceivable', 'perceivable'],
+      ['Operable', 'operable'],
+      ['Understandable', 'understandable'],
+      ['Robust', 'robust'],
+    ];
     const hasScores = principles.some(([, key]) => cats[key]?.score != null);
 
-    let html = '<table>\n<caption>Table 3: Findings by WCAG principle</caption>\n<thead><tr><th scope="col">WCAG Principle</th>';
+    let html =
+      '<table>\n<caption>Table 3: Findings by WCAG principle</caption>\n<thead><tr><th scope="col">WCAG Principle</th>';
     if (hasScores) html += '<th scope="col">Score</th>';
     html += '<th scope="col">Violations</th></tr></thead>\n<tbody>';
 
@@ -805,39 +882,51 @@ class ReportGenerator {
   }
 
   generateMethodologySection(data) {
-    const hasLlm = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
-    const hasAaa = (data.violations || []).some(v => v.wcagLevel === 'AAA');
+    const hasLlm = data.scanners && Object.keys(data.scanners).some((s) => s.startsWith('llm-'));
+    const hasAaa = (data.violations || []).some((v) => v.wcagLevel === 'AAA');
     const levelLabel = hasAaa ? 'Level AA (with AAA advisories)' : 'Level AA';
     let html = `<p>Assessment conducted via automated scanning against WCAG 2.2 ${levelLabel} success criteria per EN 301 549.</p>`;
     if (hasLlm) {
-      html += '<p>This audit includes LLM-powered semantic analysis for AAA-level criteria. Findings marked <span class="method-badge method-llm" aria-label="Large Language Model analysis">LLM</span> were identified using large language model analysis and should be verified by manual review.</p>';
+      html +=
+        '<p>This audit includes LLM-powered semantic analysis for AAA-level criteria. Findings marked <span class="method-badge method-llm" aria-label="Large Language Model analysis">LLM</span> were identified using large language model analysis and should be verified by manual review.</p>';
     }
-    html += '<div class="scope-note">This report documents machine-detectable violations only. Automated testing covers approximately 30\u201340% of WCAG success criteria. A full conformance evaluation requires additional manual expert review, assistive technology testing, and user testing. Findings should be interpreted as a lower bound of existing barriers.</div>';
+    html +=
+      '<div class="scope-note">This report documents machine-detectable violations only. Automated testing covers approximately 30\u201340% of WCAG success criteria. A full conformance evaluation requires additional manual expert review, assistive technology testing, and user testing. Findings should be interpreted as a lower bound of existing barriers.</div>';
 
     if (data.scanners && Object.keys(data.scanners).length > 0) {
       const names = Object.keys(data.scanners);
-      const passed = names.filter(s => data.scanners[s].passed).length;
-      const failed = names.filter(s => !data.scanners[s].passed);
+      const passed = names.filter((s) => data.scanners[s].passed).length;
+      const failed = names.filter((s) => !data.scanners[s].passed);
 
       html += `<p>${names.length} scanner modules executed. ${passed} passed without findings.</p>`;
 
       // Summarize where findings concentrated
       if (failed.length > 0) {
         const top = failed
-          .map(n => ({ name: n, count: data.scanners[n].violationCount || 0 }))
+          .map((n) => ({ name: n, count: data.scanners[n].violationCount || 0 }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 5);
-        html += `<p>Findings concentrated in: ${top.map(t => `${this.esc(t.name)} (${this.esc(t.count)})`).join(', ')}.</p>`;
+        html += `<p>Findings concentrated in: ${top.map((t) => `${this.esc(t.name)} (${this.esc(t.count)})`).join(', ')}.</p>`;
       }
     }
     return html;
   }
 
   groupViolationsByPrinciple(violations) {
-    const groups = { perceivable: [], operable: [], understandable: [], robust: [], eaa: [], other: [] };
+    const groups = {
+      perceivable: [],
+      operable: [],
+      understandable: [],
+      robust: [],
+      eaa: [],
+      other: [],
+    };
     for (const v of violations) groups[classifyWcagPrinciple(v)].push(v);
     for (const key of Object.keys(groups)) {
-      groups[key].sort((a, b) => (SEVERITY_ORDER[normalizeSeverity(a)] || 2) - (SEVERITY_ORDER[normalizeSeverity(b)] || 2));
+      groups[key].sort(
+        (a, b) =>
+          (SEVERITY_ORDER[normalizeSeverity(a)] || 2) - (SEVERITY_ORDER[normalizeSeverity(b)] || 2)
+      );
     }
     return groups;
   }
@@ -847,8 +936,8 @@ class ReportGenerator {
       return '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>';
     }
 
-    const aaa = data.violations.filter(v => v.wcagLevel === 'AAA');
-    const conformance = data.violations.filter(v => v.wcagLevel !== 'AAA');
+    const aaa = data.violations.filter((v) => v.wcagLevel === 'AAA');
+    const conformance = data.violations.filter((v) => v.wcagLevel !== 'AAA');
     const groups = this.groupViolationsByPrinciple(conformance);
     const totalViolations = conformance.length;
     let html = '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>';
@@ -876,7 +965,9 @@ class ReportGenerator {
     }
 
     // Only show "Other" if there are violations with actual descriptions
-    const meaningfulOther = groups.other.filter(v => (v.description || v.type || v.issue || '').trim());
+    const meaningfulOther = groups.other.filter((v) =>
+      (v.description || v.type || v.issue || '').trim()
+    );
     if (meaningfulOther.length > 0) {
       html += `<h3 id="s-4-5"><span class="sn">4.5</span> Other Findings</h3>`;
       html += this.renderViolationTable(meaningfulOther, tableCounter, 'Other findings');
@@ -896,7 +987,8 @@ class ReportGenerator {
 
   renderViolationTable(violations, tableNum, captionText) {
     let html = `<div class="table-responsive" tabindex="0" role="region" aria-label="${this.esc(captionText || 'Data table')}">\n<table>\n`;
-    if (tableNum && captionText) html += `<caption>Table ${this.esc(tableNum)}: ${this.esc(captionText)}</caption>\n`;
+    if (tableNum && captionText)
+      html += `<caption>Table ${this.esc(tableNum)}: ${this.esc(captionText)}</caption>\n`;
     html += `<thead><tr><th scope="col" class="col-num">#</th><th scope="col" class="col-sev">Severity</th><th scope="col" class="col-criterion">Criterion</th><th scope="col" class="col-source">Source</th><th scope="col">Finding</th><th scope="col">Element</th><th scope="col">Remediation</th></tr></thead>
 <tbody>`;
 
@@ -908,7 +1000,9 @@ class ReportGenerator {
       const desc = this.esc(descText) + (isIncomplete ? ' <em>(Manual review required)</em>' : '');
       const el = v.element
         ? `<code>${this.esc(v.element)}</code>`
-        : (v.nodes && v.nodes[0] && v.nodes[0].selector ? `<code>${this.esc(v.nodes[0].selector)}</code>` : '\u2014');
+        : v.nodes && v.nodes[0] && v.nodes[0].selector
+          ? `<code>${this.esc(v.nodes[0].selector)}</code>`
+          : '\u2014';
       const rec = this.esc(v.recommendation || v.suggestion || v.axeHelp || '\u2014');
       const source = this._classifyViolationSource(v);
       const sourceBadge = `<span class="source-badge source-${source.key}" title="${source.title}">${source.label}</span>`;
@@ -926,12 +1020,24 @@ class ReportGenerator {
   _classifyViolationSource(v) {
     const scannerId = v.scannerId || '';
     if (v.source === 'axe-core' || scannerId === 'axe-core') {
-      return { key: 'axe', label: 'axe', title: 'Static DOM analysis via axe-core (high confidence)' };
+      return {
+        key: 'axe',
+        label: 'axe',
+        title: 'Static DOM analysis via axe-core (high confidence)',
+      };
     }
     if (scannerId.startsWith('llm-') || v.source === 'llm') {
-      return { key: 'llm', label: 'LLM', title: 'AI-assisted semantic analysis (requires manual verification)' };
+      return {
+        key: 'llm',
+        label: 'LLM',
+        title: 'AI-assisted semantic analysis (requires manual verification)',
+      };
     }
-    return { key: 'puppeteer', label: 'Puppeteer', title: 'Interaction/viewport/keyboard testing (medium confidence)' };
+    return {
+      key: 'puppeteer',
+      label: 'Puppeteer',
+      title: 'Interaction/viewport/keyboard testing (medium confidence)',
+    };
   }
 
   generateEuComplianceSection(data) {
@@ -941,7 +1047,8 @@ class ReportGenerator {
     if (!hasLegacyEu && eaaViolations.length === 0) return '';
 
     let html = '<h2 id="s-5"><span class="sn">5</span> EU/EAA Compliance</h2>';
-    html += '<p>Assessment of compliance with the European Accessibility Act (EAA) and EN 301 549 procedural requirements.</p>';
+    html +=
+      '<p>Assessment of compliance with the European Accessibility Act (EAA) and EN 301 549 procedural requirements.</p>';
 
     if (hasLegacyEu) {
       html += `<p>EN 301 549 compliance score: ${this.esc(data.euCompliance.en301549.score || 0)} of 100.</p>`;
@@ -953,7 +1060,8 @@ class ReportGenerator {
       html += this.renderViolationTable(eaaViolations, tNum, 'EU/EAA compliance findings');
     } else if (hasLegacyEu && data.euCompliance.en301549.violations?.length > 0) {
       const violations = data.euCompliance.en301549.violations;
-      html += '<table>\n<caption>EU/EAA compliance findings</caption>\n<thead><tr><th scope="col">#</th><th scope="col">Severity</th><th scope="col">Clause</th><th scope="col">Finding</th></tr></thead>\n<tbody>';
+      html +=
+        '<table>\n<caption>EU/EAA compliance findings</caption>\n<thead><tr><th scope="col">#</th><th scope="col">Severity</th><th scope="col">Clause</th><th scope="col">Finding</th></tr></thead>\n<tbody>';
       violations.forEach((v, i) => {
         const sev = normalizeSeverity(v);
         html += `<tr class="row-${sev}"><th scope="row">${i + 1}</th><td><span class="sev">${SEVERITY_LABELS[sev]}</span></td><td>${this.esc(v.clause || '')}</td><td>${this.esc(v.description || '')}</td></tr>`;
@@ -969,11 +1077,16 @@ class ReportGenerator {
       return '<h2 id="s-6"><span class="sn">6</span> Recommended Actions</h2>\n<p>No actions required.</p>';
     }
 
-    const groups = this.groupViolationsByPrinciple(data.violations.filter(v => v.wcagLevel !== 'AAA'));
+    const groups = this.groupViolationsByPrinciple(
+      data.violations.filter((v) => v.wcagLevel !== 'AAA')
+    );
 
     const collectCriteria = (violations) => {
       const c = new Set();
-      violations.forEach(v => { const k = v.criterion || v.wcagCriteria || v.clause || ''; if (k) c.add(String(k)); });
+      violations.forEach((v) => {
+        const k = v.criterion || v.wcagCriteria || v.clause || '';
+        if (k) c.add(String(k));
+      });
       return [...c];
     };
 
@@ -982,23 +1095,43 @@ class ReportGenerator {
     // Critical first (EAA gaps), then High (perceivable/operable), then Medium
     if (groups.eaa.length > 0) {
       const c = collectCriteria(groups.eaa);
-      recs.push({ p: 'Critical', ref: c.join(', '), text: `${groups.eaa.length} EU EAA compliance gaps. Publish accessibility statement, establish feedback mechanism and monitoring procedures.` });
+      recs.push({
+        p: 'Critical',
+        ref: c.join(', '),
+        text: `${groups.eaa.length} EU EAA compliance gaps. Publish accessibility statement, establish feedback mechanism and monitoring procedures.`,
+      });
     }
     if (groups.perceivable.length > 0) {
       const c = collectCriteria(groups.perceivable);
-      recs.push({ p: 'High', ref: c.join(', '), text: `${groups.perceivable.length} perceivable findings. Review non-text content alternatives and information structure.` });
+      recs.push({
+        p: 'High',
+        ref: c.join(', '),
+        text: `${groups.perceivable.length} perceivable findings. Review non-text content alternatives and information structure.`,
+      });
     }
     if (groups.operable.length > 0) {
       const c = collectCriteria(groups.operable);
-      recs.push({ p: 'High', ref: c.join(', '), text: `${groups.operable.length} operable findings. Verify keyboard access, focus indicators, link purpose.` });
+      recs.push({
+        p: 'High',
+        ref: c.join(', '),
+        text: `${groups.operable.length} operable findings. Verify keyboard access, focus indicators, link purpose.`,
+      });
     }
     if (groups.understandable.length > 0) {
       const c = collectCriteria(groups.understandable);
-      recs.push({ p: 'Medium', ref: c.join(', '), text: `${groups.understandable.length} understandable findings. Set page language attribute, review navigation consistency.` });
+      recs.push({
+        p: 'Medium',
+        ref: c.join(', '),
+        text: `${groups.understandable.length} understandable findings. Set page language attribute, review navigation consistency.`,
+      });
     }
     if (groups.robust.length > 0) {
       const c = collectCriteria(groups.robust);
-      recs.push({ p: 'Medium', ref: c.join(', '), text: `${groups.robust.length} robustness findings. Correct parsing errors and ARIA attribute usage.` });
+      recs.push({
+        p: 'Medium',
+        ref: c.join(', '),
+        text: `${groups.robust.length} robustness findings. Correct parsing errors and ARIA attribute usage.`,
+      });
     }
 
     const recTableNum = this._tableCounter || 9;
@@ -1024,9 +1157,10 @@ class ReportGenerator {
     html += `<tr><th scope="row" class="col-label">Generated</th><td>${this.esc(new Date(data.timestamp).toLocaleString('en-GB'))}</td></tr>`;
     html += `<tr><th scope="row" class="col-label">Generator</th><td>${this.esc(data.metadata?.generatedBy || 'Web Accessibility Checker v3.0')}</td></tr>`;
     html += `<tr><th scope="row" class="col-label">Target</th><td>${this.esc(data.url || '')}</td></tr>`;
-    const appLlm = data.scanners && Object.keys(data.scanners).some(s => s.startsWith('llm-'));
+    const appLlm = data.scanners && Object.keys(data.scanners).some((s) => s.startsWith('llm-'));
     html += `<tr><th scope="row" class="col-label">Standard</th><td>WCAG 2.2 ${appLlm ? 'Level AAA' : 'Level AA'} / EN 301 549</td></tr>`;
-    if (data.scanners) html += `<tr><th scope="row" class="col-label">Modules Executed</th><td>${Object.keys(data.scanners).length}</td></tr>`;
+    if (data.scanners)
+      html += `<tr><th scope="row" class="col-label">Modules Executed</th><td>${Object.keys(data.scanners).length}</td></tr>`;
     html += '</tbody></table>';
     tNum++;
 
@@ -1076,8 +1210,10 @@ class ReportGenerator {
   async deleteReport(reportId) {
     try {
       this.assertSafeReportId(reportId);
-      const files = [`${reportId}.json`, `${reportId}.html`, `${reportId}.pdf`].map(f => path.join(this.reportsDir, f));
-      await Promise.all(files.map(f => fs.remove(f).catch(() => {})));
+      const files = [`${reportId}.json`, `${reportId}.html`, `${reportId}.pdf`].map((f) =>
+        path.join(this.reportsDir, f)
+      );
+      await Promise.all(files.map((f) => fs.remove(f).catch(() => {})));
       return true;
     } catch (error) {
       console.error('Error deleting report:', error);
@@ -1089,12 +1225,23 @@ class ReportGenerator {
     try {
       const files = await fs.readdir(this.reportsDir);
       const reports = await Promise.all(
-        files.filter(f => f.endsWith('.json')).slice(0, limit).map(async (file) => {
-          try {
-            const m = await fs.readJson(path.join(this.reportsDir, file));
-            return { id: m.id, timestamp: m.timestamp, url: m.url, score: m.accessibilityScore, violationsCount: m.violations ? m.violations.length : 0 };
-          } catch (e) { return null; }
-        })
+        files
+          .filter((f) => f.endsWith('.json'))
+          .slice(0, limit)
+          .map(async (file) => {
+            try {
+              const m = await fs.readJson(path.join(this.reportsDir, file));
+              return {
+                id: m.id,
+                timestamp: m.timestamp,
+                url: m.url,
+                score: m.accessibilityScore,
+                violationsCount: m.violations ? m.violations.length : 0,
+              };
+            } catch (e) {
+              return null;
+            }
+          })
       );
       return reports.filter(Boolean).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     } catch (error) {

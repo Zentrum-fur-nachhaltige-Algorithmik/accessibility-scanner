@@ -52,11 +52,16 @@ function isBestPracticeOnly(tags) {
  */
 function mapImpactToSeverity(impact) {
   switch (impact) {
-    case 'critical': return 'critical';
-    case 'serious': return 'serious';
-    case 'moderate': return 'moderate';
-    case 'minor': return 'minor';
-    default: return 'moderate';
+    case 'critical':
+      return 'critical';
+    case 'serious':
+      return 'serious';
+    case 'moderate':
+      return 'moderate';
+    case 'minor':
+      return 'minor';
+    default:
+      return 'moderate';
   }
 }
 
@@ -99,7 +104,7 @@ class AxeCoreAdapter extends BaseScanner {
       const ready = await isComplete();
       console.warn(
         '[axe-core] Page never reached readyState "complete" (stalled subresource); ' +
-        `aborted pending loads and ${ready ? 'continued' : 'proceeding anyway'}.`
+          `aborted pending loads and ${ready ? 'continued' : 'proceeding anyway'}.`
       );
       return ready;
     } catch (e) {
@@ -112,12 +117,7 @@ class AxeCoreAdapter extends BaseScanner {
     await this._ensurePageReady(page);
 
     const axeBuilder = new AxePuppeteer(page)
-      .withTags([
-        'wcag2a', 'wcag2aa',
-        'wcag21a', 'wcag21aa',
-        'wcag22aa',
-        'best-practice',
-      ])
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
       .options({ resultTypes: ['violations', 'incomplete'] });
 
     const axeResults = await axeBuilder.analyze();
@@ -132,7 +132,7 @@ class AxeCoreAdapter extends BaseScanner {
     }
 
     // Convert incomplete results as info severity
-    for (const rule of (axeResults.incomplete || [])) {
+    for (const rule of axeResults.incomplete || []) {
       for (const node of rule.nodes) {
         violations.push(this._convertNode(rule, node, 'incomplete'));
       }
@@ -147,10 +147,11 @@ class AxeCoreAdapter extends BaseScanner {
       summary: {
         engine: 'axe-core',
         version: axeResults.testEngine?.version || 'unknown',
-        rulesRun: (axeResults.violations?.length || 0) +
-                  (axeResults.passes?.length || 0) +
-                  (axeResults.incomplete?.length || 0) +
-                  (axeResults.inapplicable?.length || 0),
+        rulesRun:
+          (axeResults.violations?.length || 0) +
+          (axeResults.passes?.length || 0) +
+          (axeResults.incomplete?.length || 0) +
+          (axeResults.inapplicable?.length || 0),
         violationRules: axeResults.violations?.length || 0,
         incompleteRules: axeResults.incomplete?.length || 0,
         totalNodes: violations.length,
@@ -169,16 +170,16 @@ class AxeCoreAdapter extends BaseScanner {
       // Core fields
       scannerId: this.id,
       ruleId: rule.id,
-      impact: isIncomplete ? 'minor' : (node.impact || rule.impact || 'moderate'),
+      impact: isIncomplete ? 'minor' : node.impact || rule.impact || 'moderate',
       severity: isIncomplete
         ? 'info'
-        : (isBestPracticeOnly(rule.tags)
-            ? 'best-practice'
-            : mapImpactToSeverity(node.impact || rule.impact)),
-      description: isIncomplete
-        ? `[Needs manual review] ${rule.help}`
-        : rule.help,
-      nodes: [{ selector: Array.isArray(node.target) ? node.target.join(' ') : String(node.target) }],
+        : isBestPracticeOnly(rule.tags)
+          ? 'best-practice'
+          : mapImpactToSeverity(node.impact || rule.impact),
+      description: isIncomplete ? `[Needs manual review] ${rule.help}` : rule.help,
+      nodes: [
+        { selector: Array.isArray(node.target) ? node.target.join(' ') : String(node.target) },
+      ],
       wcagCriteria,
 
       // axe-core specific fields
@@ -192,7 +193,7 @@ class AxeCoreAdapter extends BaseScanner {
       category: null,
       recommendation: isIncomplete
         ? 'Manual review required — axe-core could not fully evaluate this element.'
-        : (node.failureSummary || null),
+        : node.failureSummary || null,
 
       // Metadata
       source: 'axe-core',

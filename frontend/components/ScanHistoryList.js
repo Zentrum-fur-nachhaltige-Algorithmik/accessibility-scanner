@@ -26,13 +26,7 @@ function EntryFacts({ entry }) {
  * stored can be reopened; older entries keep their metadata only and render as
  * plain text so no dead controls end up in the tab order.
  */
-export default function ScanHistoryList({
-  entries,
-  activeJobId,
-  headingRef,
-  onOpen,
-  onClear,
-}) {
+export default function ScanHistoryList({ entries, activeJobId, headingRef, onOpen, onClear }) {
   return (
     <section className="pb-section" aria-labelledby="history-heading">
       <h2 className="pb-h2" id="history-heading" tabIndex={-1} ref={headingRef}>
@@ -42,14 +36,13 @@ export default function ScanHistoryList({
 
       {entries.length === 0 ? (
         <p className="pb-note">
-          No scans yet. Completed scans are listed here, stored only in this
-          browser.
+          No scans yet. Completed scans are listed here, stored only in this browser.
         </p>
       ) : (
         <>
           <p className="pb-note">
-            The last {entries.length} {entries.length === 1 ? 'scan' : 'scans'} in
-            this browser. Select an entry to show its stored result again.
+            The last {entries.length} {entries.length === 1 ? 'scan' : 'scans'} in this browser.
+            Select an entry to show its stored result again.
           </p>
           <ol className="pb-hist-list">
             {entries.map((entry, index) => {
@@ -66,9 +59,7 @@ export default function ScanHistoryList({
                       <span className="sr-only">Show stored result for </span>
                       <span className="pb-hist-url">{entry.url}</span>
                       <EntryFacts entry={entry} />
-                      {isActive && (
-                        <span className="pb-hist-tag">Shown in section 2</span>
-                      )}
+                      {isActive && <span className="pb-hist-tag">Shown in section 2</span>}
                     </button>
                   ) : (
                     <div className="pb-hist-item pb-hist-item-plain">

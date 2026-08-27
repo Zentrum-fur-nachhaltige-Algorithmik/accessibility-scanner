@@ -13,7 +13,7 @@ class AccessibilityStatementScanner extends BaseScanner {
   constructor() {
     super('accessibility-statement', {
       wcagCriteria: ['EN 301 549 12.1'],
-      wcagPrinciple: 'robust'
+      wcagPrinciple: 'robust',
     });
   }
 
@@ -29,7 +29,7 @@ class AccessibilityStatementScanner extends BaseScanner {
     const defaultOptions = {
       searchDepth: 3,
       timeout: 30000,
-      language: 'auto'
+      language: 'auto',
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -38,7 +38,7 @@ class AccessibilityStatementScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["EAA-Statement", "EN-301-549-12.1.1"],
+      criteria: ['EAA-Statement', 'EN-301-549-12.1.1'],
       passed: statementResults.violations.length === 0,
       violations: statementResults.violations,
       summary: {
@@ -49,8 +49,8 @@ class AccessibilityStatementScanner extends BaseScanner {
         lastUpdated: statementResults.lastUpdated,
         complianceLevel: statementResults.complianceLevel,
         knownIssuesListed: statementResults.knownIssuesListed,
-        feedbackMechanismAvailable: statementResults.feedbackMechanismAvailable
-      }
+        feedbackMechanismAvailable: statementResults.feedbackMechanismAvailable,
+      },
     };
   }
 
@@ -91,7 +91,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         lastUpdated: null,
         complianceLevel: null,
         knownIssuesListed: false,
-        feedbackMechanismAvailable: false
+        feedbackMechanismAvailable: false,
       };
     }
 
@@ -99,17 +99,20 @@ class AccessibilityStatementScanner extends BaseScanner {
 
     // 2. Navigate to accessibility statement page
     try {
-      await page.goto(statementLinkResults.url, { waitUntil: 'networkidle0', timeout: options.timeout });
+      await page.goto(statementLinkResults.url, {
+        waitUntil: 'networkidle0',
+        timeout: options.timeout,
+      });
       statementAccessible = true;
       console.log(`  Found accessibility statement at: ${statementLinkResults.url}`);
     } catch (error) {
       violations.push({
-        criterion: "EAA-Statement",
-        issue: "inaccessible-statement",
+        criterion: 'EAA-Statement',
+        issue: 'inaccessible-statement',
         description: `Accessibility statement link found but page is not accessible: ${error.message}`,
         element: statementLinkResults.selector,
-        suggestion: "Ensure accessibility statement page loads correctly and is accessible",
-        severity: "serious"
+        suggestion: 'Ensure accessibility statement page loads correctly and is accessible',
+        severity: 'serious',
       });
 
       return {
@@ -121,7 +124,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         lastUpdated: null,
         complianceLevel: null,
         knownIssuesListed: false,
-        feedbackMechanismAvailable: false
+        feedbackMechanismAvailable: false,
       };
     }
 
@@ -132,12 +135,12 @@ class AccessibilityStatementScanner extends BaseScanner {
     lastUpdated = contentAnalysis.lastUpdated;
     if (!contentAnalysis.lastUpdated || this.isStatementOutdated(contentAnalysis.lastUpdated)) {
       violations.push({
-        criterion: "EAA-Statement",
-        issue: "outdated-statement",
-        description: "No last updated date found or statement is older than 12 months",
-        element: "main",
-        suggestion: "Add last updated date and ensure statement is reviewed at least annually",
-        severity: "major"
+        criterion: 'EAA-Statement',
+        issue: 'outdated-statement',
+        description: 'No last updated date found or statement is older than 12 months',
+        element: 'main',
+        suggestion: 'Add last updated date and ensure statement is reviewed at least annually',
+        severity: 'major',
       });
     }
 
@@ -145,12 +148,12 @@ class AccessibilityStatementScanner extends BaseScanner {
     complianceLevel = contentAnalysis.complianceLevel;
     if (!contentAnalysis.complianceLevel) {
       violations.push({
-        criterion: "EAA-Statement",
-        issue: "incomplete-content",
-        description: "Accessibility statement lacks required information: compliance level",
-        element: "main",
-        suggestion: "Add compliance level (A, AA, AAA, partial, or non-compliant)",
-        severity: "major"
+        criterion: 'EAA-Statement',
+        issue: 'incomplete-content',
+        description: 'Accessibility statement lacks required information: compliance level',
+        element: 'main',
+        suggestion: 'Add compliance level (A, AA, AAA, partial, or non-compliant)',
+        severity: 'major',
       });
     }
 
@@ -158,12 +161,13 @@ class AccessibilityStatementScanner extends BaseScanner {
     contactMechanismProvided = contentAnalysis.contactMechanism;
     if (!contentAnalysis.contactMechanism) {
       violations.push({
-        criterion: "EAA-Statement",
-        issue: "missing-contact",
-        description: "No contact mechanism provided for accessibility issues",
-        element: "main",
-        suggestion: "Add contact information (email, phone, or feedback form) for accessibility issues",
-        severity: "serious"
+        criterion: 'EAA-Statement',
+        issue: 'missing-contact',
+        description: 'No contact mechanism provided for accessibility issues',
+        element: 'main',
+        suggestion:
+          'Add contact information (email, phone, or feedback form) for accessibility issues',
+        severity: 'serious',
       });
     }
 
@@ -185,7 +189,7 @@ class AccessibilityStatementScanner extends BaseScanner {
       lastUpdated,
       complianceLevel,
       knownIssuesListed,
-      feedbackMechanismAvailable
+      feedbackMechanismAvailable,
     };
   }
 
@@ -215,7 +219,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         /last updated[:\s]*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i,
         /updated[:\s]*([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i,
         /([0-9]{4}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{1,2})/i,
-        /([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i
+        /([0-9]{1,2}[\/\-\.][0-9]{1,2}[\/\-\.][0-9]{4})/i,
       ];
 
       // Check time elements first
@@ -249,7 +253,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         /wcag\s+(a)/i,
         /(fully\s+compliant)/i,
         /(partially\s+compliant)/i,
-        /(non[‑\-\s]*compliant)/i
+        /(non[‑\-\s]*compliant)/i,
       ];
 
       for (const pattern of compliancePatterns) {
@@ -268,11 +272,11 @@ class AccessibilityStatementScanner extends BaseScanner {
 
       // Look for contact mechanism
       const contactPatterns = [
-        /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,  // Email
-        /\+?[0-9\s\-()]{10,}/,             // Phone
+        /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/, // Email
+        /\+?[0-9\s\-()]{10,}/, // Phone
         /contact\s+us/i,
         /feedback/i,
-        /report\s+issue/i
+        /report\s+issue/i,
       ];
 
       let contactMechanism = false;
@@ -297,7 +301,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         /known\s+issues/i,
         /limitations/i,
         /exceptions/i,
-        /accessibility\s+barriers/i
+        /accessibility\s+barriers/i,
       ];
 
       let knownIssues = false;
@@ -313,7 +317,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         /feedback/i,
         /report\s+problem/i,
         /contact\s+us/i,
-        /accessibility\s+support/i
+        /accessibility\s+support/i,
       ];
 
       let feedbackMechanism = false;
@@ -329,7 +333,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         complianceLevel,
         contactMechanism,
         knownIssues,
-        feedbackMechanism
+        feedbackMechanism,
       };
     });
 
@@ -356,7 +360,6 @@ class AccessibilityStatementScanner extends BaseScanner {
   get needsExclusiveAccess() {
     return true;
   }
-
 }
 
 module.exports = AccessibilityStatementScanner;

@@ -55,17 +55,19 @@ function postJSON(url, body) {
 
 function getJSON(url) {
   return new Promise((resolve, reject) => {
-    http.get(url, (res) => {
-      let chunks = '';
-      res.on('data', (c) => (chunks += c));
-      res.on('end', () => {
-        try {
-          resolve({ status: res.statusCode, body: JSON.parse(chunks) });
-        } catch {
-          resolve({ status: res.statusCode, body: chunks });
-        }
-      });
-    }).on('error', reject);
+    http
+      .get(url, (res) => {
+        let chunks = '';
+        res.on('data', (c) => (chunks += c));
+        res.on('end', () => {
+          try {
+            resolve({ status: res.statusCode, body: JSON.parse(chunks) });
+          } catch {
+            resolve({ status: res.statusCode, body: chunks });
+          }
+        });
+      })
+      .on('error', reject);
   });
 }
 
@@ -113,15 +115,11 @@ describe('Self-scan: frontend and report accessibility', () => {
 
     // 2. Start the Next.js production server (requires prior build)
     frontendPort = 3999 + Math.floor(Math.random() * 1000);
-    frontendProcess = spawn(
-      'npx',
-      ['next', 'start', 'frontend', '-p', String(frontendPort)],
-      {
-        cwd: projectRoot,
-        stdio: ['ignore', 'pipe', 'pipe'],
-        env: { ...process.env },
-      }
-    );
+    frontendProcess = spawn('npx', ['next', 'start', 'frontend', '-p', String(frontendPort)], {
+      cwd: projectRoot,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env },
+    });
 
     // Wait for the Next.js server to be ready
     await waitForServer(`http://127.0.0.1:${frontendPort}/`, 90_000);
@@ -153,12 +151,15 @@ describe('Self-scan: frontend and report accessibility', () => {
       const result = res.body;
       // Filter out Next.js framework internals (next-route-announcer), not user-facing
       const critical = (result.violations || []).filter(
-        (v) => ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase())
-          && !(v.element || '').includes('next-route-announcer')
+        (v) =>
+          ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase()) &&
+          !(v.element || '').includes('next-route-announcer')
       );
 
       if (critical.length > 0) {
-        console.error('Scanner UI page (/): critical/serious violations:\n' + JSON.stringify(critical, null, 2));
+        console.error(
+          'Scanner UI page (/): critical/serious violations:\n' + JSON.stringify(critical, null, 2)
+        );
       }
 
       expect(critical).toHaveLength(0);
@@ -181,13 +182,17 @@ describe('Self-scan: frontend and report accessibility', () => {
       const result = res.body;
       // Filter out Next.js framework internals and mailto: navigation errors
       const critical = (result.violations || []).filter(
-        (v) => ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase())
-          && !(v.element || '').includes('next-route-announcer')
-          && !(v.description || '').includes('mailto:')
+        (v) =>
+          ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase()) &&
+          !(v.element || '').includes('next-route-announcer') &&
+          !(v.description || '').includes('mailto:')
       );
 
       if (critical.length > 0) {
-        console.error('Accessibility statement page (/accessibility): critical/serious violations:\n' + JSON.stringify(critical, null, 2));
+        console.error(
+          'Accessibility statement page (/accessibility): critical/serious violations:\n' +
+            JSON.stringify(critical, null, 2)
+        );
       }
 
       expect(critical).toHaveLength(0);
@@ -230,13 +235,14 @@ describe('Self-scan: frontend and report accessibility', () => {
       expect(reportScanRes.status).toBe(200);
 
       const result = reportScanRes.body;
-      const critical = (result.violations || []).filter(
-        (v) => ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase())
+      const critical = (result.violations || []).filter((v) =>
+        ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase())
       );
 
       if (critical.length > 0) {
         const summary = critical.map(
-          (v) => `[${v.severity || v.impact}] ${v.criterion || v.wcagCriteria || ''}: ${v.description || v.type || v.issue}`
+          (v) =>
+            `[${v.severity || v.impact}] ${v.criterion || v.wcagCriteria || ''}: ${v.description || v.type || v.issue}`
         );
         console.error('Report HTML: critical/serious violations:\n' + summary.join('\n'));
       }

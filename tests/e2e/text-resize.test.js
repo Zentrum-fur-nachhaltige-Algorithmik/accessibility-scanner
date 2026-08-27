@@ -27,9 +27,7 @@ describe('TextResizeScanner', () => {
       const result = await scanner.scan(page);
       expect(result).toBeDefined();
 
-      const fixedSizeViolations = (result.violations || []).filter(v =>
-        v.type === 'fixed-size'
-      );
+      const fixedSizeViolations = (result.violations || []).filter((v) => v.type === 'fixed-size');
       expect(fixedSizeViolations).toEqual([]);
     } finally {
       await page.close();
@@ -43,9 +41,7 @@ describe('TextResizeScanner', () => {
       const result = await scanner.scan(page);
       expect(result).toBeDefined();
 
-      const fixedSizeViolations = (result.violations || []).filter(v =>
-        v.type === 'fixed-size'
-      );
+      const fixedSizeViolations = (result.violations || []).filter((v) => v.type === 'fixed-size');
       expect(fixedSizeViolations).toEqual([]);
     } finally {
       await page.close();
@@ -57,7 +53,7 @@ describe('TextResizeScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const clipped = (result.violations || []).filter(v => v.type === 'text-overflow');
+      const clipped = (result.violations || []).filter((v) => v.type === 'text-overflow');
       expect(clipped).toEqual([]);
     } finally {
       await page.close();
@@ -71,8 +67,15 @@ describe('TextResizeScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      const cssSmells = (result.violations || []).filter(v =>
-        ['small-fixed-font', 'fixed-width', 'fixed-min-width', 'restrictive-max-width', 'overflow-hidden-fixed'].includes(v.type));
+      const cssSmells = (result.violations || []).filter((v) =>
+        [
+          'small-fixed-font',
+          'fixed-width',
+          'fixed-min-width',
+          'restrictive-max-width',
+          'overflow-hidden-fixed',
+        ].includes(v.type)
+      );
       expect(cssSmells.length).toBeGreaterThan(0);
       for (const v of cssSmells) expect(v.severity).toBe('info');
     } finally {
@@ -87,12 +90,12 @@ describe('TextResizeScanner', () => {
       const result = await scanner.scan(page);
       expect(result).toBeDefined();
       // must be real, measured findings — not just `info` CSS hints
-      const real = (result.violations || []).filter(v => v.severity !== 'info');
+      const real = (result.violations || []).filter((v) => v.severity !== 'info');
       expect(real.length).toBeGreaterThan(0);
 
       // fixed-height/fixed-width containers with overflow:hidden really do
       // swallow text at 200%/400% — with measured evidence attached
-      const clipped = real.filter(v => v.type === 'text-overflow');
+      const clipped = real.filter((v) => v.type === 'text-overflow');
       expect(clipped.length).toBeGreaterThan(0);
       for (const v of clipped) {
         expect(v.details.clippedCharacters).toBeGreaterThan(0);
@@ -110,8 +113,8 @@ describe('TextResizeScanner', () => {
     try {
       const result = await scanner.scan(page);
       const keys = (result.violations || [])
-        .filter(v => v.type === 'text-overflow')
-        .map(v => `${v.type}::${v.element}`);
+        .filter((v) => v.type === 'text-overflow')
+        .map((v) => `${v.type}::${v.element}`);
       expect(new Set(keys).size).toBe(keys.length);
     } finally {
       await page.close();

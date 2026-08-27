@@ -41,7 +41,10 @@ describe('utils/rendered', () => {
     page = await getPage();
     await page.setContent(PAGE, { waitUntil: 'load' });
   }, 60000);
-  afterAll(async () => { await page.close(); await closeBrowser(); });
+  afterAll(async () => {
+    await page.close();
+    await closeBrowser();
+  });
 
   it('excludes display:none, off-canvas, hidden, aria-hidden and tabindex=-1 from focusable-rendered', async () => {
     const res = await page.evaluate((code) => {
@@ -61,8 +64,16 @@ describe('utils/rendered', () => {
       };
     }, renderedCode);
     expect(res).toEqual({
-      navLink: true, mobileNav: false, drawer: false, hiddenBtn: false, ariaHidden: false,
-      mainTarget: false, mainIsTarget: false, menuBtnTarget: true, svgTarget: false, skipSrOnly: true,
+      navLink: true,
+      mobileNav: false,
+      drawer: false,
+      hiddenBtn: false,
+      ariaHidden: false,
+      mainTarget: false,
+      mainIsTarget: false,
+      menuBtnTarget: true,
+      svgTarget: false,
+      skipSrOnly: true,
     });
   });
 
@@ -80,7 +91,12 @@ describe('utils/rendered', () => {
     // Off-canvas / display:none controls stay structurally focusable so a focus
     // walk can record their unfocused baseline; only __isFocusableRendered
     // answers "is it painted right now".
-    expect(res).toEqual({ drawerFocusable: true, drawerRendered: false, mobileFocusable: true, mainTarget: false });
+    expect(res).toEqual({
+      drawerFocusable: true,
+      drawerRendered: false,
+      mobileFocusable: true,
+      mainTarget: false,
+    });
   });
 });
 
@@ -105,7 +121,10 @@ describe('utils/keyboard-focus baseline for hidden-until-focused controls', () =
     page = await getPage();
     await page.setContent(RING_PAGE, { waitUntil: 'load' });
   }, 60000);
-  afterAll(async () => { await page.close(); await closeBrowser(); });
+  afterAll(async () => {
+    await page.close();
+    await closeBrowser();
+  });
 
   it('still sees :focus-visible while another tab is in front', async () => {
     // Chromium only matches :focus while the document HAS focus. The scan
@@ -145,7 +164,10 @@ describe('utils/keyboard-focus tabWalk', () => {
     page = await getPage();
     await page.setContent(PAGE, { waitUntil: 'load' });
   }, 60000);
-  afterAll(async () => { await page.close(); await closeBrowser(); });
+  afterAll(async () => {
+    await page.close();
+    await closeBrowser();
+  });
 
   it('walks every reachable element once, sees :focus-visible rings, and flags the ring-less button', async () => {
     const steps = await collectTabWalk(page, { maxSteps: 20 });
@@ -154,8 +176,20 @@ describe('utils/keyboard-focus tabWalk', () => {
     // aria-hidden link (that is a defect of such pages); the walk reports
     // them with rendered:false so scanners can decide. display:none and
     // [hidden] are genuinely unreachable.
-    expect(tags).toEqual(['a:Skip', 'a:A', 'a:B', 'button:Menü', 'a:Drawer link', 'button:no ring', 'input:field', 'a:aria hidden']);
-    expect(steps.filter((s) => !s.rendered).map((s) => s.text)).toEqual(['Drawer link', 'aria hidden']);
+    expect(tags).toEqual([
+      'a:Skip',
+      'a:A',
+      'a:B',
+      'button:Menü',
+      'a:Drawer link',
+      'button:no ring',
+      'input:field',
+      'a:aria hidden',
+    ]);
+    expect(steps.filter((s) => !s.rendered).map((s) => s.text)).toEqual([
+      'Drawer link',
+      'aria hidden',
+    ]);
     expect(new Set(steps.map((s) => s.tabId)).size).toBe(steps.length);
     expect(steps.some((s) => s.stuck)).toBe(false);
 

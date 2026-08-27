@@ -89,23 +89,31 @@ class BaseScanner {
     // Submit empty forms to trigger validation messages
     const forms = await page.$$('form');
     for (const form of forms) {
-      const submit = await form.$('button[type="submit"], input[type="submit"], button:not([type])');
+      const submit = await form.$(
+        'button[type="submit"], input[type="submit"], button:not([type])'
+      );
       if (submit) {
         try {
           await submit.click();
-          await new Promise(r => setTimeout(r, 300));
-        } catch { /* non-fatal */ }
+          await new Promise((r) => setTimeout(r, 300));
+        } catch {
+          /* non-fatal */
+        }
       }
     }
 
     // Click toggle triggers (modals, dropdowns, accordions)
-    const toggleSelectors = '[data-toggle], [data-bs-toggle], [aria-haspopup="true"], [aria-expanded="false"]';
+    const toggleSelectors =
+      '[data-toggle], [data-bs-toggle], [aria-haspopup="true"], [aria-expanded="false"]';
     const toggles = await page.$$(toggleSelectors);
-    for (const toggle of toggles.slice(0, 5)) { // limit to 5 to avoid runaway
+    for (const toggle of toggles.slice(0, 5)) {
+      // limit to 5 to avoid runaway
       try {
         await toggle.click();
-        await new Promise(r => setTimeout(r, 200));
-      } catch { /* non-fatal */ }
+        await new Promise((r) => setTimeout(r, 200));
+      } catch {
+        /* non-fatal */
+      }
     }
 
     // Focus first few form inputs to trigger describedby associations
@@ -113,12 +121,14 @@ class BaseScanner {
     for (const input of inputs.slice(0, 5)) {
       try {
         await input.focus();
-        await new Promise(r => setTimeout(r, 100));
-      } catch { /* non-fatal */ }
+        await new Promise((r) => setTimeout(r, 100));
+      } catch {
+        /* non-fatal */
+      }
     }
 
     // Brief settle time
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300));
   }
 
   /**

@@ -28,9 +28,7 @@ class MultipleWaysScanner extends BaseScanner {
       for (const nav of navs) {
         const links = nav.querySelectorAll('a[href]');
         if (links.length > 2) {
-          const label = nav.getAttribute('aria-label')
-            || nav.getAttribute('aria-labelledby')
-            || '';
+          const label = nav.getAttribute('aria-label') || nav.getAttribute('aria-labelledby') || '';
           // Skip breadcrumb navs — counted separately
           if (/breadcrumb/i.test(label) || /breadcrumb/i.test(nav.className)) continue;
           mechanisms.push({
@@ -42,19 +40,15 @@ class MultipleWaysScanner extends BaseScanner {
       }
 
       // 2. Search functionality
-      const searchForms = document.querySelectorAll(
-        'form[role="search"], [role="search"]'
-      );
-      const searchInputs = document.querySelectorAll(
-        'input[type="search"]'
-      );
+      const searchForms = document.querySelectorAll('form[role="search"], [role="search"]');
+      const searchInputs = document.querySelectorAll('input[type="search"]');
       if (searchForms.length > 0 || searchInputs.length > 0) {
         mechanisms.push({ type: 'search' });
       }
 
       // 3. Sitemap link
       const allLinks = Array.from(document.querySelectorAll('a[href]'));
-      const sitemapLinks = allLinks.filter(a =>
+      const sitemapLinks = allLinks.filter((a) =>
         /sitemap|site[\s-]?map/i.test(a.textContent + ' ' + (a.getAttribute('href') || ''))
       );
       if (sitemapLinks.length > 0) {
@@ -64,7 +58,7 @@ class MultipleWaysScanner extends BaseScanner {
       // 4. Table of contents
       const toc = document.querySelectorAll(
         '[class*="toc"], [class*="table-of-contents"], [id*="toc"], ' +
-        '[role="directory"], nav[aria-label*="content" i], nav[aria-label*="Inhalt" i]'
+          '[role="directory"], nav[aria-label*="content" i], nav[aria-label*="Inhalt" i]'
       );
       if (toc.length > 0) {
         mechanisms.push({ type: 'toc' });
@@ -73,15 +67,14 @@ class MultipleWaysScanner extends BaseScanner {
       // 5. Breadcrumb (validate links are functional, not just href="#")
       const breadcrumbs = document.querySelectorAll(
         '[class*="breadcrumb"], [aria-label*="breadcrumb" i], ' +
-        'nav[aria-label*="Breadcrumb" i], ol[class*="breadcrumb"]'
+          'nav[aria-label*="Breadcrumb" i], ol[class*="breadcrumb"]'
       );
       if (breadcrumbs.length > 0) {
         for (const bc of breadcrumbs) {
           const links = bc.querySelectorAll('a[href]');
-          const functional = Array.from(links).filter(a => {
+          const functional = Array.from(links).filter((a) => {
             const href = (a.getAttribute('href') || '').trim();
-            return href && href !== '#' && href !== '#!' &&
-              !href.startsWith('javascript:');
+            return href && href !== '#' && href !== '#!' && !href.startsWith('javascript:');
           });
           if (functional.length >= 2) {
             mechanisms.push({ type: 'breadcrumb', linkCount: functional.length });
@@ -101,7 +94,7 @@ class MultipleWaysScanner extends BaseScanner {
       }
 
       // 7. A-Z / Index links
-      const indexLinks = allLinks.filter(a =>
+      const indexLinks = allLinks.filter((a) =>
         /\b(index|a[\s-]?z|alle seiten|all pages)\b/i.test(a.textContent)
       );
       if (indexLinks.length > 0) {
@@ -117,15 +110,23 @@ class MultipleWaysScanner extends BaseScanner {
         const h1 = (document.querySelector('h1')?.textContent || '').toLowerCase();
         const processContext = url + ' ' + title + ' ' + h1;
         const processPatterns = [
-          /checkout/i, /payment/i, /step\s*\d/i, /wizard/i,
-          /sign[\s-]?in/i, /log[\s-]?in/i, /register/i, /registration/i,
-          /reset[\s-]?password/i, /verify/i, /confirmation/i,
+          /checkout/i,
+          /payment/i,
+          /step\s*\d/i,
+          /wizard/i,
+          /sign[\s-]?in/i,
+          /log[\s-]?in/i,
+          /register/i,
+          /registration/i,
+          /reset[\s-]?password/i,
+          /verify/i,
+          /confirmation/i,
         ];
-        return processPatterns.some(p => p.test(processContext));
+        return processPatterns.some((p) => p.test(processContext));
       })();
 
       // Deduplicate by type
-      const uniqueTypes = [...new Set(mechanisms.map(m => m.type))];
+      const uniqueTypes = [...new Set(mechanisms.map((m) => m.type))];
 
       // Evidence that this page is actually part of a larger multi-page site
       // (mirrors the self-detection in page-structure-scanner.js's identical
@@ -138,7 +139,7 @@ class MultipleWaysScanner extends BaseScanner {
       // within a page hierarchy even in a static fixture/preview that has no
       // real backing subpages to link to, so its crumbs are placeholders.
       const internalPaths = new Set();
-      allLinks.forEach(link => {
+      allLinks.forEach((link) => {
         const raw = (link.getAttribute('href') || '').trim();
         if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) {
           return;
@@ -215,21 +216,24 @@ class MultipleWaysScanner extends BaseScanner {
     // for "only 1 way to locate content" while still catching real
     // multi-page-site pages like bad-multiple-ways.html (its breadcrumb
     // trail alone is 5 steps deep, well past the >= 2 threshold).
-    const singlePageContext = options.singlePageContext === true || options.skipMultiPageCriteria === true;
+    const singlePageContext =
+      options.singlePageContext === true || options.skipMultiPageCriteria === true;
     const assertFullViolation = !singlePageContext && data.hasEvidenceOfLargerSite;
 
     const violations = [];
 
     if (data.count < 2) {
       if (assertFullViolation) {
-        violations.push(this.formatViolation(
-          '2.4.5',
-          data.count === 0 ? 'serious' : 'moderate',
-          `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-          'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g., navigation menu, search, sitemap, table of contents, breadcrumb).',
-          [],
-          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
-        ));
+        violations.push(
+          this.formatViolation(
+            '2.4.5',
+            data.count === 0 ? 'serious' : 'moderate',
+            `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
+              'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g., navigation menu, search, sitemap, table of contents, breadcrumb).',
+            [],
+            'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
+          )
+        );
       } else {
         // Don't assert a violation from a single page with no evidence it's
         // part of a larger site — downgrade to an informational,
@@ -238,9 +242,9 @@ class MultipleWaysScanner extends BaseScanner {
           '2.4.5',
           'minor',
           `This page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-          'WCAG 2.4.5 (Multiple Ways) is evaluated across an entire site or process, not one page in isolation — ' +
-          'this cannot be confirmed as a violation without checking whether other pages of the site provide search, ' +
-          'a sitemap, or another way to locate content.',
+            'WCAG 2.4.5 (Multiple Ways) is evaluated across an entire site or process, not one page in isolation — ' +
+            'this cannot be confirmed as a violation without checking whether other pages of the site provide search, ' +
+            'a sitemap, or another way to locate content.',
           [],
           'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html',
           'info'

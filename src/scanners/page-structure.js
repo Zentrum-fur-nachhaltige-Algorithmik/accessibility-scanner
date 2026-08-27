@@ -10,7 +10,7 @@ class PageStructureScanner extends BaseScanner {
   constructor() {
     super('page-structure', {
       wcagCriteria: ['1.3.1', '2.4.1', '2.4.2', '2.4.6'],
-      wcagPrinciple: 'robust'
+      wcagPrinciple: 'robust',
     });
   }
 
@@ -25,7 +25,7 @@ class PageStructureScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.2.4.2", "9.2.4.4", "9.2.4.5", "9.2.4.6"],
+      criteria: ['9.2.4.2', '9.2.4.4', '9.2.4.5', '9.2.4.6'],
       passed: structureResults.violations.length === 0,
       violations: structureResults.violations,
       summary: {
@@ -33,8 +33,8 @@ class PageStructureScanner extends BaseScanner {
         titleDescriptive: structureResults.titleDescriptive,
         linksHavePurpose: structureResults.linksHavePurpose,
         multipleWaysAvailable: structureResults.multipleWaysAvailable,
-        headingsDescriptive: structureResults.headingsDescriptive
-      }
+        headingsDescriptive: structureResults.headingsDescriptive,
+      },
     };
   }
 
@@ -86,7 +86,7 @@ class PageStructureScanner extends BaseScanner {
       titleDescriptive,
       linksHavePurpose,
       multipleWaysAvailable,
-      headingsDescriptive
+      headingsDescriptive,
     };
   }
 
@@ -100,11 +100,11 @@ class PageStructureScanner extends BaseScanner {
     const titleInfo = await page.evaluate(() => {
       const titleElement = document.querySelector('title');
       const title = titleElement ? titleElement.textContent.trim() : '';
-      
+
       return {
         hasTitle: !!title,
         title: title,
-        length: title.length
+        length: title.length,
       };
     });
 
@@ -113,27 +113,30 @@ class PageStructureScanner extends BaseScanner {
 
     if (!hasTitle) {
       violations.push({
-        criterion: "9.2.4.2",
-        element: "title",
-        issue: "no-page-title",
-        description: "Page does not have a title element or title is empty",
-        suggestion: "Add a descriptive <title> element to the document head"
+        criterion: '9.2.4.2',
+        element: 'title',
+        issue: 'no-page-title',
+        description: 'Page does not have a title element or title is empty',
+        suggestion: 'Add a descriptive <title> element to the document head',
       });
     } else {
       // Check if title is descriptive
       const title = titleInfo.title.toLowerCase();
       const genericTitles = ['untitled', 'document', 'page', 'new page', 'home', 'welcome'];
-      const isGeneric = genericTitles.some(generic => title === generic || title.startsWith(generic + ' '));
+      const isGeneric = genericTitles.some(
+        (generic) => title === generic || title.startsWith(generic + ' ')
+      );
       const isShort = titleInfo.length < 5;
       const hasOnlySpecialChars = /^[^a-zA-Z0-9]+$/.test(titleInfo.title);
 
       if (isGeneric || isShort || hasOnlySpecialChars) {
         violations.push({
-          criterion: "9.2.4.2",
-          element: "title",
-          issue: "generic-page-title",
+          criterion: '9.2.4.2',
+          element: 'title',
+          issue: 'generic-page-title',
           description: `Page title "${titleInfo.title}" is not descriptive enough`,
-          suggestion: "Use a specific, descriptive title that identifies the page purpose or content"
+          suggestion:
+            'Use a specific, descriptive title that identifies the page purpose or content',
         });
       } else {
         isDescriptive = true;
@@ -143,7 +146,7 @@ class PageStructureScanner extends BaseScanner {
     return {
       hasTitle,
       isDescriptive,
-      violations
+      violations,
     };
   }
 
@@ -154,89 +157,112 @@ class PageStructureScanner extends BaseScanner {
     console.log('  Testing link purpose...');
     const violations = [];
 
-    const linkResults = await page.evaluate((visScript, accnameCode) => {
-      eval(visScript);
-      // Shared ACCNAME implementation (__accessibleNameInfo). SC 2.4.4 is about
-      // the link's ACCESSIBLE NAME, not its textContent: `<a><img alt="Home"></a>`
-      // announces "Home" and is not an empty link.
-      eval(accnameCode);
-      const links = Array.from(document.querySelectorAll('a[href]')).filter(isElementVisible);
-      const problematicLinks = [];
+    const linkResults = await page.evaluate(
+      (visScript, accnameCode) => {
+        eval(visScript);
+        // Shared ACCNAME implementation (__accessibleNameInfo). SC 2.4.4 is about
+        // the link's ACCESSIBLE NAME, not its textContent: `<a><img alt="Home"></a>`
+        // announces "Home" and is not an empty link.
+        eval(accnameCode);
+        const links = Array.from(document.querySelectorAll('a[href]')).filter(isElementVisible);
+        const problematicLinks = [];
 
-      links.forEach((link, index) => {
-        const href = link.getAttribute('href');
-        const nameInfo = __accessibleNameInfo(link);
-        const text = nameInfo.name;
-        const ariaLabel = link.getAttribute('aria-label');
-        const title = link.getAttribute('title');
+        links.forEach((link, index) => {
+          const href = link.getAttribute('href');
+          const nameInfo = __accessibleNameInfo(link);
+          const text = nameInfo.name;
+          const ariaLabel = link.getAttribute('aria-label');
+          const title = link.getAttribute('title');
 
-        // Skip skip links and anchors
-        if (href.startsWith('#') || link.classList.contains('skip-link')) {
-          return;
-        }
+          // Skip skip links and anchors
+          if (href.startsWith('#') || link.classList.contains('skip-link')) {
+            return;
+          }
 
-        // Generate selector
-        const selector = link.id ? `a#${link.id}` :
-                        link.className ? `a.${link.className.split(' ').join('.')}` :
-                        `a:nth-child(${index + 1})`;
+          // Generate selector
+          const selector = link.id
+            ? `a#${link.id}`
+            : link.className
+              ? `a.${link.className.split(' ').join('.')}`
+              : `a:nth-child(${index + 1})`;
 
-        // Check if link has meaningful text
-        const genericTexts = ['click here', 'here', 'read more', 'more', 'link', 'this', 'continue'];
-        const isGeneric = genericTexts.some(generic => text.toLowerCase() === generic);
-        const isEmpty = !text;
-        const isOnlySymbols = text && /^[^\w\s]+$/.test(text);
-        // A short name that was AUTHORED (aria-label/aria-labelledby/title) is a
-        // deliberate choice, not an accident of the markup — only a short name
-        // taken from the link's own content counts as vague.
-        const isAuthoredName = nameInfo.source === 'aria-label' ||
-                               nameInfo.source === 'aria-labelledby' ||
-                               nameInfo.source === 'title';
-        const isVague = text.length > 0 && text.length < 3 && !isAuthoredName;
+          // Check if link has meaningful text
+          const genericTexts = [
+            'click here',
+            'here',
+            'read more',
+            'more',
+            'link',
+            'this',
+            'continue',
+          ];
+          const isGeneric = genericTexts.some((generic) => text.toLowerCase() === generic);
+          const isEmpty = !text;
+          const isOnlySymbols = text && /^[^\w\s]+$/.test(text);
+          // A short name that was AUTHORED (aria-label/aria-labelledby/title) is a
+          // deliberate choice, not an accident of the markup — only a short name
+          // taken from the link's own content counts as vague.
+          const isAuthoredName =
+            nameInfo.source === 'aria-label' ||
+            nameInfo.source === 'aria-labelledby' ||
+            nameInfo.source === 'title';
+          const isVague = text.length > 0 && text.length < 3 && !isAuthoredName;
 
-        if (isEmpty || isGeneric || isOnlySymbols || isVague) {
-          problematicLinks.push({
-            selector,
-            text: text || '[empty]',
-            href: href.substring(0, 50),
-            issue: isEmpty ? 'empty-link-text' :
-                   isGeneric ? 'generic-link-text' :
-                   isOnlySymbols ? 'symbol-only-link' : 'vague-link-text',
-            nameSource: nameInfo.source,
-            nameReason: nameInfo.reason,
-            hasAriaLabel: !!ariaLabel,
-            hasTitle: !!title
-          });
-        }
-      });
+          if (isEmpty || isGeneric || isOnlySymbols || isVague) {
+            problematicLinks.push({
+              selector,
+              text: text || '[empty]',
+              href: href.substring(0, 50),
+              issue: isEmpty
+                ? 'empty-link-text'
+                : isGeneric
+                  ? 'generic-link-text'
+                  : isOnlySymbols
+                    ? 'symbol-only-link'
+                    : 'vague-link-text',
+              nameSource: nameInfo.source,
+              nameReason: nameInfo.reason,
+              hasAriaLabel: !!ariaLabel,
+              hasTitle: !!title,
+            });
+          }
+        });
 
-      return {
-        totalLinks: links.length,
-        problematicLinks
-      };
-    }, BaseScanner.visibilityFilterScript, accnameUtils);
+        return {
+          totalLinks: links.length,
+          problematicLinks,
+        };
+      },
+      BaseScanner.visibilityFilterScript,
+      accnameUtils
+    );
 
     const allLinksHavePurpose = linkResults.problematicLinks.length === 0;
 
-    linkResults.problematicLinks.forEach(link => {
+    linkResults.problematicLinks.forEach((link) => {
       violations.push({
-        criterion: "9.2.4.4",
+        criterion: '9.2.4.4',
         element: link.selector,
-        issue: "ambiguous-link",
-        description: link.issue === 'empty-link-text'
-          ? `Link has no accessible name (${link.nameReason || 'no naming mechanism'})`
-          : `Link text "${link.text}" does not clearly describe the link's purpose`,
+        issue: 'ambiguous-link',
+        description:
+          link.issue === 'empty-link-text'
+            ? `Link has no accessible name (${link.nameReason || 'no naming mechanism'})`
+            : `Link text "${link.text}" does not clearly describe the link's purpose`,
         nameSource: link.nameSource,
-        suggestion: link.issue === 'empty-link-text' ?
-          "Add descriptive text content, aria-label, or title attribute" :
-          "Use more specific, descriptive link text that explains where the link goes or what it does"
+        suggestion:
+          link.issue === 'empty-link-text'
+            ? 'Add descriptive text content, aria-label, or title attribute'
+            : 'Use more specific, descriptive link text that explains where the link goes or what it does',
       });
     });
 
-    console.log(`    Found ${linkResults.totalLinks} links, ${linkResults.problematicLinks.length} problematic`);
+    console.log(
+      `    Found ${linkResults.totalLinks} links, ${linkResults.problematicLinks.length} problematic`
+    );
 
     return {
       allLinksHavePurpose,
-      violations
+      violations,
     };
   }
 
@@ -255,34 +281,44 @@ class PageStructureScanner extends BaseScanner {
         searchFunction: false,
         tableOfContents: false,
         footerNavigation: false,
-        siteIndex: false
+        siteIndex: false,
       };
 
       // Check for main navigation
-      const navElements = document.querySelectorAll('nav, [role="navigation"], .navigation, .nav-menu, .main-nav');
+      const navElements = document.querySelectorAll(
+        'nav, [role="navigation"], .navigation, .nav-menu, .main-nav'
+      );
       ways.mainNavigation = navElements.length > 0;
 
       // Check for breadcrumbs. NOTE: `[role="navigation"] ol|ul` used to be in
       // this list — that matches the <ul> of any ordinary nav menu, so the main
       // navigation was counted a second time as a "breadcrumb". Only markup
       // that actually identifies itself as a breadcrumb counts.
-      const breadcrumbSelectors = ['.breadcrumb', '.breadcrumbs', '[class*="breadcrumb"]', '[aria-label*="breadcrumb" i]'];
-      ways.breadcrumbs = breadcrumbSelectors.some(selector => document.querySelector(selector));
+      const breadcrumbSelectors = [
+        '.breadcrumb',
+        '.breadcrumbs',
+        '[class*="breadcrumb"]',
+        '[aria-label*="breadcrumb" i]',
+      ];
+      ways.breadcrumbs = breadcrumbSelectors.some((selector) => document.querySelector(selector));
 
       // Check for sitemap links
-      const sitemapLinks = Array.from(document.querySelectorAll('a')).some(link =>
-        link.textContent.toLowerCase().includes('sitemap') ||
-        link.href.toLowerCase().includes('sitemap')
+      const sitemapLinks = Array.from(document.querySelectorAll('a')).some(
+        (link) =>
+          link.textContent.toLowerCase().includes('sitemap') ||
+          link.href.toLowerCase().includes('sitemap')
       );
       ways.sitemap = sitemapLinks;
 
       // Check for search functionality
-      const searchElements = document.querySelectorAll('input[type="search"], [role="search"], .search-box, .search-form, #search');
+      const searchElements = document.querySelectorAll(
+        'input[type="search"], [role="search"], .search-box, .search-form, #search'
+      );
       ways.searchFunction = searchElements.length > 0;
 
       // Check for table of contents
       const tocSelectors = ['.toc', '.table-of-contents', '#toc', '#table-of-contents'];
-      ways.tableOfContents = tocSelectors.some(selector => document.querySelector(selector));
+      ways.tableOfContents = tocSelectors.some((selector) => document.querySelector(selector));
 
       // A footer link block that lists the site's pages is technique G126
       // ("providing a list of links to all other web pages") / G125 and is one
@@ -291,16 +327,23 @@ class PageStructureScanner extends BaseScanner {
       // second way is a footer sitemap fail the criterion.
       const footers = document.querySelectorAll('footer, [role="contentinfo"]');
       for (const footer of footers) {
-        const internal = Array.from(footer.querySelectorAll('a[href]')).filter(a => {
+        const internal = Array.from(footer.querySelectorAll('a[href]')).filter((a) => {
           const raw = (a.getAttribute('href') || '').trim();
           if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) return false;
-          try { return new URL(raw, document.baseURI).origin === location.origin; } catch (e) { return false; }
+          try {
+            return new URL(raw, document.baseURI).origin === location.origin;
+          } catch (e) {
+            return false;
+          }
         });
-        if (internal.length > 3) { ways.footerNavigation = true; break; }
+        if (internal.length > 3) {
+          ways.footerNavigation = true;
+          break;
+        }
       }
 
       // A-Z / index links (technique G63/G64 neighbours).
-      ways.siteIndex = Array.from(document.querySelectorAll('a[href]')).some(a =>
+      ways.siteIndex = Array.from(document.querySelectorAll('a[href]')).some((a) =>
         /\b(index|a[\s-]?z|alle seiten|all pages)\b/i.test(a.textContent || '')
       );
 
@@ -312,7 +355,7 @@ class PageStructureScanner extends BaseScanner {
       // at "another page" of a site/process, so they can't establish that SC 2.4.5
       // (a whole-site criterion) even applies here.
       const internalPaths = new Set();
-      Array.from(document.querySelectorAll('a[href]')).forEach(link => {
+      Array.from(document.querySelectorAll('a[href]')).forEach((link) => {
         const raw = (link.getAttribute('href') || '').trim();
         if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) {
           return;
@@ -334,7 +377,7 @@ class PageStructureScanner extends BaseScanner {
         ways,
         availableWays,
         hasMultipleWays: availableWays >= 2,
-        hasEvidenceOfLargerSite
+        hasEvidenceOfLargerSite,
       };
     });
 
@@ -351,16 +394,19 @@ class PageStructureScanner extends BaseScanner {
     //      hasEvidenceOfLargerSite above). A standalone page with no such links is
     //      structurally out of scope for 2.4.5 and must not be flagged, even though
     //      it's the safe (non-opted-out) default.
-    const skipMultiPageCriteria = options.singlePageContext === true || options.skipMultiPageCriteria === true;
-    const shouldCheckMultipleWays = !skipMultiPageCriteria && navigationResults.hasEvidenceOfLargerSite;
+    const skipMultiPageCriteria =
+      options.singlePageContext === true || options.skipMultiPageCriteria === true;
+    const shouldCheckMultipleWays =
+      !skipMultiPageCriteria && navigationResults.hasEvidenceOfLargerSite;
 
     if (!navigationResults.hasMultipleWays && shouldCheckMultipleWays) {
       violations.push({
-        criterion: "9.2.4.5",
-        element: "document",
-        issue: "no-multiple-ways",
+        criterion: '9.2.4.5',
+        element: 'document',
+        issue: 'no-multiple-ways',
         description: `Only ${navigationResults.availableWays} way(s) to locate content found. WCAG requires at least 2 ways.`,
-        suggestion: "Provide multiple ways to locate content: navigation menu, breadcrumbs, search function, sitemap, or table of contents"
+        suggestion:
+          'Provide multiple ways to locate content: navigation menu, breadcrumbs, search function, sitemap, or table of contents',
       });
     }
 
@@ -368,7 +414,7 @@ class PageStructureScanner extends BaseScanner {
 
     return {
       hasMultipleWays: navigationResults.hasMultipleWays,
-      violations
+      violations,
     };
   }
 
@@ -379,127 +425,147 @@ class PageStructureScanner extends BaseScanner {
     console.log('  Testing headings and labels...');
     const violations = [];
 
-    const headingResults = await page.evaluate((visScript, accnameCode) => {
-      eval(visScript);
-      // Shared ACCNAME implementation (__accessibleNameInfo). A heading whose
-      // only child is `<img alt="…">` has textContent "" but is NOT empty —
-      // its accessible name is the image's alt text.
-      eval(accnameCode);
-      const problematicHeadings = [];
-      const problematicLabels = [];
+    const headingResults = await page.evaluate(
+      (visScript, accnameCode) => {
+        eval(visScript);
+        // Shared ACCNAME implementation (__accessibleNameInfo). A heading whose
+        // only child is `<img alt="…">` has textContent "" but is NOT empty —
+        // its accessible name is the image's alt text.
+        eval(accnameCode);
+        const problematicHeadings = [];
+        const problematicLabels = [];
 
-      // Check headings (h1-h6) — skip hidden
-      const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).filter(isElementVisible);
-      headings.forEach((heading, index) => {
-        const text = __accessibleNameInfo(heading).name;
-        const level = heading.tagName.toLowerCase();
-        
-        const selector = heading.id ? `${level}#${heading.id}` : 
-                        heading.className ? `${level}.${heading.className.split(' ').join('.')}` :
-                        `${level}:nth-child(${index + 1})`;
+        // Check headings (h1-h6) — skip hidden
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).filter(
+          isElementVisible
+        );
+        headings.forEach((heading, index) => {
+          const text = __accessibleNameInfo(heading).name;
+          const level = heading.tagName.toLowerCase();
 
-        // Check if heading is descriptive
-        const isEmpty = !text;
-        const isGeneric = ['heading', 'title', 'section', 'content'].includes(text.toLowerCase());
-        const isVague = text.length > 0 && text.length < 3;
-        const isOnlyNumbers = /^\d+$/.test(text);
+          const selector = heading.id
+            ? `${level}#${heading.id}`
+            : heading.className
+              ? `${level}.${heading.className.split(' ').join('.')}`
+              : `${level}:nth-child(${index + 1})`;
 
-        if (isEmpty || isGeneric || isVague || isOnlyNumbers) {
-          problematicHeadings.push({
-            selector,
-            text: text || '[empty]',
-            level,
-            issue: isEmpty ? 'empty-heading' : 
-                   isGeneric ? 'generic-heading' : 
-                   isVague ? 'vague-heading' : 'numeric-only-heading'
-          });
-        }
-      });
+          // Check if heading is descriptive
+          const isEmpty = !text;
+          const isGeneric = ['heading', 'title', 'section', 'content'].includes(text.toLowerCase());
+          const isVague = text.length > 0 && text.length < 3;
+          const isOnlyNumbers = /^\d+$/.test(text);
 
-      // Check form labels — skip hidden
-      const formControls = Array.from(document.querySelectorAll('input, textarea, select')).filter(isElementVisible);
+          if (isEmpty || isGeneric || isVague || isOnlyNumbers) {
+            problematicHeadings.push({
+              selector,
+              text: text || '[empty]',
+              level,
+              issue: isEmpty
+                ? 'empty-heading'
+                : isGeneric
+                  ? 'generic-heading'
+                  : isVague
+                    ? 'vague-heading'
+                    : 'numeric-only-heading',
+            });
+          }
+        });
 
-      formControls.forEach((control, index) => {
-        const type = control.type || control.tagName.toLowerCase();
-        const id = control.id;
-        const name = control.name;
+        // Check form labels — skip hidden
+        const formControls = Array.from(
+          document.querySelectorAll('input, textarea, select')
+        ).filter(isElementVisible);
 
-        // Skip hidden inputs and buttons. Native `submit`/`button` inputs always carry
-        // a browser-supplied default accessible name (e.g. "Submit Query") even with
-        // no `value`/text, so they're exempt outright.
-        if (type === 'hidden' || type === 'submit' || type === 'button') {
-          return;
-        }
+        formControls.forEach((control, index) => {
+          const type = control.type || control.tagName.toLowerCase();
+          const id = control.id;
+          const name = control.name;
 
-        const selector = id ? `${control.tagName.toLowerCase()}#${id}` :
-                        name ? `${control.tagName.toLowerCase()}[name="${name}"]` :
-                        `${control.tagName.toLowerCase()}:nth-child(${index + 1})`;
+          // Skip hidden inputs and buttons. Native `submit`/`button` inputs always carry
+          // a browser-supplied default accessible name (e.g. "Submit Query") even with
+          // no `value`/text, so they're exempt outright.
+          if (type === 'hidden' || type === 'submit' || type === 'button') {
+            return;
+          }
 
-        // The accessible name is computed by the shared ACCNAME helper, which
-        // covers every mechanism this check used to enumerate by hand —
-        // `label[for]`, wrapping `<label>` (implicit association),
-        // `aria-labelledby`, `aria-label`, `title`, `value` on reset buttons —
-        // PLUS the one it was missing: `alt` on `<input type="image">`.
-        // `placeholder` is deliberately NOT a naming mechanism here: a
-        // placeholder-only field is a real 2.4.6/3.3.2 failure.
-        const nameInfo = __accessibleNameInfo(control);
-        const placeholder = control.getAttribute('placeholder');
+          const selector = id
+            ? `${control.tagName.toLowerCase()}#${id}`
+            : name
+              ? `${control.tagName.toLowerCase()}[name="${name}"]`
+              : `${control.tagName.toLowerCase()}:nth-child(${index + 1})`;
 
-        if (!nameInfo.name) {
-          problematicLabels.push({
-            selector,
-            type,
-            hasPlaceholder: !!placeholder,
-            nameReason: nameInfo.reason,
-            issue: 'missing-label'
-          });
-        }
-      });
+          // The accessible name is computed by the shared ACCNAME helper, which
+          // covers every mechanism this check used to enumerate by hand —
+          // `label[for]`, wrapping `<label>` (implicit association),
+          // `aria-labelledby`, `aria-label`, `title`, `value` on reset buttons —
+          // PLUS the one it was missing: `alt` on `<input type="image">`.
+          // `placeholder` is deliberately NOT a naming mechanism here: a
+          // placeholder-only field is a real 2.4.6/3.3.2 failure.
+          const nameInfo = __accessibleNameInfo(control);
+          const placeholder = control.getAttribute('placeholder');
 
-      return {
-        totalHeadings: headings.length,
-        problematicHeadings,
-        totalFormControls: formControls.length,
-        problematicLabels
-      };
-    }, BaseScanner.visibilityFilterScript, accnameUtils);
+          if (!nameInfo.name) {
+            problematicLabels.push({
+              selector,
+              type,
+              hasPlaceholder: !!placeholder,
+              nameReason: nameInfo.reason,
+              issue: 'missing-label',
+            });
+          }
+        });
+
+        return {
+          totalHeadings: headings.length,
+          problematicHeadings,
+          totalFormControls: formControls.length,
+          problematicLabels,
+        };
+      },
+      BaseScanner.visibilityFilterScript,
+      accnameUtils
+    );
 
     // Add heading violations
-    headingResults.problematicHeadings.forEach(heading => {
+    headingResults.problematicHeadings.forEach((heading) => {
       violations.push({
-        criterion: "9.2.4.6",
+        criterion: '9.2.4.6',
         element: heading.selector,
-        issue: "poor-heading",
+        issue: 'poor-heading',
         description: `Heading "${heading.text}" is not descriptive (${heading.issue})`,
-        suggestion: "Use clear, descriptive headings that explain the section content"
+        suggestion: 'Use clear, descriptive headings that explain the section content',
       });
     });
 
     // Add label violations
-    headingResults.problematicLabels.forEach(label => {
+    headingResults.problematicLabels.forEach((label) => {
       violations.push({
-        criterion: "9.2.4.6",
+        criterion: '9.2.4.6',
         element: label.selector,
-        issue: "missing-label",
+        issue: 'missing-label',
         description: `Form control (${label.type}) has no accessible name (${label.nameReason || 'no naming mechanism'})`,
-        suggestion: label.hasPlaceholder ?
-          "Add a proper <label> element in addition to placeholder text" :
-          "Add a <label> element, aria-label, aria-labelledby, or title attribute"
+        suggestion: label.hasPlaceholder
+          ? 'Add a proper <label> element in addition to placeholder text'
+          : 'Add a <label> element, aria-label, aria-labelledby, or title attribute',
       });
     });
 
-    const allHeadingsDescriptive = headingResults.problematicHeadings.length === 0 && 
-                                  headingResults.problematicLabels.length === 0;
+    const allHeadingsDescriptive =
+      headingResults.problematicHeadings.length === 0 &&
+      headingResults.problematicLabels.length === 0;
 
-    console.log(`    Analyzed ${headingResults.totalHeadings} headings, ${headingResults.totalFormControls} form controls`);
-    console.log(`    Found ${headingResults.problematicHeadings.length} heading issues, ${headingResults.problematicLabels.length} label issues`);
+    console.log(
+      `    Analyzed ${headingResults.totalHeadings} headings, ${headingResults.totalFormControls} form controls`
+    );
+    console.log(
+      `    Found ${headingResults.problematicHeadings.length} heading issues, ${headingResults.problematicLabels.length} label issues`
+    );
 
     return {
       allHeadingsDescriptive,
-      violations
+      violations,
     };
   }
-
 }
 
 module.exports = PageStructureScanner;

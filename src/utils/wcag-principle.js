@@ -22,8 +22,10 @@ function classifyWcagPrinciple(violation) {
 
   // An explicit principle, if a scanner ever sets one, always wins.
   const explicit = violation.wcagPrinciple;
-  if (typeof explicit === 'string' &&
-      ['perceivable', 'operable', 'understandable', 'robust', 'eaa'].includes(explicit)) {
+  if (
+    typeof explicit === 'string' &&
+    ['perceivable', 'operable', 'understandable', 'robust', 'eaa'].includes(explicit)
+  ) {
     return explicit;
   }
 

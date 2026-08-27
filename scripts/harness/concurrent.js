@@ -63,7 +63,7 @@ const CONCURRENT_SCANNERS = {
   'advanced-contrast': { module: '../../src/scanners/advanced-contrast' },
   'screen-reader': { module: '../../src/scanners/screen-reader' },
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
-  'orientation': { module: '../../src/scanners/orientation' },
+  orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
   'language-detection': { module: '../../src/scanners/language-detection' },
   'predictable-navigation': { module: '../../src/scanners/predictable-navigation' },
@@ -101,7 +101,7 @@ const CONCURRENT_SCANNERS = {
 function matchesCriteria(violation, criteria, scannerCriteria = null) {
   const hit = (value) => {
     const c = String(value || '');
-    return c && criteria.some(target => c.includes(target) || c === `9.${target}`);
+    return c && criteria.some((target) => c.includes(target) || c === `9.${target}`);
   };
 
   if (violation.criterion || violation.ruleId) {
@@ -125,7 +125,7 @@ function matchesCriteria(violation, criteria, scannerCriteria = null) {
  * not claim to cover.
  */
 function intersectCriteria(fileCriteria, scannerCriteria) {
-  return fileCriteria.filter(c => scannerCriteria.includes(c));
+  return fileCriteria.filter((c) => scannerCriteria.includes(c));
 }
 
 function parseArgs(argv) {
@@ -173,7 +173,7 @@ async function main() {
   const ALL_CRITERIA = Object.keys(CRITERION_TO_SCANNERS).sort();
 
   // ---- Parse all test files and route to scanners ----
-  const allFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.html'));
+  const allFiles = fs.readdirSync(testDir).filter((f) => f.endsWith('.html'));
   const parsedFiles = []; // { file, metadata, isGood, isBad }
   const testPlan = []; // { file, scanner, criteria (intersected), expectViolations, title }
 
@@ -207,7 +207,9 @@ async function main() {
     }
   }
 
-  console.log(`Test plan: ${testPlan.length} tests across ${new Set(testPlan.map(t => t.scanner)).size} scanners\n`);
+  console.log(
+    `Test plan: ${testPlan.length} tests across ${new Set(testPlan.map((t) => t.scanner)).size} scanners\n`
+  );
 
   // ---- Group files by criterion for byCriterion.files (independent of routing) ----
   const filesByCriterion = {};
@@ -231,7 +233,7 @@ async function main() {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(fs.readFileSync(filePath));
   });
-  const port = await new Promise(resolve => {
+  const port = await new Promise((resolve) => {
     server.listen(0, () => resolve(server.address().port));
   });
 
@@ -243,8 +245,14 @@ async function main() {
   // Suppress verbose scanner output
   const origLog = console.log;
   const origWarn = console.warn;
-  function silence() { console.log = () => {}; console.warn = () => {}; }
-  function restore() { console.log = origLog; console.warn = origWarn; }
+  function silence() {
+    console.log = () => {};
+    console.warn = () => {};
+  }
+  function restore() {
+    console.log = origLog;
+    console.warn = origWarn;
+  }
 
   let passed = 0;
   let failed = 0;
@@ -254,7 +262,8 @@ async function main() {
 
   // Per-criterion detection bookkeeping: c -> { truePositive: bool, falsePositiveHit: bool }
   const criterionStats = {};
-  for (const c of ALL_CRITERIA) criterionStats[c] = { truePositive: false, falsePositiveHit: false };
+  for (const c of ALL_CRITERIA)
+    criterionStats[c] = { truePositive: false, falsePositiveHit: false };
 
   // Group tests by scanner for readable console output
   const byScanner = {};
@@ -274,7 +283,7 @@ async function main() {
 
     for (const t of tests) {
       const page = await browser.newPage();
-      page.on('dialog', d => d.dismiss().catch(() => {}));
+      page.on('dialog', (d) => d.dismiss().catch(() => {}));
       await page.setViewport({ width: 1920, height: 1080 });
 
       let status;
@@ -295,7 +304,9 @@ async function main() {
         restore();
 
         const allViolations = result.violations || [];
-        const relevant = allViolations.filter(v => matchesCriteria(v, t.criteria, scannerCriteria[scannerId]));
+        const relevant = allViolations.filter((v) =>
+          matchesCriteria(v, t.criteria, scannerCriteria[scannerId])
+        );
         matched = relevant.length;
 
         const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
@@ -311,9 +322,13 @@ async function main() {
         } else {
           origLog(`  FAIL [${label}] ${t.file}: ${detail}`);
           if (relevant.length > 0) {
-            relevant.slice(0, 3).forEach(v =>
-              origLog(`    - [${v.criterion}] ${v.issue}: ${(v.description || '').substring(0, 100)}`)
-            );
+            relevant
+              .slice(0, 3)
+              .forEach((v) =>
+                origLog(
+                  `    - [${v.criterion}] ${v.issue}: ${(v.description || '').substring(0, 100)}`
+                )
+              );
           }
           failed++;
           failures.push({ file: t.file, scanner: scannerId, label, detail });
@@ -323,8 +338,11 @@ async function main() {
         // aggregate `matched` count above — needed because a single test
         // can carry multiple intersected criteria at once).
         for (const c of t.criteria) {
-          const matchedForC = allViolations.some(v => matchesCriteria(v, [c], scannerCriteria[scannerId]));
-          if (!criterionStats[c]) criterionStats[c] = { truePositive: false, falsePositiveHit: false };
+          const matchedForC = allViolations.some((v) =>
+            matchesCriteria(v, [c], scannerCriteria[scannerId])
+          );
+          if (!criterionStats[c])
+            criterionStats[c] = { truePositive: false, falsePositiveHit: false };
           if (t.expectViolations) {
             if (matchedForC) criterionStats[c].truePositive = true;
           } else {
@@ -389,7 +407,9 @@ async function main() {
   }
 
   origLog(`\n=== SUMMARY ===`);
-  origLog(`Total: ${passed + failed + errored} | Passed: ${passed} | Failed: ${failed} | Errored: ${errored}`);
+  origLog(
+    `Total: ${passed + failed + errored} | Passed: ${passed} | Failed: ${failed} | Errored: ${errored}`
+  );
 
   if (failures.length > 0) {
     origLog(`\nFailures:`);
@@ -400,14 +420,20 @@ async function main() {
 
   origLog(`\nPer-scanner:`);
   for (const [id, p] of Object.entries(perScanner)) {
-    origLog(`  ${id}: bad ${p.badDetected}/${p.badTotal} detected, good ${p.goodClean}/${p.goodTotal} clean`);
+    origLog(
+      `  ${id}: bad ${p.badDetected}/${p.badTotal} detected, good ${p.goodClean}/${p.goodTotal} clean`
+    );
   }
 
-  const noTruePositive = ALL_CRITERIA.filter(c => byCriterion[c].files.bad.length > 0 && !byCriterion[c].truePositive);
+  const noTruePositive = ALL_CRITERIA.filter(
+    (c) => byCriterion[c].files.bad.length > 0 && !byCriterion[c].truePositive
+  );
   if (noTruePositive.length > 0) {
     origLog(`\nCriteria with NO scanner detecting their bad file(s) (truePositive=false):`);
     for (const c of noTruePositive) {
-      origLog(`  ${c} (scanners: ${byCriterion[c].scanners.join(', ') || 'none'}; bad files: ${byCriterion[c].files.bad.join(', ')})`);
+      origLog(
+        `  ${c} (scanners: ${byCriterion[c].scanners.join(', ') || 'none'}; bad files: ${byCriterion[c].files.bad.join(', ')})`
+      );
     }
   }
 
@@ -437,7 +463,7 @@ async function main() {
 module.exports = { CONCURRENT_SCANNERS, matchesCriteria, intersectCriteria };
 
 if (require.main === module) {
-  main().catch(err => {
+  main().catch((err) => {
     console.error('Fatal:', err);
     process.exit(1);
   });

@@ -166,32 +166,66 @@ const PROFILES = {
   fast: [
     'axe-core',
     // Concurrent (no seizure-prevention — its 10s observation dominates)
-    'color-contrast', 'use-of-color', 'images-of-text', 'advanced-contrast',
-    'nontext-contrast', 'screen-reader', 'media-accessibility',
-    'language-detection', 'predictable-navigation', 'error-handling',
-    'html-validation', 'page-structure', 'label-in-name',
-    'status-messages', 'advanced-aria', 'timing-controls',
-    'orientation', 'input-purpose',
+    'color-contrast',
+    'use-of-color',
+    'images-of-text',
+    'advanced-contrast',
+    'nontext-contrast',
+    'screen-reader',
+    'media-accessibility',
+    'language-detection',
+    'predictable-navigation',
+    'error-handling',
+    'html-validation',
+    'page-structure',
+    'label-in-name',
+    'status-messages',
+    'advanced-aria',
+    'timing-controls',
+    'orientation',
+    'input-purpose',
     // Fast exclusive (~6s each with navigation)
-    'keyboard-navigation', 'focus-management', 'input-modalities',
-    'responsive-design', 'hover-focus-content',
+    'keyboard-navigation',
+    'focus-management',
+    'input-modalities',
+    'responsive-design',
+    'hover-focus-content',
   ],
   standard: [
     'axe-core',
     // Everything except text-resize, mobile-specific
-    'color-contrast', 'use-of-color', 'images-of-text', 'advanced-contrast',
-    'nontext-contrast', 'screen-reader', 'media-accessibility',
-    'language-detection', 'predictable-navigation', 'error-handling',
-    'html-validation', 'page-structure', 'label-in-name',
-    'status-messages', 'advanced-aria',
-    'seizure-prevention', 'timing-controls',
-    'orientation', 'input-purpose',
-    'keyboard-navigation', 'focus-management', 'input-modalities',
-    'responsive-design', 'hover-focus-content', 'concurrent-input',
+    'color-contrast',
+    'use-of-color',
+    'images-of-text',
+    'advanced-contrast',
+    'nontext-contrast',
+    'screen-reader',
+    'media-accessibility',
+    'language-detection',
+    'predictable-navigation',
+    'error-handling',
+    'html-validation',
+    'page-structure',
+    'label-in-name',
+    'status-messages',
+    'advanced-aria',
+    'seizure-prevention',
+    'timing-controls',
+    'orientation',
+    'input-purpose',
+    'keyboard-navigation',
+    'focus-management',
+    'input-modalities',
+    'responsive-design',
+    'hover-focus-content',
+    'concurrent-input',
     'dynamic-spa',
-    'accessibility-statement', 'contact-mechanism',
-    'compliance-monitoring', 'eaa-procedure',
-    'multiple-ways', 'llm-sensory-characteristics',
+    'accessibility-statement',
+    'contact-mechanism',
+    'compliance-monitoring',
+    'eaa-procedure',
+    'multiple-ways',
+    'llm-sensory-characteristics',
     // The axe `incomplete` adjudicator belongs in `standard`: it turns
     // axe's "needs manual review" backlog into decided findings, which is
     // the single biggest precision win on real pages.
@@ -232,15 +266,15 @@ function allScannerIds() {
  */
 function getProfile(name, opts = {}) {
   if (!PROFILES.hasOwnProperty(name)) {
-    throw new Error(`Unknown scan profile: "${name}". Valid profiles: ${Object.keys(PROFILES).join(', ')}`);
+    throw new Error(
+      `Unknown scan profile: "${name}". Valid profiles: ${Object.keys(PROFILES).join(', ')}`
+    );
   }
 
   const requested = PROFILES[name] || allScannerIds();
   const { isProven } = require('./scanner-trust');
 
-  const scannerIds = opts.includeExperimental
-    ? requested
-    : requested.filter((id) => isProven(id));
+  const scannerIds = opts.includeExperimental ? requested : requested.filter((id) => isProven(id));
   const excluded = requested.filter((id) => !scannerIds.includes(id));
 
   return {

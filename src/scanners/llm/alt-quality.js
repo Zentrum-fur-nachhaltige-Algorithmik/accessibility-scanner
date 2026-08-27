@@ -22,10 +22,14 @@ const MAX_IMAGES = 30;
 
 class LLMAltQualityScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-alt-quality', {
-      wcagCriteria: ['1.1.1'],
-      wcagPrinciple: 'perceivable',
-    }, llmClient);
+    super(
+      'llm-alt-quality',
+      {
+        wcagCriteria: ['1.1.1'],
+        wcagPrinciple: 'perceivable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
@@ -114,7 +118,16 @@ Return violations as JSON.`;
         ),
       ];
 
-      const NATIVE_IMAGE_TAGS = ['img', 'svg', 'area', 'input', 'picture', 'canvas', 'object', 'embed'];
+      const NATIVE_IMAGE_TAGS = [
+        'img',
+        'svg',
+        'area',
+        'input',
+        'picture',
+        'canvas',
+        'object',
+        'embed',
+      ];
 
       for (const el of imgs) {
         if (out.length >= limit) break;
@@ -128,11 +141,12 @@ Return violations as JSON.`;
         // On a real image element the alt attribute names it; elsewhere the
         // author's alternative may live in aria-label or an <svg><title>.
         const svgTitle = el.querySelector && el.querySelector('title');
-        const alt = NATIVE_IMAGE_TAGS.includes(tag) && el.hasAttribute('alt')
-          ? el.getAttribute('alt')
-          : (el.getAttribute('aria-label') ||
-             (svgTitle ? svgTitle.textContent : null) ||
-             el.getAttribute('alt'));
+        const alt =
+          NATIVE_IMAGE_TAGS.includes(tag) && el.hasAttribute('alt')
+            ? el.getAttribute('alt')
+            : el.getAttribute('aria-label') ||
+              (svgTitle ? svgTitle.textContent : null) ||
+              el.getAttribute('alt');
         if (alt === null || alt === undefined) continue;
 
         const src = el.getAttribute('src') || el.getAttribute('data-src') || '';
@@ -160,16 +174,16 @@ Return violations as JSON.`;
           linkHasOtherText: link
             ? (link.textContent || '').replace(/\s+/g, ' ').trim().length > 0
             : false,
-          figcaption: fig && fig.querySelector('figcaption')
-            ? fig.querySelector('figcaption').textContent.trim().slice(0, 160)
-            : null,
+          figcaption:
+            fig && fig.querySelector('figcaption')
+              ? fig.querySelector('figcaption').textContent.trim().slice(0, 160)
+              : null,
           title: el.getAttribute('title'),
           longdesc: el.getAttribute('longdesc') || el.getAttribute('aria-describedby') || null,
           nearestHeading: nearestHeading(el),
           surroundingText: surroundingText(el),
           role: el.getAttribute('role'),
-          className:
-            typeof el.className === 'string' ? el.className.slice(0, 60) : null,
+          className: typeof el.className === 'string' ? el.className.slice(0, 60) : null,
         });
       }
 

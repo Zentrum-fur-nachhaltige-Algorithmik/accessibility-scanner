@@ -14,7 +14,7 @@ class EAAProcedureScanner extends BaseScanner {
   constructor() {
     super('eaa-procedure', {
       wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
-      wcagPrinciple: 'robust'
+      wcagPrinciple: 'robust',
     });
   }
 
@@ -32,7 +32,7 @@ class EAAProcedureScanner extends BaseScanner {
       testFeedbackProcess: true,
       testComplianceMonitoring: true,
       searchDepth: 3,
-      timeout: 60000
+      timeout: 60000,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -41,7 +41,7 @@ class EAAProcedureScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["EAA-Statement", "EAA-Contact", "EAA-Feedback", "EAA-Monitoring"],
+      criteria: ['EAA-Statement', 'EAA-Contact', 'EAA-Feedback', 'EAA-Monitoring'],
       passed: eaaResults.violations.length === 0,
       violations: eaaResults.violations,
       summary: {
@@ -50,9 +50,9 @@ class EAAProcedureScanner extends BaseScanner {
         feedbackProcessImplemented: eaaResults.feedbackProcessImplemented,
         complianceMonitoringActive: eaaResults.complianceMonitoringActive,
         euLegalCompliance: eaaResults.euLegalCompliance,
-        gatedOnMissingStatement: !eaaResults.accessibilityStatementPresent
+        gatedOnMissingStatement: !eaaResults.accessibilityStatementPresent,
       },
-      visualEvidence: eaaResults.visualEvidence
+      visualEvidence: eaaResults.visualEvidence,
     };
   }
 
@@ -77,7 +77,12 @@ class EAAProcedureScanner extends BaseScanner {
 
     // 1. Test accessibility statement presence and compliance
     if (options.testAccessibilityStatement) {
-      const statementResults = await this.analyzeAccessibilityStatement(page, scanDir, violations, options);
+      const statementResults = await this.analyzeAccessibilityStatement(
+        page,
+        scanDir,
+        violations,
+        options
+      );
       accessibilityStatementPresent = statementResults.present;
     }
 
@@ -103,14 +108,18 @@ class EAAProcedureScanner extends BaseScanner {
 
     // 4. Test compliance monitoring procedures
     if (options.testComplianceMonitoring && statementGate) {
-      const monitoringResults = await this.analyzeComplianceMonitoring(page, scanDir, violations, options);
+      const monitoringResults = await this.analyzeComplianceMonitoring(
+        page,
+        scanDir,
+        violations,
+        options
+      );
       complianceMonitoringActive = monitoringResults.active;
     }
 
     // Calculate overall EU legal compliance
-    const euLegalCompliance = accessibilityStatementPresent &&
-                             contactMechanismAvailable &&
-                             feedbackProcessImplemented;
+    const euLegalCompliance =
+      accessibilityStatementPresent && contactMechanismAvailable && feedbackProcessImplemented;
 
     // Generate visual evidence
     visualEvidence.push({
@@ -120,7 +129,7 @@ class EAAProcedureScanner extends BaseScanner {
       contactMechanismAvailable: contactMechanismAvailable,
       feedbackProcessImplemented: feedbackProcessImplemented,
       complianceMonitoringActive: complianceMonitoringActive,
-      euLegalCompliance: euLegalCompliance
+      euLegalCompliance: euLegalCompliance,
     });
 
     console.log(`EAA procedural analysis complete: ${violations.length} violations found`);
@@ -133,7 +142,7 @@ class EAAProcedureScanner extends BaseScanner {
       contactMechanismAvailable,
       feedbackProcessImplemented,
       complianceMonitoringActive,
-      euLegalCompliance
+      euLegalCompliance,
     };
   }
 
@@ -153,8 +162,11 @@ class EAAProcedureScanner extends BaseScanner {
 
     const currentPageAnalysis = await page.evaluate(() => {
       const statementKeywords = [
-        'accessibility statement', 'accessibility policy', 'accessibility information',
-        'erklärung zur barrierefreiheit', 'barrierefreiheitserklärung'
+        'accessibility statement',
+        'accessibility policy',
+        'accessibility information',
+        'erklärung zur barrierefreiheit',
+        'barrierefreiheitserklärung',
       ];
 
       const pageText = document.body.textContent.toLowerCase();
@@ -174,7 +186,7 @@ class EAAProcedureScanner extends BaseScanner {
           hasWCAG: elementText.includes('wcag'),
           hasContactInfo: elementText.includes('contact') || elementText.includes('email'),
           hasComplianceDate: elementText.includes('20') && elementText.includes('date'),
-          hasKnownIssues: elementText.includes('known') || elementText.includes('limitation')
+          hasKnownIssues: elementText.includes('known') || elementText.includes('limitation'),
         };
         break;
       }
@@ -202,14 +214,16 @@ class EAAProcedureScanner extends BaseScanner {
             const linkText = link.textContent.toLowerCase();
             const href = link.getAttribute('href');
 
-            if ((linkText.includes('accessibility') ||
-                 linkText.includes('statement') ||
-                 href.toLowerCase().includes('accessibility')) &&
-                !href.startsWith('mailto:') &&
-                !href.startsWith('tel:')) {
+            if (
+              (linkText.includes('accessibility') ||
+                linkText.includes('statement') ||
+                href.toLowerCase().includes('accessibility')) &&
+              !href.startsWith('mailto:') &&
+              !href.startsWith('tel:')
+            ) {
               accessibilityLinks.push({
                 text: linkText.trim(),
-                href: href
+                href: href,
               });
             }
           }
@@ -222,8 +236,9 @@ class EAAProcedureScanner extends BaseScanner {
           try {
             if (statementLink.href.startsWith('/') || statementLink.href.startsWith(page.url())) {
               const newPage = await this.browser.newPage();
-              const fullUrl = statementLink.href.startsWith('/') ?
-                new URL(statementLink.href, page.url()).href : statementLink.href;
+              const fullUrl = statementLink.href.startsWith('/')
+                ? new URL(statementLink.href, page.url()).href
+                : statementLink.href;
 
               await newPage.goto(fullUrl, { waitUntil: 'networkidle0', timeout: 10000 });
 
@@ -237,12 +252,14 @@ class EAAProcedureScanner extends BaseScanner {
                 const pageText = document.body.textContent.toLowerCase();
 
                 return {
-                  hasWCAG: pageText.includes('wcag') || pageText.includes('web content accessibility'),
+                  hasWCAG:
+                    pageText.includes('wcag') || pageText.includes('web content accessibility'),
                   hasContactInfo: pageText.includes('contact') && pageText.includes('@'),
                   hasComplianceLevel: pageText.includes('aa') || pageText.includes('level'),
                   hasLastUpdated: pageText.includes('updated') || pageText.includes('reviewed'),
-                  hasKnownLimitations: pageText.includes('limitation') || pageText.includes('known'),
-                  contentLength: pageText.length
+                  hasKnownLimitations:
+                    pageText.includes('limitation') || pageText.includes('known'),
+                  contentLength: pageText.length,
                 };
               });
 
@@ -252,34 +269,34 @@ class EAAProcedureScanner extends BaseScanner {
                 // Validate statement quality
                 if (!statementPageAnalysis.hasWCAG) {
                   violations.push({
-                    criterion: "EAA-Statement",
+                    criterion: 'EAA-Statement',
                     element: 'accessibility statement',
                     issue: 'statement-missing-wcag-reference',
                     description: 'Accessibility statement lacks WCAG compliance reference',
                     severity: 'warning',
-                    suggestion: 'Include WCAG 2.2 AA compliance level and reference in statement'
+                    suggestion: 'Include WCAG 2.2 AA compliance level and reference in statement',
                   });
                 }
 
                 if (!statementPageAnalysis.hasContactInfo) {
                   violations.push({
-                    criterion: "EAA-Statement",
+                    criterion: 'EAA-Statement',
                     element: 'accessibility statement',
                     issue: 'statement-missing-contact',
                     description: 'Accessibility statement lacks contact information',
                     severity: 'error',
-                    suggestion: 'Include contact details for accessibility feedback and support'
+                    suggestion: 'Include contact details for accessibility feedback and support',
                   });
                 }
 
                 if (!statementPageAnalysis.hasLastUpdated) {
                   violations.push({
-                    criterion: "EAA-Statement",
+                    criterion: 'EAA-Statement',
                     element: 'accessibility statement',
                     issue: 'statement-missing-update-date',
                     description: 'Accessibility statement lacks last updated date',
                     severity: 'warning',
-                    suggestion: 'Include last review/update date for transparency'
+                    suggestion: 'Include last review/update date for transparency',
                   });
                 }
               }
@@ -321,7 +338,7 @@ class EAAProcedureScanner extends BaseScanner {
         phone: false,
         form: false,
         chat: false,
-        feedback: false
+        feedback: false,
       };
 
       // Look for email contacts
@@ -340,17 +357,23 @@ class EAAProcedureScanner extends BaseScanner {
 
       // Look for contact forms
       const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
+      forms.forEach((form) => {
         const formText = form.textContent.toLowerCase();
-        if (formText.includes('contact') || formText.includes('feedback') ||
-            formText.includes('support') || formText.includes('help')) {
+        if (
+          formText.includes('contact') ||
+          formText.includes('feedback') ||
+          formText.includes('support') ||
+          formText.includes('help')
+        ) {
           contactMethods.form = true;
           available = true;
         }
       });
 
       // Look for chat or messaging systems
-      const chatElements = document.querySelectorAll('[class*="chat"], [id*="chat"], [class*="message"], [id*="intercom"]');
+      const chatElements = document.querySelectorAll(
+        '[class*="chat"], [id*="chat"], [class*="message"], [id*="intercom"]'
+      );
       if (chatElements.length > 0) {
         contactMethods.chat = true;
         available = true;
@@ -358,9 +381,13 @@ class EAAProcedureScanner extends BaseScanner {
 
       // Look for feedback mechanisms
       const feedbackElements = document.querySelectorAll('a, button');
-      feedbackElements.forEach(element => {
+      feedbackElements.forEach((element) => {
         const text = element.textContent.toLowerCase();
-        if (text.includes('feedback') || text.includes('report') || text.includes('accessibility')) {
+        if (
+          text.includes('feedback') ||
+          text.includes('report') ||
+          text.includes('accessibility')
+        ) {
           contactMethods.feedback = true;
           available = true;
         }
@@ -368,9 +395,11 @@ class EAAProcedureScanner extends BaseScanner {
 
       // Look for accessibility-specific contact information
       const pageText = document.body.textContent.toLowerCase();
-      const hasAccessibilityContact = pageText.includes('accessibility') &&
-                                     (pageText.includes('contact') || pageText.includes('email') ||
-                                      pageText.includes('feedback'));
+      const hasAccessibilityContact =
+        pageText.includes('accessibility') &&
+        (pageText.includes('contact') ||
+          pageText.includes('email') ||
+          pageText.includes('feedback'));
 
       return { issues, available, contactMethods, hasAccessibilityContact };
     });
@@ -378,23 +407,23 @@ class EAAProcedureScanner extends BaseScanner {
     // Validate contact mechanism quality
     if (!contactAnalysis.available) {
       violations.push({
-        criterion: "EAA-Contact",
+        criterion: 'EAA-Contact',
         element: 'website',
         issue: 'no-contact-mechanism',
         description: 'No contact mechanism found for accessibility feedback',
         severity: 'error',
-        suggestion: 'Provide email, phone, or contact form for accessibility support'
+        suggestion: 'Provide email, phone, or contact form for accessibility support',
       });
     } else {
       // Check for accessibility-specific contact
       if (!contactAnalysis.hasAccessibilityContact) {
         violations.push({
-          criterion: "EAA-Contact",
+          criterion: 'EAA-Contact',
           element: 'contact information',
           issue: 'no-accessibility-specific-contact',
           description: 'No accessibility-specific contact information found',
           severity: 'warning',
-          suggestion: 'Provide dedicated contact method for accessibility feedback and issues'
+          suggestion: 'Provide dedicated contact method for accessibility feedback and issues',
         });
       }
 
@@ -402,12 +431,13 @@ class EAAProcedureScanner extends BaseScanner {
       const methodCount = Object.values(contactAnalysis.contactMethods).filter(Boolean).length;
       if (methodCount < 2) {
         violations.push({
-          criterion: "EAA-Contact",
+          criterion: 'EAA-Contact',
           element: 'contact methods',
           issue: 'limited-contact-options',
           description: 'Limited contact options available for accessibility feedback',
           severity: 'warning',
-          suggestion: 'Provide multiple contact methods (email, phone, form) for better accessibility'
+          suggestion:
+            'Provide multiple contact methods (email, phone, form) for better accessibility',
         });
       }
     }
@@ -429,15 +459,19 @@ class EAAProcedureScanner extends BaseScanner {
         reportIssue: false,
         accessibilityFeedback: false,
         responseCommitment: false,
-        publicFeedback: false
+        publicFeedback: false,
       };
 
       // Look for feedback forms
       const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
+      forms.forEach((form) => {
         const formText = form.textContent.toLowerCase();
-        if (formText.includes('feedback') || formText.includes('report') ||
-            formText.includes('issue') || formText.includes('problem')) {
+        if (
+          formText.includes('feedback') ||
+          formText.includes('report') ||
+          formText.includes('issue') ||
+          formText.includes('problem')
+        ) {
           feedbackFeatures.feedbackForm = true;
           implemented = true;
         }
@@ -445,10 +479,15 @@ class EAAProcedureScanner extends BaseScanner {
 
       // Look for "report issue" or "report problem" functionality
       const reportElements = document.querySelectorAll('a, button');
-      reportElements.forEach(element => {
+      reportElements.forEach((element) => {
         const text = element.textContent.toLowerCase();
-        if (text.includes('report') && (text.includes('issue') || text.includes('problem') ||
-            text.includes('bug') || text.includes('accessibility'))) {
+        if (
+          text.includes('report') &&
+          (text.includes('issue') ||
+            text.includes('problem') ||
+            text.includes('bug') ||
+            text.includes('accessibility'))
+        ) {
           feedbackFeatures.reportIssue = true;
           implemented = true;
         }
@@ -462,14 +501,21 @@ class EAAProcedureScanner extends BaseScanner {
       }
 
       // Look for response commitment
-      if (pageText.includes('respond') || pageText.includes('reply') ||
-          pageText.includes('within') || pageText.includes('business days')) {
+      if (
+        pageText.includes('respond') ||
+        pageText.includes('reply') ||
+        pageText.includes('within') ||
+        pageText.includes('business days')
+      ) {
         feedbackFeatures.responseCommitment = true;
       }
 
       // Look for public feedback or transparency
-      if (pageText.includes('public') && pageText.includes('feedback') ||
-          pageText.includes('transparent') || pageText.includes('open')) {
+      if (
+        (pageText.includes('public') && pageText.includes('feedback')) ||
+        pageText.includes('transparent') ||
+        pageText.includes('open')
+      ) {
         feedbackFeatures.publicFeedback = true;
       }
 
@@ -479,35 +525,36 @@ class EAAProcedureScanner extends BaseScanner {
     // Validate feedback process quality
     if (!feedbackAnalysis.implemented) {
       violations.push({
-        criterion: "EAA-Feedback",
+        criterion: 'EAA-Feedback',
         element: 'website',
         issue: 'no-feedback-process',
         description: 'No feedback process found for accessibility issues',
         severity: 'error',
-        suggestion: 'Implement feedback mechanism for users to report accessibility barriers'
+        suggestion: 'Implement feedback mechanism for users to report accessibility barriers',
       });
     } else {
       // Check for response commitment
       if (!feedbackAnalysis.feedbackFeatures.responseCommitment) {
         violations.push({
-          criterion: "EAA-Feedback",
+          criterion: 'EAA-Feedback',
           element: 'feedback process',
           issue: 'no-response-commitment',
           description: 'Feedback process lacks response time commitment',
           severity: 'warning',
-          suggestion: 'Specify response timeframe for accessibility feedback (e.g., within 5 business days)'
+          suggestion:
+            'Specify response timeframe for accessibility feedback (e.g., within 5 business days)',
         });
       }
 
       // Check for accessibility-specific feedback
       if (!feedbackAnalysis.feedbackFeatures.accessibilityFeedback) {
         violations.push({
-          criterion: "EAA-Feedback",
+          criterion: 'EAA-Feedback',
           element: 'feedback process',
           issue: 'no-accessibility-specific-feedback',
           description: 'No accessibility-specific feedback mechanism found',
           severity: 'warning',
-          suggestion: 'Provide dedicated feedback channel for accessibility-related issues'
+          suggestion: 'Provide dedicated feedback channel for accessibility-related issues',
         });
       }
     }
@@ -529,40 +576,57 @@ class EAAProcedureScanner extends BaseScanner {
         auditInformation: false,
         updateSchedule: false,
         improvementPlan: false,
-        publicReporting: false
+        publicReporting: false,
       };
 
       const pageText = document.body.textContent.toLowerCase();
 
       // Look for compliance monitoring statements
-      if (pageText.includes('compliance') && (pageText.includes('monitor') ||
-          pageText.includes('review') || pageText.includes('audit'))) {
+      if (
+        pageText.includes('compliance') &&
+        (pageText.includes('monitor') || pageText.includes('review') || pageText.includes('audit'))
+      ) {
         monitoringFeatures.complianceStatement = true;
         active = true;
       }
 
       // Look for audit information
-      if (pageText.includes('audit') || pageText.includes('assessment') ||
-          pageText.includes('evaluation')) {
+      if (
+        pageText.includes('audit') ||
+        pageText.includes('assessment') ||
+        pageText.includes('evaluation')
+      ) {
         monitoringFeatures.auditInformation = true;
         active = true;
       }
 
       // Look for update schedule
-      if (pageText.includes('schedule') || pageText.includes('regular') ||
-          pageText.includes('annually') || pageText.includes('quarterly')) {
+      if (
+        pageText.includes('schedule') ||
+        pageText.includes('regular') ||
+        pageText.includes('annually') ||
+        pageText.includes('quarterly')
+      ) {
         monitoringFeatures.updateSchedule = true;
       }
 
       // Look for improvement plan
-      if (pageText.includes('improvement') || pageText.includes('roadmap') ||
-          pageText.includes('plan') || pageText.includes('enhance')) {
+      if (
+        pageText.includes('improvement') ||
+        pageText.includes('roadmap') ||
+        pageText.includes('plan') ||
+        pageText.includes('enhance')
+      ) {
         monitoringFeatures.improvementPlan = true;
       }
 
       // Look for public reporting
-      if (pageText.includes('public') && (pageText.includes('report') ||
-          pageText.includes('transparency') || pageText.includes('progress'))) {
+      if (
+        pageText.includes('public') &&
+        (pageText.includes('report') ||
+          pageText.includes('transparency') ||
+          pageText.includes('progress'))
+      ) {
         monitoringFeatures.publicReporting = true;
       }
 
@@ -572,35 +636,35 @@ class EAAProcedureScanner extends BaseScanner {
     // Validate monitoring procedures
     if (!monitoringAnalysis.active) {
       violations.push({
-        criterion: "EAA-Monitoring",
+        criterion: 'EAA-Monitoring',
         element: 'website',
         issue: 'no-compliance-monitoring',
         description: 'No compliance monitoring procedures documented',
         severity: 'warning',
-        suggestion: 'Document accessibility compliance monitoring and review procedures'
+        suggestion: 'Document accessibility compliance monitoring and review procedures',
       });
     } else {
       // Check for improvement plan
       if (!monitoringAnalysis.monitoringFeatures.improvementPlan) {
         violations.push({
-          criterion: "EAA-Monitoring",
+          criterion: 'EAA-Monitoring',
           element: 'monitoring procedures',
           issue: 'no-improvement-plan',
           description: 'No accessibility improvement plan documented',
           severity: 'warning',
-          suggestion: 'Include accessibility improvement roadmap and planned enhancements'
+          suggestion: 'Include accessibility improvement roadmap and planned enhancements',
         });
       }
 
       // Check for update schedule
       if (!monitoringAnalysis.monitoringFeatures.updateSchedule) {
         violations.push({
-          criterion: "EAA-Monitoring",
+          criterion: 'EAA-Monitoring',
           element: 'monitoring procedures',
           issue: 'no-update-schedule',
           description: 'No regular review schedule for accessibility compliance',
           severity: 'warning',
-          suggestion: 'Establish and document regular accessibility review schedule'
+          suggestion: 'Establish and document regular accessibility review schedule',
         });
       }
     }
@@ -611,7 +675,6 @@ class EAAProcedureScanner extends BaseScanner {
   get needsExclusiveAccess() {
     return true;
   }
-
 }
 
 module.exports = EAAProcedureScanner;

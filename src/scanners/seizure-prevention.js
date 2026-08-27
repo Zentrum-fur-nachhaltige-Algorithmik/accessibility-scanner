@@ -15,7 +15,7 @@ class SeizurePreventionScanner extends BaseScanner {
       // the criterion invisible to the coverage matrix and to every
       // criterion-filtered harness. The scanner has always tested it.
       wcagCriteria: ['2.3.1', '2.3.2', '2.3.3'],
-      wcagPrinciple: 'operable'
+      wcagPrinciple: 'operable',
     });
   }
 
@@ -31,7 +31,7 @@ class SeizurePreventionScanner extends BaseScanner {
       testAnimationTriggers: true,
       testMotionSensitivity: true,
       observationTime: 10000,
-      timeout: 60000
+      timeout: 60000,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -45,17 +45,17 @@ class SeizurePreventionScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["9.2.3.1", "9.2.3.3"],
+      criteria: ['9.2.3.1', '9.2.3.3'],
       passed: seizureResults.violations.length === 0,
       violations: seizureResults.violations,
       summary: {
         noFlashingViolations: seizureResults.noFlashingViolations,
         animationTriggersControlled: seizureResults.animationTriggersControlled,
         motionSensitivitySupported: seizureResults.motionSensitivitySupported,
-        seizureRiskLevel: seizureResults.seizureRiskLevel
+        seizureRiskLevel: seizureResults.seizureRiskLevel,
       },
       screenshotPath: scanDir,
-      visualEvidence: seizureResults.visualEvidence
+      visualEvidence: seizureResults.visualEvidence,
     };
   }
 
@@ -78,7 +78,11 @@ class SeizurePreventionScanner extends BaseScanner {
 
     // 1. CRITICAL: Test for dangerous flashing content (WCAG 2.3.1)
     if (options.testFlashingContent) {
-      const flashingResults = await this.analyzeFlashingContent(page, violations, options.observationTime);
+      const flashingResults = await this.analyzeFlashingContent(
+        page,
+        violations,
+        options.observationTime
+      );
       noFlashingViolations = flashingResults.safe;
       seizureRiskLevel = flashingResults.riskLevel;
     }
@@ -103,7 +107,7 @@ class SeizurePreventionScanner extends BaseScanner {
       flashingSafe: noFlashingViolations,
       animationControlled: animationTriggersControlled,
       motionSensitive: motionSensitivitySupported,
-      safetyWarning: seizureRiskLevel === 'HIGH' ? 'DANGER: High seizure risk detected!' : null
+      safetyWarning: seizureRiskLevel === 'HIGH' ? 'DANGER: High seizure risk detected!' : null,
     });
 
     console.log(`🚨 Seizure prevention analysis complete: ${violations.length} violations found`);
@@ -115,7 +119,7 @@ class SeizurePreventionScanner extends BaseScanner {
       noFlashingViolations,
       animationTriggersControlled,
       motionSensitivitySupported,
-      seizureRiskLevel
+      seizureRiskLevel,
     };
   }
 
@@ -130,7 +134,7 @@ class SeizurePreventionScanner extends BaseScanner {
       window.flashDetectionData = {
         flashingElements: [],
         flashCounts: {},
-        startTime: Date.now()
+        startTime: Date.now(),
       };
 
       // SVG and MathML elements expose `className` as an SVGAnimatedString, not
@@ -142,9 +146,7 @@ class SeizurePreventionScanner extends BaseScanner {
       const safeClass = (el) => (typeof el.className === 'string' ? el.className : '');
       const safeSelector = (el) => {
         const cls = safeClass(el).trim().split(/\s+/).filter(Boolean)[0];
-        return el.tagName.toLowerCase() +
-               (el.id ? `#${el.id}` : '') +
-               (cls ? `.${cls}` : '');
+        return el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') + (cls ? `.${cls}` : '');
       };
       window.__seizureSafeClass = safeClass;
       window.__seizureSafeSelector = safeSelector;
@@ -158,15 +160,15 @@ class SeizurePreventionScanner extends BaseScanner {
 
           const elementKey = `element_${index}`;
           const computedStyle = window.getComputedStyle(element);
-          
+
           // Check for CSS animations that might cause flashing
           const animationName = computedStyle.animationName;
           const animationDuration = parseFloat(computedStyle.animationDuration) || 0;
           const animationIterationCount = computedStyle.animationIterationCount;
-          
+
           if (animationName !== 'none' && animationDuration > 0) {
             const flashFrequency = 1 / animationDuration; // flashes per second
-            
+
             // CRITICAL: Check for dangerous flash rates (>3 Hz is seizure risk)
             if (flashFrequency > 3 || animationIterationCount === 'infinite') {
               window.flashDetectionData.flashingElements.push({
@@ -176,11 +178,11 @@ class SeizurePreventionScanner extends BaseScanner {
                 frequency: flashFrequency,
                 duration: animationDuration,
                 selector: safeSelector(element),
-                riskLevel: flashFrequency > 3 ? 'HIGH' : 'MEDIUM'
+                riskLevel: flashFrequency > 3 ? 'HIGH' : 'MEDIUM',
               });
             }
           }
-          
+
           // Monitor for class changes that might indicate flashing
           if (safeClass(element).includes('flash') || safeClass(element).includes('blink')) {
             window.flashDetectionData.flashingElements.push({
@@ -189,27 +191,27 @@ class SeizurePreventionScanner extends BaseScanner {
               type: 'css-class',
               className: safeClass(element),
               selector: safeSelector(element),
-              riskLevel: 'HIGH' // Assume high risk for explicit flashing classes
+              riskLevel: 'HIGH', // Assume high risk for explicit flashing classes
             });
           }
-          
+
           element.flashMonitor = true;
         });
       };
-      
+
       // Initial scan
       observeFlashing();
-      
+
       // Monitor for new elements
       const observer = new MutationObserver(observeFlashing);
       observer.observe(document.body, { childList: true, subtree: true });
-      
+
       window.flashObserver = observer;
     });
 
     // Wait and observe for flashing content
     console.log(`Observing page for ${observationTime}ms to detect flashing...`);
-    await new Promise(resolve => setTimeout(resolve, observationTime));
+    await new Promise((resolve) => setTimeout(resolve, observationTime));
 
     // Analyze detected flashing
     const flashingAnalysis = await page.evaluate(() => {
@@ -223,8 +225,8 @@ class SeizurePreventionScanner extends BaseScanner {
       }
 
       const flashData = window.flashDetectionData;
-      
-      flashData.flashingElements.forEach(flashElement => {
+
+      flashData.flashingElements.forEach((flashElement) => {
         // CRITICAL: Check for dangerous flash frequencies
         if (flashElement.frequency && flashElement.frequency > 3) {
           issues.push({
@@ -234,60 +236,62 @@ class SeizurePreventionScanner extends BaseScanner {
             animationName: flashElement.animationName,
             description: `DANGER: Flashing at ${flashElement.frequency.toFixed(2)} Hz exceeds safe limit of 3 Hz`,
             severity: 'critical',
-            riskLevel: 'HIGH'
+            riskLevel: 'HIGH',
           });
           safe = false;
           riskLevel = 'HIGH';
         }
-        
+
         // Check for CSS-based flashing
         if (flashElement.type === 'css-class') {
           issues.push({
             type: 'css-flashing-class',
             element: flashElement.selector,
-            className: (typeof flashElement.className === 'string' ? flashElement.className : ''),
+            className: typeof flashElement.className === 'string' ? flashElement.className : '',
             description: 'Element uses CSS class indicating flashing/blinking behavior',
             severity: 'error',
-            riskLevel: 'HIGH'
+            riskLevel: 'HIGH',
           });
           safe = false;
           if (riskLevel !== 'HIGH') riskLevel = 'MEDIUM';
         }
-        
+
         // Check for infinite animations that could be problematic
-        if (flashElement.animationIterationCount === 'infinite' && 
-            flashElement.frequency > 1) {
+        if (flashElement.animationIterationCount === 'infinite' && flashElement.frequency > 1) {
           issues.push({
             type: 'infinite-animation-risk',
             element: flashElement.selector,
             frequency: flashElement.frequency,
             description: 'Infinite animation with potential seizure risk',
             severity: 'warning',
-            riskLevel: 'MEDIUM'
+            riskLevel: 'MEDIUM',
           });
           if (riskLevel === 'LOW') riskLevel = 'MEDIUM';
         }
       });
 
       // Check for red flashing specifically (highest seizure risk)
-      const redFlashElements = document.querySelectorAll('[style*="red"], [class*="red"], [class*="error"]');
-      redFlashElements.forEach(element => {
+      const redFlashElements = document.querySelectorAll(
+        '[style*="red"], [class*="red"], [class*="error"]'
+      );
+      redFlashElements.forEach((element) => {
         const computedStyle = window.getComputedStyle(element);
         const animationName = computedStyle.animationName;
-        
+
         if (animationName !== 'none') {
           // className is an SVGAnimatedString on SVG/MathML elements.
           const cls = typeof element.className === 'string' ? element.className : '';
-          const selector = element.tagName.toLowerCase() +
-                          (element.id ? `#${element.id}` : '') +
-                          (cls.trim() ? `.${cls.trim().split(/\s+/)[0]}` : '');
-          
+          const selector =
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (cls.trim() ? `.${cls.trim().split(/\s+/)[0]}` : '');
+
           issues.push({
             type: 'red-flashing-content',
             element: selector,
             description: 'CRITICAL: Red flashing content detected - highest seizure risk',
             severity: 'critical',
-            riskLevel: 'HIGH'
+            riskLevel: 'HIGH',
           });
           safe = false;
           riskLevel = 'HIGH';
@@ -298,9 +302,9 @@ class SeizurePreventionScanner extends BaseScanner {
     });
 
     // Create violations for flashing content - CRITICAL PRIORITY
-    flashingAnalysis.issues.forEach(issue => {
+    flashingAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.3.1",
+        criterion: '9.2.3.1',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
@@ -308,15 +312,18 @@ class SeizurePreventionScanner extends BaseScanner {
         severity: issue.severity,
         riskLevel: issue.riskLevel,
         suggestion: this.getFlashingSuggestion(issue.type),
-        safetyWarning: issue.severity === 'critical' ? '⚠️ IMMEDIATE ACTION REQUIRED - SEIZURE RISK' : null
+        safetyWarning:
+          issue.severity === 'critical' ? '⚠️ IMMEDIATE ACTION REQUIRED - SEIZURE RISK' : null,
       });
     });
 
-    console.log(`🚨 Flashing analysis complete: ${flashingAnalysis.issues.length} issues, Risk: ${flashingAnalysis.riskLevel}`);
+    console.log(
+      `🚨 Flashing analysis complete: ${flashingAnalysis.issues.length} issues, Risk: ${flashingAnalysis.riskLevel}`
+    );
 
-    return { 
-      safe: flashingAnalysis.safe, 
-      riskLevel: flashingAnalysis.riskLevel 
+    return {
+      safe: flashingAnalysis.safe,
+      riskLevel: flashingAnalysis.riskLevel,
     };
   }
 
@@ -332,36 +339,42 @@ class SeizurePreventionScanner extends BaseScanner {
 
       // Check for prefers-reduced-motion support
       const supportsReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      
+
       // Look for elements that trigger animations on interaction
-      const interactiveElements = document.querySelectorAll('button, [role="button"], a[href], input, [onclick], [onmouseover], [onfocus]');
-      
-      interactiveElements.forEach(element => {
+      const interactiveElements = document.querySelectorAll(
+        'button, [role="button"], a[href], input, [onclick], [onmouseover], [onfocus]'
+      );
+
+      interactiveElements.forEach((element) => {
         // className is an SVGAnimatedString on SVG/MathML elements — an inline
         // <svg> inside a <button> would otherwise throw and abort this sweep.
         const cls = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (cls.trim() ? `.${cls.trim().split(/\s+/)[0]}` : '')
+          selector:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (cls.trim() ? `.${cls.trim().split(/\s+/)[0]}` : ''),
         };
 
         // Check for hover/focus animations
-        const hasHoverAnimation = element.style.transition !== '' ||
-                                cls.includes('hover') ||
-                                cls.includes('animate');
+        const hasHoverAnimation =
+          element.style.transition !== '' || cls.includes('hover') || cls.includes('animate');
 
         if (hasHoverAnimation) {
           // Check if animation respects prefers-reduced-motion
-          const respectsMotionPreference = element.style.transition.includes('prefers-reduced-motion') ||
-                                          document.querySelector('style')?.textContent.includes('@media (prefers-reduced-motion: reduce)');
+          const respectsMotionPreference =
+            element.style.transition.includes('prefers-reduced-motion') ||
+            document
+              .querySelector('style')
+              ?.textContent.includes('@media (prefers-reduced-motion: reduce)');
 
           if (!respectsMotionPreference) {
             issues.push({
               type: 'animation-no-motion-preference',
               element: elementInfo.selector,
-              description: 'Interactive animation does not respect prefers-reduced-motion preference',
-              severity: 'warning'
+              description:
+                'Interactive animation does not respect prefers-reduced-motion preference',
+              severity: 'warning',
             });
           }
         }
@@ -369,22 +382,25 @@ class SeizurePreventionScanner extends BaseScanner {
         // Check for onclick animations that might be jarring
         if (element.hasAttribute('onclick')) {
           const onclickCode = element.getAttribute('onclick');
-          const hasAnimationTrigger = onclickCode.includes('animate') ||
-                                     onclickCode.includes('transition') ||
-                                     onclickCode.includes('transform');
+          const hasAnimationTrigger =
+            onclickCode.includes('animate') ||
+            onclickCode.includes('transition') ||
+            onclickCode.includes('transform');
 
           if (hasAnimationTrigger) {
             // Look for animation controls or motion preference handling
-            const hasMotionControls = document.querySelector('[type="checkbox"][id*="motion"]') ||
-                                     document.querySelector('[type="checkbox"][id*="animation"]') ||
-                                     document.querySelector('button[aria-label*="motion"]');
+            const hasMotionControls =
+              document.querySelector('[type="checkbox"][id*="motion"]') ||
+              document.querySelector('[type="checkbox"][id*="animation"]') ||
+              document.querySelector('button[aria-label*="motion"]');
 
             if (!hasMotionControls) {
               issues.push({
                 type: 'interaction-animation-no-controls',
                 element: elementInfo.selector,
-                description: 'Interactive animation lacks user controls or motion preference support',
-                severity: 'warning'
+                description:
+                  'Interactive animation lacks user controls or motion preference support',
+                severity: 'warning',
               });
               controlled = false;
             }
@@ -395,12 +411,12 @@ class SeizurePreventionScanner extends BaseScanner {
       // Check for CSS animations triggered by :hover, :focus, :active
       const styleSheets = Array.from(document.styleSheets);
       let hasMotionSafeCSS = false;
-      
+
       try {
-        styleSheets.forEach(sheet => {
+        styleSheets.forEach((sheet) => {
           try {
             const rules = Array.from(sheet.cssRules || sheet.rules || []);
-            rules.forEach(rule => {
+            rules.forEach((rule) => {
               if (rule.selectorText && rule.selectorText.includes('prefers-reduced-motion')) {
                 hasMotionSafeCSS = true;
               }
@@ -414,14 +430,16 @@ class SeizurePreventionScanner extends BaseScanner {
       }
 
       // Check if page has interactive animations but no motion preferences
-      const hasInteractiveAnimations = document.querySelectorAll('[class*="animate"], [style*="transition"], [style*="transform"]').length > 0;
-      
+      const hasInteractiveAnimations =
+        document.querySelectorAll('[class*="animate"], [style*="transition"], [style*="transform"]')
+          .length > 0;
+
       if (hasInteractiveAnimations && !hasMotionSafeCSS) {
         issues.push({
           type: 'no-reduced-motion-support',
           element: 'document',
           description: 'Page has animations but does not support prefers-reduced-motion',
-          severity: 'warning'
+          severity: 'warning',
         });
       }
 
@@ -429,14 +447,14 @@ class SeizurePreventionScanner extends BaseScanner {
     });
 
     // Create violations for animation interaction issues
-    animationAnalysis.issues.forEach(issue => {
+    animationAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.3.3",
+        criterion: '9.2.3.3',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getAnimationSuggestion(issue.type)
+        suggestion: this.getAnimationSuggestion(issue.type),
       });
     });
 
@@ -456,24 +474,32 @@ class SeizurePreventionScanner extends BaseScanner {
       // Check for vestibular disorder considerations
       const motionKeywords = ['scroll', 'parallax', 'zoom', 'spin', 'rotate', 'tilt'];
       const pageText = document.body.textContent.toLowerCase();
-      
-      const hasMotionEffects = motionKeywords.some(keyword => 
-        pageText.includes(keyword) || 
-        document.querySelector(`[class*="${keyword}"]`) ||
-        document.querySelector(`[id*="${keyword}"]`)
+
+      const hasMotionEffects = motionKeywords.some(
+        (keyword) =>
+          pageText.includes(keyword) ||
+          document.querySelector(`[class*="${keyword}"]`) ||
+          document.querySelector(`[id*="${keyword}"]`)
       );
 
       if (hasMotionEffects) {
         // Look for motion reduction controls
-        const motionControls = document.querySelectorAll('input[type="checkbox"], button, [role="switch"]');
+        const motionControls = document.querySelectorAll(
+          'input[type="checkbox"], button, [role="switch"]'
+        );
         let hasMotionToggle = false;
 
-        motionControls.forEach(control => {
-          const controlText = control.textContent.toLowerCase() + 
-                            (control.getAttribute('aria-label') || '').toLowerCase();
-          
-          if (controlText.includes('motion') || controlText.includes('animation') ||
-              controlText.includes('parallax') || controlText.includes('scroll')) {
+        motionControls.forEach((control) => {
+          const controlText =
+            control.textContent.toLowerCase() +
+            (control.getAttribute('aria-label') || '').toLowerCase();
+
+          if (
+            controlText.includes('motion') ||
+            controlText.includes('animation') ||
+            controlText.includes('parallax') ||
+            controlText.includes('scroll')
+          ) {
             hasMotionToggle = true;
           }
         });
@@ -483,24 +509,24 @@ class SeizurePreventionScanner extends BaseScanner {
             type: 'motion-effects-no-toggle',
             element: 'document',
             description: 'Motion effects detected without user controls to disable them',
-            severity: 'warning'
+            severity: 'warning',
           });
           supported = false;
         }
 
         // Check for CSS prefers-reduced-motion support
         const reducedMotionSupport = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        
+
         if (!reducedMotionSupport) {
           // Check if CSS actually implements reduced motion
           const styleSheets = Array.from(document.styleSheets);
           let implementsReducedMotion = false;
-          
+
           try {
-            styleSheets.forEach(sheet => {
+            styleSheets.forEach((sheet) => {
               try {
                 const rules = Array.from(sheet.cssRules || []);
-                rules.forEach(rule => {
+                rules.forEach((rule) => {
                   if (rule.media && rule.media.mediaText.includes('prefers-reduced-motion')) {
                     implementsReducedMotion = true;
                   }
@@ -517,8 +543,9 @@ class SeizurePreventionScanner extends BaseScanner {
             issues.push({
               type: 'no-reduced-motion-css',
               element: 'document',
-              description: 'Motion effects present but prefers-reduced-motion not implemented in CSS',
-              severity: 'warning'
+              description:
+                'Motion effects present but prefers-reduced-motion not implemented in CSS',
+              severity: 'warning',
             });
           }
         }
@@ -528,14 +555,14 @@ class SeizurePreventionScanner extends BaseScanner {
     });
 
     // Create violations for motion sensitivity issues
-    motionAnalysis.issues.forEach(issue => {
+    motionAnalysis.issues.forEach((issue) => {
       violations.push({
-        criterion: "9.2.3.3",
+        criterion: '9.2.3.3',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
         severity: issue.severity,
-        suggestion: this.getMotionSensitivitySuggestion(issue.type)
+        suggestion: this.getMotionSensitivitySuggestion(issue.type),
       });
     });
 
@@ -547,10 +574,14 @@ class SeizurePreventionScanner extends BaseScanner {
    */
   getFlashingSuggestion(violationType) {
     const suggestions = {
-      'dangerous-flash-frequency': '🚨 CRITICAL: Remove or reduce flashing to under 3 Hz immediately - SEIZURE RISK',
-      'css-flashing-class': '🚨 Remove CSS flashing/blinking classes - replace with static alternatives',
-      'infinite-animation-risk': 'Limit animation duration or provide pause controls for infinite animations',
-      'red-flashing-content': '🚨 CRITICAL: Remove red flashing content immediately - highest seizure risk'
+      'dangerous-flash-frequency':
+        '🚨 CRITICAL: Remove or reduce flashing to under 3 Hz immediately - SEIZURE RISK',
+      'css-flashing-class':
+        '🚨 Remove CSS flashing/blinking classes - replace with static alternatives',
+      'infinite-animation-risk':
+        'Limit animation duration or provide pause controls for infinite animations',
+      'red-flashing-content':
+        '🚨 CRITICAL: Remove red flashing content immediately - highest seizure risk',
     };
     return suggestions[violationType] || '🚨 Review flashing content for seizure safety';
   }
@@ -560,9 +591,10 @@ class SeizurePreventionScanner extends BaseScanner {
    */
   getAnimationSuggestion(violationType) {
     const suggestions = {
-      'animation-no-motion-preference': 'Implement @media (prefers-reduced-motion: reduce) to disable animations',
+      'animation-no-motion-preference':
+        'Implement @media (prefers-reduced-motion: reduce) to disable animations',
       'interaction-animation-no-controls': 'Add user controls to disable interactive animations',
-      'no-reduced-motion-support': 'Implement CSS prefers-reduced-motion media query support'
+      'no-reduced-motion-support': 'Implement CSS prefers-reduced-motion media query support',
     };
     return suggestions[violationType] || 'Provide user controls for motion-triggered animations';
   }
@@ -572,12 +604,13 @@ class SeizurePreventionScanner extends BaseScanner {
    */
   getMotionSensitivitySuggestion(violationType) {
     const suggestions = {
-      'motion-effects-no-toggle': 'Add user controls to disable motion effects for vestibular disorder support',
-      'no-reduced-motion-css': 'Implement @media (prefers-reduced-motion: reduce) CSS rules to disable motion'
+      'motion-effects-no-toggle':
+        'Add user controls to disable motion effects for vestibular disorder support',
+      'no-reduced-motion-css':
+        'Implement @media (prefers-reduced-motion: reduce) CSS rules to disable motion',
     };
     return suggestions[violationType] || 'Provide motion sensitivity controls for accessibility';
   }
-
 }
 
 module.exports = SeizurePreventionScanner;

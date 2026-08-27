@@ -163,7 +163,7 @@ function mentions(violations, needle) {
 const FIXTURES = [
   {
     file: 'own-audit-ui.html',
-    source: 'http://localhost:3111/audit (this repo\'s own Next.js frontend)',
+    source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
     // observed 2026-07-27: 28 total ensemble violations (profile=standard, --no-llm);
     // also observed 32 on an earlier run — run-to-run drift is normal.
     // Band is deliberately wide — a crash/explosion alarm, not a baseline.
@@ -201,8 +201,12 @@ const FIXTURES = [
         check: ({ violations }) => {
           const hits = mentions(violations, 'next-route-announcer');
           if (hits.length === 0) return null;
-          return `${hits.length} violation(s) flag the Next.js route announcer: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `${hits.length} violation(s) flag the Next.js route announcer: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -222,8 +226,12 @@ const FIXTURES = [
             prose: ['label', 'accessible name', 'name'],
           }).filter((v) => !selectorText(v).includes('#url-'));
           if (hits.length === 0) return null;
-          return `input#url (which HAS <label for="url">) flagged: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `input#url (which HAS <label for="url">) flagged: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -246,7 +254,9 @@ const FIXTURES = [
         // language (or to flag a child lang that contradicts <html lang>),
         // this turns green on its own.
         check: ({ violations }) => {
-          const hits = findViolations(violations, { id: ['3.1.1', '3.1.2', 'html-lang', 'valid-lang', 'html-has-lang'] });
+          const hits = findViolations(violations, {
+            id: ['3.1.1', '3.1.2', 'html-lang', 'valid-lang', 'html-has-lang'],
+          });
           if (hits.length > 0) return null;
           return 'no 3.1.1/3.1.2 language violation reported despite lang="de" on an all-English page';
         },
@@ -297,8 +307,12 @@ const FIXTURES = [
             selector: 'brand__logo',
           });
           if (hits.length === 0) return null;
-          return `logo img (alt="Dr. Julian Mauermann – Facharzt für Urologie") flagged: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `logo img (alt="Dr. Julian Mauermann – Facharzt für Urologie") flagged: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -312,8 +326,12 @@ const FIXTURES = [
             id: ['html-has-lang', 'html-lang-valid', '3.1.1'],
           });
           if (hits.length === 0) return null;
-          return `page-language flagged despite a correct <html lang="de">: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `page-language flagged despite a correct <html lang="de">: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
     ],
@@ -344,7 +362,8 @@ const FIXTURES = [
           const s = scanners['axe-core'];
           if (!s) return 'axe-core missing from results entirely';
           if (s.error) return `axe-core returned error: ${s.error}`;
-          if (!s.violationCount) return 'axe-core reported 0 violations — suspicious silent-zero on a dead-iframe page';
+          if (!s.violationCount)
+            return 'axe-core reported 0 violations — suspicious silent-zero on a dead-iframe page';
           return null;
         },
       },
@@ -404,8 +423,12 @@ const FIXTURES = [
             selector: 'framer-1jpi8d1',
           });
           if (hits.length === 0) return null;
-          return `logo link (named by <img alt="Logo">) flagged as unnamed: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `logo link (named by <img alt="Logo">) flagged as unnamed: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
     ],
@@ -456,10 +479,18 @@ const FIXTURES = [
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['html-has-lang', 'html-lang-valid', '3.1.1'],
-          }).filter((v) => /(^|[\s|>])html($|[\s|.:[])/i.test(selectorText(v)) || selectorText(v).trim() === 'html');
+          }).filter(
+            (v) =>
+              /(^|[\s|>])html($|[\s|.:[])/i.test(selectorText(v)) ||
+              selectorText(v).trim() === 'html'
+          );
           if (hits.length === 0) return null;
-          return `page-language flagged despite a correct <html lang="de">: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `page-language flagged despite a correct <html lang="de">: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -483,13 +514,20 @@ const FIXTURES = [
         // as 3.1.1 "Invalid lang attribute value", there as 3.1.2 "Element has
         // invalid language code". Both are asserted so a partial fix is visible.
         check: ({ violations }) => {
-          const hits = violations.filter((v) =>
-            /"(arz|bcl|ckb|gpe|new|rki|wuu|yue|ast|dsb|hsb)"/i.test(`${v.issue || ''} ${v.description || ''}`) &&
-            /invalid/i.test(`${v.issue || ''} ${v.description || ''}`)
+          const hits = violations.filter(
+            (v) =>
+              /"(arz|bcl|ckb|gpe|new|rki|wuu|yue|ast|dsb|hsb)"/i.test(
+                `${v.issue || ''} ${v.description || ''}`
+              ) && /invalid/i.test(`${v.issue || ''} ${v.description || ''}`)
           );
           if (hits.length === 0) return null;
-          return `${hits.length} valid ISO 639-3 subtag(s) reported as invalid: ` +
-            hits.slice(0, 6).map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `${hits.length} valid ISO 639-3 subtag(s) reported as invalid: ` +
+            hits
+              .slice(0, 6)
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -500,12 +538,16 @@ const FIXTURES = [
         // (2 occurrences). A correctly declared inline language change must not
         // be reported as a WCAG 3.1.2 "language of parts" violation.
         check: ({ violations }) => {
-          const hits = findViolations(violations, { id: ['3.1.2'] }).filter((v) =>
-            /commons/i.test(selectorText(v)) || /commons/i.test(proseText(v))
+          const hits = findViolations(violations, { id: ['3.1.2'] }).filter(
+            (v) => /commons/i.test(selectorText(v)) || /commons/i.test(proseText(v))
           );
           if (hits.length === 0) return null;
-          return `correctly-marked <span lang="en">Commons</span> flagged as a 3.1.2 violation: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `correctly-marked <span lang="en">Commons</span> flagged as a 3.1.2 violation: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -578,8 +620,12 @@ const FIXTURES = [
             selector: 'm24-c-menu-item-icon',
           });
           if (hits.length === 0) return null;
-          return `decorative alt="" menu icons flagged as missing alt: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `decorative alt="" menu icons flagged as missing alt: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -603,8 +649,15 @@ const FIXTURES = [
             prose: ['empty heading', 'heading element is empty', 'heading "[empty]"'],
           }).filter((v) => /(^|[^a-z])h2/i.test(selectorText(v)));
           if (hits.length === 0) return null;
-          return `the only text-empty h2 (named by <img alt="Mozilla Anzeigen">) flagged as an empty heading: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${selectorText(v)} :: ${v.description || v.issue}`).join('; ');
+          return (
+            `the only text-empty h2 (named by <img alt="Mozilla Anzeigen">) flagged as an empty heading: ` +
+            hits
+              .map(
+                (v) =>
+                  `[${v.scannerId}/${v.ruleId || v.criterion}] ${selectorText(v)} :: ${v.description || v.issue}`
+              )
+              .join('; ')
+          );
         },
       },
       {
@@ -626,8 +679,12 @@ const FIXTURES = [
             selector: 'm24-c-navigation-logo-link',
           });
           if (hits.length === 0) return null;
-          return `logo link (named by <img alt="Mozilla">) flagged as unnamed: ` +
-            hits.map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `logo link (named by <img alt="Mozilla">) flagged as unnamed: ` +
+            hits
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
       {
@@ -645,15 +702,22 @@ const FIXTURES = [
         // (e.g. by only accepting 2-letter ISO 639-1 codes) is a false positive.
         check: ({ violations }) => {
           const hits = violations.filter(
-            (v) => /invalid.*(language|lang).*(code|tag)|language code/i.test(
-              `${v.issue || ''} ${v.description || ''} ${v.ruleId || ''}`
-            ) && /"(ast|cak|dsb|hsb|lij|skr|trs|kab|sco|gpe)"/i.test(
-              `${v.issue || ''} ${v.description || ''}`
-            )
+            (v) =>
+              /invalid.*(language|lang).*(code|tag)|language code/i.test(
+                `${v.issue || ''} ${v.description || ''} ${v.ruleId || ''}`
+              ) &&
+              /"(ast|cak|dsb|hsb|lij|skr|trs|kab|sco|gpe)"/i.test(
+                `${v.issue || ''} ${v.description || ''}`
+              )
           );
           if (hits.length === 0) return null;
-          return `${hits.length} valid ISO 639-3 subtag(s) reported as invalid language codes: ` +
-            hits.slice(0, 5).map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`).join('; ');
+          return (
+            `${hits.length} valid ISO 639-3 subtag(s) reported as invalid language codes: ` +
+            hits
+              .slice(0, 5)
+              .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
+              .join('; ')
+          );
         },
       },
     ],
@@ -674,7 +738,12 @@ function startServer(dir) {
     const rel = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '');
     const filePath = path.join(dir, rel);
     // Refuse to escape the fixture directory.
-    if (!filePath.startsWith(dir) || !rel || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    if (
+      !filePath.startsWith(dir) ||
+      !rel ||
+      !fs.existsSync(filePath) ||
+      !fs.statSync(filePath).isFile()
+    ) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not found');
       return;
@@ -698,7 +767,9 @@ function parseArgs(argv) {
     else if (argv[i] === '--only') out.only = argv[++i];
     else if (argv[i] === '--no-llm') out.noLlm = true;
     else if (argv[i] === '--help' || argv[i] === '-h') {
-      console.log('Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>]');
+      console.log(
+        'Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>]'
+      );
       process.exit(0);
     }
   }
@@ -719,7 +790,12 @@ async function scanFile(url, scannerIds, scanOptions) {
   let timer;
   const timeoutPromise = new Promise((_, rej) => {
     timer = setTimeout(
-      () => rej(new Error(`WALL-CLOCK TIMEOUT after ${PER_FILE_TIMEOUT_MS}ms — treated as a hang, not a soft skip`)),
+      () =>
+        rej(
+          new Error(
+            `WALL-CLOCK TIMEOUT after ${PER_FILE_TIMEOUT_MS}ms — treated as a hang, not a soft skip`
+          )
+        ),
       PER_FILE_TIMEOUT_MS
     );
   });
@@ -754,13 +830,16 @@ async function main() {
   // and the crash it is quarantined for must stay visible until it is fixed.
   // Running only the proven set here would make this harness blind to the
   // failures it exists to catch.
-  const { scannerIds: profileIds, options: profileOptions } =
-    getProfile(PROFILE, { includeExperimental: true });
-  const scannerIds = profileIds && args.noLlm ? profileIds.filter((id) => !id.startsWith('llm-')) : profileIds;
+  const { scannerIds: profileIds, options: profileOptions } = getProfile(PROFILE, {
+    includeExperimental: true,
+  });
+  const scannerIds =
+    profileIds && args.noLlm ? profileIds.filter((id) => !id.startsWith('llm-')) : profileIds;
 
   let fixtures = FIXTURES.filter((f) => fs.existsSync(path.join(FIXTURE_DIR, f.file)));
   const missing = FIXTURES.filter((f) => !fs.existsSync(path.join(FIXTURE_DIR, f.file)));
-  if (args.only) fixtures = fixtures.filter((f) => f.file === args.only || f.file === `${args.only}.html`);
+  if (args.only)
+    fixtures = fixtures.filter((f) => f.file === args.only || f.file === `${args.only}.html`);
 
   if (fixtures.length === 0) {
     console.error(`No fixtures to run. Did you run: node scripts/capture-realworld.js ?`);
@@ -769,7 +848,9 @@ async function main() {
 
   const { server, port } = await startServer(FIXTURE_DIR);
   console.log(`Serving ${FIXTURE_DIR} on http://localhost:${port}`);
-  console.log(`Profile: ${PROFILE} | LLM scanners: ${llmEnabled ? 'ENABLED' : 'disabled'} | fixtures: ${fixtures.length}\n`);
+  console.log(
+    `Profile: ${PROFILE} | LLM scanners: ${llmEnabled ? 'ENABLED' : 'disabled'} | fixtures: ${fixtures.length}\n`
+  );
 
   const report = {
     startedAt: new Date().toISOString(),
@@ -839,7 +920,12 @@ async function main() {
       const s = scanners[id];
       if (!s) {
         entry.missingScanners.push(id);
-        failures.push({ layer: 'no-crash', file: fx.file, scanner: id, detail: 'scanner missing from results entirely' });
+        failures.push({
+          layer: 'no-crash',
+          file: fx.file,
+          scanner: id,
+          detail: 'scanner missing from results entirely',
+        });
       } else if (s.error) {
         entry.scannerErrors.push({ scanner: id, error: s.error });
         failures.push({ layer: 'no-crash', file: fx.file, scanner: id, detail: s.error });
@@ -848,15 +934,28 @@ async function main() {
     // The pipeline records a scanner that threw before identifying itself under
     // the id 'unknown'. That is still a crash and must not slip through.
     if (scanners.unknown) {
-      entry.scannerErrors.push({ scanner: 'unknown', error: scanners.unknown.error || 'unidentified scanner failure' });
-      failures.push({ layer: 'no-crash', file: fx.file, scanner: 'unknown', detail: scanners.unknown.error || 'unidentified scanner failure' });
+      entry.scannerErrors.push({
+        scanner: 'unknown',
+        error: scanners.unknown.error || 'unidentified scanner failure',
+      });
+      failures.push({
+        layer: 'no-crash',
+        file: fx.file,
+        scanner: 'unknown',
+        detail: scanners.unknown.error || 'unidentified scanner failure',
+      });
     }
 
     // LLM scanners: crash-only assertion, results must be an array.
     for (const [id, s] of Object.entries(scanners)) {
       if (!id.startsWith('llm-')) continue;
       if (typeof s.violationCount !== 'number') {
-        failures.push({ layer: 'no-crash', file: fx.file, scanner: id, detail: 'LLM scanner did not return a violations array' });
+        failures.push({
+          layer: 'no-crash',
+          file: fx.file,
+          scanner: id,
+          detail: 'LLM scanner did not return a violations array',
+        });
       }
     }
 
@@ -894,17 +993,20 @@ async function main() {
     // Slowness is reported, never swallowed — see PER_FILE_TIMEOUT_MS.
     entry.slow = elapsedMs > SLOW_FILE_MS;
 
-    entry.noise = noise.filter((l) => /error|fail|cannot|undefined|not ready/i.test(l)).slice(0, 40);
+    entry.noise = noise
+      .filter((l) => /error|fail|cannot|undefined|not ready/i.test(l))
+      .slice(0, 40);
     report.files.push(entry);
 
     const stOk = entry.spotTruths.filter((s) => s.ok).length;
     realLog(
       `  ${violations.length} violations | ${entry.scannerCount}/${entry.expectedScannerCount} scanners | ` +
-      `${entry.scannerErrors.length} errors | spot-truths ${stOk}/${entry.spotTruths.length} | ${(elapsedMs / 1000).toFixed(1)}s`
+        `${entry.scannerErrors.length} errors | spot-truths ${stOk}/${entry.spotTruths.length} | ${(elapsedMs / 1000).toFixed(1)}s`
     );
     for (const e of entry.scannerErrors) realLog(`    SCANNER ERROR  ${e.scanner}: ${e.error}`);
     for (const m of entry.missingScanners) realLog(`    SCANNER MISSING ${m}`);
-    for (const s of entry.spotTruths.filter((x) => !x.ok)) realLog(`    SPOT-TRUTH FAIL ${s.name}: ${s.detail}`);
+    for (const s of entry.spotTruths.filter((x) => !x.ok))
+      realLog(`    SPOT-TRUTH FAIL ${s.name}: ${s.detail}`);
   }
 
   // ---- summary ----
@@ -916,38 +1018,55 @@ async function main() {
   console.log(`profile=${PROFILE}  llm=${llmEnabled ? 'on' : 'off'}  fixtures=${fixtures.length}`);
   console.log('');
   console.log(
-    'file'.padEnd(26) + 'viol'.padStart(6) + '  ' + 'band'.padEnd(14) +
-    'scanners'.padStart(10) + 'errors'.padStart(8) + 'spot'.padStart(7) + 'time'.padStart(9)
+    'file'.padEnd(26) +
+      'viol'.padStart(6) +
+      '  ' +
+      'band'.padEnd(14) +
+      'scanners'.padStart(10) +
+      'errors'.padStart(8) +
+      'spot'.padStart(7) +
+      'time'.padStart(9)
   );
   console.log('-'.repeat(82));
   for (const f of report.files) {
-    const band = f.band ? `[${f.band[0]}-${f.band[1]}]${f.bandOk === false ? ' X' : ''}` : '(recording)';
-    const spot = f.spotTruths.length ? `${f.spotTruths.filter((s) => s.ok).length}/${f.spotTruths.length}` : '-';
+    const band = f.band
+      ? `[${f.band[0]}-${f.band[1]}]${f.bandOk === false ? ' X' : ''}`
+      : '(recording)';
+    const spot = f.spotTruths.length
+      ? `${f.spotTruths.filter((s) => s.ok).length}/${f.spotTruths.length}`
+      : '-';
     console.log(
       f.file.padEnd(26) +
-      String(f.totalViolations == null ? 'HANG' : f.totalViolations).padStart(6) + '  ' +
-      band.padEnd(14) +
-      `${f.scannerCount ?? '-'}/${f.expectedScannerCount ?? '-'}`.padStart(10) +
-      String(f.scannerErrors.length + f.missingScanners.length).padStart(8) +
-      spot.padStart(7) +
-      `${(f.elapsedMs / 1000).toFixed(1)}s`.padStart(9)
+        String(f.totalViolations == null ? 'HANG' : f.totalViolations).padStart(6) +
+        '  ' +
+        band.padEnd(14) +
+        `${f.scannerCount ?? '-'}/${f.expectedScannerCount ?? '-'}`.padStart(10) +
+        String(f.scannerErrors.length + f.missingScanners.length).padStart(8) +
+        spot.padStart(7) +
+        `${(f.elapsedMs / 1000).toFixed(1)}s`.padStart(9)
     );
   }
   console.log('-'.repeat(82));
 
   if (missing.length) {
-    console.log(`\nMISSING FIXTURES (run capture-realworld.js): ${missing.map((m) => m.file).join(', ')}`);
+    console.log(
+      `\nMISSING FIXTURES (run capture-realworld.js): ${missing.map((m) => m.file).join(', ')}`
+    );
   }
 
   const slow = report.files.filter((f) => f.slow);
   if (slow.length) {
-    console.log(`\nSLOW FILES (> ${SLOW_FILE_MS / 1000}s — not a failure, but a real performance finding):`);
+    console.log(
+      `\nSLOW FILES (> ${SLOW_FILE_MS / 1000}s — not a failure, but a real performance finding):`
+    );
     for (const f of slow) console.log(`  ${f.file}: ${(f.elapsedMs / 1000).toFixed(1)}s`);
   }
 
   const crashFailures = failures.filter((f) => f.layer === 'no-crash');
   if (crashFailures.length) {
-    console.log(`\nSCANNER CRASHES / HANGS (${crashFailures.length}) — these are REAL FINDINGS, not harness bugs:`);
+    console.log(
+      `\nSCANNER CRASHES / HANGS (${crashFailures.length}) — these are REAL FINDINGS, not harness bugs:`
+    );
     for (const f of crashFailures) {
       console.log(`  ${f.file} :: ${f.scanner || '(whole file)'}`);
       console.log(`      ${f.detail}`);
@@ -966,7 +1085,9 @@ async function main() {
     for (const f of spotFailures) console.log(`  ${f.file}: ${f.detail}`);
   }
 
-  console.log(`\nRESULT: ${report.passed ? 'PASS' : `FAIL (${failures.length} failure${failures.length === 1 ? '' : 's'})`}`);
+  console.log(
+    `\nRESULT: ${report.passed ? 'PASS' : `FAIL (${failures.length} failure${failures.length === 1 ? '' : 's'})`}`
+  );
   console.log('=== END SUMMARY ===');
 
   server.close();

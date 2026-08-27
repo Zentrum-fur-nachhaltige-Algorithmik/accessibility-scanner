@@ -84,8 +84,10 @@ class ConcurrentInputScanner extends BaseScanner {
         instrumented = await page.evaluate(() => Boolean(window.__a11yInputLog));
       }
     } catch (e) {
-      console.warn(`concurrent-input: listener instrumentation unavailable (${e.message}); ` +
-        'falling back to inline-attribute analysis');
+      console.warn(
+        `concurrent-input: listener instrumentation unavailable (${e.message}); ` +
+          'falling back to inline-attribute analysis'
+      );
       instrumented = false;
     }
 
@@ -122,9 +124,7 @@ class ConcurrentInputScanner extends BaseScanner {
       /** Event families present on an element, from attributes + instrumentation. */
       function modalities(el) {
         const attrs = [...el.attributes].map((a) => a.name.toLowerCase());
-        const logged = (el.getAttribute('data-a11y-listeners') || '')
-          .split(/\s+/)
-          .filter(Boolean);
+        const logged = (el.getAttribute('data-a11y-listeners') || '').split(/\s+/).filter(Boolean);
 
         const has = (re) =>
           attrs.some((a) => a.startsWith('on') && re.test(a.slice(2))) ||
@@ -276,8 +276,9 @@ class ConcurrentInputScanner extends BaseScanner {
         while ((m = listenerRe.exec(src)) !== null) {
           const body = m[3];
           const cancels = /\.preventDefault\s*\(\s*\)|return\s+false\s*;/.test(body);
-          const discriminates =
-            /\.key\b|\.code\b|keyCode|charCode|\.which\b|isComposing/.test(body);
+          const discriminates = /\.key\b|\.code\b|keyCode|charCode|\.which\b|isComposing/.test(
+            body
+          );
           if (cancels && !discriminates) {
             out.push({
               target: m[1],
@@ -312,8 +313,7 @@ class ConcurrentInputScanner extends BaseScanner {
             'branches. Devices that support both modalities simultaneously (2-in-1 ' +
             'laptops, tablets with a keyboard and mouse) lose one of them.',
           severity: 'serious',
-          suggestion:
-            'Bind Pointer Events once instead of branching on a capability probe.',
+          suggestion: 'Bind Pointer Events once instead of branching on a capability probe.',
         });
       } else {
         result.violations.push({

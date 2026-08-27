@@ -125,28 +125,26 @@ function _assemblePack(extracted, opts) {
       payloads.push(own);
     } else {
       const prev = payloads[i - 1];
-      const tail = opts.overlapChars > 0
-        ? prev.slice(Math.max(0, prev.length - opts.overlapChars))
-        : '';
+      const tail =
+        opts.overlapChars > 0 ? prev.slice(Math.max(0, prev.length - opts.overlapChars)) : '';
       payloads.push(tail ? `${tail}\n${OVERLAP_MARKER}\n${own}` : own);
     }
   }
 
   const outlineText = outline.length > 0 ? outline.join('\n') : '(no headings or landmarks)';
   const n = payloads.length;
-  const chunks = payloads.map((payload, i) =>
-    `=== PAGE CONTEXT (part ${i + 1} of ${n}) ===\n` +
-    `${headDigest}\n` +
-    `\n--- DOCUMENT OUTLINE ---\n` +
-    `${outlineText}\n` +
-    `\n--- PAGE CONTENT ---\n` +
-    `${payload}\n` +
-    `=== END PAGE CONTEXT ===`
+  const chunks = payloads.map(
+    (payload, i) =>
+      `=== PAGE CONTEXT (part ${i + 1} of ${n}) ===\n` +
+      `${headDigest}\n` +
+      `\n--- DOCUMENT OUTLINE ---\n` +
+      `${outlineText}\n` +
+      `\n--- PAGE CONTENT ---\n` +
+      `${payload}\n` +
+      `=== END PAGE CONTEXT ===`
   );
 
-  const analyzedFraction = skeletonChars > 0
-    ? Math.min(1, analyzedChars / skeletonChars)
-    : 0;
+  const analyzedFraction = skeletonChars > 0 ? Math.min(1, analyzedChars / skeletonChars) : 0;
 
   return {
     chunks,
@@ -174,8 +172,20 @@ function _extractInPage(cfg) {
   const BUDGET = cfg.maxCharsPerChunk;
 
   const VOID_TAGS = new Set([
-    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta',
-    'param', 'source', 'track', 'wbr',
+    'area',
+    'base',
+    'br',
+    'col',
+    'embed',
+    'hr',
+    'img',
+    'input',
+    'link',
+    'meta',
+    'param',
+    'source',
+    'track',
+    'wbr',
   ]);
 
   // Dropped entirely: they carry no accessibility-relevant text and are the
@@ -184,24 +194,82 @@ function _extractInPage(cfg) {
 
   // Whitelist, emitted in this exact order for byte-stability across scanners.
   const ATTR_ORDER = [
-    'id', 'class', 'role', 'lang', 'dir', 'alt', 'title', 'href', 'src', 'srcset',
-    'type', 'name', 'value', 'placeholder', 'for', 'autocomplete', 'required',
-    'disabled', 'readonly', 'checked', 'selected', 'multiple', 'pattern', 'min',
-    'max', 'step', 'minlength', 'maxlength', 'tabindex', 'contenteditable',
-    'hidden', 'draggable', 'target', 'rel', 'action', 'method', 'novalidate',
-    'controls', 'autoplay', 'muted', 'loop', 'kind', 'srclang', 'label', 'open',
-    'datetime', 'colspan', 'rowspan', 'headers', 'scope', 'width', 'height',
+    'id',
+    'class',
+    'role',
+    'lang',
+    'dir',
+    'alt',
+    'title',
+    'href',
+    'src',
+    'srcset',
+    'type',
+    'name',
+    'value',
+    'placeholder',
+    'for',
+    'autocomplete',
+    'required',
+    'disabled',
+    'readonly',
+    'checked',
+    'selected',
+    'multiple',
+    'pattern',
+    'min',
+    'max',
+    'step',
+    'minlength',
+    'maxlength',
+    'tabindex',
+    'contenteditable',
+    'hidden',
+    'draggable',
+    'target',
+    'rel',
+    'action',
+    'method',
+    'novalidate',
+    'controls',
+    'autoplay',
+    'muted',
+    'loop',
+    'kind',
+    'srclang',
+    'label',
+    'open',
+    'datetime',
+    'colspan',
+    'rowspan',
+    'headers',
+    'scope',
+    'width',
+    'height',
   ];
 
-  const STYLE_PROP_RE = /^(position|display|visibility|color|background|background-color|outline|outline-color|outline-width|text-align|font-size|line-height|width|height|overflow|animation|transition)/;
+  const STYLE_PROP_RE =
+    /^(position|display|visibility|color|background|background-color|outline|outline-color|outline-width|text-align|font-size|line-height|width|height|overflow|animation|transition)/;
 
   const LANDMARK_TAGS = {
-    header: true, nav: true, main: true, aside: true, footer: true,
-    section: true, form: true, search: true,
+    header: true,
+    nav: true,
+    main: true,
+    aside: true,
+    footer: true,
+    section: true,
+    form: true,
+    search: true,
   };
   const LANDMARK_ROLES = new Set([
-    'banner', 'navigation', 'main', 'complementary', 'contentinfo', 'region',
-    'search', 'form',
+    'banner',
+    'navigation',
+    'main',
+    'complementary',
+    'contentinfo',
+    'region',
+    'search',
+    'form',
   ]);
 
   function escText(s) {
@@ -344,7 +412,15 @@ function _extractInPage(cfg) {
       let inner = '';
       for (const t of el.querySelectorAll('title, desc')) {
         const txt = (t.textContent || '').replace(/\s+/g, ' ').trim();
-        if (txt) inner += '<' + t.tagName.toLowerCase() + '>' + escText(txt) + '</' + t.tagName.toLowerCase() + '>';
+        if (txt)
+          inner +=
+            '<' +
+            t.tagName.toLowerCase() +
+            '>' +
+            escText(txt) +
+            '</' +
+            t.tagName.toLowerCase() +
+            '>';
       }
       return openTag(el) + inner + '</svg>';
     }
@@ -371,8 +447,12 @@ function _extractInPage(cfg) {
     const el = unwrap(node);
     const tag = el.tagName.toLowerCase();
     const indivisible =
-      VOID_TAGS.has(tag) || tag === 'script' || tag === 'svg' ||
-      tag === 'canvas' || tag === 'template' || el.childNodes.length === 0;
+      VOID_TAGS.has(tag) ||
+      tag === 'script' ||
+      tag === 'svg' ||
+      tag === 'canvas' ||
+      tag === 'template' ||
+      el.childNodes.length === 0;
     if (indivisible) return [serialized];
 
     const parts = [openTag(el)];
@@ -392,13 +472,16 @@ function _extractInPage(cfg) {
   const headLines = ['--- HEAD ---'];
   const docEl = document.documentElement;
   const htmlAttrs = [];
-  if (docEl.getAttribute('lang')) htmlAttrs.push('lang="' + escAttr(docEl.getAttribute('lang')) + '"');
+  if (docEl.getAttribute('lang'))
+    htmlAttrs.push('lang="' + escAttr(docEl.getAttribute('lang')) + '"');
   if (docEl.getAttribute('dir')) htmlAttrs.push('dir="' + escAttr(docEl.getAttribute('dir')) + '"');
   headLines.push('<html' + (htmlAttrs.length ? ' ' + htmlAttrs.join(' ') : '') + '>');
 
   const titleEl = document.querySelector('title');
   if (titleEl) {
-    headLines.push('<title>' + escText((titleEl.textContent || '').replace(/\s+/g, ' ').trim()) + '</title>');
+    headLines.push(
+      '<title>' + escText((titleEl.textContent || '').replace(/\s+/g, ' ').trim()) + '</title>'
+    );
   }
 
   // VERBATIM — load-bearing evidence for 2.2.3 / 3.2.5, and invisible to the
@@ -423,7 +506,16 @@ function _extractInPage(cfg) {
     }
   }
   if (sheets.length > 0) {
-    headLines.push('stylesheets: ' + sheets.length + ' [' + sheets.slice(0, 3).map((h) => cap(h, 200)).join(', ') + ']');
+    headLines.push(
+      'stylesheets: ' +
+        sheets.length +
+        ' [' +
+        sheets
+          .slice(0, 3)
+          .map((h) => cap(h, 200))
+          .join(', ') +
+        ']'
+    );
   }
 
   // -- outline ----------------------------------------------------------------

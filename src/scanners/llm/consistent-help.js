@@ -31,10 +31,14 @@ const MAX_SUBPAGES = 2;
 
 class LLMConsistentHelpScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-consistent-help', {
-      wcagCriteria: ['3.2.6'],
-      wcagPrinciple: 'understandable',
-    }, llmClient);
+    super(
+      'llm-consistent-help',
+      {
+        wcagCriteria: ['3.2.6'],
+        wcagPrinciple: 'understandable',
+      },
+      llmClient
+    );
   }
 
   /** Navigates to sub-pages — must own its tab. */
@@ -53,7 +57,9 @@ class LLMConsistentHelpScanner extends LLMBaseScanner {
     let candidates = [];
     try {
       candidates = await this._findSubPages(page);
-    } catch { /* non-fatal */ }
+    } catch {
+      /* non-fatal */
+    }
 
     if (candidates.length > 0) {
       mode = 'multi-page';
@@ -68,7 +74,9 @@ class LLMConsistentHelpScanner extends LLMBaseScanner {
       }
       try {
         await page.goto(originalUrl, { waitUntil: 'domcontentloaded', timeout });
-      } catch { /* the pipeline discards this tab anyway */ }
+      } catch {
+        /* the pipeline discards this tab anyway */
+      }
     }
 
     // ---- mode B: repeated page-like sections in one document ----------
@@ -157,7 +165,7 @@ Return violations as JSON.`;
         }
         if (u.origin !== here.origin) continue;
         if (!/^https?:$/.test(u.protocol)) continue;
-        if (u.pathname === here.pathname) continue;    // same page / pure fragment
+        if (u.pathname === here.pathname) continue; // same page / pure fragment
         if (/\.(pdf|jpe?g|png|gif|svg|zip|docx?|xlsx?)$/i.test(u.pathname)) continue;
         if (seen.has(u.pathname)) continue;
         seen.add(u.pathname);
@@ -266,9 +274,13 @@ Return violations as JSON.`;
       const all = [...document.querySelectorAll('*')].filter((el) => {
         if (!(el instanceof HTMLElement)) return false;
         const cls = typeof el.className === 'string' ? el.className : '';
-        if (!/\b(page|screen|view|slide|step)[-_]?(section|wrapper|container|panel)?\b/i.test(cls)) return false;
+        if (!/\b(page|screen|view|slide|step)[-_]?(section|wrapper|container|panel)?\b/i.test(cls))
+          return false;
         // Must look like a page: its own header/nav/footer plus some content.
-        return el.querySelector('nav, header, footer, [role="navigation"], [role="contentinfo"]') !== null;
+        return (
+          el.querySelector('nav, header, footer, [role="navigation"], [role="contentinfo"]') !==
+          null
+        );
       });
       const outermost = all.filter((el) => !all.some((o) => o !== el && o.contains(el)));
       if (outermost.length < 2) return [];

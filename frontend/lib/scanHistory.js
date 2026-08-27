@@ -81,12 +81,8 @@ export function addHistoryEntry(entry) {
     url: entry.url,
     profile: entry.profile || '',
     date: entry.date || new Date().toISOString(),
-    score:
-      typeof entry.score === 'number' && Number.isFinite(entry.score)
-        ? entry.score
-        : null,
-    violationCount:
-      typeof entry.violationCount === 'number' ? entry.violationCount : null,
+    score: typeof entry.score === 'number' && Number.isFinite(entry.score) ? entry.score : null,
+    violationCount: typeof entry.violationCount === 'number' ? entry.violationCount : null,
     result: trimResult(entry.result),
   };
 

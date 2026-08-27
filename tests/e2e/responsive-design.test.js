@@ -58,8 +58,8 @@ describe('ResponsiveDesignScanner', () => {
       const result = await scanner.scan(page, { heuristicOnly: true });
       expect(result).toBeDefined();
       // Only check text-spacing-specific violations (this file is designed for text-spacing compliance)
-      const textSpacingViolations = result.violations.filter(v =>
-        v.issue && v.issue.startsWith('text-spacing-')
+      const textSpacingViolations = result.violations.filter(
+        (v) => v.issue && v.issue.startsWith('text-spacing-')
       );
       expect(textSpacingViolations).toEqual([]);
     } finally {
@@ -90,7 +90,7 @@ describe('ResponsiveDesignScanner', () => {
       expect(result).toBeDefined();
 
       // Check for duplicates
-      const keys = result.violations.map(v => `${v.element}::${v.issue}::${v.criterion}`);
+      const keys = result.violations.map((v) => `${v.element}::${v.issue}::${v.criterion}`);
       const unique = new Set(keys);
       expect(keys.length).toBe(unique.size);
     } finally {
@@ -120,7 +120,7 @@ describe('ResponsiveDesignScanner', () => {
     try {
       const violations = [];
       await scanner.testContentReflow(page, scanDir, violations, {});
-      const fixed = violations.filter(v => v.issue === 'fixed-width-element');
+      const fixed = violations.filter((v) => v.issue === 'fixed-width-element');
       expect(fixed).toEqual([]);
     } finally {
       await page.close();
@@ -133,12 +133,12 @@ describe('ResponsiveDesignScanner', () => {
     try {
       const violations = [];
       await scanner.testContentReflow(page, scanDir, violations, {});
-      const fixed = violations.filter(v => v.issue === 'fixed-width-element');
+      const fixed = violations.filter((v) => v.issue === 'fixed-width-element');
       expect(fixed.length).toBeGreaterThan(0);
       for (const v of fixed) {
         expect(v.description).toMatch(/width: \d+(\.\d+)?px/);
       }
-      expect(violations.some(v => v.issue === 'reflow-failure')).toBe(true);
+      expect(violations.some((v) => v.issue === 'reflow-failure')).toBe(true);
     } finally {
       await page.close();
     }
@@ -178,7 +178,7 @@ describe('ResponsiveDesignScanner', () => {
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result.violations.some(v => v.issue === 'text-resize-fixed-font')).toBe(false);
+      expect(result.violations.some((v) => v.issue === 'text-resize-fixed-font')).toBe(false);
     } finally {
       await page.close();
     }
@@ -188,7 +188,7 @@ describe('ResponsiveDesignScanner', () => {
     const badPage = await getPage(`${getBaseUrl()}/bad-text-resize.html`);
     try {
       const result = await scanner.scan(badPage, { heuristicOnly: true });
-      const clip = result.violations.filter(v => v.issue === 'text-resize-clip-risk');
+      const clip = result.violations.filter((v) => v.issue === 'text-resize-clip-risk');
       expect(clip.length).toBeGreaterThan(0);
       for (const v of clip) {
         // description carries the measured evidence, not just a CSS property

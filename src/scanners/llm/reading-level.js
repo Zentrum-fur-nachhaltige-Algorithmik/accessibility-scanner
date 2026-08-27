@@ -13,10 +13,14 @@ const LLMBaseScanner = require('./base');
 
 class LLMReadingLevelScanner extends LLMBaseScanner {
   constructor(llmClient) {
-    super('llm-reading-level', {
-      wcagCriteria: ['3.1.5'],
-      wcagPrinciple: 'understandable',
-    }, llmClient);
+    super(
+      'llm-reading-level',
+      {
+        wcagCriteria: ['3.1.5'],
+        wcagPrinciple: 'understandable',
+      },
+      llmClient
+    );
   }
 
   async scan(page, options = {}) {
@@ -26,39 +30,40 @@ class LLMReadingLevelScanner extends LLMBaseScanner {
       const clone = main.cloneNode(true);
 
       // Strip non-content elements
-      clone.querySelectorAll(
-        'nav, header, footer, script, style, noscript, ' +
-        '[role="navigation"], [role="banner"], [role="contentinfo"]'
-      ).forEach(el => el.remove());
+      clone
+        .querySelectorAll(
+          'nav, header, footer, script, style, noscript, ' +
+            '[role="navigation"], [role="banner"], [role="contentinfo"]'
+        )
+        .forEach((el) => el.remove());
 
       const text = clone.textContent.replace(/\s+/g, ' ').trim();
-      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
-      const words = text.split(/\s+/).filter(w => w.length > 0);
-      const avgWordsPerSentence = sentences.length > 0
-        ? Math.round(words.length / sentences.length)
-        : 0;
+      const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
+      const words = text.split(/\s+/).filter((w) => w.length > 0);
+      const avgWordsPerSentence =
+        sentences.length > 0 ? Math.round(words.length / sentences.length) : 0;
 
       // Detect simplification mechanisms
       const hasGlossary = !!document.querySelector(
         '[class*="glossar" i], [id*="glossar" i], [class*="glossary" i], ' +
-        '[id*="glossary" i], dl, [role="definition"]'
+          '[id*="glossary" i], dl, [role="definition"]'
       );
       const hasSimplifiedVersion = !!document.querySelector(
         '[class*="simple" i], [class*="plain" i], [class*="easy-read" i], ' +
-        '[class*="simplified" i], [class*="einfache-sprache" i], ' +
-        '[aria-label*="simplified" i], [aria-label*="plain language" i], ' +
-        '[aria-label*="einfache sprache" i], details summary'
+          '[class*="simplified" i], [class*="einfache-sprache" i], ' +
+          '[aria-label*="simplified" i], [aria-label*="plain language" i], ' +
+          '[aria-label*="einfache sprache" i], details summary'
       );
       const hasSummary = !!document.querySelector(
         '[class*="summary" i], [class*="abstract" i], [class*="tldr" i], ' +
-        '[class*="overview" i], [class*="zusammenfassung" i]'
+          '[class*="overview" i], [class*="zusammenfassung" i]'
       );
       const hasDefinitions = document.querySelectorAll('dfn, abbr[title]').length > 2;
 
       // Sample longest paragraphs (most likely to have readability issues)
       const paragraphs = Array.from(clone.querySelectorAll('p, article, section > div'))
-        .map(p => p.textContent.replace(/\s+/g, ' ').trim())
-        .filter(t => t.length > 100)
+        .map((p) => p.textContent.replace(/\s+/g, ' ').trim())
+        .filter((t) => t.length > 100)
         .sort((a, b) => b.length - a.length)
         .slice(0, 5);
 

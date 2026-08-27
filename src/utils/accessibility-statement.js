@@ -53,7 +53,9 @@ const MISSING_STATEMENT_RULE = 'missing-accessibility-statement';
 
 /** Pure predicate, so the keyword list is unit-testable without a browser. */
 function matchesStatementLink(text, href) {
-  const t = String(text || '').toLowerCase().trim();
+  const t = String(text || '')
+    .toLowerCase()
+    .trim();
   const h = String(href || '').toLowerCase();
   if (h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('javascript:')) return false;
   return STATEMENT_LINK_KEYWORDS.some((k) => t.includes(k) || h.includes(k));
@@ -67,9 +69,12 @@ function matchesStatementLink(text, href) {
 async function findStatementLink(page) {
   return page.evaluate((keywords) => {
     const matches = (text, href) => {
-      const t = String(text || '').toLowerCase().trim();
+      const t = String(text || '')
+        .toLowerCase()
+        .trim();
       const h = String(href || '').toLowerCase();
-      if (h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('javascript:')) return false;
+      if (h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('javascript:'))
+        return false;
       return keywords.some((k) => t.includes(k) || h.includes(k));
     };
 

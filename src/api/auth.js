@@ -116,7 +116,9 @@ function createAuthMiddleware(options = {}) {
  */
 function logAuthStartupState(token = process.env.API_TOKEN, logger = console) {
   if (typeof token === 'string' && token.length > 0) {
-    logger.log('Auth: API_TOKEN set — /api/* and /reports/* require Authorization: Bearer <token> (except /api/health)');
+    logger.log(
+      'Auth: API_TOKEN set — /api/* and /reports/* require Authorization: Bearer <token> (except /api/health)'
+    );
     return true;
   }
   logger.warn('Auth: API is running OPEN — set API_TOKEN for deployment');

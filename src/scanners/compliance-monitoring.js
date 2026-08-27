@@ -10,7 +10,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
   constructor() {
     super('compliance-monitoring', {
       wcagCriteria: ['EN 301 549 12.4'],
-      wcagPrinciple: 'robust'
+      wcagPrinciple: 'robust',
     });
   }
 
@@ -25,7 +25,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
   async scan(page, options = {}) {
     const defaultOptions = {
       timeout: 30000,
-      searchDepth: 3
+      searchDepth: 3,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
@@ -34,7 +34,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ["EAA-Monitoring", "EN-301-549-12.1.3"],
+      criteria: ['EAA-Monitoring', 'EN-301-549-12.1.3'],
       passed: monitoringResults.violations.length === 0,
       violations: monitoringResults.violations,
       summary: {
@@ -43,8 +43,8 @@ class ComplianceMonitoringScanner extends BaseScanner {
         issueTrackingSystem: monitoringResults.issueTrackingSystem,
         userFeedbackIntegrated: monitoringResults.userFeedbackIntegrated,
         continuousImprovementEvidence: monitoringResults.continuousImprovementEvidence,
-        gatedOnMissingStatement: monitoringResults.gatedOnMissingStatement || false
-      }
+        gatedOnMissingStatement: monitoringResults.gatedOnMissingStatement || false,
+      },
     };
   }
 
@@ -71,7 +71,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         regularAuditsScheduled: false,
         issueTrackingSystem: false,
         userFeedbackIntegrated: false,
-        continuousImprovementEvidence: false
+        continuousImprovementEvidence: false,
       };
     }
 
@@ -89,11 +89,13 @@ class ComplianceMonitoringScanner extends BaseScanner {
 
     // Combine results from main page and dedicated pages
     const combinedAnalysis = {
-      monitoringProcedure: mainPageAnalysis.monitoringProcedure || monitoringPageAnalysis.monitoringProcedure,
+      monitoringProcedure:
+        mainPageAnalysis.monitoringProcedure || monitoringPageAnalysis.monitoringProcedure,
       regularAudits: mainPageAnalysis.regularAudits || monitoringPageAnalysis.regularAudits,
       issueTracking: mainPageAnalysis.issueTracking || monitoringPageAnalysis.issueTracking,
       userFeedback: mainPageAnalysis.userFeedback || monitoringPageAnalysis.userFeedback,
-      continuousImprovement: mainPageAnalysis.continuousImprovement || monitoringPageAnalysis.continuousImprovement
+      continuousImprovement:
+        mainPageAnalysis.continuousImprovement || monitoringPageAnalysis.continuousImprovement,
     };
 
     // Set results
@@ -106,51 +108,56 @@ class ComplianceMonitoringScanner extends BaseScanner {
     // Generate violations for missing elements
     if (!monitoringProcedureDocumented) {
       violations.push({
-        criterion: "EAA-Monitoring",
-        issue: "no-monitoring-procedure",
-        description: "No documented accessibility monitoring procedures found",
-        suggestion: "Document and publish accessibility monitoring procedures including regular review processes",
-        severity: "major"
+        criterion: 'EAA-Monitoring',
+        issue: 'no-monitoring-procedure',
+        description: 'No documented accessibility monitoring procedures found',
+        suggestion:
+          'Document and publish accessibility monitoring procedures including regular review processes',
+        severity: 'major',
       });
     }
 
     if (!regularAuditsScheduled) {
       violations.push({
-        criterion: "EAA-Monitoring",
-        issue: "no-audit-schedule",
-        description: "No evidence of regular accessibility audits or scheduled reviews",
-        suggestion: "Implement and document regular accessibility audit schedule (e.g., quarterly or annually)",
-        severity: "major"
+        criterion: 'EAA-Monitoring',
+        issue: 'no-audit-schedule',
+        description: 'No evidence of regular accessibility audits or scheduled reviews',
+        suggestion:
+          'Implement and document regular accessibility audit schedule (e.g., quarterly or annually)',
+        severity: 'major',
       });
     }
 
     if (!issueTrackingSystem) {
       violations.push({
-        criterion: "EAA-Monitoring",
-        issue: "no-issue-tracking",
-        description: "No accessibility issue tracking system evident",
-        suggestion: "Implement public accessibility issue tracker or document issue management process",
-        severity: "major"
+        criterion: 'EAA-Monitoring',
+        issue: 'no-issue-tracking',
+        description: 'No accessibility issue tracking system evident',
+        suggestion:
+          'Implement public accessibility issue tracker or document issue management process',
+        severity: 'major',
       });
     }
 
     if (!userFeedbackIntegrated) {
       violations.push({
-        criterion: "EAA-Monitoring",
-        issue: "no-user-feedback",
-        description: "No evidence of user feedback integration into accessibility improvements",
-        suggestion: "Document how user accessibility feedback is collected and integrated into improvements",
-        severity: "major"
+        criterion: 'EAA-Monitoring',
+        issue: 'no-user-feedback',
+        description: 'No evidence of user feedback integration into accessibility improvements',
+        suggestion:
+          'Document how user accessibility feedback is collected and integrated into improvements',
+        severity: 'major',
       });
     }
 
     if (!continuousImprovementEvidence) {
       violations.push({
-        criterion: "EAA-Monitoring",
-        issue: "no-improvement-evidence",
-        description: "No evidence of continuous accessibility improvement efforts",
-        suggestion: "Publish accessibility improvement roadmap or changelog showing ongoing enhancements",
-        severity: "major"
+        criterion: 'EAA-Monitoring',
+        issue: 'no-improvement-evidence',
+        description: 'No evidence of continuous accessibility improvement efforts',
+        suggestion:
+          'Publish accessibility improvement roadmap or changelog showing ongoing enhancements',
+        severity: 'major',
       });
     }
 
@@ -160,7 +167,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
       regularAuditsScheduled,
       issueTrackingSystem,
       userFeedbackIntegrated,
-      continuousImprovementEvidence
+      continuousImprovementEvidence,
     };
   }
 
@@ -179,7 +186,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         /monitoring\s+procedures?/i,
         /accessibility\s+review/i,
         /compliance\s+monitoring/i,
-        /accessibility\s+oversight/i
+        /accessibility\s+oversight/i,
       ];
 
       let monitoringProcedure = false;
@@ -199,7 +206,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         /audit\s+schedule/i,
         /periodic\s+review/i,
         /monthly\s+review/i,
-        /we\s+conduct.*audit/i
+        /we\s+conduct.*audit/i,
       ];
 
       let regularAudits = false;
@@ -220,7 +227,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         /public\s+issue/i,
         /github.*issues?/i,
         /jira/i,
-        /trello/i
+        /trello/i,
       ];
 
       let issueTracking = false;
@@ -237,9 +244,13 @@ class ComplianceMonitoringScanner extends BaseScanner {
         const href = link.getAttribute('href').toLowerCase();
         const text = link.textContent.toLowerCase();
 
-        if (href.includes('github.com') && (href.includes('issues') || text.includes('issues')) ||
-            href.includes('jira') || href.includes('trello') ||
-            text.includes('issue tracker') || text.includes('bug tracker')) {
+        if (
+          (href.includes('github.com') && (href.includes('issues') || text.includes('issues'))) ||
+          href.includes('jira') ||
+          href.includes('trello') ||
+          text.includes('issue tracker') ||
+          text.includes('bug tracker')
+        ) {
           issueTracking = true;
           break;
         }
@@ -253,7 +264,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         /feedback.*review/i,
         /integrate.*feedback/i,
         /accessibility\s+feedback/i,
-        /user\s+suggestions?/i
+        /user\s+suggestions?/i,
       ];
 
       let userFeedback = false;
@@ -275,7 +286,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         /changelog/i,
         /what.*new/i,
         /recent.*update/i,
-        /improvement.*log/i
+        /improvement.*log/i,
       ];
 
       let continuousImprovement = false;
@@ -291,7 +302,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         regularAudits,
         issueTracking,
         userFeedback,
-        continuousImprovement
+        continuousImprovement,
       };
     });
 
@@ -312,7 +323,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
       regularAudits: false,
       issueTracking: false,
       userFeedback: false,
-      continuousImprovement: false
+      continuousImprovement: false,
     };
 
     // Analyze each found page
@@ -324,12 +335,15 @@ class ComplianceMonitoringScanner extends BaseScanner {
         const pageAnalysis = await this.analyzePageForMonitoring(page);
 
         // Combine results (OR operation - if any page has evidence, mark as true)
-        combinedAnalysis.monitoringProcedure = combinedAnalysis.monitoringProcedure || pageAnalysis.monitoringProcedure;
-        combinedAnalysis.regularAudits = combinedAnalysis.regularAudits || pageAnalysis.regularAudits;
-        combinedAnalysis.issueTracking = combinedAnalysis.issueTracking || pageAnalysis.issueTracking;
+        combinedAnalysis.monitoringProcedure =
+          combinedAnalysis.monitoringProcedure || pageAnalysis.monitoringProcedure;
+        combinedAnalysis.regularAudits =
+          combinedAnalysis.regularAudits || pageAnalysis.regularAudits;
+        combinedAnalysis.issueTracking =
+          combinedAnalysis.issueTracking || pageAnalysis.issueTracking;
         combinedAnalysis.userFeedback = combinedAnalysis.userFeedback || pageAnalysis.userFeedback;
-        combinedAnalysis.continuousImprovement = combinedAnalysis.continuousImprovement || pageAnalysis.continuousImprovement;
-
+        combinedAnalysis.continuousImprovement =
+          combinedAnalysis.continuousImprovement || pageAnalysis.continuousImprovement;
       } catch (error) {
         console.log(`  Could not analyze ${pageInfo.url}: ${error.message}`);
       }
@@ -355,7 +369,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
         'improvements',
         'roadmap',
         'changelog',
-        'updates'
+        'updates',
       ];
 
       const links = Array.from(document.querySelectorAll('a[href]'));
@@ -368,17 +382,18 @@ class ComplianceMonitoringScanner extends BaseScanner {
         for (const pattern of monitoringPatterns) {
           if (text.includes(pattern) || href.includes(pattern)) {
             // Avoid duplicate pages and external links
-            if (!foundPages.some(p => p.url === link.href) &&
-                !link.href.startsWith('mailto:') &&
-                !link.href.startsWith('tel:') &&
-                !link.href.includes('twitter.com') &&
-                !link.href.includes('facebook.com') &&
-                !link.href.includes('linkedin.com')) {
-
+            if (
+              !foundPages.some((p) => p.url === link.href) &&
+              !link.href.startsWith('mailto:') &&
+              !link.href.startsWith('tel:') &&
+              !link.href.includes('twitter.com') &&
+              !link.href.includes('facebook.com') &&
+              !link.href.includes('linkedin.com')
+            ) {
               foundPages.push({
                 url: link.href,
                 text: link.textContent.trim(),
-                pattern: pattern
+                pattern: pattern,
               });
             }
             break;
@@ -396,7 +411,6 @@ class ComplianceMonitoringScanner extends BaseScanner {
   get needsExclusiveAccess() {
     return true;
   }
-
 }
 
 module.exports = ComplianceMonitoringScanner;

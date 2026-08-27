@@ -1,4 +1,3 @@
-const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
 
@@ -116,61 +115,6 @@ class AdvancedAriaScanner extends BaseScanner {
             recommendations: this.generateAdvancedAriaRecommendations(violations),
             widgetPatterns: this.generateWidgetPatternGuidance(violations)
         };
-    }
-
-    /**
-     * @deprecated Use scan(page, options) via ScanPipeline instead
-     * Scan advanced ARIA widget compliance (WCAG 4.1.2)
-     * @param {string} url - URL to scan
-     * @param {Object} options - Scanning options
-     * @returns {Promise<Object>} AdvancedAriaReport
-     */
-    async scanAdvancedAria(url, options = {}) {
-        const defaultOptions = {
-            checkTreeViews: true,
-            checkDataGrids: true,
-            checkComboboxes: true,
-            checkCarousels: true,
-            checkTabPanels: true,
-            checkAccordions: true,
-            checkMenubars: true,
-            checkDialogs: true,
-            checkLiveRegions: true,
-            validateKeyboardInteraction: true,
-            checkAriaStates: true,
-            timeout: 60000
-        };
-
-        const scanOptions = { ...defaultOptions, ...options };
-
-        try {
-            await this.init();
-            const page = await this.browser.newPage();
-            const timestamp = Date.now();
-            const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-            await fs.ensureDir(scanDir);
-
-            await page.setViewport({ width: 1280, height: 1024 });
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-            // Take screenshot for analysis
-            const screenshotPath = path.join(scanDir, 'advanced-aria-analysis.png');
-            await page.screenshot({
-                path: screenshotPath,
-                fullPage: true
-            });
-
-            try {
-                const result = await this.scan(page, options);
-                result.screenshotPath = screenshotPath;
-                return result;
-            } finally {
-                await page.close();
-            }
-
-        } catch (error) {
-            throw new Error(`Advanced ARIA scan failed: ${error.message}`);
-        }
     }
 
     /**

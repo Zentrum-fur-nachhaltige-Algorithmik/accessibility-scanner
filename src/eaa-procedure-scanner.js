@@ -1,4 +1,3 @@
-const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
 const {
@@ -56,63 +55,6 @@ class EAAProcedureScanner extends BaseScanner {
       },
       visualEvidence: eaaResults.visualEvidence
     };
-  }
-
-  /**
-   * @deprecated Use scan(page, options) via ScanPipeline instead
-   * Scan EAA procedural compliance
-   * @param {string} url - URL to scan
-   * @param {Object} options - Scanning options
-   * @returns {Promise<Object>} EAAProcedureReport
-   */
-  async scanEAAProcedure(url, options = {}) {
-    const defaultOptions = {
-      testAccessibilityStatement: true,
-      testContactMechanism: true,
-      testFeedbackProcess: true,
-      testComplianceMonitoring: true,
-      searchDepth: 3,
-      timeout: 60000
-    };
-
-    const scanOptions = { ...defaultOptions, ...options };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-
-      // Set viewport for consistent testing
-      await page.setViewport({ width: 1920, height: 1080 });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      // Create timestamped scan directory
-      const timestamp = Date.now();
-      const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
-      await fs.ensureDir(scanDir);
-
-      const eaaResults = await this.performEAAProcedureAnalysis(page, scanDir, scanOptions);
-
-      await page.close();
-
-      return {
-        scannerId: this.id,
-        criteria: ["EAA-Statement", "EAA-Contact", "EAA-Feedback", "EAA-Monitoring"],
-        passed: eaaResults.violations.length === 0,
-        violations: eaaResults.violations,
-        summary: {
-          accessibilityStatementPresent: eaaResults.accessibilityStatementPresent,
-          contactMechanismAvailable: eaaResults.contactMechanismAvailable,
-          feedbackProcessImplemented: eaaResults.feedbackProcessImplemented,
-          complianceMonitoringActive: eaaResults.complianceMonitoringActive,
-          euLegalCompliance: eaaResults.euLegalCompliance
-        },
-        screenshotPath: scanDir,
-        visualEvidence: eaaResults.visualEvidence
-      };
-
-    } catch (error) {
-      throw new Error(`EAA procedure scan failed: ${error.message}`);
-    }
   }
 
   /**

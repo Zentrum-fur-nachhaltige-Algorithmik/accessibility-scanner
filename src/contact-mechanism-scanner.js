@@ -50,38 +50,6 @@ class ContactMechanismScanner extends BaseScanner {
   }
 
   /**
-   * @deprecated Use scan(page, options) via ScanPipeline instead
-   * Scan for contact mechanism compliance
-   * @param {string} url - URL to scan
-   * @param {Object} options - Scanning options
-   * @returns {Promise<Object>} ContactMechanismReport
-   */
-  async scanContactMechanisms(url, options = {}) {
-    const defaultOptions = {
-      timeout: 30000,
-      searchDepth: 3
-    };
-
-    const scanOptions = { ...defaultOptions, ...options };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, options);
-      } finally {
-        await page.close();
-      }
-
-    } catch (error) {
-      throw new Error(`Contact mechanism scan failed: ${error.message}`);
-    }
-  }
-
-  /**
    * Analyze contact mechanisms on the page
    */
   async analyzeContactMechanisms(page, options) {

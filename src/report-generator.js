@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const htmlPdf = require('html-pdf-node');
 
 const DEFAULT_ORG_NAME = 'Abraham Nemeth Society for Accessible Algorithmics e.V.';
 

@@ -55,39 +55,6 @@ class AccessibilityStatementScanner extends BaseScanner {
   }
 
   /**
-   * @deprecated Use scan(page, options) via ScanPipeline instead
-   * Scan for accessibility statement compliance
-   * @param {string} url - URL to scan
-   * @param {Object} options - Scanning options
-   * @returns {Promise<Object>} AccessibilityStatementReport
-   */
-  async scanAccessibilityStatement(url, options = {}) {
-    const defaultOptions = {
-      searchDepth: 3,
-      timeout: 30000,
-      language: 'auto'
-    };
-
-    const scanOptions = { ...defaultOptions, ...options };
-
-    try {
-      await this.init();
-      const page = await this.browser.newPage();
-
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: scanOptions.timeout });
-
-      try {
-        return await this.scan(page, options);
-      } finally {
-        await page.close();
-      }
-
-    } catch (error) {
-      throw new Error(`Accessibility statement scan failed: ${error.message}`);
-    }
-  }
-
-  /**
    * Analyze accessibility statement presence and completeness
    */
   async analyzeAccessibilityStatement(page, options) {

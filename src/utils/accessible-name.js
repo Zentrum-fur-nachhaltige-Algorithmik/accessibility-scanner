@@ -1,62 +1,8 @@
 /**
- * Browser-injectable accessible-name utility.
- *
- * WHY THIS EXISTS
- * ---------------
- * Several scanners used to compute an element's "name" ad hoc — almost always
- * `element.textContent.trim()`, sometimes plus `aria-label`/`title`. That model
- * of the accessibility API is incomplete, and it produced a whole family of
- * false positives on real pages: a logo link whose only child is
- * `<img alt="Logo">`, a heading named by a child image, a link named through
- * `aria-labelledby`, an `<svg role="img"><title>` icon button, an
- * `<input type="image" alt="Search">`. A screen reader announces all of those;
- * `textContent` returns "".
- *
- * This module implements a pragmatic subset of ACCNAME
- * (https://w3c.github.io/accname/) as a string of browser-context functions,
- * exactly like `src/utils/browser-contrast.js`: `require` it in Node, pass the
- * string into `page.evaluate`, `eval()` it there.
- *
- *     const { injectableCode: accnameUtils } = require('./utils/accessible-name');
- *     ...
- *     await page.evaluate((accnameCode) => {
- *       eval(accnameCode);
- *       const { name, source } = __accessibleNameInfo(el);
- *     }, accnameUtils);
- *
- * PRECEDENCE (highest first)
- *   1. aria-labelledby   — ID list, each reference resolved to its own name
- *   2. aria-label
- *   3. native labelling  — label[for] / wrapping <label>, <caption>, <legend>,
- *                          <figcaption>, alt on img|area|input[type=image],
- *                          <svg><title>, value on input[type=button|submit|reset]
- *   4. name from content — the subtree's text, which INCLUDES a child
- *                          `<img alt>`, a descendant's `aria-label`, and an
- *                          `<svg><title>`; only for roles that take their name
- *                          from content (link, button, heading, cell, …)
- *   5. title
- *
- * Every result carries the `source` it came from, so a scanner can report WHY
- * an element is unnamed instead of just that it is. When the name is empty,
- * `reason` names the mechanism that was present but produced nothing.
- *
- * DELIBERATE DEVIATIONS FROM THE SPEC (all documented, all conservative):
- *   - `placeholder` is NOT accepted as a name. The spec's HTML-AAM does allow
- *     it as a last resort for text inputs; treating a placeholder-only field as
- *     named would silence a check the corpus shows is a TRUE positive.
- *   - Hidden-subtree pruning only looks at `aria-hidden="true"` and the `hidden`
- *     attribute; it does NOT call `getComputedStyle` on every descendant. That
- *     would be O(nodes) per named element and this runs on 5000-node pages.
- *     The consequence — CSS-hidden text can still contribute — only ever makes
- *     an element look MORE named, i.e. it errs away from false positives.
- *   - Embedded form controls contribute nothing to a name computed from
- *     content (a `<select>`'s `<option>` text is a value, not label text).
- *
- * Exposed browser-context API:
- *   __accessibleNameInfo(el) -> { name, source, reason }
- *   __accessibleName(el)     -> string
- *   __hasAccessibleName(el)  -> boolean
- *   __accNameFromContent(el, visited, depth) -> string  (raw subtree text)
+ * Browser-injectable accessible-name utility (pragmatic subset of ACCNAME).
+ * Exposes __accessibleNameInfo, __accessibleName, __hasAccessibleName, __accNameFromContent
+ * and the SC 2.5.3 helpers __visibleLabelText and __nameContainsLabel.
+ * `eval()` the exported string inside `page.evaluate`.
  */
 
 const injectableCode = `
@@ -81,8 +27,10 @@ const injectableCode = `
   }
 
   /**
-   * Pruned from name computation. Cheap attribute checks only — see the
-   * module header for why getComputedStyle is deliberately not used here.
+   * Pruned from name computation. Cheap attribute checks only: calling
+   * getComputedStyle on every descendant would be O(nodes) per named element,
+   * and the only consequence is that CSS-hidden text may still contribute,
+   * which errs away from false positives.
    */
   function __accIsHiddenForName(el) {
     if (!el || el.nodeType !== 1) return false;
@@ -178,7 +126,7 @@ const injectableCode = `
 
       var tag = __accTagOf(node);
       if (tag === 'script' || tag === 'style' || tag === 'template' || tag === 'noscript') continue;
-      // Embedded controls carry a value, not label text — their subtree
+      // Embedded controls carry a value, not label text, so their subtree
       // (e.g. a <select>'s <option> list) is not part of an ancestor's name.
       if (tag === 'select' || tag === 'textarea') continue;
 
@@ -228,7 +176,7 @@ const injectableCode = `
   /**
    * Text of the <label> element(s) associated with a form control.
    *
-   * Prefers the native \`control.labels\` NodeList — that is exactly how the
+   * Prefers the native \`control.labels\` NodeList: that is exactly how the
    * browser (and therefore assistive technology) resolves the association, and
    * a wrapping <label for="thisId"> appears in it ONCE. Falls back to
    * \`label[for]\` + \`closest('label')\` for hosts/elements without \`.labels\`.
@@ -249,7 +197,7 @@ const injectableCode = `
         try {
           var found = document.querySelectorAll('label[for="' + esc + '"]');
           for (var j = 0; j < found.length; j++) list.push(found[j]);
-        } catch (e) { /* malformed id — no selector-based association */ }
+        } catch (e) { /* malformed id: no selector-based association */ }
       }
       var wrap = control.closest ? control.closest('label') : null;
       if (wrap && list.indexOf(wrap) === -1) list.push(wrap);
@@ -354,11 +302,15 @@ const injectableCode = `
 
   /**
    * Compute an element's accessible name.
+   * Precedence: aria-labelledby, aria-label, native labelling (label, caption,
+   * legend, figcaption, alt, svg title, button value), name from content (for
+   * roles that take it, including child img alt and svg title), then title.
+   * Placeholder is not accepted as a name.
    * @returns {{name: string, source: string, reason: string|null}}
    *   source: 'aria-labelledby' | 'aria-label' | 'label' | 'alt' | 'value' |
    *           'default' | 'svg-title' | 'caption' | 'legend' | 'figcaption' |
    *           'contents' | 'title' | 'none' | 'error'
-   *   reason: only when name is '' — which mechanism was present but empty.
+   *   reason: only when name is '': which mechanism was present but empty.
    */
   function __accessibleNameInfo(el) {
     try {
@@ -429,15 +381,14 @@ const injectableCode = `
     return __accessibleNameInfo(el).name.length > 0;
   }
 
-  // -------------------------------------------------------------------------
-  // VISIBLE LABEL (SC 2.5.3 "Label in Name")
-  // -------------------------------------------------------------------------
+  // Visible label (SC 2.5.3 "Label in Name")
   //
   // 2.5.3 requires the accessible name to contain "the text that is presented
-  // visually" — the LABEL of the control, not every glyph inside its box.
-  // Concatenating textContent gets both parts of that wrong on real markup:
+  // visually": the label of the control, not every glyph inside its box.
+  // Concatenating textContent glues block-level children together without a
+  // word boundary and treats monograms and taglines as part of the label:
   //
-  //   <a class="brand" aria-label="Dr. Elena Brandt — Startseite" href="#top">
+  //   <a class="brand" aria-label="Dr. Elena Brandt: Startseite" href="#top">
   //     <span class="mark">Br</span>                      <!-- 19px monogram -->
   //     <span class="bname">Dr. Elena Brandt</span>       <!-- 20px wordmark -->
   //     <span class="brole">Kardiologie · Graz</span>     <!-- 11.5px tagline -->
@@ -445,33 +396,24 @@ const injectableCode = `
   //
   //   textContent -> "BrDr. Elena BrandtKardiologie · Graz"
   //
-  // Two independent defects: block-level children are glued together without a
-  // word boundary ("BrDr."), and the monogram + tagline are treated as part of
-  // the label although neither identifies the control — the wordmark does.
-  // Every branding link on the golden corpus failed 2.5.3 because of this.
-  //
-  // __visibleLabelSegments(el) returns the rendered text runs with the data
-  // needed to tell label from decoration:
+  // __visibleLabelSegments(el) returns the rendered text runs as
   //   { text, fontSize, isIconSubstitute }
   // dropping anything that is not in the accessibility tree (aria-hidden,
   // [hidden], display:none, visibility:hidden, sr-only clipping).
   //
-  // __visibleLabelText(el) reduces those segments to
-  //   { full, label, segments }
-  //   - full  : every segment, space-separated  (the strict reading of 2.5.3)
+  // __visibleLabelText(el) reduces those segments to { full, label, segments }:
+  //   - full  : every segment, space-separated (the strict reading of 2.5.3)
   //   - label : the segments that actually label the control, dropping
-  //       (a) ICON SUBSTITUTES — a run of <= 3 characters with no whitespace
-  //           next to other runs: monograms ("Br"), icon-font glyphs, "»".
-  //           These are pictures rendered as text; a speech user does not say
-  //           them, and 2.5.3's own note excludes non-text content.
-  //       (b) SUPPLEMENTARY runs — rendered below 80 % of the largest run's
+  //       (a) icon substitutes: a run of <= 3 characters with no whitespace
+  //           next to other runs (monograms, icon-font glyphs, "»"). These are
+  //           pictures rendered as text; 2.5.3's own note excludes non-text
+  //           content.
+  //       (b) supplementary runs: rendered below 80 % of the largest run's
   //           font-size when more than one run remains. Typographic hierarchy
-  //           is how a design says "this line is the name, that line is a
-  //           subtitle"; the subtitle is not the label.
-  // A caller passes 2.5.3 if EITHER \`full\` or \`label\` is contained in the name,
-  // so the reduction can only remove findings, never invent them. A control
-  // with a single uniform text run — every \`bad-label-in-name.html\` case —
-  // reduces to itself and is unaffected.
+  //           marks the subtitle, and the subtitle is not the label.
+  // A caller passes 2.5.3 if either \`full\` or \`label\` is contained in the
+  // name, so the reduction can only remove findings, never invent them. A
+  // control with a single uniform text run reduces to itself.
   function __visibleLabelSegments(el) {
     var segments = [];
     if (!el || el.nodeType !== 1) return segments;
@@ -562,7 +504,7 @@ const injectableCode = `
 
   // Does \`name\` contain \`visible\`? Two accepting tests, in this order:
   //
-  //   1. SUBSTRING containment on the normalised strings — the test axe-core's
+  //   1. SUBSTRING containment on the normalised strings: the test axe-core's
   //      \`label-content-name-mismatch\` applies, and the plain reading of
   //      Understanding 2.5.3 ("the name contains the text that is presented
   //      visually"). Crucially it does NOT require word boundaries to line up.
@@ -574,14 +516,14 @@ const injectableCode = `
   //
   //   2. The visible words appearing IN ORDER inside the name, which
   //      Understanding 2.5.3 allows explicitly: the name may carry extra words
-  //      before, after and BETWEEN the label's words — visible
+  //      before, after and BETWEEN the label's words. Visible
   //      \`PDF herunterladen\` against the name \`PDF-Dokument herunterladen\`
   //      is conformant, and no substring test can see that.
   //
   // Test 1 alone would fail case 2; test 2 alone would fail case 1. Together
   // they accept exactly the set the criterion accepts. The bounded cost is
   // that a name embedding the label inside an unrelated longer word also
-  // passes — the same behaviour every other conformance tool has.
+  // passes, the same behaviour every other conformance tool has.
   function __nameContainsLabel(name, visible) {
     if (!visible) return true;
     if (!name) return false;

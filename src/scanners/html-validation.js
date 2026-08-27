@@ -1,3 +1,9 @@
+/**
+ * HTML Validation Scanner.
+ * WCAG 4.1.1, 4.1.2 (EN 301 549 9.4.1.1, 9.4.1.2), plus name/role/ARIA checks.
+ * Pure DOM analysis with no script injection, so it works under strict CSP:
+ * button/link/frame names, aria-* validity, meta tags, duplicate ids, form labels.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -5,15 +11,6 @@ const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('html-validation');
 
-/**
- * Enhanced HTML Validation Scanner for WCAG 2.2 compliance testing
- * PHASE 1: CSP-Independent Implementation
- *
- * Implements EN 301 549 criteria 9.4.1.1, 9.4.1.3 + 40+ additional axe rules
- * Coverage: button-name, link-name, frame-title, aria-*, meta-*, duplicate-id-*
- *
- * CSP-Immune: Uses pure DOM parsing and analysis (no script injection)
- */
 class HTMLValidationScanner extends BaseScanner {
   constructor() {
     super('html-validation', {
@@ -103,11 +100,9 @@ class HTMLValidationScanner extends BaseScanner {
     // Group 6: Form and Input Validation
     await this.validateFormAccessibility(page, violations);
 
-    // Group 7: Heading and Structure — heading-order / page-has-heading-one
-    // are axe-core best-practice rules already run by axe-core-adapter.js;
-    // our duplicate was removed (see note near the end of this file).
+    // Heading order and page-has-heading-one are axe-core best-practice rules
+    // already run by axe-core-adapter.js and are not repeated here.
 
-    // Legacy validation for backward compatibility
     const duplicateIdResults = await this.checkDuplicateIds(page, violations);
     duplicateIds = duplicateIdResults.count;
     syntaxErrors += duplicateIds;
@@ -231,10 +226,9 @@ class HTMLValidationScanner extends BaseScanner {
     log.debug('Validating HTML structure...');
 
     const structureIssues = await page.evaluate((accnameCode) => {
-      // Shared ACCNAME implementation (__accessibleNameInfo) — see
+      // Shared ACCNAME implementation (__accessibleNameInfo), see
       // src/utils/accessible-name.js. Used for the empty-heading and
-      // unlabeled-form-control checks below, both of which used to model the
-      // accessibility API as "textContent plus a couple of attributes".
+      // unlabeled-form-control checks below.
       eval(accnameCode);
 
       const issues = [];
@@ -295,10 +289,8 @@ class HTMLValidationScanner extends BaseScanner {
         // Check for form controls without labels.
         // The shared helper covers label[for], wrapping <label> (implicit
         // association), aria-label(ledby), title, `value` on button-type inputs
-        // and `alt` on <input type="image"> — the last of which this check used
-        // to miss, reporting a perfectly-named image submit button as unlabeled.
-        // A `label`/`aria-labelledby` that resolves to empty text is now
-        // correctly treated as NO name (it previously counted as labelled).
+        // and `alt` on <input type="image">. A `label`/`aria-labelledby` that
+        // resolves to empty text counts as NO name.
         if (
           ['input', 'textarea', 'select'].includes(tagName) &&
           element.type !== 'hidden' &&
@@ -708,17 +700,17 @@ class HTMLValidationScanner extends BaseScanner {
         }
       });
 
-      // ── SC 4.1.3 evidence gate ────────────────────────────────────────
+      // SC 4.1.3 evidence gate
       //
       // The selector list above is a className/id SUBSTRING net: on a real
       // practice site it scoops up every `.status-indicator` dot, every
       // static `.success` blurb and every `.error-message` slot, whether or
       // not anything ever writes to it. Matching the net is therefore NOT
-      // evidence that an element is a status message — it only makes it a
+      // evidence that an element is a status message. It only makes it a
       // candidate.
       //
       // This mirrors the evidence model of the dedicated 4.1.3 scanner
-      // (phase6a-status-messages-scanner.js `evaluateCandidate`), minus its
+      // (status-messages.js `evaluateCandidate`), minus its
       // MutationObserver source: html-validation runs read-only and
       // concurrently, so it must not interact with the page and cannot
       // observe runtime dynamism. Only the two statically-decidable sources
@@ -743,7 +735,7 @@ class HTMLValidationScanner extends BaseScanner {
         return false;
       }
 
-      // Evidence 2: classic "error slot filled by JS" — empty at load and
+      // Evidence 2: classic "error slot filled by JS", empty at load and
       // pointed at by a control's aria-describedby / aria-errormessage.
       // Exempt when the page ships a separate aria-live announcer, which is
       // the accepted compensating pattern (the message still gets spoken).
@@ -804,11 +796,8 @@ class HTMLValidationScanner extends BaseScanner {
           }
 
           // Check for appropriate role usage.
-          // Evidence-gated: the old form fired whenever role="alert" content
-          // lacked the ENGLISH words "error"/"invalid" — i.e. on every
-          // correctly-marked-up German alert ("Bitte prüfen Sie Ihre
-          // Eingabe"). Now it needs positive evidence that the element is a
-          // NON-critical message wearing role="alert": a class/id that names
+          // Evidence-gated: needs positive evidence that the element is a
+          // NON-critical message wearing role="alert", a class/id that names
           // it as success/info/hint, in en or de.
           const nonCriticalNaming =
             /(^|[-_ ])(success|info|hint|notice|tip|hinweis|erfolg|erfolgreich)([-_ ]|$)/i;
@@ -921,10 +910,9 @@ class HTMLValidationScanner extends BaseScanner {
     log.debug('Validating button names...');
 
     const buttonIssues = await page.evaluate((accnameCode) => {
-      // Shared ACCNAME implementation — see src/utils/accessible-name.js.
-      // Replaces the local attribute chain, which read only textContent for the
-      // element's own text and therefore reported an icon button whose only
-      // child is `<img alt="Menu">` (or an inline `<svg><title>`) as unnamed.
+      // Shared ACCNAME implementation, see src/utils/accessible-name.js.
+      // It walks child `<img alt>` and inline `<svg><title>`, so icon buttons
+      // are named correctly.
       eval(accnameCode);
 
       // Helper function for element selector generation (browser context)
@@ -981,11 +969,9 @@ class HTMLValidationScanner extends BaseScanner {
     log.debug('Validating link names...');
 
     const linkIssues = await page.evaluate((accnameCode) => {
-      // Shared ACCNAME implementation — see src/utils/accessible-name.js.
-      // The local version already walked child `<img alt>`, but resolved
-      // `aria-labelledby` as a SINGLE id (the attribute is an ID *list*) and
-      // preferred `title` over the subtree, both of which disagree with what a
-      // screen reader announces.
+      // Shared ACCNAME implementation, see src/utils/accessible-name.js.
+      // It resolves `aria-labelledby` as an ID list and prefers the subtree
+      // over `title`, matching what a screen reader announces.
       eval(accnameCode);
 
       // Helper function for element selector generation (browser context)
@@ -1987,12 +1973,12 @@ class HTMLValidationScanner extends BaseScanner {
        *
        * Preferred source is the native `control.labels` NodeList: that is exactly how
        * a browser (and therefore assistive technology) resolves label associations.
-       * A wrapping <label for="thisId"> appears in it ONCE, not twice — one element,
+       * A wrapping <label for="thisId"> appears in it ONCE, not twice: one element,
        * two association mechanisms.
        *
        * Fallback (hosts/elements without `.labels`) collects `label[for=<id>]` plus
-       * the closest ancestor <label> into a Set, so ELEMENT IDENTITY — not the number
-       * of association mechanisms — determines the count.
+       * the closest ancestor <label> into a Set, so ELEMENT IDENTITY (not the number
+       * of association mechanisms) determines the count.
        */
       function getAssociatedLabels(control) {
         const native = control.labels;
@@ -2004,10 +1990,9 @@ class HTMLValidationScanner extends BaseScanner {
 
       /**
        * Permissive, identity-deduplicated label lookup, used to decide whether a
-       * control is labelled AT ALL. Deliberately looser than `control.labels`
-       * (it accepts e.g. a select nested in a <label> that already labels an earlier
-       * radio), so that fixing the multiple-labels count does not silently turn into
-       * a flood of new "no associated label" findings.
+       * control is labelled AT ALL. Looser than `control.labels` (it accepts e.g. a
+       * select nested in a <label> that already labels an earlier radio), so the
+       * strict multiple-labels count does not produce "no associated label" findings.
        */
       function getCandidateLabels(control) {
         const unique = new Set();
@@ -2020,7 +2005,7 @@ class HTMLValidationScanner extends BaseScanner {
           try {
             document.querySelectorAll(`label[for="${escaped}"]`).forEach((l) => unique.add(l));
           } catch (e) {
-            /* malformed id — no selector-based association */
+            /* malformed id: no selector-based association */
           }
         }
 
@@ -2074,13 +2059,13 @@ class HTMLValidationScanner extends BaseScanner {
         //
         // labelCount counts DISTINCT label ELEMENTS, not association mechanisms.
         // A control wrapped in a <label> that ALSO carries a matching for="" is
-        // associated by two mechanisms but by one and the same element — browsers
+        // associated by two mechanisms but by one and the same element. Browsers
         // report `control.labels.length === 1` for it, and it is NOT a "multiple
         // labels" violation. Two genuinely distinct <label> elements pointing at the
         // same control still count as 2 and are still flagged below.
         labelCount += getAssociatedLabels(control).length;
 
-        // "Is it labelled at all" stays on the looser lookup — see getCandidateLabels().
+        // "Is it labelled at all" stays on the looser lookup, see getCandidateLabels().
         if (getCandidateLabels(control).length > 0) {
           hasLabel = true;
         }
@@ -2123,19 +2108,6 @@ class HTMLValidationScanner extends BaseScanner {
       });
     });
   }
-
-  // NOTE: heading-structure validation intentionally REMOVED (2026-07-27).
-  //
-  // validateHeadingStructure() re-implemented axe-core's `heading-order` and
-  // `page-has-heading-one` rules. axe-core-adapter.js runs axe with the
-  // `best-practice` tag, so axe already reports both — verified identical
-  // firing on good-auto-submitting-form, good-css-background-accessible,
-  // good-language-override and good-motion-vestibular (axe: heading-order,
-  // 1 node each; ours: 1 violation each) and on bad-headings-labels (axe:
-  // heading-order + empty-heading). Per the "library base scan + custom
-  // scanners only where axe can't go architecture the duplicate is dropped
-  // rather than narrowed. Empty headings remain covered by this scanner's
-  // separate `empty-heading` check.
 
   /**
    * Helper method to generate element selector

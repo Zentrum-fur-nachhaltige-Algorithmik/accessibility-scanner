@@ -1,11 +1,8 @@
 /**
  * LLM Sensory Characteristics Scanner
- *
- * Covers:
- * - 1.3.3 Sensory Characteristics (Level A)
- *
- * Detects instructions that rely SOLELY on shape, color, size,
- * visual location, orientation, or sound to convey information.
+ * Covers 1.3.3 Sensory Characteristics (Level A).
+ * Detects instructions that rely solely on shape, color, size, visual
+ * location, orientation, or sound.
  */
 
 const LLMBaseScanner = require('./base');
@@ -39,12 +36,12 @@ Examples of violations:
 - "Press the larger button to continue" (size only, no label)
 
 Examples that are NOT violations (do NOT flag these):
-- "Click the Submit button (round, green)" — name IS provided alongside visual cue
-- "Error messages are shown in red text with a warning icon and the word 'Error'" — multiple cues
-- "Use the Account Settings link in the navigation menu" — element is named
-- "The sidebar labeled 'Quick Actions' on the right" — name provided alongside location
+- "Click the Submit button (round, green)": name IS provided alongside visual cue
+- "Error messages are shown in red text with a warning icon and the word 'Error'": multiple cues
+- "Use the Account Settings link in the navigation menu": element is named
+- "The sidebar labeled 'Quick Actions' on the right": name provided alongside location
 - Decorative or informational text that is NOT an instruction (e.g., "The sky is blue")
-- Standard UI labels like "Click Submit" or "Press Cancel" — these reference the element by name
+- Standard UI labels like "Click Submit" or "Press Cancel": these reference the element by name
 
 CRITICAL: Only flag actual instructions that would leave a non-visual user unable to identify the referenced element. If any textual identifier (name, label, role) accompanies the sensory reference, it is NOT a violation. Err on the side of NOT flagging.
 

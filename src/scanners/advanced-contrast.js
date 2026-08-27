@@ -1,20 +1,15 @@
+/**
+ * Advanced Contrast Scanner.
+ * WCAG 1.4.11, 1.4.13 (EN 301 549 9.1.4.11, 9.1.4.13).
+ * Measures UI component, graphical object and hover/focus content contrast.
+ * Text contrast (1.4.3/1.4.6) is the color-contrast scanner's remit.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
 const log = require('../utils/logger').createLogger('advanced-contrast');
 
-/**
- * Advanced Contrast Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.1.4.11, 9.1.4.13 (Non-text Contrast, Content on Hover or Focus)
- * Tests UI components, graphical objects, and hover/focus content contrast
- *
- * Declared criteria note: this scanner only ever emits `9.1.4.11` and
- * `9.1.4.13` findings. It previously ALSO claimed 1.4.3/1.4.6 (text contrast),
- * which it does not test at all — that is `color-contrast-scanner.js`'s remit —
- * so every harness run routed 1.4.3/1.4.6 fixtures here and recorded a miss.
- * The metadata now matches what the scanner actually produces.
- */
 class AdvancedContrastScanner extends BaseScanner {
   constructor() {
     super('advanced-contrast', {
@@ -119,26 +114,9 @@ class AdvancedContrastScanner extends BaseScanner {
    * Test UI component and graphical object contrast (WCAG 1.4.11) in a single
    * in-page pass.
    *
-   * Rewritten wholesale. The previous implementation:
-   *  - enumerated elements once per entry in a selector list whose entries
-   *    overlap (`button` / `.btn` / `.button`, `.icon` / `[class*="icon"]`), so
-   *    the same element was measured and reported up to four times;
-   *  - serialised each element to a CSS selector string and then RE-SELECTED it
-   *    with `document.querySelector` in a second `page.evaluate`. The generated
-   *    selector was a class list (matches every sibling with those classes) or
-   *    `tagName:nth-of-type(n)` where n was the element's index within a
-   *    `querySelectorAll` result, not among its siblings — so the second lookup
-   *    routinely measured a DIFFERENT element than the one enumerated, or none;
-   *  - read `element.parentElement`'s own computed background and fell back to
-   *    white, so a transparent parent produced bogus ratios;
-   *  - never alpha-composited translucent fills;
-   *  - applied invented leniency tiers (1.5:1 / 2.5:1 for inputs) gated on a
-   *    "has focus indicator" probe that was true for almost every element.
-   *
-   * Everything now runs against live element references inside one evaluate,
-   * uses the shared WCAG helpers, and applies the SC 1.4.11 exceptions
-   * (inactive components, decorative graphics, boundary already identified by
-   * a compliant border).
+   * Runs against live element references inside one evaluate, uses the shared
+   * WCAG helpers, and applies the SC 1.4.11 exceptions (inactive components,
+   * decorative graphics, boundary already identified by a compliant border).
    */
   async testNonTextContrast(page) {
     log.debug('Testing UI component contrast...');
@@ -156,7 +134,7 @@ class AdvancedContrastScanner extends BaseScanner {
         return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')';
       }
 
-      // Stable, human-findable description. Only ever used for reporting —
+      // Stable, human-findable description. Only ever used for reporting,
       // never fed back into querySelector.
       function describe(element) {
         let out = element.tagName.toLowerCase();
@@ -206,7 +184,7 @@ class AdvancedContrastScanner extends BaseScanner {
       // decoration, and WCAG does not require a visual boundary at all (a
       // borderless text button passes). Reporting the border would mean that
       // ADDING a faint border to an otherwise-passing control creates a
-      // failure. The exception is deliberately narrow — it does not apply when
+      // failure. The exception is narrow: it does not apply when
       // the control has its own background fill (then the fill/border is the
       // shape that delineates the control, and it is measured as before), nor
       // when the label itself is below 3:1 (an icon glyph or greyed-out text
@@ -293,7 +271,7 @@ class AdvancedContrastScanner extends BaseScanner {
               elementType === 'ui-component' &&
               identifiedByOwnLabel(element, backdrop, THRESHOLD)
             ) {
-              // Decorative border on a text-labelled, unfilled control — see
+              // Decorative border on a text-labelled, unfilled control, see
               // identifiedByOwnLabel() above. Evidence is already recorded.
             } else if (ratio < THRESHOLD) {
               violations.push({
@@ -320,7 +298,7 @@ class AdvancedContrastScanner extends BaseScanner {
 
         // Fill: SC 1.4.11 covers the visual information REQUIRED to identify
         // the component. When a compliant border already provides that
-        // boundary, the fill carries no additional requirement — otherwise the
+        // boundary, the fill carries no additional requirement. Otherwise the
         // canonical accessible form control (white field, white page, dark
         // border) fails for no reason.
         if (compliantBorder) continue;
@@ -382,12 +360,11 @@ class AdvancedContrastScanner extends BaseScanner {
       /**
        * Build a selector that is actually valid CSS.
        *
-       * Two real-world traps this closes, both found on live sites:
-       *  - React's `useId()` produces ids like ":Rbaqrlaupgqop:" — the colons
+       * Two traps this closes:
+       *  - React's `useId()` produces ids like ":Rbaqrlaupgqop:"; the colons
        *    MUST be escaped or `document.querySelector` throws.
        *  - `class="mzp-c-button "` (trailing space) split naively yields an
-       *    empty token, producing a dangling "." — also a SyntaxError.
-       * Either one aborted the whole contrast sweep on real pages.
+       *    empty token, producing a dangling ".", also a SyntaxError.
        */
       const buildSafeSelector = (element, index) => {
         const esc = (v) =>
@@ -578,7 +555,7 @@ class AdvancedContrastScanner extends BaseScanner {
           };
         }
 
-        return { contrastRatio: 21 }; // Not determinable — never report a failure
+        return { contrastRatio: 21 }; // Not determinable: never report a failure
       },
       tooltip,
       contrastUtils

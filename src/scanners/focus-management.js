@@ -1,14 +1,15 @@
+/**
+ * Focus Management Scanner.
+ * WCAG 2.4.3, 2.4.7, 2.4.11 (EN 301 549 9.2.4.3, 9.2.4.7, 9.2.4.11).
+ * Walks the tab sequence to check focus order, visible focus indicators,
+ * focus not obscured and focus handling in modals, with screenshot evidence.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { tabWalk, cleanupTabWalk, TAB_ATTR } = require('../utils/keyboard-focus');
 const log = require('../utils/logger').createLogger('focus-management');
 
-/**
- * Focus Management Scanner for WCAG compliance testing
- * Implements EN 301 549 criteria 9.2.4.3, 9.2.4.7 (Focus Order, Focus Visible)
- * Analyzes logical tab order and visual focus indicators with screenshot validation
- */
 class FocusManagementScanner extends BaseScanner {
   constructor() {
     super('focus-management', {
@@ -22,7 +23,7 @@ class FocusManagementScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method — receives an already-navigated Puppeteer page.
+   * Core scan method. Receives an already-navigated Puppeteer page.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
@@ -145,7 +146,7 @@ class FocusManagementScanner extends BaseScanner {
 
     // 4. Validate focus visibility for all elements (SC 2.4.7: an indicator
     //    must exist). Indicator CONTRAST is SC 1.4.11 and is reported once, by
-    //    nontext-contrast — a low-contrast ring is visible, so it is not a
+    //    nontext-contrast: a low-contrast ring is visible, so it is not a
     //    2.4.7 failure and must not be double-counted here.
     for (const focusItem of focusTestResults.sequence) {
       if (
@@ -165,7 +166,7 @@ class FocusManagementScanner extends BaseScanner {
       }
     }
 
-    // 5. Test focus not obscured (WCAG 2.4.11) — BEFORE the modal tests below
+    // 5. Test focus not obscured (WCAG 2.4.11) BEFORE the modal tests below
     //    open dialogs and leave fixed overlays on the page
     let focusNotObscured = true;
     const obscuredResults = await this.analyzeFocusObscured(

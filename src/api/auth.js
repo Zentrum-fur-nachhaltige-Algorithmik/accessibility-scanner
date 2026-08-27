@@ -1,23 +1,10 @@
-'use strict';
-
 /**
- * auth — bearer-token protection for the scan API and generated reports.
- *
- * The API drives a headless browser and writes files; leaving it open on a
- * public port is a resource-abuse and SSRF-pivot risk. When `API_TOKEN` is set
- * every `/api/*` route except the health probe requires
- * `Authorization: Bearer <API_TOKEN>`.
- *
- * `/reports/*` is protected on the same terms: that static mount serves exactly
- * the same generated files as `/api/report/:id` — scanned URLs, DOM snippets
- * and findings — so leaving it open would hand out through one door what the
- * other door locks.
- *
- * When `API_TOKEN` is unset the server stays open (local development, CLI and
- * test harnesses) and logs a loud startup warning instead.
- *
- * @module auth
+ * auth
+ * Bearer-token protection for the scan API and generated reports.
+ * When API_TOKEN is set, /api/* (except /api/health) and /reports/* require
+ * `Authorization: Bearer <API_TOKEN>`; when unset the server stays open and warns.
  */
+'use strict';
 
 const log = require('../utils/logger').createLogger('auth');
 
@@ -36,7 +23,7 @@ const DEFAULT_PROTECTED_PREFIXES = ['/api', '/reports'];
  * Constant-time string comparison.
  *
  * Both sides are hashed first so that `timingSafeEqual` always sees equal-length
- * buffers — otherwise it throws, and the throw itself leaks the token length.
+ * buffers; otherwise it throws, and the throw itself leaks the token length.
  */
 function safeCompare(a, b) {
   const digest = (value) => crypto.createHash('sha256').update(String(value), 'utf8').digest();
@@ -119,11 +106,11 @@ function createAuthMiddleware(options = {}) {
 function logAuthStartupState(token = process.env.API_TOKEN, logger = log) {
   if (typeof token === 'string' && token.length > 0) {
     logger.info(
-      'Auth: API_TOKEN set — /api/* and /reports/* require Authorization: Bearer <token> (except /api/health)'
+      'Auth: API_TOKEN set. /api/* and /reports/* require Authorization: Bearer <token> (except /api/health)'
     );
     return true;
   }
-  logger.warn('Auth: API is running OPEN — set API_TOKEN for deployment');
+  logger.warn('Auth: API is running OPEN. Set API_TOKEN for deployment');
   return false;
 }
 

@@ -1,30 +1,17 @@
+/**
+ * Concurrent Input Mechanisms Scanner.
+ * WCAG 2.5.6 (EN 301 549 9.2.5.6).
+ * Reports only observable restrictions to one input modality (DOM, computed
+ * styles, registered listeners); no "feels touch-first" heuristics.
+ */
 const BaseScanner = require('../core/base-scanner');
 const log = require('../utils/logger').createLogger('concurrent-input');
 
-/**
- * Concurrent Input Mechanisms Scanner — WCAG 2.5.6 (AAA),
- * EN 301 549 clause 9.2.5.6.
- *
- * "Web content does not restrict use of input modalities available on a
- * platform except where the restriction is essential, required to ensure the
- * security of the content, or required to respect user settings."
- *
- * The failure mode is a page that assumes ONE input modality. Every check below
- * is evidence-based: it fires only when a concrete restriction is observable in
- * the DOM, the computed styles, or the actually-registered event listeners.
- * There is deliberately no "this page feels touch-first" heuristic — 2.5.6 is
- * about demonstrable exclusion, not about style.
- *
- * Listener discovery
- * ------------------
- * Inline `on*` attributes are only half the picture; most real pages register
- * handlers with `addEventListener`. This scanner therefore instruments
- * `EventTarget.prototype.addEventListener` via `evaluateOnNewDocument` and
- * reloads the page, so it sees the real listener map. That mutation is why the
- * scanner declares `needsExclusiveAccess`. If the reload fails (CSP, offline
- * fixture, detached frame) it degrades gracefully to attribute-only analysis
- * and says so in the summary.
- */
+// Instruments EventTarget.prototype.addEventListener before the page reloads
+// so the scanner sees the real listener map, not just inline on* attributes.
+// This mutation is why the scanner declares needsExclusiveAccess. If the reload
+// fails (CSP, offline fixture, detached frame) the scan degrades to
+// attribute-only analysis and says so in the summary.
 
 const INSTRUMENTATION = `
   (function () {
@@ -65,7 +52,7 @@ class ConcurrentInputScanner extends BaseScanner {
     });
   }
 
-  /** Reloads the page with instrumentation installed — must own its tab. */
+  /** Reloads the page with instrumentation installed, so it must own its tab. */
   get needsExclusiveAccess() {
     return true;
   }
@@ -166,7 +153,7 @@ class ConcurrentInputScanner extends BaseScanner {
           issue: 'touch-only-interaction',
           description:
             `<${el.tagName.toLowerCase()}> handles touch events but exposes no mouse, ` +
-            'pointer, click or keyboard equivalent — mouse, pen, switch and keyboard ' +
+            'pointer, click or keyboard equivalent. Mouse, pen, switch and keyboard ' +
             'users cannot operate it.',
           severity: 'error',
           suggestion:
@@ -178,8 +165,8 @@ class ConcurrentInputScanner extends BaseScanner {
 
       // ---- 2. mouse-only interaction -----------------------------------
       // Low-level mouse events with no click, no touch and no pointer
-      // fallback: touch and pen users get nothing. (`click` is deliberately
-      // treated as modality-neutral — browsers synthesise it from taps.)
+      // fallback: touch and pen users get nothing. (`click` is treated as
+      // modality-neutral because browsers synthesise it from taps.)
       for (const el of candidates) {
         const m = modalities(el);
         if (!m.mouse) continue;
@@ -191,7 +178,7 @@ class ConcurrentInputScanner extends BaseScanner {
           issue: 'mouse-only-interaction',
           description:
             `<${el.tagName.toLowerCase()}> reacts only to low-level mouse events ` +
-            '(mousedown/mouseup/mousemove) with no click, touch or pointer equivalent — ' +
+            '(mousedown/mouseup/mousemove) with no click, touch or pointer equivalent. ' +
             'touch and pen users cannot operate it.',
           severity: 'error',
           suggestion:
@@ -208,7 +195,7 @@ class ConcurrentInputScanner extends BaseScanner {
         const m = modalities(el);
         const interactive =
           el.matches(NATIVE_INTERACTIVE) || m.click || m.mouse || m.touch || m.pointer;
-        if (!interactive) continue; // decorative overlay — correct use of the property
+        if (!interactive) continue; // decorative overlay: correct use of the property
 
         const rect = el.getBoundingClientRect();
         if (rect.width < 2 || rect.height < 2) continue;
@@ -245,11 +232,9 @@ class ConcurrentInputScanner extends BaseScanner {
         }
       }
 
-      // NOTE: `user-scalable=no` / `maximum-scale=1` is also a touch-modality
-      // restriction, but it is already reported by html-validation-scanner and
-      // phase6d-mobile-specific-scanner under 1.4.4/1.4.10. Emitting it a third
-      // time here would inflate the ensemble count for one underlying defect,
-      // so this scanner deliberately stays silent about it.
+      // `user-scalable=no` / `maximum-scale=1` is also a touch-modality
+      // restriction, but html-validation and mobile-specific already report it
+      // under 1.4.4/1.4.10, so it is not emitted a third time here.
 
       return {
         violations,

@@ -1,13 +1,7 @@
 /**
  * LLM Behavioral Scanner
- *
- * Covers criteria about application behavior and timing:
- * - 2.2.3 No Timing (AAA)
- * - 2.2.4 Interruptions (AAA)
- * - 2.2.5 Re-authentication (AAA)
- * - 2.2.6 Timeouts (AAA)
- * - 3.2.5 Change on Request (AAA)
- * - 3.3.5 Help (AAA)
+ * Covers 2.2.3 No Timing, 2.2.4 Interruptions, 2.2.5 Re-authentication,
+ * 2.2.6 Timeouts, 3.2.5 Change on Request and 3.3.5 Help (all AAA).
  */
 
 const LLMBaseScanner = require('./base');
@@ -74,11 +68,11 @@ external scripts you cannot see, from framework attributes, or from what a page
    numbers). Flag ONLY when such a form has NO help of any kind: no instruction
    text, no aria-describedby hints, no title/placeholder guidance, no help link
    or contact reference. Simple forms (login, search, contact forms with
-   name/email/message) do NOT require context-sensitive help — never flag them.
+   name/email/message) do NOT require context-sensitive help: never flag them.
 
 Do NOT flag:
 - Anything based on the mere presence of setTimeout/setInterval (timers are used
-  for animations, debouncing, analytics — flag only when the timer's callback
+  for animations, debouncing, analytics: flag only when the timer's callback
   demonstrably submits, navigates, logs out, or removes user data)
 - External or minified scripts whose behavior you cannot read
 - Missing help links on simple pages or simple forms

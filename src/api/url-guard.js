@@ -1,26 +1,15 @@
-'use strict';
-
 /**
- * url-guard — SSRF protection for scan targets.
- *
- * The scanner drives a real browser against an arbitrary, caller-supplied URL.
- * Without a guard that is a textbook SSRF primitive: an attacker can point the
- * scanner at cloud metadata (169.254.169.254), at internal services on the
- * loopback/RFC1918 network, or at `file://` and exfiltrate the response through
- * the generated report.
- *
- * Policy enforced by {@link assertScannableUrl}:
- *   1. Scheme must be http: or https:  (file:, data:, chrome:, gopher: … rejected)
- *   2. Host must pass the optional SCAN_ALLOWED_HOSTS allowlist
- *   3. Every address the host resolves to must be publicly routable
- *
- * @module url-guard
+ * url-guard
+ * SSRF protection for scan targets: the browser must never be pointed at
+ * cloud metadata, loopback/RFC1918 services or non-http schemes.
+ * assertScannableUrl checks scheme, the SCAN_ALLOWED_HOSTS allowlist and every resolved address.
  */
+'use strict';
 
 const dns = require('dns').promises;
 const net = require('net');
 
-// ── Typed errors ────────────────────────────────────────────────
+// Typed errors
 
 /** Base class for every rejection produced by this module. */
 class UrlGuardError extends Error {
@@ -62,14 +51,14 @@ class PrivateAddressError extends UrlGuardError {
   }
 }
 
-/** Hostname could not be resolved at all — we refuse to hand it to the browser. */
+/** Hostname could not be resolved at all; it is never handed to the browser. */
 class DnsResolutionError extends UrlGuardError {
   constructor(message) {
     super(message, 'DNS_RESOLUTION_FAILED');
   }
 }
 
-// ── Address classification ──────────────────────────────────────
+// Address classification
 
 /**
  * IPv4 ranges that must never be reached by a scan.
@@ -85,7 +74,7 @@ const BLOCKED_V4 = [
   ['169.254.0.0', 16, 'link-local / cloud metadata 169.254.0.0/16'],
   ['172.16.0.0', 12, 'RFC1918 private 172.16.0.0/12'],
   ['192.168.0.0', 16, 'RFC1918 private 192.168.0.0/16'],
-  // defence in depth — not required by spec, equally non-public
+  // defence in depth: not required by spec, equally non-public
   ['100.64.0.0', 10, 'carrier-grade NAT 100.64.0.0/10'],
   ['192.0.0.0', 24, 'IETF protocol assignments 192.0.0.0/24'],
   ['198.18.0.0', 15, 'benchmarking 198.18.0.0/15'],
@@ -172,7 +161,7 @@ function describeBlockedIPv6(ip) {
   if (allZeroUpTo(15) && b[15] === 1) return 'loopback ::1';
   if (allZeroUpTo(16)) return 'unspecified ::';
 
-  // ::ffff:a.b.c.d (mapped) and ::a.b.c.d (compatible) tunnel an IPv4 address —
+  // ::ffff:a.b.c.d (mapped) and ::a.b.c.d (compatible) tunnel an IPv4 address:
   // classify by the embedded IPv4 so ::ffff:127.0.0.1 is blocked like 127.0.0.1.
   const mapped = allZeroUpTo(10) && b[10] === 0xff && b[11] === 0xff;
   const compatible = allZeroUpTo(12);
@@ -206,7 +195,7 @@ function isPrivateAddress(ip) {
   return describeBlockedAddress(ip) !== null;
 }
 
-// ── Allowlist ───────────────────────────────────────────────────
+// Allowlist
 
 /**
  * Parse SCAN_ALLOWED_HOSTS.
@@ -233,7 +222,7 @@ function parseAllowlist(raw) {
 }
 
 /**
- * Suffix match on label boundaries — `.vercel.app` matches `a.vercel.app` but
+ * Suffix match on label boundaries: `.vercel.app` matches `a.vercel.app` but
  * never `evil-vercel.app`.
  */
 function matchAllowlist(hostname, entries) {
@@ -264,7 +253,7 @@ function allowlistVouchesForPrivate(hostname, hit) {
   return exact && !entry.wildcard;
 }
 
-// ── Public API ──────────────────────────────────────────────────
+// Public API
 
 /**
  * Validate that a URL is safe to hand to the scanning browser.
@@ -291,7 +280,7 @@ async function assertScannableUrl(url, options = {}) {
 
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     throw new BlockedProtocolError(
-      `Unsupported URL scheme "${parsed.protocol}" — only http: and https: may be scanned`
+      `Unsupported URL scheme "${parsed.protocol}": only http: and https: may be scanned`
     );
   }
 
@@ -321,7 +310,7 @@ async function assertScannableUrl(url, options = {}) {
 
   const allowPrivate = allowlistVouchesForPrivate(hostname, hit);
 
-  // Literal IP target — no resolution needed, classify directly.
+  // Literal IP target: no resolution needed, classify directly.
   if (net.isIP(hostname)) {
     const reason = describeBlockedAddress(hostname);
     if (reason && !allowPrivate) {
@@ -364,80 +353,8 @@ async function assertScannableUrl(url, options = {}) {
   return { url: parsed.href, hostname, addresses, allowlisted: !!hit };
 }
 
-/**
- * Build a Puppeteer `request` handler that re-applies the same SSRF policy to
- * every sub-resource the scanned page requests (redirects, XHR, iframes, …).
- *
- * {@link assertScannableUrl} only vets the *entry* URL; a hostile page can
- * still redirect or fetch its way to 169.254.169.254 afterwards. This hook
- * closes that gap.
- *
- * NOT wired into the pipeline — src/scan-pipeline.js is owned by another agent.
- * To adopt it there:
- *
- * ```js
- * const { createRequestGuard } = require('./url-guard');
- * await page.setRequestInterception(true);
- * page.on('request', createRequestGuard({ onBlock: (url, err) => log(url, err.code) }));
- * ```
- *
- * Caveats for whoever wires it up:
- *  - `setRequestInterception(true)` disables Chrome's HTTP cache and slows
- *    scans; measure before enabling it for every scanner.
- *  - Only one handler may resolve a request. If other interceptors exist, use
- *    puppeteer's cooperative intercept mode (`request.continue({}, priority)`).
- *  - Non-network schemes (data:, blob:, about:) are passed through; file: is
- *    always aborted.
- *
- * @param {object} [options]
- * @param {string} [options.allowedHosts] override for SCAN_ALLOWED_HOSTS
- * @param {(url: string, error: Error) => void} [options.onBlock] block callback
- * @returns {(request: import('puppeteer').HTTPRequest) => Promise<void>}
- */
-function createRequestGuard(options = {}) {
-  const { onBlock } = options;
-  const passthroughSchemes = new Set(['data:', 'blob:', 'about:']);
-
-  return async function guardRequest(request) {
-    if (
-      typeof request.isInterceptResolutionHandled === 'function' &&
-      request.isInterceptResolutionHandled()
-    ) {
-      return;
-    }
-
-    const requestUrl = request.url();
-    let protocol = null;
-    try {
-      protocol = new URL(requestUrl).protocol;
-    } catch (error) {
-      /* fall through — unparseable URLs are aborted below */
-    }
-
-    if (protocol && passthroughSchemes.has(protocol)) {
-      await request.continue().catch(() => {});
-      return;
-    }
-
-    try {
-      await assertScannableUrl(requestUrl, { allowedHosts: options.allowedHosts });
-      await request.continue().catch(() => {});
-    } catch (error) {
-      if (onBlock) {
-        try {
-          onBlock(requestUrl, error);
-        } catch (e) {
-          /* never let logging break a scan */
-        }
-      }
-      await request.abort('blockedbyclient').catch(() => {});
-    }
-  };
-}
-
 module.exports = {
   assertScannableUrl,
-  createRequestGuard,
   isPrivateAddress,
   describeBlockedAddress,
   parseAllowlist,

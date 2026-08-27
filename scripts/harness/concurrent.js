@@ -1,30 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Concurrent Scanner True/False Positive Test
- *
- * Mirrors test-exclusive-scanners.js but covers the ~20 concurrent
- * (non-exclusive) deterministic scanners instead of the 7 exclusive ones.
- *
- *  - Bad files: pass ONLY if at least one returned violation matches a
- *    criterion that BOTH the test file declares (its WCAG-TEST `criterion:`
- *    list) AND the scanner under test itself claims to cover (its own
- *    `wcagCriteria` constructor metadata). ">0 violations of any kind"
- *    does NOT count — this is violation-level ground truth, not just a
- *    non-zero count.
- *  - Good files: pass when zero violations match that same intersected
- *    criterion set (no false positives).
- *
- * Unlike the exclusive harness, several concurrent scanners legitimately
- * claim overlapping WCAG criteria (e.g. both color-contrast and
- * advanced-contrast claim 1.4.3/1.4.6; screen-reader, page-structure and
- * advanced-aria all claim 1.3.1). Routing is therefore many-to-many: a
- * test file is run against EVERY concurrent scanner whose own wcagCriteria
- * intersects the file's declared criteria, not just one.
- *
- * Each test gets its own fresh page (concurrent scanners don't need
- * exclusive access, but isolating state per-test keeps results honest and
- * avoids one fixture's DOM mutations leaking into the next test).
+ * concurrent.js: true/false-positive harness for the concurrent (non-exclusive) deterministic
+ * scanners. A bad file passes only if a violation matches a criterion that both the file
+ * declares and the scanner claims; a good file passes when no such violation is reported.
  *
  * Usage:
  *   node scripts/harness/concurrent.js
@@ -49,12 +28,14 @@ async function loadPuppeteer() {
 
 /**
  * Concurrent (non-exclusive) deterministic scanner definitions: id -> module.
- * Criteria are NOT hardcoded here — they are read from each scanner's own
- * `wcagCriteria` constructor metadata at instantiation time (see below),
- * per the task requirement to use each scanner's real, current metadata.
+ * Criteria are not hardcoded here; they are read from each scanner's own
+ * `wcagCriteria` constructor metadata at instantiation time. Routing is
+ * many-to-many: a test file runs against every scanner whose criteria
+ * intersect the file's declared criteria. Each test gets a fresh page so one
+ * fixture's DOM mutations cannot leak into the next.
  *
- * Excludes axe-core (covered by tests/e2e/axe-core.test.js) and
- * every scanner already covered by test-exclusive-scanners.js.
+ * Excludes axe-core (covered by tests/e2e/axe-core.test.js) and every scanner
+ * covered by scripts/harness/exclusive.js.
  */
 const CONCURRENT_SCANNERS = {
   'color-contrast': { module: '../../src/scanners/color-contrast' },
@@ -77,26 +58,21 @@ const CONCURRENT_SCANNERS = {
 };
 
 /**
- * Check if a violation matches any of the target criteria.
- * (identical semantics to test-exclusive-scanners.js)
- */
-/**
  * Does a violation belong to any of `criteria`?
  *
  * The deterministic scanners emit three different violation shapes, and the
  * matcher has to read all of them or it silently scores real detections as
- * misses (which is how `color-contrast` appeared to miss `bad-color-contrast`
- * while returning 22 correct violations):
+ * misses:
  *
- *   1. `criterion` / `ruleId` — a per-violation criterion (most scanners,
+ *   1. `criterion` / `ruleId`: a per-violation criterion (most scanners,
  *      EN 301 549 "9.x.y.z" or bare "x.y.z"). Most precise; preferred.
- *   2. `wcagCriteria` — a per-violation ARRAY (nontext-contrast, label-in-name).
- *   3. neither — the violation carries only element/measurement fields
- *      (color-contrast). The only sound attribution left is the SCANNER's own
+ *   2. `wcagCriteria`: a per-violation array (nontext-contrast, label-in-name).
+ *   3. neither: the violation carries only element/measurement fields
+ *      (color-contrast). The only sound attribution left is the scanner's own
  *      declared criteria, which the caller passes as `scannerCriteria`. This is
- *      safe here precisely because the caller has already intersected the file's
- *      declared criteria with the scanner's, so a scanner can still never be
- *      credited for a criterion it does not claim.
+ *      safe because the caller has already intersected the file's declared
+ *      criteria with the scanner's, so a scanner is never credited for a
+ *      criterion it does not claim.
  */
 function matchesCriteria(violation, criteria, scannerCriteria = null) {
   const hit = (value) => {
@@ -120,9 +96,8 @@ function matchesCriteria(violation, criteria, scannerCriteria = null) {
  * Intersect a test file's declared WCAG criteria with a scanner's own
  * claimed wcagCriteria. Both are plain "x.y.z" strings from consistent
  * sources (WCAG-TEST comment blocks / BaseScanner constructor metadata),
- * so exact-string membership is the correct (and only correct) check here
- * — this is what stops a scanner being credited for a criterion it does
- * not claim to cover.
+ * so exact-string membership is the right check; it stops a scanner being
+ * credited for a criterion it does not claim to cover.
  */
 function intersectCriteria(fileCriteria, scannerCriteria) {
   return fileCriteria.filter((c) => scannerCriteria.includes(c));
@@ -146,7 +121,7 @@ async function main() {
   const puppeteer = await loadPuppeteer();
   const testDir = TEST_SITES;
 
-  // ---- Instantiate scanners first: we need each one's real wcagCriteria ----
+  // ---- Instantiate scanners first to read each one's real wcagCriteria ----
   const scannerInstances = {};
   const scannerCriteria = {}; // id -> string[] (from instance.wcagCriteria)
 
@@ -216,7 +191,7 @@ async function main() {
   for (const c of ALL_CRITERIA) filesByCriterion[c] = { bad: [], good: [] };
   for (const { file, metadata, isGood, isBad } of parsedFiles) {
     for (const c of metadata.criterion) {
-      if (!filesByCriterion[c]) continue; // criterion not covered by any of our scanners
+      if (!filesByCriterion[c]) continue; // criterion not covered by any concurrent scanner
       if (isBad) filesByCriterion[c].bad.push(file);
       if (isGood) filesByCriterion[c].good.push(file);
     }
@@ -335,8 +310,8 @@ async function main() {
         }
 
         // Per-criterion detection bookkeeping (finer grain than the
-        // aggregate `matched` count above — needed because a single test
-        // can carry multiple intersected criteria at once).
+        // aggregate `matched` count above: a single test can carry several
+        // intersected criteria).
         for (const c of t.criteria) {
           const matchedForC = allViolations.some((v) =>
             matchesCriteria(v, [c], scannerCriteria[scannerId])
@@ -456,10 +431,10 @@ async function main() {
 }
 
 // Exported so `scripts/coverage-matrix.js` can read the real scanner list instead
-// of regex-scraping this file. Criteria are intentionally absent here (they are
-// read from each scanner's own metadata at run time), so the matrix resolves
-// them from the scanner registry by id. Guarded so requiring this module never
-// launches a browser.
+// of regex-scraping this file. Criteria are absent here (read from each
+// scanner's own metadata at run time), so the matrix resolves them from the
+// scanner registry by id. Guarded so requiring this module never launches a
+// browser.
 module.exports = { CONCURRENT_SCANNERS, matchesCriteria, intersectCriteria };
 
 if (require.main === module) {

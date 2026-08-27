@@ -1,21 +1,20 @@
+/**
+ * Seizure Prevention Scanner.
+ * WCAG 2.3.1, 2.3.2, 2.3.3 (EN 301 549 9.2.3.1, 9.2.3.3).
+ * Observes the page for flashing content and interaction-triggered animation
+ * and checks for prefers-reduced-motion support.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('seizure-prevention');
 
-/**
- * Seizure Prevention Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.2.3.1, 9.2.3.3 (Three Flashes, Animation from Interactions)
- * CRITICAL SAFETY REQUIREMENT - Tests for seizure-inducing content
- */
 class SeizurePreventionScanner extends BaseScanner {
   constructor() {
     super('seizure-prevention', {
       // 2.3.3 (Animation from Interactions) is emitted by analyzeAnimationTriggers()
-      // as EN 301 549 clause 9.2.3.3, but was missing from this list — which made
-      // the criterion invisible to the coverage matrix and to every
-      // criterion-filtered harness. The scanner has always tested it.
+      // as EN 301 549 clause 9.2.3.3.
       wcagCriteria: ['2.3.1', '2.3.2', '2.3.3'],
       wcagPrinciple: 'operable',
     });
@@ -140,11 +139,8 @@ class SeizurePreventionScanner extends BaseScanner {
       };
 
       // SVG and MathML elements expose `className` as an SVGAnimatedString, not
-      // a string — `.includes()` and `.split()` throw on them. Because the sweep
-      // below is a forEach over querySelectorAll('*'), a single inline <svg>
-      // aborted the ENTIRE flash analysis. Real pages are full of inline SVG
-      // icons; the synthetic corpus has almost none, which is why this survived
-      // until the real-world fixtures were added.
+      // a string; `.includes()` and `.split()` throw on them, which would abort
+      // the whole querySelectorAll('*') sweep below on a single inline <svg>.
       const safeClass = (el) => (typeof el.className === 'string' ? el.className : '');
       const safeSelector = (el) => {
         const cls = safeClass(el).trim().split(/\s+/).filter(Boolean)[0];
@@ -347,7 +343,7 @@ class SeizurePreventionScanner extends BaseScanner {
       );
 
       interactiveElements.forEach((element) => {
-        // className is an SVGAnimatedString on SVG/MathML elements — an inline
+        // className is an SVGAnimatedString on SVG/MathML elements; an inline
         // <svg> inside a <button> would otherwise throw and abort this sweep.
         const cls = typeof element.className === 'string' ? element.className : '';
         const elementInfo = {

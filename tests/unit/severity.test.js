@@ -82,7 +82,7 @@ describe('severity', () => {
       expect(worse).toBeGreaterThan(0);
     });
 
-    it('is unchanged from the old subtraction for lightly-broken pages', () => {
+    it('equals 100 minus the penalty for lightly-broken pages', () => {
       expect(scoreFromPenalty(2)).toBe(98);
       expect(scoreFromPenalty(5)).toBe(95);
       expect(scoreFromPenalty(0)).toBe(100);

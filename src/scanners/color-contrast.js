@@ -1,16 +1,13 @@
+/**
+ * Color Contrast Scanner.
+ * WCAG 1.4.3, 1.4.6 (EN 301 549 9.1.4.3, 9.1.4.6).
+ * All colour maths comes from the shared helpers in src/utils/browser-contrast.js
+ * (relative luminance, alpha compositing, ancestor background resolution).
+ */
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
 const log = require('../utils/logger').createLogger('color-contrast');
 
-/**
- * Color Contrast Scanner for WCAG compliance testing
- * Implements EN 301 549 criterion 9.1.4.3 (Contrast Minimum)
- *
- * All colour maths comes from the shared helpers in
- * `src/utils/browser-contrast.js` (WCAG relative luminance, alpha
- * compositing, ancestor background resolution) — this scanner deliberately
- * keeps no private copy of the formula.
- */
 class ColorContrastScanner extends BaseScanner {
   constructor() {
     super('color-contrast', {
@@ -103,9 +100,8 @@ class ColorContrastScanner extends BaseScanner {
             if (!fgRgb) return;
 
             // A gradient or background-image behind the text means the rendered
-            // backdrop cannot be derived from the CSSOM. Assuming white here is
-            // how "white text on a dark gradient" used to be reported as a
-            // confident 1.09:1 violation. Report it as needing review instead.
+            // backdrop cannot be derived from the CSSOM. Report it as needing
+            // review instead of guessing a backdrop.
             if (background.indeterminate) {
               incomplete.push({
                 element: describe(element),
@@ -119,16 +115,10 @@ class ColorContrastScanner extends BaseScanner {
               return;
             }
 
-            // Fully transparent text paints nothing — there is no contrast to
+            // Fully transparent text paints nothing: there is no contrast to
             // measure and no text to read, so 1.4.3 does not apply.
-            //
-            // SEMI-transparent text is a different case and used to be skipped
-            // here too (`fgRgb.a < 1`). That silenced real AA failures: the
-            // golden corpus renders its footer taglines as
-            // `color: rgba(208,224,224,.5)` on `#1c3a3a`, which composites to
-            // #768d8d = 3.47:1 — a genuine 1.4.3 failure that axe-core reports
-            // and this scanner did not. __blendOver() below composites the alpha
-            // correctly, so there is no reason to look away.
+            // Semi-transparent text is still measured; __blendOver() below
+            // composites the alpha onto the backdrop.
             if (options.ignoreTransparent && fgRgb.a === 0) return;
 
             const bgRgb = { r: background.r, g: background.g, b: background.b, a: 1 };
@@ -146,12 +136,8 @@ class ColorContrastScanner extends BaseScanner {
               // Generate suggestions
               const suggestedForeground = bgRgb.r + bgRgb.g + bgRgb.b > 384 ? '#000000' : '#ffffff';
 
-              // `type` is what identifies the rule everywhere downstream
+              // `type` identifies the rule everywhere downstream
               // (report grouping, the golden-corpus harness, severity.ruleKey()).
-              // Without it these findings were counted as `unclassified` — 45 of
-              // them across the corpus, unattributable to any rule — and
-              // normalizeSeverity() fell back to 'moderate' for a criterion whose
-              // impact is 'serious'.
               violations.push({
                 type: 'insufficient-text-contrast',
                 category: 'contrast',
@@ -197,8 +183,8 @@ class ColorContrastScanner extends BaseScanner {
       passed: contrastResults.violations.length === 0,
       violations: contrastResults.violations,
       // Elements whose rendered background could not be determined from CSS
-      // (gradients/background images). Deliberately NOT violations — an
-      // unknown is not a failure.
+      // (gradients/background images). Not violations: an unknown is not a
+      // failure.
       incomplete: contrastResults.incomplete,
       summary: {
         totalElements: contrastResults.totalElements,

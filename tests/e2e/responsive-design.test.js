@@ -114,7 +114,7 @@ describe('ResponsiveDesignScanner', () => {
   it('does not report fixed-width-element for fluid content wider than 320px', async () => {
     // good-text-spacing.html contains a fluid table that renders ~626px wide at
     // 320px viewport. Its computed width is a px length, but nothing declares a
-    // fixed width — so it must not be reported as a fixed-width element.
+    // fixed width, so it must not be reported as a fixed-width element.
     const url = `${getBaseUrl()}/good-text-spacing.html`;
     const page = await getPage(url);
     try {
@@ -171,8 +171,8 @@ describe('ResponsiveDesignScanner', () => {
       await goodPage.close();
     }
   }, 120000);
-  it('no longer reports px font-size rules as a 1.4.4 failure', async () => {
-    // Browser zoom scales px text like rem text — a px font-size alone is not a
+  it('does not report px font-size rules as a 1.4.4 failure', async () => {
+    // Browser zoom scales px text like rem text: a px font-size alone is not a
     // resize failure (the small-text hint lives in the text-resize scanner).
     const url = `${getBaseUrl()}/bad-text-resize.html`;
     const page = await getPage(url);

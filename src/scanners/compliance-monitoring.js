@@ -1,13 +1,14 @@
+/**
+ * Compliance Monitoring Scanner.
+ * EN 301 549 12.1.3 (European Accessibility Act monitoring procedures).
+ * Checks whether the published accessibility statement documents audits,
+ * issue tracking, feedback integration and improvement evidence.
+ */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const { findStatementLink } = require('../utils/accessibility-statement');
 const log = require('../utils/logger').createLogger('compliance-monitoring');
 
-/**
- * Compliance Monitoring Scanner for EAA Procedural Requirements
- * Implements European Accessibility Act monitoring requirements
- * EN 301 549 criteria 12.1.3 (Accessibility procedures)
- */
 class ComplianceMonitoringScanner extends BaseScanner {
   constructor() {
     super('compliance-monitoring', {
@@ -62,7 +63,7 @@ class ComplianceMonitoringScanner extends BaseScanner {
     // documents a monitoring procedure, an audit schedule, issue tracking,
     // feedback integration or improvement evidence (EN 301 549 clause 12.2.2).
     // With no statement on the site there is nothing to judge, and
-    // `accessibility-statement` already reports the one real defect — so stay
+    // `accessibility-statement` already reports the one real defect, so stay
     // silent instead of adding five more findings for the same root cause.
     const statementLink = await findStatementLink(page);
     if (!statementLink.found) {

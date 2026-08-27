@@ -1,9 +1,7 @@
 /**
  * LLM Auth Scanner
- *
- * Covers authentication accessibility criteria:
- * - 3.3.8 Accessible Authentication (Minimum) (AA)
- * - 3.3.9 Accessible Authentication (Enhanced) (AAA)
+ * Covers 3.3.8 Accessible Authentication (Minimum) (AA) and
+ * 3.3.9 Accessible Authentication (Enhanced) (AAA).
  */
 
 const LLMBaseScanner = require('./base');
@@ -21,7 +19,7 @@ class LLMAuthScanner extends LLMBaseScanner {
   }
 
   async scan(page, options = {}) {
-    // Pre-check: does this page contain auth-related elements?
+    // Pre-check for auth-related elements.
     const hasAuth = await page.evaluate(() => {
       const inputs = document.querySelectorAll(
         'input[type="password"], input[autocomplete*="password"], form[action*="login"], form[action*="auth"], form[action*="signin"]'

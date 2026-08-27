@@ -1,14 +1,15 @@
+/**
+ * Error Handling Scanner.
+ * WCAG 3.3.1, 3.3.2, 3.3.3, 3.3.4 (EN 301 549 9.3.3.1 to 9.3.3.4).
+ * Tests error identification, labels and instructions, error suggestions and
+ * error prevention, optionally by submitting forms with invalid input.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('error-handling');
 
-/**
- * Error Handling Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.3.3.1, 9.3.3.2, 9.3.3.3, 9.3.3.4
- * Tests error identification, labels/instructions, suggestions, and error prevention
- */
 class ErrorHandlingScanner extends BaseScanner {
   constructor() {
     super('error-handling', {
@@ -329,8 +330,8 @@ class ErrorHandlingScanner extends BaseScanner {
 
       /**
        * Text that spells out a password policy, in English or German. Kept
-       * narrow on purpose: generic words like "number" appear in unrelated
-       * labels ("Account Number") and must not silence the check.
+       * narrow: generic words like "number" appear in unrelated labels
+       * ("Account Number") and must not silence the check.
        */
       function statesPasswordPolicy(text) {
         if (!text) return false;
@@ -388,7 +389,7 @@ class ErrorHandlingScanner extends BaseScanner {
         const hasPlaceholder = field.hasAttribute('placeholder');
 
         // `<input type="image">` takes its accessible name from `alt` and
-        // `<input type="reset">` from `value` — those ARE names, so a
+        // `<input type="reset">` from `value`. Those ARE names, so a
         // correctly-named image submit button is not an unlabelled field.
         // (hidden/submit/button are already returned above.)
         const hasNativeAttributeName =
@@ -829,11 +830,8 @@ class ErrorHandlingScanner extends BaseScanner {
           IMPORTANT_DATA_TERMS.some((term) => formText.includes(term));
 
         if (hasImportantData) {
-          // Check for confirmation mechanisms.
-          // NOTE: an `onsubmit` attribute used to count as a confirmation
-          // mechanism here, which made this check unreachable for every form
-          // that has a submit handler - i.e. essentially every real form. A
-          // submit handler is not evidence of a confirmation step.
+          // Check for confirmation mechanisms. An `onsubmit` attribute is not
+          // evidence of a confirmation step.
           const confirmationButtons = Array.from(
             form.querySelectorAll('input[type="submit"], button[type="submit"]')
           );

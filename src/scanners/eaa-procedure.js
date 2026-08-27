@@ -1,3 +1,9 @@
+/**
+ * EAA Procedure Scanner.
+ * EN 301 549 12.1, 12.2, 12.4 (European Accessibility Act procedural requirements).
+ * Checks the accessibility statement, feedback process, contact point and monitoring
+ * procedure; all statement-based checks are gated on a statement being found.
+ */
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
@@ -7,11 +13,6 @@ const {
   missingStatementViolation,
 } = require('../utils/accessibility-statement');
 
-/**
- * EAA Procedure Scanner for EU European Accessibility Act 2025 compliance
- * Tests procedural requirements beyond WCAG technical standards
- * Legal compliance for EU market accessibility obligations
- */
 class EAAProcedureScanner extends BaseScanner {
   constructor() {
     super('eaa-procedure', {
@@ -89,11 +90,9 @@ class EAAProcedureScanner extends BaseScanner {
     }
 
     // Steps 2-4 all judge what the accessibility statement declares (feedback
-    // process, accessibility contact point, monitoring procedure — EN 301 549
+    // process, accessibility contact point, monitoring procedure: EN 301 549
     // clause 12.2.2). With no statement published they have nothing to read,
-    // and step 1 has already reported the single root cause. Running them
-    // anyway is what turned one missing statement into four findings here and
-    // twelve across the EAA scanner group.
+    // and step 1 has already reported the single root cause.
     const statementGate = accessibilityStatementPresent || !options.testAccessibilityStatement;
 
     // 2. Test contact mechanism availability
@@ -157,9 +156,7 @@ class EAAProcedureScanner extends BaseScanner {
     // Detection of the LINK is shared with the other three EAA scanners
     // (src/utils/accessibility-statement.js) so they cannot disagree about
     // whether a statement exists. A statement may also live inline on the page,
-    // which is what the embedded check below covers — narrowly: the old version
-    // treated any 200-character block containing the word "accessible" as a
-    // statement.
+    // which the narrow embedded check below covers.
     const statementLink = await findStatementLink(page);
 
     const currentPageAnalysis = await page.evaluate(() => {
@@ -317,8 +314,7 @@ class EAAProcedureScanner extends BaseScanner {
 
     // One finding, `serious`, shared shape with the accessibility-statement
     // scanner so ScanPipeline can collapse the duplicate (see
-    // src/utils/accessibility-statement.js). `severity: 'error'` used to map to
-    // `critical` in src/severity.js.
+    // src/utils/accessibility-statement.js).
     if (!present) {
       violations.push(missingStatementViolation());
     }

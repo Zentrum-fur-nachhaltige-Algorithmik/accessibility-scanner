@@ -1,18 +1,8 @@
 /**
  * LLM Alt-Text Quality Scanner
- *
- * Covers:
- * - 1.1.1 Non-text Content (Level A) — the QUALITY half.
- *
- * axe-core's `image-alt` family answers "is there an alt attribute?". It cannot
- * answer "does this alt actually convey the same information as the image?",
- * which is what 1.1.1 requires. This scanner closes that half: it hands the LLM
- * each image's alt text together with the context a human reviewer would use
- * (filename, nearby heading, figcaption, link text, size, role) and asks
- * whether the alternative is a usable substitute.
- *
- * It deliberately does NOT re-report missing alt attributes — that is axe's
- * job, and duplicating it would inflate the ensemble count for one defect.
+ * Covers 1.1.1 Non-text Content (Level A): the quality of existing alt text.
+ * Hands the LLM each image's alt together with the context a human reviewer
+ * would use (filename, nearby heading, figcaption, link text, size, role).
  */
 
 const LLMBaseScanner = require('./base');
@@ -78,8 +68,8 @@ Return violations as JSON.`;
 
   /**
    * Gather each image together with the context a human would use to judge its
-   * alt text. Images WITHOUT an alt attribute are excluded — that is axe-core's
-   * finding, not ours.
+   * alt text. Images WITHOUT an alt attribute are excluded: that is axe-core's
+   * finding.
    */
   async _collectImages(page, max = MAX_IMAGES) {
     return page.evaluate((limit) => {
@@ -199,29 +189,29 @@ Another tool already checks whether an alt attribute EXISTS. Your job is the par
 Flag an image ONLY when one of these specific, evidenced failures applies:
 
 1. **Alt is the filename or a file-like string.** The "alt" value equals or closely matches "filename", or looks like a filename/asset id (e.g. "IMG_2043.JPG", "hero-banner-2x.png", "unnamed", "download", "Screenshot 2024-11-03 at 10.22.11"). Cite the alt and the filename.
-2. **Alt is a placeholder or a bare generic noun** that conveys nothing: "image", "photo", "picture", "graphic", "Bild", "Foto", "Grafik", "Abbildung", "banner", "icon", "spacer", "thumbnail" — used alone, with no further description. A bare "logo" counts too. Cite the alt.
-3. **Alt duplicates adjacent visible text verbatim** — the alt is (nearly) identical to "figcaption", "nearestHeading" or the link's own text, so a screen-reader user hears the same sentence twice. Cite both strings.
-4. **An image that is the ONLY content of a link has an empty or meaningless alt** — "insideLink" is true, "linkHasOtherText" is false, and "alt" is empty or one of the generic values above, so the link has no usable purpose. Cite "linkHref".
-5. **A complex informative image is described by a single short phrase with no long description available.** Only when the evidence really points at a chart/diagram/map/infographic — "filename", "className", "figcaption", "nearestHeading" or "surroundingText" says so (e.g. "diagramm", "chart", "grafik-statistik", "infografik", "Abb. 3") — AND "alt" is under about 60 characters AND "longdesc" is null. Cite all three.
+2. **Alt is a placeholder or a bare generic noun** that conveys nothing: "image", "photo", "picture", "graphic", "Bild", "Foto", "Grafik", "Abbildung", "banner", "icon", "spacer", "thumbnail", used alone, with no further description. A bare "logo" counts too. Cite the alt.
+3. **Alt duplicates adjacent visible text verbatim**: the alt is (nearly) identical to "figcaption", "nearestHeading" or the link's own text, so a screen-reader user hears the same sentence twice. Cite both strings.
+4. **An image that is the ONLY content of a link has an empty or meaningless alt**: "insideLink" is true, "linkHasOtherText" is false, and "alt" is empty or one of the generic values above, so the link has no usable purpose. Cite "linkHref".
+5. **A complex informative image is described by a single short phrase with no long description available.** Only when the evidence really points at a chart/diagram/map/infographic: "filename", "className", "figcaption", "nearestHeading" or "surroundingText" says so (e.g. "diagramm", "chart", "grafik-statistik", "infografik", "Abb. 3"), AND "alt" is under about 60 characters AND "longdesc" is null. Cite all three.
 6. **Alt text that is keyword stuffing or marketing copy** rather than a description: a comma/pipe-separated keyword list, or a string repeating the practice/product name several times. Cite the alt.
 
 Examples that are NOT violations (do NOT flag these):
-- \`altIsEmpty: true\` on a decorative image that is NOT the only content of a link — an empty alt is the CORRECT way to hide decoration. Never flag an empty alt on its own.
-- Small icons (renderedSize under roughly 32×32) that sit next to their own visible text label — the icon is decorative reinforcement.
+- \`altIsEmpty: true\` on a decorative image that is NOT the only content of a link: an empty alt is the CORRECT way to hide decoration. Never flag an empty alt on its own.
+- Small icons (renderedSize under roughly 32×32) that sit next to their own visible text label: the icon is decorative reinforcement.
 - Alt text that is short but sufficient for a simple photo ("Dr. Maria Huber im Behandlungsraum", "Praxiseingang mit Rampe").
-- Alt text starting with "Bild von …" / "Foto von …" / "Image of …" — mildly redundant, but the information is there. Not a failure.
+- Alt text starting with "Bild von …" / "Foto von …" / "Image of …": mildly redundant, but the information is there. Not a failure.
 - Alt text in German, or in any language other than English. Judge the MEANING, not the language.
 - Alt text that differs in wording from the caption while adding genuinely different information.
-- A logo whose alt names the organisation ("Ordination Dr. Huber") — that is correct, not generic.
+- A logo whose alt names the organisation ("Ordination Dr. Huber"): that is correct, not generic.
 - Any image whose alt you simply find stylistically weak. "Could be better" is not a WCAG failure.
-- Missing alt attributes entirely — those are not in your list and are reported elsewhere. Never report a missing alt.
+- Missing alt attributes entirely: those are not in your list and are reported elsewhere. Never report a missing alt.
 - The element's TAG. Judge the alt text only. Some pages carry image alternatives on \`<div>\`/\`<span>\` placeholders rather than \`<img>\`; that is a different defect, reported elsewhere, and is never your finding.
 
-Note on sizes: \`<area>\` elements inside an image map always report a rendered size of 0×0. Never treat that as "too small to matter" — judge them by their alt text like any other image.
+Note on sizes: \`<area>\` elements inside an image map always report a rendered size of 0×0. Never treat that as "too small to matter": judge them by their alt text like any other image.
 
-Report at most 10 violations. If there are more, report the 10 most severe and say so in the summary — a long response risks being truncated and lost entirely.
+Report at most 10 violations. If there are more, report the 10 most severe and say so in the summary: a long response risks being truncated and lost entirely.
 
-CRITICAL: every violation you report must quote the exact measured values it rests on (the alt string, and the filename / figcaption / linkHref / size that makes it a failure) and name which of the six numbered failures applies. If you cannot quote that evidence, do not report it. Err strongly on the side of NOT flagging — a page full of adequate-but-plain alt text is compliant.
+CRITICAL: every violation you report must quote the exact measured values it rests on (the alt string, and the filename / figcaption / linkHref / size that makes it a failure) and name which of the six numbered failures applies. If you cannot quote that evidence, do not report it. Err strongly on the side of NOT flagging: a page full of adequate-but-plain alt text is compliant.
 
 Use criterion "1.1.1" and set "selector" to the image's measured "selector" value.`;
 

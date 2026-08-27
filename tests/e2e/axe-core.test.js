@@ -29,12 +29,11 @@ function isWcagViolation(v) {
 }
 
 /**
- * Known pre-existing violations in test fixtures. These are real WCAG issues
- * in files labeled "good" — axe-core catches them, our custom scanners didn't.
- * Fixing the fixtures is tracked separately. Listed here so the E2E test
- * validates axe-core integration without failing on legacy fixture bugs.
+ * Known violations in fixtures labeled "good": real WCAG issues that axe-core
+ * catches. Fixing the fixtures is tracked separately; listing them here lets
+ * the E2E test validate the axe-core integration without failing on them.
  *
- * Each entry: fileName → allowed violation rule IDs.
+ * Each entry: fileName -> allowed violation rule IDs.
  */
 const KNOWN_FIXTURE_ISSUES = {
   'good-character-key-shortcuts.html': ['color-contrast'],
@@ -80,7 +79,7 @@ describe('axe-core E2E', () => {
     await stopFixtureServer();
   });
 
-  describe('good files — no unexpected WCAG violations', () => {
+  describe('good files: no unexpected WCAG violations', () => {
     it.each(goodFiles)(
       '%s',
       async (fileName) => {
@@ -112,7 +111,7 @@ describe('axe-core E2E', () => {
     );
   });
 
-  describe('bad files — adapter runs without crashing', () => {
+  describe('bad files: adapter runs without crashing', () => {
     it.each(badFiles)(
       '%s',
       async (fileName) => {
@@ -121,14 +120,14 @@ describe('axe-core E2E', () => {
         try {
           const result = await adapter.scan(page);
           const wcagViolations = result.violations.filter(isWcagViolation);
-          // Log for baseline
+          // Log files axe-core cannot cover on its own
           if (wcagViolations.length === 0) {
             console.log(
-              `  [INFO] ${fileName}: axe-core found 0 WCAG violations — needs interaction/LLM scanner`
+              `  [INFO] ${fileName}: axe-core found 0 WCAG violations: needs interaction/LLM scanner`
             );
           }
-          // Many bad files target interaction-based or LLM criteria axe-core can't detect.
-          // We just verify the adapter doesn't crash.
+          // Many bad files target interaction-based or LLM criteria axe-core cannot
+          // detect; only verify that the adapter does not crash.
           expect(result).toBeDefined();
           expect(result.scannerId).toBe('axe-core');
           expect(Array.isArray(result.violations)).toBe(true);

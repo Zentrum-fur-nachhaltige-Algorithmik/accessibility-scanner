@@ -1,11 +1,7 @@
 /**
  * LLM Media Alternatives Scanner
- *
- * Covers AAA media criteria:
- * - 1.2.6 Sign Language (Recorded) (AAA)
- * - 1.2.7 Extended Audio Description (Recorded) (AAA)
- * - 1.2.8 Media Alternative (Recorded) (AAA)
- * - 1.2.9 Audio-only (Live) (AAA)
+ * Covers 1.2.6 Sign Language, 1.2.7 Extended Audio Description,
+ * 1.2.8 Media Alternative (Recorded) and 1.2.9 Audio-only (Live) (all AAA).
  */
 
 const LLMBaseScanner = require('./base');
@@ -23,7 +19,7 @@ class LLMMediaAlternativesScanner extends LLMBaseScanner {
   }
 
   async scan(page, options = {}) {
-    // Pre-check: does this page contain media elements or media-related content?
+    // Pre-check for media elements or media-related content.
     const hasMedia = await page.evaluate(() => {
       const media = document.querySelectorAll(
         'video, audio, iframe[src*="youtube"], iframe[src*="vimeo"], [class*="player"], [class*="stream"], [class*="media"], [class*="video"], [class*="audio"]'
@@ -49,7 +45,7 @@ class LLMMediaAlternativesScanner extends LLMBaseScanner {
 
 2. **1.2.7 Extended Audio Description**: For pre-recorded video, is there an extended audio description option? Look for: a <track kind="descriptions"> element, a link to an audio-described version, or mention of extended descriptions. If no video elements exist on the page, skip this check.
 
-3. **1.2.8 Media Alternative (Recorded)**: Is there a full text transcript for all recorded video content? Look for: a visible transcript on the page, a link to a transcript document, or a <details> element containing a transcript. Captions alone do NOT satisfy this — a separate full-text document is needed.
+3. **1.2.8 Media Alternative (Recorded)**: Is there a full text transcript for all recorded video content? Look for: a visible transcript on the page, a link to a transcript document, or a <details> element containing a transcript. Captions alone do NOT satisfy this: a separate full-text document is needed.
 
 4. **1.2.9 Audio-only (Live)**: For live audio-only streams, is there a real-time text alternative? Only flag this if the page actually contains live audio-only content (live stream without video). If media has video, this criterion does not apply.
 

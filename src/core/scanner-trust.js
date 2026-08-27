@@ -1,21 +1,8 @@
 /**
- * Scanner trust tiers.
- *
- * Default scan profiles contain axe-core, the LLM scanners, and ONLY those
- * custom scanners with a proven clean record. Everything else is quarantined
- * into an `experimental` tier: still registered, still runnable, but excluded
- * from the default profiles and reported with `confidence: 'low'` so a report
- * can mark it as such.
- *
- * The point is NOT that custom scanners are bad — axe + LLM alone would lose
- * every interaction criterion (keyboard, focus, reflow, target size, seizure,
- * hover, EAA procedural), which is this suite's whole differentiator. The
- * failure mode was shipping UNPROVEN scanners in default profiles. Nothing is
- * ever deleted; a scanner earns its way back by turning its harness red green.
- *
- * The tier data lives in `scanner-trust.json` and is DERIVED from the recorded
- * battery results by `scripts/derive-scanner-trust.js` — membership is evidence,
- * revisited each battery run, not opinion.
+ * scanner-trust
+ * Trust tiers for custom scanners: `proven` scanners join the default profiles,
+ * `experimental` ones stay registered but are excluded from defaults and report
+ * `confidence: 'low'`. Tiers are derived from recorded battery results into scanner-trust.json.
  */
 
 const TRUST_DATA = require('./scanner-trust.json');

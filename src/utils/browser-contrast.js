@@ -1,20 +1,8 @@
 /**
- * Browser-injectable contrast utility functions.
- *
- * These functions run inside Puppeteer's page.evaluate() context (browser, not Node.js).
- * Import and inject the code string into page.evaluate to use them.
- *
- * Provides:
- *   __parseRgb, __getLuminance, __getContrastRatio          — WCAG colour math
- *   __blendOver, __resolveBackground,
- *   __getEffectiveBackgroundColor, __isColorTransparent     — background resolution
- *   __isInactive, __getRenderedBorder, __isLargeText,
- *   __hasAlternativeIdentifier                             — WCAG applicability
- *
- * Every contrast ratio produced anywhere in this codebase must come from
- * __getContrastRatio: the gamma-corrected, 0.2126/0.7152/0.0722-weighted
- * relative-luminance formula from WCAG 2.x. An average of R+G+B is NOT a
- * contrast ratio and must never be substituted for it.
+ * Browser-injectable contrast utilities for page.evaluate().
+ * Exposes __parseRgb, __getLuminance, __getContrastRatio, __blendOver, __resolveBackground,
+ * __getEffectiveBackgroundColor, __isColorTransparent, __isInactive, __getRenderedBorder,
+ * __isLargeText, __hasAlternativeIdentifier. All ratios use WCAG 2.x relative luminance.
  */
 
 const injectableCode = `
@@ -34,8 +22,8 @@ const injectableCode = `
         a: hex.length === 8 ? parseInt(hex.substring(6, 8), 16) / 255 : 1
       };
     }
-    // Handle rgb/rgba (both the legacy comma syntax and the CSS Color 4
-    // space-separated "rgb(0 0 0 / 50%)" syntax evergreen browsers now serialise)
+    // Handle rgb/rgba (both the comma syntax and the CSS Color 4
+    // space-separated "rgb(0 0 0 / 50%)" syntax)
     const match = rgbString.match(/rgba?\\(\\s*([\\d.]+)[,\\s]+([\\d.]+)[,\\s]+([\\d.]+)(?:\\s*[,/]\\s*([\\d.]+%?))?\\s*\\)/);
     if (!match) return null;
     let alpha = 1;
@@ -69,7 +57,7 @@ const injectableCode = `
 
   // Alpha-composite \`fg\` over an opaque \`bg\` (simple source-over). A
   // translucent colour does NOT render as its own rgb triple, so comparing
-  // rgba(0,0,0,0.7) directly against anything is meaningless — it has to be
+  // rgba(0,0,0,0.7) directly against anything is meaningless: it has to be
   // flattened against whatever is actually behind it first.
   function __blendOver(fg, bg) {
     const a = (fg && fg.a !== undefined) ? fg.a : 1;
@@ -88,8 +76,8 @@ const injectableCode = `
   //
   // When any layer paints a background-image (a gradient, or a bitmap) the
   // rendered colour cannot be derived from the CSSOM at all. Rather than
-  // silently assuming white — which manufactures confident 1:1 "violations"
-  // for white text on a dark gradient — the result is flagged
+  // silently assuming white (which manufactures confident 1:1 "violations"
+  // for white text on a dark gradient) the result is flagged
   // \`indeterminate\` so callers can report "needs review" instead.
   function __resolveBackground(element) {
     const layers = [];
@@ -139,8 +127,8 @@ const injectableCode = `
   // WCAG 1.4.3 and 1.4.11 both carve out inactive (disabled) components:
   // "Text ... that is part of an inactive user interface component ... has no
   // contrast requirement" (1.4.3 Incidental) and "Inactive user interface
-  // components" (1.4.11 exception). A greyed-out control is greyed out ON
-  // PURPOSE — reporting it is reporting the intended design as a defect.
+  // components" (1.4.11 exception). A greyed-out control is intended design,
+  // not a defect.
   function __isInactive(element) {
     if (!element || element.nodeType !== 1) return false;
     if (element.disabled === true) return true;
@@ -187,7 +175,7 @@ const injectableCode = `
   // SC 1.4.11 applies to "the visual information required to identify user
   // interface components". Where a component paints a border that itself
   // reaches the threshold against the adjacent background, THAT border is the
-  // boundary the user perceives — the fill is then not additionally required
+  // boundary the user perceives, and the fill is then not additionally required
   // to contrast with the page. Standard accessible form styling (a white input
   // on a white page with a dark 2px border) depends on this.
   function __hasCompliantBorder(styles, backdrop, threshold) {
@@ -202,7 +190,7 @@ const injectableCode = `
 
   /**
    * SC 1.4.11 asks that the visual information needed to IDENTIFY a
-   * component has 3:1 contrast — not that every painted edge does. A button
+   * component has 3:1 contrast, not that every painted edge does. A button
    * whose border is faint but whose label text or icon glyph clearly stands
    * out is identified by that text/glyph; the border is decoration.
    * Returns { by: 'text'|'icon'|null, ratio }.

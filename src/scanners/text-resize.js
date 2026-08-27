@@ -1,3 +1,9 @@
+/**
+ * Text Resize Scanner.
+ * WCAG 1.4.4 (EN 301 549 9.1.4.4).
+ * Emulates 200% and 400% zoom by shrinking the viewport and measures
+ * horizontal overflow, clipped text and covered interactive elements.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -5,11 +11,6 @@ const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: clipCode } = require('../utils/text-clipping');
 
-/**
- * Text Resize Scanner for WCAG 1.4.4 compliance testing
- * Tests 200% zoom and 400% mobile zoom without horizontal scrolling
- * Critical for 25% of users who need text magnification
- */
 class TextResizeScanner extends BaseScanner {
   constructor() {
     super('text-resize', {
@@ -18,8 +19,7 @@ class TextResizeScanner extends BaseScanner {
     });
     // Browser zoom Z% on a 1280px window is a viewport of 1280/Z CSS px.
     // WCAG 1.4.10 sets the floor at 320 CSS px (= 400% of 1280); there is
-    // no requirement to reflow below that, so the former "mobile-400%"
-    // 94px viewport tested something no layout can satisfy (FP-4).
+    // no requirement to reflow below that.
     this.testViewports = [
       { width: 1280, height: 1024, name: 'desktop', scale: 1 },
       { width: 640, height: 512, name: 'desktop-200%', scale: 2 },
@@ -236,7 +236,7 @@ class TextResizeScanner extends BaseScanner {
               // The following four are CSS *smells*, not failures:
               // a px width/min-width/max-width or an overflow:hidden
               // box only violates 1.4.4/1.4.10 if it actually clips
-              // content or forces horizontal scrolling — and that is
+              // content or forces horizontal scrolling, and that is
               // measured per viewport (horizontal-scroll, text-overflow,
               // fixed-size). A rule like `.card { width: 900px }` inside
               // a `@media (min-width: 1200px)` block reflows perfectly.
@@ -409,7 +409,7 @@ class TextResizeScanner extends BaseScanner {
             parentStyles.display === 'inline-grid');
         if (isFlexGridChild) continue;
 
-        // Check for problematic fixed sizes — only width from inline style or non-flowing layout
+        // Check for problematic fixed sizes: only width from inline style or non-flowing layout
         const widthIssue = hasInlineWidth && parseInt(el.style.width) > 400;
         const minWidthIssue = hasInlineMinWidth && parseInt(el.style.minWidth) > 400;
         const maxWidthTooSmall =
@@ -457,12 +457,11 @@ class TextResizeScanner extends BaseScanner {
 
     // Text that is provably clipped away at this viewport.
     //
-    // WCAG 1.4.4 / 1.4.10 are about *loss of information*, so we measure the
-    // painted glyph boxes (Range.getClientRects) against the container's
-    // padding box instead of comparing scrollWidth/clientWidth. The old
-    // comparison fired on every container whose child box stuck out by a
-    // few rounded pixels while all text stayed inside (see
-    // src/utils/text-clipping.js).
+    // WCAG 1.4.4 / 1.4.10 are about loss of information, so the painted
+    // glyph boxes (Range.getClientRects) are measured against the container's
+    // padding box instead of comparing scrollWidth/clientWidth, which fires
+    // on containers whose child box sticks out by a few rounded pixels while
+    // all text stays inside (see src/utils/text-clipping.js).
     const clippedText = await page.evaluate(
       (renderedCode, clipCode) => {
         eval(renderedCode);
@@ -477,7 +476,7 @@ class TextResizeScanner extends BaseScanner {
       violations.push({
         type: 'text-overflow',
         // Declared truncation (line-clamp / ellipsis) looks identical at every
-        // zoom level and keeps the text in the accessibility tree — a hint,
+        // zoom level and keeps the text in the accessibility tree: a hint,
         // not a 1.4.4/1.4.10 failure.
         severity: issue.truncationDeclared ? 'info' : 'serious',
         description: issue.truncationDeclared
@@ -511,14 +510,14 @@ class TextResizeScanner extends BaseScanner {
     // Interactive elements that are rendered and keyboard-reachable but
     // whose centre is covered by another element at this zoom level.
     // Elements that are display:none (responsive nav behind a hamburger),
-    // off-canvas, or simply scrolled out of view are NOT blocked (FP-2).
+    // off-canvas, or simply scrolled out of view are not blocked.
     const interactionIssues = await page.evaluate((renderedCode) => {
       eval(renderedCode);
       const issues = [];
       const prevX = window.scrollX,
         prevY = window.scrollY;
-      // `scroll-behavior: smooth` would animate scrollIntoView and we
-      // would measure before the scroll happened.
+      // `scroll-behavior: smooth` would animate scrollIntoView and the
+      // measurement would run before the scroll happened.
       const noSmooth = document.createElement('style');
       noSmooth.textContent = 'html, body { scroll-behavior: auto !important; }';
       document.head.appendChild(noSmooth);
@@ -533,10 +532,9 @@ class TextResizeScanner extends BaseScanner {
         el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
         const rect = el.getBoundingClientRect();
         if (rect.width < 1 || rect.height < 1) continue;
-        // Probe the real centre. Clamping it to the viewport edge (as this
-        // used to do) tests a point that belongs to some other element and
-        // manufactured "blocked" findings for anything that could not be
-        // scrolled fully into view.
+        // Probe the real centre. Clamping it to the viewport edge would test
+        // a point that belongs to some other element and report anything
+        // that cannot be scrolled fully into view as blocked.
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         if (cx < 0 || cy < 0 || cx >= window.innerWidth || cy >= window.innerHeight) continue;

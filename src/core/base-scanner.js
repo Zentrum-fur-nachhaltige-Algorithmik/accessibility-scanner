@@ -1,9 +1,8 @@
 /**
- * BaseScanner — abstract base class for all accessibility scanners.
- *
- * Subclasses receive an already-loaded Puppeteer page and return a
- * standardized ScanResult. They must NOT launch browsers, create pages,
- * or navigate — the ScanPipeline handles all of that.
+ * BaseScanner
+ * Abstract base class for all accessibility scanners.
+ * Subclasses receive an already-loaded Puppeteer page and return a ScanResult.
+ * They never launch browsers, create pages or navigate; ScanPipeline does that.
  */
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const path = require('path');
@@ -11,10 +10,10 @@ const config = require('../config');
 
 class BaseScanner {
   /**
-   * @param {string} id       — unique scanner identifier (e.g. 'color-contrast')
-   * @param {Object} metadata — optional WCAG metadata
-   * @param {string[]} metadata.wcagCriteria  — e.g. ['1.4.3', '1.4.6']
-   * @param {string}   metadata.wcagPrinciple — 'perceivable' | 'operable' | 'understandable' | 'robust'
+   * @param {string} id - unique scanner identifier (e.g. 'color-contrast')
+   * @param {Object} metadata - optional WCAG metadata
+   * @param {string[]} metadata.wcagCriteria - e.g. ['1.4.3', '1.4.6']
+   * @param {string}   metadata.wcagPrinciple - 'perceivable' | 'operable' | 'understandable' | 'robust'
    */
   constructor(id, metadata = {}) {
     if (new.target === BaseScanner) {
@@ -33,15 +32,15 @@ class BaseScanner {
   /**
    * Core scan method. Receives an already-loaded page.
    *
-   * @param {import('puppeteer').Page} page    — navigated Puppeteer page
-   * @param {Object}                   options — pipeline-forwarded options
+   * @param {import('puppeteer').Page} page - navigated Puppeteer page
+   * @param {Object}                   options - pipeline-forwarded options
    * @returns {Promise<ScanResult>}
    *
    * @typedef {Object} ScanResult
-   * @property {string}      scannerId  — this.id
-   * @property {boolean}     passed     — true when violations.length === 0
+   * @property {string}      scannerId - this.id
+   * @property {boolean}     passed - true when violations.length === 0
    * @property {Violation[]} violations
-   * @property {Object}      summary    — scanner-specific summary data
+   * @property {Object}      summary - scanner-specific summary data
    */
   async scan(page, options = {}) {
     throw new Error(`${this.id}: scan() not implemented`);
@@ -58,7 +57,7 @@ class BaseScanner {
 
   /**
    * Helper to build a standardized violation object.
-   * @param {string} severity — 'violation' | 'best-practice' | 'info'
+   * @param {string} severity - 'violation' | 'best-practice' | 'info'
    */
   formatViolation(ruleId, impact, description, nodes = [], helpUrl = '', severity = 'violation') {
     return {
@@ -134,12 +133,12 @@ class BaseScanner {
   /**
    * Injectable helpers shared by scanners that run inside page.evaluate().
    * Includes everything from src/utils/rendered.js (__isRendered,
-   * __isFocusableRendered, __isInteractiveTarget, __isSrOnly) plus the two
-   * legacy names kept for existing callers.
+   * __isFocusableRendered, __isInteractiveTarget, __isSrOnly) plus
+   * isElementVisible() and isSrOnly().
    *
-   * isElementVisible() differs from __isRendered() on purpose: it answers
+   * isElementVisible() differs from __isRendered(): it answers
    * "is this exposed to assistive technology?" (hidden / aria-hidden /
-   * display / visibility, including ancestors) and does NOT require a painted
+   * display / visibility, including ancestors) and does not require a painted
    * box, so sr-only content still counts as visible to AT.
    */
   static get visibilityFilterScript() {

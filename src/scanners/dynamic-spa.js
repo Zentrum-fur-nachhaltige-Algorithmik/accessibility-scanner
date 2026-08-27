@@ -1,15 +1,15 @@
+/**
+ * Dynamic Content and SPA Scanner.
+ * WCAG 4.1.2, 4.1.3 (EN 301 549 9.4.1.2, 9.4.1.3).
+ * Observes the DOM through route changes, form submissions, modals, search
+ * and infinite scroll to check focus management and live-region announcements.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('dynamic-spa');
 
-/**
- * Phase 6E: Dynamic Content & Single Page Application (SPA) Scanner
- * Implements testing for dynamic content updates, route changes, and SPA accessibility
- * Critical for modern web applications with dynamic content and client-side routing
- * CSP-independent implementation focusing on DOM observation and interaction testing
- */
 class DynamicSpaScanner extends BaseScanner {
   constructor() {
     super('dynamic-spa', {
@@ -23,8 +23,8 @@ class DynamicSpaScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method — receives an already-navigated Puppeteer page.
-   * Note: This scanner may re-navigate internally (route changes, DOM observation) since it has exclusive access.
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * May re-navigate internally (route changes, DOM observation) since it has exclusive access.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
@@ -1040,17 +1040,8 @@ class DynamicSpaScanner extends BaseScanner {
 
       // Check if focus monitoring was set up
       if (window.accessibilityMonitor && window.accessibilityMonitor.focusChanges) {
-        // NOTE (Sprint P2): the former `no-focus-tracking` violation
-        // fired whenever `focusChanges` was empty. That array is filled
-        // only by real `focusin` events, and this scanner never focuses
-        // anything itself — so on any page where the scan happens not to
-        // move focus (i.e. every static multi-page site) the array is
-        // empty by construction. "We observed no focus change" is
-        // absence of evidence, not a 2.4.3 Focus Order failure: 2.4.3
-        // constrains the ORDER of focus when it does move, and cannot be
-        // failed by a page that never had a dynamic focus move to make.
-        // The count stays available in the result payload; it is no
-        // longer reported as a violation.
+        // An empty `focusChanges` array is not reported: it is absence of
+        // evidence, not a 2.4.3 failure. The count is exposed in the payload.
 
         // Check for focus traps in modals (simplified check)
         const modalElements = document.querySelectorAll('[role="dialog"], .modal');

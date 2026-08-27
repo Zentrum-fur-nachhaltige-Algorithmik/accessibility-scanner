@@ -1,27 +1,7 @@
 /**
- * Browser-injectable "is this element actually rendered / reachable?" helpers.
- *
- * These run inside page.evaluate(). Inject `injectableCode` (e.g. via
- * `eval(renderedCode)` at the top of the evaluate callback, the same way
- * `src/utils/browser-contrast.js` is used) and call:
- *
- *   __isRendered(el)          — painted and not hidden by any ancestor:
- *                               display/visibility/opacity/hidden/inert/
- *                               aria-hidden/content-visibility, off-canvas.
- *   __isFocusable(el)         — structurally keyboard-reachable (not
- *                               disabled, tabindex !== -1, focusable tag or
- *                               [tabindex]) REGARDLESS of whether it is
- *                               painted right now.
- *   __isFocusableRendered(el) — __isFocusable + __isRendered.
- *   __isInteractiveTarget(el) — a pointer target in the WCAG 2.5.8 sense:
- *                               native control / interactive role / tabindex>=0
- *                               — no class-name guessing, no tabindex="-1".
- *   __isSrOnly(el)            — visually hidden but exposed to AT (clip/1px).
- *
- * Why this exists: almost every false positive on healthy pages traced back to
- * scanners measuring elements that are not rendered at all (a `display:none`
- * mobile menu, an off-canvas drawer, a `tabindex="-1"` skip-link target). One
- * shared definition of "rendered" keeps that decision out of each scanner.
+ * Browser-injectable "is this element rendered / reachable?" helpers.
+ * Exposes __isRendered, __isFocusable, __isFocusableRendered, __isInteractiveTarget
+ * and __isSrOnly; `eval()` the exported string inside `page.evaluate`.
  */
 
 const injectableCode = `
@@ -100,9 +80,9 @@ const injectableCode = `
     return false;
   }
 
-  // Structural keyboard reachability only — says nothing about whether the
+  // Structural keyboard reachability only; says nothing about whether the
   // element is painted right now. Split out from __isFocusableRendered because
-  // controls that are deliberately hidden UNTIL focused (skip links parked
+  // controls that are hidden until focused (skip links parked
   // off-canvas with translateY(-100%), reveal-on-scroll CTAs) are reachable by
   // Tab even though they are invisible while unfocused: a focus walk has to be
   // able to record their unfocused baseline before it starts.

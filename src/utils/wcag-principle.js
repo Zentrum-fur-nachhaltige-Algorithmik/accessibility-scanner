@@ -1,16 +1,8 @@
 /**
- * Shared WCAG principle classification.
- *
- * Violations reach us in three shapes: custom scanners set `criterion`
- * ("9.1.4.3", EN 301 549 clause numbering), the axe adapter sets a
- * `wcagCriteria` array plus a non-numeric `ruleId` ("color-contrast"), and LLM
- * scanners set a bare numeric `ruleId` ("1.3.3") via `formatViolation()`.
- *
- * Both `report-generator.js` (which groups findings by principle in the report)
- * and `scan-pipeline.js` (whose `categories` field is part of the scan API)
- * need the same answer, so the logic lives here rather than being duplicated —
- * and `scan-pipeline` importing `report-generator` just for this would drag in
- * `html-pdf-node` and the whole PDF stack.
+ * Shared WCAG principle classification for violations.
+ * Handles the three shapes findings come in: `criterion` ("9.1.4.3"), an axe
+ * `wcagCriteria` array plus rule id, or a bare numeric `ruleId` ("1.3.3").
+ * Used by both report-generator and scan-pipeline without importing the PDF stack.
  */
 
 /**

@@ -1,36 +1,13 @@
 /**
- * One shared answer to "does this site publish an accessibility statement?".
- *
- * Four scanners need that answer — `accessibility-statement`, `eaa-procedure`,
- * `contact-mechanism` and `compliance-monitoring` — and each used to implement
- * its own keyword search AND emit its own follow-up findings when the answer
- * was NO. On a site without a statement that produced twelve findings for a
- * single defect with a single fix:
- *
- *   missing-statement (critical!), missing-accessibility-statement,
- *   no-response-time, no-monitoring-procedure, no-audit-schedule,
- *   no-issue-tracking, no-user-feedback, no-improvement-evidence,
- *   no-accessibility-specific-contact, no-feedback-process,
- *   no-compliance-monitoring, …
- *
- * Every one of those follow-ups is a statement about the STATEMENT: EN 301 549
- * clause 12.2.2 / the EAA require the published statement to name the feedback
- * mechanism, the accessibility contact point and the monitoring and review
- * process. They are only decidable once a statement exists and can be read; on
- * a site with no statement at all there is exactly one defect to report, and it
- * is the missing statement.
- *
- * Severity is `serious`, not `critical`: a missing statement is a breach of an
- * EAA/BFSG procedural duty, but it blocks no user from operating the page — the
- * `critical` tier is reserved for findings that do.
+ * Accessibility statement detection shared by the EAA/EN 301 549 scanners.
+ * Answers "does this site link an accessibility statement?" once, so a site
+ * without one earns a single `serious` finding instead of one per scanner.
  */
 
 /**
  * Link text / href fragments that identify an accessibility statement.
- *
- * Deliberately narrower than the old per-scanner lists, which matched the bare
- * words `statement`, `compliance` and `accessibility` and so classified any
- * "Impressum"/"Compliance" style footer link as a statement.
+ * Bare words like `statement` or `compliance` are excluded so that
+ * "Impressum"/"Compliance" style footer links are not classified as one.
  */
 const STATEMENT_LINK_KEYWORDS = [
   'accessibility statement',
@@ -99,7 +76,7 @@ function missingStatementViolation() {
     element: 'website',
     issue: MISSING_STATEMENT_RULE,
     description:
-      'No accessibility statement is linked from this page — required by the European Accessibility Act / EN 301 549 clause 12.2.2.',
+      'No accessibility statement is linked from this page. Required by the European Accessibility Act / EN 301 549 clause 12.2.2.',
     suggestion:
       'Publish an accessibility statement (conformance level, known limitations, feedback contact, review date) and link it from the footer or main navigation.',
     severity: 'serious',

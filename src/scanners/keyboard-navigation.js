@@ -1,3 +1,8 @@
+/**
+ * Keyboard Navigation Scanner.
+ * WCAG 2.1.1, 2.1.2, 2.1.4 (EN 301 549 9.2.1.1, 9.2.1.2, 9.2.1.4).
+ * Drives real Tab presses through the page and analyses focus order, traps and shortcuts.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -6,11 +11,6 @@ const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('keyboard-navigation');
 
-/**
- * Keyboard Navigation Scanner for WCAG compliance testing
- * Implements EN 301 549 criteria 9.2.1.1, 9.2.1.2, 9.2.1.4 (Keyboard Accessible, No Keyboard Trap, Character Key Shortcuts)
- * Uses full visual screenshot analysis for thorough focus visibility testing
- */
 class KeyboardNavigationScanner extends BaseScanner {
   constructor() {
     super('keyboard-navigation', {
@@ -24,7 +24,7 @@ class KeyboardNavigationScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method — receives an already-navigated Puppeteer page.
+   * Core scan method. Receives an already-navigated Puppeteer page.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
@@ -239,11 +239,6 @@ class KeyboardNavigationScanner extends BaseScanner {
     // 6. Analyze tab order logic (visual vs DOM order)
     await this.analyzeTabOrderLogic(page, tabOrder, violations);
 
-    // ============================================================================
-    // PHASE 2: CSP-IMMUNE KEYBOARD ENHANCEMENT METHODS
-    // Implements 15+ axe rules without script injection
-    // ============================================================================
-
     // Group 1: Skip Links and Bypass Mechanisms (replaces axe: skip-link, bypass)
     await this.validateSkipLinks(page, violations);
     await this.validateBypassMechanisms(page, violations);
@@ -295,10 +290,9 @@ class KeyboardNavigationScanner extends BaseScanner {
   ) {
     log.debug('Testing keyboard navigation with visual analysis...');
 
-    // Real Tab presses via src/utils/keyboard-focus.js. Identity is the tab
-    // id stamped on each element — the old loop compared two differently
-    // built selector STRINGS, so two sibling `a.nav-link`s looked like the
-    // same element and were reported as a keyboard trap after 3 steps (FP-5).
+    // Real Tab presses via src/utils/keyboard-focus.js. Element identity is
+    // the tab id stamped on each element, not its selector string, so two
+    // sibling `a.nav-link`s are not mistaken for one element.
     const maxSteps = Math.min(80, Math.max(20, interactiveElements.length + 5));
     let stepIndex = 0;
 
@@ -490,12 +484,11 @@ class KeyboardNavigationScanner extends BaseScanner {
     let traps = 0;
 
     // Test modals and overlays
-    // Only things that ARE dialogs right now: rendered, and either
+    // Only things that are dialogs right now: rendered, and either
     // semantically a dialog (role / <dialog open> / aria-modal) or a
-    // class-named modal that is actually shown — and with at least one
+    // class-named modal that is actually shown, with at least one
     // focusable child, because a container nothing can focus cannot trap
-    // focus (the old check focused nothing, pressed Tab, landed on the page's
-    // first link inside an always-visible `.overlay` wrapper → "trap", FP-5).
+    // focus.
     const modalElements = await page.evaluate((renderedCode) => {
       eval(renderedCode);
       const modals = [];
@@ -842,7 +835,7 @@ class KeyboardNavigationScanner extends BaseScanner {
     try {
       // Visual positions as measured DURING the tab walk (document
       // coordinates). Re-resolving the selector string would hit the first
-      // DOM match — e.g. the off-canvas mobile nav instead of the desktop nav.
+      // DOM match, e.g. the off-canvas mobile nav instead of the desktop nav.
       const positions = tabOrder.map((t) => {
         if (!t.rect) return null;
         return {
@@ -1042,10 +1035,7 @@ class KeyboardNavigationScanner extends BaseScanner {
     }
   }
 
-  // ============================================================================
-  // PHASE 2: CSP-IMMUNE KEYBOARD ENHANCEMENT METHODS
-  // Implements 15+ axe rules without script injection
-  // ============================================================================
+  // CSP-independent keyboard checks (no script injection)
 
   /**
    * Validate skip links (replaces axe: skip-link)
@@ -1725,9 +1715,8 @@ class KeyboardNavigationScanner extends BaseScanner {
        * fail "clickable but not keyboard accessible". Screen-reader-only live
        * regions are the specific trap: Next.js ships `<next-route-announcer>`,
        * a 1x1 clipped custom element, and React assigns unknown props as
-       * PROPERTIES on custom elements — which leaves a truthy but non-callable
-       * `element.onclick` behind. That combination made every Next.js page
-       * report a spurious "serious" keyboard violation.
+       * properties on custom elements, which leaves a truthy but non-callable
+       * `element.onclick` behind.
        */
       function isNonInteractiveByRendering(element) {
         const style = window.getComputedStyle(element);
@@ -1923,7 +1912,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       // Check for elements that change focus unexpectedly
       const elementsWithOnChange = document.querySelectorAll('select[onchange], input[onchange]');
       elementsWithOnChange.forEach((element) => {
-        // This is hard to detect statically, but we can warn about potential issues
+        // Hard to detect statically; warn about potential issues
         const selector = getElementSelector(element);
 
         if (element.tagName.toLowerCase() === 'select') {
@@ -1960,7 +1949,7 @@ class KeyboardNavigationScanner extends BaseScanner {
     log.debug('Validating interactive element accessibility...');
 
     const interactiveIssues = await page.evaluate((accnameCode) => {
-      // Shared ACCNAME implementation (__accessibleNameInfo) — see
+      // Shared ACCNAME implementation (__accessibleNameInfo), see
       // src/utils/accessible-name.js.
       eval(accnameCode);
 
@@ -2003,14 +1992,10 @@ class KeyboardNavigationScanner extends BaseScanner {
 
         if (isHidden) return; // Skip hidden elements
 
-        // Check for missing accessible names.
-        //
-        // This used to be `element.textContent.trim()` plus a hand-rolled
-        // attribute chain, which reported every element named by a child
-        // `<img alt>` / inline `<svg><title>` / `aria-labelledby` as unnamed —
-        // e.g. a header logo link `<a><img alt="Logo"></a>`. The shared helper
-        // computes what a screen reader actually announces, and reports the
-        // mechanism that produced it (or the one that came up empty).
+        // Check for missing accessible names. The shared helper computes what
+        // a screen reader announces (including child `<img alt>`, inline
+        // `<svg><title>` and `aria-labelledby`) and reports the mechanism
+        // that produced it (or the one that came up empty).
         const nameInfo = __accessibleNameInfo(element);
 
         if (!nameInfo.name) {

@@ -90,7 +90,7 @@ async function request(path, { method = 'GET', body, token, signal } = {}) {
 /**
  * Queue a scan.
  * @returns {Promise<{ jobId: string|null, result: object|null }>}
- *   `result` is only set when talking to a legacy synchronous server, which
+ *   `result` is only set when the server answers synchronously, which
  *   answers 200 with the finished scan result instead of 202 + a job id.
  */
 export async function startScan({ url, profile, token, signal } = {}) {

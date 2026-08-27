@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * HTML File to Scanner Mapping Configuration
- *
- * Defines which scanners should trigger on which HTML test files
- * This creates a structured approach for targeted testing instead of
- * brute-force matrix testing of all scanner×file combinations
+ * html-scanner-mapping.js: which scanners should (and should not) trigger on
+ * which HTML test files, for targeted testing instead of a full scanner x file matrix.
  */
 
 /**
@@ -21,7 +18,7 @@
  *   }
  */
 const HTML_SCANNER_MAPPING = {
-  // === PHASE 1 FOUNDATION PATTERNS ===
+  // Foundation patterns
 
   // Image Alt Text Issues
   'bad-image-alt.html': {
@@ -76,7 +73,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Icons without proper accessible names or ARIA labels',
   },
 
-  // === PHASE 2 KEYBOARD & NAVIGATION ===
+  // Keyboard and navigation
 
   // Keyboard Access
   'bad-keyboard-access.html': {
@@ -138,7 +135,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Links with ambiguous or non-descriptive text',
   },
 
-  // === PHASE 3 ADVANCED PATTERNS ===
+  // Advanced patterns
 
   // Reflow and Responsive Design
   'bad-reflow.html': {
@@ -183,7 +180,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Unexpected context changes on focus or input',
   },
 
-  // === ORIGINAL COMPREHENSIVE PATTERNS ===
+  // Comprehensive patterns
 
   // Color and Contrast
   'bad-color-contrast.html': {
@@ -377,7 +374,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Content requiring advanced reading level without alternatives',
   },
 
-  // NEW PHASE 6A TEST CASES
+  // Label in name, non-text contrast, status messages, text resize
 
   // Autocomplete
   'bad-autocomplete.html': {
@@ -457,7 +454,7 @@ const HTML_SCANNER_MAPPING = {
       'Real accessibility issues found on beeproduced.com: empty alt attributes, missing skip links, keyboard navigation problems, ARIA issues, landmark violations',
   },
 
-  // === GOOD EXAMPLES (POSITIVE TEST DATA) ===
+  // Good examples
 
   'good-accessibility.html': {
     expectedScanners: [],
@@ -545,7 +542,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Comprehensive error prevention implementation',
   },
 
-  // NEW GOOD EXAMPLES
+  // Further good examples
 
   'good-autocomplete.html': {
     expectedScanners: [],
@@ -696,7 +693,7 @@ const HTML_SCANNER_MAPPING = {
     description: 'Appropriate context change handling with user control',
   },
 
-  // === "MESSY BUT VALID" PATTERNS (False Positive Prevention) ===
+  // Messy but valid patterns (false-positive guards)
 
   'good-hidden-modal.html': {
     expectedScanners: [],
@@ -704,7 +701,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['4.1.2', '1.3.1'],
     description:
-      'Hidden modals, off-canvas navs, pre-rendered tooltips with display:none — scanners must skip hidden widgets',
+      'Hidden modals, off-canvas navs, pre-rendered tooltips with display:none: scanners must skip hidden widgets',
   },
 
   'good-js-validation.html': {
@@ -713,7 +710,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['4.1.2', '3.3.1', '3.3.2'],
     description:
-      'JS-driven validation: aria-describedby to hidden errors, aria-invalid=false, hidden role=alert — all valid at initial load',
+      'JS-driven validation: aria-describedby to hidden errors, aria-invalid=false, hidden role=alert, all valid at initial load',
   },
 
   'good-redundant-aria.html': {
@@ -722,7 +719,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['4.1.2', '1.3.1'],
     description:
-      'Redundant ARIA roles on semantic HTML5 elements and nav-without-list — valid patterns, not violations',
+      'Redundant ARIA roles on semantic HTML5 elements and nav-without-list: valid patterns, not violations',
   },
 
   'good-bootstrap-patterns.html': {
@@ -731,7 +728,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.3', '1.4.6', '4.1.2'],
     description:
-      'Bootstrap-like CDN CSS patterns, collapsed components hidden by default — tests computed style contrast',
+      'Bootstrap-like CDN CSS patterns, collapsed components hidden by default: tests computed style contrast',
   },
 
   // Fixtures reproducing false-positive classes observed on real sites.
@@ -742,7 +739,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['3.3.1', '3.3.3'],
     description:
-      'Material/Tailwind colour tokens (bg-error-container, text-error, text-on-error-container) on marketing cards are not error messages — error-no-suggestion must not fire',
+      'Material/Tailwind colour tokens (bg-error-container, text-error, text-on-error-container) on marketing cards are not error messages: error-no-suggestion must not fire',
   },
 
   'good-text-spacing-grid-cards.html': {
@@ -751,7 +748,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.12'],
     description:
-      'overflow:hidden grid of cards whose text still fits under the 1.4.12 spacing overrides at 320/375/768/1920 — text-spacing-failure must not fire',
+      'overflow:hidden grid of cards whose text still fits under the 1.4.12 spacing overrides at 320/375/768/1920: text-spacing-failure must not fire',
   },
 
   'good-decorative-blur-blob.html': {
@@ -760,7 +757,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.10', '1.4.4'],
     description:
-      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero — fixed-width-element / mobile-fixed-width-400-zoom must not fire',
+      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element / mobile-fixed-width-400-zoom must not fire',
   },
 
   'good-two-column-tab-order.html': {
@@ -778,7 +775,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['4.1.2'],
     description:
-      'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference — valid per WAI-ARIA 1.2, tab-missing-controls must not fire',
+      'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference: valid per WAI-ARIA 1.2, tab-missing-controls must not fire',
   },
 
   'good-accessibility-marketing-page.html': {
@@ -787,7 +784,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
     description:
-      'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit" — one missing-accessibility-statement is correct, the follow-up rules (no-audit-schedule, no-issue-tracking, no-feedback-process …) must stay silent',
+      'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit": one missing-accessibility-statement is correct, the follow-up rules (no-audit-schedule, no-issue-tracking, no-feedback-process, ...) must stay silent',
   },
 
   'good-accessibility-statement-complete.html': {
@@ -801,7 +798,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
     description:
-      'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure) — no EAA finding at all',
+      'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
   'good-contrast-hidden-and-arbitrary-classes.html': {
@@ -810,7 +807,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.3'],
     description:
-      'Text that is never painted (display:none ancestor, [hidden]) plus Tailwind arbitrary-value classes — no contrast finding, and every reported selector must be a valid querySelector argument',
+      'Text that is never painted (display:none ancestor, [hidden]) plus Tailwind arbitrary-value classes: no contrast finding, and every reported selector must be a valid querySelector argument',
   },
 
   'bad-keyboard-fixed-skiplink-tab-order.html': {
@@ -819,12 +816,12 @@ const HTML_SCANNER_MAPPING = {
     testType: 'bad',
     wcagCriteria: ['2.1.1', '2.4.3'],
     description:
-      'Off-canvas fixed skip link as first tab stop, then a div[onclick] without tabindex and a tabindex="5" jump — both defects must survive the tab walk',
+      'Off-canvas fixed skip link as first tab stop, then a div[onclick] without tabindex and a tabindex="5" jump: both defects must survive the tab walk',
   },
 };
 
 /**
- * Available scanner names (from individual-scanner-api.js)
+ * Available scanner names
  */
 const AVAILABLE_SCANNERS = [
   'color-contrast',

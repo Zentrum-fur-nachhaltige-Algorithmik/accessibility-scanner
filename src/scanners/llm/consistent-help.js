@@ -1,27 +1,8 @@
 /**
  * LLM Consistent Help Scanner
- *
- * Covers:
- * - 3.2.6 Consistent Help (Level A, new in WCAG 2.2)
- *
- * "If a Web page contains [human contact details, a human contact mechanism, a
- * self-help option, or a fully automated contact mechanism], then access to at
- * least one of those is included in the same relative order on each page,
- * unless a change is initiated by the user."
- *
- * 3.2.6 is a criterion about a SET of pages, so this scanner navigates to up to
- * two same-origin sub-pages (the pattern the EAA scanners use) and compares the
- * help inventory of each. Where a page has no navigable sub-pages but does
- * contain repeated page-like sections — the shape our test fixtures use, and
- * also how many one-page practice sites are built — it compares those sections
- * instead, and says which mode it used in the summary.
- *
- * Position is measured deterministically in the browser (container landmark,
- * index within that container, ratio). The LLM decides only the two things
- * measurement cannot: whether two differently-worded items ("Hilfe", "Support",
- * "Häufige Fragen") are the SAME help mechanism, and whether an order
- * difference is a real inconsistency or an artefact of pages having different
- * numbers of navigation items.
+ * Covers 3.2.6 Consistent Help (Level A).
+ * Help-mechanism position is measured in the browser across sub-pages (or
+ * repeated page-like sections); the LLM only judges equivalence and order changes.
  */
 
 const LLMBaseScanner = require('./base');
@@ -42,7 +23,7 @@ class LLMConsistentHelpScanner extends LLMBaseScanner {
     );
   }
 
-  /** Navigates to sub-pages — must own its tab. */
+  /** Navigates to sub-pages, so it must own its tab. */
   get needsExclusiveAccess() {
     return true;
   }
@@ -300,17 +281,17 @@ Return violations as JSON.`;
 
 const PROMPT = `Check these page views for WCAG 2.2 criterion 3.2.6 (Consistent Help, Level A).
 
-The criterion: if a set of pages offers a help mechanism — human contact details (phone, e-mail, postal address), a human contact mechanism (contact form, chat with a person), a self-help option (FAQ, help page, "Häufige Fragen"), or a fully automated contact mechanism (chatbot) — then at least one such mechanism must appear in the SAME RELATIVE ORDER on every page in the set.
+The criterion: if a set of pages offers a help mechanism, that is human contact details (phone, e-mail, postal address), a human contact mechanism (contact form, chat with a person), a self-help option (FAQ, help page, "Häufige Fragen"), or a fully automated contact mechanism (chatbot), then at least one such mechanism must appear in the SAME RELATIVE ORDER on every page in the set.
 
-"Same relative order" means the mechanism appears at the same point in the page's reading order relative to the other content around it — e.g. always the last item of the main navigation, or always in the footer. It does NOT require identical pixel position, identical wording, or identical styling.
+"Same relative order" means the mechanism appears at the same point in the page's reading order relative to the other content around it, e.g. always the last item of the main navigation, or always in the footer. It does NOT require identical pixel position, identical wording, or identical styling.
 
 Flag ONLY if ALL of the following are true:
 1. At least two page views are given below AND at least one of them contains a help mechanism.
-2. The SAME help mechanism (or an equivalent one — treat "Hilfe", "Help", "Support", "FAQ", "Häufige Fragen" as the same self-help mechanism; treat a phone number as the same mechanism wherever it appears) is present on more than one view.
+2. The SAME help mechanism (or an equivalent one: treat "Hilfe", "Help", "Support", "FAQ", "Häufige Fragen" as the same self-help mechanism; treat a phone number as the same mechanism wherever it appears) is present on more than one view.
 3. Its measured position differs materially between views: a different "container" (e.g. \`nav\` on one view, \`footer\` on another), or a clearly different position within the same container (e.g. \`positionRatio\` 1.0 = last item on one view vs 0.0 = first item on another).
 4. There is no indication the change was initiated by the user.
 
-You may also flag the case where a help mechanism is present on some views and entirely ABSENT from another view in the same set — that is a failure of "included in the same relative order on each page".
+You may also flag the case where a help mechanism is present on some views and entirely ABSENT from another view in the same set: that is a failure of "included in the same relative order on each page".
 
 Examples of violations:
 - "Help" link is the LAST item of the nav on view 1 (positionRatio 1.0, container nav) and the FIRST item on view 2 (positionRatio 0.0, container nav).
@@ -318,9 +299,9 @@ Examples of violations:
 - A "Hilfe" link exists in the nav of views 1 and 2 and is missing entirely from view 3.
 
 Examples that are NOT violations (do NOT flag these):
-- Same container and near-identical positionRatio, with only the wording differing ("Hilfe" vs "Support") — same mechanism, same relative order.
-- positionRatio differing slightly because the views have different numbers of navigation items (e.g. 0.75 vs 0.8, still the last-but-one item) — that is not a material change.
-- A help mechanism appearing in ADDITION on some pages (nav on every page, plus an extra footer link on one page) — the required mechanism is still in the same relative order everywhere.
+- Same container and near-identical positionRatio, with only the wording differing ("Hilfe" vs "Support"): same mechanism, same relative order.
+- positionRatio differing slightly because the views have different numbers of navigation items (e.g. 0.75 vs 0.8, still the last-but-one item): that is not a material change.
+- A help mechanism appearing in ADDITION on some pages (nav on every page, plus an extra footer link on one page): the required mechanism is still in the same relative order everywhere.
 - Only ONE view contains any help mechanism at all and the others are a different kind of page from a different process.
 - Contact details in an obviously page-specific context (a doctor's direct line on that doctor's own profile page) while the site-wide contact link stays put.
 - Ordering differences among items that are not help mechanisms.

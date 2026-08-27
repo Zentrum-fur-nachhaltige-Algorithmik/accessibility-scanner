@@ -1,10 +1,10 @@
+/**
+ * Orientation Scanner.
+ * WCAG 1.3.4 (EN 301 549 9.1.3.4).
+ * Detects CSS and JS orientation locks that restrict content to a single display orientation.
+ */
 const BaseScanner = require('../core/base-scanner');
 
-/**
- * Orientation Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criterion 9.1.3.4 (Orientation)
- * Detects CSS/JS-based orientation locks that restrict content to a single display orientation
- */
 class OrientationScanner extends BaseScanner {
   constructor() {
     super('orientation', {
@@ -37,7 +37,7 @@ class OrientationScanner extends BaseScanner {
           try {
             rules = sheet.cssRules || sheet.rules;
           } catch (e) {
-            // Cross-origin stylesheet — skip
+            // Cross-origin stylesheet, skip
             continue;
           }
           if (!rules) continue;
@@ -91,11 +91,11 @@ class OrientationScanner extends BaseScanner {
           }
         }
       } catch (e) {
-        // Stylesheet access error — non-fatal
+        // Stylesheet access error, non-fatal
       }
 
       if (orientationMediaViolations.length > 0) {
-        // Deduplicate — group by locked orientation
+        // Deduplicate: group by locked orientation
         const byOrientation = {};
         for (const v of orientationMediaViolations) {
           const key = v.lockedOrientation;
@@ -128,7 +128,7 @@ class OrientationScanner extends BaseScanner {
             criterion: '9.1.3.4',
             element: getSelector(el),
             issue: 'forced-dimensions',
-            description: `Element has min-width: ${Math.round(minWidth)}px with overflow:hidden — forces landscape-only viewing`,
+            description: `Element has min-width: ${Math.round(minWidth)}px with overflow:hidden. This forces landscape-only viewing`,
             severity: 'serious',
             suggestion:
               'Use responsive width (max-width, %, vw) and allow overflow:auto or remove overflow:hidden.',
@@ -151,7 +151,7 @@ class OrientationScanner extends BaseScanner {
             criterion: '9.1.3.4',
             element: getSelector(el),
             issue: 'forced-dimensions',
-            description: `Element has min-width: ${Math.round(minWidth)}px with overflow:hidden — content inaccessible in portrait`,
+            description: `Element has min-width: ${Math.round(minWidth)}px with overflow:hidden. Content is inaccessible in portrait`,
             severity: 'serious',
             suggestion: 'Use responsive sizing. Replace fixed min-width with flexible layout.',
           });

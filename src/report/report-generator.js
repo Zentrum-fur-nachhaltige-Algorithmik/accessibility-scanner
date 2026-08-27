@@ -1,11 +1,14 @@
+/**
+ * report-generator
+ * Renders scan results into HTML and PDF audit reports.
+ * Every scan-derived value is HTML-escaped before interpolation; the PDF is
+ * rendered from the escaped HTML with puppeteer.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const config = require('../config');
-
-// Extracted to src/utils/wcag-principle.js so scan-pipeline.js can share it
-// without pulling this module's PDF stack into the scan path.
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
 const { normalizeSeverity, isHardViolation } = require('../core/severity');
@@ -54,7 +57,7 @@ class ReportGenerator {
     const timestamp = new Date().toISOString();
 
     // scanData is spread FIRST so that scan-controlled fields can never shadow
-    // the ids/timestamps we generate (a scan result carrying its own `id` would
+    // the generated ids/timestamps (a scan result carrying its own `id` would
     // otherwise decide what the report claims to be).
     const reportData = {
       ...scanData,
@@ -108,7 +111,7 @@ class ReportGenerator {
    *
    * Without one the browser (and headless Chrome during PDF rendering) may
    * sniff the encoding, which is both a mojibake source and a classic escaping
-   * bypass — UTF-7-style payloads only work against an undeclared document.
+   * bypass: UTF-7-style payloads only work against an undeclared document.
    * The built-in template already declares it; custom templates dropped into
    * templates/ may not.
    */
@@ -126,7 +129,7 @@ class ReportGenerator {
     // descriptions (CSS/code snippets) crash the render.
     let browser;
     try {
-      // htmlContent is the already-escaped output of generateHTMLReport — the
+      // htmlContent is the already-escaped output of generateHTMLReport; the
       // PDF renderer must never be handed raw scan data.
       const puppeteer = require('puppeteer');
       browser = await puppeteer.launch({
@@ -172,7 +175,7 @@ class ReportGenerator {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{docNumber}} — Accessibility Audit Report</title>
+<title>{{docNumber}}: Accessibility Audit Report</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -368,7 +371,7 @@ class ReportGenerator {
     letter-spacing: 0.04em;
     color: #1B3A6B;
   }
-  /* no zebra striping — document tables use hairlines only */
+  /* no zebra striping: document tables use hairlines only */
 
   /* --- Severity: monochrome labels, row tint for emphasis --- */
   .sev { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: #14181D; }
@@ -621,7 +624,7 @@ class ReportGenerator {
 </main>
 
 <footer class="doc-footer" aria-label="Document information">
-  <span>{{orgName}} — {{docNumber}}</span>
+  <span>{{orgName}} / {{docNumber}}</span>
   <span>{{reportDate}}</span>
 </footer>
 
@@ -648,7 +651,7 @@ class ReportGenerator {
     const violationsCount = allFindings.filter(isHardViolation).length;
     const passes = data.passes || 0;
 
-    // Scalar placeholders — every value is scan-controlled, so every value is escaped.
+    // Scalar placeholders: every value is scan-controlled, so every value is escaped.
     html = this.fill(
       html,
       /{{pageTitle}}/g,
@@ -698,7 +701,7 @@ class ReportGenerator {
       data.orgContact ? `<p class="doc-meta-line">${this.esc(data.orgContact)}</p>` : ''
     );
 
-    // Sections — each generator escapes its own scan-derived values.
+    // Sections: each generator escapes its own scan-derived values.
     html = this.fill(html, /{{tocSection}}/g, this.generateTocSection(data));
     html = this.fill(html, /{{severityDistribution}}/g, this.generateSeverityDistribution(data));
     html = this.fill(
@@ -720,14 +723,14 @@ class ReportGenerator {
   }
 
   /**
-   * THE HTML escaping helper for this generator.
+   * HTML escaping helper for this generator.
    *
    * Every scan-result-derived string (descriptions, selectors, elements, URLs,
    * scanner ids, criteria, summaries, counts) must pass through here before it
-   * is interpolated into report HTML — scan results are attacker-controlled:
+   * is interpolated into report HTML. Scan results are attacker-controlled:
    * a hostile page can put markup into any DOM snippet the scanners capture,
-   * and the report is served from our own origin (and rendered into the PDF by
-   * headless Chrome).
+   * and the report is served from the scanner's own origin (and rendered into
+   * the PDF by headless Chrome).
    *
    * Escapes the five HTML-significant characters, so the result is safe both in
    * text nodes and inside single- or double-quoted attribute values.
@@ -748,11 +751,11 @@ class ReportGenerator {
   /**
    * Escaping alone keeps a URL inside its quoted attribute, but it does not
    * stop `javascript:`/`data:text/html` payloads from being placed in a src or
-   * href. Only image URLs we can vouch for are emitted; anything else is
+   * href. Only image URLs that can be vouched for are emitted; anything else is
    * dropped.
    *
    * @param {*} value caller-supplied URL
-   * @returns {string} escaped, safe URL — or '' when it must not be emitted
+   * @returns {string} escaped, safe URL, or '' when it must not be emitted
    */
   escUrl(value) {
     if (value === null || value === undefined) return '';
@@ -1180,7 +1183,7 @@ class ReportGenerator {
 
   /**
    * Report ids are used to build filesystem paths, so they must be opaque
-   * tokens — never traversal sequences. Mirrors the check in src/server.js.
+   * tokens, never traversal sequences. Mirrors the check in src/server.js.
    * @param {string} reportId
    * @throws {Error} when the id is not a safe token
    */

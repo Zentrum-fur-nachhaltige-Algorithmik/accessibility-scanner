@@ -1,12 +1,8 @@
 /**
  * LLM Reading Level Scanner
- *
- * Covers:
- * - 3.1.5 Reading Level (Level AAA)
- *
- * Checks that content does not require reading ability beyond
- * lower secondary education level, or that a simplified version
- * is provided. Explicitly multilingual (EN: Flesch, DE: Wiener Sachtextformel).
+ * Covers 3.1.5 Reading Level (Level AAA).
+ * Checks that content does not exceed lower secondary reading level or that a
+ * simplified version exists. EN uses Flesch, DE uses Wiener Sachtextformel.
  */
 
 const LLMBaseScanner = require('./base');

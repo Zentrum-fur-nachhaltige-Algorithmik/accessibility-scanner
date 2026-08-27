@@ -327,7 +327,7 @@ export default function Home() {
         profile,
         token,
       });
-      // A legacy synchronous server answers with the finished result instead
+      // A synchronous server answers with the finished result instead
       // of a job id: render it straight away.
       if (syncResult) {
         finishScan(context, syncResult);

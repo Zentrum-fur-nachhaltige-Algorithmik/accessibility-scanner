@@ -1,29 +1,8 @@
 /**
  * LLM Focus Appearance Scanner
- *
- * Covers AAA focus criteria:
- * - 2.4.12 Focus Not Obscured (Enhanced) (AAA)
- * - 2.4.13 Focus Appearance (AAA)
- *
- * The context handed to the model is MEASURED, never guessed:
- *
- *  - Focus states come from a real keyboard tab walk (`src/utils/keyboard-focus.js`),
- *    not `element.focus()`. Chromium only enters `:focus-visible` on keyboard
- *    focus, so the old `el.focus()` dump reported `outline: none` for every
- *    element on sites that (correctly) style `:focus-visible` only — the model
- *    dutifully turned that into "`.menu-btn` has no focus indicator" while the
- *    element in fact shows `outline: 2px solid rgb(31,61,50)` at 11.19:1 (FP-6).
- *  - Obscuring is a computed hit test per focused element instead of a dump of
- *    every fixed/sticky box on the page. A link inside a sticky header is not
- *    obscured BY that header, so any coverer that is an ancestor of the focused
- *    element is excluded (same rule as the FP-9 fix in focus-management-scanner).
- *  - When every tab stop has a measured, ≥3:1, ≥2px-thick indicator, a
- *    "missing/insufficient focus indicator" finding is arithmetically wrong;
- *    the fact is stated in the prompt AND 2.4.13 findings are rejected in code
- *    (same shape as the FP-13 code guard in llm-incomplete-reviewer-scanner).
- *
- * Both criteria are AAA, so `ScanPipeline.assembleResult` downgrades whatever
- * survives to `severity: 'info'` via `wcagCriteria` (set by `formatViolation`).
+ * Covers 2.4.12 Focus Not Obscured (Enhanced) and 2.4.13 Focus Appearance (AAA).
+ * Focus states come from a real keyboard tab walk plus a per-element hit test;
+ * 2.4.13 findings are rejected in code when every indicator measures as sufficient.
  */
 
 const LLMBaseScanner = require('./base');
@@ -104,8 +83,8 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
 
   /**
    * Hit-test the focused element at 9 points. A coverer only counts when it is
-   * (or sits inside) a fixed/sticky box that is NOT an ancestor of the element —
-   * an element is never obscured by its own ancestor (FP-9).
+   * (or sits inside) a fixed/sticky box that is NOT an ancestor of the element:
+   * an element is never obscured by its own ancestor.
    */
   async measureOcclusion(page, tabId) {
     return page.evaluate(
@@ -222,7 +201,7 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
           (guards.minIndicatorContrast != null
             ? ` (lowest measured ratio ${guards.minIndicatorContrast}:1)`
             : '') +
-          `. Do NOT report a missing, removed, weak or insufficient focus indicator — such a finding would be false and will be rejected.`
+          `. Do NOT report a missing, removed, weak or insufficient focus indicator: such a finding would be false and will be rejected.`
       );
     } else if (guards.allIndicatorsVisible) {
       facts.push(
@@ -241,7 +220,7 @@ class LLMFocusAppearanceScanner extends LLMBaseScanner {
 
     return `Check this page for WCAG 2.2 AAA focus criteria. Report ONLY 2.4.12 and 2.4.13.
 
-The data below was MEASURED in a real browser by pressing Tab (so \`:focus-visible\` rules applied) and hit-testing each focused element. It overrides anything the HTML or CSS text may suggest — never infer a focus problem from a stylesheet rule when the measurement for that element says otherwise.
+The data below was MEASURED in a real browser by pressing Tab (so \`:focus-visible\` rules applied) and hit-testing each focused element. It overrides anything the HTML or CSS text may suggest: never infer a focus problem from a stylesheet rule when the measurement for that element says otherwise.
 
 ${facts.length ? facts.join('\n') + '\n' : ''}
 1. **2.4.12 Focus Not Obscured (Enhanced)**: no part of the focused element may be hidden by author content. Judge this ONLY from the \`obscured\` measurement of each tab stop below (\`anyPartObscured: true\` + \`coveredBy\`). An element is never obscured by one of its own ancestors, and elements that are not covered in the measurement are not violations.
@@ -316,7 +295,7 @@ Return violations as JSON; return an empty array when the measurements show no f
   /**
    * Find the measured tab stops a violation is talking about. Matching is by
    * the last simple selector the model quoted (`.menu-btn`, `button.menu-btn`,
-   * `#id`) because the model rewrites our long descendant selectors.
+   * `#id`) because the model rewrites the long descendant selectors.
    *
    * @returns {Object[]} matched stops (empty when the citation is unusable)
    */

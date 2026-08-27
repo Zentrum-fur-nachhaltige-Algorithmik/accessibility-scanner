@@ -36,14 +36,14 @@ describe('LLMClient retry policy', () => {
     }
   });
 
-  it('still retries 500 and succeeds on a later attempt', async () => {
+  it('retries 500 and succeeds on a later attempt', async () => {
     const c = clientWithStatuses([500, 500, 200]);
     const res = await c._retryWithBackoff(() => c._sendRequest({}));
     expect(c._sendRequest).toHaveBeenCalledTimes(3);
     expect(res.success).toBe(true);
   });
 
-  it('still retries 429 and 408', async () => {
+  it('retries 429 and 408', async () => {
     for (const status of [429, 408]) {
       const c = clientWithStatuses([status, 200]);
       const res = await c._retryWithBackoff(() => c._sendRequest({}));

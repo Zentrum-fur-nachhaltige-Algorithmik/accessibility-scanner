@@ -80,8 +80,8 @@ describe('Self-scan: frontend and report accessibility', () => {
 
   beforeAll(async () => {
     // 1. Start the backend API server on a random port.
-    // The SSRF guard rejects private hosts unless allowlisted; this test's
-    // whole point is scanning our own localhost fixture servers.
+    // The SSRF guard rejects private hosts unless allowlisted; this test scans
+    // the localhost fixture servers.
     process.env.SCAN_ALLOWED_HOSTS = '127.0.0.1,localhost';
     const app = require('../../src/server');
     await new Promise((resolve, reject) => {
@@ -204,7 +204,7 @@ describe('Self-scan: frontend and report accessibility', () => {
       expect(reportRes.body.reportUrl).toBeDefined();
 
       // The report is served at /api/report/:id which returns HTML
-      // We need the full URL for scanning
+      // Full URL needed for scanning
       const reportUrl = `http://127.0.0.1:${apiPort}${reportRes.body.reportUrl}`;
 
       // Now scan the generated report itself

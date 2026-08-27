@@ -1,3 +1,9 @@
+/**
+ * Non-text Contrast Scanner.
+ * WCAG 1.4.11 (EN 301 549 9.1.4.11), plus focus indicator visibility for 2.4.7.
+ * Measures 3:1 contrast of UI component boundaries, graphical objects, focus indicators
+ * and state changes against their resolved backdrop.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -5,11 +11,6 @@ const { tabWalk, cleanupTabWalk } = require('../utils/keyboard-focus');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
 const { injectableCode: renderedUtils } = require('../utils/rendered');
 
-/**
- * Non-text Contrast Scanner for WCAG 1.4.11 compliance testing
- * Tests UI components and graphical objects for 3:1 contrast ratio
- * Critical for UI usability and legal compliance
- */
 class NonTextContrastScanner extends BaseScanner {
   constructor() {
     super('nontext-contrast', {
@@ -128,16 +129,15 @@ class NonTextContrastScanner extends BaseScanner {
         /**
          * Evaluate one UI component against SC 1.4.11.
          *
-         * Three things this deliberately does that the naive version did not:
-         *  - the backdrop is the first ancestor that actually PAINTS
+         * Three rules:
+         *  - the backdrop is the first ancestor that actually paints
          *    (__resolveBackground), never `element.parentElement`'s own
-         *    computed background — a transparent parent used to yield
-         *    rgba(0,0,0,0) and a bogus 1:1 ratio;
+         *    computed background, which may be transparent;
          *  - translucent fills and borders are alpha-composited onto that
-         *    backdrop before any ratio is taken — rgba(0,0,0,0.7) does not
-         *    render as black;
+         *    backdrop before any ratio is taken (rgba(0,0,0,0.7) does not
+         *    render as black);
          *  - a component whose painted border already reaches the threshold
-         *    is not additionally required to have a contrasting FILL. SC
+         *    is not additionally required to have a contrasting fill. SC
          *    1.4.11 governs "the visual information required to identify"
          *    the component, and a compliant border is that information. The
          *    standard accessible pattern (white input, white page, dark
@@ -146,10 +146,8 @@ class NonTextContrastScanner extends BaseScanner {
         function evaluateComponent(element, index, config) {
           // SC 1.4.11 exception: inactive user interface components.
           if (__isInactive(element)) return;
-          // Nothing that is not painted can fail a CONTRAST criterion. A
-          // `display:none` hamburger button in a desktop layout has no
-          // client rects at all, yet its computed white-on-white style
-          // used to be measured and reported as a 1:1 failure.
+          // Nothing that is not painted can fail a contrast criterion (e.g.
+          // a `display:none` hamburger button in a desktop layout).
           if (!__isRendered(element)) return;
 
           const styles = window.getComputedStyle(element);
@@ -178,13 +176,12 @@ class NonTextContrastScanner extends BaseScanner {
           // "Visual information required to identify" the component: a
           // label or an icon glyph with sufficient contrast IS that
           // information, so neither the border nor the fill has to carry
-          // it. Computed once and applied to BOTH branches — the fill
-          // branch used to skip this guard, so a transparent icon button
-          // with a 14:1 glyph still failed on its invisible fill.
+          // it. Computed once and applied to both branches, so a transparent
+          // icon button with a high-contrast glyph passes.
           const alt = __hasAlternativeIdentifier(element, backdrop, contrastThreshold);
 
           // Border contrast (only for borders that are actually painted,
-          // and only when nothing else — label text, icon glyph — already
+          // and only when nothing else (label text, icon glyph) already
           // identifies the component with sufficient contrast).
           if (renderedBorder && !compliantBorder) {
             const borderRgb = __parseRgb(renderedBorder.color);
@@ -218,7 +215,7 @@ class NonTextContrastScanner extends BaseScanner {
             }
           }
 
-          // Fill contrast — only relevant when no compliant border already
+          // Fill contrast, only relevant when no compliant border already
           // identifies the component's boundary.
           if (config.checkFill && !compliantBorder && !alt.by) {
             const ownBg = __parseRgb(styles.backgroundColor);
@@ -297,14 +294,8 @@ class NonTextContrastScanner extends BaseScanner {
   }
 
   /**
-   * Analyze graphical objects for contrast compliance.
-   *
-   * Every ratio here used to be computed by `this.getContrastRatio(...)`
-   * INSIDE page.evaluate. `this` in the browser is not the scanner instance,
-   * so every one of those calls threw a TypeError that the surrounding
-   * try/catch swallowed — the entire SVG/canvas/progress analysis was dead
-   * code that could never report anything. It now uses the injected shared
-   * WCAG helpers.
+   * Analyze graphical objects for contrast compliance, using the injected
+   * shared WCAG helpers inside page.evaluate.
    *
    * SC 1.4.11 covers "graphical objects ... required to understand the
    * content". Purely decorative graphics are out of scope, so an SVG that is
@@ -423,10 +414,8 @@ class NonTextContrastScanner extends BaseScanner {
         }
 
         // Progress bars: the track boundary is the information that has to
-        // be perceivable. (Canvas contents cannot be read from the CSSOM at
-        // all — the old canvas "check" only ever compared the element's own
-        // CSS background against its parent, which says nothing about what
-        // is painted into the canvas, so it is reported as needing review.)
+        // be perceivable. Canvas contents cannot be read from the CSSOM at
+        // all, so canvases are reported as needing review.
         const progressBars = document.querySelectorAll('progress, [role="progressbar"]');
         for (let i = 0; i < progressBars.length; i++) {
           const progress = progressBars[i];
@@ -485,12 +474,12 @@ class NonTextContrastScanner extends BaseScanner {
    * Focus is moved with REAL keyboard Tab presses through
    * src/utils/keyboard-focus.js, never with element.focus(): programmatic
    * focus does not enter Chromium's `:focus-visible` state, so a page whose
-   * only ring is `:focus-visible { outline: ... }` (the modern default)
-   * looked like it had no indicator at all. Identity is by tab id, so two
-   * nav links with identical class names are two elements, not a "trap".
+   * only ring is `:focus-visible { outline: ... }` would look like it had no
+   * indicator at all. Identity is by tab id, so two nav links with identical
+   * class names are two elements, not a "trap".
    *
-   * `getComputedStyle(el, ':focus')` is never used — the second argument is a
-   * pseudo-ELEMENT selector and returns the normal style.
+   * `getComputedStyle(el, ':focus')` is never used: the second argument is a
+   * pseudo-element selector and returns the normal style.
    */
   async analyzeFocusIndicators(page, options) {
     const violations = [];
@@ -615,26 +604,14 @@ class NonTextContrastScanner extends BaseScanner {
    * "visual information required to identify ... states of user interface
    * components").
    *
-   * What this replaced, and why: the previous implementation set a
-   * `hasHoverStyles` flag if ANY rule ANYWHERE in the document mentioned
-   * `:hover` — not whether a hover rule matched the element under test — and
-   * then reported a violation whenever the element's own background AND
-   * border-color were transparent. It computed no contrast ratio at all, read
-   * the raw `element.parentElement` background (transparent parents included),
-   * and fired on plain text links, whose identification comes from their text
-   * and underline. Across the whole fixture corpus it produced 6 findings on
-   * `good-*` files, 1 on a real-world page and ZERO on any `bad-*` file — it
-   * was noise with no detection value.
+   * Resolves the style rules that actually match the element and carry a
+   * semantic state pseudo-class/attribute (`:checked`, `aria-checked`,
+   * `aria-selected`, `aria-pressed`, `aria-expanded`), then verifies the
+   * declared state indication is perceivable: at least one declared property
+   * must produce a visible change, and a state signalled by colour alone must
+   * reach the 3:1 threshold against the colour it replaces.
    *
-   * What this does instead: it resolves the style rules that ACTUALLY match
-   * the element and carry a semantic state pseudo-class/attribute
-   * (`:checked`, `aria-checked`, `aria-selected`, `aria-pressed`,
-   * `aria-expanded`), then verifies the declared state indication is
-   * perceivable — at least one declared property must produce a visible
-   * change, and a state signalled by colour alone must reach the 3:1
-   * threshold against the colour it replaces.
-   *
-   * `:hover` and `:active` are deliberately NOT treated as states here.
+   * `:hover` and `:active` are not treated as states here.
    * SC 1.4.11's "states" are the ones that carry information (checked,
    * selected, expanded, pressed); a hover treatment is a transient
    * affordance, and WCAG does not require one to exist or to reach 3:1
@@ -762,7 +739,7 @@ class NonTextContrastScanner extends BaseScanner {
           }
           if (structuralChange) continue;
 
-          // Otherwise the state is signalled by colour alone — that colour
+          // Otherwise the state is signalled by colour alone, and that colour
           // change has to be perceivable.
           let bestRatio = null;
           let evidence = null;
@@ -830,10 +807,6 @@ class NonTextContrastScanner extends BaseScanner {
 
   /**
    * Count the elements this scanner actually looks at.
-   *
-   * This used to be `Math.max(50 - violations.length, 0)` — a fabricated
-   * number that made the summary read like a real denominator while being
-   * unrelated to the page. It is now measured.
    */
   async countCheckedElements(page) {
     try {

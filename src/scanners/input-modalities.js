@@ -1,3 +1,9 @@
+/**
+ * Input Modalities Scanner.
+ * WCAG 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.5.7, 2.5.8 (EN 301 549 9.2.5.x).
+ * Tests pointer gestures, pointer cancellation, label in name, motion actuation,
+ * dragging alternatives and target size.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -5,11 +11,6 @@ const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('input-modalities');
 
-/**
- * Input Modalities Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.2.5.1, 9.2.5.2, 9.2.5.3, 9.2.5.4
- * Tests pointer gestures, cancellation, label matching, and motion actuation
- */
 class InputModalitiesScanner extends BaseScanner {
   constructor() {
     super('input-modalities', {
@@ -23,7 +24,7 @@ class InputModalitiesScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method — receives an already-navigated Puppeteer page.
+   * Core scan method. Receives an already-navigated Puppeteer page.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
@@ -438,11 +439,8 @@ class InputModalitiesScanner extends BaseScanner {
 
         // Visible label, normalisation and the containment test all come from
         // src/utils/accessible-name.js (__visibleLabelText / __nameContainsLabel
-        // / __labelInNameOk) so this scanner and phase6a-label-in-name cannot
-        // disagree about what "the visible label" is. The local copy that used
-        // to live here concatenated every rendered text node, which made a
-        // branding link's monogram and tagline part of the label and failed
-        // every one of them — see the header comment in that file.
+        // / __labelInNameOk) so this scanner and label-in-name cannot disagree
+        // about what "the visible label" is.
         const norm = __visibleLabelNormalize;
 
         const controls = document.querySelectorAll(
@@ -877,7 +875,7 @@ class InputModalitiesScanner extends BaseScanner {
             }
           }
         }
-        if (!blocker) continue; // undersized but sufficiently spaced — passes 2.5.8
+        if (!blocker) continue; // undersized but sufficiently spaced: passes 2.5.8
 
         adequate = false;
         issues.push({
@@ -997,7 +995,7 @@ class InputModalitiesScanner extends BaseScanner {
         if (el.getAttribute('draggable') === 'true') return;
 
         if (el.hasAttribute('ondrop') || el.hasAttribute('ondragover')) {
-          // This is a drop zone — check if it also has click-to-add or similar
+          // This is a drop zone. Check if it also has click-to-add or similar
           const hasClickAlternative =
             el.getAttribute('onclick') ||
             el.querySelector('button, [role="button"], input[type="file"]');

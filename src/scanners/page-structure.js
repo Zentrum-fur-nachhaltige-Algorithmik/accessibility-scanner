@@ -1,12 +1,12 @@
+/**
+ * Page Structure Scanner.
+ * WCAG 2.4.2, 2.4.4, 2.4.5, 2.4.6 (EN 301 549 9.2.4.2, 9.2.4.4, 9.2.4.5, 9.2.4.6).
+ * Checks page title, link purpose, multiple ways and heading/label descriptiveness.
+ */
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('page-structure');
 
-/**
- * Page Structure Scanner for WCAG compliance testing
- * Implements EN 301 549 criteria 9.2.4.2, 9.2.4.4, 9.2.4.5, 9.2.4.6
- * (Page Titles, Link Purpose, Multiple Ways, Headings and Labels)
- */
 class PageStructureScanner extends BaseScanner {
   constructor() {
     super('page-structure', {
@@ -200,9 +200,9 @@ class PageStructureScanner extends BaseScanner {
           const isGeneric = genericTexts.some((generic) => text.toLowerCase() === generic);
           const isEmpty = !text;
           const isOnlySymbols = text && /^[^\w\s]+$/.test(text);
-          // A short name that was AUTHORED (aria-label/aria-labelledby/title) is a
-          // deliberate choice, not an accident of the markup — only a short name
-          // taken from the link's own content counts as vague.
+          // A short name that was authored (aria-label/aria-labelledby/title) is
+          // a choice, not an accident of the markup. Only a short name taken
+          // from the link's own content counts as vague.
           const isAuthoredName =
             nameInfo.source === 'aria-label' ||
             nameInfo.source === 'aria-labelledby' ||
@@ -291,10 +291,9 @@ class PageStructureScanner extends BaseScanner {
       );
       ways.mainNavigation = navElements.length > 0;
 
-      // Check for breadcrumbs. NOTE: `[role="navigation"] ol|ul` used to be in
-      // this list — that matches the <ul> of any ordinary nav menu, so the main
-      // navigation was counted a second time as a "breadcrumb". Only markup
-      // that actually identifies itself as a breadcrumb counts.
+      // Check for breadcrumbs. Only markup that identifies itself as a
+      // breadcrumb counts; `[role="navigation"] ol|ul` would match the <ul>
+      // of any ordinary nav menu.
       const breadcrumbSelectors = [
         '.breadcrumb',
         '.breadcrumbs',
@@ -323,9 +322,8 @@ class PageStructureScanner extends BaseScanner {
 
       // A footer link block that lists the site's pages is technique G126
       // ("providing a list of links to all other web pages") / G125 and is one
-      // of the mechanisms WCAG names for 2.4.5 — the dedicated multiple-ways
-      // scanner already counts it. Omitting it here made every site whose
-      // second way is a footer sitemap fail the criterion.
+      // of the mechanisms WCAG names for 2.4.5; the multiple-ways scanner
+      // counts it too.
       const footers = document.querySelectorAll('footer, [role="contentinfo"]');
       for (const footer of footers) {
         const internal = Array.from(footer.querySelectorAll('a[href]')).filter((a) => {
@@ -352,7 +350,7 @@ class PageStructureScanner extends BaseScanner {
 
       // Evidence that this page is actually part of a larger multi-page site: at
       // least 2 same-origin links to distinct paths. Fragment-only ("#..."),
-      // "javascript:", "mailto:", and "tel:" links don't count — none of them point
+      // "javascript:", "mailto:", and "tel:" links don't count: none of them point
       // at "another page" of a site/process, so they can't establish that SC 2.4.5
       // (a whole-site criterion) even applies here.
       const internalPaths = new Set();
@@ -382,19 +380,16 @@ class PageStructureScanner extends BaseScanner {
       };
     });
 
-    // SC 2.4.5 "Multiple Ways" (9.2.4.5) is defined over a *set of web pages* in a
-    // site or process — applying it to a single isolated page is a category error.
-    // We therefore only emit `no-multiple-ways` when BOTH of the following hold:
+    // SC 2.4.5 "Multiple Ways" (9.2.4.5) is defined over a set of web pages in a
+    // site or process, not a single isolated page. `no-multiple-ways` is only
+    // emitted when both of the following hold:
     //  (a) the caller hasn't opted this scan out of multi-page criteria via
     //      `options.singlePageContext === true` or `options.skipMultiPageCriteria
-    //      === true` (set this for standalone fixtures/previews known not to be
-    //      part of a larger site — multi-page/EAA site scans should leave it unset
-    //      so this check still runs); and
-    //  (b) — when the caller hasn't given either signal above — the page itself
-    //      shows real evidence of belonging to a larger site (see
-    //      hasEvidenceOfLargerSite above). A standalone page with no such links is
-    //      structurally out of scope for 2.4.5 and must not be flagged, even though
-    //      it's the safe (non-opted-out) default.
+    //      === true` (set this for standalone fixtures/previews; site scans
+    //      should leave it unset); and
+    //  (b) the page itself shows real evidence of belonging to a larger site
+    //      (see hasEvidenceOfLargerSite above). A standalone page with no such
+    //      links is out of scope for 2.4.5 and must not be flagged.
     const skipMultiPageCriteria =
       options.singlePageContext === true || options.skipMultiPageCriteria === true;
     const shouldCheckMultipleWays =
@@ -430,13 +425,13 @@ class PageStructureScanner extends BaseScanner {
       (visScript, accnameCode) => {
         eval(visScript);
         // Shared ACCNAME implementation (__accessibleNameInfo). A heading whose
-        // only child is `<img alt="…">` has textContent "" but is NOT empty —
+        // only child is `<img alt="…">` has textContent "" but is not empty:
         // its accessible name is the image's alt text.
         eval(accnameCode);
         const problematicHeadings = [];
         const problematicLabels = [];
 
-        // Check headings (h1-h6) — skip hidden
+        // Check headings (h1-h6), skipping hidden ones
         const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).filter(
           isElementVisible
         );
@@ -472,7 +467,7 @@ class PageStructureScanner extends BaseScanner {
           }
         });
 
-        // Check form labels — skip hidden
+        // Check form labels, skipping hidden ones
         const formControls = Array.from(
           document.querySelectorAll('input, textarea, select')
         ).filter(isElementVisible);
@@ -495,13 +490,11 @@ class PageStructureScanner extends BaseScanner {
               ? `${control.tagName.toLowerCase()}[name="${name}"]`
               : `${control.tagName.toLowerCase()}:nth-child(${index + 1})`;
 
-          // The accessible name is computed by the shared ACCNAME helper, which
-          // covers every mechanism this check used to enumerate by hand —
-          // `label[for]`, wrapping `<label>` (implicit association),
-          // `aria-labelledby`, `aria-label`, `title`, `value` on reset buttons —
-          // PLUS the one it was missing: `alt` on `<input type="image">`.
-          // `placeholder` is deliberately NOT a naming mechanism here: a
-          // placeholder-only field is a real 2.4.6/3.3.2 failure.
+          // The accessible name is computed by the shared ACCNAME helper
+          // (`label[for]`, wrapping `<label>`, `aria-labelledby`, `aria-label`,
+          // `title`, `value` on reset buttons, `alt` on `<input type="image">`).
+          // `placeholder` is not a naming mechanism here: a placeholder-only
+          // field is a real 2.4.6/3.3.2 failure.
           const nameInfo = __accessibleNameInfo(control);
           const placeholder = control.getAttribute('placeholder');
 

@@ -1,14 +1,15 @@
+/**
+ * Timing Controls Scanner.
+ * WCAG 2.2.1, 2.2.2 (EN 301 549 9.2.2.1, 9.2.2.2, 9.2.2.6).
+ * Observes the page for timeouts, auto-playing media and moving content and
+ * checks whether the user can pause, stop or extend them.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('timing-controls');
 
-/**
- * Timing Controls Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.2.2.1, 9.2.2.2, 9.2.2.6
- * Tests timing adjustability, auto-play controls, and timeout handling
- */
 class TimingControlsScanner extends BaseScanner {
   constructor() {
     super('timing-controls', {

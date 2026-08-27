@@ -308,7 +308,7 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-status-messages.html': {
-    expectedScanners: ['page-structure'],
+    expectedScanners: ['page-structure', 'status-messages'],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['4.1.3'],

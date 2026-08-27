@@ -1235,11 +1235,14 @@ async function main() {
     entry.totalViolations = violations.length;
     entry.scannerCount = Object.keys(scanners).length;
     // Per-scanner violation counts: the band is a total, so a scanner that
-    // trades false positives for false negatives stays invisible in it.
+    // trades false positives for false negatives stays invisible in it. Read
+    // from the per-scanner summaries, because only axe-core stamps its id onto
+    // each violation.
     entry.perScanner = {};
-    for (const v of violations) {
-      const id = v.scannerId || 'unknown';
-      entry.perScanner[id] = (entry.perScanner[id] || 0) + 1;
+    for (const [id, s] of Object.entries(scanners)) {
+      if (s && typeof s.violationCount === 'number' && s.violationCount > 0) {
+        entry.perScanner[id] = s.violationCount;
+      }
     }
     entry.expectedScannerCount = outcome.expectedIds.length;
 

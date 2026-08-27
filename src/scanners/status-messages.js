@@ -41,19 +41,28 @@ class StatusMessagesScanner extends BaseScanner {
       ...options,
     };
 
-    // The observer has to exist before anything is clicked, or the mutations
-    // the clicks cause are not witnessed.
-    await this.installMutationObserver(page);
+    // The clicks below reach handlers that call alert(), which blocks the
+    // page's JavaScript and with it every later click and evaluate.
+    const stopDismissingDialogs = BaseScanner.dismissDialogs(page);
 
-    if (scanOptions.simulateInteractions && !scanOptions.heuristicOnly) {
-      await this.simulateInteractions(page, scanOptions);
-    } else {
-      // No simulated interactions: hold the window open anyway so content
-      // that updates on its own (timers, deferred fetches) is recorded.
-      await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(scanOptions)));
+    let violations;
+    try {
+      // The observer has to exist before anything is clicked, or the mutations
+      // the clicks cause are not witnessed.
+      await this.installMutationObserver(page);
+
+      if (scanOptions.simulateInteractions && !scanOptions.heuristicOnly) {
+        await this.simulateInteractions(page, scanOptions);
+      } else {
+        // No simulated interactions: hold the window open anyway so content
+        // that updates on its own (timers, deferred fetches) is recorded.
+        await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(scanOptions)));
+      }
+
+      violations = await this.analyzeStatusRegions(page);
+    } finally {
+      stopDismissingDialogs();
     }
-
-    const violations = await this.analyzeStatusRegions(page);
 
     return {
       scannerId: this.id,
@@ -389,6 +398,10 @@ class StatusMessagesScanner extends BaseScanner {
             const words = tokens(element);
             if (!words.some(function (word) { return meta.words.includes(word); })) continue;
             if (helpers.hasLiveRegionAttributes(element)) continue;
+            // A control is not a status message: a toggle whose own label
+            // changes from "Pause" to "Resume" reports its new state through
+            // its role and name, not through an announcement.
+            if (__isInteractiveTarget(element)) continue;
             if (!__isRendered(element)) continue;
 
             const hasText = !!element.textContent.trim();

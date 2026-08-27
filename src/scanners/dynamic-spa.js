@@ -66,6 +66,9 @@ class DynamicSpaScanner extends BaseScanner {
       if (frame === page.mainFrame()) state.navigations += 1;
     };
     page.on('framenavigated', onFrameNavigated);
+    // A link handler that calls confirm() blocks the page's JavaScript, and
+    // with it every later click and evaluate this scanner makes.
+    const stopDismissingDialogs = BaseScanner.dismissDialogs(page);
 
     let violations = [];
     try {
@@ -74,6 +77,7 @@ class DynamicSpaScanner extends BaseScanner {
       log.warn('Error during route change testing:', error.message);
     } finally {
       page.off('framenavigated', onFrameNavigated);
+      stopDismissingDialogs();
     }
 
     return {

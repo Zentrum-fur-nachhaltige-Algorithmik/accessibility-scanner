@@ -2,10 +2,11 @@
  * The ARIA vocabulary, shared by every check that has to decide whether a role
  * or an aria-* attribute exists. One list, so a name added to WAI-ARIA is not
  * reported as invalid by whichever scanner happens to hold a shorter copy.
- * Sources: WAI-ARIA 1.2, DPUB-ARIA 1.0, WAI-ARIA Graphics 1.0.
+ * Sources: WAI-ARIA 1.2 plus the index-text attributes of 1.3, DPUB-ARIA 1.0,
+ * WAI-ARIA Graphics 1.0.
  */
 
-/** Every aria-* attribute defined by WAI-ARIA 1.2. */
+/** Every aria-* attribute browsers accept, from WAI-ARIA 1.2 and 1.3. */
 const ARIA_ATTRIBUTES = [
   'aria-activedescendant',
   'aria-atomic',

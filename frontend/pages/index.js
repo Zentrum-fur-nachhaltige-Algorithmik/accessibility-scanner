@@ -725,7 +725,8 @@ export default function Home() {
           <footer className="pb-footer">
             <p>{APP_NAME}: automated WCAG 2.2 conformity assessment</p>
             <p>
-              <a href="/">Report</a> · <a href="/accessibility">Accessibility statement</a>
+              <a href="/">Report</a> ·{' '}
+              <a href="/accessibility">Accessibility statement and contact</a>
             </p>
           </footer>
         </div>

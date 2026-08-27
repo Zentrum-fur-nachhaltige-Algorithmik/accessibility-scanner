@@ -97,11 +97,11 @@ describe('Self-scan: frontend and report accessibility', () => {
 
     // 2. Start the Next.js production server (requires prior build)
     frontendPort = 3999 + Math.floor(Math.random() * 1000);
-    frontendProcess = spawn('npx', ['next', 'start', 'frontend', '-p', String(frontendPort)], {
-      cwd: projectRoot,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env },
-    });
+    frontendProcess = spawn(
+      path.join(projectRoot, 'node_modules', '.bin', 'next'),
+      ['start', 'frontend', '-p', String(frontendPort)],
+      { cwd: projectRoot, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env } }
+    );
 
     // Wait for the Next.js server to be ready
     await waitForServer(`http://127.0.0.1:${frontendPort}/`, 90_000);
@@ -114,6 +114,7 @@ describe('Self-scan: frontend and report accessibility', () => {
       await new Promise((r) => setTimeout(r, 1000));
     }
     if (apiServer) {
+      apiServer.closeAllConnections();
       await new Promise((resolve) => apiServer.close(resolve));
     }
   }, 30_000);

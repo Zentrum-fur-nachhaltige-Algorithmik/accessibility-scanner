@@ -313,7 +313,7 @@ class TimingControlsScanner extends BaseScanner {
           // Look for user controls
           const hasControls =
             element.hasAttribute('controls') ||
-            element.parentElement.querySelector('button') ||
+            (element.parentElement && element.parentElement.querySelector('button')) ||
             document.querySelector(`button[aria-controls="${element.id}"]`);
 
           if (!hasControls) {
@@ -340,6 +340,27 @@ class TimingControlsScanner extends BaseScanner {
       });
 
       return { issues, controlled };
+    });
+
+    // Record which elements actually rewrite their own text while nobody is
+    // interacting with the page. This is what "auto-updating content" means in
+    // 2.2.2; the words a page happens to contain say nothing about it.
+    await page.evaluate(() => {
+      const counts = new Map();
+      const observer = new MutationObserver((records) => {
+        for (const rec of records) {
+          const node = rec.type === 'characterData' ? rec.target.parentElement : rec.target;
+          if (!node || node.nodeType !== 1) continue;
+          if (node.closest('script, style, head')) continue;
+          counts.set(node, (counts.get(node) || 0) + 1);
+        }
+      });
+      observer.observe(document.body, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+      window.__a11yAutoUpdate = { counts, observer };
     });
 
     // Observe page for auto-starting content
@@ -373,7 +394,7 @@ class TimingControlsScanner extends BaseScanner {
           // Look for pause controls
           const hasPauseControl =
             element.querySelector('button') ||
-            element.parentElement.querySelector('button') ||
+            (element.parentElement && element.parentElement.querySelector('button')) ||
             document.querySelector(`button[aria-controls="${element.id}"]`) ||
             element.hasAttribute('onclick');
 
@@ -399,22 +420,19 @@ class TimingControlsScanner extends BaseScanner {
         }
       });
 
-      // Check for auto-updating content (like news tickers, live feeds)
-      const updateIndicators = ['live', 'updating', 'ticker', 'feed', 'refresh'];
-      const allElements = document.querySelectorAll('*');
-
-      allElements.forEach((element) => {
-        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-        const className = typeof element.className === 'string' ? element.className : '';
-        const elementText = element.textContent.toLowerCase();
-        const hasUpdateIndicator = updateIndicators.some(
-          (indicator) =>
-            elementText.includes(indicator) ||
-            className.toLowerCase().includes(indicator) ||
-            element.id.toLowerCase().includes(indicator)
-        );
-
-        if (hasUpdateIndicator && element.textContent.trim().length > 20) {
+      // Auto-updating content: elements that rewrote themselves repeatedly
+      // during the observation window without any input from the user.
+      // A single update is a page settling in (lazy image, hydration); 2.2.2
+      // is about content that keeps updating.
+      const MIN_AUTO_UPDATES = 3;
+      const recorded = window.__a11yAutoUpdate;
+      if (recorded) {
+        recorded.observer.disconnect();
+        for (const [element, count] of recorded.counts) {
+          if (count < MIN_AUTO_UPDATES) continue;
+          if (!element.isConnected) continue;
+          // SVG/MathML elements expose className as an SVGAnimatedString
+          const className = typeof element.className === 'string' ? element.className : '';
           const elementInfo = {
             selector:
               element.tagName.toLowerCase() +
@@ -425,19 +443,20 @@ class TimingControlsScanner extends BaseScanner {
           // Look for pause/stop controls
           const hasUpdateControls =
             element.querySelector('button') ||
-            element.parentElement.querySelector('button') ||
-            document.querySelector(`button[aria-controls="${element.id}"]`);
+            (element.parentElement && element.parentElement.querySelector('button')) ||
+            (element.id && document.querySelector(`button[aria-controls="${element.id}"]`));
 
           if (!hasUpdateControls) {
             issues.push({
               type: 'auto-update-no-controls',
               element: elementInfo.selector,
-              description: 'Auto-updating content lacks pause or stop controls',
+              description: `Content updated ${count} times on its own and lacks pause or stop controls`,
               severity: 'warning',
             });
           }
         }
-      });
+        delete window.__a11yAutoUpdate;
+      }
 
       return { issues, controlled };
     });
@@ -512,7 +531,7 @@ class TimingControlsScanner extends BaseScanner {
           // Look for pause, stop, or hide controls
           const hasControls =
             element.querySelector('button') ||
-            element.parentElement.querySelector('button') ||
+            (element.parentElement && element.parentElement.querySelector('button')) ||
             document.querySelector(`button[aria-controls="${element.id}"]`) ||
             element.hasAttribute('onclick') ||
             element.closest('[role="dialog"]'); // Modals often have close buttons

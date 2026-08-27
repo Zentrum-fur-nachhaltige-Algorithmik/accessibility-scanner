@@ -1,8 +1,16 @@
 # accessibility-scanner
 
-WCAG 2.2 scanner for web pages. It runs axe-core, 34 deterministic Puppeteer
-checks and 12 optional LLM-assisted checks through one headless Chromium
-pipeline and returns JSON, HTML or PDF. Every success criterion is mapped to a
+axe-core covers the WCAG 2.2 criteria that can be decided from the DOM alone.
+This project extends it with checks that need a real browser session or
+judgement: 30 deterministic Puppeteer scanners (keyboard, focus, reflow, text
+resize, motion, timing, contrast of non-text content, EAA statement and
+contact requirements) and 12 LLM-assisted scanners for criteria such as
+reading level, sensory characteristics or alt text quality. An agentic
+screen-reader check, where an LLM has to complete tasks using only what a
+screen reader announces, is in progress on the `feat/sr-agent` branch.
+
+Everything runs through one Express API and one headless Chromium pipeline
+and comes back as JSON, HTML or PDF. Every success criterion is mapped to a
 mechanism and to the fixtures that prove it; the mapping is checked in CI.
 
 [![ci](https://github.com/Zentrum-fur-nachhaltige-Algorithmik/accessibility-scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/Zentrum-fur-nachhaltige-Algorithmik/accessibility-scanner/actions/workflows/ci.yml)
@@ -21,7 +29,7 @@ client (curl, Next.js UI)
 | url-guard (SSRF)       |                 |
 +------------------------+                 v
    ^                             +--------------------+
-   |  GET /api/scan/job/:id      | ScanPipeline       |  one Chromium per job
+   |  GET /api/scan/job/:id      | ScanPipeline       |  one context per scan
    |                             +--------------------+
    |                                |              |
    |            page loaded once    |              |  reload before each
@@ -42,6 +50,10 @@ client (curl, Next.js UI)
    |                                   |
    +-----------------------------------+   JSON  ->  HTML / PDF report
 ```
+
+The process keeps one Chromium and relaunches it every 50 scans. Each scan
+runs in its own browser context, so cookies, storage and cache never carry
+over from one target to the next.
 
 Scanners extend `BaseScanner` and receive an already loaded page. Concurrent
 scanners only read the DOM and run in parallel; exclusive scanners change the

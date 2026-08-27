@@ -1,16 +1,24 @@
 /**
  * ScanPipeline
- * Orchestrates scanner execution against a single URL with one browser instance.
- * Runs concurrent scanners (page.evaluate only) in parallel on one page and
- * re-navigates between exclusive scanners (viewport/keyboard/navigation changes).
+ * Orchestrates scanner execution against a single URL. One Chromium per
+ * process, recycled after a number of scans; one isolated browser context per
+ * scan so cookies, storage and cache never leak between targets. Concurrent
+ * scanners share one page; exclusive scanners each get a fresh tab.
  */
 const puppeteer = require('puppeteer');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
 class ScanPipeline {
-  constructor() {
+  /**
+   * @param {Object} [options]
+   * @param {number} [options.maxScansPerBrowser] relaunch Chromium after this many scans (default 50)
+   */
+  constructor(options = {}) {
     this.browser = null;
     this.scanners = new Map();
+    this.maxScansPerBrowser = options.maxScansPerBrowser ?? 50;
+    this.scanCount = 0;
+    this.activeScans = 0;
   }
 
   /**
@@ -45,6 +53,8 @@ class ScanPipeline {
     const { scannerIds = null, timeout = 30000, screenshotDir = null, ...scannerOptions } = options;
 
     await this.ensureBrowser();
+    this.activeScans += 1;
+    const context = await this.browser.createBrowserContext();
 
     const selected = scannerIds
       ? scannerIds.map((id) => this.scanners.get(id)).filter(Boolean)
@@ -57,7 +67,7 @@ class ScanPipeline {
     const concurrent = selected.filter((s) => !s.needsExclusiveAccess);
     const exclusive = selected.filter((s) => s.needsExclusiveAccess);
 
-    const page = await this.browser.newPage();
+    const page = await context.newPage();
     this.autoDismissDialogs(page);
     await page.setViewport({ width: 1920, height: 1080 });
 
@@ -117,7 +127,7 @@ class ScanPipeline {
         const batch = exclusive.slice(i, i + tabConcurrency);
         const batchResults = await Promise.allSettled(
           batch.map(async (scanner) => {
-            const tab = await this.browser.newPage();
+            const tab = await context.newPage();
             this.autoDismissDialogs(tab);
             await tab.setViewport({ width: 1920, height: 1080 });
             try {
@@ -143,6 +153,10 @@ class ScanPipeline {
       }
     } finally {
       await page.close().catch(() => {});
+      await context.close().catch(() => {});
+      this.activeScans -= 1;
+      this.scanCount += 1;
+      await this.recycleBrowserIfDue();
     }
 
     return this.assembleResult(url, allResults);
@@ -159,10 +173,6 @@ class ScanPipeline {
     page.on('dialog', (dialog) => dialog.dismiss().catch(() => {}));
   }
 
-  /**
-   * Navigate with CSP fallback.
-   * Will be enhanced in Phase 5 with full CSP strategy from csp-strategy.js.
-   */
   async navigateWithCSPFallback(page, url, options = {}) {
     const timeout = options.timeout || 30000;
     await page.goto(url, { waitUntil: 'networkidle0', timeout });
@@ -342,6 +352,14 @@ class ScanPipeline {
         headless: 'new',
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
+    }
+  }
+
+  /** Relaunch Chromium after maxScansPerBrowser scans, once no scan is using it. */
+  async recycleBrowserIfDue() {
+    if (this.activeScans === 0 && this.scanCount >= this.maxScansPerBrowser) {
+      this.scanCount = 0;
+      await this.close();
     }
   }
 

@@ -89,29 +89,32 @@ class InputModalitiesScanner extends BaseScanner {
       pointerGesturesAccessible = gestureResults.accessible;
     }
 
-    // 2. Test pointer cancellation (WCAG 2.5.2)
-    const cancellationResults = await this.analyzePointerCancellation(page, violations);
-    pointerCancellationAvailable = cancellationResults.available;
-
-    // 3. Test label in name (WCAG 2.5.3)
+    // 2. Test label in name (WCAG 2.5.3)
     if (options.testLabelMatching) {
       const labelResults = await this.analyzeLabelInName(page, violations);
       labelNamesConsistent = labelResults.consistent;
     }
 
-    // 4. Test motion actuation (WCAG 2.5.4)
+    // 3. Test target size minimum (WCAG 2.5.8)
+    const targetSizeResults = await this.analyzeTargetSize(page, violations);
+    targetSizingAdequate = targetSizeResults.adequate;
+
+    // 4. Test dragging movements (WCAG 2.5.7)
+    const draggingResults = await this.analyzeDraggingMovements(page, violations);
+    draggingAlternativesProvided = draggingResults.alternativesProvided;
+
+    // The two probes below dispatch events at the page and can leave it
+    // changed, so every read-only measurement above runs first.
+
+    // 5. Test motion actuation (WCAG 2.5.4)
     if (options.testMotionActuation) {
       const motionResults = await this.analyzeMotionActuation(page, violations);
       motionAlternativesProvided = motionResults.alternativesProvided;
     }
 
-    // 5. Test target size minimum (WCAG 2.5.8)
-    const targetSizeResults = await this.analyzeTargetSize(page, violations);
-    targetSizingAdequate = targetSizeResults.adequate;
-
-    // 6. Test dragging movements (WCAG 2.5.7)
-    const draggingResults = await this.analyzeDraggingMovements(page, violations);
-    draggingAlternativesProvided = draggingResults.alternativesProvided;
+    // 6. Test pointer cancellation (WCAG 2.5.2)
+    const cancellationResults = await this.analyzePointerCancellation(page, violations);
+    pointerCancellationAvailable = cancellationResults.available;
 
     // Generate visual evidence
     visualEvidence.push({
@@ -140,136 +143,58 @@ class InputModalitiesScanner extends BaseScanner {
   }
 
   /**
-   * Analyze pointer gestures (WCAG 2.5.1)
+   * Analyze pointer gestures (WCAG 2.5.1).
+   *
+   * Only a declared multipoint or path-based gesture handler counts. The word
+   * "swipe" or "slide" in a caption, a single `ontouchstart` (the ordinary way
+   * to make a tap responsive) and the `draggable` attribute say nothing about
+   * a multipoint or path gesture; dragging is 2.5.7 and is measured there.
    */
   async analyzePointerGestures(page, violations) {
     log.debug('Analyzing pointer gestures...');
 
-    const gestureAnalysis = await page.evaluate(() => {
+    const gestureAnalysis = await page.evaluate((renderedSrc) => {
+      eval(renderedSrc);
       const issues = [];
       let accessible = true;
 
-      // Find elements with complex gesture requirements
-      const allElements = document.querySelectorAll('*');
+      const gestureElements = document.querySelectorAll(
+        '[ongesturestart], [ongesturechange], [ongestureend]'
+      );
 
-      allElements.forEach((element) => {
+      gestureElements.forEach((element) => {
+        if (!__isRendered(element)) return;
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          tagName: element.tagName.toLowerCase(),
-          id: element.id,
-          className: className,
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (className ? `.${className.split(' ')[0]}` : ''),
-        };
+        const selector =
+          element.tagName.toLowerCase() +
+          (element.id ? `#${element.id}` : '') +
+          (className ? `.${className.split(' ')[0]}` : '');
 
-        // Check for drag and drop without keyboard alternatives
-        if (element.hasAttribute('draggable') && element.getAttribute('draggable') === 'true') {
-          const hasKeyboardAlternative =
-            (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1') ||
-            element.querySelector('[tabindex]:not([tabindex="-1"])') ||
-            element.closest('[role="button"]') ||
-            document.querySelector(`button[aria-controls="${element.id}"]`);
-
-          if (!hasKeyboardAlternative) {
-            issues.push({
-              type: 'drag-without-alternative',
-              element: elementInfo.selector,
-              description: 'Draggable element lacks keyboard alternative',
-              severity: 'error',
-            });
-            accessible = false;
-          }
-        }
-
-        // Check for multi-touch gestures without alternatives
-        const hasMultiTouchListeners =
-          element.ontouchstart ||
-          element.ontouchmove ||
-          element.getAttribute('ontouchstart') ||
-          element.getAttribute('ontouchmove');
-
-        if (hasMultiTouchListeners) {
-          // Check for simple touch/click alternatives
-          const hasSimpleAlternative =
-            element.onclick ||
-            element.onmouseup ||
-            element.getAttribute('onclick') ||
-            element.getAttribute('onmouseup') ||
-            (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
-
-          if (!hasSimpleAlternative) {
-            issues.push({
-              type: 'multitouch-without-alternative',
-              element: elementInfo.selector,
-              description: 'Multi-touch gesture lacks simple activation alternative',
-              severity: 'error',
-            });
-            accessible = false;
-          }
-        }
-
-        // Check for swipe-only interfaces (only for interactive elements)
-        const isInteractiveElement =
-          element.tagName.toLowerCase() === 'button' ||
+        // A gesture handler is acceptable when the same element can also be
+        // operated with a single tap or from the keyboard.
+        const hasSimpleActivation =
+          element.onclick ||
+          element.onkeydown ||
           element.hasAttribute('onclick') ||
-          element.hasAttribute('role') ||
-          (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
+          element.hasAttribute('onkeydown') ||
+          __isInteractiveTarget(element) ||
+          element.querySelector('button, [role="button"], a[href], input, select, textarea');
 
-        if (isInteractiveElement) {
-          const swipeIndicators = ['swipe', 'slide'];
-          const elementText = element.textContent.toLowerCase();
-          const ariaLabel = element.getAttribute('aria-label')?.toLowerCase() || '';
-
-          const hasSwipeIndication = swipeIndicators.some(
-            (indicator) => elementText.includes(indicator) || ariaLabel.includes(indicator)
-          );
-
-          if (hasSwipeIndication) {
-            // Look for alternative navigation controls
-            const hasAlternativeNavigation =
-              document.querySelector('button[aria-label*="next"]') ||
-              document.querySelector('button[aria-label*="previous"]') ||
-              document.querySelector('.pagination') ||
-              document.querySelector('[role="tablist"]') ||
-              element.closest('form') ||
-              (element.hasAttribute('tabindex') && element.getAttribute('tabindex') !== '-1');
-
-            if (!hasAlternativeNavigation) {
-              issues.push({
-                type: 'swipe-without-alternative',
-                element: elementInfo.selector,
-                description: 'Swipe gesture interface lacks alternative navigation controls',
-                severity: 'warning',
-              });
-            }
-          }
-        }
-
-        // Check for path-based gestures (complex gestures)
-        if (element.hasAttribute('ongesturestart') || element.hasAttribute('ongesturechange')) {
-          const hasSimpleActivation =
-            element.onclick ||
-            element.onkeydown ||
-            element.hasAttribute('onclick') ||
-            element.hasAttribute('onkeydown');
-
-          if (!hasSimpleActivation) {
-            issues.push({
-              type: 'complex-gesture-only',
-              element: elementInfo.selector,
-              description: 'Complex path-based gesture lacks simple activation method',
-              severity: 'error',
-            });
-            accessible = false;
-          }
+        if (!hasSimpleActivation) {
+          issues.push({
+            type: 'complex-gesture-only',
+            element: selector,
+            description:
+              'Element handles a multipoint or path-based gesture and offers no single-pointer or keyboard activation',
+            severity: 'error',
+          });
+          accessible = false;
         }
       });
 
       return { issues, accessible };
-    });
+    }, renderedCode);
 
     // Create violations for gesture issues
     gestureAnalysis.issues.forEach((issue) => {
@@ -287,128 +212,162 @@ class InputModalitiesScanner extends BaseScanner {
   }
 
   /**
-   * Analyze pointer cancellation (WCAG 2.5.2)
+   * Analyze pointer cancellation (WCAG 2.5.2) by pressing and aborting.
+   *
+   * Each rendered target receives a pointerdown; the press is then aborted
+   * (pointercancel, mouseleave, and a pointerup outside the element), which is
+   * what a user does when they change their mind. Two observations decide the
+   * verdict: whether the down-event changed the page or opened a dialog at
+   * all, and whether the abort changed it again. A page that reacts to the
+   * abort has implemented the Abort or Undo clause, which is how the pressed
+   * state and the "moving away cancels" hint of a correct control differ from
+   * a function that ran on the down-event and stays. The inline-attribute
+   * reasoning this replaces could not see a listener bound with
+   * addEventListener and guessed the rest from the button text.
+   *
+   * Pages that repaint on their own (clocks, carousels, tickers) are measured
+   * once with no interaction first; when that idle baseline already changes
+   * the DOM, the probe cannot attribute a change to the press and is skipped.
    */
   async analyzePointerCancellation(page, violations) {
     log.debug('Analyzing pointer cancellation...');
 
-    const cancellationAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let available = true;
+    const cancellationAnalysis = await page.evaluate(
+      async (renderedSrc, maxTargets) => {
+        eval(renderedSrc);
+        const issues = [];
+        let available = true;
 
-      // Find interactive elements that might have cancellation issues
-      const interactiveElements = document.querySelectorAll(
-        'button, [role="button"], input[type="button"], input[type="submit"], a[href], [onclick], [onmousedown], [ontouchstart]'
-      );
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        let dialogCalls = 0;
+        // The page without the pressed control itself. 2.5.2 allows the
+        // down-event to show that the control is pressed, so a change confined
+        // to the target's own markup (a `pressed` or `dragging` class) is
+        // feedback, not a function that ran.
+        const fingerprint = (el) =>
+          `${document.body.innerHTML.length - (el ? el.outerHTML.length : 0)}|${document.querySelectorAll('*').length}|${location.href}|${dialogCalls}`;
 
-      interactiveElements.forEach((element) => {
-        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-        const className = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          tagName: element.tagName.toLowerCase(),
-          id: element.id,
-          className: className,
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (className ? `.${className.split(' ')[0]}` : ''),
-          textContent: element.textContent.trim().substring(0, 50),
+        // alert()/confirm()/prompt() block the renderer; recording the call is
+        // the observation this probe needs and never stalls the page.
+        const nativeDialogs = {
+          alert: window.alert,
+          confirm: window.confirm,
+          prompt: window.prompt,
+        };
+        window.alert = () => {
+          dialogCalls++;
+        };
+        window.confirm = () => {
+          dialogCalls++;
+          return false;
+        };
+        window.prompt = () => {
+          dialogCalls++;
+          return null;
         };
 
-        // Check for down-event activation without cancellation
-        const hasDownEvent =
-          element.onmousedown ||
-          element.ontouchstart ||
-          element.getAttribute('onmousedown') ||
-          element.getAttribute('ontouchstart');
-
-        if (hasDownEvent) {
-          // Check if there's corresponding up-event or cancellation mechanism
-          const hasUpEvent =
-            element.onmouseup ||
-            element.ontouchend ||
-            element.getAttribute('onmouseup') ||
-            element.getAttribute('ontouchend') ||
-            element.onclick ||
-            element.getAttribute('onclick');
-
-          const hasLeaveEvent =
-            element.onmouseleave ||
-            element.ontouchcancel ||
-            element.getAttribute('onmouseleave') ||
-            element.getAttribute('ontouchcancel');
-
-          // Elements with keydown/keyup handlers likely have JS-registered up events too
-          const hasKeyboardHandler =
-            element.onkeydown ||
-            element.getAttribute('onkeydown') ||
-            element.getAttribute('role') === 'slider' ||
-            element.getAttribute('role') === 'scrollbar';
-
-          if (!hasUpEvent && !hasLeaveEvent && !hasKeyboardHandler) {
-            // Check if it's a critical action that requires cancellation
-            const criticalKeywords = [
-              'delete',
-              'remove',
-              'buy',
-              'purchase',
-              'pay',
-              'submit',
-              'send',
-              'confirm',
-            ];
-            const isCritical = criticalKeywords.some(
-              (keyword) =>
-                elementInfo.textContent.toLowerCase().includes(keyword) ||
-                element.getAttribute('aria-label')?.toLowerCase().includes(keyword)
-            );
-
-            if (isCritical) {
-              issues.push({
-                type: 'critical-action-no-cancellation',
-                element: elementInfo.selector,
-                description:
-                  'Critical action activates on down-event without cancellation mechanism',
-                textContent: elementInfo.textContent,
-                severity: 'error',
-              });
-              available = false;
-            } else {
-              issues.push({
-                type: 'down-event-no-cancellation',
-                element: elementInfo.selector,
-                description: 'Action activates on down-event without cancellation option',
-                textContent: elementInfo.textContent,
-                severity: 'warning',
-              });
-            }
+        try {
+          // Idle calibration: a page that rewrites itself on a timer cannot be
+          // measured this way.
+          const idleBefore = fingerprint(null);
+          await wait(150);
+          if (fingerprint(null) !== idleBefore) {
+            return { issues, available, skipped: 'page mutates on its own' };
           }
+
+          const candidates = [];
+          document
+            .querySelectorAll(
+              'button, [role="button"], a[href], input[type="button"], input[type="submit"], input[type="reset"], [onmousedown], [onpointerdown], [ontouchstart]'
+            )
+            .forEach((el) => {
+              if (candidates.length >= maxTargets) return;
+              if (!__isInteractiveTarget(el) || !__isRendered(el)) return;
+              const tag = el.tagName.toLowerCase();
+              // Typing and choosing controls are operated by their own UI, not
+              // by a down-event activation.
+              if (tag === 'textarea' || tag === 'select') return;
+              if (tag === 'input' && !['button', 'submit', 'reset'].includes(el.type)) return;
+              candidates.push(el);
+            });
+
+          for (const el of candidates) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width < 1 || rect.height < 1) continue;
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const before = fingerprint(el);
+
+            const pointerInit = {
+              bubbles: true,
+              cancelable: true,
+              composed: true,
+              pointerId: 1,
+              pointerType: 'mouse',
+              isPrimary: true,
+              button: 0,
+              buttons: 1,
+              clientX: x,
+              clientY: y,
+            };
+            el.dispatchEvent(new PointerEvent('pointerdown', pointerInit));
+            el.dispatchEvent(new MouseEvent('mousedown', pointerInit));
+            await wait(60);
+            const afterDown = fingerprint(el);
+            if (afterDown === before) continue; // the down-event did nothing
+
+            // Abort the press: the pointer leaves the target and is released
+            // somewhere else. A control that implements Abort or Undo reacts
+            // to that; one that already ran its function does not.
+            el.dispatchEvent(
+              new PointerEvent('pointermove', { ...pointerInit, clientX: 0, clientY: 0 })
+            );
+            el.dispatchEvent(new PointerEvent('pointercancel', { ...pointerInit, buttons: 0 }));
+            el.dispatchEvent(
+              new MouseEvent('mouseleave', { ...pointerInit, clientX: 0, clientY: 0, buttons: 0 })
+            );
+            document.documentElement.dispatchEvent(
+              new PointerEvent('pointerup', {
+                ...pointerInit,
+                clientX: 0,
+                clientY: 0,
+                buttons: 0,
+              })
+            );
+            document.documentElement.dispatchEvent(
+              new MouseEvent('mouseup', { ...pointerInit, clientX: 0, clientY: 0, buttons: 0 })
+            );
+            await wait(60);
+
+            const after = fingerprint(el);
+            if (after !== afterDown) continue; // the page reacted to the abort
+
+            const className = typeof el.className === 'string' ? el.className : '';
+            issues.push({
+              type: 'down-event-activation',
+              element:
+                el.tagName.toLowerCase() +
+                (el.id ? `#${el.id}` : '') +
+                (className ? `.${className.trim().split(/\s+/)[0]}` : ''),
+              textContent: (el.textContent || '').trim().substring(0, 50),
+              description:
+                'The pointerdown changed the page and aborting the press before the pointer was released undid nothing',
+              severity: 'serious',
+            });
+            available = false;
+          }
+        } finally {
+          window.alert = nativeDialogs.alert;
+          window.confirm = nativeDialogs.confirm;
+          window.prompt = nativeDialogs.prompt;
         }
 
-        // Check for immediate actions that can't be cancelled
-        const immediateActionIndicators = ['immediate', 'instant', 'auto'];
-        const hasImmediateAction = immediateActionIndicators.some(
-          (indicator) =>
-            elementInfo.textContent.toLowerCase().includes(indicator) ||
-            element.getAttribute('aria-label')?.toLowerCase().includes(indicator)
-        );
+        return { issues, available };
+      },
+      renderedCode,
+      25
+    );
 
-        if (hasImmediateAction) {
-          issues.push({
-            type: 'immediate-action-no-cancel',
-            element: elementInfo.selector,
-            description: 'Immediate action cannot be cancelled or undone',
-            textContent: elementInfo.textContent,
-            severity: 'error',
-          });
-          available = false;
-        }
-      });
-
-      return { issues, available };
-    });
-
-    // Create violations for cancellation issues
     cancellationAnalysis.issues.forEach((issue) => {
       violations.push({
         criterion: '9.2.5.2',
@@ -495,237 +454,77 @@ class InputModalitiesScanner extends BaseScanner {
   }
 
   /**
-   * Analyze motion actuation (WCAG 2.5.4)
+   * Analyze motion actuation (WCAG 2.5.4) by firing device motion at the page.
+   *
+   * A synthetic `devicemotion` and `deviceorientation` event is dispatched at
+   * the window; a page that acts on device motion changes its DOM in response,
+   * and a page that does not is untouched. That replaces the previous test,
+   * which read motion words out of the body text and inferred a feature from
+   * `window.DeviceMotionEvent !== undefined`, a constant in Chromium.
    */
   async analyzeMotionActuation(page, violations) {
     log.debug('Analyzing motion actuation...');
 
-    const motionAnalysis = await page.evaluate(() => {
+    const motionAnalysis = await page.evaluate(async () => {
       const issues = [];
       let alternativesProvided = true;
 
-      // Check for device motion API usage
-      const hasDeviceMotion = window.DeviceMotionEvent !== undefined;
-      const hasDeviceOrientation = window.DeviceOrientationEvent !== undefined;
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const fingerprint = () =>
+        `${document.body.innerHTML.length}|${document.querySelectorAll('*').length}|${location.href}`;
 
-      if (hasDeviceMotion || hasDeviceOrientation) {
-        // Look for motion-related keywords in visible page content (exclude script/style)
-        const motionKeywords = [
-          'shake',
-          'tilt',
-          'rotate',
-          'motion',
-          'gesture',
-          'device orientation',
-        ];
-        const clone = document.body.cloneNode(true);
-        clone.querySelectorAll('script, style, noscript').forEach((el) => el.remove());
-        const pageText = clone.textContent.toLowerCase();
-
-        const hasMotionFeatures = motionKeywords.some((keyword) => pageText.includes(keyword));
-
-        if (hasMotionFeatures) {
-          // Check for disable/alternative controls
-          const disableControls = document.querySelectorAll(
-            'input[type="checkbox"], button, [role="switch"]'
-          );
-          let hasDisableOption = false;
-          let hasAlternativeMethod = false;
-
-          disableControls.forEach((control) => {
-            const controlText =
-              control.textContent.toLowerCase() +
-              (control.getAttribute('aria-label') || '').toLowerCase() +
-              (control.getAttribute('placeholder') || '').toLowerCase();
-
-            if (
-              (controlText.includes('motion') &&
-                (controlText.includes('enable') || controlText.includes('disable'))) ||
-              (controlText.includes('shake') &&
-                (controlText.includes('enable') || controlText.includes('disable'))) ||
-              controlText.includes('tilt') ||
-              controlText.includes('disable motion') ||
-              controlText.includes('enable motion') ||
-              controlText.includes('motion controls')
-            ) {
-              hasDisableOption = true;
-            }
-          });
-
-          // Look for alternative methods (buttons for same functionality)
-          const actionButtons = document.querySelectorAll('button, [role="button"]');
-          actionButtons.forEach((button) => {
-            const buttonText =
-              button.textContent.toLowerCase() +
-              (button.getAttribute('aria-label') || '').toLowerCase();
-
-            if (
-              buttonText.includes('refresh') ||
-              buttonText.includes('reload') ||
-              buttonText.includes('update') ||
-              buttonText.includes('manual') ||
-              buttonText.includes('alternative')
-            ) {
-              hasAlternativeMethod = true;
-            }
-          });
-
-          // Only flag as violations if no controls found AND motion features are explicitly mentioned
-          const explicitMotionFeatures = motionKeywords.some(
-            (keyword) =>
-              pageText.includes(`${keyword} to `) ||
-              pageText.includes(`${keyword} device`) ||
-              pageText.includes(`${keyword} your phone`)
-          );
-
-          if (explicitMotionFeatures && !hasDisableOption) {
-            issues.push({
-              type: 'motion-no-disable-option',
-              element: 'document',
-              description: 'Motion-activated features lack user control to disable them',
-              severity: 'error',
-            });
-            alternativesProvided = false;
-          }
-
-          if (explicitMotionFeatures && !hasAlternativeMethod) {
-            issues.push({
-              type: 'motion-no-alternative-method',
-              element: 'document',
-              description: 'Motion-activated functionality lacks alternative input method',
-              severity: 'error',
-            });
-            alternativesProvided = false;
-          }
-        }
+      const idle = fingerprint();
+      await wait(150);
+      if (fingerprint() !== idle) {
+        return { issues, alternativesProvided, skipped: 'page mutates on its own' };
       }
 
-      // Check for CSS motion controls that might be problematic
-      const elementsWithTransform = document.querySelectorAll(
-        '[style*="transform"], [class*="rotate"], [class*="shake"]'
-      );
+      const before = fingerprint();
 
-      elementsWithTransform.forEach((element) => {
-        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-        const className = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (className ? `.${className.split(' ')[0]}` : ''),
-        };
-
-        // Check if element responds to device orientation
-        const hasOrientationCSS =
-          className.includes('orientation') || element.style.transform.includes('rotate');
-
-        if (hasOrientationCSS) {
-          // Look for alternative controls for this element
-          const hasControlButton =
-            document.querySelector(`button[aria-controls="${element.id}"]`) ||
-            element.querySelector('button') ||
-            element.parentElement.querySelector('button');
-
-          if (!hasControlButton) {
-            issues.push({
-              type: 'orientation-css-no-alternative',
-              element: elementInfo.selector,
-              description: 'Element responds to device orientation without alternative controls',
-              severity: 'warning',
-            });
-          }
+      if (typeof DeviceMotionEvent === 'function') {
+        try {
+          window.dispatchEvent(
+            new DeviceMotionEvent('devicemotion', {
+              acceleration: { x: 30, y: 30, z: 30 },
+              accelerationIncludingGravity: { x: 30, y: 30, z: 40 },
+              rotationRate: { alpha: 90, beta: 90, gamma: 90 },
+              interval: 16,
+            })
+          );
+        } catch (e) {
+          /* constructor unavailable */
         }
-      });
-
-      // Check for infinite CSS animations without pause controls or prefers-reduced-motion
-      let hasReducedMotionQuery = false;
-      try {
-        for (const sheet of document.styleSheets) {
-          try {
-            for (const rule of sheet.cssRules || []) {
-              if (
-                rule instanceof CSSMediaRule &&
-                rule.conditionText &&
-                rule.conditionText.includes('prefers-reduced-motion')
-              ) {
-                hasReducedMotionQuery = true;
-                break;
-              }
-            }
-          } catch (e) {
-            /* cross-origin */
-          }
-          if (hasReducedMotionQuery) break;
-        }
-      } catch (e) {
-        /* no stylesheets */
       }
+      if (typeof DeviceOrientationEvent === 'function') {
+        try {
+          window.dispatchEvent(
+            new DeviceOrientationEvent('deviceorientation', {
+              alpha: 180,
+              beta: 60,
+              gamma: 45,
+              absolute: true,
+            })
+          );
+        } catch (e) {
+          /* constructor unavailable */
+        }
+      }
+      await wait(120);
 
-      if (!hasReducedMotionQuery) {
-        const allElements = document.querySelectorAll('*');
-        const animatedElements = [];
-
-        allElements.forEach((el) => {
-          const style = window.getComputedStyle(el);
-          if (style.display === 'none' || style.visibility === 'hidden') return;
-
-          const iterationCount = style.animationIterationCount;
-          const duration = style.animationDuration;
-          const animName = style.animationName;
-
-          if (
-            iterationCount === 'infinite' &&
-            animName &&
-            animName !== 'none' &&
-            duration &&
-            duration !== '0s' &&
-            duration !== '0ms'
-          ) {
-            const className = el.className && typeof el.className === 'string' ? el.className : '';
-            animatedElements.push({
-              selector:
-                el.tagName.toLowerCase() +
-                (el.id ? `#${el.id}` : '') +
-                (className ? `.${className.split(' ')[0]}` : ''),
-              animation: animName,
-              duration: duration,
-            });
-          }
+      if (fingerprint() !== before) {
+        issues.push({
+          type: 'motion-actuation-without-alternative',
+          element: 'document',
+          description:
+            'The page changed in response to a synthetic device motion event, so a function is operated by moving the device',
+          severity: 'moderate',
         });
-
-        if (animatedElements.length > 0) {
-          // Check for pause/stop controls
-          const pauseControls = document.querySelectorAll(
-            'button, [role="button"], input[type="checkbox"], [role="switch"]'
-          );
-          let hasPauseControl = false;
-          const pauseKeywords = /pause|stop|disable|reduce|animation|motion/i;
-          pauseControls.forEach((ctrl) => {
-            const text =
-              (ctrl.textContent || '') +
-              (ctrl.getAttribute('aria-label') || '') +
-              (ctrl.getAttribute('title') || '');
-            if (pauseKeywords.test(text)) hasPauseControl = true;
-          });
-
-          if (!hasPauseControl) {
-            for (const anim of animatedElements) {
-              issues.push({
-                type: 'infinite-animation-no-pause',
-                element: anim.selector,
-                description: `Infinite CSS animation "${anim.animation}" (${anim.duration}) without pause control or prefers-reduced-motion media query`,
-                severity: 'error',
-              });
-              alternativesProvided = false;
-            }
-          }
-        }
+        alternativesProvided = false;
       }
 
       return { issues, alternativesProvided };
     });
 
-    // Create violations for motion actuation issues
     motionAnalysis.issues.forEach((issue) => {
       violations.push({
         criterion: '9.2.5.4',
@@ -755,29 +554,6 @@ class InputModalitiesScanner extends BaseScanner {
       const MIN_SIZE = 24; // WCAG 2.5.8 AA minimum
       const RADIUS = MIN_SIZE / 2; // spacing exception: 24px-diameter circle
 
-      const INLINE_TEXT_PARENTS = new Set([
-        'p',
-        'li',
-        'td',
-        'th',
-        'dd',
-        'dt',
-        'span',
-        'label',
-        'figcaption',
-        'blockquote',
-        'cite',
-        'em',
-        'strong',
-        'small',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-      ]);
-
       function selectorOf(el) {
         return (
           el.tagName.toLowerCase() +
@@ -788,19 +564,29 @@ class InputModalitiesScanner extends BaseScanner {
         );
       }
 
-      /** 2.5.8 "Inline" exception: the target is in a sentence or its size is constrained by line-height of non-target text. */
+      /**
+       * 2.5.8 "Inline" exception: the target sits in a sentence and its box is
+       * constrained by the line height of the text around it. The parent tag
+       * is not what decides that: a link inside `<div class="prose">` or a
+       * `display: inline-block` link in running copy is just as constrained as
+       * one inside a `<p>`, and both used to lose the exception.
+       */
       function isInlineTextTarget(el, style) {
-        if (style.display !== 'inline') return false;
+        if (!['inline', 'inline-block', 'inline-flex'].includes(style.display)) return false;
         const parent = el.parentElement;
         if (!parent) return false;
-        if (
-          !INLINE_TEXT_PARENTS.has(parent.tagName.toLowerCase()) &&
-          !parent.closest('p, li, td, th, dd, figcaption, blockquote')
-        )
-          return false;
         const own = (el.textContent || '').trim().length;
         const all = (parent.textContent || '').trim().length;
-        return all > own + 2; // surrounded by other text
+        if (all <= own + 2) return false; // not surrounded by other text
+        const parentStyle = window.getComputedStyle(parent);
+        const fontSize = parseFloat(parentStyle.fontSize) || 16;
+        const lineHeight =
+          parentStyle.lineHeight === 'normal'
+            ? fontSize * 1.2
+            : parseFloat(parentStyle.lineHeight) || fontSize * 1.2;
+        // The target may not be taller than the line box it sits in, otherwise
+        // the author sized it and the exception does not apply.
+        return el.getBoundingClientRect().height <= lineHeight * 1.5;
       }
 
       /** 2.5.8 "User agent control" exception: size set by the UA, not the author. */
@@ -911,15 +697,27 @@ class InputModalitiesScanner extends BaseScanner {
   }
 
   /**
-   * Analyze dragging movements (WCAG 2.5.7)
-   * Checks that drag operations have single-pointer alternatives
+   * Analyze dragging movements (WCAG 2.5.7).
+   *
+   * A drag interface is taken from the platform API the page actually uses
+   * (`draggable="true"`, an `ondragstart` handler, a drop target), never from
+   * a class name containing "sortable". The single-pointer alternative is
+   * looked for structurally: a rendered control inside the draggable item, in
+   * the container that holds it, or bound to it with `aria-controls`. The
+   * previous version searched sibling buttons for the English words
+   * up/down/move/sort/reorder, so a list whose buttons read "Nach oben" was
+   * reported although the alternative was right there.
    */
   async analyzeDraggingMovements(page, violations) {
     log.debug('Analyzing dragging movements...');
 
-    const dragAnalysis = await page.evaluate(() => {
+    const dragAnalysis = await page.evaluate((renderedSrc) => {
+      eval(renderedSrc);
       const issues = [];
       let alternativesProvided = true;
+
+      const CONTROLS =
+        'button, [role="button"], a[href], input:not([type="hidden"]), select, textarea, [role="option"], [role="gridcell"], [role="slider"], [contenteditable]';
 
       function getSelector(el) {
         return (
@@ -929,126 +727,69 @@ class InputModalitiesScanner extends BaseScanner {
         );
       }
 
-      function hasAlternativeControls(el) {
-        // Check for sibling/nearby buttons with move/reorder labels
+      /** A rendered control the element itself, its container or an aria-controls reference offers. */
+      function hasPointerAlternative(el) {
+        const own = Array.from(el.querySelectorAll(CONTROLS)).filter(__isRendered);
+        if (own.length) return true;
+        if (__isInteractiveTarget(el)) return true;
+        if (el.id) {
+          const bound = document.querySelector(`[aria-controls~="${CSS.escape(el.id)}"]`);
+          if (bound && __isRendered(bound)) return true;
+        }
+        // The container the item is dragged within: a listbox or grid pattern,
+        // or any sibling control that can move it without a drag.
         const parent = el.parentElement;
         if (!parent) return false;
-
-        const buttons = parent.querySelectorAll('button, [role="button"], a[href]');
-        const movePatterns = /\b(up|down|move|sort|reorder|left|right|remove|add|insert)\b/i;
-        for (const btn of buttons) {
-          const text = (btn.textContent + ' ' + (btn.getAttribute('aria-label') || '')).trim();
-          if (movePatterns.test(text)) return true;
-        }
-
-        // Check if element itself also has click/keyboard handlers
-        if (
-          el.getAttribute('onclick') ||
-          el.getAttribute('onkeydown') ||
-          el.getAttribute('onkeyup')
-        )
-          return true;
-
-        // Check for ARIA listbox/grid patterns
         const parentRole = parent.getAttribute('role');
-        if (parentRole === 'listbox' || parentRole === 'grid') return true;
-        if (parent.getAttribute('aria-sort')) return true;
-
-        // Check for keyboard-accessible role on the draggable itself
-        if (el.getAttribute('role') === 'option' || el.getAttribute('role') === 'gridcell')
-          return true;
-
-        // Traverse up one more level for move buttons in a wrapper
-        const grandparent = parent.parentElement;
-        if (grandparent) {
-          const gpButtons = grandparent.querySelectorAll('button, [role="button"]');
-          for (const btn of gpButtons) {
-            const text = (btn.textContent + ' ' + (btn.getAttribute('aria-label') || '')).trim();
-            if (movePatterns.test(text)) return true;
-          }
+        if (parentRole === 'listbox' || parentRole === 'grid' || parentRole === 'tree') return true;
+        for (const sibling of parent.children) {
+          if (sibling === el) continue;
+          if (Array.from(sibling.querySelectorAll(CONTROLS)).some(__isRendered)) return true;
+          if (__isInteractiveTarget(sibling) && __isRendered(sibling)) return true;
         }
-
         return false;
       }
 
-      // 1. Find elements with draggable="true"
-      const draggables = document.querySelectorAll('[draggable="true"]');
-      draggables.forEach((el) => {
-        if (!hasAlternativeControls(el)) {
-          issues.push({
-            type: 'drag-only-no-alternative',
-            element: getSelector(el),
-            description:
-              'Draggable element has no single-pointer or keyboard alternative for repositioning',
-            severity: 'serious',
-          });
-          alternativesProvided = false;
-        }
-      });
-
-      // 2. Find elements with drag event handlers (inline)
-      const dragHandlerElements = document.querySelectorAll(
-        '[ondragstart], [ondrag], [ondragend], [ondragover], [ondrop]'
-      );
-      dragHandlerElements.forEach((el) => {
-        // Don't double-count if already flagged as draggable
-        if (el.getAttribute('draggable') === 'true') return;
-
-        if (el.hasAttribute('ondrop') || el.hasAttribute('ondragover')) {
-          // This is a drop zone. Check if it also has click-to-add or similar
-          const hasClickAlternative =
-            el.getAttribute('onclick') ||
-            el.querySelector('button, [role="button"], input[type="file"]');
-          if (!hasClickAlternative) {
-            issues.push({
-              type: 'drop-zone-no-alternative',
-              element: getSelector(el),
-              description: 'Drop zone has no non-drag mechanism to add/move content',
-              severity: 'serious',
-            });
-            alternativesProvided = false;
-          }
-        } else if (el.hasAttribute('ondragstart')) {
-          if (!hasAlternativeControls(el)) {
-            issues.push({
-              type: 'drag-only-no-alternative',
-              element: getSelector(el),
-              description: 'Element with drag handler has no single-pointer alternative',
-              severity: 'serious',
-            });
-            alternativesProvided = false;
-          }
-        }
-      });
-
-      // 3. Detect sortable list patterns (common in JS libraries)
-      const sortableContainers = document.querySelectorAll(
-        '[data-sortable], [class*="sortable"], [class*="draggable-list"], [class*="drag-list"]'
-      );
-      sortableContainers.forEach((container) => {
-        const items = container.querySelectorAll('li, [role="listitem"], [data-sortable-item]');
-        if (items.length < 2) return;
-
-        // Check if any item has move buttons
-        let hasButtons = false;
-        items.forEach((item) => {
-          if (hasAlternativeControls(item)) hasButtons = true;
+      const dragSources = new Set();
+      document
+        .querySelectorAll('[draggable="true"], [ondragstart], [ondrag], [ondragend]')
+        .forEach((el) => {
+          if (__isRendered(el)) dragSources.add(el);
         });
 
-        if (!hasButtons) {
-          issues.push({
-            type: 'sortable-no-buttons',
-            element: getSelector(container),
-            description:
-              'Sortable list uses drag-only reordering without up/down buttons or keyboard alternative',
-            severity: 'serious',
-          });
-          alternativesProvided = false;
-        }
+      for (const el of dragSources) {
+        if (hasPointerAlternative(el)) continue;
+        issues.push({
+          type: 'drag-only-no-alternative',
+          element: getSelector(el),
+          description:
+            'Element is moved by dragging and neither it, its container nor an aria-controls reference offers a control that does the same with a single pointer',
+          severity: 'serious',
+        });
+        alternativesProvided = false;
+      }
+
+      document.querySelectorAll('[ondrop], [ondragover]').forEach((el) => {
+        if (!__isRendered(el)) return;
+        if (dragSources.has(el)) return;
+        // A drop target passes when a file input or a control that opens one
+        // is reachable from it or from the form it belongs to.
+        const scope = el.closest('form, fieldset, [role="group"]') || el;
+        const alternatives = Array.from(scope.querySelectorAll(CONTROLS)).filter(
+          (c) => __isRendered(c) || (c.tagName.toLowerCase() === 'input' && c.type === 'file')
+        );
+        if (alternatives.length) return;
+        issues.push({
+          type: 'drop-zone-no-alternative',
+          element: getSelector(el),
+          description: 'Drop target offers no control that adds the same content without a drag',
+          severity: 'serious',
+        });
+        alternativesProvided = false;
       });
 
       return { issues, alternativesProvided };
-    });
+    }, renderedCode);
 
     dragAnalysis.issues.forEach((issue) => {
       violations.push({
@@ -1089,8 +830,6 @@ class InputModalitiesScanner extends BaseScanner {
         'Add move up/down buttons, click-to-select, or keyboard arrow key support as alternatives to drag',
       'drop-zone-no-alternative':
         'Add a click/tap mechanism (button, file input) to add content to the drop zone',
-      'sortable-no-buttons':
-        'Add up/down or move buttons to each list item for single-pointer reordering',
     };
     return (
       suggestions[violationType] ||
@@ -1103,12 +842,6 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getGestureSuggestion(violationType) {
     const suggestions = {
-      'drag-without-alternative':
-        'Provide keyboard-accessible controls (arrow keys, buttons) as alternatives to drag and drop',
-      'multitouch-without-alternative':
-        'Ensure multi-touch gestures have single-point alternatives (buttons, keyboard shortcuts)',
-      'swipe-without-alternative':
-        'Add navigation buttons or keyboard controls alongside swipe gestures',
       'complex-gesture-only':
         'Provide simple click/tap alternatives for complex path-based gestures',
     };
@@ -1122,12 +855,8 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getCancellationSuggestion(violationType) {
     const suggestions = {
-      'critical-action-no-cancellation':
-        'Implement completion on up-event with ability to cancel by moving pointer away',
-      'down-event-no-cancellation':
-        'Use click (up-event) for activation instead of mousedown/touchstart',
-      'immediate-action-no-cancel':
-        'Add confirmation dialogs or undo mechanisms for immediate actions',
+      'down-event-activation':
+        'Complete the action on the up-event, so that moving the pointer away before releasing it aborts the action',
     };
     return (
       suggestions[violationType] ||
@@ -1154,13 +883,8 @@ class InputModalitiesScanner extends BaseScanner {
    */
   getMotionSuggestion(violationType) {
     const suggestions = {
-      'motion-no-disable-option': 'Provide user controls to disable motion-activated features',
-      'motion-no-alternative-method':
-        'Add button or keyboard alternatives to motion-triggered actions',
-      'orientation-css-no-alternative':
-        'Provide manual controls for orientation-dependent functionality',
-      'infinite-animation-no-pause':
-        'Add a pause/stop control and a @media (prefers-reduced-motion: reduce) CSS rule to disable or reduce animations',
+      'motion-actuation-without-alternative':
+        'Offer the same function from a user interface component and let the user switch device motion actuation off',
     };
     return (
       suggestions[violationType] ||

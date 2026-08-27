@@ -1,34 +1,12 @@
 /**
- * WCAG 2.2 success criterion -> conformance level (A / AA / AAA).
- *
- * Parsed deterministically from wcag2.2.md (the same `#### x.y.z Title (LEVEL)`
- * headings tests/coverage-matrix.js reads) at module load, so the runtime and
- * the coverage matrix can never disagree about a criterion's level.
- *
- * Why this exists: no violation carried a level before, so AAA-only findings
- * (2.5.5 44px targets, 2.4.13 focus appearance, the LLM AAA scanners) counted
- * exactly like Level A failures in the score and the report.
+ * WCAG 2.2 success criterion to conformance level (A / AA / AAA).
+ * Source: src/data/wcag22-criteria.json, shared with scripts/coverage-matrix.js
+ * so runtime and coverage matrix cannot disagree about a criterion's level.
  */
-const fs = require('fs');
-const path = require('path');
+const CRITERIA = require('./data/wcag22-criteria.json');
 
-const WCAG_MD = path.join(__dirname, '..', 'wcag2.2.md');
+const LEVELS = new Map(CRITERIA.map((c) => [c.sc, c.level]));
 
-function parseLevels() {
-  const md = fs.readFileSync(WCAG_MD, 'utf-8');
-  const out = new Map();
-  for (const line of md.split('\n')) {
-    if (!/^####\s/.test(line)) continue;
-    const m = line.match(/^####\s+(~~)?(\d+\.\d+\.\d+)\s+([\s\S]*)$/);
-    if (!m) continue;
-    const levelMatch = m[3].match(/\((A|AA|AAA)\)\s*(?:🆕|🗑️|~~)*\s*$/);
-    out.set(m[2], levelMatch ? levelMatch[1] : 'REMOVED');
-  }
-  if (out.size === 0) throw new Error('wcag-levels: parsed 0 criteria from wcag2.2.md');
-  return out;
-}
-
-const LEVELS = parseLevels();
 const RANK = { A: 0, AA: 1, AAA: 2 };
 
 /**

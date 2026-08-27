@@ -1,0 +1,325 @@
+{
+  "startedAt": "2026-07-27T17:19:04.293Z",
+  "profile": "standard",
+  "llmEnabled": false,
+  "perFileTimeoutMs": 600000,
+  "files": [
+    {
+      "file": "own-audit-ui.html",
+      "source": "http://localhost:3111/audit (this repo's own Next.js frontend)",
+      "elapsedMs": 1865426,
+      "timedOut": false,
+      "totalViolations": 29,
+      "band": [
+        14,
+        56
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: language-detection completes without error",
+          "kind": "must-pass",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: __next-route-announcer__ empty live region NOT flagged",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: labelled url input not flagged as unlabelled",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: <html lang=\"de\"> contradicts English content / inner lang=\"en\"",
+          "kind": "must-detect",
+          "ok": false,
+          "detail": "no 3.1.1/3.1.2 language violation reported despite lang=\"de\" on an all-English page"
+        }
+      ],
+      "scannerCount": 32,
+      "expectedScannerCount": 32,
+      "bandOk": true,
+      "slow": true,
+      "noise": [
+        "Starting error handling analysis...",
+        "Analyzing error identification...",
+        "Analyzing error suggestions...",
+        "Analyzing error prevention...",
+        "Simulating form errors for testing...",
+        "Error handling analysis complete: 0 violations found",
+        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id"
+      ]
+    },
+    {
+      "file": "med-theme.html",
+      "source": "https://dr-mauermann-urologe.vercel.app",
+      "elapsedMs": 90853,
+      "timedOut": false,
+      "totalViolations": 41,
+      "band": [
+        22,
+        88
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: heading level skips h2 -> h4",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: brand logo has a descriptive alt",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: <html lang=\"de\"> matches the German content",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "scannerCount": 32,
+      "expectedScannerCount": 32,
+      "bandOk": true,
+      "slow": false,
+      "noise": [
+        "Starting error handling analysis...",
+        "Analyzing error identification...",
+        "Analyzing error suggestions...",
+        "Analyzing error prevention...",
+        "Simulating form errors for testing...",
+        "Error handling analysis complete: 0 violations found",
+        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id"
+      ]
+    },
+    {
+      "file": "beeproduced.html",
+      "source": "https://beeproduced.com",
+      "elapsedMs": 95418,
+      "timedOut": false,
+      "totalViolations": 430,
+      "band": [
+        189,
+        758
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: axe-core survives the dead <iframe> and still reports",
+          "kind": "must-pass",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: positive tabindex=\"1\" on 5 elements",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: heading level skips h1 -> h5",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: logo link has an accessible name via its inner img alt",
+          "kind": "must-not-flag",
+          "ok": false,
+          "detail": "logo link (named by <img alt=\"Logo\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+        }
+      ],
+      "scannerCount": 32,
+      "expectedScannerCount": 32,
+      "bandOk": true,
+      "slow": false,
+      "noise": [
+        "Starting error handling analysis...",
+        "Analyzing error identification...",
+        "Analyzing error suggestions...",
+        "Analyzing error prevention...",
+        "Simulating form errors for testing...",
+        "Error handling analysis complete: 13 violations found",
+        "Error testing dropdown select#:Rbaqrlaupgqop:: Failed to execute 'querySelector' on 'Document': 'select#:Rbaqrlaupgqop:' is not a valid selector."
+      ]
+    },
+    {
+      "file": "wiki-medical-de.html",
+      "source": "https://de.wikipedia.org/wiki/Prostatakarzinom",
+      "elapsedMs": 360199,
+      "timedOut": false,
+      "totalViolations": 1637,
+      "band": [
+        810,
+        3240
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: images with no alt attribute at all",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: <html lang=\"de\"> itself is not flagged",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: valid ISO 639-3 subtags on interlanguage links",
+          "kind": "must-not-flag",
+          "ok": false,
+          "detail": "18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code \"arz\"; [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"bcl\"; [undefined/9.3.1.2] Element has invalid language code \"ckb\"; [undefined/9.3.1.2] Element has invalid language code \"gpe\"; [undefined/9.3.1.2] Element has invalid language code \"new\""
+        },
+        {
+          "name": "CLEAN: inline <span lang=\"en\"> correctly marks a language change",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: data table has a completely empty <th> corner cell",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "scannerCount": 32,
+      "expectedScannerCount": 32,
+      "bandOk": true,
+      "slow": true,
+      "noise": [
+        "Starting error handling analysis...",
+        "Analyzing error identification...",
+        "Analyzing error suggestions...",
+        "Analyzing error prevention...",
+        "Simulating form errors for testing...",
+        "Error handling analysis complete: 2 violations found",
+        "Error testing modal trigger input#vector-main-menu-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-main-menu-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing modal trigger input#vector-appearance-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-appearance-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing modal trigger input#vector-user-links-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-user-links-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing modal trigger input#vector-page-titlebar-toc-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-page-titlebar-toc-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing modal trigger input#vector-variants-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-variants-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing modal trigger input#vector-page-tools-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-page-tools-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing modal trigger input#vector-sticky-header-toc-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-sticky-header-toc-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
+        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing search input 1: Node is either not clickable or not an Element"
+      ]
+    },
+    {
+      "file": "modern-commercial.html",
+      "source": "https://www.mozilla.org/de/",
+      "elapsedMs": 204583,
+      "timedOut": false,
+      "totalViolations": 250,
+      "band": [
+        111,
+        446
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: a literal <blink> element in the navigation",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: decorative images correctly use alt=\"\"",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "CLEAN: heading whose accessible name comes from an image alt",
+          "kind": "must-not-flag",
+          "ok": false,
+          "detail": "the only text-empty h2 (named by <img alt=\"Mozilla Anzeigen\">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading \"[empty]\" is not descriptive (empty-heading)"
+        },
+        {
+          "name": "CLEAN: nav logo link is named by its inner img alt",
+          "kind": "must-not-flag",
+          "ok": false,
+          "detail": "logo link (named by <img alt=\"Mozilla\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+        },
+        {
+          "name": "CLEAN: valid 3-letter BCP-47 subtags are not \"invalid language codes\"",
+          "kind": "must-not-flag",
+          "ok": false,
+          "detail": "9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"cak\"; [undefined/9.3.1.2] Element has invalid language code \"dsb\"; [undefined/9.3.1.2] Element has invalid language code \"hsb\"; [undefined/9.3.1.2] Element has invalid language code \"kab\""
+        }
+      ],
+      "scannerCount": 32,
+      "expectedScannerCount": 32,
+      "bandOk": true,
+      "slow": false,
+      "noise": [
+        "Starting error handling analysis...",
+        "Analyzing error identification...",
+        "Analyzing error suggestions...",
+        "Analyzing error prevention...",
+        "Simulating form errors for testing...",
+        "Error handling analysis complete: 7 violations found",
+        "Error testing navigation link 1: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
+        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id"
+      ]
+    }
+  ],
+  "finishedAt": "2026-07-27T18:02:40.799Z",
+  "failures": [
+    {
+      "layer": "spot-truth",
+      "file": "own-audit-ui.html",
+      "detail": "REAL: <html lang=\"de\"> contradicts English content / inner lang=\"en\" — no 3.1.1/3.1.2 language violation reported despite lang=\"de\" on an all-English page"
+    },
+    {
+      "layer": "spot-truth",
+      "file": "beeproduced.html",
+      "detail": "CLEAN: logo link has an accessible name via its inner img alt — logo link (named by <img alt=\"Logo\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+    },
+    {
+      "layer": "spot-truth",
+      "file": "wiki-medical-de.html",
+      "detail": "CLEAN: valid ISO 639-3 subtags on interlanguage links — 18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code \"arz\"; [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"bcl\"; [undefined/9.3.1.2] Element has invalid language code \"ckb\"; [undefined/9.3.1.2] Element has invalid language code \"gpe\"; [undefined/9.3.1.2] Element has invalid language code \"new\""
+    },
+    {
+      "layer": "spot-truth",
+      "file": "modern-commercial.html",
+      "detail": "CLEAN: heading whose accessible name comes from an image alt — the only text-empty h2 (named by <img alt=\"Mozilla Anzeigen\">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading \"[empty]\" is not descriptive (empty-heading)"
+    },
+    {
+      "layer": "spot-truth",
+      "file": "modern-commercial.html",
+      "detail": "CLEAN: nav logo link is named by its inner img alt — logo link (named by <img alt=\"Mozilla\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+    },
+    {
+      "layer": "spot-truth",
+      "file": "modern-commercial.html",
+      "detail": "CLEAN: valid 3-letter BCP-47 subtags are not \"invalid language codes\" — 9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"cak\"; [undefined/9.3.1.2] Element has invalid language code \"dsb\"; [undefined/9.3.1.2] Element has invalid language code \"hsb\"; [undefined/9.3.1.2] Element has invalid language code \"kab\""
+    }
+  ],
+  "passed": false
+}

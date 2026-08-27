@@ -1,0 +1,456 @@
+{
+  "generatedAt": "2026-07-27T16:43:28.117Z",
+  "harness": "exclusive",
+  "totals": {
+    "passed": 50,
+    "failed": 0
+  },
+  "results": [
+    {
+      "file": "bad-beeproduced-real-issues.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 6,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-character-key-shortcuts.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.4"
+      ],
+      "matched": 5,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-keyboard-access.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.1",
+        "2.1.2"
+      ],
+      "matched": 31,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-keyboard-native-override.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 54,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-keyboard-trap.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.2"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-scrollable-content.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 6,
+      "status": "PASS"
+    },
+    {
+      "file": "good-accessibility.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-character-key-shortcuts.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-keyboard-native-override.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-keyboard-trap.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.2"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-scrollable-content.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-concurrent-input.html",
+      "scanner": "concurrent-input",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.6"
+      ],
+      "matched": 14,
+      "status": "PASS"
+    },
+    {
+      "file": "good-concurrent-input.html",
+      "scanner": "concurrent-input",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.6"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-dragging-movements.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.7"
+      ],
+      "matched": 7,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-input-modalities.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.1",
+        "2.5.2",
+        "2.5.3",
+        "2.5.4"
+      ],
+      "matched": 9,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-keyboard-native-override.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.1"
+      ],
+      "matched": 5,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-label-in-name.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.3"
+      ],
+      "matched": 6,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-motion-vestibular.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.4"
+      ],
+      "matched": 15,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-pointer-cancellation.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.2"
+      ],
+      "matched": 5,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-target-size-minimum.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.8"
+      ],
+      "matched": 37,
+      "status": "PASS"
+    },
+    {
+      "file": "good-dragging-movements.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.7"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-keyboard-native-override.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-label-in-name.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.3"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-motion-vestibular.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-pointer-cancellation.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.2"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-target-size-minimum.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.8"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-focus-management.html",
+      "scanner": "focus-management",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.3",
+        "2.4.7"
+      ],
+      "matched": 2,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-focus-not-obscured.html",
+      "scanner": "focus-management",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.11"
+      ],
+      "matched": 2,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-focus-order.html",
+      "scanner": "focus-management",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.3"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-focus-visible.html",
+      "scanner": "focus-management",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.7"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "good-focus-management.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.3",
+        "2.4.7"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-focus-not-obscured.html",
+      "scanner": "focus-management",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-hover-focus-content.html",
+      "scanner": "hover-focus-content",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.13"
+      ],
+      "matched": 7,
+      "status": "PASS"
+    },
+    {
+      "file": "good-hover-focus-content.html",
+      "scanner": "hover-focus-content",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.13"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-multiple-ways.html",
+      "scanner": "multiple-ways",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.5"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "good-multiple-ways.html",
+      "scanner": "multiple-ways",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.5"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-reflow.html",
+      "scanner": "responsive-design",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.10"
+      ],
+      "matched": 4,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-text-resize.html",
+      "scanner": "responsive-design",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 31,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-text-spacing.html",
+      "scanner": "responsive-design",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.12"
+      ],
+      "matched": 13,
+      "status": "PASS"
+    },
+    {
+      "file": "good-reflow.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.10"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-text-resize.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-text-spacing.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.12"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-seizure-risk.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": true,
+      "criteria": [
+        "2.3.1"
+      ],
+      "matched": 10,
+      "status": "PASS"
+    },
+    {
+      "file": "good-seizure-safe.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": false,
+      "criteria": [
+        "2.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    }
+  ]
+}

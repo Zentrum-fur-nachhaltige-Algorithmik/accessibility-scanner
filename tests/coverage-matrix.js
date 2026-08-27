@@ -31,7 +31,6 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const WCAG_MD = path.join(ROOT, 'wcag2.2.md');
 const TEST_SITES = path.join(ROOT, 'test-sites');
 const OUT_MD = path.join(ROOT, 'docs', 'sprints', 'p2-quality', 'coverage-matrix.md');
 
@@ -75,7 +74,7 @@ const MANUAL_OVERRIDES = {
     justification:
       'Target Size (Enhanced) (AAA) — the 44x44 check was removed from ' +
       'mobile-specific because it was reported as an AA failure on every ' +
-      'healthy page (false-positive-reports/2026-08-09, FP-1). The AA minimum ' +
+      'healthy page. The AA minimum ' +
       '(2.5.8, 24x24 with the spacing exception) is automated in ' +
       'input-modalities; the AAA size is a design review item.',
   },
@@ -100,37 +99,14 @@ const MANUAL_OVERRIDES = {
 };
 
 // ---------------------------------------------------------------------------
-// 1. Criterion list from wcag2.2.md
+// 1. Criterion list
 // ---------------------------------------------------------------------------
 
 /**
  * @returns {{sc: string, level: 'A'|'AA'|'AAA'|'REMOVED', title: string}[]}
  */
 function parseCriteria() {
-  const md = fs.readFileSync(WCAG_MD, 'utf-8');
-  const out = [];
-
-  for (const line of md.split('\n')) {
-    if (!/^####\s/.test(line)) continue;
-    const m = line.match(/^####\s+(~~)?(\d+\.\d+\.\d+)\s+([\s\S]*)$/);
-    if (!m) continue;
-
-    const rest = m[3];
-    const levelMatch = rest.match(/\((A|AA|AAA)\)\s*(?:🆕|🗑️|~~)*\s*$/);
-    const level = levelMatch ? levelMatch[1] : 'REMOVED';
-    const title = rest
-      .replace(/\s*\((A|AA|AAA)\)\s*(?:🆕|🗑️|~~)*\s*$/, '')
-      .replace(/~~/g, '')
-      .replace(/🗑️|🆕/g, '')
-      .trim();
-
-    out.push({ sc: m[2], level, title });
-  }
-
-  if (out.length === 0) {
-    throw new Error('coverage-matrix: parsed 0 criteria from wcag2.2.md — parser broken');
-  }
-  return out;
+  return require(path.join(ROOT, 'src', 'data', 'wcag22-criteria.json'));
 }
 
 // ---------------------------------------------------------------------------
@@ -309,7 +285,7 @@ function collectHarnessCoverage(axeByCriterion, fixturesByCriterion, scanners) {
 // 6. Recorded harness OUTCOMES — "how well", not just "is it tested"
 // ---------------------------------------------------------------------------
 
-const RAW_DIR = path.join(ROOT, 'docs', 'sprints', 'p2-quality', 'raw');
+const RAW_DIR = path.join(ROOT, 'tests', 'data', 'harness');
 
 /**
  * Read every checked-in `harness-*.json` produced by the three harnesses

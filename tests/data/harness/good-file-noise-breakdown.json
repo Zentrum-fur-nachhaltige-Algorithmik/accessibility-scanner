@@ -1,0 +1,1026 @@
+{
+  "generatedAt": "2026-07-27T17:11:13.620Z",
+  "goodFiles": [
+    "good-accessibility",
+    "good-auto-submitting-form",
+    "good-color-contrast",
+    "good-css-background-accessible",
+    "good-form-errors",
+    "good-images-of-text",
+    "good-language-override",
+    "good-motion-vestibular",
+    "good-redundant-aria",
+    "good-skip-links"
+  ],
+  "perFile": {
+    "good-accessibility": {
+      "totalViolations": 9,
+      "breakdown": [
+        {
+          "scannerId": "nontext-contrast",
+          "type": "insufficient-interactive-state-contrast",
+          "criterion": "1.4.11",
+          "count": 4,
+          "samples": [
+            {
+              "element": "a[2]",
+              "raw": {
+                "type": "insufficient-interactive-state-contrast",
+                "category": "state-change",
+                "severity": "moderate",
+                "element": "a[2]",
+                "description": "Interactive element may lack sufficient visual distinction in different states",
+                "details": {
+                  "backgroundColor": "rgba(0, 0, 0, 0)",
+                  "borderColor": "rgba(0, 0, 0, 0)",
+                  "parentBackground": "rgba(0, 0, 0, 0)",
+                  "tagName": "a",
+                  "type": null,
+                  "id": null
+                },
+                "wcagCriteria": "1.4.11",
+                "impact": "Interactive states may not be clearly distinguishable",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "a[3]",
+              "raw": {
+                "type": "insufficient-interactive-state-contrast",
+                "category": "state-change",
+                "severity": "moderate",
+                "element": "a[3]",
+                "description": "Interactive element may lack sufficient visual distinction in different states",
+                "details": {
+                  "backgroundColor": "rgba(0, 0, 0, 0)",
+                  "borderColor": "rgba(0, 0, 0, 0)",
+                  "parentBackground": "rgba(0, 0, 0, 0)",
+                  "tagName": "a",
+                  "type": null,
+                  "id": null
+                },
+                "wcagCriteria": "1.4.11",
+                "impact": "Interactive states may not be clearly distinguishable",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "nontext-contrast",
+          "type": "insufficient-focus-indicator-contrast",
+          "criterion": "1.4.11",
+          "count": 2,
+          "samples": [
+            {
+              "element": "button[12]",
+              "raw": {
+                "type": "insufficient-focus-indicator-contrast",
+                "category": "focus-indicator",
+                "severity": "serious",
+                "element": "button[12]",
+                "description": "Focus indicator has insufficient contrast against background",
+                "details": {
+                  "outlineColor": "rgb(128, 189, 255)",
+                  "backgroundColor": "rgb(248, 249, 250)",
+                  "elementBackground": "rgb(30, 126, 52)",
+                  "outlineWidth": "3px",
+                  "contrastRatio": 2.6,
+                  "required": 3,
+                  "cssSelector": "button.good-button",
+                  "tagName": "button",
+                  "type": "submit",
+                  "id": null
+                },
+                "wcagCriteria": "1.4.11",
+                "impact": "Focus indicator is not clearly visible to users",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "button[13]",
+              "raw": {
+                "type": "insufficient-focus-indicator-contrast",
+                "category": "focus-indicator",
+                "severity": "serious",
+                "element": "button[13]",
+                "description": "Focus indicator has insufficient contrast against background",
+                "details": {
+                  "outlineColor": "rgb(128, 189, 255)",
+                  "backgroundColor": "rgb(248, 249, 250)",
+                  "elementBackground": "rgb(108, 117, 125)",
+                  "outlineWidth": "3px",
+                  "contrastRatio": 2.38,
+                  "required": 3,
+                  "cssSelector": "button.good-button.good-button-secondary",
+                  "tagName": "button",
+                  "type": "reset",
+                  "id": null
+                },
+                "wcagCriteria": "1.4.11",
+                "impact": "Focus indicator is not clearly visible to users",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "error-no-suggestion",
+          "criterion": "9.3.3.3",
+          "count": 2,
+          "samples": [
+            {
+              "element": "div#email-error.error-message",
+              "raw": {
+                "criterion": "9.3.3.3",
+                "element": "div#email-error.error-message",
+                "issue": "error-no-suggestion",
+                "description": "Error message lacks helpful suggestion for correction",
+                "severity": "warning",
+                "suggestion": "Provide specific suggestions for correcting the error",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "div.status-message",
+              "raw": {
+                "criterion": "9.3.3.3",
+                "element": "div.status-message",
+                "issue": "error-no-suggestion",
+                "description": "Error message lacks helpful suggestion for correction",
+                "severity": "warning",
+                "suggestion": "Provide specific suggestions for correcting the error",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "required-fields-no-error-display",
+          "criterion": "9.3.3.1",
+          "count": 1,
+          "samples": [
+            {
+              "element": "form fields",
+              "raw": {
+                "criterion": "9.3.3.1",
+                "element": "form fields",
+                "issue": "required-fields-no-error-display",
+                "description": "1 required fields do not show errors when invalid",
+                "severity": "warning",
+                "suggestion": "Implement client-side validation that shows errors for required fields",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "good-auto-submitting-form": {
+      "totalViolations": 3,
+      "breakdown": [
+        {
+          "scannerId": "predictable-navigation",
+          "type": "inconsistent-required-field-identification",
+          "criterion": "9.3.2.4",
+          "count": 1,
+          "samples": [
+            {
+              "element": "form fields",
+              "raw": {
+                "criterion": "9.3.2.4",
+                "element": "form fields",
+                "issue": "inconsistent-required-field-identification",
+                "description": "Required form fields lack consistent identification method",
+                "severity": "error",
+                "suggestion": "Use consistent method to identify required fields (asterisk, \"required\" text, or aria-required)",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "timing-controls",
+          "type": "timeout-no-extend-option",
+          "criterion": "9.2.2.1",
+          "count": 1,
+          "samples": [
+            {
+              "element": "document",
+              "raw": {
+                "criterion": "9.2.2.1",
+                "element": "document",
+                "issue": "timeout-no-extend-option",
+                "description": "Timeout detected without user control to extend time limit",
+                "severity": "error",
+                "suggestion": "Provide user controls to extend time limits (extend, continue session buttons)",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "required-fields-no-error-display",
+          "criterion": "9.3.3.1",
+          "count": 1,
+          "samples": [
+            {
+              "element": "form fields",
+              "raw": {
+                "criterion": "9.3.3.1",
+                "element": "form fields",
+                "issue": "required-fields-no-error-display",
+                "description": "5 required fields do not show errors when invalid",
+                "severity": "warning",
+                "suggestion": "Implement client-side validation that shows errors for required fields",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "good-color-contrast": {
+      "totalViolations": 0,
+      "breakdown": []
+    },
+    "good-css-background-accessible": {
+      "totalViolations": 3,
+      "breakdown": [
+        {
+          "scannerId": "use-of-color",
+          "type": "chart-color-only",
+          "criterion": "1.4.1",
+          "count": 2,
+          "samples": [
+            {
+              "element": "svg",
+              "raw": {
+                "element": "svg",
+                "issue": "chart-color-only",
+                "description": "Chart or graph may rely only on color to distinguish data",
+                "suggestion": "Add patterns, textures, labels, or legend to differentiate data series",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "table.chart-table",
+              "raw": {
+                "element": "table.chart-table",
+                "issue": "chart-color-only",
+                "description": "Chart or graph may rely only on color to distinguish data",
+                "suggestion": "Add patterns, textures, labels, or legend to differentiate data series",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "error-no-suggestion",
+          "criterion": "9.3.3.3",
+          "count": 1,
+          "samples": [
+            {
+              "element": "div.notification-accessible",
+              "raw": {
+                "criterion": "9.3.3.3",
+                "element": "div.notification-accessible",
+                "issue": "error-no-suggestion",
+                "description": "Error message lacks helpful suggestion for correction",
+                "severity": "warning",
+                "suggestion": "Provide specific suggestions for correcting the error",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "good-form-errors": {
+      "totalViolations": 2,
+      "breakdown": [
+        {
+          "scannerId": "predictable-navigation",
+          "type": "inconsistent-error-identification",
+          "criterion": "9.3.2.4",
+          "count": 1,
+          "samples": [
+            {
+              "element": "error elements",
+              "raw": {
+                "criterion": "9.3.2.4",
+                "element": "error elements",
+                "issue": "inconsistent-error-identification",
+                "description": "Error states use inconsistent identification methods",
+                "severity": "warning",
+                "suggestion": "Standardize error identification with consistent classes, ARIA attributes, and visual styling",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "advanced-contrast",
+          "type": "ui-component-contrast",
+          "criterion": "9.1.4.11",
+          "count": 1,
+          "samples": [
+            {
+              "element": "select#country-field",
+              "raw": {
+                "criterion": "9.1.4.11",
+                "element": "select#country-field",
+                "issue": "ui-component-contrast",
+                "description": "ui component background has insufficient contrast: 1.15:1",
+                "contrastRatio": 1.1498567656584315,
+                "requiredRatio": 3,
+                "elementType": "ui-component",
+                "suggestion": "Increase background contrast to meet 3:1 minimum ratio",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "good-images-of-text": {
+      "totalViolations": 0,
+      "breakdown": []
+    },
+    "good-language-override": {
+      "totalViolations": 9,
+      "breakdown": [
+        {
+          "scannerId": "screen-reader",
+          "type": "form-control-missing-label",
+          "criterion": "9.3.3.2",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input",
+              "raw": {
+                "criterion": "9.3.3.2",
+                "clause": "9.3.3.2",
+                "type": "form-control-missing-label",
+                "issue": "form-control-missing-label",
+                "element": "input",
+                "description": "Labels or Instructions - search control is identified only by its placeholder, which is not an accessible name",
+                "severity": "high",
+                "suggestion": "Add a <label for=\"…\">, aria-label, or aria-labelledby pointing at visible text",
+                "details": [
+                  "No associated label found"
+                ],
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "page-structure",
+          "type": "missing-label",
+          "criterion": "9.2.4.6",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input:nth-child(5)",
+              "raw": {
+                "criterion": "9.2.4.6",
+                "element": "input:nth-child(5)",
+                "issue": "missing-label",
+                "description": "Form control (search) lacks a proper label",
+                "suggestion": "Add a proper <label> element in addition to placeholder text",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "label-in-name",
+          "type": "form-label-not-in-name",
+          "criterion": "2.5.3",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input[4]",
+              "raw": {
+                "type": "form-label-not-in-name",
+                "category": "form-control",
+                "severity": "serious",
+                "element": "input[4]",
+                "description": "Form control visible label is not contained in accessible name",
+                "details": {
+                  "visibleText": "Suchen Sie international...",
+                  "accessibleName": "",
+                  "visibleTextNormalized": "suchen sie international...",
+                  "accessibleNameNormalized": "",
+                  "tagName": "input",
+                  "type": "search",
+                  "id": null,
+                  "name": null,
+                  "placeholder": "Suchen Sie international...",
+                  "ariaLabel": null,
+                  "ariaLabelledby": null,
+                  "hasLabels": false
+                },
+                "wcagCriteria": "2.5.3",
+                "impact": "Voice control users cannot target this form field by speaking its visible label",
+                "voiceControlCommand": "\"Click Suchen Sie international...\" will fail",
+                "recommendation": "Ensure accessible name contains the visible label text",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "html-validation",
+          "type": "label",
+          "criterion": "4.1.2",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input",
+              "raw": {
+                "criterion": "4.1.2",
+                "element": "input",
+                "issue": "label",
+                "description": "Form control has no associated label",
+                "severity": "critical",
+                "suggestion": "Add label element, aria-label, or aria-labelledby to form control",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "html-validation",
+          "type": "unlabeled-form-control",
+          "criterion": "9.4.1.1",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input",
+              "raw": {
+                "criterion": "9.4.1.1",
+                "element": "input",
+                "issue": "unlabeled-form-control",
+                "description": "Form control missing accessible label",
+                "severity": "warning",
+                "suggestion": "Add label element, aria-label, or aria-labelledby attribute",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "field-no-label",
+          "criterion": "9.3.3.2",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input",
+              "raw": {
+                "criterion": "9.3.3.2",
+                "element": "input",
+                "issue": "field-no-label",
+                "description": "Form field lacks accessible label",
+                "severity": "error",
+                "suggestion": "Add proper label element or aria-label for form field",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "placeholder-only-label",
+          "criterion": "9.3.3.2",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input",
+              "raw": {
+                "criterion": "9.3.3.2",
+                "element": "input",
+                "issue": "placeholder-only-label",
+                "description": "Placeholder text used as only label - accessibility issue",
+                "severity": "error",
+                "suggestion": "Provide persistent label in addition to placeholder text",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "error-handling",
+          "type": "email-field-no-format-suggestion",
+          "criterion": "9.3.3.3",
+          "count": 1,
+          "samples": [
+            {
+              "element": "input#goodEmail",
+              "raw": {
+                "criterion": "9.3.3.3",
+                "element": "input#goodEmail",
+                "issue": "email-field-no-format-suggestion",
+                "description": "Email field lacks format example or suggestion",
+                "severity": "warning",
+                "suggestion": "Provide email format example (e.g., \"user@example.com\")",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "advanced-contrast",
+          "type": "ui-component-contrast",
+          "criterion": "9.1.4.11",
+          "count": 1,
+          "samples": [
+            {
+              "element": "select#goodCountry",
+              "raw": {
+                "criterion": "9.1.4.11",
+                "element": "select#goodCountry",
+                "issue": "ui-component-contrast",
+                "description": "ui component background has insufficient contrast: 1.15:1",
+                "contrastRatio": 1.1498567656584315,
+                "requiredRatio": 3,
+                "elementType": "ui-component",
+                "suggestion": "Increase background contrast to meet 3:1 minimum ratio",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "good-motion-vestibular": {
+      "totalViolations": 19,
+      "breakdown": [
+        {
+          "scannerId": "color-contrast",
+          "type": "color-contrast-generic",
+          "criterion": "1.4.3+1.4.6",
+          "count": 8,
+          "samples": [
+            {
+              "element": "button#prevButton",
+              "raw": {
+                "element": "button#prevButton",
+                "currentRatio": 1.61,
+                "requiredRatio": 4.5,
+                "foregroundColor": "rgb(255, 255, 255)",
+                "backgroundColor": "rgb(204, 204, 204)",
+                "isLargeText": false,
+                "suggestedForeground": "#000000",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "h4",
+              "raw": {
+                "element": "h4",
+                "currentRatio": 1.09,
+                "requiredRatio": 4.5,
+                "foregroundColor": "rgb(255, 255, 255)",
+                "backgroundColor": "rgb(241, 248, 233)",
+                "isLargeText": false,
+                "suggestedForeground": "#000000",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "nontext-contrast",
+          "type": "insufficient-background-contrast",
+          "criterion": "1.4.11",
+          "count": 4,
+          "samples": [
+            {
+              "element": "button[2]",
+              "raw": {
+                "type": "insufficient-background-contrast",
+                "category": "ui-component",
+                "severity": "moderate",
+                "element": "button[2]",
+                "description": "Button background has insufficient contrast",
+                "details": {
+                  "backgroundColor": "rgba(0, 0, 0, 0.7)",
+                  "parentBackground": "rgb(0, 0, 0)",
+                  "contrastRatio": 1,
+                  "required": 3,
+                  "tagName": "button",
+                  "id": "videoPlayButton"
+                },
+                "wcagCriteria": "1.4.11",
+                "impact": "Button is not easily distinguishable from background",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "button[3]",
+              "raw": {
+                "type": "insufficient-background-contrast",
+                "category": "ui-component",
+                "severity": "moderate",
+                "element": "button[3]",
+                "description": "Button background has insufficient contrast",
+                "details": {
+                  "backgroundColor": "rgba(0, 0, 0, 0.7)",
+                  "parentBackground": "rgb(0, 0, 0)",
+                  "contrastRatio": 1,
+                  "required": 3,
+                  "tagName": "button",
+                  "id": "videoStopButton"
+                },
+                "wcagCriteria": "1.4.11",
+                "impact": "Button is not easily distinguishable from background",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "predictable-navigation",
+          "type": "input-opens-modal-dialog",
+          "criterion": "9.3.2.2",
+          "count": 3,
+          "samples": [
+            {
+              "element": "input#globalMotionEnabled",
+              "raw": {
+                "criterion": "9.3.2.2",
+                "element": "input#globalMotionEnabled",
+                "issue": "input-opens-modal-dialog",
+                "description": "Changing this control automatically opens a modal dialog, moving focus without user request",
+                "severity": "warning",
+                "evidence": "onchange handler opens a modal dialog which takes focus",
+                "suggestion": "Do not open dialogs from change/input/blur handlers - trigger them from an explicit user action such as a button press",
+                "experimental": true,
+                "confidence": "low"
+              }
+            },
+            {
+              "element": "input#reduceMotionEnabled",
+              "raw": {
+                "criterion": "9.3.2.2",
+                "element": "input#reduceMotionEnabled",
+                "issue": "input-opens-modal-dialog",
+                "description": "Changing this control automatically opens a modal dialog, moving focus without user request",
+                "severity": "warning",
+                "evidence": "onchange handler opens a modal dialog which takes focus",
+                "suggestion": "Do not open dialogs from change/input/blur handlers - trigger them from an explicit user action such as a button press",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "advanced-aria",
+          "type": "missing-carousel-label",
+          "criterion": "4.1.2",
+          "count": 1,
+          "samples": [
+            {
+              "element": "div.good-carousel",
+              "raw": {
+                "type": "missing-carousel-label",
+                "category": "carousel",
+                "severity": "serious",
+                "element": "div.good-carousel",
+                "description": "Carousel lacks accessible name",
+                "details": {
+                  "carouselId": "",
+                  "carouselClass": "good-carousel",
+                  "evidence": {
+                    "declared": false,
+                    "slideCount": 5,
+                    "hasControls": true
+                  }
+                },
+                "wcagCriteria": "4.1.2",
+                "impact": "Screen reader users cannot identify carousel purpose",
+                "recommendation": "Add aria-label describing carousel content",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "timing-controls",
+          "type": "timeout-no-extend-option",
+          "criterion": "9.2.2.1",
+          "count": 1,
+          "samples": [
+            {
+              "element": "document",
+              "raw": {
+                "criterion": "9.2.2.1",
+                "element": "document",
+                "issue": "timeout-no-extend-option",
+                "description": "Timeout detected without user control to extend time limit",
+                "severity": "error",
+                "suggestion": "Provide user controls to extend time limits (extend, continue session buttons)",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "timing-controls",
+          "type": "timeout-no-data-preservation",
+          "criterion": "9.2.2.1",
+          "count": 1,
+          "samples": [
+            {
+              "element": "document",
+              "raw": {
+                "criterion": "9.2.2.1",
+                "element": "document",
+                "issue": "timeout-no-data-preservation",
+                "description": "Forms present but no data preservation mechanism detected for timeouts",
+                "severity": "warning",
+                "suggestion": "Add auto-save functionality or session storage to preserve user data",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        },
+        {
+          "scannerId": "advanced-contrast",
+          "type": "ui-component-contrast",
+          "criterion": "9.1.4.11",
+          "count": 1,
+          "samples": [
+            {
+              "element": "button#prevButton",
+              "raw": {
+                "criterion": "9.1.4.11",
+                "element": "button#prevButton",
+                "issue": "ui-component-contrast",
+                "description": "ui component background has insufficient contrast: 1.61:1",
+                "contrastRatio": 1.6059285649300714,
+                "requiredRatio": 3,
+                "elementType": "ui-component",
+                "suggestion": "Increase background contrast to meet 3:1 minimum ratio",
+                "experimental": true,
+                "confidence": "low"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "good-redundant-aria": {
+      "totalViolations": 0,
+      "breakdown": []
+    },
+    "good-skip-links": {
+      "totalViolations": 0,
+      "breakdown": []
+    }
+  },
+  "aggregate": [
+    {
+      "scannerId": "color-contrast",
+      "type": "color-contrast-generic",
+      "criterion": "1.4.3+1.4.6",
+      "count": 8,
+      "fileCounts": {
+        "good-motion-vestibular": 8
+      }
+    },
+    {
+      "scannerId": "nontext-contrast",
+      "type": "insufficient-interactive-state-contrast",
+      "criterion": "1.4.11",
+      "count": 4,
+      "fileCounts": {
+        "good-accessibility": 4
+      }
+    },
+    {
+      "scannerId": "nontext-contrast",
+      "type": "insufficient-background-contrast",
+      "criterion": "1.4.11",
+      "count": 4,
+      "fileCounts": {
+        "good-motion-vestibular": 4
+      }
+    },
+    {
+      "scannerId": "error-handling",
+      "type": "error-no-suggestion",
+      "criterion": "9.3.3.3",
+      "count": 3,
+      "fileCounts": {
+        "good-accessibility": 2,
+        "good-css-background-accessible": 1
+      }
+    },
+    {
+      "scannerId": "advanced-contrast",
+      "type": "ui-component-contrast",
+      "criterion": "9.1.4.11",
+      "count": 3,
+      "fileCounts": {
+        "good-form-errors": 1,
+        "good-language-override": 1,
+        "good-motion-vestibular": 1
+      }
+    },
+    {
+      "scannerId": "predictable-navigation",
+      "type": "input-opens-modal-dialog",
+      "criterion": "9.3.2.2",
+      "count": 3,
+      "fileCounts": {
+        "good-motion-vestibular": 3
+      }
+    },
+    {
+      "scannerId": "nontext-contrast",
+      "type": "insufficient-focus-indicator-contrast",
+      "criterion": "1.4.11",
+      "count": 2,
+      "fileCounts": {
+        "good-accessibility": 2
+      }
+    },
+    {
+      "scannerId": "error-handling",
+      "type": "required-fields-no-error-display",
+      "criterion": "9.3.3.1",
+      "count": 2,
+      "fileCounts": {
+        "good-accessibility": 1,
+        "good-auto-submitting-form": 1
+      }
+    },
+    {
+      "scannerId": "timing-controls",
+      "type": "timeout-no-extend-option",
+      "criterion": "9.2.2.1",
+      "count": 2,
+      "fileCounts": {
+        "good-auto-submitting-form": 1,
+        "good-motion-vestibular": 1
+      }
+    },
+    {
+      "scannerId": "use-of-color",
+      "type": "chart-color-only",
+      "criterion": "1.4.1",
+      "count": 2,
+      "fileCounts": {
+        "good-css-background-accessible": 2
+      }
+    },
+    {
+      "scannerId": "predictable-navigation",
+      "type": "inconsistent-required-field-identification",
+      "criterion": "9.3.2.4",
+      "count": 1,
+      "fileCounts": {
+        "good-auto-submitting-form": 1
+      }
+    },
+    {
+      "scannerId": "predictable-navigation",
+      "type": "inconsistent-error-identification",
+      "criterion": "9.3.2.4",
+      "count": 1,
+      "fileCounts": {
+        "good-form-errors": 1
+      }
+    },
+    {
+      "scannerId": "screen-reader",
+      "type": "form-control-missing-label",
+      "criterion": "9.3.3.2",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "page-structure",
+      "type": "missing-label",
+      "criterion": "9.2.4.6",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "label-in-name",
+      "type": "form-label-not-in-name",
+      "criterion": "2.5.3",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "html-validation",
+      "type": "label",
+      "criterion": "4.1.2",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "html-validation",
+      "type": "unlabeled-form-control",
+      "criterion": "9.4.1.1",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "error-handling",
+      "type": "field-no-label",
+      "criterion": "9.3.3.2",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "error-handling",
+      "type": "placeholder-only-label",
+      "criterion": "9.3.3.2",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "error-handling",
+      "type": "email-field-no-format-suggestion",
+      "criterion": "9.3.3.3",
+      "count": 1,
+      "fileCounts": {
+        "good-language-override": 1
+      }
+    },
+    {
+      "scannerId": "advanced-aria",
+      "type": "missing-carousel-label",
+      "criterion": "4.1.2",
+      "count": 1,
+      "fileCounts": {
+        "good-motion-vestibular": 1
+      }
+    },
+    {
+      "scannerId": "timing-controls",
+      "type": "timeout-no-data-preservation",
+      "criterion": "9.2.2.1",
+      "count": 1,
+      "fileCounts": {
+        "good-motion-vestibular": 1
+      }
+    }
+  ]
+}

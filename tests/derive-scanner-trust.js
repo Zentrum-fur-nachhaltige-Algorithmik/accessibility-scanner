@@ -38,7 +38,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const RAW = path.join(ROOT, 'docs', 'sprints', 'p2-quality', 'raw');
+const RAW = path.join(ROOT, 'tests', 'data', 'harness');
 const OUT = path.join(ROOT, 'src', 'scanner-trust.json');
 
 /** Violations on the good-file corpus above which a scanner is a noise source. */

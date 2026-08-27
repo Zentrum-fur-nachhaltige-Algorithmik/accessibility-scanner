@@ -101,10 +101,17 @@ class AccessibilityStatementScanner extends BaseScanner {
 
     // 2. Navigate to accessibility statement page
     try {
-      await page.goto(statementLinkResults.url, {
+      const response = await page.goto(statementLinkResults.url, {
         waitUntil: 'networkidle0',
         timeout: options.timeout,
       });
+      // An error page still loads, and its body would then be measured for a
+      // review date and a conformance level it can never contain. A broken
+      // link is one finding about the link, not three about its content.
+      const status = response ? response.status() : 0;
+      if (status >= 400) {
+        throw new Error(`HTTP ${status}`);
+      }
       statementAccessible = true;
       log.debug(`  Found accessibility statement at: ${statementLinkResults.url}`);
     } catch (error) {

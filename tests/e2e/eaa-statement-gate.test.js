@@ -34,6 +34,17 @@ describe('EAA statement gate', () => {
     // the bare words "statement" and "compliance" must not match
     expect(matchesStatementLink('Financial statement', '/investors/statement')).toBe(false);
     expect(matchesStatementLink('Accessibility', 'mailto:a11y@example.org')).toBe(false);
+    // the bare word "accessibility" is the title of countless articles: it
+    // identifies a statement only as the whole link text or a whole path segment
+    expect(matchesStatementLink('Introduction to Web Accessibility', '/intro')).toBe(false);
+    expect(
+      matchesStatementLink('Tolerating Inaccessibility', '/blog/tolerating-inaccessibility/')
+    ).toBe(false);
+    expect(matchesStatementLink('Web Accessibility for Designers', '/resources/designers/')).toBe(
+      false
+    );
+    expect(matchesStatementLink('Accessibility', '/accessibility/')).toBe(true);
+    expect(matchesStatementLink('Read more', '/help/accessibility.html')).toBe(true);
   });
 
   it('reports one serious finding (not twelve, none critical) when no statement exists', async () => {

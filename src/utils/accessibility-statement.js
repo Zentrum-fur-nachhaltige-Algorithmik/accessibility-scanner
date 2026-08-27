@@ -12,7 +12,6 @@
 const STATEMENT_LINK_KEYWORDS = [
   'accessibility statement',
   'accessibility-statement',
-  'accessibility',
   'barrierefreiheit',
   'barrierefreiheitserklärung',
   'erklärung zur barrierefreiheit',
@@ -25,6 +24,37 @@ const STATEMENT_LINK_KEYWORDS = [
   'a11y',
 ];
 
+/**
+ * The bare word `accessibility` is the title of countless articles, so it only
+ * identifies a statement when it is the whole link text or a whole path
+ * segment: "Accessibility" -> /accessibility/ is a statement link,
+ * "Introduction to Web Accessibility" -> /intro is an article.
+ */
+const GENERIC_KEYWORDS = ['accessibility', 'accessibilité'];
+
+/** Does the bare word stand alone as the link text or as a path segment? */
+function matchesGenericKeyword(text, href) {
+  const t = String(text || '')
+    .toLowerCase()
+    .replace(/[\s\u00a0]+/g, ' ')
+    .trim();
+  if (GENERIC_KEYWORDS.includes(t)) return true;
+
+  const path = String(href || '')
+    .toLowerCase()
+    .split(/[?#]/)[0]
+    .replace(/\.(html?|php|aspx?)$/, '');
+  return path.split('/').some((segment) => {
+    let decoded = segment;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      // Malformed escape: compare the raw segment instead.
+    }
+    return GENERIC_KEYWORDS.includes(decoded);
+  });
+}
+
 /** Rule id for the one finding a site without a statement earns. */
 const MISSING_STATEMENT_RULE = 'missing-accessibility-statement';
 
@@ -35,7 +65,8 @@ function matchesStatementLink(text, href) {
     .trim();
   const h = String(href || '').toLowerCase();
   if (h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('javascript:')) return false;
-  return STATEMENT_LINK_KEYWORDS.some((k) => t.includes(k) || h.includes(k));
+  if (STATEMENT_LINK_KEYWORDS.some((k) => t.includes(k) || h.includes(k))) return true;
+  return matchesGenericKeyword(t, h);
 }
 
 /**
@@ -44,29 +75,47 @@ function matchesStatementLink(text, href) {
  * @returns {Promise<{found: boolean, url?: string, text?: string, selector?: string}>}
  */
 async function findStatementLink(page) {
-  return page.evaluate((keywords) => {
-    const matches = (text, href) => {
-      const t = String(text || '')
-        .toLowerCase()
-        .trim();
-      const h = String(href || '').toLowerCase();
-      if (h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('javascript:'))
-        return false;
-      return keywords.some((k) => t.includes(k) || h.includes(k));
-    };
+  return page.evaluate(
+    (keywords, generic) => {
+      const matchesGeneric = (t, h) => {
+        if (generic.includes(t.replace(/[\s\u00a0]+/g, ' ').trim())) return true;
+        const path = h.split(/[?#]/)[0].replace(/\.(html?|php|aspx?)$/, '');
+        return path.split('/').some((segment) => {
+          let decoded = segment;
+          try {
+            decoded = decodeURIComponent(segment);
+          } catch {
+            // Malformed escape: compare the raw segment instead.
+          }
+          return generic.includes(decoded);
+        });
+      };
+      const matches = (text, href) => {
+        const t = String(text || '')
+          .toLowerCase()
+          .trim();
+        const h = String(href || '').toLowerCase();
+        if (h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('javascript:'))
+          return false;
+        if (keywords.some((k) => t.includes(k) || h.includes(k))) return true;
+        return matchesGeneric(t, h);
+      };
 
-    for (const link of Array.from(document.querySelectorAll('a[href]'))) {
-      const rawHref = link.getAttribute('href') || '';
-      if (!matches(link.textContent, rawHref)) continue;
-      const selector = link.id
-        ? `a#${link.id}`
-        : link.className && typeof link.className === 'string'
-          ? `a.${link.className.trim().split(/\s+/).join('.')}`
-          : `a[href="${rawHref}"]`;
-      return { found: true, url: link.href, text: link.textContent.trim(), selector };
-    }
-    return { found: false };
-  }, STATEMENT_LINK_KEYWORDS);
+      for (const link of Array.from(document.querySelectorAll('a[href]'))) {
+        const rawHref = link.getAttribute('href') || '';
+        if (!matches(link.textContent, rawHref)) continue;
+        const selector = link.id
+          ? `a#${link.id}`
+          : link.className && typeof link.className === 'string'
+            ? `a.${link.className.trim().split(/\s+/).join('.')}`
+            : `a[href="${rawHref}"]`;
+        return { found: true, url: link.href, text: link.textContent.trim(), selector };
+      }
+      return { found: false };
+    },
+    STATEMENT_LINK_KEYWORDS,
+    GENERIC_KEYWORDS
+  );
 }
 
 /** The single canonical finding for "this site has no accessibility statement". */
@@ -85,6 +134,7 @@ function missingStatementViolation() {
 
 module.exports = {
   STATEMENT_LINK_KEYWORDS,
+  GENERIC_KEYWORDS,
   MISSING_STATEMENT_RULE,
   matchesStatementLink,
   findStatementLink,

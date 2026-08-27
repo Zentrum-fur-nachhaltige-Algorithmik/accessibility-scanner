@@ -1,0 +1,648 @@
+{
+ "generatedAt": "2026-08-24T15:30:00.000Z",
+ "profile": "full",
+ "llm": false,
+ "note": "merged from 5 per-theme runs after the FP-fix sprint 2026-08-24",
+ "pages": [
+  {
+   "theme": "evergreen",
+   "route": "index",
+   "score": 78,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 5,
+    "insufficient-focus-indicator-contrast": 1,
+    "text-overflow": 1,
+    "text-spacing-failure": 1,
+    "text-resize-clip-risk": 1,
+    "mobile-overflow-hidden-400-zoom": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "leistungen",
+   "score": 88,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "text-spacing-failure": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "team",
+   "score": 90,
+   "findings": 3,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "kontakt",
+   "score": 90,
+   "findings": 3,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "preise",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "focus-obscured-by-fixed-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "patienteninfo",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "focus-obscured-by-fixed-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "impressum",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "focus-obscured-by-fixed-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "evergreen",
+   "route": "datenschutz",
+   "score": 90,
+   "findings": 3,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "index",
+   "score": 68,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 5,
+    "insufficient-focus-indicator-contrast": 1,
+    "text-overflow": 1,
+    "text-spacing-failure": 1,
+    "text-resize-clip-risk": 1,
+    "mobile-overflow-hidden-400-zoom": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "leistungen",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "team",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "kontakt",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "preise",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "patienteninfo",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "impressum",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "clinic",
+   "route": "datenschutz",
+   "score": 79,
+   "findings": 11,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 4,
+    "insufficient-text-contrast": 4,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "index",
+   "score": 74,
+   "findings": 12,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 5,
+    "insufficient-focus-indicator-contrast": 1,
+    "text-overflow": 1,
+    "interaction-blocked": 1,
+    "text-spacing-failure": 1,
+    "text-resize-clip-risk": 1,
+    "mobile-overflow-hidden-400-zoom": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "leistungen",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "team",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "kontakt",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "preise",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "patienteninfo",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "impressum",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "spectrum",
+   "route": "datenschutz",
+   "score": 85,
+   "findings": 4,
+   "critical": 0,
+   "counts": {
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "index",
+   "score": 60,
+   "findings": 36,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 11,
+    "insufficient-text-contrast": 11,
+    "svg-img-alt": 5,
+    "insufficient-focus-indicator-contrast": 1,
+    "text-overflow": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "text-spacing-failure": 2,
+    "text-resize-clip-risk": 1,
+    "mobile-overflow-hidden-400-zoom": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "leistungen",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "team",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "kontakt",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "preise",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "patienteninfo",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "impressum",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "lumen",
+   "route": "datenschutz",
+   "score": 70,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "insufficient-focus-indicator-contrast": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "index",
+   "score": 64,
+   "findings": 31,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 9,
+    "insufficient-text-contrast": 10,
+    "svg-img-alt": 5,
+    "text-overflow": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "text-spacing-failure": 1,
+    "text-resize-clip-risk": 1,
+    "mobile-overflow-hidden-400-zoom": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "leistungen",
+   "score": 72,
+   "findings": 20,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 8,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "text-spacing-failure": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "team",
+   "score": 73,
+   "findings": 25,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 10,
+    "insufficient-text-contrast": 11,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "kontakt",
+   "score": 74,
+   "findings": 19,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 8,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "preise",
+   "score": 74,
+   "findings": 18,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "patienteninfo",
+   "score": 74,
+   "findings": 18,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "impressum",
+   "score": 74,
+   "findings": 18,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  },
+  {
+   "theme": "warmth",
+   "route": "datenschutz",
+   "score": 74,
+   "findings": 18,
+   "critical": 0,
+   "counts": {
+    "color-contrast": 7,
+    "insufficient-text-contrast": 7,
+    "svg-img-alt": 1,
+    "interaction-blocked": 1,
+    "focus-obscured-by-sticky-element": 1,
+    "missing-accessibility-statement": 1
+   },
+   "failed": []
+  }
+ ],
+ "ruleTotals": {
+  "svg-img-alt": 60,
+  "insufficient-focus-indicator-contrast": 32,
+  "text-overflow": 5,
+  "text-spacing-failure": 8,
+  "text-resize-clip-risk": 5,
+  "mobile-overflow-hidden-400-zoom": 5,
+  "missing-accessibility-statement": 40,
+  "focus-obscured-by-fixed-element": 3,
+  "color-contrast": 153,
+  "insufficient-text-contrast": 157,
+  "interaction-blocked": 24,
+  "focus-obscured-by-sticky-element": 16
+ },
+ "failures": []
+}

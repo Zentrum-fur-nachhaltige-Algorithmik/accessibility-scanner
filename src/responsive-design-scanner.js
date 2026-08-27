@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: renderedCode } = require('./utils/rendered');
+const { injectableCode: textClippingCode } = require('./utils/text-clipping');
 
 /**
  * Responsive Design Scanner for WCAG 2.2 compliance testing
@@ -176,6 +178,15 @@ class ResponsiveDesignScanner extends BaseScanner {
         });
       }
 
+      // Restore the real viewport after zoom emulation
+      await page.setViewport({
+        width: viewport.width,
+        height: viewport.height,
+        deviceScaleFactor: viewport.devicePixelRatio || 1
+      });
+      await page.reload({ waitUntil: 'networkidle0' });
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       // 3. Test text spacing at this viewport
       const textSpacingResult = await this.testTextSpacing(page, scanDir, viewport, violations);
       if (!textSpacingResult.spacingOk) {
@@ -202,14 +213,29 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Test specific zoom level for responsive issues
+   * Test specific zoom level for responsive issues.
+   *
+   * Zoom is emulated by SHRINKING THE CSS VIEWPORT (width / zoom), which is
+   * what browser zoom actually does to layout. The former `body.style.zoom`
+   * approach broke position:fixed/sticky and vw units and produced phantom
+   * overflow. WCAG 1.4.10 only requires reflow down to 320 CSS px, so the
+   * emulated width is clamped at 320; a combination whose clamped width is
+   * already covered by a wider base viewport is skipped as redundant.
    */
   async testZoomLevel(page, scanDir, viewport, zoomLevel, violations) {
-    // Set zoom level
-    await page.evaluateOnNewDocument((zoom) => {
-      document.body.style.zoom = zoom / 100;
-    }, zoomLevel);
+    const MIN_REFLOW_WIDTH = 320;
+    const rawWidth = Math.round(viewport.width * 100 / zoomLevel);
+    const rawHeight = Math.round(viewport.height * 100 / zoomLevel);
+    const cssWidth = Math.max(MIN_REFLOW_WIDTH, rawWidth);
+    const cssHeight = Math.max(Math.round(rawHeight * cssWidth / Math.max(rawWidth, 1)), 256);
 
+    // Below 320 CSS px everything clamps to the same 320px layout. Measure it
+    // once (the canonical 320px @ 400% check) and skip the other combinations.
+    if (rawWidth < MIN_REFLOW_WIDTH && !(viewport.width === MIN_REFLOW_WIDTH && zoomLevel === 400)) {
+      return { screenshot: null, hasHorizontalScroll: false, contentLoss: false, textNotReadable: false, skipped: true };
+    }
+
+    await page.setViewport({ width: cssWidth, height: cssHeight, deviceScaleFactor: 1 });
     await page.reload({ waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -224,10 +250,10 @@ class ResponsiveDesignScanner extends BaseScanner {
       const html = document.documentElement;
       
       const scrollWidth = Math.max(body.scrollWidth, html.scrollWidth);
-      const clientWidth = Math.max(body.clientWidth, html.clientWidth);
-      
-      // Check if content overflows horizontally
-      const hasHorizontalScroll = scrollWidth > clientWidth;
+      const clientWidth = window.innerWidth;
+
+      // 1px tolerance: sub-pixel rounding of borders/shadows is not a reflow failure
+      const hasHorizontalScroll = scrollWidth > clientWidth + 1;
       
       // Check for content that might be cut off or overlapping
       const elements = document.querySelectorAll('*');
@@ -246,25 +272,39 @@ class ResponsiveDesignScanner extends BaseScanner {
           contentLoss = true;
         }
 
-        // Check for overlapping text — skip off-screen/visually-hidden elements
-        if (style.position === 'absolute' || style.position === 'fixed') {
-          // Skip elements that are intentionally off-screen (skip links, sr-only, etc.)
+        // Overlapping text: an absolutely positioned element painted over a
+        // sibling's text. position:fixed overlays (sticky CTAs, headers,
+        // cookie banners) float above the page by design and are skipped;
+        // they are checked by the focus-obscured logic instead.
+        if (style.position === 'absolute') {
           if (rect.width <= 1 || rect.height <= 1) return;
           if (rect.right < 0 || rect.bottom < 0) return;
           if (style.clip && style.clip !== 'auto') return;
           if (style.clipPath && style.clipPath !== 'none') return;
+          if (style.pointerEvents === 'none' && parseFloat(style.opacity) < 1) return;
+          const ownText = (el.textContent || '').trim().length > 0;
+          const bg = style.backgroundColor;
+          const opaqueBg = bg && !/rgba\(\s*\d+,\s*\d+,\s*\d+,\s*0\s*\)/.test(bg) && bg !== 'transparent';
+          if (!ownText && !opaqueBg && style.backgroundImage === 'none') return; // invisible box
+          const area = rect.width * rect.height;
 
           const siblings = Array.from(el.parentElement?.children || []);
           siblings.forEach(sibling => {
-            if (sibling !== el) {
-              const siblingStyle = window.getComputedStyle(sibling);
-              if (siblingStyle.display === 'none' || siblingStyle.visibility === 'hidden') return;
-              const siblingRect = sibling.getBoundingClientRect();
-              if (siblingRect.width === 0 || siblingRect.height === 0) return;
-              if (rect.left < siblingRect.right && rect.right > siblingRect.left &&
-                  rect.top < siblingRect.bottom && rect.bottom > siblingRect.top) {
-                overlappingElements++;
-              }
+            if (sibling === el) return;
+            const siblingStyle = window.getComputedStyle(sibling);
+            if (siblingStyle.display === 'none' || siblingStyle.visibility === 'hidden') return;
+            if (siblingStyle.position === 'absolute' || siblingStyle.position === 'fixed') return;
+            const hasText = Array.from(sibling.childNodes).some(n => n.nodeType === 3 && n.textContent.trim());
+            if (!hasText) return;
+            const siblingRect = sibling.getBoundingClientRect();
+            if (siblingRect.width === 0 || siblingRect.height === 0) return;
+            const ix = Math.min(rect.right, siblingRect.right) - Math.max(rect.left, siblingRect.left);
+            const iy = Math.min(rect.bottom, siblingRect.bottom) - Math.max(rect.top, siblingRect.top);
+            if (ix <= 0 || iy <= 0) return;
+            const overlap = ix * iy;
+            // Meaningful only when a substantial part of the text block is covered
+            if (overlap / (siblingRect.width * siblingRect.height) > 0.25 || overlap / area > 0.5) {
+              overlappingElements++;
             }
           });
         }
@@ -355,30 +395,17 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Test text spacing customization (WCAG 1.4.12)
+   * Test text spacing customization (WCAG 1.4.12).
+   *
+   * Measures clipping BEFORE and AFTER injecting the 1.4.12 values and reports
+   * only text that becomes NEWLY clipped — carousels, custom scrollbars and
+   * decorative overflow:hidden containers that were already "overflowing"
+   * before the injection are not 1.4.12 failures. One finding per element.
    */
   async testTextSpacing(page, scanDir, viewport, violations) {
     console.log(`  Testing text spacing for ${viewport.name}...`);
 
-    // Apply text spacing modifications per WCAG 1.4.12
-    const spacingResult = await page.evaluate(() => {
-      // Store original styles
-      const originalStyles = [];
-      const allElements = document.querySelectorAll('*');
-      
-      allElements.forEach(el => {
-        const style = window.getComputedStyle(el);
-        originalStyles.push({
-          element: el,
-          lineHeight: style.lineHeight,
-          letterSpacing: style.letterSpacing,
-          wordSpacing: style.wordSpacing
-        });
-      });
-
-      // Apply WCAG 1.4.12 text spacing requirements
-      const style = document.createElement('style');
-      style.textContent = `
+    const SPACING_CSS = `
         * {
           line-height: 1.5 !important;
           letter-spacing: 0.12em !important;
@@ -387,83 +414,158 @@ class ResponsiveDesignScanner extends BaseScanner {
         p {
           margin-bottom: 2em !important;
         }
-      `;
+    `;
+
+    const spacingResult = await page.evaluate((renderedCode, css) => {
+      eval(renderedCode);
+
+      function selectorOf(el) {
+        return el.tagName.toLowerCase() +
+          (el.id ? `#${el.id}` : '') +
+          (el.className && typeof el.className === 'string' && el.className.trim()
+            ? `.${el.className.trim().split(/\s+/).slice(0, 2).join('.')}` : '');
+      }
+
+      function hasDirectText(el) {
+        for (const n of el.childNodes) {
+          if (n.nodeType === 3 && n.textContent.trim().length > 0) return true;
+        }
+        return false;
+      }
+
+      /** Nearest ancestor (or self) that clips on the given axis. */
+      function clipperOf(el) {
+        let n = el;
+        while (n && n !== document.documentElement) {
+          const cs = window.getComputedStyle(n);
+          const cx = cs.overflowX === 'hidden' || cs.overflowX === 'clip';
+          const cy = cs.overflowY === 'hidden' || cs.overflowY === 'clip';
+          if (cx || cy) return { el: n, cx, cy };
+          n = n.parentElement;
+        }
+        return null;
+      }
+
+      /** Union rect of the element's direct text nodes. */
+      function textRect(el) {
+        const range = document.createRange();
+        let out = null;
+        for (const n of el.childNodes) {
+          if (n.nodeType !== 3 || !n.textContent.trim()) continue;
+          range.selectNodeContents(n);
+          for (const r of range.getClientRects()) {
+            if (r.width === 0 || r.height === 0) continue;
+            out = out
+              ? { left: Math.min(out.left, r.left), top: Math.min(out.top, r.top), right: Math.max(out.right, r.right), bottom: Math.max(out.bottom, r.bottom) }
+              : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+          }
+        }
+        return out;
+      }
+
+      /** Pixels of the element's text lying outside its clipping container (0 = not clipped). */
+      function clippedPx(el, clipper) {
+        if (!clipper) return 0;
+        const t = textRect(el);
+        if (!t) return 0;
+        const c = clipper.el.getBoundingClientRect();
+        let px = 0;
+        if (clipper.cx) px = Math.max(px, t.right - c.right, c.left - t.left);
+        if (clipper.cy) px = Math.max(px, t.bottom - c.bottom, c.top - t.top);
+        return px > 1 ? px : 0; // sub-pixel rounding is not clipping
+      }
+
+      function verticallyClipped(el, clipper) {
+        const t = textRect(el);
+        if (!t) return false;
+        const c = clipper.el.getBoundingClientRect();
+        return t.bottom - c.bottom > 1 || c.top - t.top > 1;
+      }
+
+      const candidates = [];
+      document.querySelectorAll('body *').forEach(el => {
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'script' || tag === 'style' || tag === 'noscript' || tag === 'svg') return;
+        if (!hasDirectText(el) || !__isRendered(el)) return;
+        const clipper = clipperOf(el);
+        if (!clipper) return;
+        const cs = window.getComputedStyle(el);
+        const fs = parseFloat(cs.fontSize) || 16;
+        const lh = cs.lineHeight === 'normal' ? 1.2 * fs : parseFloat(cs.lineHeight);
+        const ls = cs.letterSpacing === 'normal' ? 0 : parseFloat(cs.letterSpacing);
+        const ws = cs.wordSpacing === 'normal' ? 0 : parseFloat(cs.wordSpacing);
+        // Already at (or beyond) the 1.4.12 values: baseline clipping IS the 1.4.12 state.
+        const alreadySpaced = lh >= 1.5 * fs - 0.5 && ls >= 0.12 * fs - 0.1 && ws >= 0.16 * fs - 0.1;
+        const truncated = cs.whiteSpace === 'nowrap' || cs.textOverflow === 'ellipsis';
+        candidates.push({ el, clipper, before: clippedPx(el, clipper), alreadySpaced, truncated });
+      });
+
+      const style = document.createElement('style');
+      style.setAttribute('data-a11y-text-spacing', '');
+      style.textContent = css;
       document.head.appendChild(style);
 
-      // Wait for layout to settle
       return new Promise(resolve => {
         setTimeout(() => {
-          // Check for layout breaks
-          let layoutBroken = false;
-          let overlappingText = false;
-          let cutOffContent = false;
-          
-          allElements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            const computedStyle = window.getComputedStyle(el);
-            
-            // Check for content that overflows or gets cut off
-            if (computedStyle.overflow === 'hidden' && 
-                (el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight)) {
-              cutOffContent = true;
+          const issues = [];
+          for (const c of candidates) {
+            const after = clippedPx(c.el, c.clipper);
+            if (!__isRendered(c.el)) continue;
+            // Text that WAS fully visible and is clipped by the injected spacing, or already clipped on a page
+            // that already applies 1.4.12 spacing (vertical clipping only — a
+            // horizontally clipped baseline is a carousel/marquee/ellipsis, not 1.4.12).
+            const newlyClipped = c.before === 0 && after > 0;
+            const clippedAtSpec = after > 0 && c.alreadySpaced && !c.truncated && c.clipper.cy && verticallyClipped(c.el, c.clipper);
+            if (newlyClipped || clippedAtSpec) {
+              issues.push({
+                element: selectorOf(c.el),
+                container: selectorOf(c.clipper.el),
+                clippedPx: Math.round(after),
+                text: c.el.textContent.trim().slice(0, 60),
+              });
             }
-            
-            // Check for negative margins or positions that might indicate broken layout
-            if (rect.width < 0 || rect.height < 0) {
-              layoutBroken = true;
-            }
-          });
-
-          // Remove the test style
+          }
           document.head.removeChild(style);
-          
-          resolve({
-            layoutBroken,
-            overlappingText,
-            cutOffContent
-          });
+          resolve({ issues, candidates: candidates.length });
         }, 500);
       });
-    });
+    }, renderedCode, SPACING_CSS);
 
-    // Take screenshot with modified text spacing
-    const spacingScreenshot = path.join(scanDir, `${viewport.name.replace(/\s+/g, '-')}-text-spacing.png`);
-    
-    // Temporarily apply spacing for screenshot
-    await page.addStyleTag({
-      content: `
-        * {
-          line-height: 1.5 !important;
-          letter-spacing: 0.12em !important;
-          word-spacing: 0.16em !important;
-        }
-        p {
-          margin-bottom: 2em !important;
-        }
-      `
-    });
-    
+    // Screenshot with the spacing applied, then restore the page state
+    const screenshotName = `${viewport.name.replace(/\s+/g, '-')}-text-spacing.png`;
+    await page.addStyleTag({ content: SPACING_CSS }).then(h => h && h.evaluate(el => el.setAttribute('data-a11y-text-spacing', '')).catch(() => {}));
     await new Promise(resolve => setTimeout(resolve, 300));
-    await page.screenshot({ path: spacingScreenshot, fullPage: true });
+    await page.screenshot({ path: path.join(scanDir, screenshotName), fullPage: true });
+    await page.evaluate(() => {
+      document.querySelectorAll('style[data-a11y-text-spacing]').forEach(el => el.remove());
+    });
 
-    if (spacingResult.layoutBroken || spacingResult.cutOffContent) {
+    for (const issue of spacingResult.issues.slice(0, 20)) {
       violations.push({
         criterion: "9.1.4.12",
+        element: issue.element,
         viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
         issue: "text-spacing-failure",
-        description: "Layout breaks when text spacing is customized per WCAG requirements",
-        screenshot: `${viewport.name.replace(/\s+/g, '-')}-text-spacing.png`,
-        suggestion: "Design layout to accommodate user text spacing customizations"
+        description: `Text in ${issue.element} is clipped by ${issue.clippedPx}px inside ${issue.container} when WCAG 1.4.12 text spacing is applied ("${issue.text}")`,
+        screenshot: screenshotName,
+        suggestion: "Let the container grow with its content (avoid fixed heights with overflow:hidden on text) so user text-spacing overrides do not clip text"
       });
     }
+    if (spacingResult.issues.length > 20) {
+      console.log(`  text-spacing: ${spacingResult.issues.length} clipped elements, reporting first 20`);
+    }
 
-    return {
-      spacingOk: !spacingResult.layoutBroken && !spacingResult.cutOffContent
-    };
+    return { spacingOk: spacingResult.issues.length === 0 };
   }
 
   /**
    * Test content reflow at critical breakpoints
+   *
+   * `fixed-width-element` is derived from the *authored* CSS (inline style or a
+   * matching style rule), never from `getComputedStyle().width` — the computed
+   * value is always a used px length, so reading it would flag every element
+   * that happens to be wider than 320px (fluid tables, `width:100%` wrappers)
+   * as "fixed width".
    */
   async testContentReflow(page, scanDir, violations, options) {
     console.log('Testing content reflow at 320px...');
@@ -475,6 +577,7 @@ class ResponsiveDesignScanner extends BaseScanner {
     const reflowAnalysis = await page.evaluate(() => {
       const body = document.body;
       const html = document.documentElement;
+      const viewportWidth = window.innerWidth || 320;
 
       // Check if an element or any ancestor has overflow:auto/scroll (scrollable container)
       function isInsideScrollableContainer(el) {
@@ -485,6 +588,53 @@ class ResponsiveDesignScanner extends BaseScanner {
           parent = parent.parentElement;
         }
         return false;
+      }
+
+      /**
+       * Authored (declared) width/min-width of an element in px, or null.
+       * Looks at the inline style first, then at every matching CSSStyleRule
+       * whose media query currently applies. Only absolute px declarations
+       * count — %, vw, rem-with-max-width etc. reflow by definition.
+       */
+      const styleRules = [];
+      try {
+        for (const sheet of document.styleSheets) {
+          let rules;
+          try { rules = sheet.cssRules; } catch (e) { continue; } // cross-origin
+          if (!rules) continue;
+          const walk = (list) => {
+            for (const rule of list) {
+              if (rule.media && rule.cssRules) {
+                // Only rules from media queries that currently match
+                if (window.matchMedia(rule.media.mediaText).matches) walk(rule.cssRules);
+                continue;
+              }
+              if (rule.cssRules && !rule.selectorText) { walk(rule.cssRules); continue; }
+              if (!rule.selectorText || !rule.style) continue;
+              const w = rule.style.getPropertyValue('width');
+              const mw = rule.style.getPropertyValue('min-width');
+              if (!w && !mw) continue;
+              styleRules.push({ selector: rule.selectorText, width: w, minWidth: mw });
+            }
+          };
+          walk(rules);
+        }
+      } catch (e) { /* no stylesheets */ }
+
+      function authoredWidths(el) {
+        let width = null;
+        let minWidth = null;
+        const take = (w, mw) => {
+          if (w && w.trim().endsWith('px')) width = w.trim();
+          if (mw && mw.trim().endsWith('px')) minWidth = mw.trim();
+        };
+        for (const r of styleRules) {
+          let matches = false;
+          try { matches = el.matches(r.selector); } catch (e) { continue; } // ::pseudo etc.
+          if (matches) take(r.width, r.minWidth);
+        }
+        take(el.style.width, el.style.minWidth); // inline style wins
+        return { width, minWidth };
       }
 
       // Check for fixed-width elements that don't reflow
@@ -503,9 +653,13 @@ class ResponsiveDesignScanner extends BaseScanner {
         // Skip zero-size elements
         if (rect.width === 0 || rect.height === 0) return;
 
-        // Only flag elements with explicit fixed CSS widths or min-widths that exceed 320px
-        const hasFixedCssWidth = style.width && style.width.includes('px') && parseInt(style.width) > 320;
-        const hasFixedMinWidth = style.minWidth && style.minWidth.includes('px') && parseInt(style.minWidth) > 320;
+        // Only an element that actually overflows the 320px viewport can break reflow
+        if (rect.width <= viewportWidth + 1) return;
+
+        // Only flag elements with an authored fixed width / min-width above 320px
+        const authored = authoredWidths(el);
+        const hasFixedCssWidth = authored.width && parseFloat(authored.width) > 320;
+        const hasFixedMinWidth = authored.minWidth && parseFloat(authored.minWidth) > 320;
 
         if (!hasFixedCssWidth && !hasFixedMinWidth) return;
         // Skip elements properly contained in a scrollable ancestor
@@ -517,14 +671,15 @@ class ResponsiveDesignScanner extends BaseScanner {
 
         fixedElements.push({
           selector,
-          width: rect.width,
-          fixedWidth: style.width,
-          minWidth: style.minWidth
+          width: Math.round(rect.width),
+          fixedWidth: hasFixedCssWidth ? authored.width : null,
+          minWidth: hasFixedMinWidth ? authored.minWidth : null
         });
       });
 
       return {
-        hasHorizontalScroll: Math.max(body.scrollWidth, html.scrollWidth) > 320,
+        // 1px tolerance for sub-pixel rounding of borders/shadows
+        hasHorizontalScroll: Math.max(body.scrollWidth, html.scrollWidth) > viewportWidth + 1,
         fixedElements: fixedElements.slice(0, 10) // Limit to first 10
       };
     });
@@ -551,7 +706,7 @@ class ResponsiveDesignScanner extends BaseScanner {
         element: element.selector,
         viewport: "320px width",
         issue: "fixed-width-element",
-        description: `Element has fixed width (${element.width}px) that exceeds viewport`,
+        description: `Element declares ${element.fixedWidth ? `width: ${element.fixedWidth}` : `min-width: ${element.minWidth}`} and renders ${element.width}px wide, exceeding the 320px reflow viewport`,
         suggestion: "Use relative units (%, em, rem) or responsive design for element widths"
       });
     });
@@ -844,95 +999,55 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic text resize check (WCAG 1.4.4) — detects fixed font sizes and clipping containers
+   * Heuristic text resize check (WCAG 1.4.4) — concurrent-compatible, pure read.
+   *
+   * Reports only text that is *measurably* cut off: `__findClippedText()`
+   * compares the painted line boxes of every text node against the padding box
+   * of its innermost clipping container. Two earlier heuristics were dropped
+   * because neither is evidence of a 1.4.4 failure:
+   *
+   *   - `text-resize-fixed-font` flagged every `font-size: …px` rule. Browser
+   *     zoom scales px text just like rem text, so a px font-size alone is not
+   *     a resize failure; the remaining useful signal (text below 16px) is
+   *     already reported as the informational `small-fixed-font` by the
+   *     text-resize scanner. It produced 390 `serious` findings on the corpus,
+   *     all false positives.
+   *   - the container check read `getComputedStyle(el).height`, which resolves
+   *     to a px used-value for *every* element — so each `overflow: hidden`
+   *     section (e.g. `section#hero` with `scrollHeight === clientHeight`,
+   *     zero clipped characters) was reported as a clipping risk.
    */
   async heuristicTextResizeCheck(page) {
     console.log('Running heuristic text resize check...');
 
-    const result = await page.evaluate(() => {
+    const result = await page.evaluate((renderedCode, clipCode) => {
+      eval(renderedCode);
+      eval(clipCode);
+
       const violations = [];
+      const clipped = window.__findClippedText({ minChars: 3 }) || [];
 
-      function getSelector(el) {
-        return el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
-      }
+      for (const c of clipped) {
+        // Author-declared truncation (ellipsis / -webkit-line-clamp) is a design
+        // decision that applies at every size; the full text stays in the DOM.
+        if (c.truncationDeclared) continue;
 
-      // Scan stylesheets for font-size declarations in px
-      const pxFontRules = [];
-      try {
-        for (const sheet of document.styleSheets) {
-          try {
-            for (const rule of sheet.cssRules || []) {
-              if (!(rule instanceof CSSStyleRule)) continue;
-              const fontSize = rule.style.fontSize;
-              if (fontSize && fontSize.endsWith('px')) {
-                const sel = rule.selectorText || '';
-                // Skip selectors that are pseudo-elements or already use relative patterns
-                if (sel.includes('::')) continue;
-                const matched = document.querySelectorAll(sel);
-                if (matched.length > 0) {
-                  pxFontRules.push({ selector: sel, fontSize, count: matched.length });
-                }
-              }
-            }
-          } catch (e) { /* cross-origin */ }
-        }
-      } catch (e) { /* no stylesheets */ }
+        const axis = c.axis === 'both'
+          ? `${c.overshootX}px horizontally and ${c.overshootY}px vertically`
+          : (c.axis === 'horizontal' ? `${c.overshootX}px horizontally` : `${c.overshootY}px vertically`);
 
-      // Report px font-size rules
-      for (const rule of pxFontRules) {
         violations.push({
           criterion: '9.1.4.4',
-          element: rule.selector,
-          issue: 'text-resize-fixed-font',
-          description: `CSS rule "${rule.selector}" sets font-size: ${rule.fontSize} (absolute unit) affecting ${rule.count} element(s). Text may not resize properly to 200%`,
+          element: c.selector,
+          issue: 'text-resize-clip-risk',
+          description: `Text is cut off inside ${c.selector} (overflow: ${c.overflow}, height: ${c.height}): ${c.clippedChars} characters extend ${axis} beyond the visible box, e.g. "${c.samples[0]}"`,
           severity: 'serious',
-          suggestion: 'Use relative units (rem, em, %) for font-size to allow text to scale with user zoom.',
+          suggestion: 'Use min-height instead of a fixed height, or change overflow to auto/visible, so the text stays visible when it is enlarged.',
         });
       }
 
-      function isSrOnlyResize(el) {
-        if (!el || el.nodeType !== 1) return false;
-        const cls = el.className || '';
-        if (typeof cls === 'string' && (/\bsr-only\b/.test(cls) || /\bvisually-hidden\b/.test(cls))) return true;
-        const s = window.getComputedStyle(el);
-        if (s.position !== 'absolute' && s.position !== 'fixed') return false;
-        const w = parseFloat(s.width), h = parseFloat(s.height);
-        if (w > 1 || h > 1) return false;
-        if (s.overflow !== 'hidden') return false;
-        return true;
-      }
-
-      // Check for fixed-height containers with overflow:hidden that contain text
-      const allElements = document.querySelectorAll('*');
-      allElements.forEach(el => {
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden') return;
-        if (isSrOnlyResize(el)) return;
-
-        const isOverflowHidden = style.overflow === 'hidden' ||
-          style.overflowY === 'hidden';
-        const height = style.height;
-        const hasFixedHeight = height && height !== 'auto' && height.endsWith('px');
-
-        if (isOverflowHidden && hasFixedHeight) {
-          const text = el.textContent.trim();
-          if (text && text.length > 10) {
-            violations.push({
-              criterion: '9.1.4.4',
-              element: getSelector(el),
-              issue: 'text-resize-clip-risk',
-              description: `Text container with height: ${height} and overflow: hidden will clip content when text is zoomed to 200%`,
-              severity: 'serious',
-              suggestion: 'Use min-height instead of fixed height, or change overflow to auto/visible.',
-            });
-          }
-        }
-      });
-
       return { violations };
-    });
+    }, renderedCode, textClippingCode);
 
     console.log(`Heuristic text resize check complete: ${result.violations.length} violations found`);
     return result;

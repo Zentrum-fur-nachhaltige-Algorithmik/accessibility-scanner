@@ -133,6 +133,8 @@ description: Properly implemented hover/focus content
             /* GUT: Bleibt offen mit Verzögerung und kann mit Maus erreicht werden */
         }
         
+        /* GUT: Escape setzt .dismissed — Inhalt verschwindet auch bei weiterhin gehaltenem Hover (1.4.13 dismissable) */
+        .good-dropdown.dismissed .good-dropdown-content { display: none !important; }
         .good-dropdown.open .good-dropdown-content,
         .good-dropdown:hover .good-dropdown-content,
         .good-dropdown:focus-within .good-dropdown-content {
@@ -512,13 +514,15 @@ description: Properly implemented hover/focus content
         <div class="good-title">GOOD 1: Persistent Tooltip mit Schließen-Option</div>
         <p><strong>Lösung:</strong> Tooltip bleibt sichtbar wenn Maus darüber ist, kann geschlossen werden</p>
         <div class="interactive-area">
-            <button class="good-tooltip-trigger" aria-describedby="tooltip1">
+            <!-- span[role=button] instead of <button>: a <button> cannot contain another <button>
+                 (the parser would eject the close control out of the tooltip) -->
+            <span class="good-tooltip-trigger" role="button" tabindex="0" aria-describedby="tooltip1">
                 Hover/Focus für Tooltip
                 <div id="tooltip1" class="good-tooltip" role="tooltip">
                     Diese Information bleibt sichtbar bis Sie sie schließen!
                     <button class="close-tooltip" onclick="closeTooltip(this)" aria-label="Tooltip schließen">×</button>
                 </div>
-            </button>
+            </span>
             <p>✅ Tooltip ist stabil - kann mit Maus erreicht und gelesen werden</p>
         </div>
     </div>
@@ -900,9 +904,14 @@ description: Properly implemented hover/focus content
             });
         }
         
+        // Re-arm hover dropdowns once the pointer leaves them
+        document.querySelectorAll('.good-dropdown').forEach(d => d.addEventListener('mouseleave', () => d.classList.remove('dismissed')));
+
         // Global keyboard handlers
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
+                // Dismiss hover-revealed dropdowns without moving the pointer
+                document.querySelectorAll('.good-dropdown').forEach(d => d.classList.add('dismissed'));
                 // Close any open dropdowns
                 const openDropdowns = document.querySelectorAll('.good-dropdown.open');
                 openDropdowns.forEach(dropdown => {

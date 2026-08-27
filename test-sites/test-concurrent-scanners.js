@@ -60,7 +60,6 @@ const CONCURRENT_SCANNERS = {
   'use-of-color': { module: '../src/use-of-color-scanner' },
   'images-of-text': { module: '../src/images-of-text-scanner' },
   'advanced-contrast': { module: '../src/advanced-contrast-scanner' },
-  'nontext-contrast': { module: '../src/phase6a-nontext-contrast-scanner' },
   'screen-reader': { module: '../src/screen-reader-scanner' },
   'media-accessibility': { module: '../src/media-accessibility-scanner' },
   'orientation': { module: '../src/orientation-scanner' },

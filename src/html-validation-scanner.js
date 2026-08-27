@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: accnameUtils } = require('./utils/accessible-name');
 
 /**
  * Enhanced HTML Validation Scanner for WCAG 2.2 compliance testing
@@ -235,7 +236,13 @@ class HTMLValidationScanner extends BaseScanner {
   async validateHTMLStructure(page, violations) {
     console.log('Validating HTML structure...');
 
-    const structureIssues = await page.evaluate(() => {
+    const structureIssues = await page.evaluate((accnameCode) => {
+      // Shared ACCNAME implementation (__accessibleNameInfo) — see
+      // src/utils/accessible-name.js. Used for the empty-heading and
+      // unlabeled-form-control checks below, both of which used to model the
+      // accessibility API as "textContent plus a couple of attributes".
+      eval(accnameCode);
+
       const issues = [];
 
       // Check for common HTML structure issues
@@ -250,8 +257,9 @@ class HTMLValidationScanner extends BaseScanner {
                         (element.id ? `#${element.id}` : '') + 
                         (className ? `.${className.split(' ')[0]}` : '');
 
-        // Check for invalid nesting
-        if (tagName === 'div' && element.closest('span, em, strong, a')) {
+        // Check for invalid nesting. <a> is NOT in the list: its content
+        // model is transparent, so block-level children are valid HTML5.
+        if (tagName === 'div' && element.closest('span, em, strong, b, i, small, label')) {
           issues.push({
             type: 'invalid-nesting',
             element: selector,
@@ -270,30 +278,38 @@ class HTMLValidationScanner extends BaseScanner {
           });
         }
 
-        // Check for empty headings
-        if (/^h[1-6]$/.test(tagName) && !element.textContent.trim()) {
-          issues.push({
-            type: 'empty-heading',
-            element: selector,
-            description: 'Heading element is empty',
-            suggestion: 'Provide meaningful heading text or remove empty heading'
-          });
+        // Check for empty headings.
+        // "Empty" means NO ACCESSIBLE NAME, not empty textContent:
+        // `<h2><img alt="Mozilla Anzeigen"></h2>` announces "Mozilla Anzeigen".
+        if (/^h[1-6]$/.test(tagName)) {
+          const headingName = __accessibleNameInfo(element);
+          if (!headingName.name) {
+            issues.push({
+              type: 'empty-heading',
+              element: selector,
+              description: `Heading element has no accessible name (${headingName.reason || 'no naming mechanism'})`,
+              suggestion: 'Provide meaningful heading text or remove empty heading'
+            });
+          }
         }
 
-        // Check for form controls without labels
-        if (['input', 'textarea', 'select'].includes(tagName) && 
+        // Check for form controls without labels.
+        // The shared helper covers label[for], wrapping <label> (implicit
+        // association), aria-label(ledby), title, `value` on button-type inputs
+        // and `alt` on <input type="image"> — the last of which this check used
+        // to miss, reporting a perfectly-named image submit button as unlabeled.
+        // A `label`/`aria-labelledby` that resolves to empty text is now
+        // correctly treated as NO name (it previously counted as labelled).
+        if (['input', 'textarea', 'select'].includes(tagName) &&
             element.type !== 'hidden' && element.type !== 'submit' && element.type !== 'button') {
-          
-          const hasLabel = element.hasAttribute('aria-label') ||
-                          element.hasAttribute('aria-labelledby') ||
-                          document.querySelector(`label[for="${element.id}"]`) ||
-                          element.closest('label');
-          
-          if (!hasLabel) {
+
+          const controlName = __accessibleNameInfo(element);
+
+          if (!controlName.name) {
             issues.push({
               type: 'unlabeled-form-control',
               element: selector,
-              description: 'Form control missing accessible label',
+              description: `Form control has no accessible name (${controlName.reason || 'no naming mechanism'})`,
               suggestion: 'Add label element, aria-label, or aria-labelledby attribute'
             });
           }
@@ -347,7 +363,7 @@ class HTMLValidationScanner extends BaseScanner {
       });
 
       return issues;
-    });
+    }, accnameUtils);
 
     // Create violations for structure issues
     structureIssues.forEach(issue => {
@@ -757,54 +773,43 @@ class HTMLValidationScanner extends BaseScanner {
   async validateButtonNames(page, violations) {
     console.log('Validating button names...');
     
-    const buttonIssues = await page.evaluate(() => {
+    const buttonIssues = await page.evaluate((accnameCode) => {
+      // Shared ACCNAME implementation — see src/utils/accessible-name.js.
+      // Replaces the local attribute chain, which read only textContent for the
+      // element's own text and therefore reported an icon button whose only
+      // child is `<img alt="Menu">` (or an inline `<svg><title>`) as unnamed.
+      eval(accnameCode);
+
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
+        const className = element.className && typeof element.className === 'string'
+          ? `.${element.className.split(' ')[0]}`
           : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
       const buttons = document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"], [role="button"]');
-      
+
       buttons.forEach((button, index) => {
         const selector = getElementSelector(button);
-        let accessibleName = '';
-        
-        // Get accessible name from various sources
-        if (button.hasAttribute('aria-label')) {
-          accessibleName = button.getAttribute('aria-label').trim();
-        } else if (button.hasAttribute('aria-labelledby')) {
-          const labelId = button.getAttribute('aria-labelledby');
-          const labelElement = document.getElementById(labelId);
-          if (labelElement) {
-            accessibleName = labelElement.textContent.trim();
-          }
-        } else if (button.hasAttribute('title')) {
-          accessibleName = button.getAttribute('title').trim();
-        } else if (button.textContent) {
-          accessibleName = button.textContent.trim();
-        } else if (button.hasAttribute('value')) {
-          accessibleName = button.getAttribute('value').trim();
-        }
-        
-        if (!accessibleName) {
+        const nameInfo = __accessibleNameInfo(button);
+
+        if (!nameInfo.name) {
           issues.push({
             type: 'button-name',
             element: selector,
-            description: 'Button has no accessible name',
+            description: `Button has no accessible name (${nameInfo.reason || 'no naming mechanism'})`,
             severity: 'critical',
             suggestion: 'Add aria-label, text content, or value attribute to provide accessible name'
           });
         }
       });
-      
+
       return issues;
-    });
+    }, accnameUtils);
     
     buttonIssues.forEach(issue => {
       violations.push({
@@ -824,63 +829,44 @@ class HTMLValidationScanner extends BaseScanner {
   async validateLinkNames(page, violations) {
     console.log('Validating link names...');
     
-    const linkIssues = await page.evaluate(() => {
+    const linkIssues = await page.evaluate((accnameCode) => {
+      // Shared ACCNAME implementation — see src/utils/accessible-name.js.
+      // The local version already walked child `<img alt>`, but resolved
+      // `aria-labelledby` as a SINGLE id (the attribute is an ID *list*) and
+      // preferred `title` over the subtree, both of which disagree with what a
+      // screen reader announces.
+      eval(accnameCode);
+
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
         const id = element.id ? `#${element.id}` : '';
-        const className = element.className && typeof element.className === 'string' 
-          ? `.${element.className.split(' ')[0]}` 
+        const className = element.className && typeof element.className === 'string'
+          ? `.${element.className.split(' ')[0]}`
           : '';
         return `${tagName}${id}${className}`;
       }
-      
+
       const issues = [];
       const links = document.querySelectorAll('a[href], [role="link"]');
-      
+
       links.forEach((link, index) => {
         const selector = getElementSelector(link);
-        let accessibleName = '';
-        
-        // Get accessible name from various sources
-        if (link.hasAttribute('aria-label')) {
-          accessibleName = link.getAttribute('aria-label').trim();
-        } else if (link.hasAttribute('aria-labelledby')) {
-          const labelId = link.getAttribute('aria-labelledby');
-          const labelElement = document.getElementById(labelId);
-          if (labelElement) {
-            accessibleName = labelElement.textContent.trim();
-          }
-        } else if (link.hasAttribute('title')) {
-          accessibleName = link.getAttribute('title').trim();
-        } else {
-          // Get text content, including alt text from images
-          let textContent = '';
-          const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
-          let node;
-          while (node = walker.nextNode()) {
-            if (node.nodeType === Node.TEXT_NODE) {
-              textContent += node.textContent;
-            } else if (node.tagName === 'IMG' && node.hasAttribute('alt')) {
-              textContent += node.getAttribute('alt');
-            }
-          }
-          accessibleName = textContent.trim();
-        }
-        
-        if (!accessibleName) {
+        const nameInfo = __accessibleNameInfo(link);
+
+        if (!nameInfo.name) {
           issues.push({
             type: 'link-name',
             element: selector,
-            description: 'Link has no accessible name',
+            description: `Link has no accessible name (${nameInfo.reason || 'no naming mechanism'})`,
             severity: 'critical',
             suggestion: 'Add aria-label, text content, or meaningful link text'
           });
         }
       });
-      
+
       return issues;
-    });
+    }, accnameUtils);
     
     linkIssues.forEach(issue => {
       violations.push({

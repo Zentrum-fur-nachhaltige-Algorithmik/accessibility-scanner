@@ -1,7 +1,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { tabWalk, cleanupTabWalk } = require('./utils/keyboard-focus');
 const { injectableCode: contrastUtils } = require('./utils/browser-contrast');
+const { injectableCode: renderedUtils } = require('./utils/rendered');
 
 /**
  * Non-text Contrast Scanner for WCAG 1.4.11 compliance testing
@@ -16,6 +18,12 @@ class NonTextContrastScanner extends BaseScanner {
         });
         this.screenshotDir = path.join(__dirname, '../tmp/nontext-contrast-screenshots');
     }
+
+    /**
+     * Focus-indicator analysis drives real keyboard focus (Tab) and scrolls
+     * the page; that must not happen on a tab shared with other scanners.
+     */
+    get needsExclusiveAccess() { return true; }
 
     /**
      * Core scan method. Receives an already-navigated Puppeteer page.
@@ -45,29 +53,35 @@ class NonTextContrastScanner extends BaseScanner {
         });
 
         const violations = [];
+        // Elements whose rendered contrast could not be determined from CSS
+        // (gradients, background images, canvas). Reported separately so an
+        // unknown is never counted as a failure.
+        const incomplete = [];
+
+        const collect = (result) => {
+            if (!result) return;
+            violations.push(...(result.violations || []));
+            incomplete.push(...(result.incomplete || []));
+        };
 
         // Analyze UI components
         if (scanOptions.checkInteractiveElements) {
-            const uiViolations = await this.analyzeUIComponents(page, scanOptions);
-            violations.push(...uiViolations);
+            collect(await this.analyzeUIComponents(page, scanOptions));
         }
 
         // Analyze graphical objects
         if (scanOptions.checkGraphicalObjects) {
-            const graphicsViolations = await this.analyzeGraphicalObjects(page, scanOptions);
-            violations.push(...graphicsViolations);
+            collect(await this.analyzeGraphicalObjects(page, scanOptions));
         }
 
         // Analyze focus indicators
         if (scanOptions.checkFocusIndicators) {
-            const focusViolations = await this.analyzeFocusIndicators(page, scanOptions);
-            violations.push(...focusViolations);
+            collect(await this.analyzeFocusIndicators(page, scanOptions));
         }
 
         // Analyze interactive states
         if (scanOptions.checkStateChanges) {
-            const stateViolations = await this.analyzeInteractiveStates(page, scanOptions);
-            violations.push(...stateViolations);
+            collect(await this.analyzeInteractiveStates(page, scanOptions));
         }
 
         return {
@@ -75,12 +89,14 @@ class NonTextContrastScanner extends BaseScanner {
             criteria: ["1.4.11"],
             passed: violations.length === 0,
             violations: violations,
+            incomplete: incomplete,
             summary: {
-                totalElementsChecked: violations.length + this.getPassedElementsCount(violations),
+                totalElementsChecked: await this.countCheckedElements(page),
                 uiComponentIssues: violations.filter(v => v.category === 'ui-component').length,
                 graphicalObjectIssues: violations.filter(v => v.category === 'graphical-object').length,
                 focusIndicatorIssues: violations.filter(v => v.category === 'focus-indicator').length,
                 stateChangeIssues: violations.filter(v => v.category === 'state-change').length,
+                incompleteElements: incomplete.length,
                 averageContrastRatio: this.calculateAverageContrast(violations)
             },
             screenshotPath: screenshotPath,
@@ -92,215 +108,251 @@ class NonTextContrastScanner extends BaseScanner {
      * Analyze UI components for contrast compliance
      */
     async analyzeUIComponents(page, options) {
-        return await page.evaluate((contrastThreshold, contrastCode) => {
+        return await page.evaluate((contrastThreshold, contrastCode, renderedCode) => {
             // Inject the shared WCAG contrast helpers (__parseRgb, __getLuminance,
-            // __getContrastRatio, __getEffectiveBackgroundColor, __isColorTransparent).
+            // __getContrastRatio, __blendOver, __resolveBackground, __isInactive,
+            // __getRenderedBorder, __hasCompliantBorder, __isColorTransparent)
+            // and the rendering test (__isRendered).
             eval(contrastCode);
+            eval(renderedCode);
 
             const violations = [];
+            const incomplete = [];
 
-            // WCAG contrast ratio between two computed CSS colours.
-            // Unparseable colours return 21 (i.e. "no finding") rather than
-            // silently degrading to black, which used to invent violations.
-            function getContrastRatio(color1, color2) {
-                const rgb1 = __parseRgb(color1);
-                const rgb2 = __parseRgb(color2);
-                if (!rgb1 || !rgb2) return 21;
-                return __getContrastRatio(rgb1, rgb2);
-            }
+            function rgbString(c) { return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')'; }
 
-            // Effective background behind an element: walks ancestors until a
-            // non-transparent background is found (a transparent immediate parent
-            // must not be reported as the background — <body> may be the painter).
-            function getBackgroundColor(element) {
-                if (!element) return 'rgb(255, 255, 255)';
-                const bg = __getEffectiveBackgroundColor(element);
-                return 'rgb(' + bg.r + ', ' + bg.g + ', ' + bg.b + ')';
-            }
+            /**
+             * Evaluate one UI component against SC 1.4.11.
+             *
+             * Three things this deliberately does that the naive version did not:
+             *  - the backdrop is the first ancestor that actually PAINTS
+             *    (__resolveBackground), never `element.parentElement`'s own
+             *    computed background — a transparent parent used to yield
+             *    rgba(0,0,0,0) and a bogus 1:1 ratio;
+             *  - translucent fills and borders are alpha-composited onto that
+             *    backdrop before any ratio is taken — rgba(0,0,0,0.7) does not
+             *    render as black;
+             *  - a component whose painted border already reaches the threshold
+             *    is not additionally required to have a contrasting FILL. SC
+             *    1.4.11 governs "the visual information required to identify"
+             *    the component, and a compliant border is that information. The
+             *    standard accessible pattern (white input, white page, dark
+             *    border) otherwise fails for no reason.
+             */
+            function evaluateComponent(element, index, config) {
+                // SC 1.4.11 exception: inactive user interface components.
+                if (__isInactive(element)) return;
+                // Nothing that is not painted can fail a CONTRAST criterion. A
+                // `display:none` hamburger button in a desktop layout has no
+                // client rects at all, yet its computed white-on-white style
+                // used to be measured and reported as a 1:1 failure.
+                if (!__isRendered(element)) return;
 
-            // A border is only painted when its style is not none/hidden AND its
-            // used width is > 0. `border: none` still computes a border-color
-            // (CSS initial value `currentColor`, i.e. the text colour), so
-            // border-color alone is never evidence that a border exists.
-            // Returns the first actually-painted, non-transparent side, or null.
-            function getRenderedBorder(styles) {
-                const sides = ['Top', 'Right', 'Bottom', 'Left'];
-                for (const side of sides) {
-                    const borderStyle = styles['border' + side + 'Style'];
-                    const borderWidth = parseFloat(styles['border' + side + 'Width']);
-                    const borderColor = styles['border' + side + 'Color'];
-                    if (borderStyle && borderStyle !== 'none' && borderStyle !== 'hidden' &&
-                        borderWidth > 0 && !__isColorTransparent(borderColor)) {
-                        return {
-                            color: borderColor,
-                            side: side.toLowerCase(),
-                            width: styles['border' + side + 'Width'],
-                            style: borderStyle
-                        };
+                const styles = window.getComputedStyle(element);
+                const background = __resolveBackground(element.parentElement || element);
+
+                if (background.indeterminate) {
+                    incomplete.push({
+                        type: 'indeterminate-component-background',
+                        category: 'ui-component',
+                        element: `${element.tagName.toLowerCase()}[${index}]`,
+                        description: 'Component sits on an image or gradient background; its rendered contrast cannot be computed from CSS and needs manual review.',
+                        details: {
+                            backgroundImage: background.indeterminateSource,
+                            tagName: element.tagName.toLowerCase(),
+                            id: element.id || null
+                        },
+                        wcagCriteria: '1.4.11'
+                    });
+                    return;
+                }
+
+                const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
+                const renderedBorder = __getRenderedBorder(styles);
+                const compliantBorder = __hasCompliantBorder(styles, backdrop, contrastThreshold);
+                // "Visual information required to identify" the component: a
+                // label or an icon glyph with sufficient contrast IS that
+                // information, so neither the border nor the fill has to carry
+                // it. Computed once and applied to BOTH branches — the fill
+                // branch used to skip this guard, so a transparent icon button
+                // with a 14:1 glyph still failed on its invisible fill.
+                const alt = __hasAlternativeIdentifier(element, backdrop, contrastThreshold);
+
+                // Border contrast (only for borders that are actually painted,
+                // and only when nothing else — label text, icon glyph — already
+                // identifies the component with sufficient contrast).
+                if (renderedBorder && !compliantBorder) {
+                    const borderRgb = __parseRgb(renderedBorder.color);
+                    if (borderRgb && !alt.by) {
+                        const flattened = __blendOver(borderRgb, backdrop);
+                        const contrast = __getContrastRatio(flattened, backdrop);
+                        if (contrast < contrastThreshold) {
+                            violations.push({
+                                type: config.borderType,
+                                category: 'ui-component',
+                                severity: 'serious',
+                                element: `${element.tagName.toLowerCase()}[${index}]`,
+                                description: config.borderDescription,
+                                details: {
+                                    borderColor: renderedBorder.color,
+                                    borderSide: renderedBorder.side,
+                                    borderWidth: renderedBorder.width,
+                                    backgroundColor: rgbString(backdrop),
+                                    contrastRatio: Math.round(contrast * 100) / 100,
+                                    required: contrastThreshold,
+                                    tagName: element.tagName.toLowerCase(),
+                                    role: element.getAttribute('role') || null,
+                                    type: element.type || null,
+                                    id: element.id || null,
+                                    className: (typeof element.className === 'string' && element.className) || null
+                                },
+                                wcagCriteria: '1.4.11',
+                                impact: config.borderImpact
+                            });
+                        }
                     }
                 }
-                return null;
+
+                // Fill contrast — only relevant when no compliant border already
+                // identifies the component's boundary.
+                if (config.checkFill && !compliantBorder && !alt.by) {
+                    const ownBg = __parseRgb(styles.backgroundColor);
+                    if (ownBg && ownBg.a > 0) {
+                        const flattened = __blendOver(ownBg, backdrop);
+                        const contrast = __getContrastRatio(flattened, backdrop);
+                        if (contrast < contrastThreshold) {
+                            violations.push({
+                                type: 'insufficient-background-contrast',
+                                category: 'ui-component',
+                                severity: 'moderate',
+                                element: `${element.tagName.toLowerCase()}[${index}]`,
+                                description: 'Component background has insufficient contrast',
+                                details: {
+                                    backgroundColor: styles.backgroundColor,
+                                    renderedBackgroundColor: rgbString(flattened),
+                                    parentBackground: rgbString(backdrop),
+                                    contrastRatio: Math.round(contrast * 100) / 100,
+                                    required: contrastThreshold,
+                                    tagName: element.tagName.toLowerCase(),
+                                    id: element.id || null
+                                },
+                                wcagCriteria: '1.4.11',
+                                impact: 'Component is not easily distinguishable from background'
+                            });
+                        }
+                    }
+                }
             }
 
-            // Check buttons
+            // Buttons
             const buttons = document.querySelectorAll('button, input[type="button"], input[type="submit"], input[type="reset"]');
             for (let i = 0; i < buttons.length; i++) {
-                const button = buttons[i];
-                const styles = window.getComputedStyle(button);
-                const renderedBorder = getRenderedBorder(styles);
-                const backgroundColor = styles.backgroundColor;
-                const parentBg = getBackgroundColor(button.parentElement);
-
-                // Check border contrast (only for borders that are actually painted)
-                if (renderedBorder) {
-                    const contrast = getContrastRatio(renderedBorder.color, parentBg);
-                    if (contrast < contrastThreshold) {
-                        violations.push({
-                            type: 'insufficient-border-contrast',
-                            category: 'ui-component',
-                            severity: 'serious',
-                            element: `button[${i}]`,
-                            description: 'Button border has insufficient contrast against background',
-                            details: {
-                                borderColor: renderedBorder.color,
-                                borderSide: renderedBorder.side,
-                                borderWidth: renderedBorder.width,
-                                backgroundColor: parentBg,
-                                contrastRatio: Math.round(contrast * 100) / 100,
-                                required: contrastThreshold,
-                                tagName: button.tagName.toLowerCase(),
-                                type: button.type || null,
-                                id: button.id || null,
-                                className: button.className || null
-                            },
-                            wcagCriteria: '1.4.11',
-                            impact: 'Button boundaries are not clearly visible'
-                        });
-                    }
-                }
-
-                // Check background contrast for filled buttons
-                if (backgroundColor && !__isColorTransparent(backgroundColor)) {
-                    const contrast = getContrastRatio(backgroundColor, parentBg);
-                    if (contrast < contrastThreshold) {
-                        violations.push({
-                            type: 'insufficient-background-contrast',
-                            category: 'ui-component',
-                            severity: 'moderate',
-                            element: `button[${i}]`,
-                            description: 'Button background has insufficient contrast',
-                            details: {
-                                backgroundColor: backgroundColor,
-                                parentBackground: parentBg,
-                                contrastRatio: Math.round(contrast * 100) / 100,
-                                required: contrastThreshold,
-                                tagName: button.tagName.toLowerCase(),
-                                id: button.id || null
-                            },
-                            wcagCriteria: '1.4.11',
-                            impact: 'Button is not easily distinguishable from background'
-                        });
-                    }
-                }
+                evaluateComponent(buttons[i], i, {
+                    borderType: 'insufficient-border-contrast',
+                    borderDescription: 'Button border has insufficient contrast against background',
+                    borderImpact: 'Button boundaries are not clearly visible',
+                    checkFill: true
+                });
             }
 
-            // Check form controls
+            // Form controls
             const formControls = document.querySelectorAll('input:not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea');
             for (let i = 0; i < formControls.length; i++) {
-                const control = formControls[i];
-                const styles = window.getComputedStyle(control);
-                const renderedBorder = getRenderedBorder(styles);
-                const parentBg = getBackgroundColor(control.parentElement);
-
-                if (renderedBorder) {
-                    const contrast = getContrastRatio(renderedBorder.color, parentBg);
-                    if (contrast < contrastThreshold) {
-                        violations.push({
-                            type: 'insufficient-form-border-contrast',
-                            category: 'ui-component',
-                            severity: 'serious',
-                            element: `${control.tagName.toLowerCase()}[${i}]`,
-                            description: 'Form control border has insufficient contrast',
-                            details: {
-                                borderColor: renderedBorder.color,
-                                borderSide: renderedBorder.side,
-                                borderWidth: renderedBorder.width,
-                                backgroundColor: parentBg,
-                                contrastRatio: Math.round(contrast * 100) / 100,
-                                required: contrastThreshold,
-                                tagName: control.tagName.toLowerCase(),
-                                type: control.type || null,
-                                id: control.id || null
-                            },
-                            wcagCriteria: '1.4.11',
-                            impact: 'Form control boundaries are not clearly visible'
-                        });
-                    }
-                }
+                evaluateComponent(formControls[i], i, {
+                    borderType: 'insufficient-form-border-contrast',
+                    borderDescription: 'Form control border has insufficient contrast',
+                    borderImpact: 'Form control boundaries are not clearly visible',
+                    checkFill: false
+                });
             }
 
-            // Check custom controls (checkboxes, radio buttons, sliders)
+            // Custom controls (checkboxes, radio buttons, sliders)
             const customControls = document.querySelectorAll('[role="checkbox"], [role="radio"], [role="slider"], input[type="checkbox"], input[type="radio"], input[type="range"]');
             for (let i = 0; i < customControls.length; i++) {
-                const control = customControls[i];
-                const styles = window.getComputedStyle(control);
-                const renderedBorder = getRenderedBorder(styles);
-                const parentBg = getBackgroundColor(control.parentElement);
-
-                // Check border contrast
-                if (renderedBorder) {
-                    const contrast = getContrastRatio(renderedBorder.color, parentBg);
-                    if (contrast < contrastThreshold) {
-                        violations.push({
-                            type: 'insufficient-custom-control-contrast',
-                            category: 'ui-component',
-                            severity: 'serious',
-                            element: `${control.tagName.toLowerCase()}[${i}]`,
-                            description: 'Custom control has insufficient border contrast',
-                            details: {
-                                borderColor: renderedBorder.color,
-                                borderSide: renderedBorder.side,
-                                borderWidth: renderedBorder.width,
-                                backgroundColor: parentBg,
-                                contrastRatio: Math.round(contrast * 100) / 100,
-                                required: contrastThreshold,
-                                role: control.getAttribute('role'),
-                                type: control.type || null,
-                                id: control.id || null
-                            },
-                            wcagCriteria: '1.4.11',
-                            impact: 'Custom control boundaries are not clearly visible'
-                        });
-                    }
-                }
+                evaluateComponent(customControls[i], i, {
+                    borderType: 'insufficient-custom-control-contrast',
+                    borderDescription: 'Custom control has insufficient border contrast',
+                    borderImpact: 'Custom control boundaries are not clearly visible',
+                    checkFill: false
+                });
             }
 
-            return violations;
-        }, options.contrastThreshold, contrastUtils);
+            return { violations: violations, incomplete: incomplete };
+        }, options.contrastThreshold, contrastUtils, renderedUtils);
     }
 
     /**
-     * Analyze graphical objects for contrast compliance
+     * Analyze graphical objects for contrast compliance.
+     *
+     * Every ratio here used to be computed by `this.getContrastRatio(...)`
+     * INSIDE page.evaluate. `this` in the browser is not the scanner instance,
+     * so every one of those calls threw a TypeError that the surrounding
+     * try/catch swallowed — the entire SVG/canvas/progress analysis was dead
+     * code that could never report anything. It now uses the injected shared
+     * WCAG helpers.
+     *
+     * SC 1.4.11 covers "graphical objects ... required to understand the
+     * content". Purely decorative graphics are out of scope, so an SVG that is
+     * aria-hidden, role="presentation"/"none", or carries no accessible name
+     * at all is skipped rather than reported.
      */
     async analyzeGraphicalObjects(page, options) {
-        return await page.evaluate((contrastThreshold) => {
+        return await page.evaluate((contrastThreshold, contrastCode) => {
+            eval(contrastCode);
+
             const violations = [];
+            const incomplete = [];
 
-            // Check SVG elements
-            const svgElements = document.querySelectorAll('svg *[fill], svg *[stroke]');
-            for (let i = 0; i < svgElements.length; i++) {
-                const element = svgElements[i];
-                const fill = element.getAttribute('fill');
-                const stroke = element.getAttribute('stroke');
-                const svgParent = element.closest('svg');
-                const svgStyles = window.getComputedStyle(svgParent);
-                const parentBg = svgStyles.backgroundColor || 'rgb(255, 255, 255)';
+            function rgbString(c) { return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')'; }
 
-                // Check fill contrast
-                if (fill && fill !== 'none' && fill !== 'transparent') {
-                    try {
-                        const contrast = this.getContrastRatio(fill, parentBg);
-                        if (contrast < contrastThreshold) {
+            // Decorative graphics convey nothing and are outside SC 1.4.11.
+            function isMeaningfulGraphic(svg) {
+                if (!svg) return false;
+                if (svg.getAttribute('aria-hidden') === 'true') return false;
+                const role = svg.getAttribute('role');
+                if (role === 'presentation' || role === 'none') return false;
+                const hasName = !!(svg.getAttribute('aria-label') ||
+                    svg.getAttribute('aria-labelledby') ||
+                    svg.querySelector('title'));
+                return hasName || role === 'img' || role === 'graphics-document';
+            }
+
+            // Compare a colour against a backdrop, alpha-compositing first.
+            // Returns null when either colour cannot be parsed (an unparseable
+            // colour is not evidence of a violation).
+            function ratioAgainst(colorStr, backdrop) {
+                const parsed = __parseRgb(colorStr);
+                if (!parsed) return null;
+                if (parsed.a === 0) return null;
+                return __getContrastRatio(__blendOver(parsed, backdrop), backdrop);
+            }
+
+            // SVG fills/strokes inside meaningful graphics
+            const svgRoots = Array.from(document.querySelectorAll('svg')).filter(isMeaningfulGraphic);
+            for (const svg of svgRoots) {
+                const background = __resolveBackground(svg.parentElement || svg);
+                if (background.indeterminate) {
+                    incomplete.push({
+                        type: 'indeterminate-graphic-background',
+                        category: 'graphical-object',
+                        element: 'svg',
+                        description: 'Graphic sits on an image or gradient background; contrast needs manual review.',
+                        details: { backgroundImage: background.indeterminateSource, id: svg.id || null },
+                        wcagCriteria: '1.4.11'
+                    });
+                    continue;
+                }
+                const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
+
+                const shapes = svg.querySelectorAll('*[fill], *[stroke]');
+                for (let i = 0; i < shapes.length; i++) {
+                    const element = shapes[i];
+                    const fill = element.getAttribute('fill');
+                    const stroke = element.getAttribute('stroke');
+
+                    if (fill && fill !== 'none' && fill !== 'transparent' && fill !== 'currentColor') {
+                        const contrast = ratioAgainst(fill, backdrop);
+                        if (contrast !== null && contrast < contrastThreshold) {
                             violations.push({
                                 type: 'insufficient-svg-fill-contrast',
                                 category: 'graphical-object',
@@ -309,7 +361,7 @@ class NonTextContrastScanner extends BaseScanner {
                                 description: 'SVG element fill has insufficient contrast',
                                 details: {
                                     fillColor: fill,
-                                    backgroundColor: parentBg,
+                                    backgroundColor: rgbString(backdrop),
                                     contrastRatio: Math.round(contrast * 100) / 100,
                                     required: contrastThreshold,
                                     tagName: element.tagName.toLowerCase()
@@ -318,16 +370,11 @@ class NonTextContrastScanner extends BaseScanner {
                                 impact: 'Graphical content may not be clearly visible'
                             });
                         }
-                    } catch (e) {
-                        // Skip invalid color values
                     }
-                }
 
-                // Check stroke contrast
-                if (stroke && stroke !== 'none' && stroke !== 'transparent') {
-                    try {
-                        const contrast = this.getContrastRatio(stroke, parentBg);
-                        if (contrast < contrastThreshold) {
+                    if (stroke && stroke !== 'none' && stroke !== 'transparent' && stroke !== 'currentColor') {
+                        const contrast = ratioAgainst(stroke, backdrop);
+                        if (contrast !== null && contrast < contrastThreshold) {
                             violations.push({
                                 type: 'insufficient-svg-stroke-contrast',
                                 category: 'graphical-object',
@@ -336,7 +383,7 @@ class NonTextContrastScanner extends BaseScanner {
                                 description: 'SVG element stroke has insufficient contrast',
                                 details: {
                                     strokeColor: stroke,
-                                    backgroundColor: parentBg,
+                                    backgroundColor: rgbString(backdrop),
                                     contrastRatio: Math.round(contrast * 100) / 100,
                                     required: contrastThreshold,
                                     tagName: element.tagName.toLowerCase()
@@ -345,395 +392,352 @@ class NonTextContrastScanner extends BaseScanner {
                                 impact: 'Graphical boundaries may not be clearly visible'
                             });
                         }
-                    } catch (e) {
-                        // Skip invalid color values
                     }
                 }
             }
 
-            // Check canvas elements (basic analysis)
-            const canvasElements = document.querySelectorAll('canvas');
-            for (let i = 0; i < canvasElements.length; i++) {
-                const canvas = canvasElements[i];
-                const parentBg = window.getComputedStyle(canvas.parentElement).backgroundColor || 'rgb(255, 255, 255)';
-
-                // Check canvas background
-                const canvasStyles = window.getComputedStyle(canvas);
-                const canvasBg = canvasStyles.backgroundColor;
-
-                if (canvasBg && canvasBg !== 'rgba(0, 0, 0, 0)' && canvasBg !== 'transparent') {
-                    try {
-                        const contrast = this.getContrastRatio(canvasBg, parentBg);
-                        if (contrast < contrastThreshold) {
-                            violations.push({
-                                type: 'insufficient-canvas-contrast',
-                                category: 'graphical-object',
-                                severity: 'moderate',
-                                element: `canvas[${i}]`,
-                                description: 'Canvas element has insufficient background contrast',
-                                details: {
-                                    canvasBackground: canvasBg,
-                                    parentBackground: parentBg,
-                                    contrastRatio: Math.round(contrast * 100) / 100,
-                                    required: contrastThreshold,
-                                    id: canvas.id || null
-                                },
-                                wcagCriteria: '1.4.11',
-                                impact: 'Canvas content may not be clearly distinguishable'
-                            });
-                        }
-                    } catch (e) {
-                        // Skip invalid color values
-                    }
-                }
-            }
-
-            // Check progress bars
+            // Progress bars: the track boundary is the information that has to
+            // be perceivable. (Canvas contents cannot be read from the CSSOM at
+            // all — the old canvas "check" only ever compared the element's own
+            // CSS background against its parent, which says nothing about what
+            // is painted into the canvas, so it is reported as needing review.)
             const progressBars = document.querySelectorAll('progress, [role="progressbar"]');
             for (let i = 0; i < progressBars.length; i++) {
                 const progress = progressBars[i];
+                if (__isInactive(progress)) continue;
                 const styles = window.getComputedStyle(progress);
-                const backgroundColor = styles.backgroundColor;
-                const borderColor = styles.borderColor || styles.borderTopColor;
-                const borderStyle = styles.borderTopStyle;
-                const borderWidth = parseFloat(styles.borderTopWidth);
-                // `border: none` still computes a border-color; only a border that
-                // is actually painted can have a contrast problem.
-                const hasRenderedBorder = borderStyle && borderStyle !== 'none' &&
-                    borderStyle !== 'hidden' && borderWidth > 0;
-                const parentBg = window.getComputedStyle(progress.parentElement).backgroundColor || 'rgb(255, 255, 255)';
+                const background = __resolveBackground(progress.parentElement || progress);
+                if (background.indeterminate) continue;
+                const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
+                const renderedBorder = __getRenderedBorder(styles);
+                if (!renderedBorder) continue;
 
-                // Check progress bar border
-                if (hasRenderedBorder && borderColor && borderColor !== 'rgba(0, 0, 0, 0)' && borderColor !== 'transparent') {
-                    try {
-                        const contrast = this.getContrastRatio(borderColor, parentBg);
-                        if (contrast < contrastThreshold) {
-                            violations.push({
-                                type: 'insufficient-progress-border-contrast',
-                                category: 'ui-component',
-                                severity: 'moderate',
-                                element: `progress[${i}]`,
-                                description: 'Progress bar border has insufficient contrast',
-                                details: {
-                                    borderColor: borderColor,
-                                    backgroundColor: parentBg,
-                                    contrastRatio: Math.round(contrast * 100) / 100,
-                                    required: contrastThreshold,
-                                    id: progress.id || null
-                                },
-                                wcagCriteria: '1.4.11',
-                                impact: 'Progress bar boundaries are not clearly visible'
-                            });
-                        }
-                    } catch (e) {
-                        // Skip invalid color values
-                    }
+                const contrast = ratioAgainst(renderedBorder.color, backdrop);
+                if (contrast !== null && contrast < contrastThreshold) {
+                    violations.push({
+                        type: 'insufficient-progress-border-contrast',
+                        category: 'ui-component',
+                        severity: 'moderate',
+                        element: `progress[${i}]`,
+                        description: 'Progress bar border has insufficient contrast',
+                        details: {
+                            borderColor: renderedBorder.color,
+                            backgroundColor: rgbString(backdrop),
+                            contrastRatio: Math.round(contrast * 100) / 100,
+                            required: contrastThreshold,
+                            id: progress.id || null
+                        },
+                        wcagCriteria: '1.4.11',
+                        impact: 'Progress bar boundaries are not clearly visible'
+                    });
                 }
             }
 
-            return violations;
-        }, options.contrastThreshold);
+            const canvases = document.querySelectorAll('canvas');
+            for (let i = 0; i < canvases.length; i++) {
+                incomplete.push({
+                    type: 'canvas-contrast-not-determinable',
+                    category: 'graphical-object',
+                    element: `canvas[${i}]`,
+                    description: 'Canvas contents are painted programmatically and cannot be evaluated from CSS; contrast needs manual review.',
+                    details: { id: canvases[i].id || null },
+                    wcagCriteria: '1.4.11'
+                });
+            }
+
+            return { violations: violations, incomplete: incomplete };
+        }, options.contrastThreshold, contrastUtils);
     }
 
     /**
-     * Analyze focus indicators for contrast compliance.
+     * Analyze focus indicators (SC 2.4.7 visibility, SC 1.4.11 contrast).
      *
-     * The focus state is read by actually focusing the element and then reading its
-     * (live) computed style. `getComputedStyle(el, ':focus')` does NOT work: the
-     * second argument selects a pseudo-ELEMENT (`::before`), not a pseudo-CLASS, and
-     * returns an inert style object whose properties come back as empty strings.
+     * Focus is moved with REAL keyboard Tab presses through
+     * src/utils/keyboard-focus.js, never with element.focus(): programmatic
+     * focus does not enter Chromium's `:focus-visible` state, so a page whose
+     * only ring is `:focus-visible { outline: ... }` (the modern default)
+     * looked like it had no indicator at all. Identity is by tab id, so two
+     * nav links with identical class names are two elements, not a "trap".
      *
-     * Each element is snapshotted before and after focusing so that "focus changes
-     * nothing at all" can be distinguished from "focus applies a visible indicator",
-     * and focus is released again so the page is left in its prior state.
+     * `getComputedStyle(el, ':focus')` is never used — the second argument is a
+     * pseudo-ELEMENT selector and returns the normal style.
      */
     async analyzeFocusIndicators(page, options) {
-        return await page.evaluate((contrastThreshold, contrastCode) => {
-            // Inject the shared WCAG contrast helpers.
-            eval(contrastCode);
+        const violations = [];
+        const incomplete = [];
+        const contrastThreshold = options.contrastThreshold;
+        const maxSteps = options.maxFocusSteps || 120;
+        let steps = 0;
 
-            const violations = [];
-            const FOCUSABLE_SELECTOR = 'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+        // One CSS rule, one defect: a `:focus-visible { outline: <colour> }` that
+        // fails 3:1 fails identically on every element it matches (the eight
+        // footer links of the med template are eight copies of ONE ring). They
+        // are grouped by ring colour + backdrop + width and reported once with
+        // the full element list, so the report shows the defect, not its
+        // multiplicity.
+        const lowContrastGroups = new Map();
 
-            // Style properties that can carry a focus indication.
-            const TRACKED_PROPS = [
-                'outlineStyle', 'outlineColor', 'outlineWidth', 'outlineOffset',
-                'boxShadow', 'backgroundColor', 'backgroundImage', 'color',
-                'textDecorationLine', 'filter', 'transform',
-                'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor',
-                'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth',
-                'borderTopStyle', 'borderRightStyle', 'borderBottomStyle', 'borderLeftStyle'
-            ];
+        try {
+            for await (const step of tabWalk(page, { maxSteps })) {
+                steps++;
+                if (step.stuck) break;
+                if (!step.rendered) continue; // focus landed on something not painted (handled by 2.4.3/2.4.11 checks)
+                const ind = step.indicator;
+                const outlineStyle = step.after.outlineStyle;
 
-            // Computed style objects are LIVE, so the values must be copied out
-            // before the element's state changes.
-            function snapshot(el) {
-                const computed = window.getComputedStyle(el);
-                const snap = {};
-                for (const prop of TRACKED_PROPS) snap[prop] = computed[prop];
-                return snap;
-            }
+                if (ind.visible) continue;
 
-            function hasPaintedOutline(snap) {
-                return !!snap.outlineStyle && snap.outlineStyle !== 'none' &&
-                    parseFloat(snap.outlineWidth) > 0 &&
-                    !__isColorTransparent(snap.outlineColor);
-            }
-
-            // A border side only paints when its style is not none/hidden and its
-            // used width is > 0 (`border: none` still computes a border-color).
-            function hasPaintedBorderSide(snap, side) {
-                const borderStyle = snap['border' + side + 'Style'];
-                return !!borderStyle && borderStyle !== 'none' && borderStyle !== 'hidden' &&
-                    parseFloat(snap['border' + side + 'Width']) > 0 &&
-                    !__isColorTransparent(snap['border' + side + 'Color']);
-            }
-
-            // Human-findable description, serialised only for reporting. The live
-            // element reference is used for every measurement — the previous
-            // implementation re-selected elements with a generated
-            // `tagName:nth-of-type(n)` expression that did not match the element it
-            // had enumerated, so it measured the wrong node (or none at all).
-            function describeElement(el) {
-                let out = el.tagName.toLowerCase();
-                if (el.id) out += `#${el.id}`;
-                const cls = (el.getAttribute('class') || '').trim().split(/\s+/).filter(Boolean);
-                if (cls.length) out += `.${cls.join('.')}`;
-                return out;
-            }
-
-            const elements = Array.from(document.querySelectorAll(FOCUSABLE_SELECTOR)).slice(0, 20);
-
-            for (let index = 0; index < elements.length; index++) {
-              // One unanalysable element must not abort the whole check.
-              try {
-                const element = elements[index];
-                const info = {
-                    selector: `${element.tagName.toLowerCase()}[${index}]`,
-                    cssSelector: describeElement(element),
-                    tagName: element.tagName.toLowerCase(),
-                    type: element.type || null,
-                    id: element.id || null
-                };
-
-                let unfocused = null;
-                let focused = null;
-                let didFocus = false;
-                const previouslyFocused = document.activeElement;
-
-                try {
-                    unfocused = snapshot(element);
-                    // preventScroll keeps the viewport where it was, so focusing does
-                    // not perturb layout/scroll-dependent checks elsewhere.
-                    element.focus({ preventScroll: true });
-                    didFocus = document.activeElement === element;
-                    focused = snapshot(element);
-                } catch (e) {
-                    continue;
-                } finally {
-                    // Leave the page as we found it.
-                    try {
-                        if (typeof element.blur === 'function') element.blur();
-                        if (previouslyFocused && previouslyFocused !== element &&
-                            previouslyFocused !== document.body &&
-                            typeof previouslyFocused.focus === 'function') {
-                            previouslyFocused.focus({ preventScroll: true });
-                        }
-                    } catch (e) { /* restoring focus is best-effort */ }
-                }
-
-                // Element cannot take focus at all (disabled, hidden, <a> without
-                // href, ...). It is not reachable, so focus indication does not apply.
-                if (!didFocus || !focused) continue;
-
-                // `outline-style: auto` is the user agent's own focus ring. The UA
-                // paints a platform-specific, deliberately always-visible treatment
-                // (Chrome draws a dual-tone ring), and the computed `outline-color`
-                // is not what actually gets painted — running it through a contrast
-                // check would be meaningless.
-                if (focused.outlineStyle === 'auto') continue;
-
-                if (hasPaintedOutline(focused)) {
-                    const outlineRgb = __parseRgb(focused.outlineColor);
-                    if (!outlineRgb) continue;
-
-                    // The ring sits between the element and whatever is behind it.
-                    // WCAG 1.4.11 requires 3:1 against *adjacent* colour, so it passes
-                    // when it is distinguishable from either neighbour (e.g. a white
-                    // ring around a black chip on a white page is clearly visible).
-                    const surroundingBg = __getEffectiveBackgroundColor(element.parentElement || element);
-                    const ownBg = __getEffectiveBackgroundColor(element);
-                    const contrast = Math.max(
-                        __getContrastRatio(outlineRgb, surroundingBg),
-                        __getContrastRatio(outlineRgb, ownBg)
-                    );
-
-                    if (contrast < contrastThreshold) {
-                        violations.push({
-                            type: 'insufficient-focus-indicator-contrast',
-                            category: 'focus-indicator',
-                            severity: 'serious',
-                            element: info.selector,
-                            description: 'Focus indicator has insufficient contrast against background',
-                            details: {
-                                outlineColor: focused.outlineColor,
-                                backgroundColor: `rgb(${surroundingBg.r}, ${surroundingBg.g}, ${surroundingBg.b})`,
-                                elementBackground: `rgb(${ownBg.r}, ${ownBg.g}, ${ownBg.b})`,
-                                outlineWidth: focused.outlineWidth,
-                                contrastRatio: Math.round(contrast * 100) / 100,
-                                required: contrastThreshold,
-                                cssSelector: info.cssSelector,
-                                tagName: info.tagName,
-                                type: info.type,
-                                id: info.id
-                            },
-                            wcagCriteria: '1.4.11',
-                            impact: 'Focus indicator is not clearly visible to users'
-                        });
+                if (ind.lowContrast && outlineStyle !== 'auto') {
+                    const key = `${step.after.outlineColor}|${ind.backdrop}|${step.after.outlineWidth}`;
+                    let group = lowContrastGroups.get(key);
+                    if (!group) {
+                        group = {
+                            outlineColor: step.after.outlineColor,
+                            outlineWidth: step.after.outlineWidth,
+                            backdrop: ind.backdrop,
+                            ratio: ind.ratio,
+                            element: step.selector,
+                            tagName: step.tag,
+                            elements: []
+                        };
+                        lowContrastGroups.set(key, group);
                     }
+                    group.elements.push({ selector: step.selector, text: step.text, tagName: step.tag });
                     continue;
                 }
 
-                // No painted outline — any other change caused by focusing that
-                // results in something actually visible counts as an indicator.
-                const boxShadowIndicator = focused.boxShadow !== unfocused.boxShadow &&
-                    !!focused.boxShadow && focused.boxShadow !== 'none';
-
-                const backgroundIndicator =
-                    (focused.backgroundColor !== unfocused.backgroundColor &&
-                        !__isColorTransparent(focused.backgroundColor)) ||
-                    (focused.backgroundImage !== unfocused.backgroundImage &&
-                        !!focused.backgroundImage && focused.backgroundImage !== 'none');
-
-                const borderIndicator = ['Top', 'Right', 'Bottom', 'Left'].some(side =>
-                    (focused['border' + side + 'Color'] !== unfocused['border' + side + 'Color'] ||
-                        focused['border' + side + 'Width'] !== unfocused['border' + side + 'Width'] ||
-                        focused['border' + side + 'Style'] !== unfocused['border' + side + 'Style']) &&
-                    hasPaintedBorderSide(focused, side));
-
-                const textIndicator = focused.color !== unfocused.color ||
-                    focused.textDecorationLine !== unfocused.textDecorationLine;
-
-                const effectIndicator = focused.filter !== unfocused.filter ||
-                    focused.transform !== unfocused.transform;
-
-                if (boxShadowIndicator || backgroundIndicator || borderIndicator ||
-                    textIndicator || effectIndicator) {
+                // Positive evidence only. tabWalk re-measures every candidate
+                // (second focused read, then blur for a real unfocused
+                // baseline) and marks it `confirmed`; an unconfirmed candidate
+                // means focus moved on before the check could be repeated, and
+                // an absent-evidence guess is exactly what produced flaky
+                // `missing-focus-indicator` findings on pages that do have a
+                // :focus-visible ring.
+                if (!ind.confirmed) {
+                    incomplete.push({
+                        type: 'focus-indicator-not-determinable',
+                        category: 'focus-indicator',
+                        element: step.selector,
+                        description: 'Focus moved away before the focus indicator could be re-measured; needs manual review.',
+                        details: { tagName: step.tag, text: step.text, reasons: ind.reasons },
+                        wcagCriteria: '2.4.7'
+                    });
                     continue;
                 }
 
                 violations.push({
                     type: 'missing-focus-indicator',
                     category: 'focus-indicator',
-                    severity: 'critical',
-                    element: info.selector,
-                    description: 'Element lacks visible focus indicator',
+                    severity: 'serious',
+                    element: step.selector,
+                    description: 'Element lacks visible focus indicator when focused via keyboard',
                     details: {
-                        cssSelector: info.cssSelector,
-                        tagName: info.tagName,
-                        type: info.type,
-                        id: info.id,
-                        outline: `${focused.outlineStyle} ${focused.outlineWidth} ${focused.outlineColor}`,
-                        boxShadow: focused.boxShadow,
-                        borderColor: focused.borderTopColor,
-                        unfocusedOutline: `${unfocused.outlineStyle} ${unfocused.outlineWidth} ${unfocused.outlineColor}`
+                        tagName: step.tag,
+                        text: step.text,
+                        outline: ind.outline,
+                        boxShadow: step.after.boxShadow,
+                        borderColor: step.after.borderTopColor,
+                        unfocusedOutline: `${step.before.outlineStyle} ${step.before.outlineWidth} ${step.before.outlineColor}`,
+                        unfocusedBoxShadow: step.before.boxShadow,
+                        unfocusedBackgroundColor: step.before.backgroundColor,
+                        confirmedByBlurComparison: true
                     },
-                    wcagCriteria: '1.4.11',
+                    wcagCriteria: '2.4.7',
                     impact: 'Users cannot see which element has focus'
                 });
-              } catch (e) {
-                // Skip elements that cannot be focused or inspected
-              }
             }
+        } finally {
+            await cleanupTabWalk(page);
+        }
 
-            return violations;
-        }, options.contrastThreshold, contrastUtils);
+        for (const group of lowContrastGroups.values()) {
+            violations.push({
+                type: 'insufficient-focus-indicator-contrast',
+                category: 'focus-indicator',
+                severity: 'serious',
+                element: group.element,
+                description: group.elements.length > 1
+                    ? `Focus indicator has insufficient contrast against background (${group.elements.length} elements share this ring)`
+                    : 'Focus indicator has insufficient contrast against background',
+                details: {
+                    outlineColor: group.outlineColor,
+                    outlineWidth: group.outlineWidth,
+                    backgroundColor: group.backdrop,
+                    contrastRatio: Math.round(group.ratio * 100) / 100,
+                    required: contrastThreshold,
+                    tagName: group.tagName,
+                    text: group.elements[0].text,
+                    occurrences: group.elements.length,
+                    affectedElements: group.elements.slice(0, 25).map((e) => e.selector)
+                },
+                wcagCriteria: '1.4.11',
+                impact: 'Focus indicator is not clearly visible to users'
+            });
+        }
+
+        return { violations, incomplete, focusStepsWalked: steps };
     }
 
     /**
-     * Analyze interactive states for contrast compliance
+     * Analyze component STATE indication for contrast compliance (SC 1.4.11,
+     * "visual information required to identify ... states of user interface
+     * components").
+     *
+     * What this replaced, and why: the previous implementation set a
+     * `hasHoverStyles` flag if ANY rule ANYWHERE in the document mentioned
+     * `:hover` — not whether a hover rule matched the element under test — and
+     * then reported a violation whenever the element's own background AND
+     * border-color were transparent. It computed no contrast ratio at all, read
+     * the raw `element.parentElement` background (transparent parents included),
+     * and fired on plain text links, whose identification comes from their text
+     * and underline. Across the whole fixture corpus it produced 6 findings on
+     * `good-*` files, 1 on a real-world page and ZERO on any `bad-*` file — it
+     * was noise with no detection value.
+     *
+     * What this does instead: it resolves the style rules that ACTUALLY match
+     * the element and carry a semantic state pseudo-class/attribute
+     * (`:checked`, `aria-checked`, `aria-selected`, `aria-pressed`,
+     * `aria-expanded`), then verifies the declared state indication is
+     * perceivable — at least one declared property must produce a visible
+     * change, and a state signalled by colour alone must reach the 3:1
+     * threshold against the colour it replaces.
+     *
+     * `:hover` and `:active` are deliberately NOT treated as states here.
+     * SC 1.4.11's "states" are the ones that carry information (checked,
+     * selected, expanded, pressed); a hover treatment is a transient
+     * affordance, and WCAG does not require one to exist or to reach 3:1
+     * against the resting style. `:focus` has its own dedicated check in
+     * analyzeFocusIndicators.
      */
     async analyzeInteractiveStates(page, options) {
-        return await page.evaluate((contrastThreshold) => {
+        return await page.evaluate((contrastThreshold, contrastCode) => {
+            eval(contrastCode);
+
             const violations = [];
 
-            // Check hover states
-            const interactiveElements = document.querySelectorAll('a, button, input[type="button"], input[type="submit"]');
+            // Pseudo-classes / attribute selectors that signal a semantic state.
+            const STATE_PATTERN = /:checked|:indeterminate|\[aria-checked|\[aria-selected|\[aria-pressed|\[aria-expanded|\[aria-current/;
+            // Properties whose change can constitute a visible state indicator.
+            const COLOUR_PROPS = ['background-color', 'border-color', 'border-top-color',
+                'border-right-color', 'border-bottom-color', 'border-left-color',
+                'outline-color', 'color'];
+            const STRUCTURAL_PROPS = ['border-width', 'border-style', 'border-top-width',
+                'border-top-style', 'outline-width', 'outline-style', 'box-shadow',
+                'background-image', 'content', 'text-decoration', 'text-decoration-line',
+                'font-weight', 'transform', 'opacity'];
 
-            for (let i = 0; i < Math.min(interactiveElements.length, 15); i++) { // Limit for performance
-                const element = interactiveElements[i];
-                const normalStyles = window.getComputedStyle(element);
+            // Strip state pseudo-classes/attributes so the remaining selector can
+            // be matched against the live element.
+            function baseSelector(selectorText) {
+                return selectorText
+                    .replace(/:(checked|indeterminate)\b/g, '')
+                    .replace(/\[aria-(checked|selected|pressed|expanded|current)(=("|')?[^\]]*)?\]/g, '')
+                    .trim();
+            }
 
-                // Simulate hover by checking CSS hover rules
-                try {
-                    // Create temporary element to test hover styles
-                    const testEl = element.cloneNode(true);
-                    testEl.style.cssText = normalStyles.cssText;
-
-                    // Check if element has hover styles defined
-                    const sheets = Array.from(document.styleSheets);
-                    let hasHoverStyles = false;
-
-                    for (const sheet of sheets) {
-                        try {
-                            const rules = Array.from(sheet.cssRules || []);
-                            for (const rule of rules) {
-                                if (rule.selectorText && rule.selectorText.includes(':hover')) {
-                                    hasHoverStyles = true;
-                                    break;
-                                }
-                            }
-                        } catch (e) {
-                            // Skip CORS-blocked stylesheets
-                        }
-                    }
-
-                    if (hasHoverStyles) {
-                        // Basic check for hover state visibility.
-                        // NOTE: unlike the border-contrast checks above, this reads
-                        // border-color with inverted polarity — an opaque colour is
-                        // taken as evidence that the element HAS a boundary, and only
-                        // the absence of one is reported. Adding the
-                        // border-style/border-width "is it actually painted" guard
-                        // here would therefore make the check fire MORE often (every
-                        // `border: none` element would newly qualify), so it is
-                        // deliberately not applied. This heuristic is over-broad for
-                        // an unrelated reason — it flags plain text links, which SC
-                        // 1.4.11 exempts as text — and wants narrowing, not a guard.
-                        const backgroundColor = normalStyles.backgroundColor;
-                        const borderColor = normalStyles.borderColor;
-                        const parentBg = window.getComputedStyle(element.parentElement).backgroundColor || 'rgb(255, 255, 255)';
-
-                        // Check if element has sufficient visual distinction
-                        if (backgroundColor === 'rgba(0, 0, 0, 0)' || backgroundColor === 'transparent') {
-                            if (!borderColor || borderColor === 'rgba(0, 0, 0, 0)' || borderColor === 'transparent') {
-                                violations.push({
-                                    type: 'insufficient-interactive-state-contrast',
-                                    category: 'state-change',
-                                    severity: 'moderate',
-                                    element: `${element.tagName.toLowerCase()}[${i}]`,
-                                    description: 'Interactive element may lack sufficient visual distinction in different states',
-                                    details: {
-                                        backgroundColor: backgroundColor,
-                                        borderColor: borderColor,
-                                        parentBackground: parentBg,
-                                        tagName: element.tagName.toLowerCase(),
-                                        type: element.type || null,
-                                        id: element.id || null
-                                    },
-                                    wcagCriteria: '1.4.11',
-                                    impact: 'Interactive states may not be clearly distinguishable'
-                                });
+            function collectStateRules() {
+                const out = [];
+                for (const sheet of Array.from(document.styleSheets)) {
+                    let rules;
+                    try { rules = Array.from(sheet.cssRules || []); } catch (e) { continue; }
+                    const walk = (list) => {
+                        for (const rule of list) {
+                            if (rule.cssRules) { walk(Array.from(rule.cssRules)); continue; }
+                            if (!rule.selectorText || !rule.style) continue;
+                            if (!STATE_PATTERN.test(rule.selectorText)) continue;
+                            for (const part of rule.selectorText.split(',')) {
+                                if (!STATE_PATTERN.test(part)) continue;
+                                const base = baseSelector(part);
+                                if (!base) continue;
+                                out.push({ base: base, style: rule.style, selectorText: part.trim() });
                             }
                         }
+                    };
+                    walk(rules);
+                }
+                return out;
+            }
+
+            const stateRules = collectStateRules();
+            if (stateRules.length === 0) return { violations: violations, incomplete: [] };
+
+            const candidates = document.querySelectorAll(
+                'a, button, input, select, textarea, [role="checkbox"], [role="radio"], ' +
+                '[role="switch"], [role="tab"], [role="option"], [role="menuitemcheckbox"], ' +
+                '[role="menuitemradio"], [aria-checked], [aria-selected], [aria-pressed], [aria-expanded]'
+            );
+
+            for (let i = 0; i < Math.min(candidates.length, 40); i++) {
+                const element = candidates[i];
+                if (__isInactive(element)) continue;
+
+                let matched = null;
+                for (const rule of stateRules) {
+                    try {
+                        if (element.matches(rule.base)) { matched = rule; break; }
+                    } catch (e) { /* invalid/unsupported selector */ }
+                }
+                if (!matched) continue;
+
+                const normal = window.getComputedStyle(element);
+                const background = __resolveBackground(element.parentElement || element);
+                if (background.indeterminate) continue;
+                const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
+
+                // Does the state rule declare anything that changes the rendering
+                // in a way other than a plain colour swap? Then the state is
+                // indicated structurally and there is nothing to measure.
+                let structuralChange = false;
+                for (const prop of STRUCTURAL_PROPS) {
+                    const declared = matched.style.getPropertyValue(prop);
+                    if (declared && declared !== normal.getPropertyValue(prop)) { structuralChange = true; break; }
+                }
+                if (structuralChange) continue;
+
+                // Otherwise the state is signalled by colour alone — that colour
+                // change has to be perceivable.
+                let bestRatio = null;
+                let evidence = null;
+                for (const prop of COLOUR_PROPS) {
+                    const declared = matched.style.getPropertyValue(prop);
+                    if (!declared) continue;
+                    const before = __parseRgb(normal.getPropertyValue(prop));
+                    const after = __parseRgb(declared);
+                    if (!before || !after) continue;
+                    const ratio = __getContrastRatio(__blendOver(before, backdrop), __blendOver(after, backdrop));
+                    if (bestRatio === null || ratio > bestRatio) {
+                        bestRatio = ratio;
+                        evidence = { property: prop, from: normal.getPropertyValue(prop), to: declared };
                     }
-                } catch (e) {
-                    // Skip elements that can't be analyzed
+                }
+
+                if (bestRatio !== null && bestRatio < contrastThreshold) {
+                    violations.push({
+                        type: 'insufficient-interactive-state-contrast',
+                        category: 'state-change',
+                        severity: 'moderate',
+                        element: `${element.tagName.toLowerCase()}[${i}]`,
+                        description: 'Component state is signalled by a colour change that is not distinguishable from the resting colour',
+                        details: {
+                            stateSelector: matched.selectorText,
+                            changedProperty: evidence.property,
+                            restingColor: evidence.from,
+                            stateColor: evidence.to,
+                            contrastRatio: Math.round(bestRatio * 100) / 100,
+                            required: contrastThreshold,
+                            tagName: element.tagName.toLowerCase(),
+                            role: element.getAttribute('role') || null,
+                            type: element.type || null,
+                            id: element.id || null
+                        },
+                        wcagCriteria: '1.4.11',
+                        impact: 'Users cannot tell which state the component is in'
+                    });
                 }
             }
 
-            return violations;
-        }, options.contrastThreshold);
+            return { violations: violations, incomplete: [] };
+        }, options.contrastThreshold, contrastUtils);
     }
 
     /**
@@ -748,11 +752,22 @@ class NonTextContrastScanner extends BaseScanner {
     }
 
     /**
-     * Get count of passed elements (estimated)
+     * Count the elements this scanner actually looks at.
+     *
+     * This used to be `Math.max(50 - violations.length, 0)` — a fabricated
+     * number that made the summary read like a real denominator while being
+     * unrelated to the page. It is now measured.
      */
-    getPassedElementsCount(violations) {
-        // Estimate based on typical page composition
-        return Math.max(50 - violations.length, 0);
+    async countCheckedElements(page) {
+        try {
+            return await page.evaluate(() => document.querySelectorAll(
+                'button, input, select, textarea, [role="checkbox"], [role="radio"], ' +
+                '[role="slider"], svg, canvas, progress, [role="progressbar"], ' +
+                'a, [tabindex]:not([tabindex="-1"])'
+            ).length);
+        } catch (e) {
+            return 0;
+        }
     }
 
     /**

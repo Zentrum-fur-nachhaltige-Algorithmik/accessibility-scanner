@@ -1,0 +1,69 @@
+<!-- WCAG-TEST
+criterion: 1.4.3
+level: AA
+title: Non-rendered text and Tailwind arbitrary-value classes must not produce contrast findings
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: color-contrast
+description: (a) A placeholder span whose colour equals its background lives inside a display:none drawer and inside a [hidden] block - it paints nothing, so 1.4.3 does not apply. (b) Visible badges carry Tailwind arbitrary-value classes (text-[0.65rem], tracking-[0.25em], shadow-black/25, hover:-translate-y-0.5) and conform at >=4.5:1. Every reported element selector must additionally be a valid document.querySelector argument - the naive tag+"."+classes.join(".") builder emits span.text-[0.65rem] which throws.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leistungen der Ordination</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  main, header, footer { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.5rem; }
+  /* Off-state mobile drawer: never painted until a script sets display:flex. */
+  .mobile-drawer { display: none; }
+  .tag {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .25rem .75rem; border-radius: 999px; font-weight: 700; text-transform: uppercase;
+  }
+  .tag-neutral { background: #f1f4f2; color: #2b2f2c; }
+  .tag-accent  { background: #cfe6c8; color: #24483a; }
+  /* Tailwind-style arbitrary-value utilities, kept verbatim as class names. */
+  .text-\[0\.65rem\] { font-size: 0.65rem; }
+  .tracking-\[0\.25em\] { letter-spacing: 0.25em; }
+  .shadow-black\/25 { box-shadow: 0 1px 2px rgba(0, 0, 0, .25); }
+  .hover\:-translate-y-0\.5:hover { transform: translateY(-2px); }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+</header>
+<main id="inhalt">
+  <h1>Leistungen der Ordination</h1>
+
+  <p>
+    <span class="tag tag-neutral text-[0.65rem] tracking-[0.25em] shadow-black/25 hover:-translate-y-0.5">Kassenleistung</span>
+    <span class="tag tag-accent text-[0.65rem] tracking-[0.25em] shadow-black/25 hover:-translate-y-0.5">Wahlarzt</span>
+  </p>
+
+  <h2>Vorsorge</h2>
+  <p>Jaehrliche Vorsorgeuntersuchung inklusive Labor und Befundbesprechung.</p>
+
+  <!-- (a) not rendered: display:none ancestor -->
+  <div class="mobile-drawer">
+    <span class="text-[0.65rem] tracking-[0.25em] shadow-black/25" style="color: #ffffff; background: #ffffff;">Platzhalter</span>
+  </div>
+
+  <!-- (a) not rendered: hidden attribute -->
+  <div hidden>
+    <span style="color: #f1f4f2; background: #f1f4f2;">Platzhalter</span>
+  </div>
+</main>
+<footer>
+  <p>Musterpraxis, Musterstrasse 1, 1010 Wien</p>
+</footer>
+</body>
+</html>

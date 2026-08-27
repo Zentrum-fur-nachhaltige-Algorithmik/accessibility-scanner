@@ -1,0 +1,80 @@
+<!-- WCAG-TEST
+criterion: EN 301 549 12.1, EN 301 549 12.2, EN 301 549 12.4
+level: AA
+title: Marketing page about accessibility law is not an accessibility statement
+test_type: good
+expected_violations: 1
+testable_by: dom
+scanners: accessibility-statement, eaa-procedure, contact-mechanism, compliance-monitoring
+description: A guide page titled "Barrierefreiheit & BaFG" that explains which laws (BGStG, BaFG, WZG, WCAG 2.2 AA) apply to Austrian doctors' websites. It is marketing copy, not a declaration about THIS site. The footer link labelled "Barrierefreiheit" points back at this same guide, which is what the statement detector accepts as "a statement exists" - so exactly ONE finding is correct, missing-accessibility-statement (no statement is published anywhere). Every follow-up rule (no-audit-schedule, no-issue-tracking, no-feedback-process, no-compliance-monitoring, no-response-time, no-accessibility-specific-contact ...) describes a property of a statement that does not exist and must stay silent. Reproduces the gsunde.website/barrierefreiheit FP cluster.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barrierefreiheit &amp; BaFG — was fuer Arztwebsites gilt</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  header, main, footer { max-width: 58rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.35rem; margin-top: 2rem; }
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 22rem; }
+  th, td { border: 1px solid #c9cfcb; padding: .5rem .75rem; text-align: left; }
+  th { background: #f1f4f2; }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+</header>
+<main id="inhalt">
+  <h1>Barrierefreiheit &amp; BaFG</h1>
+  <p>
+    Dieser Ratgeber fasst zusammen, welche Vorgaben fuer Ordinations-Websites in Oesterreich
+    gelten und ab wann sie greifen. Er ist ein redaktioneller Beitrag und beschreibt nicht den
+    Zustand dieser Website.
+  </p>
+
+  <h2>Welche Gesetze gelten</h2>
+  <div class="table-scroll" role="region" aria-label="Rechtsgrundlagen" tabindex="0">
+  <table>
+    <caption>Rechtsgrundlagen fuer Websites von Gesundheitsdienstleistern</caption>
+    <thead>
+      <tr><th scope="col">Regelwerk</th><th scope="col">Gilt fuer</th><th scope="col">Seit</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>BGStG</td><td>Diskriminierungsschutz, auch digital</td><td>2006</td></tr>
+      <tr><td>BaFG</td><td>Produkte und Dienstleistungen an Verbraucher</td><td>2025</td></tr>
+      <tr><td>WZG</td><td>Websites oeffentlicher Stellen</td><td>2019</td></tr>
+      <tr><td>WCAG 2.2 AA</td><td>Technischer Pruefmassstab</td><td>2023</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Was das praktisch bedeutet</h2>
+  <ul>
+    <li>Terminformulare muessen mit der Tastatur bedienbar sein.</li>
+    <li>Texte brauchen ausreichenden Kontrast, mindestens 4,5:1.</li>
+    <li>Videos brauchen Untertitel.</li>
+    <li>Ordinationen mit weniger als zehn Beschaeftigten und unter zwei Millionen Euro Umsatz sind
+        von einzelnen Pflichten des BaFG ausgenommen.</li>
+  </ul>
+
+  <h2>Beratung anfragen</h2>
+  <p>
+    Sie moechten wissen, wo Ihre Website steht?
+    Schreiben Sie an <a href="mailto:beratung@beispielagentur.at">beratung@beispielagentur.at</a>
+    oder rufen Sie uns unter <a href="tel:+4312345678">01 234 56 78</a> an.
+  </p>
+</main>
+<footer>
+  <p><a href="good-accessibility-marketing-page.html">Barrierefreiheit</a> — Beispielagentur, Musterstrasse 1, 1010 Wien</p>
+</footer>
+</body>
+</html>

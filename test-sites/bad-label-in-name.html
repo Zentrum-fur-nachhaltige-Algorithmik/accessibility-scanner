@@ -7,6 +7,19 @@ expected_violations: 5
 testable_by: regex
 scanners: page-structure
 description: Accessible names not matching visible labels for voice control
+
+Four accessible names were rewritten on 2026-08-24. They used to be
+"Speichern und weiter" / "Über unser Unternehmen" / "Kontaktinformationen
+anzeigen" / "Bundesland auswählen" against the visible labels "Weiter" /
+"Über uns" / "Kontakt" / "Land auswählen:". Each of those CONTAINS its
+visible label as a substring, so under WCAG 2.5.3 — and under axe-core's
+label-content-name-mismatch, which this repo now follows — all four
+conform: a speech user saying the visible label reaches the control.
+Requiring the label's words to line up with the name's word boundaries
+instead is what made them look like failures, and that reading produces
+false positives on every German compound ("Telefon" vs "Telefonnummer").
+The names now genuinely share no text with their labels, so every entry in
+this fixture is a real violation again.
 -->
 <!DOCTYPE html>
 <html lang="de">
@@ -82,7 +95,7 @@ description: Accessible names not matching visible labels for voice control
         <p><strong>Problem:</strong> Voice-Control-Software hört "Formular absenden" aber User sagt "Jetzt kaufen"</p>
         <div class="button-group">
             <button aria-label="Formular absenden" class="submit-btn">Jetzt kaufen</button>
-            <button aria-label="Speichern und weiter" class="submit-btn">Weiter</button>
+            <button aria-label="Formular abschicken" class="submit-btn">Weiter</button>
             <button aria-label="Zurück zur Startseite">Home</button>
         </div>
     </div>
@@ -93,8 +106,8 @@ description: Accessible names not matching visible labels for voice control
         <p><strong>Problem:</strong> Voice-Control-Benutzer können nicht navigieren</p>
         <div class="link-group">
             <a href="#" aria-label="Startseite besuchen">Home</a> |
-            <a href="#" aria-label="Über unser Unternehmen">Über uns</a> |
-            <a href="#" aria-label="Kontaktinformationen anzeigen">Kontakt</a> |
+            <a href="#" aria-label="Firmenprofil anzeigen">Über uns</a> |
+            <a href="#" aria-label="Anfahrt und Öffnungszeiten">Kontakt</a> |
             <a href="#" aria-label="Hier klicken für mehr Informationen">Mehr erfahren</a>
         </div>
     </div>
@@ -121,7 +134,7 @@ description: Accessible names not matching visible labels for voice control
         <p><strong>Problem:</strong> Dropdown-Auswahl ist für Voice-Control nicht zugänglich</p>
         <div class="form-group">
             <label for="country-select">Land auswählen:</label>
-            <select id="country-select" aria-label="Bundesland auswählen">
+            <select id="country-select" aria-label="Region wählen">
                 <option value="">Bitte wählen</option>
                 <option value="de">Deutschland</option>
                 <option value="at">Österreich</option>
@@ -200,7 +213,7 @@ description: Accessible names not matching visible labels for voice control
         <ul>
             <li>Versuche "Jetzt kaufen" zu sagen → Fehlschlag (aria-label: "Formular absenden")</li>
             <li>Versuche "Home" zu sagen → Fehlschlag (aria-label: "Startseite besuchen")</li>
-            <li>Versuche "Land auswählen" zu sagen → Fehlschlag (aria-label: "Bundesland auswählen")</li>
+            <li>Versuche "Land auswählen" zu sagen → Fehlschlag (aria-label: "Region wählen")</li>
             <li>Versuche "Play-Button" zu sagen → Fehlschlag (Symbol ▶ aber aria-label: "Pause")</li>
         </ul>
     </div>

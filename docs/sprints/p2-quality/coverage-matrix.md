@@ -4,7 +4,7 @@
      Regenerate with: node tests/coverage-matrix.js
      Validate in CI with: node tests/coverage-matrix.js --check -->
 
-Generated: 2026-07-27T18:03:28.870Z
+Generated: 2026-08-22T13:21:36.802Z
 
 Every WCAG 2.2 success criterion (A, AA and AAA) is mapped to exactly one **primary mechanism**. A criterion that a scanner merely *mentions* in its metadata, but that no harness asserts on, is reported as unverified — the generator fails the build rather than let the matrix drift from the code.
 
@@ -14,10 +14,10 @@ Every WCAG 2.2 success criterion (A, AA and AAA) is mapped to exactly one **prim
 |---|---:|---:|---:|---:|---:|
 | `axe-core` | 12 | 10 | 1 | 1 | 0 |
 | `hybrid` | 16 | 6 | 6 | 4 | 0 |
-| `deterministic` | 25 | 10 | 11 | 4 | 0 |
+| `deterministic` | 24 | 10 | 11 | 3 | 0 |
 | `llm` | 24 | 3 | 1 | 20 | 0 |
 | `experimental-only` | 5 | 1 | 4 | 0 | 0 |
-| `MANUAL` | 4 | 1 | 1 | 2 | 0 |
+| `MANUAL` | 5 | 1 | 1 | 3 | 0 |
 | `NOT-APPLICABLE-STATIC` | 1 | 0 | 0 | 0 | 1 |
 | **total** | **87** | 31 | 24 | 31 | 1 |
 
@@ -25,7 +25,7 @@ Every WCAG 2.2 success criterion (A, AA and AAA) is mapped to exactly one **prim
 
 ## Matrix
 
-`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e.
+`H` = harnesses asserting on the criterion: `x`=exclusive, `c`=concurrent, `l`=llm, `a`=axe-e2e, `g`=golden corpus (false-positive guard on healthy real pages).
 
 `Detect` is the LAST RECORDED outcome from the harnesses whose results are checked in
 at `docs/sprints/p2-quality/raw/harness-*.json` — an actual measurement, not merely the
@@ -59,19 +59,19 @@ undetected".
 | 1.3.6 | AAA | Zweck identifizieren | `llm:llm-semantic-text` | — | 1/1 | l | — |
 | 1.4.1 | A | Benutzung von Farbe | `axe-core` | `use-of-color (experimental)` | 2/1 | ac | TP **FP!** |
 | 1.4.2 | A | Audio-Steuerung | `axe-core` | — | 1/1 | a | — |
-| 1.4.3 | AA | Kontrast (Minimum) | `hybrid:axe-core+color-contrast` | `advanced-contrast (experimental)` | 2/2 | ac | TP FP- |
-| 1.4.4 | AA | Textgröße ändern | `hybrid:axe-core+text-resize` | `responsive-design` | 1/1 | ax | TP FP- |
+| 1.4.3 | AA | Kontrast (Minimum) | `hybrid:axe-core+color-contrast` | — | 2/2 | ac | TP FP- |
+| 1.4.4 | AA | Textgröße ändern | `hybrid:axe-core+text-resize` | `responsive-design` | 1/1 | axg | TP FP- |
 | 1.4.5 | AA | Bilder eines Textes | `experimental:images-of-text` | — | 1/1 | c | **tp** FP- |
-| 1.4.6 | AAA | Kontrast (Erweitert) | `hybrid:axe-core+color-contrast` | `advanced-contrast (experimental)` | 1/2 | ac | TP FP- |
+| 1.4.6 | AAA | Kontrast (Erweitert) | `hybrid:axe-core+color-contrast` | — | 1/2 | ac | TP FP- |
 | 1.4.7 | AAA | Leiser oder kein Hintergrund-Audio | `llm:llm-visual-presentation` | — | 1/1 | l | — |
 | 1.4.8 | AAA | Visuelle Präsentation | `llm:llm-visual-presentation` | — | 2/2 | l | — |
 | 1.4.9 | AAA | Bilder eines Textes (keine Ausnahme) | `llm:llm-visual-presentation` | `images-of-text (experimental)` | 2/1 | cl | TP FP- |
-| 1.4.10 | AA | Umbruch (Reflow) | `deterministic:responsive-design` | `mobile-specific` | 1/1 | x | TP FP- |
-| 1.4.11 | AA | Nicht-Text-Kontrast | `deterministic:nontext-contrast` | `advanced-contrast (experimental)` | 1/1 | c | TP FP- |
-| 1.4.12 | AA | Textabstand | `hybrid:axe-core+responsive-design` | — | 1/1 | ax | TP FP- |
-| 1.4.13 | AA | Eingeblendete Inhalte | `deterministic:hover-focus-content` | — | 1/1 | x | TP FP- |
+| 1.4.10 | AA | Umbruch (Reflow) | `deterministic:responsive-design` | `mobile-specific` | 1/1 | xg | TP FP- |
+| 1.4.11 | AA | Nicht-Text-Kontrast | `deterministic:nontext-contrast` | `advanced-contrast (experimental)` | 1/1 | cxg | TP FP- |
+| 1.4.12 | AA | Textabstand | `hybrid:axe-core+responsive-design` | — | 1/1 | axg | TP FP- |
+| 1.4.13 | AA | Eingeblendete Inhalte | `deterministic:hover-focus-content` | `advanced-contrast (experimental)` | 1/1 | cxg | TP FP- |
 | 2.1.1 | A | Tastatur | `hybrid:axe-core+keyboard-navigation` | — | 4/3 | ax | TP FP- |
-| 2.1.2 | A | Keine Tastaturfalle | `deterministic:keyboard-navigation` | — | 2/1 | x | TP FP- |
+| 2.1.2 | A | Keine Tastaturfalle | `deterministic:keyboard-navigation` | — | 2/1 | xg | TP FP- |
 | 2.1.3 | AAA | Tastatur (keine Ausnahme) | `axe-core` | — | 1/1 | a | — |
 | 2.1.4 | A | Zeichentastenkürzel | `deterministic:keyboard-navigation` | — | 1/1 | x | TP FP- |
 | 2.2.1 | A | Zeitbegrenzung anpassbar | `axe-core` | `timing-controls (experimental)` | 1/1 | ac | TP **FP!** |
@@ -89,21 +89,21 @@ undetected".
 | 2.4.4 | A | Linkzweck (im Kontext) | `axe-core` | — | 1/1 | a | — |
 | 2.4.5 | AA | Verschiedene Methoden | `deterministic:multiple-ways` | — | 1/1 | x | TP FP- |
 | 2.4.6 | AA | Überschriften und Beschriftungen | `experimental:page-structure` | — | 1/1 | c | TP FP- |
-| 2.4.7 | AA | Fokus sichtbar | `deterministic:focus-management` | — | 2/1 | x | TP FP- |
+| 2.4.7 | AA | Fokus sichtbar | `deterministic:focus-management` | — | 2/1 | xg | TP FP- |
 | 2.4.8 | AAA | Position | `MANUAL` | — | 1/1 | — | — |
 | 2.4.9 | AAA | Linkzweck (nur Link) | `hybrid:axe-core+llm-semantic-text` | — | 3/3 | al | — |
 | 2.4.10 | AAA | Abschnittsüberschriften | `llm:llm-semantic-text` | — | 1/1 | l | — |
-| 2.4.11 | AA | Fokus nicht verdeckt (Minimum) | `deterministic:focus-management` | — | 1/1 | x | TP FP- |
+| 2.4.11 | AA | Fokus nicht verdeckt (Minimum) | `deterministic:focus-management` | — | 1/1 | xg | TP FP- |
 | 2.4.12 | AAA | Fokus nicht verdeckt (Erweitert) | `llm:llm-focus-appearance` | — | 1/1 | l | — |
 | 2.4.13 | AAA | Fokusdarstellung | `llm:llm-focus-appearance` | — | 2/2 | l | — |
 | 2.5.1 | A | Zeigergesten | `deterministic:input-modalities` | — | 2/1 | x | TP FP- |
 | 2.5.2 | A | Zeigereingabe abbrechen | `deterministic:input-modalities` | — | 2/1 | x | TP FP- |
-| 2.5.3 | A | Beschriftung im zugänglichen Namen | `hybrid:axe-core+input-modalities` | `label-in-name (experimental)` | 2/1 | acx | TP **FP!** |
+| 2.5.3 | A | Beschriftung im zugänglichen Namen | `hybrid:axe-core+input-modalities` | `label-in-name (experimental)` | 2/1 | acxg | TP **FP!** |
 | 2.5.4 | A | Betätigung durch Bewegung | `deterministic:input-modalities` | — | 2/1 | x | TP FP- |
-| 2.5.5 | AAA | Zielgröße (Erweitert) | `deterministic:mobile-specific` | — | 1/1 | — | — |
+| 2.5.5 | AAA | Zielgröße (Erweitert) | `MANUAL` | — | 1/1 | — | — |
 | 2.5.6 | AAA | Gleichzeitige Eingabemechanismen | `deterministic:concurrent-input` | — | 1/1 | x | TP FP- |
 | 2.5.7 | AA | Ziehbewegungen | `deterministic:input-modalities` | — | 1/1 | x | TP FP- |
-| 2.5.8 | AA | Zielgröße (Minimum) | `hybrid:axe-core+input-modalities` | — | 1/1 | ax | TP FP- |
+| 2.5.8 | AA | Zielgröße (Minimum) | `hybrid:axe-core+input-modalities` | — | 1/1 | axg | TP FP- |
 | 3.1.1 | A | Sprache der Seite | `axe-core` | `language-detection (experimental)` | 1/2 | ac | TP FP- |
 | 3.1.2 | AA | Sprache von Teilen | `axe-core` | `language-detection (experimental)` | 2/2 | ac | TP FP- |
 | 3.1.3 | AAA | Ungebräuchliche Wörter | `llm:llm-semantic-text` | — | 2/2 | l | — |
@@ -158,6 +158,7 @@ Primary mechanism column):
 | 1.4.5 | AA | `experimental:images-of-text` | Only experimental scanners cover this criterion — images-of-text: concurrent harness: FAIL — missed bad-images-of-text.html (1.4.5,1.4.9) |
 | 2.4.6 | AA | `experimental:page-structure` | Only experimental scanners cover this criterion — page-structure: concurrent harness: FAIL — missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness: FAIL — missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-aria.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-data-tables.html (1.3.1) | concurrent harness: FAIL — missed bad-form-grouping.html (1.3.1) | concurrent harness: FAIL — missed bad-form-labels.html (1.3.1) | (+2 more) |
 | 2.4.8 | AAA | `MANUAL` | Location (AAA) — whether a user can determine their position requires the surrounding set of pages and its information architecture, not one page. |
+| 2.5.5 | AAA | `MANUAL` | Target Size (Enhanced) (AAA) — the 44x44 check was removed from mobile-specific because it was reported as an AA failure on every healthy page (false-positive-reports/2026-08-09, FP-1). The AA minimum (2.5.8, 24x24 with the spacing exception) is automated in input-modalities; the AAA size is a design review item. |
 | 3.3.1 | A | `experimental:error-handling+status-messages` | Only experimental scanners cover this criterion — error-handling: concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2) ;; status-messages: concurrent harness: FAIL — missed bad-form-errors.html (3.3.1) | concurrent harness: FAIL — missed bad-status-messages.html (4.1.3) |
 | 3.3.3 | AA | `experimental:error-handling` | Only experimental scanners cover this criterion — error-handling: concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2) |
 | 3.3.4 | AA | `experimental:error-handling` | Only experimental scanners cover this criterion — error-handling: concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2) |
@@ -209,8 +210,8 @@ Trust tiers (derived from the recorded battery results by `tests/derive-scanner-
 | `color-contrast` | deterministic | no | proven | 1.4.3, 1.4.6 | — |
 | `use-of-color` | deterministic | no | **experimental** | 1.4.1 | concurrent harness: FAIL — missed bad-use-of-color.html (1.4.1) / concurrent harness: FAIL — false positive on good-css-background-accessible.html (1.4.1) |
 | `images-of-text` | deterministic | no | **experimental** | 1.4.5, 1.4.9 | concurrent harness: FAIL — missed bad-images-of-text.html (1.4.5,1.4.9) |
-| `advanced-contrast` | deterministic | no | **experimental** | 1.4.3, 1.4.6, 1.4.11 | concurrent harness: FAIL — missed bad-color-contrast.html (1.4.3,1.4.6) / concurrent harness: FAIL — missed bad-focus-visible.html (1.4.3) |
-| `nontext-contrast` | deterministic | no | proven | 1.4.11 | — |
+| `advanced-contrast` | deterministic | no | **experimental** | 1.4.11, 1.4.13 | concurrent harness: FAIL — missed bad-color-contrast.html (1.4.3,1.4.6) / concurrent harness: FAIL — missed bad-focus-visible.html (1.4.3) |
+| `nontext-contrast` | deterministic | yes | proven | 1.4.11 | — |
 | `text-resize` | deterministic | yes | proven | 1.4.4 | — |
 | `screen-reader` | deterministic | no | **experimental** | 1.3.1, 4.1.2, 4.1.3 | concurrent harness: FAIL — missed bad-aria-state-updates.html (4.1.2,4.1.3) / concurrent harness: FAIL — missed bad-beeproduced-real-issues.html (4.1.2,1.3.1) / concurrent harness: FAIL — missed bad-cognitive-accessibili |
 | `media-accessibility` | deterministic | no | proven | 1.2.1, 1.2.2, 1.2.3, 1.2.5 | — |
@@ -231,7 +232,7 @@ Trust tiers (derived from the recorded battery results by `tests/derive-scanner-
 | `focus-management` | deterministic | yes | proven | 2.4.3, 2.4.7, 2.4.11 | — |
 | `input-modalities` | deterministic | yes | proven | 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.5.7, 2.5.8 | — |
 | `responsive-design` | deterministic | yes | proven | 1.4.4, 1.4.10, 1.4.12 | — |
-| `mobile-specific` | deterministic | yes | proven | 1.4.10, 2.5.5 | — |
+| `mobile-specific` | deterministic | yes | proven | 1.4.10 | — |
 | `hover-focus-content` | deterministic | yes | proven | 1.4.13 | — |
 | `concurrent-input` | deterministic | yes | proven | 2.5.6 | — |
 | `dynamic-spa` | deterministic | yes | proven | 4.1.2, 4.1.3 | — |

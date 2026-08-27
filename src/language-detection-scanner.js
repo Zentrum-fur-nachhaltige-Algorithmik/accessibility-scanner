@@ -155,8 +155,8 @@ class LanguageDetectionScanner extends BaseScanner {
           element: "html",
           issue: "invalid-language-code",
           declaredLanguage: pageLanguageInfo.declaredLanguage,
-          description: `Page language code "${pageLanguageInfo.declaredLanguage}" is not a valid language identifier`,
-          suggestion: "Use a valid ISO 639-1 language code (e.g., 'en', 'es', 'fr', 'de')"
+          description: `Page language code "${pageLanguageInfo.declaredLanguage}" is not a syntactically valid BCP 47 language tag`,
+          suggestion: "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word"
         });
       }
     }
@@ -354,8 +354,8 @@ class LanguageDetectionScanner extends BaseScanner {
           element: element.selector,
           issue: "invalid-language-code",
           declaredLanguage: element.langCode,
-          description: `Element has invalid language code "${element.langCode}"`,
-          suggestion: "Use a valid ISO 639-1 language code"
+          description: `Element has a lang attribute ("${element.langCode}") that is not a syntactically valid BCP 47 language tag`,
+          suggestion: "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word"
         });
       }
     }
@@ -417,22 +417,77 @@ class LanguageDetectionScanner extends BaseScanner {
   }
 
   /**
-   * Validate language code format
+   * Validate language code format.
+   *
+   * The HTML `lang` attribute takes a BCP 47 language tag (RFC 5646), not a
+   * bare ISO 639-1 code — three-letter ISO 639-2/639-3 subtags (e.g. "deu",
+   * "gsw", "nds"), script/region/variant-qualified tags (e.g. "zh-Hant-TW",
+   * "es-419", "de-CH-1901"), and grandfathered/private-use tags (e.g.
+   * "en-GB-oed", "x-klingon") are all valid. This checks SYNTAX per the
+   * RFC 5646 ABNF, not IANA Language Subtag Registry membership — there is
+   * deliberately no hardcoded list of "known" languages here, so any tag that
+   * is grammatically well-formed is accepted even if nobody has registered it.
+   *
+   * RFC 5646 §2.1 ABNF (grandfathered tags aside):
+   *
+   *   langtag     = language ["-" script] ["-" region]
+   *                 *("-" variant) *("-" extension) ["-" privateuse]
+   *   language    = 2*3ALPHA ["-" extlang] / 4ALPHA
+   *   extlang     = 3ALPHA *2("-" 3ALPHA)
+   *   script      = 4ALPHA
+   *   region      = 2ALPHA / 3DIGIT
+   *   variant     = 5*8alphanum / (DIGIT 3alphanum)
+   *   extension   = singleton 1*("-" (2*8alphanum))
+   *   singleton   = DIGIT / any ALPHA except "x"/"X"
+   *   privateuse  = "x" 1*("-" (1*8alphanum))
+   *
+   * One deliberate narrowing vs. the raw ABNF: RFC 5646 also allows a bare
+   * 5*8ALPHA primary subtag ("registered" for future use), but the RFC's own
+   * text says "there were no examples of this kind of subtag" and "future
+   * registrations of this type are discouraged" — none exist today either.
+   * Accepting it would mean accepting any plain English (or German, etc.)
+   * word of 5-8 letters — e.g. "english" itself — as a syntactically "valid
+   * language", which defeats the point of validating. That form is excluded;
+   * every other production above is implemented in full.
    */
   isValidLanguageCode(code) {
-    if (!code) return false;
+    if (!code || typeof code !== 'string') return false;
+    const tag = code.trim();
+    if (!tag) return false;
 
-    // Basic validation for ISO 639-1 codes (2 letters) and some extended formats
-    const validPattern = /^[a-z]{2}(-[A-Z]{2})?$/;
+    // Grandfathered tags (RFC 5646 §2.2.8): a fixed, closed set of tags that
+    // predate the subtag grammar and remain valid via the standard's own
+    // exception clause. This is a syntactic constant of BCP 47 itself (there
+    // will never be a 18th entry without a new RFC) — not a language
+    // registry lookup.
+    const GRANDFATHERED = new Set([
+      // irregular
+      'en-gb-oed', 'i-ami', 'i-bnn', 'i-default', 'i-enochian', 'i-hak',
+      'i-klingon', 'i-lux', 'i-mingo', 'i-navajo', 'i-pwn', 'i-tao', 'i-tay',
+      'i-tsu', 'sgn-be-fr', 'sgn-be-nl', 'sgn-ch-de',
+      // regular
+      'art-lojban', 'cel-gaulish', 'no-bok', 'no-nyn', 'zh-guoyu', 'zh-hakka',
+      'zh-min', 'zh-min-nan', 'zh-xiang',
+    ]);
+    if (GRANDFATHERED.has(tag.toLowerCase())) return true;
 
-    // Common valid language codes
-    const validCodes = [
-      'en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ko', 'ar', 'hi',
-      'en-US', 'en-GB', 'es-ES', 'es-MX', 'fr-FR', 'fr-CA', 'de-DE', 'de-AT',
-      'it-IT', 'pt-BR', 'pt-PT', 'zh-CN', 'zh-TW'
-    ];
+    const alphanum = '[a-zA-Z0-9]';
+    const extlang = '[a-zA-Z]{3}(?:-[a-zA-Z]{3}){0,2}';
+    const language = `(?:[a-zA-Z]{2,3}(?:-${extlang})?|[a-zA-Z]{4})`;
+    const script = '[a-zA-Z]{4}';
+    const region = '(?:[a-zA-Z]{2}|[0-9]{3})';
+    const variant = `(?:${alphanum}{5,8}|[0-9]${alphanum}{3})`;
+    const singleton = '[0-9a-wyzA-WYZ]'; // any letter/digit except x/X
+    const extension = `${singleton}(?:-${alphanum}{2,8})+`;
+    const privateuse = `x(?:-${alphanum}{1,8})+`;
 
-    return validPattern.test(code) && (code.length === 2 || validCodes.includes(code));
+    const langtagPattern = new RegExp(
+      `^${language}(?:-${script})?(?:-${region})?(?:-${variant})*(?:-${extension})*(?:-${privateuse})?$`,
+      'i'
+    );
+    const privateUseOnlyPattern = new RegExp(`^${privateuse}$`, 'i');
+
+    return langtagPattern.test(tag) || privateUseOnlyPattern.test(tag);
   }
 
 }

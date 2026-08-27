@@ -1,0 +1,87 @@
+<!-- WCAG-TEST
+criterion: 4.1.2
+level: A
+title: Tabs related to their panel by aria-labelledby instead of aria-controls
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: advanced-aria, screen-reader
+description: role=tab buttons carry no aria-controls, but every role=tabpanel points back at its tab with aria-labelledby, aria-selected is maintained and arrow keys move between tabs. WAI-ARIA 1.2 / APG recommend aria-controls but do not require it, so this is not a 4.1.2 failure. Reproduces the gsunde.website FP where tab-missing-controls fired 4x.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praxis-Informationen</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  main, header, footer { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+  [role="tablist"] { display: flex; flex-wrap: wrap; gap: .25rem; border-bottom: 2px solid #c9cfcb; }
+  [role="tab"] { font: inherit; flex: 1 1 8rem; padding: .6rem .75rem; border: 0; background: #f1f4f2; color: #1a1a1a; cursor: pointer; }
+  [role="tab"][aria-selected="true"] { background: #24483a; color: #ffffff; font-weight: 700; }
+  [role="tabpanel"] { padding: 1rem 0; }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+</header>
+<main id="inhalt">
+  <h1>Praxis-Informationen</h1>
+  <div role="tablist" aria-label="Praxis-Informationen">
+    <button type="button" role="tab" id="tab-ueber-uns" aria-selected="true" tabindex="0">Ueber uns</button>
+    <button type="button" role="tab" id="tab-blog" aria-selected="false" tabindex="-1">Blog</button>
+    <button type="button" role="tab" id="tab-galerie" aria-selected="false" tabindex="-1">Galerie</button>
+    <button type="button" role="tab" id="tab-urlaub" aria-selected="false" tabindex="-1">Urlaub</button>
+  </div>
+
+  <div role="tabpanel" aria-labelledby="tab-ueber-uns" tabindex="0">
+    <h2>Ueber uns</h2>
+    <p>Unsere Ordination betreut seit 1998 Familien im dritten Wiener Gemeindebezirk.</p>
+  </div>
+  <div role="tabpanel" aria-labelledby="tab-blog" tabindex="0" hidden>
+    <h2>Blog</h2>
+    <p>Aktuelle Beitraege zu Vorsorge, Impfungen und Reisemedizin.</p>
+  </div>
+  <div role="tabpanel" aria-labelledby="tab-galerie" tabindex="0" hidden>
+    <h2>Galerie</h2>
+    <p>Einblicke in Wartezimmer, Labor und Behandlungsraum.</p>
+  </div>
+  <div role="tabpanel" aria-labelledby="tab-urlaub" tabindex="0" hidden>
+    <h2>Urlaub</h2>
+    <p>Die Ordination bleibt von 12. bis 23. August geschlossen.</p>
+  </div>
+</main>
+<footer>
+  <p>Musterpraxis, Musterstrasse 1, 1010 Wien</p>
+</footer>
+<script>
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('[role="tabpanel"]'));
+
+  function select(i) {
+    tabs.forEach(function (t, j) {
+      t.setAttribute('aria-selected', j === i ? 'true' : 'false');
+      t.setAttribute('tabindex', j === i ? '0' : '-1');
+      panels[j].hidden = j !== i;
+    });
+    tabs[i].focus();
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { select(i); });
+    tab.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); select((i + 1) % tabs.length); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); select((i - 1 + tabs.length) % tabs.length); }
+      else if (e.key === 'Home') { e.preventDefault(); select(0); }
+      else if (e.key === 'End') { e.preventDefault(); select(tabs.length - 1); }
+    });
+  });
+</script>
+</body>
+</html>

@@ -127,11 +127,46 @@ class MultipleWaysScanner extends BaseScanner {
       // Deduplicate by type
       const uniqueTypes = [...new Set(mechanisms.map(m => m.type))];
 
+      // Evidence that this page is actually part of a larger multi-page site
+      // (mirrors the self-detection in page-structure-scanner.js's identical
+      // 2.4.5/9.2.4.5 check): either (a) at least 2 same-origin links to
+      // genuinely distinct paths — fragment-only ("#..."), "javascript:",
+      // "mailto:", and "tel:" links don't count, since none of them point at
+      // "another page" — or (b) a breadcrumb-shaped trail with >= 2 steps.
+      // (b) is deliberately independent of link functionality: a breadcrumb's
+      // STRUCTURE (Home > Section > Subsection > ...) signals a position
+      // within a page hierarchy even in a static fixture/preview that has no
+      // real backing subpages to link to, so its crumbs are placeholders.
+      const internalPaths = new Set();
+      allLinks.forEach(link => {
+        const raw = (link.getAttribute('href') || '').trim();
+        if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) {
+          return;
+        }
+        let url;
+        try {
+          url = new URL(raw, document.baseURI);
+        } catch (e) {
+          return;
+        }
+        if (url.origin !== location.origin) return;
+        internalPaths.add(url.pathname);
+      });
+
+      let breadcrumbSteps = 0;
+      for (const bc of breadcrumbs) {
+        const steps = bc.querySelectorAll('a, li').length;
+        if (steps > breadcrumbSteps) breadcrumbSteps = steps;
+      }
+
+      const hasEvidenceOfLargerSite = internalPaths.size >= 2 || breadcrumbSteps >= 2;
+
       return {
         mechanisms,
         uniqueTypes,
         count: uniqueTypes.length,
         isProcess,
+        hasEvidenceOfLargerSite,
       };
     });
 
@@ -149,17 +184,70 @@ class MultipleWaysScanner extends BaseScanner {
       };
     }
 
+    // SC 2.4.5 "Multiple Ways" is defined over a *set of web pages* in a site
+    // or process (WCAG: "More than one way is available to locate a Web page
+    // within a set of Web pages") — a single page scanned in isolation cannot
+    // prove or disprove it, since another page of the same site may supply
+    // the missing mechanism. Reporting a full-severity violation from one
+    // page alone is a category error and is exactly the false-positive this
+    // gate exists to prevent.
+    //
+    // Two independent signals gate full-severity reporting, mirroring how
+    // `page-structure-scanner.js` gates its identical 2.4.5/9.2.4.5 check:
+    //  1. An explicit opt-out: a caller that KNOWS it is scanning a
+    //     standalone/single page (an isolated fixture, a one-page preview, a
+    //     single-page brochure site) sets `options.singlePageContext` or
+    //     `options.skipMultiPageCriteria`.
+    //  2. Self-detection: even with no opt-out passed (the default — nothing
+    //     currently sets one), `data.hasEvidenceOfLargerSite` tells us
+    //     whether the page itself looks like part of a larger site (real
+    //     distinct internal links, or a breadcrumb trail). Absent that
+    //     evidence, a page with < 2 mechanisms is exactly as likely to be a
+    //     deliberately single-page site (out of scope for 2.4.5) as it is a
+    //     multi-page site missing navigation aids — so it doesn't warrant a
+    //     full-severity claim on its own.
+    //
+    // A full-severity violation therefore requires BOTH: no opt-out, AND
+    // real evidence this page belongs to a bigger site. Every other case
+    // (opted out, or no such evidence) downgrades to an informational,
+    // low-confidence note instead of asserting a violation outright — this
+    // is what keeps genuinely single-page fixtures/sites from being flagged
+    // for "only 1 way to locate content" while still catching real
+    // multi-page-site pages like bad-multiple-ways.html (its breadcrumb
+    // trail alone is 5 steps deep, well past the >= 2 threshold).
+    const singlePageContext = options.singlePageContext === true || options.skipMultiPageCriteria === true;
+    const assertFullViolation = !singlePageContext && data.hasEvidenceOfLargerSite;
+
     const violations = [];
 
     if (data.count < 2) {
-      violations.push(this.formatViolation(
-        '2.4.5',
-        data.count === 0 ? 'serious' : 'moderate',
-        `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-        'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g., navigation menu, search, sitemap, table of contents, breadcrumb).',
-        [],
-        'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
-      ));
+      if (assertFullViolation) {
+        violations.push(this.formatViolation(
+          '2.4.5',
+          data.count === 0 ? 'serious' : 'moderate',
+          `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
+          'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g., navigation menu, search, sitemap, table of contents, breadcrumb).',
+          [],
+          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
+        ));
+      } else {
+        // Don't assert a violation from a single page with no evidence it's
+        // part of a larger site — downgrade to an informational,
+        // low-confidence note that flags it for whole-site review instead.
+        const violation = this.formatViolation(
+          '2.4.5',
+          'minor',
+          `This page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
+          'WCAG 2.4.5 (Multiple Ways) is evaluated across an entire site or process, not one page in isolation — ' +
+          'this cannot be confirmed as a violation without checking whether other pages of the site provide search, ' +
+          'a sitemap, or another way to locate content.',
+          [],
+          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html',
+          'info'
+        );
+        violation.confidence = 'low';
+        violations.push(violation);
+      }
     }
 
     return {

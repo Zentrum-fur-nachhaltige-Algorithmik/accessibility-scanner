@@ -1,4 +1,5 @@
 const BaseScanner = require('./base-scanner');
+const { findStatementLink } = require('./utils/accessibility-statement');
 
 /**
  * Contact Mechanism Scanner for EAA Procedural Requirements
@@ -42,7 +43,8 @@ class ContactMechanismScanner extends BaseScanner {
         onlineFormAvailable: contactResults.onlineFormAvailable,
         contactAccessible: contactResults.contactAccessible,
         responseTimeStated: contactResults.responseTimeStated,
-        multipleOptionsAvailable: contactResults.multipleOptionsAvailable
+        multipleOptionsAvailable: contactResults.multipleOptionsAvailable,
+        gatedOnMissingStatement: !contactResults.statementPresent
       }
     };
   }
@@ -95,6 +97,7 @@ class ContactMechanismScanner extends BaseScanner {
 
     // Analyze main page for contact mechanisms
     const mainPageAnalysis = await this.analyzePageContactMechanisms(page);
+    const statementPresent = (await findStatementLink(page)).found;
 
     // Check if we found any contact mechanisms on main page
     if (mainPageAnalysis.hasContactMechanisms) {
@@ -127,7 +130,7 @@ class ContactMechanismScanner extends BaseScanner {
         issue: "no-contact-methods",
         description: "No accessibility contact mechanisms found",
         suggestion: "Provide at least one contact method (email, phone, or online form) for accessibility issues",
-        severity: "critical"
+        severity: "serious"
       });
     } else {
       // Check individual contact methods quality
@@ -179,7 +182,12 @@ class ContactMechanismScanner extends BaseScanner {
         });
       }
 
-      if (!responseTimeStated) {
+      // A response-time commitment for accessibility enquiries is something the
+      // accessibility statement has to declare (EN 301 549 clause 12.2.2). With
+      // no statement published there is nothing to read it out of, and
+      // `accessibility-statement` already reports that root cause — reporting
+      // the consequence too would double-count one defect.
+      if (!responseTimeStated && statementPresent) {
         violations.push({
           criterion: "EAA-Contact",
           issue: "no-response-time",
@@ -197,7 +205,8 @@ class ContactMechanismScanner extends BaseScanner {
       onlineFormAvailable,
       contactAccessible,
       responseTimeStated,
-      multipleOptionsAvailable
+      multipleOptionsAvailable,
+      statementPresent
     };
   }
 

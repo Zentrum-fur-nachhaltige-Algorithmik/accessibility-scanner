@@ -1,6 +1,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { tabWalk, cleanupTabWalk } = require('./utils/keyboard-focus');
+const { injectableCode: renderedCode } = require('./utils/rendered');
+const { injectableCode: accnameUtils } = require('./utils/accessible-name');
 
 /**
  * Keyboard Navigation Scanner for WCAG compliance testing
@@ -252,203 +255,71 @@ class KeyboardNavigationScanner extends BaseScanner {
   async testKeyboardNavigation(page, scanDir, interactiveElements, violations, tabOrder, visualEvidence) {
     console.log('Testing keyboard navigation with visual analysis...');
 
-    // Start at the body element
-    await page.evaluate(() => {
-      document.body.focus();
-    });
+    // Real Tab presses via src/utils/keyboard-focus.js. Identity is the tab
+    // id stamped on each element — the old loop compared two differently
+    // built selector STRINGS, so two sibling `a.nav-link`s looked like the
+    // same element and were reported as a keyboard trap after 3 steps (FP-5).
+    const maxSteps = Math.min(80, Math.max(20, interactiveElements.length + 5));
+    let stepIndex = 0;
 
-    let currentIndex = 0;
-    const maxTabs = Math.min(30, Math.max(15, interactiveElements.length)); // Reasonable limit
-    const visitedElements = new Map(); // Track element -> visit count
-
-    for (let tabIndex = 0; tabIndex < maxTabs; tabIndex++) {
-      // Take screenshot before tab
-      const beforeScreenshot = await page.screenshot({
-        path: path.join(scanDir, `tab-${tabIndex.toString().padStart(3, '0')}-before.png`),
-        fullPage: false
-      });
-
-      // Get current focused element info
-      const focusInfo = await page.evaluate(() => {
-        const active = document.activeElement;
-        if (!active || active === document.body) return null;
-
-        const rect = active.getBoundingClientRect();
-        const computed = window.getComputedStyle(active);
-        const focusComputed = window.getComputedStyle(active, ':focus');
-
-        return {
-          tagName: active.tagName,
-          id: active.id || '',
-          className: active.className || '',
-          tabIndex: active.tabIndex,
-          text: active.textContent.trim().substring(0, 50),
-          selector: active.tagName.toLowerCase() + 
-                   (active.id ? `#${active.id}` : '') + 
-                   (active.className ? `.${active.className.split(' ').join('.')}` : ''),
-          rect: {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height
-          },
-          focusStyles: {
-            outline: computed.outline, // Use current computed style since element is focused
-            outlineColor: computed.outlineColor,
-            outlineWidth: computed.outlineWidth,
-            outlineStyle: computed.outlineStyle,
-            boxShadow: computed.boxShadow,
-            border: computed.border,
-            backgroundColor: computed.backgroundColor
-          },
-          computedStyles: {
-            outline: computed.outline,
-            boxShadow: computed.boxShadow,
-            border: computed.border
-          }
-        };
-      });
-
-      // Press Tab key
-      await page.keyboard.press('Tab');
-      await new Promise(resolve => setTimeout(resolve, 100)); // Allow focus to settle
-
-      // Take screenshot after tab
-      const afterScreenshot = await page.screenshot({
-        path: path.join(scanDir, `tab-${tabIndex.toString().padStart(3, '0')}-after.png`),
-        fullPage: false
-      });
-
-      // Get new focused element and its current focus styles
-      const newFocusInfo = await page.evaluate(() => {
-        const active = document.activeElement;
-        if (!active || active === document.body) return null;
-
-        const rect = active.getBoundingClientRect();
-        const computed = window.getComputedStyle(active);
-
-        // Generate unique selector
-        function generateUniqueSelector(element) {
-          let selector = element.tagName.toLowerCase();
-          
-          if (element.id) {
-            selector += `#${element.id}`;
-          } else {
-            if (element.className) {
-              const classes = element.className.split(' ').filter(c => c.trim()).slice(0, 2);
-              if (classes.length > 0) {
-                selector += `.${classes.join('.')}`;
-              }
-            }
-            
-            if (!element.id && !element.className) {
-              const text = element.textContent.trim().substring(0, 15).replace(/[^a-zA-Z0-9]/g, '');
-              if (text) {
-                selector += `[data-text="${text}"]`;
-              } else {
-                const siblings = Array.from(element.parentElement?.children || []);
-                const index = siblings.indexOf(element);
-                if (index >= 0) {
-                  selector += `:nth-child(${index + 1})`;
-                }
-              }
-            }
-          }
-          
-          return selector;
-        }
-
-        return {
-          tagName: active.tagName,
-          id: active.id || '',
-          className: active.className || '',
-          tabIndex: active.tabIndex,
-          text: active.textContent.trim().substring(0, 50),
-          selector: generateUniqueSelector(active),
-          rect: {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height
-          },
-          focusStyles: {
-            // Use current computed styles since element is focused
-            outline: computed.outline,
-            outlineColor: computed.outlineColor,
-            outlineWidth: computed.outlineWidth,
-            outlineStyle: computed.outlineStyle,
-            boxShadow: computed.boxShadow,
-            border: computed.border,
-            borderWidth: computed.borderWidth,
-            backgroundColor: computed.backgroundColor
-          }
-        };
-      });
-
-      if (newFocusInfo) {
-        // Check if this is a keyboard trap (focus didn't move from previous step)
-        if (focusInfo && focusInfo.selector === newFocusInfo.selector && tabIndex > 0) {
+    try {
+      for await (const step of tabWalk(page, { maxSteps, settleMs: 100 })) {
+        if (step.stuck) {
           violations.push({
             criterion: "9.2.1.2",
-            element: newFocusInfo.selector,
+            element: step.selector,
             issue: "keyboard-trap",
             description: `Focus is trapped on element and cannot move with Tab key`,
-            keySequence: [`Tab (step ${tabIndex})`],
+            keySequence: [`Tab (step ${step.step})`],
             suggestion: "Ensure all interactive elements allow focus to move to next element with Tab key"
           });
-          break; // Exit to prevent infinite loop
-        }
-
-        // Check for visible focus indicator
-        const hasVisibleFocus = this.analyzeVisibleFocus(newFocusInfo);
-        
-        // Add to tab order
-        const tabOrderElement = {
-          element: newFocusInfo.selector,
-          tabIndex: tabOrder.length, // Use array index for consistency
-          role: newFocusInfo.tagName.toLowerCase(),
-          isVisible: newFocusInfo.rect.width > 0 && newFocusInfo.rect.height > 0,
-          hasVisibleFocus: hasVisibleFocus.visible
-        };
-        
-        tabOrder.push(tabOrderElement);
-
-        // Record visual evidence
-        visualEvidence.push({
-          tabIndex: tabIndex,
-          element: newFocusInfo.selector,
-          beforeScreenshot: `tab-${tabIndex.toString().padStart(3, '0')}-before.png`,
-          afterScreenshot: `tab-${tabIndex.toString().padStart(3, '0')}-after.png`,
-          focusVisible: hasVisibleFocus.visible,
-          focusIndicators: hasVisibleFocus.indicators,
-          focusStyles: newFocusInfo.focusStyles
-        });
-
-        // Check for focus visibility violations
-        if (!hasVisibleFocus.visible) {
-          violations.push({
-            criterion: "9.2.4.7",
-            element: newFocusInfo.selector,
-            issue: "no-visible-focus",
-            description: "Element receives keyboard focus but has no visible focus indicator",
-            suggestion: "Add CSS :focus styles with visible outline, box-shadow, or background color change"
-          });
-        }
-
-        // Prevent infinite loops by tracking visited elements
-        const elementKey = newFocusInfo.selector;
-        const visitCount = visitedElements.get(elementKey) || 0;
-        visitedElements.set(elementKey, visitCount + 1);
-        
-        // If we've seen this element 3+ times, it's probably a cycle
-        if (visitCount >= 2) {
-          console.log(`Detected tab order cycle at ${elementKey} (visited ${visitCount + 1} times), ending navigation test`);
           break;
         }
-      } else {
-        // No focusable element found - end of tab sequence
-        break;
+        if (!step.rendered) continue;
+
+        const shot = `tab-${String(stepIndex).padStart(3, '0')}-after.png`;
+        try { await page.screenshot({ path: path.join(scanDir, shot), fullPage: false }); } catch (e) { /* best-effort */ }
+
+        const ind = step.indicator;
+        tabOrder.push({
+          element: step.selector,
+          tabId: step.tabId,
+          tabIndex: tabOrder.length,
+          role: step.tag,
+          // document coordinates, measured while the element was focused
+          rect: { x: step.rect.x + step.scrollX, y: step.rect.y + step.scrollY, width: step.rect.width, height: step.rect.height },
+          isVisible: step.rect.width > 0 && step.rect.height > 0,
+          hasVisibleFocus: ind.visible
+        });
+
+        visualEvidence.push({
+          tabIndex: stepIndex,
+          element: step.selector,
+          afterScreenshot: shot,
+          focusVisible: ind.visible,
+          focusIndicators: ind.reasons,
+          focusStyles: {
+            outline: ind.outline,
+            boxShadow: step.after.boxShadow,
+            backgroundColor: step.after.backgroundColor
+          }
+        });
+
+        // 2.4.7 is owned by focus-management (it also checks contrast); only
+        // the clear-cut "nothing changes at all" case is reported here.
+        if (!ind.visible && !ind.lowContrast) {
+          violations.push({
+            criterion: "9.2.4.7",
+            element: step.selector,
+            issue: "no-visible-focus",
+            description: "Element receives keyboard focus but has no visible focus indicator",
+            suggestion: "Add CSS :focus-visible styles with visible outline, box-shadow, or background color change"
+          });
+        }
+        stepIndex++;
       }
+    } finally {
+      await cleanupTabWalk(page);
     }
 
     console.log(`Completed keyboard navigation test: ${tabOrder.length} elements in tab order`);
@@ -564,26 +435,37 @@ class KeyboardNavigationScanner extends BaseScanner {
     let traps = 0;
     
     // Test modals and overlays
-    const modalElements = await page.evaluate(() => {
+    // Only things that ARE dialogs right now: rendered, and either
+    // semantically a dialog (role / <dialog open> / aria-modal) or a
+    // class-named modal that is actually shown — and with at least one
+    // focusable child, because a container nothing can focus cannot trap
+    // focus (the old check focused nothing, pressed Tab, landed on the page's
+    // first link inside an always-visible `.overlay` wrapper → "trap", FP-5).
+    const modalElements = await page.evaluate((renderedCode) => {
+      eval(renderedCode);
       const modals = [];
-      const selectors = ['.modal', '.overlay', '.popup', '.dialog', '[role="dialog"]', '[role="alertdialog"]'];
-      
+      const seen = new Set();
+      const selectors = ['[role="dialog"]', '[role="alertdialog"]', 'dialog[open]', '[aria-modal="true"]', '.modal', '.popup', '.dialog'];
+      let i = 0;
       selectors.forEach(selector => {
         document.querySelectorAll(selector).forEach(el => {
-          const rect = el.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            modals.push({
-              selector: el.tagName.toLowerCase() + 
-                       (el.id ? `#${el.id}` : '') + 
-                       (el.className ? `.${el.className.split(' ').join('.')}` : ''),
-              visible: true
-            });
-          }
+          if (seen.has(el) || !__isRendered(el)) return;
+          const focusable = [...el.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+            .filter(f => __isFocusableRendered(f));
+          if (focusable.length === 0) return;
+          seen.add(el);
+          const marker = 'a11y-modal-' + (i++);
+          el.setAttribute('data-a11y-modal', marker);
+          modals.push({
+            selector: `[data-a11y-modal="${marker}"]`,
+            label: el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') +
+              (typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/).join('.')}` : ''),
+            focusableCount: focusable.length
+          });
         });
       });
-      
       return modals;
-    });
+    }, renderedCode);
 
     for (const modal of modalElements) {
       // Test if focus can escape modal
@@ -617,15 +499,16 @@ class KeyboardNavigationScanner extends BaseScanner {
         await page.keyboard.press('Escape');
         await new Promise(resolve => setTimeout(resolve, 200));
 
-        const modalClosed = await page.evaluate((selector) => {
+        const modalClosed = await page.evaluate((selector, renderedCode) => {
+          eval(renderedCode);
           const modal = document.querySelector(selector);
-          return !modal || window.getComputedStyle(modal).display === 'none';
-        }, modal.selector);
+          return !modal || !__isRendered(modal);
+        }, modal.selector, renderedCode);
 
         if (!modalClosed) {
           violations.push({
             criterion: "9.2.1.2",
-            element: modal.selector,
+            element: modal.label,
             issue: "keyboard-trap",
             description: "Modal or dialog traps keyboard focus without escape mechanism",
             keySequence: ["Tab", "Escape"],
@@ -635,6 +518,10 @@ class KeyboardNavigationScanner extends BaseScanner {
         }
       }
     }
+
+    await page.evaluate(() => {
+      document.querySelectorAll('[data-a11y-modal]').forEach(el => el.removeAttribute('data-a11y-modal'));
+    }).catch(() => {});
 
     return { traps };
   }
@@ -853,32 +740,18 @@ class KeyboardNavigationScanner extends BaseScanner {
     }
 
     try {
-      // Get visual positions of all tabbed elements
-      const positions = await page.evaluate((selectors) => {
-        return selectors.map(sel => {
-          try {
-            const el = document.querySelector(sel);
-            if (!el) return null;
-            
-            const rect = el.getBoundingClientRect();
-            return {
-              selector: sel,
-              x: rect.left,
-              y: rect.top,
-              width: rect.width,
-              height: rect.height,
-              center: { 
-                x: rect.left + rect.width / 2, 
-                y: rect.top + rect.height / 2 
-              },
-              area: rect.width * rect.height
-            };
-          } catch (error) {
-            console.warn(`Error getting position for ${sel}:`, error.message);
-            return null;
-          }
-        });
-      }, tabOrder.map(t => t.element));
+      // Visual positions as measured DURING the tab walk (document
+      // coordinates). Re-resolving the selector string would hit the first
+      // DOM match — e.g. the off-canvas mobile nav instead of the desktop nav.
+      const positions = tabOrder.map(t => {
+        if (!t.rect) return null;
+        return {
+          selector: t.element,
+          x: t.rect.x, y: t.rect.y, width: t.rect.width, height: t.rect.height,
+          center: { x: t.rect.x + t.rect.width / 2, y: t.rect.y + t.rect.height / 2 },
+          area: t.rect.width * t.rect.height
+        };
+      });
 
       // Filter out null positions and elements that are too small
       const validPositions = positions.filter(p => p && p.area > 10);
@@ -977,9 +850,11 @@ class KeyboardNavigationScanner extends BaseScanner {
         // 2. Large upward vertical jump (bottom to top) - but not normal form flow
         // 3. Cross-diagonal jumps
         
-        const isBackwardJump = nextPos.center.x < currentPos.center.x && horizontalJump > jumpThreshold;
+        const sameRow = verticalJump < Math.max(currentPos.height, nextPos.height, 24);
+        const isBackwardJump = sameRow && nextPos.center.x < currentPos.center.x && horizontalJump > jumpThreshold;
         const isUpwardJump = nextPos.center.y < currentPos.center.y && verticalJump > jumpThreshold && !isNormalFormFlow;
-        const isDiagonalJump = horizontalJump > jumpThreshold && verticalJump > jumpThreshold;
+        // Down-and-left is how every multi-column layout wraps; only up-and-left/right is suspicious.
+        const isDiagonalJump = horizontalJump > jumpThreshold && verticalJump > jumpThreshold && nextPos.center.y < currentPos.center.y;
         
         if (isBackwardJump || isUpwardJump || isDiagonalJump) {
           significantJumps++;
@@ -1866,7 +1741,11 @@ class KeyboardNavigationScanner extends BaseScanner {
   async validateInteractiveElementAccessibility(page, violations) {
     console.log('Validating interactive element accessibility...');
     
-    const interactiveIssues = await page.evaluate(() => {
+    const interactiveIssues = await page.evaluate((accnameCode) => {
+      // Shared ACCNAME implementation (__accessibleNameInfo) — see
+      // src/utils/accessible-name.js.
+      eval(accnameCode);
+
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -1895,37 +1774,21 @@ class KeyboardNavigationScanner extends BaseScanner {
         
         if (isHidden) return; // Skip hidden elements
         
-        // Check for missing accessible names
-        // Check for accessible name including proper <label> association
-        const hasAriaLabel = element.hasAttribute('aria-label') || element.hasAttribute('aria-labelledby');
-        const hasTitle = element.hasAttribute('title');
-        const hasTextContent = element.textContent.trim();
-        const hasInputAlt = tagName === 'input' && element.hasAttribute('alt');
-        const hasInputValue = tagName === 'input' && element.value;
-        
-        // Check for associated label element (most important for form inputs)
-        let hasAssociatedLabel = false;
-        if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
-          const id = element.id;
-          if (id) {
-            const associatedLabel = document.querySelector(`label[for="${id}"]`);
-            hasAssociatedLabel = associatedLabel && associatedLabel.textContent.trim();
-          }
-          // Also check if input is inside a label
-          if (!hasAssociatedLabel) {
-            const parentLabel = element.closest('label');
-            hasAssociatedLabel = parentLabel && parentLabel.textContent.trim();
-          }
-        }
-        
-        const hasAccessibleName = hasAriaLabel || hasTitle || hasTextContent || 
-                                 hasInputAlt || hasInputValue || hasAssociatedLabel;
-        
-        if (!hasAccessibleName) {
+        // Check for missing accessible names.
+        //
+        // This used to be `element.textContent.trim()` plus a hand-rolled
+        // attribute chain, which reported every element named by a child
+        // `<img alt>` / inline `<svg><title>` / `aria-labelledby` as unnamed —
+        // e.g. a header logo link `<a><img alt="Logo"></a>`. The shared helper
+        // computes what a screen reader actually announces, and reports the
+        // mechanism that produced it (or the one that came up empty).
+        const nameInfo = __accessibleNameInfo(element);
+
+        if (!nameInfo.name) {
           issues.push({
             type: 'interactive-element',
             element: selector,
-            description: 'Interactive element lacks accessible name',
+            description: `Interactive element lacks accessible name (${nameInfo.reason || 'no naming mechanism'})`,
             severity: 'serious',
             suggestion: 'Add aria-label, visible text, or other accessible name mechanism'
           });
@@ -1984,9 +1847,9 @@ class KeyboardNavigationScanner extends BaseScanner {
           }
         }
       });
-      
+
       return issues;
-    });
+    }, accnameUtils);
 
     // Create violations for interactive element issues
     interactiveIssues.forEach(issue => {

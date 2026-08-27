@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: renderedCode } = require('./utils/rendered');
 
 /**
  * Hover/Focus Content Scanner for WCAG 2.2 compliance testing
@@ -32,7 +33,8 @@ class HoverFocusContentScanner extends BaseScanner {
   async heuristicScan(page) {
     console.log('Running heuristic hover/focus content check...');
 
-    const result = await page.evaluate(() => {
+    const result = await page.evaluate((renderedCode) => {
+      eval(renderedCode);
       const violations = [];
 
       function getSelector(el) {
@@ -41,116 +43,126 @@ class HoverFocusContentScanner extends BaseScanner {
           (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
       }
 
-      // 1. Scan stylesheets for :hover/:focus rules that toggle visibility
+      const norm = (sel) => sel.replace(/\s+/g, ' ').replace(/\s*([>+~,])\s*/g, '$1').trim().toLowerCase();
+
+      /** Does this element currently count as NOT rendered (so a :hover rule could reveal it)? */
+      function isHiddenNow(el) {
+        if (!__isRendered(el)) return true;
+        const cs = window.getComputedStyle(el);
+        return cs.pointerEvents === 'none' && parseFloat(cs.opacity) === 0;
+      }
+
+      /** Would applying this declaration block to a hidden element make it rendered? */
+      function revealsHidden(style, el) {
+        const cs = window.getComputedStyle(el);
+        const reveals = [];
+        if (cs.display === 'none' && style.display && style.display !== 'none') reveals.push('display');
+        if ((cs.visibility === 'hidden' || cs.visibility === 'collapse') && style.visibility === 'visible') reveals.push('visibility');
+        if (parseFloat(cs.opacity) === 0 && style.opacity && parseFloat(style.opacity) > 0) reveals.push('opacity');
+        // Off-canvas brought on-canvas
+        for (const side of ['left', 'right', 'top', 'bottom']) {
+          const v = style[side];
+          if (!v) continue;
+          const cur = parseFloat(cs[side]);
+          if (!isNaN(cur) && cur <= -Math.max(el.offsetWidth, el.offsetHeight, 50) && !String(v).trim().startsWith('-')) reveals.push(side);
+        }
+        if (style.transform && cs.transform !== 'none' && (style.transform === 'none' || /translate[XY3d]*\(\s*0(px|%)?/.test(style.transform))) reveals.push('transform');
+        return reveals;
+      }
+
+      // 1. Walk every stylesheet once: collect :hover rules that REVEAL hidden targets,
+      //    and the normalized set of all :focus/:focus-within/:focus-visible selectors.
       const hoverContentSelectors = [];
+      const focusSelectors = new Set();
+      const walk = (rules) => {
+        for (const rule of rules) {
+          if (rule.cssRules && !(rule instanceof CSSStyleRule)) { try { walk(rule.cssRules); } catch (e) { /* */ } continue; }
+          if (!(rule instanceof CSSStyleRule)) continue;
+          const sel = rule.selectorText || '';
+          if (!/:hover|:focus/i.test(sel)) continue;
+          const parts = sel.split(',').map(x => x.trim());
+          for (const part of parts) {
+            if (/:focus(-within|-visible)?/i.test(part)) focusSelectors.add(norm(part.replace(/:focus(-within|-visible)?/gi, ':focus')));
+          }
+          for (const part of parts) {
+            if (!/:hover/i.test(part)) continue;
+            let targets;
+            try { targets = document.querySelectorAll(part.replace(/:hover/gi, '')); } catch (e) { continue; }
+            const revealed = [];
+            for (const t of targets) {
+              if (!isHiddenNow(t)) continue;
+              const r = revealsHidden(rule.style, t);
+              if (r.length) revealed.push({ el: t, via: r });
+            }
+            if (!revealed.length) continue;
+            const sameRuleFocus = parts.some(x => /:focus/i.test(x));
+            hoverContentSelectors.push({
+              selector: part,
+              normalized: norm(part.replace(/:hover/gi, ':focus')),
+              type: 'hover',
+              hasFocusEquivalent: sameRuleFocus,
+              revealed: revealed.map(x => getSelector(x.el)),
+              revealedEls: revealed.map(x => x.el),
+            });
+          }
+        }
+      };
       try {
         for (const sheet of document.styleSheets) {
           let rules;
           try { rules = sheet.cssRules || sheet.rules; } catch (e) { continue; }
-          if (!rules) continue;
-
-          for (const rule of rules) {
-            if (!(rule instanceof CSSStyleRule)) continue;
-            const sel = rule.selectorText || '';
-
-            // Match patterns like .trigger:hover .content { display:block/opacity:1/visibility:visible }
-            const isHoverRule = /:hover/i.test(sel);
-            const isFocusRule = /:focus/i.test(sel);
-            if (!isHoverRule && !isFocusRule) continue;
-
-            const style = rule.style;
-            const showsContent =
-              style.display === 'block' || style.display === 'flex' || style.display === 'grid' ||
-              style.visibility === 'visible' ||
-              style.opacity === '1' ||
-              (style.left && !style.left.startsWith('-')) ||
-              (style.right && style.right !== '-300px');
-
-            if (!showsContent) continue;
-
-            // Handle comma-separated selectors: ".a:hover .b, .a:focus .b"
-            // If the same rule contains both :hover and :focus selectors, mark as having equivalent
-            const selectorParts = sel.split(',').map(s => s.trim());
-            const hasHoverPart = selectorParts.some(s => /:hover/i.test(s));
-            const hasFocusPart = selectorParts.some(s => /:focus/i.test(s));
-
-            if (hasHoverPart) {
-              hoverContentSelectors.push({
-                selector: sel,
-                type: 'hover',
-                hasFocusEquivalent: hasFocusPart, // true if same rule also has :focus
-              });
-            }
-            if (hasFocusPart && !hasHoverPart) {
-              hoverContentSelectors.push({
-                selector: sel,
-                type: 'focus',
-                hasFocusEquivalent: false,
-              });
-            }
-          }
-
-          // Check if hover-only rules have focus equivalents in OTHER rules
-          for (const entry of hoverContentSelectors) {
-            if (entry.type === 'hover' && !entry.hasFocusEquivalent) {
-              const focusEquivalent = entry.selector.replace(/:hover/g, ':focus');
-              const focusWithinEquivalent = entry.selector.replace(/:hover/g, ':focus-within');
-              entry.hasFocusEquivalent = hoverContentSelectors.some(
-                e => e.selector === focusEquivalent || e.selector === focusWithinEquivalent
-              );
-            }
-          }
+          if (rules) walk(rules);
         }
       } catch (e) { /* stylesheet access error */ }
 
+      // Focus equivalents may live in ANY sheet; compare normalized selectors.
+      for (const entry of hoverContentSelectors) {
+        if (entry.hasFocusEquivalent) continue;
+        if (focusSelectors.has(entry.normalized)) { entry.hasFocusEquivalent = true; continue; }
+        // Also accept a :focus-within on any ancestor compound of the hover subject
+        // (e.g. ".menu:hover .sub" vs ".menu:focus-within .sub" already normalized above).
+      }
+
       // Flag hover-only content (no focus equivalent)
       for (const entry of hoverContentSelectors) {
-        if (entry.type === 'hover' && !entry.hasFocusEquivalent) {
+        if (!entry.hasFocusEquivalent) {
           violations.push({
             criterion: '9.1.4.13',
             element: entry.selector,
             issue: 'hover-only-no-focus',
-            description: `Content shown on :hover has no :focus equivalent — keyboard users cannot access it`,
+            description: `Content (${entry.revealed.slice(0, 3).join(', ')}) is revealed on :hover but has no :focus / :focus-within equivalent — keyboard users cannot access it`,
             severity: 'serious',
             suggestion: 'Add a :focus or :focus-within CSS rule that shows the same content.',
           });
         }
       }
 
-      // 2. Check pointer-events:none on hover-revealed elements
+      // 2. pointer-events:none on hover-revealed elements
       for (const entry of hoverContentSelectors) {
-        // Extract the revealed content selector (part after :hover)
-        const parts = entry.selector.split(/\s*:hover\s*/);
-        if (parts.length < 2) continue;
-        const contentSelector = parts[1].trim();
-        if (!contentSelector) continue;
-
-        try {
-          const contentElements = document.querySelectorAll(contentSelector);
-          contentElements.forEach(el => {
-            const style = window.getComputedStyle(el);
-            if (style.pointerEvents === 'none') {
-              violations.push({
-                criterion: '9.1.4.13',
-                element: getSelector(el),
-                issue: 'hover-content-not-hoverable',
-                description: 'Hover-revealed content has pointer-events:none — users cannot move pointer to read it',
-                severity: 'serious',
-                suggestion: 'Remove pointer-events:none from hover-revealed content to make it hoverable.',
-              });
-            }
-          });
-        } catch (e) { /* invalid selector */ }
+        for (const el of entry.revealedEls) {
+          const style = window.getComputedStyle(el);
+          if (style.pointerEvents === 'none') {
+            violations.push({
+              criterion: '9.1.4.13',
+              element: getSelector(el),
+              issue: 'hover-content-not-hoverable',
+              description: 'Hover-revealed content has pointer-events:none — users cannot move pointer to read it',
+              severity: 'serious',
+              suggestion: 'Remove pointer-events:none from hover-revealed content to make it hoverable.',
+            });
+          }
+        }
       }
+      for (const e of hoverContentSelectors) delete e.revealedEls;
 
       // 3. Flag title attributes on interactive elements
       const interactiveWithTitle = document.querySelectorAll(
         'a[title], button[title], input[title], [role="button"][title], [tabindex][title]'
       );
       interactiveWithTitle.forEach(el => {
+        if (!__isRendered(el)) return;
         const title = el.getAttribute('title');
         if (!title || title.length < 5) return; // Skip trivially short titles
-        // Check if there's also visible text or aria-label with the same info
         const text = el.textContent.trim();
         const ariaLabel = el.getAttribute('aria-label') || '';
         if (text.includes(title) || ariaLabel.includes(title)) return; // info already accessible
@@ -165,9 +177,9 @@ class HoverFocusContentScanner extends BaseScanner {
         });
       });
 
-      // 4. Check for mouseenter/mouseover inline handlers without focus equivalents
-      const mouseOnlyHandlers = document.querySelectorAll('[onmouseenter], [onmouseover]');
-      mouseOnlyHandlers.forEach(el => {
+      // 4. Inline mouseenter/mouseover handlers without focus equivalents (rendered elements only)
+      document.querySelectorAll('[onmouseenter], [onmouseover]').forEach(el => {
+        if (!__isRendered(el)) return;
         const hasFocusHandler = el.hasAttribute('onfocus') || el.hasAttribute('onfocusin');
         if (!hasFocusHandler) {
           violations.push({
@@ -181,18 +193,13 @@ class HoverFocusContentScanner extends BaseScanner {
         }
       });
 
-      // 5. Check for setTimeout patterns in scripts (auto-dismiss)
+      // 5. setTimeout auto-dismiss patterns in inline scripts
       let hasAutoClose = false;
-      const scripts = document.querySelectorAll('script:not([src])');
-      scripts.forEach(script => {
+      document.querySelectorAll('script:not([src])').forEach(script => {
         const code = script.textContent || '';
-        // Detect setTimeout near hide/close/display=none/remove patterns
         const autoClosePattern = /setTimeout\s*\([^)]*(?:display\s*=\s*['"]none|\.hide\(|\.remove\(|classList\.remove|\.close\(|opacity\s*=\s*['"]?0)/i;
-        if (autoClosePattern.test(code)) {
-          hasAutoClose = true;
-        }
+        if (autoClosePattern.test(code)) hasAutoClose = true;
       });
-
       if (hasAutoClose) {
         violations.push({
           criterion: '9.1.4.13',
@@ -204,48 +211,26 @@ class HoverFocusContentScanner extends BaseScanner {
         });
       }
 
-      // 6. Check for Escape key handler presence (absence = not dismissable)
-      let hasEscapeHandler = false;
-      scripts.forEach(script => {
-        const code = script.textContent || '';
-        if (/['"]Escape['"]/i.test(code) || /keyCode\s*===?\s*27/.test(code) || /key\s*===?\s*['"]Escape['"]/i.test(code)) {
-          hasEscapeHandler = true;
-        }
-      });
-
-      // Check inline handlers too
-      if (!hasEscapeHandler) {
-        const escInline = document.querySelectorAll('[onkeydown], [onkeyup], [onkeypress]');
-        escInline.forEach(el => {
-          const handler = (el.getAttribute('onkeydown') || '') + (el.getAttribute('onkeyup') || '');
-          if (/Escape|27/.test(handler)) hasEscapeHandler = true;
-        });
-      }
-
-      if (hoverContentSelectors.length > 0 && !hasEscapeHandler) {
-        violations.push({
-          criterion: '9.1.4.13',
-          element: 'document',
-          issue: 'hover-content-not-dismissable',
-          description: 'Page has hover/focus-triggered content but no Escape key handler to dismiss it',
-          severity: 'serious',
-          suggestion: 'Add a keydown listener for Escape to dismiss any hover/focus-triggered content.',
-        });
-      }
+      // Dismissability (Escape) is only decided by the interactive path in fullScan():
+      // grepping inline scripts for "Escape" is blind to external bundles and produced
+      // a page-level false positive on nearly every real site (FP-11).
+      const hasEscapeHandler = null;
 
       return {
         violations,
+        hoverSelectors: hoverContentSelectors.map(e => e.selector),
         hoverContentCount: hoverContentSelectors.length,
         hasAutoClose,
         hasEscapeHandler,
       };
-    });
+    }, renderedCode);
 
     return {
       scannerId: this.id,
       criteria: ['9.1.4.13'],
       passed: result.violations.length === 0,
       violations: result.violations,
+      hoverSelectors: (result.hoverSelectors || []),
       summary: {
         heuristicOnly: true,
         hoverContentCount: result.hoverContentCount,
@@ -272,71 +257,106 @@ class HoverFocusContentScanner extends BaseScanner {
     const heuristicResult = await this.heuristicScan(page);
     const violations = [...heuristicResult.violations];
 
-    // Find hover-triggered elements to test interactively
-    const hoverTriggers = await page.evaluate(() => {
+    // Find hover-triggered elements to test interactively: subjects of the CSS
+    // :hover rules that reveal content, plus the usual class-name candidates.
+    const hoverTriggers = await page.evaluate((renderedCode, hoverSelectors) => {
+      eval(renderedCode);
       const triggers = [];
-
-      // Find elements whose children become visible on hover
-      const candidates = document.querySelectorAll(
-        '[class*="tooltip"], [class*="dropdown"], [class*="popup"], [class*="popover"], ' +
-        '[class*="hover"], [data-tooltip], [aria-describedby]'
-      );
-
-      candidates.forEach(el => {
+      const seen = new Set();
+      const sel = (el) => el.tagName.toLowerCase() +
+        (el.id ? `#${el.id}` : '') +
+        (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+      const add = (el) => {
+        if (seen.has(el) || !__isRendered(el)) return;
+        seen.add(el);
         const rect = el.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) return;
+        triggers.push({ selector: sel(el), rect: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 } });
+      };
+      for (const hs of hoverSelectors) {
+        // subject = compound that carries :hover
+        const m = hs.match(/^(.*?)(?=:hover)/i);
+        if (!m) continue;
+        try { document.querySelectorAll(m[1].trim() || '*').forEach(add); } catch (e) { /* */ }
+      }
+      document.querySelectorAll(
+        '[class*="tooltip"], [class*="dropdown"], [class*="popup"], [class*="popover"], [data-tooltip], [aria-describedby]'
+      ).forEach(add);
+      return triggers.slice(0, 10);
+    }, renderedCode, heuristicResult.hoverSelectors || []);
 
-        const selector = el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
-
-        triggers.push({
-          selector,
-          rect: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
-        });
-      });
-
-      return triggers.slice(0, 10); // Limit to avoid long scan times
-    });
+    const snapshotScript = `
+      (function () {
+        const out = [];
+        for (const el of document.querySelectorAll('body *')) {
+          if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE') continue;
+          out.push(el.checkVisibility ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : (el.offsetWidth > 0 || el.offsetHeight > 0));
+        }
+        return out;
+      })()
+    `;
 
     // Test each hover trigger interactively
     for (const [i, trigger] of hoverTriggers.entries()) {
       try {
-        // Move to trigger and hover
+        // Pre/post diff: which elements became rendered because of the hover?
+        await page.mouse.move(0, 0);
+        await new Promise(resolve => setTimeout(resolve, 250));
+        const before = await page.evaluate(snapshotScript);
         await page.mouse.move(trigger.rect.x, trigger.rect.y);
         await new Promise(resolve => setTimeout(resolve, 400));
-
-        // Take screenshot to see if new content appeared
-        await page.screenshot({ path: path.join(scanDir, `hover-${i}-active.png`) });
-
-        // Check if new content appeared
-        const hoverContent = await page.evaluate((triggerSel) => {
+        const hoverContent = await page.evaluate((beforeVis, triggerSel) => {
+          const els = [...document.querySelectorAll('body *')].filter(el => el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE');
           const trigger = document.querySelector(triggerSel);
-          if (!trigger) return null;
-
-          // Look for child elements that might have become visible
-          const children = trigger.querySelectorAll('*');
-          for (const child of children) {
-            const style = window.getComputedStyle(child);
-            if ((style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity) > 0) &&
-                child.offsetHeight > 0 && child.offsetWidth > 0) {
-              const rect = child.getBoundingClientRect();
-              const triggerRect = trigger.getBoundingClientRect();
-              // Check if this is a "revealed" element (positioned outside trigger bounds)
-              if (rect.bottom > triggerRect.bottom + 5 || rect.top < triggerRect.top - 5 ||
-                  rect.right > triggerRect.right + 100) {
-                return {
-                  found: true,
-                  contentRect: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
-                  contentSelector: child.tagName.toLowerCase() +
-                    (child.id ? `#${child.id}` : '') +
-                    (child.className && typeof child.className === 'string' ? `.${child.className.split(' ')[0]}` : ''),
-                };
+          for (let i = 0; i < els.length && i < beforeVis.length; i++) {
+            const el = els[i];
+            const vis = el.checkVisibility ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : (el.offsetWidth > 0 || el.offsetHeight > 0);
+            if (vis && !beforeVis[i]) {
+              // outermost newly revealed element
+              if (el.parentElement && els.indexOf(el.parentElement) !== -1 && !beforeVis[els.indexOf(el.parentElement)]) continue;
+              const rect = el.getBoundingClientRect();
+              if (rect.width === 0 || rect.height === 0) continue;
+              if (trigger && trigger === el) continue;
+              // 1.4.13 exception: dismissal is only required when the revealed
+              // content obscures or replaces OTHER content. Check whether any
+              // unrelated rendered text sits under the revealed box.
+              let obscures = false;
+              const pad = 2;
+              for (const other of els) {
+                if (other === el || el.contains(other) || other.contains(el)) continue;
+                if (!(other.checkVisibility ? other.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : other.offsetWidth > 0)) continue;
+                const hasOwnText = [...other.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+                const isGraphic = /^(img|svg|video|canvas|input|button|select|textarea)$/i.test(other.tagName);
+                if (!hasOwnText && !isGraphic) continue;
+                const o = other.getBoundingClientRect();
+                if (o.width === 0 || o.height === 0) continue;
+                if (o.left < rect.right - pad && o.right > rect.left + pad && o.top < rect.bottom - pad && o.bottom > rect.top + pad) { obscures = true; break; }
               }
+              // A close control inside the revealed content is an accepted dismiss mechanism.
+              const revealedAll = els.filter((x, j) => j < beforeVis.length && !beforeVis[j] &&
+                (x.checkVisibility ? x.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : x.offsetWidth > 0));
+              const controls = new Set();
+              for (const r of revealedAll) {
+                if (r.matches('button, [role="button"], a[href]')) controls.add(r);
+                r.querySelectorAll('button, [role="button"], a[href]').forEach(c => controls.add(c));
+              }
+              const hasCloseControl = [...controls].some(b => {
+                const name = ((b.getAttribute('aria-label') || '') + ' ' + (b.textContent || '') + ' ' + (b.className || '')).toLowerCase();
+                return /close|schlie|dismiss|×|✕|✖/.test(name);
+              });
+              return {
+                found: true,
+                obscures,
+                hasCloseControl,
+                contentRect: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
+                contentSelector: el.tagName.toLowerCase() +
+                  (el.id ? `#${el.id}` : '') +
+                  (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : ''),
+              };
             }
           }
           return { found: false };
-        }, trigger.selector);
+        }, before, trigger.selector);
 
         if (hoverContent && hoverContent.found) {
           // Test hoverable: move pointer to the revealed content
@@ -380,7 +400,7 @@ class HoverFocusContentScanner extends BaseScanner {
             return style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity) === 0;
           }, hoverContent.contentSelector);
 
-          if (!dismissedByEscape) {
+          if (!dismissedByEscape && hoverContent.obscures && !hoverContent.hasCloseControl) {
             const alreadyFlagged = violations.some(
               v => v.issue === 'hover-content-not-dismissable' && v.element !== 'document'
             );
@@ -389,7 +409,7 @@ class HoverFocusContentScanner extends BaseScanner {
                 criterion: '9.1.4.13',
                 element: trigger.selector,
                 issue: 'hover-content-not-dismissable',
-                description: 'Hover-triggered content is not dismissed by pressing Escape',
+                description: `Hover-triggered content (${hoverContent.contentSelector}) obscures other content and is not dismissed by pressing Escape`,
                 severity: 'serious',
                 suggestion: 'Add Escape key handler to dismiss hover/focus-triggered content without moving the pointer.',
               });

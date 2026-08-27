@@ -224,9 +224,25 @@ class DynamicSpaScanner extends BaseScanner {
                         path: path.join(scanDir, `route-before-${i}.png`)
                     });
 
+                    // Mark the current document so we can tell a client-side
+                    // route change (marker survives) from a full page load
+                    // (marker gone). Only the former is a "route change" whose
+                    // focus/title handling is the app's responsibility.
+                    await page.evaluate(() => { window.__a11ySpaMarker = true; });
+
                     // Click the navigation link
                     await link.click();
                     await new Promise(resolve => setTimeout(resolve, options.interactionTimeout));
+
+                    const stillSameDocument = await page.evaluate(() => window.__a11ySpaMarker === true).catch(() => false);
+                    if (!stillSameDocument) {
+                        // Full navigation: the browser resets focus/title itself.
+                        if (await page.url() !== initialUrl) {
+                            await page.goBack({ waitUntil: 'networkidle0' }).catch(() => {});
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
+                        continue;
+                    }
 
                     // Take screenshot after navigation
                     await page.screenshot({
@@ -994,24 +1010,17 @@ class DynamicSpaScanner extends BaseScanner {
 
             // Check if focus monitoring was set up
             if (window.accessibilityMonitor && window.accessibilityMonitor.focusChanges) {
-                const focusChanges = window.accessibilityMonitor.focusChanges;
-                
-                // Analyze focus patterns
-                if (focusChanges.length === 0) {
-                    violations.push({
-                        type: 'no-focus-tracking',
-                        category: 'focus-management',
-                        severity: 'low',
-                        element: 'document',
-                        description: 'No focus changes detected during dynamic interactions',
-                        details: {
-                            focusChangeCount: focusChanges.length
-                        },
-                        wcagCriteria: '2.4.3',
-                        impact: 'May indicate poor focus management in dynamic content',
-                        recommendation: 'Ensure proper focus management during content updates'
-                    });
-                }
+                // NOTE (Sprint P2): the former `no-focus-tracking` violation
+                // fired whenever `focusChanges` was empty. That array is filled
+                // only by real `focusin` events, and this scanner never focuses
+                // anything itself — so on any page where the scan happens not to
+                // move focus (i.e. every static multi-page site) the array is
+                // empty by construction. "We observed no focus change" is
+                // absence of evidence, not a 2.4.3 Focus Order failure: 2.4.3
+                // constrains the ORDER of focus when it does move, and cannot be
+                // failed by a page that never had a dynamic focus move to make.
+                // The count stays available in the result payload; it is no
+                // longer reported as a violation.
 
                 // Check for focus traps in modals (simplified check)
                 const modalElements = document.querySelectorAll('[role="dialog"], .modal');

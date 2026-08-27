@@ -328,10 +328,22 @@ class MediaAccessibilityScanner extends BaseScanner {
       
       svgs.forEach(svg => {
         const selector = getElementSelector(svg);
-        const isHidden = svg.offsetParent === null;
-        
+
+        // Visibility gate. `offsetParent` is an HTMLElement property: on an
+        // SVGElement it is `undefined`, so the old `svg.offsetParent === null`
+        // test was ALWAYS false and every SVG in a `display:none` subtree
+        // (mobile-menu toggles, sticky mobile CTAs, closed drawers) was
+        // reported at desktop widths. WCAG only applies to content that is
+        // actually presented, so measure the rendered box instead.
+        const rect = svg.getBoundingClientRect();
+        const svgStyle = window.getComputedStyle(svg);
+        const isHidden = (rect.width === 0 && rect.height === 0) ||
+          svgStyle.visibility === 'hidden' ||
+          svgStyle.display === 'none' ||
+          parseFloat(svgStyle.opacity) === 0;
+
         if (isHidden) return;
-        
+
         const hasTitle = svg.querySelector('title');
         const hasDesc = svg.querySelector('desc');
         const hasAriaLabel = svg.hasAttribute('aria-label') && svg.getAttribute('aria-label').trim();
@@ -344,13 +356,25 @@ class MediaAccessibilityScanner extends BaseScanner {
         }
         
         if (!hasTitle && !hasDesc && !hasAriaLabel && !hasAriaLabelledby) {
+          // An icon inside a link/button that is already named by its own text
+          // or aria-label conveys nothing on its own: the fix is aria-hidden,
+          // and the impact is a stray "graphic" announcement, not missing info.
+          const control = svg.closest('a, button, [role="button"], [role="link"], summary, label');
+          const controlNamed = control && (
+            (control.textContent || '').replace(/\s+/g, ' ').trim().length > 0 ||
+            (control.getAttribute('aria-label') || '').trim().length > 0 ||
+            control.hasAttribute('aria-labelledby'));
           mediaCounts.svgsWithoutAlt++;
           allIssues.push({
             type: 'svg-img-alt',
             element: selector,
-            description: 'SVG lacks accessible name',
-            severity: 'serious',
-            suggestion: 'Add <title> element, aria-label, or aria-labelledby to describe the SVG content'
+            description: controlNamed
+              ? 'Decorative inline SVG inside a labelled control should be hidden from assistive technology'
+              : 'SVG lacks accessible name',
+            severity: controlNamed ? 'minor' : 'serious',
+            suggestion: controlNamed
+              ? 'Add aria-hidden="true" (and focusable="false") to the decorative icon'
+              : 'Add <title> element, aria-label, or aria-labelledby to describe the SVG content'
           });
         }
         

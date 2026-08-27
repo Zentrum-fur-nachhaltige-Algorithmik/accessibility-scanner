@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: renderedCode } = require('./utils/rendered');
+const { injectableCode: accnameCode } = require('./utils/accessible-name');
 
 /**
  * Input Modalities Scanner for WCAG 2.2 compliance testing
@@ -391,106 +393,46 @@ class InputModalitiesScanner extends BaseScanner {
   async analyzeLabelInName(page, violations) {
     console.log('Analyzing label in name consistency...');
 
-    const labelAnalysis = await page.evaluate(() => {
+    const labelAnalysis = await page.evaluate((accnameCode, renderedCode) => {
+      eval(accnameCode);
+      eval(renderedCode);
       const issues = [];
       let consistent = true;
 
-      // Find elements with both visible text and accessible names
-      const labeledElements = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"], a[href], label');
+      // Visible label, normalisation and the containment test all come from
+      // src/utils/accessible-name.js (__visibleLabelText / __nameContainsLabel
+      // / __labelInNameOk) so this scanner and phase6a-label-in-name cannot
+      // disagree about what "the visible label" is. The local copy that used
+      // to live here concatenated every rendered text node, which made a
+      // branding link's monogram and tagline part of the label and failed
+      // every one of them — see the header comment in that file.
+      const norm = __visibleLabelNormalize;
 
-      labeledElements.forEach(element => {
-        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-        const className = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          tagName: element.tagName.toLowerCase(),
-          id: element.id,
-          className: className,
-          selector: element.tagName.toLowerCase() +
-                   (element.id ? `#${element.id}` : '') +
-                   (className ? `.${className.split(' ')[0]}` : '')
-        };
+      const controls = document.querySelectorAll('button, [role="button"], [role="link"], [role="menuitem"], [role="tab"], a[href], input[type="button"], input[type="submit"], input[type="reset"]');
+      controls.forEach(element => {
+        if (!__isRendered(element)) return;
+        const tag = element.tagName.toLowerCase();
+        const visible = __visibleLabelText(element);
+        const vis = visible.full;
+        if (!vis) return; // icon-only control: 2.5.3 does not apply (4.1.2 covers naming)
+        const name = norm(__accessibleName(element));
+        if (!name) return; // missing name is 4.1.2, reported elsewhere
+        if (__labelInNameOk(element, __accessibleName(element))) return;
 
-        // Get visible text
-        const visibleText = element.textContent.trim().toLowerCase();
-        
-        // Get accessible name
-        const ariaLabel = element.getAttribute('aria-label');
-        const ariaLabelledBy = element.getAttribute('aria-labelledby');
-        let accessibleName = '';
-
-        if (ariaLabel) {
-          accessibleName = ariaLabel.toLowerCase();
-        } else if (ariaLabelledBy) {
-          const labelElement = document.getElementById(ariaLabelledBy);
-          if (labelElement) {
-            accessibleName = labelElement.textContent.trim().toLowerCase();
-          }
-        } else if (element.tagName.toLowerCase() === 'input') {
-          const associatedLabel = document.querySelector(`label[for="${element.id}"]`);
-          if (associatedLabel) {
-            accessibleName = associatedLabel.textContent.trim().toLowerCase();
-          }
-        }
-
-        // Compare visible text with accessible name
-        if (visibleText && accessibleName && visibleText !== accessibleName) {
-          // Check if visible text is contained within accessible name (more flexible matching)
-          const visibleWords = visibleText.split(' ').filter(word => word.length > 2);
-          const accessibleWords = accessibleName.split(' ').filter(word => word.length > 2);
-          
-          const visibleWordsInAccessible = visibleWords.length > 0 && 
-            visibleWords.every(word => accessibleWords.some(aWord => aWord.includes(word) || word.includes(aWord)));
-
-          // Also check if accessible name contains visible text as substring (ignoring case/punctuation)
-          const normalizedVisible = visibleText.replace(/[^\w\s]/g, '').trim();
-          const normalizedAccessible = accessibleName.replace(/[^\w\s]/g, '').trim();
-          const isSubstring = normalizedAccessible.includes(normalizedVisible) || normalizedVisible.includes(normalizedAccessible);
-
-          if (!visibleWordsInAccessible && !isSubstring && normalizedVisible.length > 5) {
-            issues.push({
-              type: 'label-name-mismatch',
-              element: elementInfo.selector,
-              visibleText: visibleText.substring(0, 50),
-              accessibleName: accessibleName.substring(0, 50),
-              description: 'Visible label text does not match accessible name',
-              severity: 'error'
-            });
-            consistent = false;
-          }
-        }
-
-        // Check for accessible name without visible text
-        if (accessibleName && !visibleText && element.tagName.toLowerCase() === 'button') {
-          issues.push({
-            type: 'accessible-name-no-visible-text',
-            element: elementInfo.selector,
-            accessibleName: accessibleName.substring(0, 50),
-            description: 'Button has accessible name but no visible text',
-            severity: 'warning'
-          });
-        }
-
-        // Check for visible text without accessible name (only for critical interactive elements)
-        if (visibleText && !accessibleName && element.hasAttribute('onclick') && 
-            !element.closest('form') && !element.hasAttribute('type')) {
-          // Only flag if it's clearly an action button, not form controls
-          const actionKeywords = ['submit', 'save', 'delete', 'buy', 'download', 'share'];
-          const hasActionKeyword = actionKeywords.some(keyword => visibleText.includes(keyword));
-          
-          if (hasActionKeyword) {
-            issues.push({
-              type: 'visible-text-no-accessible-name',
-              element: elementInfo.selector,
-              visibleText: visibleText.substring(0, 50),
-              description: 'Interactive element has visible text but no accessible name',
-              severity: 'warning'
-            });
-          }
-        }
+        const className = typeof element.className === 'string' ? element.className.trim() : '';
+        issues.push({
+          type: 'label-name-mismatch',
+          element: tag + (element.id ? `#${element.id}` : '') + (className ? `.${className.split(/\s+/)[0]}` : ''),
+          visibleText: vis.substring(0, 50),
+          accessibleName: name.substring(0, 50),
+          description: 'Accessible name does not contain the visible label text',
+          severity: 'serious'
+        });
+        consistent = false;
       });
 
       return { issues, consistent };
-    });
+    }, accnameCode, renderedCode);
 
     // Create violations for label consistency issues
     labelAnalysis.issues.forEach(issue => {
@@ -722,109 +664,102 @@ class InputModalitiesScanner extends BaseScanner {
   async analyzeTargetSize(page, violations) {
     console.log('Analyzing target size minimum...');
 
-    const targetAnalysis = await page.evaluate(() => {
+    const targetAnalysis = await page.evaluate((renderedCode) => {
+      eval(renderedCode);
       const issues = [];
       let adequate = true;
 
-      const INTERACTIVE_SELECTOR = [
-        'a[href]', 'button', 'input:not([type="hidden"])',
-        'select', 'textarea', '[role="button"]', '[role="link"]',
-        '[role="menuitem"]', '[role="tab"]', '[role="checkbox"]',
-        '[role="radio"]', '[role="switch"]',
-        '[tabindex]:not([tabindex="-1"])',
-      ].join(', ');
+      const MIN_SIZE = 24;          // WCAG 2.5.8 AA minimum
+      const RADIUS = MIN_SIZE / 2;  // spacing exception: 24px-diameter circle
 
-      const MIN_SIZE = 24; // WCAG 2.5.8 AA minimum
+      const INLINE_TEXT_PARENTS = new Set(['p', 'li', 'td', 'th', 'dd', 'dt', 'span', 'label',
+        'figcaption', 'blockquote', 'cite', 'em', 'strong', 'small', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
 
-      const elements = document.querySelectorAll(INTERACTIVE_SELECTOR);
-      const interactiveRects = []; // for spacing check
-
-      elements.forEach(el => {
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden' ||
-            parseFloat(style.opacity) === 0) return;
-
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
-
-        // Exception: inline text links — WCAG 2.5.8 exempts targets whose size
-        // is determined by the line height of non-target text
-        if (el.tagName.toLowerCase() === 'a' && el.hasAttribute('href')) {
-          const isInline = style.display === 'inline' || style.display === 'inline-block';
-          if (isInline) {
-            const parent = el.parentElement;
-            if (parent) {
-              const parentTag = parent.tagName.toLowerCase();
-              const isInTextBlock = ['p', 'li', 'td', 'th', 'dd', 'span', 'div',
-                'label', 'figcaption', 'blockquote', 'cite', 'section', 'article',
-                'main', 'aside', 'nav', 'footer', 'header'].includes(parentTag);
-              if (isInTextBlock) {
-                // Inline link in flowing text — height determined by line-height, exempt
-                // Only exempt if the width is adequate (>=24px) and only height is under threshold
-                if (rect.width >= MIN_SIZE && rect.height < MIN_SIZE) return;
-                // Also exempt if parent has surrounding text
-                if (style.display === 'inline') {
-                  const parentText = parent.textContent.trim();
-                  const linkText = el.textContent.trim();
-                  if (parentText.length > linkText.length + 5) return;
-                }
-              }
-            }
-          }
-        }
-
-        const selector = el.tagName.toLowerCase() +
+      function selectorOf(el) {
+        return el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '');
+          (el.className && typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/)[0]}` : '');
+      }
 
-        interactiveRects.push({ rect, selector, el });
+      /** 2.5.8 "Inline" exception: the target is in a sentence or its size is constrained by line-height of non-target text. */
+      function isInlineTextTarget(el, style) {
+        if (style.display !== 'inline') return false;
+        const parent = el.parentElement;
+        if (!parent) return false;
+        if (!INLINE_TEXT_PARENTS.has(parent.tagName.toLowerCase()) && !parent.closest('p, li, td, th, dd, figcaption, blockquote')) return false;
+        const own = (el.textContent || '').trim().length;
+        const all = (parent.textContent || '').trim().length;
+        return all > own + 2; // surrounded by other text
+      }
 
-        const tooSmallWidth = rect.width < MIN_SIZE;
-        const tooSmallHeight = rect.height < MIN_SIZE;
+      /** 2.5.8 "User agent control" exception: size set by the UA, not the author. */
+      function isUaSizedControl(el, rect) {
+        const tag = el.tagName.toLowerCase();
+        if (tag !== 'input') return false;
+        const t = (el.type || '').toLowerCase();
+        if (t !== 'checkbox' && t !== 'radio') return false;
+        // Chromium default is 13x13; anything near that has not been author-sized.
+        return rect.width <= 16 && rect.height <= 16;
+      }
 
-        if (tooSmallWidth || tooSmallHeight) {
-          issues.push({
-            type: 'target-too-small',
-            element: selector,
-            width: Math.round(rect.width * 100) / 100,
-            height: Math.round(rect.height * 100) / 100,
-            description: `Interactive target is ${Math.round(rect.width)}x${Math.round(rect.height)}px, below the ${MIN_SIZE}x${MIN_SIZE}px minimum`,
-            severity: 'serious',
-          });
-          adequate = false;
-        }
-      });
+      // Collect every rendered pointer target ONCE (each element, not each selector match)
+      const candidates = new Set();
+      document.querySelectorAll('a, area, button, input, select, textarea, summary, [role], [tabindex], [contenteditable], audio[controls], video[controls]')
+        .forEach(el => { if (__isInteractiveTarget(el) && __isRendered(el)) candidates.add(el); });
 
-      // Check underspacing between small targets
-      for (let i = 0; i < interactiveRects.length; i++) {
-        const a = interactiveRects[i].rect;
-        if (a.width >= MIN_SIZE && a.height >= MIN_SIZE) continue;
+      const targets = [];
+      for (const el of candidates) {
+        // A target nested in another target (icon inside a button) is the same target.
+        let p = el.parentElement, nested = false;
+        while (p && p !== document.body) { if (candidates.has(p)) { nested = true; break; } p = p.parentElement; }
+        if (nested) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+        targets.push({ el, rect, selector: selectorOf(el), style: window.getComputedStyle(el) });
+      }
 
-        for (let j = i + 1; j < interactiveRects.length; j++) {
-          const b = interactiveRects[j].rect;
-          // Calculate gap between two rects
-          const gapX = Math.max(0, Math.max(a.left, b.left) - Math.min(a.right, b.right));
-          const gapY = Math.max(0, Math.max(a.top, b.top) - Math.min(a.bottom, b.bottom));
-          const gap = Math.sqrt(gapX * gapX + gapY * gapY);
+      function center(r) { return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+      function circleIntersectsRect(c, r) {
+        const dx = Math.max(r.left - c.x, 0, c.x - r.right);
+        const dy = Math.max(r.top - c.y, 0, c.y - r.bottom);
+        return dx * dx + dy * dy < RADIUS * RADIUS;
+      }
 
-          if (gap < 4 && (b.width < MIN_SIZE || b.height < MIN_SIZE)) {
-            // Only flag once per pair — check if already flagged for this pair
-            issues.push({
-              type: 'target-underspaced',
-              element: interactiveRects[i].selector,
-              nearbyElement: interactiveRects[j].selector,
-              gap: Math.round(gap * 100) / 100,
-              description: `Small targets are only ${Math.round(gap)}px apart — insufficient spacing to compensate for undersized targets`,
-              severity: 'moderate',
-            });
-            adequate = false;
-            break; // one underspacing report per element is enough
+      for (const t of targets) {
+        const { rect, el, style } = t;
+        if (rect.width >= MIN_SIZE && rect.height >= MIN_SIZE) continue;
+        if (isInlineTextTarget(el, style)) continue;
+        if (isUaSizedControl(el, rect)) continue;
+
+        // Spacing exception: the 24px circle centred on this target must not
+        // intersect any other target or any other undersized target's circle.
+        const c = center(rect);
+        let blocker = null;
+        for (const o of targets) {
+          if (o === t) continue;
+          if (circleIntersectsRect(c, o.rect)) { blocker = o; break; }
+          if (o.rect.width < MIN_SIZE || o.rect.height < MIN_SIZE) {
+            const oc = center(o.rect);
+            const d = Math.hypot(c.x - oc.x, c.y - oc.y);
+            if (d < MIN_SIZE) { blocker = o; break; }
           }
         }
+        if (!blocker) continue; // undersized but sufficiently spaced — passes 2.5.8
+
+        adequate = false;
+        issues.push({
+          type: 'target-too-small',
+          element: t.selector,
+          width: Math.round(rect.width * 100) / 100,
+          height: Math.round(rect.height * 100) / 100,
+          nearbyElement: blocker.selector,
+          description: `Interactive target is ${Math.round(rect.width)}x${Math.round(rect.height)}px (minimum ${MIN_SIZE}x${MIN_SIZE}px) and its 24px spacing circle overlaps ${blocker.selector}`,
+          severity: 'serious',
+        });
       }
 
       return { issues, adequate };
-    });
+    }, renderedCode);
 
     targetAnalysis.issues.forEach(issue => {
       violations.push({
@@ -1041,8 +976,6 @@ class InputModalitiesScanner extends BaseScanner {
   getLabelSuggestion(violationType) {
     const suggestions = {
       'label-name-mismatch': 'Ensure accessible name contains the visible label text as a substring',
-      'accessible-name-no-visible-text': 'Add visible text that matches the accessible name',
-      'visible-text-no-accessible-name': 'Add aria-label or associate with a label element'
     };
     return suggestions[violationType] || 'Ensure visible labels match accessible names for voice control users';
   }

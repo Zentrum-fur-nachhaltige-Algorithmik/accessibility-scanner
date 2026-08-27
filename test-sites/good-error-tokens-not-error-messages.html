@@ -1,0 +1,102 @@
+<!-- WCAG-TEST
+criterion: 3.3.1, 3.3.3
+level: AA
+title: Error colour tokens on marketing cards are not error messages
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: error-handling
+description: Marketing cards use Material/Tailwind colour tokens named bg-error-container, text-error and text-on-error-container. They carry no error state, no form and no validation message. The one real error message on the page (contact form) names the expected format and is wired with aria-describedby, so 3.3.1/3.3.3 are satisfied. Reproduces the gsunde.website FP where error-no-suggestion fired 7x on such cards.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praxis-Website Analyse — Symptome und Ursachen</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  :root {
+    --error: #8c2f14;
+    --error-container: #fbe4dc;
+    --on-error-container: #7a2612;
+    --secondary-container: #d9ead3;
+    --on-secondary-container: #2f5233;
+    --surface: #ffffff;
+    --on-surface: #1a1a1a;
+  }
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: var(--surface); color: var(--on-surface); line-height: 1.6; }
+  main, header, footer { max-width: 62rem; margin: 0 auto; padding: 1.5rem; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.4rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+  .card { border: 1px solid #c9cfcb; border-radius: .75rem; padding: 1rem; }
+  .bg-error-container\/40 { background: var(--error-container); }
+  .text-error { color: var(--error); }
+  .text-on-error-container { color: var(--on-error-container); }
+  .bg-secondary-container { background: var(--secondary-container); }
+  .text-on-secondary-container { color: var(--on-secondary-container); }
+  .tag { display: inline-block; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .25rem .6rem; border-radius: 999px; }
+  form { max-width: 32rem; }
+  label { display: block; font-weight: 600; margin-top: 1rem; }
+  input { display: block; width: 100%; padding: .5rem; border: 1px solid #5a5a5a; border-radius: .25rem; font: inherit; color: var(--on-surface); background: #fff; }
+  .field-error { color: var(--error); font-size: .9rem; margin-top: .35rem; }
+  .hint { color: #444444; font-size: .9rem; }
+  button { font: inherit; margin-top: 1rem; padding: .6rem 1.2rem; border: 0; border-radius: .35rem; background: #24483a; color: #ffffff; cursor: pointer; }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+</header>
+<main id="inhalt">
+  <h1>Woran Praxis-Websites scheitern</h1>
+
+  <h2>Typische Symptome</h2>
+  <div class="grid">
+    <article class="card bg-error-container/40">
+      <p class="tag text-error">Symptom</p>
+      <h3 class="text-on-error-container">Langsame WordPress-Site</h3>
+      <p class="text-on-error-container">Symptom: Langsame WordPress-Site. Ladezeiten über vier Sekunden am Handy, Bilder ohne Komprimierung, dreißig aktive Plugins.</p>
+    </article>
+    <article class="card bg-error-container/40">
+      <p class="tag text-error">Symptom</p>
+      <h3 class="text-on-error-container">Lange Wartezeit auf Termine</h3>
+      <p class="text-on-error-container">8-16 Wochen Wartezeit auf einen Kontrolltermin, weil Anfragen ausschließlich telefonisch angenommen werden.</p>
+    </article>
+    <article class="card bg-error-container/40">
+      <p class="tag text-error">Symptom</p>
+      <h3 class="text-on-error-container">Keine Online-Terminvergabe</h3>
+      <p class="text-on-error-container">Patientinnen und Patienten finden am Wochenende keinen Weg, einen Termin zu vereinbaren.</p>
+    </article>
+  </div>
+
+  <h2>Was wir dagegen tun</h2>
+  <div class="grid">
+    <article class="card bg-secondary-container">
+      <p class="tag text-on-secondary-container">Massnahme</p>
+      <p class="text-on-secondary-container">Statischer Export, Bilder in modernen Formaten, Ladezeit unter einer Sekunde.</p>
+    </article>
+    <article class="card bg-secondary-container">
+      <p class="tag text-on-secondary-container">Massnahme</p>
+      <p class="text-on-secondary-container">Terminbuchung rund um die Uhr, direkt an die Praxissoftware angebunden.</p>
+    </article>
+  </div>
+
+  <h2>Kontakt</h2>
+  <form action="#" novalidate>
+    <label for="mail">E-Mail-Adresse</label>
+    <input id="mail" name="mail" type="email" autocomplete="email" required aria-invalid="true" aria-describedby="mail-error mail-hint">
+    <p id="mail-error" class="field-error" role="alert">Die E-Mail-Adresse ist unvollständig. Erwartetes Format: name@praxis.at</p>
+    <p id="mail-hint" class="hint">Wir antworten innerhalb von zwei Werktagen.</p>
+    <button type="submit">Absenden</button>
+  </form>
+</main>
+<footer>
+  <p>Musterpraxis, Musterstrasse 1, 1010 Wien</p>
+</footer>
+</body>
+</html>

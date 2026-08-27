@@ -1,0 +1,57 @@
+<!-- WCAG-TEST
+criterion: 1.4.10, 1.4.4
+level: AA
+title: Decorative blurred background blob does not break reflow
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: responsive-design, mobile-specific
+description: A purely decorative div (600x600, border-radius 50%, blur(120px), pointer-events:none, no text) is positioned absolutely inside an overflow:hidden hero. It carries no content, cannot be interacted with and produces no horizontal scrollbar at 320px. Reproduces the gsunde.website FP where fixed-width-element and mobile-fixed-width-400-zoom fired on div.w-[600px].
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordination Dr. Muster — Willkommen</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-wrap: anywhere; hyphens: auto; }
+  html, body { margin: 0; }
+  body { font-family: system-ui, Arial, sans-serif; background: #ffffff; color: #1a1a1a; line-height: 1.6; }
+  .hero { position: relative; overflow: hidden; background: #f1f4f2; padding: 3rem 1rem; }
+  /* decorative only: no text, not focusable, not a pointer target */
+  .blob {
+    position: absolute; top: -12rem; right: -12rem; z-index: 0;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: #cfe6c8; filter: blur(120px); pointer-events: none;
+  }
+  .hero > .inner { position: relative; z-index: 1; max-width: 60rem; margin: 0 auto; }
+  main, footer { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.5rem; margin-top: 0; }
+  a { color: #24483a; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="blob" aria-hidden="true"></div>
+  <div class="inner">
+    <nav aria-label="Hauptnavigation"><a href="#inhalt">Zum Inhalt springen</a></nav>
+    <h1>Ordination Dr. Muster</h1>
+    <p>Allgemeinmedizin in Wien Landstrasse. Termine online oder telefonisch.</p>
+  </div>
+</header>
+<main id="inhalt">
+  <h2>Leistungen</h2>
+  <ul>
+    <li>Vorsorgeuntersuchung</li>
+    <li>Impfberatung</li>
+    <li>Laboruntersuchungen</li>
+  </ul>
+</main>
+<footer>
+  <p>Musterpraxis, Musterstrasse 1, 1010 Wien</p>
+</footer>
+</body>
+</html>

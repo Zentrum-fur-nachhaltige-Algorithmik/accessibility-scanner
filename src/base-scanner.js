@@ -5,6 +5,8 @@
  * standardized ScanResult. They must NOT launch browsers, create pages,
  * or navigate — the ScanPipeline handles all of that.
  */
+const { injectableCode: renderedCode } = require('./utils/rendered');
+
 class BaseScanner {
   /**
    * @param {string} id       — unique scanner identifier (e.g. 'color-contrast')
@@ -112,15 +114,32 @@ class BaseScanner {
     await new Promise(r => setTimeout(r, 300));
   }
 
+  /**
+   * Injectable helpers shared by scanners that run inside page.evaluate().
+   * Includes everything from src/utils/rendered.js (__isRendered,
+   * __isFocusableRendered, __isInteractiveTarget, __isSrOnly) plus the two
+   * legacy names kept for existing callers.
+   *
+   * isElementVisible() differs from __isRendered() on purpose: it answers
+   * "is this exposed to assistive technology?" (hidden / aria-hidden /
+   * display / visibility, including ancestors) and does NOT require a painted
+   * box, so sr-only content still counts as visible to AT.
+   */
   static get visibilityFilterScript() {
     return `
+      ${renderedCode}
       function isElementVisible(el) {
         if (!el || !el.nodeType || el.nodeType !== 1) return false;
-        if (el.hasAttribute('hidden')) return false;
-        if (el.getAttribute('aria-hidden') === 'true') return false;
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none') return false;
-        if (style.visibility === 'hidden') return false;
+        if (el.closest('[hidden], [aria-hidden="true"]')) return false;
+        if (typeof el.checkVisibility === 'function') {
+          return el.checkVisibility({ checkVisibilityCSS: true });
+        }
+        let n = el;
+        while (n && n.nodeType === 1) {
+          const style = window.getComputedStyle(n);
+          if (style.display === 'none' || style.visibility === 'hidden') return false;
+          n = n.parentElement;
+        }
         return true;
       }
 
@@ -128,12 +147,7 @@ class BaseScanner {
         if (!el || el.nodeType !== 1) return false;
         const cls = el.className || '';
         if (typeof cls === 'string' && (/\\bsr-only\\b/.test(cls) || /\\bvisually-hidden\\b/.test(cls))) return true;
-        const s = window.getComputedStyle(el);
-        if (s.position !== 'absolute' && s.position !== 'fixed') return false;
-        const w = parseFloat(s.width), h = parseFloat(s.height);
-        if (w > 1 || h > 1) return false;
-        if (s.overflow !== 'hidden') return false;
-        return true;
+        return __isSrOnly(el);
       }
     `;
   }

@@ -1,0 +1,65 @@
+<!-- WCAG-TEST
+criterion: 2.4.3
+level: A
+title: Focus Order in a two-column layout
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: Two-column hero/footer: the DOM order (left column top-to-bottom, then right column) is the meaningful order. Moving focus from the last control of the left column to the first control of the right column is visually "upward" but NOT a 2.4.3 failure. Reproduces the illogical-tab-order false positive seen on gsunde.website (2026-08-24). Also contains a roving-tabindex tablist (non-selected tab has tabindex=-1, APG pattern) — focusable-element / tabindex must not fire on it either.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Fokusreihenfolge im Zweispalten-Layout (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  header, main, footer { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .stack > * + * { margin-top: 24px; }
+  a, button { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .cta { display: inline-block; padding: 12px 20px; background: #0b4f6c; color: #fff; border-radius: 8px; text-decoration: none; }
+  .mock { border: 1px solid #999; border-radius: 12px; padding: 16px; }
+  .tabs { display: flex; gap: 8px; }
+  .tabs button { background: #eef3f5; border: 1px solid #999; padding: 8px 12px; border-radius: 6px; }
+  ul { padding-left: 18px; }
+  @media (max-width: 700px) { .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<a href="#main" class="skip">Zum Hauptinhalt springen</a>
+<header>
+  <nav aria-label="Hauptnavigation"><a href="#main">Start</a> · <a href="#leistungen">Leistungen</a> · <a href="#kontakt">Kontakt</a></nav>
+</header>
+<main id="main">
+  <section class="cols" aria-labelledby="h1">
+    <div class="stack">
+      <h1 id="h1">Barrierefreie Websites für Ordinationen</h1>
+      <p>Linke Spalte: Text, danach ein Call-to-Action ganz unten. Im DOM folgt danach die rechte Spalte, deren erstes Bedienelement visuell weiter oben liegt.</p>
+      <p>Weitere Absätze, damit der CTA deutlich unter dem Beginn der rechten Spalte liegt.</p>
+      <p>Noch ein Absatz. Noch ein Absatz. Noch ein Absatz.</p>
+      <a class="cta" href="#kontakt">Website konfigurieren</a>
+    </div>
+    <div class="mock" aria-label="Vorschau">
+      <div class="tabs" role="tablist" aria-label="Vorschau-Bereiche">
+        <button role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">Über uns</button>
+        <button role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b" tabindex="-1">Blog</button>
+      </div>
+      <div role="tabpanel" id="panel-a" aria-labelledby="tab-a"><p>Inhalt A</p><a href="#leistungen">Mehr erfahren</a></div>
+      <div role="tabpanel" id="panel-b" aria-labelledby="tab-b" hidden><p>Inhalt B</p></div>
+    </div>
+  </section>
+  <section id="leistungen"><h2>Leistungen</h2><p>Text.</p></section>
+</main>
+<footer id="kontakt">
+  <h2>Kontakt</h2>
+  <div class="cols">
+    <div><h3>Seiten</h3><ul><li><a href="#main">Start</a></li><li><a href="#leistungen">Leistungen</a></li><li><a href="#kontakt">Kontakt</a></li></ul></div>
+    <div><h3>Rechtliches</h3><ul><li><a href="#main">Impressum</a></li><li><a href="#main">Datenschutz</a></li></ul></div>
+  </div>
+</footer>
+</body>
+</html>

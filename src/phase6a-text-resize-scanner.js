@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('./base-scanner');
+const { injectableCode: renderedCode } = require('./utils/rendered');
+const { injectableCode: clipCode } = require('./utils/text-clipping');
 
 /**
  * Text Resize Scanner for WCAG 1.4.4 compliance testing
@@ -14,13 +16,15 @@ class TextResizeScanner extends BaseScanner {
             wcagPrinciple: 'perceivable'
         });
         this.screenshotDir = path.join(__dirname, '../tmp/text-resize-screenshots');
+        // Browser zoom Z% on a 1280px window is a viewport of 1280/Z CSS px.
+        // WCAG 1.4.10 sets the floor at 320 CSS px (= 400% of 1280); there is
+        // no requirement to reflow below that, so the former "mobile-400%"
+        // 94px viewport tested something no layout can satisfy (FP-4).
         this.testViewports = [
             { width: 1280, height: 1024, name: 'desktop', scale: 1 },
-            { width: 640, height: 512, name: 'desktop-200%', scale: 2 }, // 200% zoom simulation
-            { width: 320, height: 256, name: 'desktop-400%', scale: 4 }, // 400% zoom simulation
-            { width: 375, height: 667, name: 'mobile', scale: 1 },
-            { width: 188, height: 334, name: 'mobile-200%', scale: 2 }, // Mobile 200% zoom
-            { width: 94, height: 167, name: 'mobile-400%', scale: 4 }   // Mobile 400% zoom
+            { width: 640, height: 512, name: 'desktop-200%', scale: 2 },
+            { width: 320, height: 256, name: 'desktop-400%', scale: 4 },
+            { width: 375, height: 667, name: 'mobile', scale: 1 }
         ];
     }
 
@@ -87,22 +91,106 @@ class TextResizeScanner extends BaseScanner {
         const cssViolations = await this._analyzeCSSFromPage(page);
         violations.push(...cssViolations);
 
+        const finalViolations = this.groupBlockingByOverlay(
+            this.deduplicateAcrossViewports(
+                this.filterZoomInducedBlocking(violations, scanOptions.viewports || this.testViewports)
+            )
+        );
+
         return {
             scannerId: this.id,
             criteria: ["1.4.4"],
-            passed: violations.length === 0,
-            violations: violations,
+            passed: finalViolations.length === 0,
+            violations: finalViolations,
             summary: {
                 totalViewportsTested: this.testViewports.length,
                 zoomLevelsSupported: this.calculateZoomSupport(viewportResults),
-                horizontalScrollIssues: violations.filter(v => v.type === 'horizontal-scroll').length,
-                fixedElementIssues: violations.filter(v => v.type === 'fixed-size').length,
-                textFlowIssues: violations.filter(v => v.type === 'text-overflow').length
+                horizontalScrollIssues: finalViolations.filter(v => v.type === 'horizontal-scroll').length,
+                fixedElementIssues: finalViolations.filter(v => v.type === 'fixed-size').length,
+                textFlowIssues: finalViolations.filter(v => v.type === 'text-overflow').length
             },
             viewportResults: viewportResults,
             screenshotPath: scanDir,
-            recommendations: this.generateTextResizeRecommendations(violations)
+            recommendations: this.generateTextResizeRecommendations(finalViolations)
         };
+    }
+
+    /**
+     * `interaction-blocked` claims a resize/reflow failure (1.4.4 / 1.4.10), so
+     * it may only report overlaps that the *narrow* viewport creates. An
+     * element that is covered at the wide desktop reference viewport as well is
+     * a permanent layering problem (2.4.11 territory, checked by
+     * focus-management-scanner) and is not blamed on zoom here.
+     */
+    filterZoomInducedBlocking(violations, viewports) {
+        const isReference = (v) => v.scale === 1 && v.width >= 1024;
+        const referenceNames = new Set(viewports.filter(isReference).map(v => v.name));
+        const reflowNames = new Set(viewports.filter(v => !isReference(v)).map(v => v.name));
+        const baselineKeys = new Set(
+            violations.filter(v => v.type === 'interaction-blocked' && referenceNames.has(v.viewport))
+                .map(v => v.blockedKey)
+        );
+        return violations.filter(v => {
+            if (v.type !== 'interaction-blocked') return true;
+            if (!reflowNames.has(v.viewport)) return false;
+            return !baselineKeys.has(v.blockedKey);
+        });
+    }
+
+    /**
+     * One overlay = one defect. A fixed/sticky bar that covers the footer's legal
+     * links covers *every* link in that row; reporting each of them separately
+     * multiplies a single layout bug. The covering element becomes the reported
+     * element, the covered ones are listed in `details.blockedElements`.
+     */
+    groupBlockingByOverlay(violations) {
+        const map = new Map();
+        const rest = [];
+        for (const v of violations) {
+            if (v.type !== 'interaction-blocked') { rest.push(v); continue; }
+            const overlay = (v.details && v.details.coveredBy) || 'unknown';
+            if (map.has(overlay)) {
+                const g = map.get(overlay);
+                g.details.blockedElements.push(v.element);
+                for (const vp of v.affectedViewports || []) {
+                    if (!g.affectedViewports.includes(vp)) g.affectedViewports.push(vp);
+                }
+                continue;
+            }
+            map.set(overlay, {
+                ...v,
+                element: overlay,
+                description: `${overlay} covers interactive content at reduced viewport widths`,
+                details: { ...v.details, blockedElements: [v.element] },
+                affectedViewports: [...(v.affectedViewports || [])]
+            });
+        }
+        for (const g of map.values()) {
+            g.description = `${g.element} covers ${g.details.blockedElements.length} interactive element(s) at reduced viewport widths`;
+        }
+        return [...rest, ...map.values()];
+    }
+
+    /**
+     * One finding per (type, element) across the tested viewports. The same
+     * clipped container measured at 200% and at 400% is one defect, not two;
+     * the viewports it was observed at are kept in `affectedViewports`.
+     */
+    deduplicateAcrossViewports(violations) {
+        const map = new Map();
+        for (const v of violations) {
+            // blockedKey disambiguates elements whose selector is just a tag name
+            const key = `${v.type}::${v.blockedKey || v.element || v.selector || ''}`;
+            if (map.has(key)) {
+                const existing = map.get(key);
+                if (v.viewport && !existing.affectedViewports.includes(v.viewport)) {
+                    existing.affectedViewports.push(v.viewport);
+                }
+                continue;
+            }
+            map.set(key, { ...v, affectedViewports: v.viewport ? [v.viewport] : [] });
+        }
+        return [...map.values()];
     }
 
     /**
@@ -126,28 +214,37 @@ class TextResizeScanner extends BaseScanner {
                             const styles = rule.style;
 
                             if (styles.fontSize && styles.fontSize.endsWith('px') && parseInt(styles.fontSize) < 12) {
-                                issues.push({ type: 'small-fixed-font', selector, property: 'font-size', value: styles.fontSize, severity: 'moderate' });
+                                issues.push({ type: 'small-fixed-font', selector, property: 'font-size', value: styles.fontSize, severity: 'info' });
                             }
+                            // The following four are CSS *smells*, not failures:
+                            // a px width/min-width/max-width or an overflow:hidden
+                            // box only violates 1.4.4/1.4.10 if it actually clips
+                            // content or forces horizontal scrolling — and that is
+                            // measured per viewport (horizontal-scroll, text-overflow,
+                            // fixed-size). A rule like `.card { width: 900px }` inside
+                            // a `@media (min-width: 1200px)` block reflows perfectly.
+                            // Reported as `info` so they stay visible as hints without
+                            // counting as violations.
                             if (styles.width && styles.width.endsWith('px')) {
                                 const width = parseInt(styles.width);
                                 if (width > 800) {
-                                    issues.push({ type: 'fixed-width', selector, property: 'width', value: styles.width, severity: 'serious' });
+                                    issues.push({ type: 'fixed-width', selector, property: 'width', value: styles.width, severity: 'info' });
                                 }
                             }
                             if (styles.minWidth && styles.minWidth.endsWith('px')) {
                                 const minWidth = parseInt(styles.minWidth);
                                 if (minWidth > 600) {
-                                    issues.push({ type: 'fixed-min-width', selector, property: 'min-width', value: styles.minWidth, severity: 'serious' });
+                                    issues.push({ type: 'fixed-min-width', selector, property: 'min-width', value: styles.minWidth, severity: 'info' });
                                 }
                             }
                             if (styles.maxWidth && styles.maxWidth.endsWith('px')) {
                                 const maxWidth = parseInt(styles.maxWidth);
                                 if (maxWidth < 320) {
-                                    issues.push({ type: 'restrictive-max-width', selector, property: 'max-width', value: styles.maxWidth, severity: 'moderate' });
+                                    issues.push({ type: 'restrictive-max-width', selector, property: 'max-width', value: styles.maxWidth, severity: 'info' });
                                 }
                             }
                             if (styles.overflow === 'hidden' && (styles.width?.endsWith('px') || styles.height?.endsWith('px'))) {
-                                issues.push({ type: 'overflow-hidden-fixed', selector, properties: { overflow: styles.overflow, width: styles.width, height: styles.height }, severity: 'serious' });
+                                issues.push({ type: 'overflow-hidden-fixed', selector, properties: { overflow: styles.overflow, width: styles.width, height: styles.height }, severity: 'info' });
                             }
                         }
                     }
@@ -191,7 +288,8 @@ class TextResizeScanner extends BaseScanner {
         // Check for horizontal scrolling
         const scrollInfo = await page.evaluate(() => {
             return {
-                hasHorizontalScroll: document.documentElement.scrollWidth > window.innerWidth,
+                // 1px tolerance: sub-pixel rounding must not count as overflow
+                hasHorizontalScroll: document.documentElement.scrollWidth > window.innerWidth + 1,
                 scrollWidth: document.documentElement.scrollWidth,
                 viewportWidth: window.innerWidth,
                 bodyWidth: document.body ? document.body.scrollWidth : 0
@@ -201,14 +299,14 @@ class TextResizeScanner extends BaseScanner {
         if (scrollInfo.hasHorizontalScroll && viewport.scale >= 2) {
             violations.push({
                 type: 'horizontal-scroll',
-                severity: 'critical',
-                description: `Horizontal scrolling required at ${viewport.scale * 100}% zoom`,
+                severity: 'serious',
+                description: `Horizontal scrolling required at ${viewport.scale * 100}% zoom (${scrollInfo.viewportWidth}px viewport)`,
                 details: {
                     viewportWidth: scrollInfo.viewportWidth,
                     contentWidth: scrollInfo.scrollWidth,
                     overflow: scrollInfo.scrollWidth - scrollInfo.viewportWidth
                 },
-                wcagCriteria: '1.4.4',
+                wcagCriteria: '1.4.10',
                 impact: 'Users cannot access content without horizontal scrolling'
             });
         }
@@ -297,98 +395,123 @@ class TextResizeScanner extends BaseScanner {
             });
         }
 
-        // Check for text overflow and truncation
-        const textOverflowIssues = await page.evaluate(() => {
-            const issues = [];
-            const textElements = document.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6, a, button, label');
-            
-            for (const el of textElements) {
-                const styles = window.getComputedStyle(el);
-                const rect = el.getBoundingClientRect();
-                
-                if (styles.overflow === 'hidden' && el.scrollWidth > el.clientWidth) {
-                    issues.push({
-                        tagName: el.tagName.toLowerCase(),
-                        id: el.id || null,
-                        className: el.className || null,
-                        textContent: el.textContent.substring(0, 100),
-                        scrollWidth: el.scrollWidth,
-                        clientWidth: el.clientWidth,
-                        overflow: styles.overflow,
-                        whiteSpace: styles.whiteSpace
-                    });
-                }
-            }
-            
-            return issues;
-        });
+        // Text that is provably clipped away at this viewport.
+        //
+        // WCAG 1.4.4 / 1.4.10 are about *loss of information*, so we measure the
+        // painted glyph boxes (Range.getClientRects) against the container's
+        // padding box instead of comparing scrollWidth/clientWidth. The old
+        // comparison fired on every container whose child box stuck out by a
+        // few rounded pixels while all text stayed inside (see
+        // src/utils/text-clipping.js).
+        const clippedText = await page.evaluate((renderedCode, clipCode) => {
+            eval(renderedCode);
+            eval(clipCode);
+            return window.__findClippedText({ minChars: 3 });
+        }, renderedCode, clipCode);
 
-        for (const issue of textOverflowIssues) {
+        for (const issue of clippedText) {
             violations.push({
                 type: 'text-overflow',
-                severity: 'serious',
-                description: 'Text content is truncated with overflow hidden',
-                element: `${issue.tagName}${issue.id ? '#' + issue.id : ''}${issue.className ? '.' + issue.className.split(' ')[0] : ''}`,
+                // Declared truncation (line-clamp / ellipsis) looks identical at every
+                // zoom level and keeps the text in the accessibility tree — a hint,
+                // not a 1.4.4/1.4.10 failure.
+                severity: issue.truncationDeclared ? 'info' : 'serious',
+                description: issue.truncationDeclared
+                    ? `Text is visually truncated (${issue.lineClamp !== 'none' ? 'line-clamp' : 'ellipsis'}); full text remains in the DOM`
+                    : `Text is cut off (${issue.axis}) by an unscrollable overflow:hidden container at this viewport`,
+                element: issue.selector,
                 details: {
-                    textPreview: issue.textContent,
+                    truncationDeclared: issue.truncationDeclared,
+                    lineClamp: issue.lineClamp,
+                    axis: issue.axis,
+                    overshootX: issue.overshootX,
+                    overshootY: issue.overshootY,
+                    clippedCharacters: issue.clippedChars,
+                    clippedTextSamples: issue.samples,
                     scrollWidth: issue.scrollWidth,
                     clientWidth: issue.clientWidth,
-                    hiddenWidth: issue.scrollWidth - issue.clientWidth,
+                    scrollHeight: issue.scrollHeight,
+                    clientHeight: issue.clientHeight,
+                    height: issue.height,
                     overflow: issue.overflow,
                     whiteSpace: issue.whiteSpace
                 },
-                wcagCriteria: '1.4.4',
-                impact: 'Text content is cut off and inaccessible at zoom levels'
+                // Clipping that only appears once the viewport is reduced to the
+                // reflow floor is a 1.4.10 failure; at the base viewport it is a
+                // 1.4.4 (text does not fit its container) failure.
+                wcagCriteria: viewport.scale >= 2 ? '1.4.10' : '1.4.4',
+                impact: 'Text content is cut off and cannot be revealed by scrolling'
             });
         }
 
-        // Check navigation and form usability at zoom
-        const interactionIssues = await page.evaluate(() => {
+        // Interactive elements that are rendered and keyboard-reachable but
+        // whose centre is covered by another element at this zoom level.
+        // Elements that are display:none (responsive nav behind a hamburger),
+        // off-canvas, or simply scrolled out of view are NOT blocked (FP-2).
+        const interactionIssues = await page.evaluate((renderedCode) => {
+            eval(renderedCode);
             const issues = [];
-            const interactives = document.querySelectorAll('a, button, input, select, textarea');
-            
-            for (const el of interactives) {
+            const prevX = window.scrollX, prevY = window.scrollY;
+            // `scroll-behavior: smooth` would animate scrollIntoView and we
+            // would measure before the scroll happened.
+            const noSmooth = document.createElement('style');
+            noSmooth.textContent = 'html, body { scroll-behavior: auto !important; }';
+            document.head.appendChild(noSmooth);
+            const candidates = [...document.querySelectorAll('a, button, input, select, textarea, [tabindex], [role="button"], [role="link"]')]
+                .filter(el => __isFocusableRendered(el)).slice(0, 200);
+            for (const el of candidates) {
+                el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
                 const rect = el.getBoundingClientRect();
-                const styles = window.getComputedStyle(el);
-                
-                // Check if element is too small or positioned off-screen
-                if (rect.width < 10 || rect.height < 10 || 
-                    rect.right < 0 || rect.bottom < 0 ||
-                    rect.left > window.innerWidth) {
-                    
-                    issues.push({
-                        tagName: el.tagName.toLowerCase(),
-                        type: el.type || null,
-                        id: el.id || null,
-                        className: el.className || null,
-                        rect: {
-                            width: rect.width,
-                            height: rect.height,
-                            x: rect.x,
-                            y: rect.y
-                        },
-                        visible: rect.width > 0 && rect.height > 0,
-                        inViewport: rect.right > 0 && rect.bottom > 0 && rect.left < window.innerWidth
-                    });
-                }
+                if (rect.width < 1 || rect.height < 1) continue;
+                // Probe the real centre. Clamping it to the viewport edge (as this
+                // used to do) tests a point that belongs to some other element and
+                // manufactured "blocked" findings for anything that could not be
+                // scrolled fully into view.
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                if (cx < 0 || cy < 0 || cx >= window.innerWidth || cy >= window.innerHeight) continue;
+                const hit = document.elementFromPoint(cx, cy);
+                if (!hit) continue;
+                if (hit === el || el.contains(hit) || hit.contains(el)) continue;
+                // A label wrapping its control, or the control's own label, is fine.
+                if (hit.closest('label') && (hit.closest('label').control === el || hit.closest('label').contains(el))) continue;
+                const hitStyle = window.getComputedStyle(hit);
+                if (hitStyle.pointerEvents === 'none') continue;
+                issues.push({
+                    tagName: el.tagName.toLowerCase(),
+                    type: el.type || null,
+                    id: el.id || null,
+                    className: typeof el.className === 'string' ? el.className : null,
+                    // Stable identity across reloads (the page is re-navigated per
+                    // viewport, so DOM node identity cannot be used).
+                    key: [el.tagName.toLowerCase(), el.id || '', typeof el.className === 'string' ? el.className : '',
+                          (el.textContent || '').trim().slice(0, 40)].join('|'),
+                    text: (el.textContent || '').trim().slice(0, 60),
+                    rect: { width: rect.width, height: rect.height, x: rect.x, y: rect.y },
+                    coveredBy: hit.tagName.toLowerCase() + (hit.id ? '#' + hit.id : '') + (typeof hit.className === 'string' && hit.className.trim() ? '.' + hit.className.trim().split(/\s+/)[0] : '')
+                });
             }
-            
+            noSmooth.remove();
+            window.scrollTo(prevX, prevY);
             return issues;
-        });
+        }, renderedCode);
 
         for (const issue of interactionIssues) {
             violations.push({
                 type: 'interaction-blocked',
-                severity: 'critical',
-                description: 'Interactive element is not accessible at zoom level',
-                element: `${issue.tagName}${issue.type ? `[type="${issue.type}"]` : ''}${issue.id ? '#' + issue.id : ''}`,
+                blockedKey: issue.key,
+                severity: 'serious',
+                description: `Interactive element is covered by ${issue.coveredBy} at this zoom level`,
+                element: `${issue.tagName}${issue.type ? `[type="${issue.type}"]` : ''}${issue.id ? '#' + issue.id : ''}` +
+                    `${issue.className ? '.' + issue.className.trim().split(/\s+/)[0] : ''}` +
+                    `${issue.text ? ` ("${issue.text}")` : ''}`,
                 details: {
-                    elementSize: `${issue.rect.width}x${issue.rect.height}`,
-                    position: `${issue.rect.x}, ${issue.rect.y}`,
-                    visible: issue.visible,
-                    inViewport: issue.inViewport
+                    text: issue.text,
+                    elementSize: `${Math.round(issue.rect.width)}x${Math.round(issue.rect.height)}`,
+                    position: `${Math.round(issue.rect.x)}, ${Math.round(issue.rect.y)}`,
+                    coveredBy: issue.coveredBy
                 },
-                wcagCriteria: '1.4.4',
+                wcagCriteria: '1.4.10',
                 impact: 'User cannot interact with this element at zoom level'
             });
         }
@@ -402,7 +525,7 @@ class TextResizeScanner extends BaseScanner {
             summary: {
                 horizontalScrollRequired: scrollInfo.hasHorizontalScroll,
                 fixedElementsFound: fixedElements.length,
-                textOverflowIssues: textOverflowIssues.length,
+                textOverflowIssues: clippedText.length,
                 interactionIssues: interactionIssues.length
             }
         };
@@ -434,12 +557,14 @@ class TextResizeScanner extends BaseScanner {
                                 
                                 // Check for problematic CSS properties
                                 if (styles.fontSize && styles.fontSize.endsWith('px') && parseInt(styles.fontSize) < 12) {
+                                    // px font sizes DO scale with browser zoom; a small
+                                    // size is a readability hint, not a 1.4.4 failure.
                                     issues.push({
                                         type: 'small-fixed-font',
                                         selector: selector,
                                         property: 'font-size',
                                         value: styles.fontSize,
-                                        severity: 'moderate'
+                                        severity: 'info'
                                     });
                                 }
                                 

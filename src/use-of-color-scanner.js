@@ -188,8 +188,22 @@ class UseOfColorScanner extends BaseScanner {
         }
       });
 
-      // 4. Check charts and data visualizations
-      const charts = document.querySelectorAll('canvas, svg, .chart, .graph, [class*="chart"], [class*="graph"]');
+      // 4. Check charts and data visualizations. A bare <svg> is almost always
+      // an icon; only treat it as a chart when it is large and uses several
+      // fill colours (i.e. could encode data series by colour).
+      const chartCandidates = [...document.querySelectorAll('canvas, .chart, .graph, [class*="chart"], [class*="graph"]')];
+      document.querySelectorAll('svg').forEach(svg => {
+        if (chartCandidates.includes(svg)) return;
+        const r = svg.getBoundingClientRect();
+        if (r.width < 150 || r.height < 100) return;
+        const fills = new Set();
+        svg.querySelectorAll('path, rect, circle, polygon, ellipse').forEach(sh => {
+          const f = window.getComputedStyle(sh).fill;
+          if (f && f !== 'none') fills.add(f);
+        });
+        if (fills.size >= 3) chartCandidates.push(svg);
+      });
+      const charts = chartCandidates;
       charts.forEach(chart => {
         // Basic check for chart elements that might rely on color
         const hasLegend = chart.querySelector('.legend, [class*="legend"]') ||

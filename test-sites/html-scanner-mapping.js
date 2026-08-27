@@ -715,6 +715,82 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.3', '1.4.6', '4.1.2'],
     description: 'Bootstrap-like CDN CSS patterns, collapsed components hidden by default — tests computed style contrast'
+  },
+
+  // === FALSE-POSITIVE FIXTURES FROM THE gsunde.website SCAN (2026-08-24) ===
+  // Each reproduces one FP class observed on https://gsunde.website/ ; see
+  // false-positive-reports/ for the measured numbers.
+
+  'good-error-tokens-not-error-messages.html': {
+    expectedScanners: [],
+    excludedScanners: ['error-handling'],
+    testType: 'good',
+    wcagCriteria: ['3.3.1', '3.3.3'],
+    description: 'Material/Tailwind colour tokens (bg-error-container, text-error, text-on-error-container) on marketing cards are not error messages — error-no-suggestion must not fire'
+  },
+
+  'good-text-spacing-grid-cards.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.12'],
+    description: 'overflow:hidden grid of cards whose text still fits under the 1.4.12 spacing overrides at 320/375/768/1920 — text-spacing-failure must not fire'
+  },
+
+  'good-decorative-blur-blob.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design', 'mobile-specific'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10', '1.4.4'],
+    description: 'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero — fixed-width-element / mobile-fixed-width-400-zoom must not fire'
+  },
+
+  'good-two-column-tab-order.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description: 'Two-column layout: focus moves left column -> right column; the visually upward jump between columns is the meaningful DOM order, illogical-tab-order must not fire; roving tabindex=-1 on a non-selected tab must not trigger focusable-element/tabindex'
+  },
+
+  'good-tabs-labelledby-only.html': {
+    expectedScanners: [],
+    excludedScanners: ['advanced-aria', 'screen-reader'],
+    testType: 'good',
+    wcagCriteria: ['4.1.2'],
+    description: 'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference — valid per WAI-ARIA 1.2, tab-missing-controls must not fire'
+  },
+
+  'good-accessibility-marketing-page.html': {
+    expectedScanners: ['accessibility-statement'],
+    excludedScanners: ['eaa-procedure', 'contact-mechanism', 'compliance-monitoring'],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+    description: 'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit" — one missing-accessibility-statement is correct, the follow-up rules (no-audit-schedule, no-issue-tracking, no-feedback-process …) must stay silent'
+  },
+
+  'good-accessibility-statement-complete.html': {
+    expectedScanners: [],
+    excludedScanners: ['accessibility-statement', 'eaa-procedure', 'contact-mechanism', 'compliance-monitoring'],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+    description: 'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure) — no EAA finding at all'
+  },
+
+  'good-contrast-hidden-and-arbitrary-classes.html': {
+    expectedScanners: [],
+    excludedScanners: ['color-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.3'],
+    description: 'Text that is never painted (display:none ancestor, [hidden]) plus Tailwind arbitrary-value classes — no contrast finding, and every reported selector must be a valid querySelector argument'
+  },
+
+  'bad-keyboard-fixed-skiplink-tab-order.html': {
+    expectedScanners: ['keyboard-navigation', 'focus-management'],
+    excludedScanners: ['color-contrast', 'language-detection'],
+    testType: 'bad',
+    wcagCriteria: ['2.1.1', '2.4.3'],
+    description: 'Off-canvas fixed skip link as first tab stop, then a div[onclick] without tabindex and a tabindex="5" jump — both defects must survive the tab walk'
   }
 };
 
@@ -738,7 +814,12 @@ const AVAILABLE_SCANNERS = [
   'page-structure',
   'accessibility-statement',
   'contact-mechanism',
-  'compliance-monitoring'
+  'compliance-monitoring',
+  'responsive-design',
+  'mobile-specific',
+  'advanced-aria',
+  'screen-reader',
+  'advanced-contrast'
 ];
 
 /**

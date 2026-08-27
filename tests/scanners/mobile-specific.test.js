@@ -71,13 +71,79 @@ describe('MobileSpecificScanner', () => {
     }
   }, 60000);
 
-  it('detects violations in bad-target-size.html', async () => {
+  it('no longer emits the rules without a WCAG basis', async () => {
+    // mobile-small-text-400-zoom (px font < 12px) and landscape-excessive-height
+    // (page taller than 8 viewports) were removed: browser zoom scales px text,
+    // and no criterion limits page length (1.3.4 is about *locking* orientation).
+    // Both fired on every healthy page of the golden corpus.
+    const url = `${getBaseUrl()}/good-reflow.html`;
+    const page = await getPage(url);
+    try {
+      const result = await scanner.scan(page);
+      const types = (result.violations || []).map(v => v.type);
+      expect(types).not.toContain('mobile-small-text-400-zoom');
+      expect(types).not.toContain('landscape-excessive-height');
+    } finally {
+      await page.close();
+    }
+  }, 60000);
+
+  it('only reports overflow:hidden containers that really swallow text', async () => {
+    const url = `${getBaseUrl()}/bad-reflow.html`;
+    const page = await getPage(url);
+    try {
+      const result = await scanner.scan(page);
+      const clips = (result.violations || []).filter(v => v.type === 'mobile-overflow-hidden-400-zoom');
+      expect(clips.length).toBeGreaterThan(0);
+      for (const v of clips) {
+        // measured evidence, not scrollWidth > clientWidth
+        expect(v.details.clippedCharacters).toBeGreaterThan(0);
+        expect(v.details.clippedTextSamples.length).toBeGreaterThan(0);
+      }
+      // one finding per element across all five device profiles
+      const keys = clips.map(v => v.element);
+      expect(new Set(keys).size).toBe(keys.length);
+    } finally {
+      await page.close();
+    }
+  }, 120000);
+
+  it('does not flag a table inside an overflow-x:auto wrapper', async () => {
+    const url = `${getBaseUrl()}/good-text-resize.html`;
+    const page = await getPage(url);
+    try {
+      const result = await scanner.scan(page);
+      const tableFPs = (result.violations || []).filter(v => v.type === 'table-not-responsive');
+      expect(tableFPs).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  }, 60000);
+
+  it('does not claim target-size findings any more (2.5.8 lives in input-modalities)', async () => {
+    // The 44px touch-target check was removed from this scanner (FP-1). It used
+    // the AAA threshold, counted non-interactive elements and multiplied every
+    // hit by five device profiles. bad-target-size.html is therefore no longer
+    // this scanner's fixture — it is asserted by input-modalities.
     const url = `${getBaseUrl()}/bad-target-size.html`;
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
-      expect(result).toBeDefined();
-      expect(result.violations.length).toBeGreaterThan(0);
+      const types = (result.violations || []).map(v => v.type);
+      expect(types).not.toContain('touch-target-too-small');
+      expect(types).not.toContain('touch-targets-too-close');
+    } finally {
+      await page.close();
+    }
+  }, 120000);
+
+  it('detects reflow violations in bad-reflow.html', async () => {
+    const url = `${getBaseUrl()}/bad-reflow.html`;
+    const page = await getPage(url);
+    try {
+      const result = await scanner.scan(page);
+      const real = (result.violations || []).filter(v => v.severity !== 'info');
+      expect(real.length).toBeGreaterThan(0);
     } finally {
       await page.close();
     }

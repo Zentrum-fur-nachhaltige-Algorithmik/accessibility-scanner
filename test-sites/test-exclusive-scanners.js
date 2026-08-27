@@ -63,6 +63,12 @@ const EXCLUSIVE_SCANNERS = {
     module: '../src/concurrent-input-scanner',
     criteria: ['2.5.6'],
   },
+  // Drives real keyboard focus (Tab) for its focus-indicator checks, so it
+  // needs its own tab. 2.4.7 stays with focus-management; 1.4.11 is here.
+  'nontext-contrast': {
+    module: '../src/phase6a-nontext-contrast-scanner',
+    criteria: ['1.4.11'],
+  },
 };
 
 /**
@@ -79,11 +85,13 @@ for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
  * Check if a violation matches any of the target criteria.
  */
 function matchesCriteria(violation, criteria) {
-  const c = violation.criterion || violation.ruleId || '';
-  return criteria.some(target => {
-    // Match "9.2.4.11" against "2.4.11", "1.4.12" against "9.1.4.12", etc.
-    return c.includes(target) || c === `9.${target}`;
-  });
+  // Scanners disagree on the field: `criterion` (EN 301 549 "9.x.y.z"),
+  // `ruleId`, or a per-violation `wcagCriteria` string/array.
+  const wc = violation.wcagCriteria;
+  const fields = [violation.criterion, violation.ruleId, ...(Array.isArray(wc) ? wc : [wc])]
+    .filter(Boolean).map(String);
+  return criteria.some(target =>
+    fields.some(c => c === target || c === `9.${target}` || c.includes(target)));
 }
 
 async function main() {

@@ -9,6 +9,8 @@ const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
+const { injectableCode: renderedUtils } = require('../utils/rendered');
+const { ARIA_ATTRIBUTES, ARIA_ROLES, ARIA_ROLE_MODULE_PREFIXES } = require('../utils/aria');
 const log = require('../utils/logger').createLogger('html-validation');
 
 class HTMLValidationScanner extends BaseScanner {
@@ -386,257 +388,174 @@ class HTMLValidationScanner extends BaseScanner {
   async validateARIAUsage(page, violations) {
     log.debug('Validating ARIA usage...');
 
-    const ariaIssues = await page.evaluate(() => {
-      const issues = [];
-      const validRoles = [
-        'alert',
-        'alertdialog',
-        'application',
-        'article',
-        'banner',
-        'button',
-        'cell',
-        'checkbox',
-        'columnheader',
-        'combobox',
-        'complementary',
-        'contentinfo',
-        'definition',
-        'dialog',
-        'directory',
-        'document',
-        'feed',
-        'figure',
-        'form',
-        'grid',
-        'gridcell',
-        'group',
-        'heading',
-        'img',
-        'link',
-        'list',
-        'listbox',
-        'listitem',
-        'log',
-        'main',
-        'marquee',
-        'math',
-        'menu',
-        'menubar',
-        'menuitem',
-        'menuitemcheckbox',
-        'menuitemradio',
-        'navigation',
-        'none',
-        'note',
-        'option',
-        'presentation',
-        'progressbar',
-        'radio',
-        'radiogroup',
-        'region',
-        'row',
-        'rowgroup',
-        'rowheader',
-        'scrollbar',
-        'search',
-        'searchbox',
-        'separator',
-        'slider',
-        'spinbutton',
-        'status',
-        'switch',
-        'tab',
-        'table',
-        'tablist',
-        'tabpanel',
-        'term',
-        'textbox',
-        'timer',
-        'toolbar',
-        'tooltip',
-        'tree',
-        'treegrid',
-        'treeitem',
-      ];
+    const ariaIssues = await page.evaluate(
+      ({ roles, rolePrefixes, attributes, renderedCode }) => {
+        eval(renderedCode);
+        const issues = [];
+        const isValidRole = (value) =>
+          String(value || '')
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(Boolean)
+            .some(
+              (token) => roles.includes(token) || rolePrefixes.some((p) => token.startsWith(p))
+            );
 
-      const validAriaStates = [
-        'aria-atomic',
-        'aria-busy',
-        'aria-checked',
-        'aria-current',
-        'aria-describedby',
-        'aria-disabled',
-        'aria-expanded',
-        'aria-grabbed',
-        'aria-haspopup',
-        'aria-hidden',
-        'aria-invalid',
-        'aria-label',
-        'aria-labelledby',
-        'aria-level',
-        'aria-live',
-        'aria-owns',
-        'aria-pressed',
-        'aria-readonly',
-        'aria-relevant',
-        'aria-required',
-        'aria-selected',
-        'aria-sort',
-        'aria-valuemax',
-        'aria-valuemin',
-        'aria-valuenow',
-        'aria-valuetext',
-        'aria-controls',
-        'aria-flowto',
-        'aria-orientation',
-        'aria-setsize',
-        'aria-posinset',
-      ];
+        // Find all elements with ARIA attributes
+        const elementsWithAria = document.querySelectorAll(
+          '[role], [aria-label], [aria-labelledby], [aria-describedby], [aria-expanded], [aria-hidden], [aria-live], [aria-current], [aria-checked], [aria-selected], [aria-pressed], [aria-disabled], [aria-required], [aria-invalid], [class*="aria-"], [id*="aria-"]'
+        );
 
-      // Find all elements with ARIA attributes
-      const elementsWithAria = document.querySelectorAll(
-        '[role], [aria-label], [aria-labelledby], [aria-describedby], [aria-expanded], [aria-hidden], [aria-live], [aria-current], [aria-checked], [aria-selected], [aria-pressed], [aria-disabled], [aria-required], [aria-invalid], [class*="aria-"], [id*="aria-"]'
-      );
+        elementsWithAria.forEach((element) => {
+          const selector =
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : '');
 
-      elementsWithAria.forEach((element) => {
-        const selector =
-          element.tagName.toLowerCase() +
-          (element.id ? `#${element.id}` : '') +
-          (element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '');
+          // Check for invalid roles
+          const role = element.getAttribute('role');
+          if (role && !isValidRole(role)) {
+            issues.push({
+              type: 'invalid-role',
+              element: selector,
+              attribute: 'role',
+              value: role,
+              description: `Invalid ARIA role: "${role}"`,
+              suggestion: 'Use a valid ARIA role or remove the role attribute',
+            });
+          }
 
-        // Check for invalid roles
-        const role = element.getAttribute('role');
-        if (role && !validRoles.includes(role)) {
-          issues.push({
-            type: 'invalid-role',
-            element: selector,
-            attribute: 'role',
-            value: role,
-            description: `Invalid ARIA role: "${role}"`,
-            suggestion: 'Use a valid ARIA role or remove the role attribute',
+          // Check for invalid ARIA attributes
+          Array.from(element.attributes).forEach((attr) => {
+            if (attr.name.startsWith('aria-') && !attributes.includes(attr.name)) {
+              issues.push({
+                type: 'invalid-aria-attribute',
+                element: selector,
+                attribute: attr.name,
+                value: attr.value,
+                description: `Invalid ARIA attribute: "${attr.name}"`,
+                suggestion: 'Use valid ARIA attributes according to the specification',
+              });
+            }
+
+            // Check for invalid ARIA values
+            if (
+              attr.name === 'aria-current' &&
+              !['page', 'step', 'location', 'date', 'time', 'true', 'false'].includes(attr.value)
+            ) {
+              issues.push({
+                type: 'invalid-aria-value',
+                element: selector,
+                attribute: attr.name,
+                value: attr.value,
+                description: `Invalid value for aria-current: "${attr.value}"`,
+                suggestion:
+                  'Use valid aria-current values: page, step, location, date, time, true, or false',
+              });
+            }
+
+            if (
+              (attr.name === 'aria-expanded' || attr.name === 'aria-hidden') &&
+              !['true', 'false'].includes(attr.value)
+            ) {
+              issues.push({
+                type: 'invalid-aria-value',
+                element: selector,
+                attribute: attr.name,
+                value: attr.value,
+                description: `Invalid boolean value for ${attr.name}: "${attr.value}"`,
+                suggestion: `Use "true" or "false" for ${attr.name}`,
+              });
+            }
           });
-        }
 
-        // Check for invalid ARIA attributes
-        Array.from(element.attributes).forEach((attr) => {
-          if (attr.name.startsWith('aria-') && !validAriaStates.includes(attr.name)) {
-            issues.push({
-              type: 'invalid-aria-attribute',
-              element: selector,
-              attribute: attr.name,
-              value: attr.value,
-              description: `Invalid ARIA attribute: "${attr.name}"`,
-              suggestion: 'Use valid ARIA attributes according to the specification',
-            });
+          // Check for missing required ARIA attributes
+          if (
+            role === 'button' &&
+            !element.hasAttribute('aria-pressed') &&
+            element.tagName.toLowerCase() !== 'button'
+          ) {
+            // This is actually optional, so we'll skip this check
           }
 
-          // Check for invalid ARIA values
-          if (
-            attr.name === 'aria-current' &&
-            !['page', 'step', 'location', 'date', 'time', 'true', 'false'].includes(attr.value)
-          ) {
+          // Check for conflicting ARIA states
+          const ariaHidden = element.getAttribute('aria-hidden');
+          const hidden = element.hasAttribute('hidden');
+
+          // aria-hidden="true" removes the element from the accessibility tree
+          // while it stays operable by keyboard: the user tabs to a control
+          // assistive technology cannot name. A collapsed or hidden control
+          // carrying aria-hidden alongside aria-expanded is consistent, not a
+          // conflict, so only reachability decides.
+          if (ariaHidden === 'true' && __isKeyboardReachable(element)) {
             issues.push({
-              type: 'invalid-aria-value',
+              type: 'conflicting-aria-states',
               element: selector,
-              attribute: attr.name,
-              value: attr.value,
-              description: `Invalid value for aria-current: "${attr.value}"`,
+              description:
+                'Element is aria-hidden="true" but still reachable by keyboard, so it is focusable without being announced',
               suggestion:
-                'Use valid aria-current values: page, step, location, date, time, true, or false',
+                'Remove aria-hidden, or take the element out of the tab order with tabindex="-1" or the hidden/inert attribute',
             });
           }
 
-          if (
-            (attr.name === 'aria-expanded' || attr.name === 'aria-hidden') &&
-            !['true', 'false'].includes(attr.value)
-          ) {
+          if (ariaHidden === 'false' && hidden) {
             issues.push({
-              type: 'invalid-aria-value',
+              type: 'conflicting-aria-states',
               element: selector,
-              attribute: attr.name,
-              value: attr.value,
-              description: `Invalid boolean value for ${attr.name}: "${attr.value}"`,
-              suggestion: `Use "true" or "false" for ${attr.name}`,
+              description:
+                'Element has conflicting visibility states: aria-hidden="false" and hidden attribute',
+              suggestion: 'Remove conflicting visibility attributes',
+            });
+          }
+
+          // Check for aria-labelledby pointing to non-existent elements
+          const labelledBy = element.getAttribute('aria-labelledby');
+          if (labelledBy) {
+            const labelIds = labelledBy.split(/\s+/);
+            labelIds.forEach((id) => {
+              if (!document.getElementById(id)) {
+                issues.push({
+                  type: 'invalid-aria-reference',
+                  element: selector,
+                  attribute: 'aria-labelledby',
+                  value: id,
+                  description: `aria-labelledby references non-existent element: "${id}"`,
+                  suggestion: 'Ensure aria-labelledby references existing element IDs',
+                });
+              }
+            });
+          }
+
+          // Check for aria-describedby pointing to non-existent elements
+          const describedBy = element.getAttribute('aria-describedby');
+          if (describedBy) {
+            const descIds = describedBy.split(/\s+/);
+            descIds.forEach((id) => {
+              if (!document.getElementById(id)) {
+                issues.push({
+                  type: 'invalid-aria-reference',
+                  element: selector,
+                  attribute: 'aria-describedby',
+                  value: id,
+                  description: `aria-describedby references non-existent element: "${id}"`,
+                  suggestion: 'Ensure aria-describedby references existing element IDs',
+                });
+              }
             });
           }
         });
 
-        // Check for missing required ARIA attributes
-        if (
-          role === 'button' &&
-          !element.hasAttribute('aria-pressed') &&
-          element.tagName.toLowerCase() !== 'button'
-        ) {
-          // This is actually optional, so we'll skip this check
-        }
-
-        // Check for conflicting ARIA states
-        const ariaHidden = element.getAttribute('aria-hidden');
-        const ariaExpanded = element.getAttribute('aria-expanded');
-        const hidden = element.hasAttribute('hidden');
-
-        if (ariaHidden === 'true' && ariaExpanded === 'true') {
-          issues.push({
-            type: 'conflicting-aria-states',
-            element: selector,
-            description:
-              'Element has conflicting ARIA states: aria-hidden="true" and aria-expanded="true"',
-            suggestion: 'Remove conflicting ARIA attributes or use appropriate values',
-          });
-        }
-
-        if (ariaHidden === 'false' && hidden) {
-          issues.push({
-            type: 'conflicting-aria-states',
-            element: selector,
-            description:
-              'Element has conflicting visibility states: aria-hidden="false" and hidden attribute',
-            suggestion: 'Remove conflicting visibility attributes',
-          });
-        }
-
-        // Check for aria-labelledby pointing to non-existent elements
-        const labelledBy = element.getAttribute('aria-labelledby');
-        if (labelledBy) {
-          const labelIds = labelledBy.split(/\s+/);
-          labelIds.forEach((id) => {
-            if (!document.getElementById(id)) {
-              issues.push({
-                type: 'invalid-aria-reference',
-                element: selector,
-                attribute: 'aria-labelledby',
-                value: id,
-                description: `aria-labelledby references non-existent element: "${id}"`,
-                suggestion: 'Ensure aria-labelledby references existing element IDs',
-              });
-            }
-          });
-        }
-
-        // Check for aria-describedby pointing to non-existent elements
-        const describedBy = element.getAttribute('aria-describedby');
-        if (describedBy) {
-          const descIds = describedBy.split(/\s+/);
-          descIds.forEach((id) => {
-            if (!document.getElementById(id)) {
-              issues.push({
-                type: 'invalid-aria-reference',
-                element: selector,
-                attribute: 'aria-describedby',
-                value: id,
-                description: `aria-describedby references non-existent element: "${id}"`,
-                suggestion: 'Ensure aria-describedby references existing element IDs',
-              });
-            }
-          });
-        }
-      });
-
-      return issues;
-    });
+        return issues;
+      },
+      {
+        roles: ARIA_ROLES,
+        rolePrefixes: ARIA_ROLE_MODULE_PREFIXES,
+        attributes: ARIA_ATTRIBUTES,
+        renderedCode: renderedUtils,
+      }
+    );
 
     // Create violations for ARIA issues
     ariaIssues.forEach((issue) => {
@@ -1164,110 +1083,63 @@ class HTMLValidationScanner extends BaseScanner {
   async validateARIAAttributes(page, violations) {
     log.debug('Validating ARIA attributes...');
 
-    const ariaIssues = await page.evaluate(() => {
-      // Helper function for element selector generation (browser context)
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
+    const ariaIssues = await page.evaluate(
+      ({ attributes }) => {
+        // Helper function for element selector generation (browser context)
+        function getElementSelector(element) {
+          const tagName = element.tagName.toLowerCase();
+          const id = element.id ? `#${element.id}` : '';
+          const className =
+            element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : '';
+          return `${tagName}${id}${className}`;
+        }
 
-      const issues = [];
+        const issues = [];
 
-      // Valid ARIA attributes
-      const validAriaAttrs = [
-        'aria-atomic',
-        'aria-busy',
-        'aria-checked',
-        'aria-colcount',
-        'aria-colindex',
-        'aria-colspan',
-        'aria-controls',
-        'aria-current',
-        'aria-describedby',
-        'aria-details',
-        'aria-disabled',
-        'aria-dropeffect',
-        'aria-errormessage',
-        'aria-expanded',
-        'aria-flowto',
-        'aria-grabbed',
-        'aria-haspopup',
-        'aria-hidden',
-        'aria-invalid',
-        'aria-keyshortcuts',
-        'aria-label',
-        'aria-labelledby',
-        'aria-level',
-        'aria-live',
-        'aria-modal',
-        'aria-multiline',
-        'aria-multiselectable',
-        'aria-orientation',
-        'aria-owns',
-        'aria-placeholder',
-        'aria-posinset',
-        'aria-pressed',
-        'aria-readonly',
-        'aria-relevant',
-        'aria-required',
-        'aria-roledescription',
-        'aria-rowcount',
-        'aria-rowindex',
-        'aria-rowspan',
-        'aria-selected',
-        'aria-setsize',
-        'aria-sort',
-        'aria-valuemax',
-        'aria-valuemin',
-        'aria-valuenow',
-        'aria-valuetext',
-      ];
+        // Get all elements with any aria attribute
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach((element) => {
+          const selector = getElementSelector(element);
 
-      // Get all elements with any aria attribute
-      const allElements = document.querySelectorAll('*');
-      allElements.forEach((element) => {
-        const selector = getElementSelector(element);
+          // Check each attribute
+          Array.from(element.attributes).forEach((attr) => {
+            if (attr.name.startsWith('aria-')) {
+              // Check if valid ARIA attribute
+              if (!attributes.includes(attr.name)) {
+                issues.push({
+                  type: 'aria-valid-attr',
+                  element: selector,
+                  attribute: attr.name,
+                  description: `Invalid ARIA attribute: ${attr.name}`,
+                  severity: 'serious',
+                  suggestion: 'Remove invalid ARIA attribute or use valid ARIA attribute',
+                });
+              }
 
-        // Check each attribute
-        Array.from(element.attributes).forEach((attr) => {
-          if (attr.name.startsWith('aria-')) {
-            // Check if valid ARIA attribute
-            if (!validAriaAttrs.includes(attr.name)) {
-              issues.push({
-                type: 'aria-valid-attr',
-                element: selector,
-                attribute: attr.name,
-                description: `Invalid ARIA attribute: ${attr.name}`,
-                severity: 'serious',
-                suggestion: 'Remove invalid ARIA attribute or use valid ARIA attribute',
-              });
+              // Check for empty values where not allowed
+              if (
+                !attr.value.trim() &&
+                !['aria-hidden', 'aria-expanded', 'aria-checked'].includes(attr.name)
+              ) {
+                issues.push({
+                  type: 'aria-valid-attr-value',
+                  element: selector,
+                  attribute: attr.name,
+                  description: `ARIA attribute ${attr.name} has empty value`,
+                  severity: 'serious',
+                  suggestion: 'Provide a meaningful value for the ARIA attribute',
+                });
+              }
             }
-
-            // Check for empty values where not allowed
-            if (
-              !attr.value.trim() &&
-              !['aria-hidden', 'aria-expanded', 'aria-checked'].includes(attr.name)
-            ) {
-              issues.push({
-                type: 'aria-valid-attr-value',
-                element: selector,
-                attribute: attr.name,
-                description: `ARIA attribute ${attr.name} has empty value`,
-                severity: 'serious',
-                suggestion: 'Provide a meaningful value for the ARIA attribute',
-              });
-            }
-          }
+          });
         });
-      });
 
-      return issues;
-    });
+        return issues;
+      },
+      { attributes: ARIA_ATTRIBUTES }
+    );
 
     ariaIssues.forEach((issue) => {
       violations.push({
@@ -1287,112 +1159,52 @@ class HTMLValidationScanner extends BaseScanner {
   async validateARIARoles(page, violations) {
     log.debug('Validating ARIA roles...');
 
-    const roleIssues = await page.evaluate(() => {
-      // Helper function for element selector generation (browser context)
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      const issues = [];
-
-      // Valid ARIA roles
-      const validRoles = [
-        'alert',
-        'alertdialog',
-        'application',
-        'article',
-        'banner',
-        'button',
-        'cell',
-        'checkbox',
-        'columnheader',
-        'combobox',
-        'complementary',
-        'contentinfo',
-        'definition',
-        'dialog',
-        'document',
-        'feed',
-        'figure',
-        'form',
-        'grid',
-        'gridcell',
-        'group',
-        'heading',
-        'img',
-        'link',
-        'list',
-        'listbox',
-        'listitem',
-        'log',
-        'main',
-        'marquee',
-        'math',
-        'menu',
-        'menubar',
-        'menuitem',
-        'menuitemcheckbox',
-        'menuitemradio',
-        'navigation',
-        'none',
-        'note',
-        'option',
-        'presentation',
-        'progressbar',
-        'radio',
-        'radiogroup',
-        'region',
-        'row',
-        'rowgroup',
-        'rowheader',
-        'scrollbar',
-        'search',
-        'searchbox',
-        'separator',
-        'slider',
-        'spinbutton',
-        'status',
-        'switch',
-        'tab',
-        'table',
-        'tablist',
-        'tabpanel',
-        'term',
-        'textbox',
-        'timer',
-        'toolbar',
-        'tooltip',
-        'tree',
-        'treegrid',
-        'treeitem',
-      ];
-
-      const elementsWithRole = document.querySelectorAll('[role]');
-
-      elementsWithRole.forEach((element) => {
-        const selector = getElementSelector(element);
-        const role = element.getAttribute('role');
-
-        if (role && !validRoles.includes(role)) {
-          issues.push({
-            type: 'aria-roles',
-            element: selector,
-            role: role,
-            description: `Invalid ARIA role: ${role}`,
-            severity: 'serious',
-            suggestion: 'Use a valid ARIA role from the ARIA specification',
-          });
+    const roleIssues = await page.evaluate(
+      ({ roles, rolePrefixes }) => {
+        // Helper function for element selector generation (browser context)
+        function getElementSelector(element) {
+          const tagName = element.tagName.toLowerCase();
+          const id = element.id ? `#${element.id}` : '';
+          const className =
+            element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : '';
+          return `${tagName}${id}${className}`;
         }
-      });
 
-      return issues;
-    });
+        const issues = [];
+
+        const isValidRole = (value) =>
+          String(value || '')
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(Boolean)
+            .some(
+              (token) => roles.includes(token) || rolePrefixes.some((p) => token.startsWith(p))
+            );
+
+        const elementsWithRole = document.querySelectorAll('[role]');
+
+        elementsWithRole.forEach((element) => {
+          const selector = getElementSelector(element);
+          const role = element.getAttribute('role');
+
+          if (role && !isValidRole(role)) {
+            issues.push({
+              type: 'aria-roles',
+              element: selector,
+              role: role,
+              description: `Invalid ARIA role: ${role}`,
+              severity: 'serious',
+              suggestion: 'Use a valid ARIA role from the ARIA specification',
+            });
+          }
+        });
+
+        return issues;
+      },
+      { roles: ARIA_ROLES, rolePrefixes: ARIA_ROLE_MODULE_PREFIXES }
+    );
 
     roleIssues.forEach((issue) => {
       violations.push({

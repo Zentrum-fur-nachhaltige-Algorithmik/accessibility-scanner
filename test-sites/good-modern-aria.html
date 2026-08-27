@@ -1,0 +1,100 @@
+<!-- WCAG-TEST
+criterion: 4.1.1, 4.1.2
+level: A
+title: Name Role Value
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: html-validation
+description: ARIA 1.2 attributes and roles plus aria-hidden on content that is out of the tab order, all of which are valid and must not be reported as invalid or conflicting
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern ARIA vocabulary</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      [hidden] {
+        display: none;
+      }
+      .decoration {
+        color: #767676;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Modern ARIA vocabulary</h1>
+
+      <h2>Combobox with autocomplete</h2>
+      <label for="country">Country</label>
+      <input
+        id="country"
+        type="text"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls="country-list"
+        autocomplete="off"
+      />
+      <ul id="country-list" role="listbox" aria-label="Country suggestions"></ul>
+
+      <h2>Described and annotated content</h2>
+      <p aria-description="A short standalone description of the paragraph below.">
+        This paragraph carries <span role="mark">a highlighted phrase</span>, an
+        <span role="insertion">inserted phrase</span> and a
+        <span role="deletion">removed phrase</span>, all of them ARIA 1.2 document structure roles.
+      </p>
+      <p>
+        Code samples use <code role="code">const answer = 42;</code> and emphasis uses
+        <em role="emphasis">this wording</em>.
+      </p>
+
+      <h2>Progress</h2>
+      <div
+        role="meter"
+        aria-label="Storage used"
+        aria-valuenow="40"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuetext="40 of 100 gigabytes"
+      >
+        40 GB of 100 GB
+      </div>
+
+      <h2>Table with header text</h2>
+      <table>
+        <caption>
+          Opening hours
+        </caption>
+        <tr>
+          <th scope="col" aria-colindextext="Day of the week">Day</th>
+          <th scope="col" aria-colindextext="Opening time">Opens</th>
+        </tr>
+        <tr>
+          <td>Monday</td>
+          <td>09:00</td>
+        </tr>
+      </table>
+
+      <h2>Decoration outside the tab order</h2>
+      <p>
+        <span class="decoration" aria-hidden="true">&#9670;</span>
+        The diamond above is decorative, is not focusable and is correctly hidden from assistive
+        technology.
+      </p>
+      <button type="button" aria-expanded="false" aria-hidden="true" hidden disabled>
+        Collapsed section toggle, hidden at this breakpoint
+      </button>
+    </main>
+  </body>
+</html>

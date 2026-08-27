@@ -1,0 +1,47 @@
+<!-- WCAG-TEST
+criterion: 4.1.1, 4.1.2
+level: A
+title: Name Role Value
+test_type: bad
+expected_violations: 2
+testable_by: regex
+scanners: html-validation
+description: Visible controls carry aria-hidden true while staying in the tab order, so keyboard users focus elements that assistive technology never announces
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>aria-hidden on reachable controls</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      .toolbar {
+        border: 1px solid #666;
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>aria-hidden on reachable controls</h1>
+
+      <div class="toolbar">
+        <!-- VIOLATION: visible, focusable, removed from the accessibility tree -->
+        <button type="button" aria-hidden="true">Save draft</button>
+
+        <!-- VIOLATION: a hidden container whose link is still tabbable -->
+        <div aria-hidden="true">
+          <a href="/archive">Open the archive</a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

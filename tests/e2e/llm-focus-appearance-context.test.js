@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const LLMFocusAppearanceScanner = require('../../src/llm-focus-appearance-scanner');
+const LLMFocusAppearanceScanner = require('../../src/scanners/llm/focus-appearance');
 
 /** The scanner requires *an* llmClient; these tests never call it. */
 const stubClient = { predict: async () => { throw new Error('LLM must not be called in this test'); } };

@@ -1,58 +1,34 @@
-# Host-agnostic local/deployment stack for the accessibility checker.
-#
-# Two services from ONE image (see Dockerfile for why): `app` runs the
-# Express API + Puppeteer scan engine, `frontend` runs the built Next.js UI
-# with its CMD overridden to `next start`. frontend/next.config.js proxies
-# the browser's /api/* calls to a hardcoded `http://localhost:3000`, so
-# `frontend` joins `app`'s network namespace (`network_mode: service:app`)
-# rather than talking to it over the compose network by service name — that
-# hardcoded rewrite would otherwise resolve to the frontend container itself
-# and fail. This is a deliberate workaround to avoid editing frontend source.
-#
-# Docker Compose auto-loads a `.env` file from this directory for the
-# ${VAR} substitutions below — copy .env.example (see docs/deployment.md) or
-# reuse the existing root .env.
-#
-# See docs/deployment.md for the full env var reference and security
-# checklist (API_TOKEN and SCAN_ALLOWED_HOSTS in particular).
+# Two services from one image: `app` runs the API and scan engine, `frontend`
+# runs the built Next.js UI. Compose reads `.env` from this directory for the
+# ${VAR} substitutions; see .env.example.
 
 services:
   app:
     build:
       context: .
       target: production
-    image: accessability:latest
+    image: accessibility-scanner:latest
     restart: unless-stopped
     ports:
       - "${HOST_PORT:-3000}:3000"
-      # Published here (not on `frontend`) because frontend shares this
-      # service's network namespace — see network_mode below.
-      - "${FRONTEND_HOST_PORT:-3001}:3001"
     environment:
-      # Fixed at 3000 inside the container: frontend/next.config.js hardcodes
-      # its API proxy destination to http://localhost:3000. Use HOST_PORT
-      # above to change the externally-published port instead.
       PORT: "3000"
-      # Auth token API consumers must send (server-hardening work in
-      # progress on another branch — currently a no-op if the running image
-      # predates that work, but always safe to set).
+      # Bearer token required on /api/* and /reports/* when set (src/api/auth.js).
       API_TOKEN: ${API_TOKEN:-}
-      # Server-side only. Never expose to the frontend/browser.
+      # Server side only; enables the LLM scanners.
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-      # Comma-separated hostname allowlist for scan targets (SSRF guard,
-      # same parallel hardening work as API_TOKEN).
+      LLM_MODEL: ${LLM_MODEL:-}
+      # Comma-separated hostname allowlist for scan targets (src/api/url-guard.js).
       SCAN_ALLOWED_HOSTS: ${SCAN_ALLOWED_HOSTS:-}
       # Concurrent scans; each holds a Chrome instance in memory.
       SCAN_CONCURRENCY: ${SCAN_CONCURRENCY:-1}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      REPORT_ORG_NAME: ${REPORT_ORG_NAME:-}
+      SCREENSHOT_DIR: /tmp/screenshots
     volumes:
       - reports:/app/reports
-    # Chrome is the memory-hungry part of this app; give the container enough
-    # headroom for a couple of concurrent scans plus PDF rendering.
     mem_limit: 2g
-    # Puppeteer/Chrome uses /dev/shm heavily; Docker's 64MB default is too
-    # small and can crash Chrome under load. The code launches Chrome without
-    # --disable-dev-shm-usage (see src/scan-pipeline.js), so this is the
-    # container-level mitigation instead of a source change.
+    # Chrome uses /dev/shm heavily; Docker's 64 MB default crashes it under load.
     shm_size: "1gb"
     healthcheck:
       test:
@@ -71,13 +47,14 @@ services:
     build:
       context: .
       target: production
-    image: accessability:latest
+      args:
+        API_ORIGIN: http://app:3000
+    image: accessibility-scanner:latest
     command: ["node_modules/.bin/next", "start", "frontend", "-p", "3001"]
-    # Shares app's network namespace so the frontend's hardcoded
-    # `http://localhost:3000` API proxy (frontend/next.config.js) reaches the
-    # `app` container. Do not add a `ports:` entry here — Compose forbids it
-    # together with network_mode: service:*; the port is published on `app`.
-    network_mode: "service:app"
+    ports:
+      - "${FRONTEND_HOST_PORT:-3001}:3001"
+    environment:
+      API_ORIGIN: http://app:3000
     depends_on:
       app:
         condition: service_healthy

@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const MobileSpecificScanner = require('../../src/phase6d-mobile-specific-scanner');
+const MobileSpecificScanner = require('../../src/scanners/mobile-specific');
 
 describe('MobileSpecificScanner', () => {
   let scanner;

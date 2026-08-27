@@ -39,7 +39,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const RAW = path.join(ROOT, 'tests', 'data', 'harness');
-const OUT = path.join(ROOT, 'src', 'scanner-trust.json');
+const OUT = path.join(ROOT, 'src', 'core', 'scanner-trust.json');
 
 /** Violations on the good-file corpus above which a scanner is a noise source. */
 const NOISE_LIMIT = 10;
@@ -65,7 +65,7 @@ function collectScannerIds() {
   console.log = () => {};
   let scanners;
   try {
-    scanners = require(path.join(ROOT, 'src', 'scanner-registry.js')).createAllScanners();
+    scanners = require(path.join(ROOT, 'src', 'core', 'scanner-registry.js')).createAllScanners();
   } finally {
     console.log = origLog;
     if (!hadKey) delete process.env.OPENROUTER_API_KEY;

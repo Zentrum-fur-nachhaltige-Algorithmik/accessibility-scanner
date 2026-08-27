@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-const BaseScanner = require('../../src/base-scanner');
+const BaseScanner = require('../../src/core/base-scanner');
 
 class TestScanner extends BaseScanner {
   constructor() {

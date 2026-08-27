@@ -31,43 +31,43 @@ async function loadPuppeteer() {
  */
 const EXCLUSIVE_SCANNERS = {
   'keyboard-navigation': {
-    module: '../src/keyboard-navigation-scanner',
+    module: '../../src/scanners/keyboard-navigation',
     criteria: ['2.1.1', '2.1.2', '2.1.4'],
   },
   'focus-management': {
-    module: '../src/focus-management-scanner',
+    module: '../../src/scanners/focus-management',
     criteria: ['2.4.3', '2.4.7', '2.4.11'],
   },
   'input-modalities': {
-    module: '../src/input-modalities-scanner',
+    module: '../../src/scanners/input-modalities',
     criteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.7', '2.5.8'],
   },
   'responsive-design': {
-    module: '../src/responsive-design-scanner',
+    module: '../../src/scanners/responsive-design',
     criteria: ['1.4.4', '1.4.10', '1.4.12'],
     scanOpts: { heuristicOnly: true }, // use heuristic mode for speed
   },
   'hover-focus-content': {
-    module: '../src/hover-focus-content-scanner',
+    module: '../../src/scanners/hover-focus-content',
     criteria: ['1.4.13'],
     scanOpts: { heuristicOnly: true },
   },
   'seizure-prevention': {
-    module: '../src/seizure-prevention-scanner',
+    module: '../../src/scanners/seizure-prevention',
     criteria: ['2.3.1'],
   },
   'multiple-ways': {
-    module: '../src/multiple-ways-scanner',
+    module: '../../src/scanners/multiple-ways',
     criteria: ['2.4.5'],
   },
   'concurrent-input': {
-    module: '../src/concurrent-input-scanner',
+    module: '../../src/scanners/concurrent-input',
     criteria: ['2.5.6'],
   },
   // Drives real keyboard focus (Tab) for its focus-indicator checks, so it
   // needs its own tab. 2.4.7 stays with focus-management; 1.4.11 is here.
   'nontext-contrast': {
-    module: '../src/phase6a-nontext-contrast-scanner',
+    module: '../../src/scanners/nontext-contrast',
     criteria: ['1.4.11'],
   },
 };

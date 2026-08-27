@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeSeverity, severityWeight, violationPenalty, scoreFromPenalty } from '../../src/severity';
-import ScanPipeline from '../../src/scan-pipeline';
+import { normalizeSeverity, severityWeight, violationPenalty, scoreFromPenalty } from '../../src/core/severity';
+import ScanPipeline from '../../src/core/scan-pipeline';
 
 describe('severity', () => {
   it('normalises the severity zoo', () => {

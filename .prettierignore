@@ -1,0 +1,8 @@
+node_modules
+frontend/.next
+src/agent/vendor
+test-sites
+reports
+tmp
+*.md
+package-lock.json

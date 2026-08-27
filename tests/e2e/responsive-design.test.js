@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const ResponsiveDesignScanner = require('../../src/responsive-design-scanner');
+const ResponsiveDesignScanner = require('../../src/scanners/responsive-design');
 
 const fs = require('fs');
 const os = require('os');

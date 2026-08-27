@@ -57,8 +57,8 @@ const path = require('path');
 const http = require('http');
 const fs = require('fs');
 
-const ScanPipeline = require('../../src/scan-pipeline');
-const { registerAllScanners, getProfile } = require('../../src/scanner-registry');
+const ScanPipeline = require('../../src/core/scan-pipeline');
+const { registerAllScanners, getProfile } = require('../../src/core/scanner-registry');
 
 const FIXTURE_DIR = path.join(__dirname, '..', '..', 'test-sites', 'realworld');
 const PROFILE = 'standard';

@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const TextResizeScanner = require('../../src/phase6a-text-resize-scanner');
+const TextResizeScanner = require('../../src/scanners/text-resize');
 
 describe('TextResizeScanner', () => {
   let scanner;

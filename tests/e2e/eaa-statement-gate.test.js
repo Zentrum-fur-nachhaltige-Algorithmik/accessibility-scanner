@@ -4,10 +4,10 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const AccessibilityStatementScanner = require('../../src/accessibility-statement-scanner');
-const ComplianceMonitoringScanner = require('../../src/compliance-monitoring-scanner');
-const ContactMechanismScanner = require('../../src/contact-mechanism-scanner');
-const EAAProcedureScanner = require('../../src/eaa-procedure-scanner');
+const AccessibilityStatementScanner = require('../../src/scanners/accessibility-statement');
+const ComplianceMonitoringScanner = require('../../src/scanners/compliance-monitoring');
+const ContactMechanismScanner = require('../../src/scanners/contact-mechanism');
+const EAAProcedureScanner = require('../../src/scanners/eaa-procedure');
 const { matchesStatementLink, MISSING_STATEMENT_RULE } = require('../../src/utils/accessibility-statement');
 
 const rule = (v) => v.issue || v.type || v.ruleId;

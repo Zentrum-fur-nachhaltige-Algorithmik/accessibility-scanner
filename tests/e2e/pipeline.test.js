@@ -3,8 +3,8 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
-const BaseScanner = require('../../src/base-scanner');
-const ScanPipeline = require('../../src/scan-pipeline');
+const BaseScanner = require('../../src/core/base-scanner');
+const ScanPipeline = require('../../src/core/scan-pipeline');
 
 // Mock concurrent scanner
 class MockConcurrentScanner extends BaseScanner {

@@ -31,7 +31,7 @@ const http = require('http');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const { isHardViolation, normalizeSeverity } = require(path.join(ROOT, 'src', 'severity'));
+const { isHardViolation, normalizeSeverity } = require(path.join(ROOT, 'src', 'core', 'severity'));
 const CORPUS = path.join(ROOT, 'test-sites', 'realworld', 'med-templates');
 
 if (!fs.existsSync(CORPUS)) {
@@ -140,8 +140,8 @@ function parseArgs(argv) {
 }
 
 async function scanPage(url, scannerIds, scanOptions) {
-  const ScanPipeline = require(path.join(ROOT, 'src', 'scan-pipeline'));
-  const { registerAllScanners } = require(path.join(ROOT, 'src', 'scanner-registry'));
+  const ScanPipeline = require(path.join(ROOT, 'src', 'core', 'scan-pipeline'));
+  const { registerAllScanners } = require(path.join(ROOT, 'src', 'core', 'scanner-registry'));
   const pipeline = new ScanPipeline();
   const registeredIds = registerAllScanners(pipeline).map((s) => s.id);
   const ids = scannerIds ? scannerIds.filter((id) => registeredIds.includes(id)) : registeredIds;
@@ -169,7 +169,7 @@ async function main() {
       }
     }
   }
-  const { getProfile } = require(path.join(ROOT, 'src', 'scanner-registry'));
+  const { getProfile } = require(path.join(ROOT, 'src', 'core', 'scanner-registry'));
   // includeExperimental: a quarantined scanner must still prove it is clean
   // on the golden corpus before it can be promoted.
   const { scannerIds, options } = getProfile('full', { includeExperimental: true });

@@ -6,15 +6,16 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs-extra');
 
-const ScanPipeline = require('./scan-pipeline');
-const { registerAllScanners, getProfile } = require('./scanner-registry');
-const ReportGenerator = require('./report-generator');
-const { assertScannableUrl, UrlGuardError } = require('./url-guard');
-const { ScanJobStore } = require('./scan-jobs');
-const { createAuthMiddleware, logAuthStartupState } = require('./auth');
+const ScanPipeline = require('./core/scan-pipeline');
+const { registerAllScanners, getProfile } = require('./core/scanner-registry');
+const ReportGenerator = require('./report/report-generator');
+const { assertScannableUrl, UrlGuardError } = require('./api/url-guard');
+const { ScanJobStore } = require('./api/scan-jobs');
+const { createAuthMiddleware, logAuthStartupState } = require('./api/auth');
+const config = require('./config');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = config.port;
 
 /**
  * Ids we accept in a path parameter before they reach path.join().
@@ -47,7 +48,7 @@ logAuthStartupState();
 
 // Serve reports directory — the same generated files as /api/report/:id, so it
 // is covered by the auth middleware above.
-const reportsDir = path.join(__dirname, '../reports');
+const reportsDir = config.reportsDir;
 fs.ensureDirSync(reportsDir);
 app.use('/reports', express.static(reportsDir));
 
@@ -62,14 +63,14 @@ let scanQueue = null;
 async function getQueue() {
   if (!scanQueue) {
     const PQueue = (await import('p-queue')).default;
-    scanQueue = new PQueue({ concurrency: parseInt(process.env.SCAN_CONCURRENCY) || 1 });
+    scanQueue = new PQueue({ concurrency: config.scanConcurrency });
   }
   return scanQueue;
 }
 
 // Rate limiter for scan endpoint (5 requests per hour per IP by default)
-const scanRateLimitMax = parseInt(process.env.SCAN_RATE_LIMIT_MAX, 10) || 5;
-const scanRateLimitWindowMs = parseInt(process.env.SCAN_RATE_LIMIT_WINDOW_MS, 10) || 60 * 60 * 1000;
+const scanRateLimitMax = config.scanRateLimitMax;
+const scanRateLimitWindowMs = config.scanRateLimitWindowMs;
 const scanLimiter = rateLimit({
   windowMs: scanRateLimitWindowMs,
   max: scanRateLimitMax,

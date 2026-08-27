@@ -63,49 +63,49 @@ async function loadPuppeteer() {
  */
 const SCANNER_TESTS = {
   'llm-semantic-text': {
-    module: '../src/llm-semantic-text-scanner',
+    module: '../../src/scanners/llm/semantic-text',
     bad: ['bad-language-aaa.html', 'bad-navigation-aaa.html'],
     good: ['good-language-aaa.html', 'good-navigation-aaa.html'],
     german: { bad: 'bad-semantic-text-de.html', good: 'good-semantic-text-de.html' },
     criteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
   },
   'llm-auth': {
-    module: '../src/llm-auth-scanner',
+    module: '../../src/scanners/llm/auth',
     bad: ['bad-accessible-auth.html', 'bad-accessible-auth-enhanced.html'],
     good: ['good-accessible-auth.html', 'good-accessible-auth-enhanced.html'],
     german: { bad: 'bad-accessible-auth-de.html', good: 'good-accessible-auth-de.html' },
     criteria: ['3.3.8', '3.3.9'],
   },
   'llm-media-alternatives': {
-    module: '../src/llm-media-alternatives-scanner',
+    module: '../../src/scanners/llm/media-alternatives',
     bad: ['bad-media-aaa.html', 'bad-media-alternatives.html'],
     good: ['good-media-aaa.html', 'good-accessibility.html'],
     german: { bad: 'bad-media-alternatives-de.html', good: 'good-media-alternatives-de.html' },
     criteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
   },
   'llm-visual-presentation': {
-    module: '../src/llm-visual-presentation-scanner',
+    module: '../../src/scanners/llm/visual-presentation',
     bad: ['bad-visual-presentation.html', 'bad-low-background-audio.html'],
     good: ['good-visual-presentation.html', 'good-low-background-audio.html'],
     german: { bad: 'bad-visual-presentation-de.html', good: 'good-visual-presentation-de.html' },
     criteria: ['1.4.7', '1.4.8', '1.4.9'],
   },
   'llm-behavioral': {
-    module: '../src/llm-behavioral-scanner',
+    module: '../../src/scanners/llm/behavioral',
     bad: ['bad-timing-aaa.html', 'bad-change-on-request.html'],
     good: ['good-timing-aaa.html', 'good-change-on-request.html'],
     german: { bad: 'bad-behavioral-de.html', good: 'good-behavioral-de.html' },
     criteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
   },
   'llm-focus-appearance': {
-    module: '../src/llm-focus-appearance-scanner',
+    module: '../../src/scanners/llm/focus-appearance',
     bad: ['bad-focus-appearance.html', 'bad-focus-not-obscured-enhanced.html'],
     good: ['good-focus-appearance.html', 'good-focus-not-obscured-enhanced.html'],
     german: { bad: 'bad-focus-appearance-de.html', good: 'good-focus-appearance-de.html' },
     criteria: ['2.4.12', '2.4.13'],
   },
   'llm-sensory-characteristics': {
-    module: '../src/llm-sensory-characteristics-scanner',
+    module: '../../src/scanners/llm/sensory-characteristics',
     bad: ['bad-sensory-characteristics.html'],
     good: ['good-sensory-characteristics.html'],
     german: {
@@ -117,7 +117,7 @@ const SCANNER_TESTS = {
     robustness: ['bad-prompt-injection.html', 'bad-long-page-de.html'],
   },
   'llm-reading-level': {
-    module: '../src/llm-reading-level-scanner',
+    module: '../../src/scanners/llm/reading-level',
     bad: ['bad-reading-level.html'],
     good: ['good-reading-level.html'],
     // Already German — the fixture pair IS the German pair.
@@ -127,25 +127,25 @@ const SCANNER_TESTS = {
 
   // ---- Sprint P2 additions ------------------------------------------------
   'llm-redundant-entry': {
-    module: '../src/llm-redundant-entry-scanner',
+    module: '../../src/scanners/llm/redundant-entry',
     bad: ['bad-redundant-entry.html'],
     good: ['good-redundant-entry.html'],
     criteria: ['3.3.7'],
   },
   'llm-consistent-help': {
-    module: '../src/llm-consistent-help-scanner',
+    module: '../../src/scanners/llm/consistent-help',
     bad: ['bad-consistent-help.html'],
     good: ['good-consistent-help.html'],
     criteria: ['3.2.6'],
   },
   'llm-alt-quality': {
-    module: '../src/llm-alt-quality-scanner',
+    module: '../../src/scanners/llm/alt-quality',
     bad: ['bad-image-alt-complex.html'],
     good: ['good-image-alt-complex.html'],
     criteria: ['1.1.1'],
   },
   'llm-incomplete-reviewer': {
-    module: '../src/llm-incomplete-reviewer-scanner',
+    module: '../../src/scanners/llm/incomplete-reviewer',
     // This scanner adjudicates whatever axe-core left `incomplete`, which is
     // page- and engine-version-dependent. A hard "must find X" assertion would
     // encode axe's current behaviour rather than ours, so its contract here is
@@ -200,7 +200,7 @@ async function main() {
   }
 
   const puppeteer = await loadPuppeteer();
-  const { LLMClient } = require('../../src/llm-client');
+  const { LLMClient } = require('../../src/llm/client');
   const client = new LLMClient({
     apiKey: process.env.OPENROUTER_API_KEY,
     maxRetries: 3,

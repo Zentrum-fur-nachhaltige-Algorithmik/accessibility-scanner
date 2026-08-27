@@ -6,7 +6,7 @@ import { join } from 'path';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const AxeCoreAdapter = require('../../src/axe-core-adapter');
+const AxeCoreAdapter = require('../../src/scanners/axe-core');
 
 const TEST_SITES_DIR = join(__dirname, '../../test-sites');
 

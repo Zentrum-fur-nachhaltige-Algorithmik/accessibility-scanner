@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const ColorContrastScanner = require('../../src/color-contrast-scanner');
+const ColorContrastScanner = require('../../src/scanners/color-contrast');
 
 describe('ColorContrastScanner', () => {
   let scanner;

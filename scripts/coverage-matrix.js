@@ -127,14 +127,14 @@ function collectScanners() {
   console.log = () => {};
   let scanners;
   try {
-    const { createAllScanners } = require(path.join(ROOT, 'src', 'scanner-registry.js'));
+    const { createAllScanners } = require(path.join(ROOT, 'src', 'core', 'scanner-registry.js'));
     scanners = createAllScanners();
   } finally {
     console.log = origLog;
     if (!hadKey) delete process.env.OPENROUTER_API_KEY;
   }
 
-  const { trustTier, trustReason } = require(path.join(ROOT, 'src', 'scanner-trust.js'));
+  const { trustTier, trustReason } = require(path.join(ROOT, 'src', 'core', 'scanner-trust.js'));
 
   return scanners.map((s) => ({
     id: s.id,

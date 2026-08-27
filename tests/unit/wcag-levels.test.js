@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { levelOf, levelOfViolation, normalizeCriterion } from '../../src/wcag-levels';
+import { levelOf, levelOfViolation, normalizeCriterion } from '../../src/core/wcag-levels';
 
 describe('wcag-levels', () => {
   it('maps criteria to levels', () => {

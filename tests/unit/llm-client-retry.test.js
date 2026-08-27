@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { LLMClient } from '../../src/llm-client.js';
+import { LLMClient } from '../../src/llm/client.js';
 
 function clientWithStatuses(statuses) {
   const client = new LLMClient({ apiKey: 'test-key', maxRetries: 5 });

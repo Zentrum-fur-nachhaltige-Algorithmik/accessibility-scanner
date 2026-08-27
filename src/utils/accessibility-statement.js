@@ -21,16 +21,15 @@ const STATEMENT_LINK_KEYWORDS = [
   'accessibilite',
   'accesibilidad',
   'toegankelijkheid',
-  'a11y',
 ];
 
 /**
- * The bare word `accessibility` is the title of countless articles, so it only
- * identifies a statement when it is the whole link text or a whole path
- * segment: "Accessibility" -> /accessibility/ is a statement link,
- * "Introduction to Web Accessibility" -> /intro is an article.
+ * The bare words `accessibility` and `a11y` are the title of countless
+ * articles and part of many site names, so they only identify a statement as
+ * the whole link text or a whole path segment: "Accessibility" -> /accessibility/
+ * is a statement link, "The A11Y Project" -> / is a home page.
  */
-const GENERIC_KEYWORDS = ['accessibility', 'accessibilité'];
+const GENERIC_KEYWORDS = ['accessibility', 'accessibilité', 'a11y'];
 
 /** Does the bare word stand alone as the link text or as a path segment? */
 function matchesGenericKeyword(text, href) {

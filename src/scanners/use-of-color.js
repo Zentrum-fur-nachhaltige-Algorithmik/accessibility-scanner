@@ -243,10 +243,19 @@ class UseOfColorScanner extends BaseScanner {
           .flatMap((token) => token.split(/[-_]+/))
           .some((word) => word.startsWith('chart') || word.startsWith('graph'));
       };
+      // A chart is drawn, so it is or contains a graphic. The accessible data
+      // table that a chart is captioned with is usually named "chart-table"
+      // and is the text alternative, not a colour-coded visualisation.
+      const drawsSomething = (el) =>
+        ['canvas', 'svg', 'img'].includes(el.tagName.toLowerCase()) ||
+        !!el.querySelector('canvas, svg, img') ||
+        window.getComputedStyle(el).backgroundImage !== 'none';
       const chartCandidates = [
         ...new Set([
           ...document.querySelectorAll('canvas'),
-          ...[...document.querySelectorAll('[class]')].filter(namesAChart),
+          ...[...document.querySelectorAll('[class]')].filter(
+            (el) => namesAChart(el) && drawsSomething(el)
+          ),
         ]),
       ];
       document.querySelectorAll('svg').forEach((svg) => {

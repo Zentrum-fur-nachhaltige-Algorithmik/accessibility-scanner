@@ -75,14 +75,10 @@ class TimingControlsScanner extends BaseScanner {
     const initialScreenshot = path.join(scanDir, 'timing-controls-analysis.png');
     await page.screenshot({ path: initialScreenshot, fullPage: true });
 
-    // 1. Test timeout adjustability (WCAG 2.2.1)
-    if (options.testTimeouts) {
-      const timeoutResults = await this.analyzeTimeoutAdjustability(page, violations);
-      timeoutsAdjustable = timeoutResults.adjustable;
-      dataPreservedOnTimeout = timeoutResults.dataPreserved;
-    }
-
-    // 2. Test auto-playing content (WCAG 2.2.2)
+    // 1. Test auto-playing content (WCAG 2.2.2). It owns the observation
+    //    window, and what it sees updating on its own is also the evidence
+    //    that the page runs a time limit at all.
+    let countdownObserved = false;
     if (options.testAutoPlay) {
       const autoPlayResults = await this.analyzeAutoPlayingContent(
         page,
@@ -90,6 +86,18 @@ class TimingControlsScanner extends BaseScanner {
         options.observationTime
       );
       autoPlayControlled = autoPlayResults.controlled;
+      countdownObserved = autoPlayResults.countdownObserved;
+    }
+
+    // 2. Test timeout adjustability (WCAG 2.2.1)
+    if (options.testTimeouts) {
+      const timeoutResults = await this.analyzeTimeoutAdjustability(
+        page,
+        violations,
+        countdownObserved
+      );
+      timeoutsAdjustable = timeoutResults.adjustable;
+      dataPreservedOnTimeout = timeoutResults.dataPreserved;
     }
 
     // 3. Test moving/updating content (WCAG 2.2.2)
@@ -103,7 +111,7 @@ class TimingControlsScanner extends BaseScanner {
     }
 
     // 4. Test timeout warnings (WCAG 2.2.6)
-    await this.analyzeTimeoutWarnings(page, violations);
+    await this.analyzeTimeoutWarnings(page, violations, countdownObserved);
 
     // Generate visual evidence
     visualEvidence.push({
@@ -130,10 +138,10 @@ class TimingControlsScanner extends BaseScanner {
   /**
    * Analyze timeout adjustability (WCAG 2.2.1)
    */
-  async analyzeTimeoutAdjustability(page, violations) {
+  async analyzeTimeoutAdjustability(page, violations, countdownObserved) {
     log.debug('Analyzing timeout adjustability...');
 
-    const timeoutAnalysis = await page.evaluate(() => {
+    const timeoutAnalysis = await page.evaluate((countdownObserved) => {
       const issues = [];
       let adjustable = true;
       let dataPreserved = true;
@@ -167,7 +175,19 @@ class TimingControlsScanner extends BaseScanner {
       // innerText (rendered text only): textContent would include inline
       // <script> source, where "setTimeout" matched the "timeout" keyword.
       const pageText = (document.body.innerText || '').toLowerCase();
-      const hasTimeoutContent = timeoutKeywords.some((keyword) => pageText.includes(keyword));
+      const mentionsTimeout = timeoutKeywords.some((keyword) => pageText.includes(keyword));
+
+      // Wording alone is not a time limit: a checklist item titled "allow
+      // extending session timeouts" is a page about timeouts, not a page with
+      // one. A meta refresh or a counter that ticked down while the page sat
+      // idle is the evidence that one exists.
+      const metaRefresh = document.querySelector('meta[http-equiv="refresh" i]');
+      const refreshDelay = metaRefresh
+        ? parseInt(metaRefresh.getAttribute('content') || '', 10)
+        : NaN;
+      const hasTimeoutContent =
+        mentionsTimeout &&
+        (countdownObserved || (Number.isFinite(refreshDelay) && refreshDelay > 0));
 
       if (hasTimeoutContent) {
         // Look for timeout adjustment controls
@@ -261,7 +281,7 @@ class TimingControlsScanner extends BaseScanner {
       window.setTimeout = originalSetTimeout;
 
       return { issues, adjustable, dataPreserved, detectedTimeouts };
-    });
+    }, countdownObserved);
 
     // Create violations for timeout issues
     timeoutAnalysis.issues.forEach((issue) => {
@@ -369,6 +389,7 @@ class TimingControlsScanner extends BaseScanner {
     const dynamicContentAnalysis = await page.evaluate(() => {
       const issues = [];
       let controlled = true;
+      let countdownObserved = false;
 
       // Look for elements with animations or auto-updating content
       const animatedElements = document.querySelectorAll(
@@ -431,6 +452,9 @@ class TimingControlsScanner extends BaseScanner {
         for (const [element, count] of recorded.counts) {
           if (count < MIN_AUTO_UPDATES) continue;
           if (!element.isConnected) continue;
+          // A number that keeps being rewritten while nobody touches the page
+          // is a running clock: the evidence a time limit exists.
+          if (/\d/.test(element.textContent || '')) countdownObserved = true;
           // SVG/MathML elements expose className as an SVGAnimatedString
           const className = typeof element.className === 'string' ? element.className : '';
           const elementInfo = {
@@ -458,7 +482,7 @@ class TimingControlsScanner extends BaseScanner {
         delete window.__a11yAutoUpdate;
       }
 
-      return { issues, controlled };
+      return { issues, controlled, countdownObserved };
     });
 
     // Combine results
@@ -477,7 +501,10 @@ class TimingControlsScanner extends BaseScanner {
       });
     });
 
-    return { controlled: overallControlled };
+    return {
+      controlled: overallControlled,
+      countdownObserved: dynamicContentAnalysis.countdownObserved,
+    };
   }
 
   /**
@@ -596,11 +623,21 @@ class TimingControlsScanner extends BaseScanner {
   /**
    * Analyze timeout warnings (WCAG 2.2.6)
    */
-  async analyzeTimeoutWarnings(page, violations) {
+  async analyzeTimeoutWarnings(page, violations, countdownObserved) {
     log.debug('Analyzing timeout warnings...');
 
-    const warningAnalysis = await page.evaluate(() => {
+    const warningAnalysis = await page.evaluate((countdownObserved) => {
       const issues = [];
+
+      // A page that only writes about timeouts has no timeout warning to make
+      // accessible, so the same evidence gates this check.
+      const metaRefresh = document.querySelector('meta[http-equiv="refresh" i]');
+      const refreshDelay = metaRefresh
+        ? parseInt(metaRefresh.getAttribute('content') || '', 10)
+        : NaN;
+      if (!countdownObserved && !(Number.isFinite(refreshDelay) && refreshDelay > 0)) {
+        return { issues };
+      }
 
       // Look for timeout-related elements
       const timeoutElements = document.querySelectorAll(
@@ -652,7 +689,7 @@ class TimingControlsScanner extends BaseScanner {
       });
 
       return { issues };
-    });
+    }, countdownObserved);
 
     // Create violations for timeout warning issues
     warningAnalysis.issues.forEach((issue) => {

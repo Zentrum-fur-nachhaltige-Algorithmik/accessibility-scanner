@@ -227,46 +227,44 @@ class PredictableNavigationScanner extends BaseScanner {
         }
       });
 
-      // Check for CSS that might cause unexpected focus styling changes
-      const styleSheets = Array.from(document.styleSheets);
-      let hasUnpredictableFocusStyles = false;
+      // Focus styles that take the focused element out of sight. Read from the
+      // rule's own declarations, not from its serialised text, and only for
+      // display/visibility: moving a control on focus is how a skip link is
+      // revealed (`position: absolute` while unfocused, in view when focused),
+      // which is the pattern to encourage, not to report.
+      const hiddenOnFocus = [];
 
-      try {
-        styleSheets.forEach((sheet) => {
-          try {
-            const rules = Array.from(sheet.cssRules || []);
-            rules.forEach((rule) => {
-              if (rule.selectorText && rule.selectorText.includes(':focus')) {
-                const focusRule = rule.cssText;
-
-                // Check for focus styles that might be disorienting
-                const problematicStyles = [
-                  'display: none',
-                  'visibility: hidden',
-                  'position: absolute',
-                ];
-                const hasProblematicStyle = problematicStyles.some((style) =>
-                  focusRule.includes(style)
-                );
-
-                if (hasProblematicStyle) {
-                  hasUnpredictableFocusStyles = true;
-                }
-              }
-            });
-          } catch (e) {
-            // Cross-origin stylesheet
+      const collectFocusRules = (rules) => {
+        for (const rule of rules) {
+          // Media queries group rules, and a nested style rule both declares
+          // and groups, so descend first and then read this rule's own
+          // declarations.
+          if (rule.cssRules && rule.cssRules.length) {
+            collectFocusRules(Array.from(rule.cssRules));
           }
-        });
-      } catch (e) {
-        // Error accessing stylesheets
+          if (!rule.selectorText || !rule.selectorText.includes(':focus')) continue;
+          if (!rule.style) continue;
+          const display = rule.style.getPropertyValue('display');
+          const visibility = rule.style.getPropertyValue('visibility');
+          if (display === 'none' || visibility === 'hidden' || visibility === 'collapse') {
+            hiddenOnFocus.push(rule.selectorText);
+          }
+        }
+      };
+
+      for (const sheet of Array.from(document.styleSheets)) {
+        try {
+          collectFocusRules(Array.from(sheet.cssRules || []));
+        } catch (e) {
+          // Cross-origin stylesheet: its rules are not readable.
+        }
       }
 
-      if (hasUnpredictableFocusStyles) {
+      if (hiddenOnFocus.length > 0) {
         issues.push({
           type: 'unpredictable-focus-styles',
-          element: 'document',
-          description: 'CSS focus styles may cause elements to disappear or move unexpectedly',
+          element: hiddenOnFocus.slice(0, 5).join(', '),
+          description: `Focus styles hide the focused element: ${hiddenOnFocus.slice(0, 5).join(', ')}`,
           severity: 'warning',
         });
       }
@@ -843,10 +841,12 @@ class PredictableNavigationScanner extends BaseScanner {
         });
       });
 
-      // Check for missing external link indicators
+      // 3.2.4 asks for consistency, not for a particular convention: a site
+      // where no external link is marked identifies them consistently. Only a
+      // split, where some carry an indicator and others do not, fails.
       if (linkPatterns.has('external')) {
         const externalLinks = linkPatterns.get('external');
-        const hasExternalIndicators = externalLinks.some(
+        const identified = externalLinks.filter(
           (link) =>
             link.text.includes('(external)') ||
             link.ariaLabel.includes('external') ||
@@ -854,11 +854,11 @@ class PredictableNavigationScanner extends BaseScanner {
             link.element.hasAttribute('target')
         );
 
-        if (!hasExternalIndicators && externalLinks.length > 0) {
+        if (identified.length > 0 && identified.length < externalLinks.length) {
           issues.push({
             type: 'external-links-no-identification',
             element: 'external links',
-            description: 'External links lack consistent identification (visual indicator or text)',
+            description: `External links are identified inconsistently: ${identified.length} of ${externalLinks.length} carry an indicator`,
             severity: 'warning',
           });
         }
@@ -867,7 +867,7 @@ class PredictableNavigationScanner extends BaseScanner {
       // Check for document link identification
       if (linkPatterns.has('document')) {
         const documentLinks = linkPatterns.get('document');
-        const hasDocumentIndicators = documentLinks.some((link) => {
+        const identified = documentLinks.filter((link) => {
           const hasFileType =
             link.text.includes('.pdf') ||
             link.text.includes('.doc') ||
@@ -879,11 +879,11 @@ class PredictableNavigationScanner extends BaseScanner {
           return hasFileType || hasIcon;
         });
 
-        if (!hasDocumentIndicators && documentLinks.length > 0) {
+        if (identified.length > 0 && identified.length < documentLinks.length) {
           issues.push({
             type: 'document-links-no-identification',
             element: 'document links',
-            description: 'Document links lack file type identification',
+            description: `Document links are identified inconsistently: ${identified.length} of ${documentLinks.length} name their file type`,
             severity: 'warning',
           });
         }

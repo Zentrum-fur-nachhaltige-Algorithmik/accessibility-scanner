@@ -8,6 +8,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
+const { injectableCode: renderedCode } = require('../utils/rendered');
 const log = require('../utils/logger').createLogger('error-handling');
 
 class ErrorHandlingScanner extends BaseScanner {
@@ -592,7 +593,8 @@ class ErrorHandlingScanner extends BaseScanner {
   async analyzeErrorSuggestions(page, violations) {
     log.debug('Analyzing error suggestions...');
 
-    const suggestionsAnalysis = await page.evaluate(() => {
+    const suggestionsAnalysis = await page.evaluate((renderedCode) => {
+      eval(renderedCode);
       const issues = [];
       let provided = true;
 
@@ -653,9 +655,12 @@ class ErrorHandlingScanner extends BaseScanner {
         }
       });
 
-      // Check input fields with specific patterns for format suggestions
+      // Check input fields with specific patterns for format suggestions.
+      // A field nobody can see is a honeypot or a template, and needs no
+      // format hint.
       const patternFields = document.querySelectorAll('input[pattern]');
       patternFields.forEach((field) => {
+        if (!__isRendered(field)) return;
         const elementInfo = {
           selector:
             field.tagName.toLowerCase() +
@@ -733,7 +738,7 @@ class ErrorHandlingScanner extends BaseScanner {
       });
 
       return { issues, provided };
-    });
+    }, renderedCode);
 
     // Create violations for error suggestions issues
     suggestionsAnalysis.issues.forEach((issue) => {
@@ -929,10 +934,12 @@ class ErrorHandlingScanner extends BaseScanner {
       );
       submitButtons.forEach((button) => {
         const buttonText = button.textContent.toLowerCase() || button.value.toLowerCase();
+        // "Cancel" is the way out of an action, not a destructive one: it is
+        // on the feedback form of most public-sector pages.
         const isIrreversible =
           buttonText.includes('delete') ||
           buttonText.includes('remove') ||
-          buttonText.includes('cancel') ||
+          buttonText.includes('erase') ||
           buttonText.includes('terminate');
 
         if (isIrreversible) {

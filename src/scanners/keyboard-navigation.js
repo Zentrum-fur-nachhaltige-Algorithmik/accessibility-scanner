@@ -1240,7 +1240,8 @@ class KeyboardNavigationScanner extends BaseScanner {
   async validateFocusableElements(page, violations) {
     log.debug('Validating focusable elements...');
 
-    const focusableIssues = await page.evaluate(() => {
+    const focusableIssues = await page.evaluate((renderedCode) => {
+      eval(renderedCode);
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -1274,7 +1275,9 @@ class KeyboardNavigationScanner extends BaseScanner {
       interactiveElements.forEach((element) => {
         const selector = getElementSelector(element);
         const tabIndex = element.tabIndex;
-        const isHidden = element.offsetParent === null;
+        // offsetParent stays set for a control parked off screen or clipped to
+        // a pixel, so a visually hidden spam trap counted as visible.
+        const isHidden = !__isRendered(element);
         const isDisabled =
           element.hasAttribute('disabled') || element.getAttribute('aria-disabled') === 'true';
 
@@ -1356,7 +1359,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       });
 
       return issues;
-    });
+    }, renderedCode);
 
     // Create violations for focusable element issues
     focusableIssues.forEach((issue) => {
@@ -1487,7 +1490,8 @@ class KeyboardNavigationScanner extends BaseScanner {
   async validateTabindexUsage(page, violations) {
     log.debug('Validating tabindex usage...');
 
-    const tabindexIssues = await page.evaluate(() => {
+    const tabindexIssues = await page.evaluate((renderedCode) => {
+      eval(renderedCode);
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -1505,6 +1509,10 @@ class KeyboardNavigationScanner extends BaseScanner {
       const elementsWithTabindex = document.querySelectorAll('[tabindex]');
 
       elementsWithTabindex.forEach((element) => {
+        // Nothing about the tab order of an element nobody can see: a
+        // visually hidden honeypot field with tabindex="-1" is doing exactly
+        // what it should.
+        if (!__isRendered(element)) return;
         const selector = getElementSelector(element);
         const tabIndex = parseInt(element.getAttribute('tabindex'));
 
@@ -1580,7 +1588,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       });
 
       return issues;
-    });
+    }, renderedCode);
 
     // Create violations for tabindex issues
     tabindexIssues.forEach((issue) => {

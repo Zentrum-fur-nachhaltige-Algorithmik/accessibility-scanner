@@ -6,6 +6,11 @@
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
+// __visibleLabelText leaves out screen-reader-only text, which it can only
+// recognise with the rendered-state helpers injected alongside it.
+const { injectableCode: renderedUtils } = require('../utils/rendered');
+const injectedUtils = `${renderedUtils}
+${accnameUtils}`;
 
 class LabelInNameScanner extends BaseScanner {
   constructor() {
@@ -195,7 +200,7 @@ class LabelInNameScanner extends BaseScanner {
         return violations;
       },
       options,
-      accnameUtils
+      injectedUtils
     );
   }
 
@@ -361,7 +366,7 @@ class LabelInNameScanner extends BaseScanner {
         return violations;
       },
       options,
-      accnameUtils
+      injectedUtils
     );
   }
 
@@ -482,7 +487,7 @@ class LabelInNameScanner extends BaseScanner {
         return violations;
       },
       options,
-      accnameUtils
+      injectedUtils
     );
   }
 
@@ -594,7 +599,7 @@ class LabelInNameScanner extends BaseScanner {
         return violations;
       },
       options,
-      accnameUtils
+      injectedUtils
     );
   }
 
@@ -692,7 +697,7 @@ class LabelInNameScanner extends BaseScanner {
         return violations;
       },
       options,
-      accnameUtils
+      injectedUtils
     );
   }
 

@@ -420,6 +420,10 @@ const injectableCode = `
 
     function hiddenFromTree(node) {
       if (node.nodeType !== 1) return false;
+      // Scripting is on in every scan, so <noscript> content never reaches the
+      // user, and script/style/template text is not rendered at all.
+      var t = node.tagName;
+      if (t === 'NOSCRIPT' || t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') return true;
       if (node.hasAttribute('hidden')) return true;
       if (node.getAttribute('aria-hidden') === 'true') return true;
       var cs = null;

@@ -1063,24 +1063,29 @@ class AdvancedAriaScanner extends BaseScanner {
               impact: 'Screen readers cannot find associated content',
               recommendation: 'Ensure aria-controls ID matches existing panel element',
             });
-          } else {
-            // Check panel has proper labeling
-            if (!panel.hasAttribute('aria-labelledby')) {
-              violations.push({
-                type: 'accordion-panel-unlabeled',
-                category: 'accordion',
-                severity: 'moderate',
-                element: getElementSelector(panel),
-                description: 'Accordion panel lacks aria-labelledby reference',
-                details: {
-                  panelId: panel.id,
-                  hasAriaLabelledby: panel.hasAttribute('aria-labelledby'),
-                },
-                wcagCriteria: '4.1.2',
-                impact: 'Screen readers cannot identify panel heading',
-                recommendation: 'Add aria-labelledby pointing to accordion button ID',
-              });
-            }
+          } else if (
+            panel.getAttribute('role') === 'region' &&
+            !panel.hasAttribute('aria-labelledby') &&
+            !panel.hasAttribute('aria-label')
+          ) {
+            // Only a panel that declares itself a region needs a name: a
+            // region is a landmark, and an unnamed landmark is unusable. A
+            // plain disclosure or dropdown, which is what most aria-expanded
+            // buttons control, needs no label of its own.
+            violations.push({
+              type: 'accordion-panel-unlabeled',
+              category: 'accordion',
+              severity: 'moderate',
+              element: getElementSelector(panel),
+              description: 'Accordion panel is a region without an accessible name',
+              details: {
+                panelId: panel.id,
+                hasAriaLabelledby: panel.hasAttribute('aria-labelledby'),
+              },
+              wcagCriteria: '4.1.2',
+              impact: 'Screen readers announce an unnamed region',
+              recommendation: 'Add aria-labelledby pointing to the accordion button id',
+            });
           }
         }
       });

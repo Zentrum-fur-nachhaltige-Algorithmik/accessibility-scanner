@@ -1,12 +1,8 @@
 /**
- * Multiple Ways Scanner (deterministic)
- *
- * Covers:
- * - 2.4.5 Multiple Ways (Level AA)
- *
- * Checks that more than one navigation mechanism is available
- * to locate a page within the site (nav, search, sitemap, TOC,
- * breadcrumb, footer nav, index).
+ * Multiple Ways Scanner.
+ * WCAG 2.4.5 (EN 301 549 9.2.4.5).
+ * Counts navigation mechanisms (nav, search, sitemap, TOC, breadcrumb, footer nav, index)
+ * and only asserts a violation when the page shows evidence of belonging to a larger site.
  */
 
 const BaseScanner = require('../core/base-scanner');
@@ -29,7 +25,7 @@ class MultipleWaysScanner extends BaseScanner {
         const links = nav.querySelectorAll('a[href]');
         if (links.length > 2) {
           const label = nav.getAttribute('aria-label') || nav.getAttribute('aria-labelledby') || '';
-          // Skip breadcrumb navs — counted separately
+          // Skip breadcrumb navs, counted separately
           if (/breadcrumb/i.test(label) || /breadcrumb/i.test(nav.className)) continue;
           mechanisms.push({
             type: 'nav',
@@ -128,16 +124,14 @@ class MultipleWaysScanner extends BaseScanner {
       // Deduplicate by type
       const uniqueTypes = [...new Set(mechanisms.map((m) => m.type))];
 
-      // Evidence that this page is actually part of a larger multi-page site
-      // (mirrors the self-detection in page-structure-scanner.js's identical
-      // 2.4.5/9.2.4.5 check): either (a) at least 2 same-origin links to
-      // genuinely distinct paths — fragment-only ("#..."), "javascript:",
-      // "mailto:", and "tel:" links don't count, since none of them point at
-      // "another page" — or (b) a breadcrumb-shaped trail with >= 2 steps.
-      // (b) is deliberately independent of link functionality: a breadcrumb's
-      // STRUCTURE (Home > Section > Subsection > ...) signals a position
-      // within a page hierarchy even in a static fixture/preview that has no
-      // real backing subpages to link to, so its crumbs are placeholders.
+      // Evidence that this page is part of a larger multi-page site (same
+      // logic as the 2.4.5 check in page-structure.js): either (a) at least
+      // 2 same-origin links to distinct paths (fragment-only, "javascript:",
+      // "mailto:" and "tel:" links do not count, since none of them point at
+      // another page), or (b) a breadcrumb-shaped trail with >= 2 steps.
+      // (b) is independent of link functionality: a breadcrumb's structure
+      // (Home > Section > Subsection) signals a position within a page
+      // hierarchy even in a static preview whose crumbs are placeholders.
       const internalPaths = new Set();
       allLinks.forEach((link) => {
         const raw = (link.getAttribute('href') || '').trim();
@@ -185,37 +179,19 @@ class MultipleWaysScanner extends BaseScanner {
       };
     }
 
-    // SC 2.4.5 "Multiple Ways" is defined over a *set of web pages* in a site
-    // or process (WCAG: "More than one way is available to locate a Web page
-    // within a set of Web pages") — a single page scanned in isolation cannot
-    // prove or disprove it, since another page of the same site may supply
-    // the missing mechanism. Reporting a full-severity violation from one
-    // page alone is a category error and is exactly the false-positive this
-    // gate exists to prevent.
+    // SC 2.4.5 is defined over a set of web pages in a site or process, so a
+    // single page scanned in isolation cannot prove or disprove it: another
+    // page of the same site may supply the missing mechanism.
     //
-    // Two independent signals gate full-severity reporting, mirroring how
-    // `page-structure-scanner.js` gates its identical 2.4.5/9.2.4.5 check:
-    //  1. An explicit opt-out: a caller that KNOWS it is scanning a
-    //     standalone/single page (an isolated fixture, a one-page preview, a
-    //     single-page brochure site) sets `options.singlePageContext` or
-    //     `options.skipMultiPageCriteria`.
-    //  2. Self-detection: even with no opt-out passed (the default — nothing
-    //     currently sets one), `data.hasEvidenceOfLargerSite` tells us
-    //     whether the page itself looks like part of a larger site (real
-    //     distinct internal links, or a breadcrumb trail). Absent that
-    //     evidence, a page with < 2 mechanisms is exactly as likely to be a
-    //     deliberately single-page site (out of scope for 2.4.5) as it is a
-    //     multi-page site missing navigation aids — so it doesn't warrant a
-    //     full-severity claim on its own.
-    //
-    // A full-severity violation therefore requires BOTH: no opt-out, AND
-    // real evidence this page belongs to a bigger site. Every other case
-    // (opted out, or no such evidence) downgrades to an informational,
-    // low-confidence note instead of asserting a violation outright — this
-    // is what keeps genuinely single-page fixtures/sites from being flagged
-    // for "only 1 way to locate content" while still catching real
-    // multi-page-site pages like bad-multiple-ways.html (its breadcrumb
-    // trail alone is 5 steps deep, well past the >= 2 threshold).
+    // A full-severity violation therefore requires both:
+    //  1. no explicit opt-out (`options.singlePageContext` or
+    //     `options.skipMultiPageCriteria`, set by callers scanning a
+    //     standalone page), and
+    //  2. `data.hasEvidenceOfLargerSite`: real distinct internal links or a
+    //     breadcrumb trail. Without that evidence a page with < 2 mechanisms
+    //     is as likely a single-page site (out of scope) as a multi-page site
+    //     missing navigation aids.
+    // Every other case downgrades to an informational, low-confidence note.
     const singlePageContext =
       options.singlePageContext === true || options.skipMultiPageCriteria === true;
     const assertFullViolation = !singlePageContext && data.hasEvidenceOfLargerSite;
@@ -235,15 +211,14 @@ class MultipleWaysScanner extends BaseScanner {
           )
         );
       } else {
-        // Don't assert a violation from a single page with no evidence it's
-        // part of a larger site — downgrade to an informational,
-        // low-confidence note that flags it for whole-site review instead.
+        // No evidence this page is part of a larger site: emit an
+        // informational, low-confidence note for whole-site review instead.
         const violation = this.formatViolation(
           '2.4.5',
           'minor',
           `This page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-            'WCAG 2.4.5 (Multiple Ways) is evaluated across an entire site or process, not one page in isolation — ' +
-            'this cannot be confirmed as a violation without checking whether other pages of the site provide search, ' +
+            'WCAG 2.4.5 (Multiple Ways) is evaluated across an entire site or process, not one page in isolation. ' +
+            'This cannot be confirmed as a violation without checking whether other pages of the site provide search, ' +
             'a sitemap, or another way to locate content.',
           [],
           'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html',

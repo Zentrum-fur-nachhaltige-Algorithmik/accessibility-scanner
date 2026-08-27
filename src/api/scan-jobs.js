@@ -1,21 +1,10 @@
-'use strict';
-
 /**
- * scan-jobs — in-memory async job store for scans.
- *
- * A full scan takes minutes, which is far longer than most HTTP clients and
- * proxies will hold a connection open. `POST /api/scan` therefore enqueues a
- * job and returns `202 {jobId}`; the client polls `GET /api/scan/job/:jobId`.
- *
- * Jobs run through the *existing* p-queue instance owned by the server, so the
- * configured scan concurrency is unchanged — the store only tracks state.
- *
- * State lives in process memory: it does not survive a restart and does not
- * work across multiple server processes. That is deliberate for now; a durable
- * store is a separate piece of work.
- *
- * @module scan-jobs
+ * scan-jobs
+ * In-memory async job store for scans: POST /api/scan enqueues a job and the
+ * client polls GET /api/scan/job/:jobId. Jobs run through the server's p-queue,
+ * so scan concurrency is unchanged. State does not survive a restart.
  */
+'use strict';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -53,7 +42,7 @@ class ScanJobStore {
     this.getQueue = getQueue;
     this.runScan = runScan;
     this.maxJobs = maxJobs;
-    /** @type {Map<string, ScanJob>} insertion-ordered — oldest first */
+    /** @type {Map<string, ScanJob>} insertion-ordered, oldest first */
     this.jobs = new Map();
   }
 
@@ -105,14 +94,14 @@ class ScanJobStore {
           } finally {
             job.finishedAt = Date.now();
             // A job only becomes evictable once it finishes, so re-run the cap
-            // here as well — evicting at creation time alone lets a burst of
+            // here as well; evicting at creation time alone lets a burst of
             // still-pending jobs grow the store without bound.
             this.evict();
           }
         })
       )
       .catch((error) => {
-        // Queue itself failed (import error, abort) — surface it on the job.
+        // Queue itself failed (import error, abort): surface it on the job.
         if (!TERMINAL.has(job.status)) {
           job.error = error && error.message ? error.message : String(error);
           job.status = 'error';
@@ -179,8 +168,8 @@ class ScanJobStore {
 
   /**
    * Enforce the retention cap by dropping the oldest *finished* jobs.
-   * Queued/running jobs are never evicted — losing them would strand a caller
-   * that is still polling — so the store may briefly exceed maxJobs under a
+   * Queued/running jobs are never evicted (losing them would strand a caller
+   * that is still polling), so the store may briefly exceed maxJobs under a
    * flood of concurrent scans.
    */
   evict() {

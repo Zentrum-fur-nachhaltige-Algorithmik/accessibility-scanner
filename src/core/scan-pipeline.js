@@ -1,14 +1,12 @@
+/**
+ * ScanPipeline
+ * Orchestrates scanner execution against a single URL with one browser instance.
+ * Runs concurrent scanners (page.evaluate only) in parallel on one page and
+ * re-navigates between exclusive scanners (viewport/keyboard/navigation changes).
+ */
 const puppeteer = require('puppeteer');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
-/**
- * ScanPipeline — orchestrates scanner execution against a single URL.
- *
- * - Manages ONE browser instance for the lifetime of the pipeline.
- * - Partitions scanners into concurrent (page.evaluate only) and
- *   exclusive (viewport/keyboard/navigation changes).
- * - Re-navigates between exclusive scanners to reset page state.
- */
 class ScanPipeline {
   constructor() {
     this.browser = null;
@@ -38,9 +36,9 @@ class ScanPipeline {
    *
    * @param {string} url
    * @param {Object} options
-   * @param {string[]} options.scannerIds — subset of scanner ids to run (default: all)
-   * @param {number}   options.timeout    — navigation timeout (default: 30000)
-   * @param {string}   options.screenshotDir — directory for scanner screenshots
+   * @param {string[]} options.scannerIds - subset of scanner ids to run (default: all)
+   * @param {number}   options.timeout - navigation timeout (default: 30000)
+   * @param {string}   options.screenshotDir - directory for scanner screenshots
    * @returns {Promise<PipelineResult>}
    */
   async scan(url, options = {}) {
@@ -73,7 +71,7 @@ class ScanPipeline {
       // Run concurrent scanners in parallel. LLM scanners get a warm-up
       // stagger: they all send an identical shared page-context prefix, so
       // awaiting the FIRST one alone lets the provider's implicit prompt cache
-      // populate for that prefix — fired all at once they would instead race
+      // populate for that prefix. Fired all at once they would instead race
       // and every one of them would miss. Order of allResults is preserved.
       const llmIdx = [];
       const otherIdx = [];
@@ -100,11 +98,9 @@ class ScanPipeline {
         if (result.status === 'fulfilled') {
           allResults.push(result.value);
         } else {
-          // Name the scanner that actually failed. This used to record
-          // `scannerId: 'unknown'`, and assembleResult keys summaries BY
-          // scannerId — so when two scanners failed on one page, the second
-          // silently overwrote the first and its error text was lost. Real
-          // pages fail more than one scanner routinely.
+          // Name the scanner that failed: assembleResult keys summaries by
+          // scannerId, so a shared placeholder id would let one failure
+          // overwrite another.
           allResults.push({
             scannerId: concurrent[i].id,
             passed: false,
@@ -156,8 +152,8 @@ class ScanPipeline {
    * Auto-dismiss JS dialogs (alert/confirm/prompt/beforeunload).
    * Scanners click page elements, which can open a modal dialog. Puppeteer
    * leaves dialogs open while no 'dialog' listener is attached, and an open
-   * dialog blocks the renderer main thread — every later evaluate() on that
-   * page (from ANY concurrent scanner) then hangs forever.
+   * dialog blocks the renderer main thread, so every later evaluate() on that
+   * page (from any concurrent scanner) hangs forever.
    */
   autoDismissDialogs(page) {
     page.on('dialog', (dialog) => dialog.dismiss().catch(() => {}));
@@ -188,7 +184,7 @@ class ScanPipeline {
       if (result.violations) {
         for (const v of result.violations) {
           // Quarantined scanners still report, but never at full confidence, so
-          // a report can present them separately ("experimental check — low
+          // a report can present them separately ("experimental check, low
           // confidence") instead of mixing them into the headline findings.
           if (tier === 'experimental') {
             v.experimental = true;
@@ -244,7 +240,7 @@ class ScanPipeline {
    * `summary.suppressed`. Without this reconciliation the reader sees both the
    * adjudicated verdict AND the original to-do item for the same element.
    *
-   * Only axe's own informational entries are ever removed — a real axe
+   * Only axe's own informational entries are ever removed. A real axe
    * violation, or any finding from another scanner, is untouched.
    */
   reconcileIncompleteReviews(violations, scannerResults) {
@@ -265,12 +261,10 @@ class ScanPipeline {
   /**
    * Violation-weighted score, 0..100.
    *
-   * Severity weights and the aggregation both live in src/severity.js: repeated
-   * instances of ONE rule count sub-linearly (they are one defect with one fix)
-   * and the penalty is mapped through exponential decay instead of being
-   * subtracted and clipped at 0 — the old `100 - sum(weights)` returned 0 for
-   * every page with more than a handful of findings, which is why the golden
-   * corpus scored 0 across the board.
+   * Severity weights and the aggregation both live in src/core/severity.js:
+   * repeated instances of one rule count sub-linearly (they are one defect
+   * with one fix) and the penalty is mapped through exponential decay rather
+   * than subtracted and clipped at 0, so pages with many findings still rank.
    */
   computeViolationWeightedScore(violations) {
     const { violationPenalty, scoreFromPenalty } = require('./severity');
@@ -282,7 +276,7 @@ class ScanPipeline {
    * report about the same site-wide fact.
    *
    * `accessibility-statement`, `eaa-procedure`, `contact-mechanism` and
-   * `compliance-monitoring` overlap by design — they all read the same footer
+   * `compliance-monitoring` overlap by design: they all read the same footer
    * and the same statement page. A missing statement is one defect, but it
    * arrived from two scanners as two findings; these rules carry no element
    * identity (they are about the website, not a node), so identity is
@@ -316,11 +310,9 @@ class ScanPipeline {
   /**
    * Bucket violations by WCAG principle for the scan API's `categories` field.
    *
-   * This used to read `v.wcagPrinciple`, which NO scanner populates on
-   * individual violations (it is class-level metadata on the scanner, not a
-   * per-violation field) — so every finding fell through to the `robust`
-   * default and `categories` was 0/0/0/N on every scan. Classify from the
-   * criterion instead, using the same helper the report generator uses.
+   * Classifies from the criterion with the same helper the report generator
+   * uses; `wcagPrinciple` is scanner-level metadata and is not set on
+   * individual violations.
    */
   categorizeViolations(violations) {
     const categories = {

@@ -57,7 +57,7 @@ describe('llm-focus-appearance: measured context', () => {
   it('never treats an ancestor as an obscuring element', () => {
     const link = ctx.stops.find((s) => s.selector.includes('nav__link'));
     expect(link.obscured.measured).toBe(true);
-    // The link lives inside the sticky header — that is not occlusion.
+    // The link lives inside the sticky header; that is not occlusion.
     expect(link.obscured.anyPartObscured).toBe(false);
   });
 
@@ -119,8 +119,7 @@ describe('llm-focus-appearance: code guards', () => {
   });
 
   it('rejects a per-element FP-6 claim even when the page as a whole fails', () => {
-    // Evergreen home: 8 footer links really do fail (1.41:1), the menu button
-    // does not — the old scanner reported exactly the compliant one.
+    // Evergreen home: 8 footer links fail (1.41:1), the menu button does not.
     const weakFooter = {
       ...goodStop('.footer__list a'),
       indicatorVisible: false,
@@ -172,7 +171,7 @@ describe('llm-focus-appearance: code guards', () => {
       scanner.rejectionReason(
         {
           ruleId: '2.4.13',
-          description: '.thin has a 1px outline at 1.2:1 — insufficient focus indicator',
+          description: '.thin has a 1px outline at 1.2:1, insufficient focus indicator',
           nodes: [],
         },
         g

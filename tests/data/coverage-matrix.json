@@ -11,10 +11,7 @@
     },
     {
       "id": "color-contrast",
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
+      "criteria": ["1.4.3", "1.4.6"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -22,41 +19,31 @@
     },
     {
       "id": "use-of-color",
-      "criteria": [
-        "1.4.1"
-      ],
+      "criteria": ["1.4.1"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-use-of-color.html (1.4.1) | concurrent harness: FAIL — false positive on good-css-background-accessible.html (1.4.1)"
+      "trustReason": "concurrent harness FAIL: missed bad-use-of-color.html (1.4.1) | concurrent harness FAIL: false positive on good-css-background-accessible.html (1.4.1)"
     },
     {
       "id": "images-of-text",
-      "criteria": [
-        "1.4.5",
-        "1.4.9"
-      ],
+      "criteria": ["1.4.5", "1.4.9"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-images-of-text.html (1.4.5,1.4.9)"
+      "trustReason": "concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)"
     },
     {
       "id": "advanced-contrast",
-      "criteria": [
-        "1.4.11",
-        "1.4.13"
-      ],
+      "criteria": ["1.4.11", "1.4.13"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-color-contrast.html (1.4.3,1.4.6) | concurrent harness: FAIL — missed bad-focus-visible.html (1.4.3)"
+      "trustReason": "concurrent harness FAIL: missed bad-color-contrast.html (1.4.3,1.4.6) | concurrent harness FAIL: missed bad-focus-visible.html (1.4.3)"
     },
     {
       "id": "nontext-contrast",
-      "criteria": [
-        "1.4.11"
-      ],
+      "criteria": ["1.4.11"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -64,9 +51,7 @@
     },
     {
       "id": "text-resize",
-      "criteria": [
-        "1.4.4"
-      ],
+      "criteria": ["1.4.4"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -74,24 +59,15 @@
     },
     {
       "id": "screen-reader",
-      "criteria": [
-        "1.3.1",
-        "4.1.2",
-        "4.1.3"
-      ],
+      "criteria": ["1.3.1", "4.1.2", "4.1.3"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-aria-state-updates.html (4.1.2,4.1.3) | concurrent harness: FAIL — missed bad-beeproduced-real-issues.html (4.1.2,1.3.1) | concurrent harness: FAIL — missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-aria.html (4.1.2,1.3.1) | concurrent harness: FAIL — missed bad-form-grouping.html (1.3.1) | concurrent harness: FAIL — missed bad-form-labels.html (1.3.1) | (+4 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2,4.1.3) | concurrent harness FAIL: missed bad-beeproduced-real-issues.html (4.1.2,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (4.1.2,1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+4 more)"
     },
     {
       "id": "media-accessibility",
-      "criteria": [
-        "1.2.1",
-        "1.2.2",
-        "1.2.3",
-        "1.2.5"
-      ],
+      "criteria": ["1.2.1", "1.2.2", "1.2.3", "1.2.5"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -99,9 +75,7 @@
     },
     {
       "id": "orientation",
-      "criteria": [
-        "1.3.4"
-      ],
+      "criteria": ["1.3.4"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -109,9 +83,7 @@
     },
     {
       "id": "input-purpose",
-      "criteria": [
-        "1.3.5"
-      ],
+      "criteria": ["1.3.5"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -119,23 +91,15 @@
     },
     {
       "id": "language-detection",
-      "criteria": [
-        "3.1.1",
-        "3.1.2"
-      ],
+      "criteria": ["3.1.1", "3.1.2"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-language-override.html (3.1.2)"
+      "trustReason": "concurrent harness FAIL: missed bad-language-override.html (3.1.2)"
     },
     {
       "id": "predictable-navigation",
-      "criteria": [
-        "3.2.1",
-        "3.2.2",
-        "3.2.3",
-        "3.2.4"
-      ],
+      "criteria": ["3.2.1", "3.2.2", "3.2.3", "3.2.4"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -143,80 +107,55 @@
     },
     {
       "id": "error-handling",
-      "criteria": [
-        "3.3.1",
-        "3.3.2",
-        "3.3.3",
-        "3.3.4"
-      ],
+      "criteria": ["3.3.1", "3.3.2", "3.3.3", "3.3.4"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2)"
+      "trustReason": "concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)"
     },
     {
       "id": "html-validation",
-      "criteria": [
-        "4.1.1",
-        "4.1.2"
-      ],
+      "criteria": ["4.1.1", "4.1.2"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-aria-state-updates.html (4.1.2) | concurrent harness: FAIL — missed bad-complex-aria.html (4.1.2) | concurrent harness: FAIL — false positive on good-aria-role-override.html (4.1.2) | concurrent harness: FAIL — false positive on good-bootstrap-patterns.html (4.1.2)"
+      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-complex-aria.html (4.1.2) | concurrent harness FAIL: false positive on good-aria-role-override.html (4.1.2) | concurrent harness FAIL: false positive on good-bootstrap-patterns.html (4.1.2)"
     },
     {
       "id": "page-structure",
-      "criteria": [
-        "1.3.1",
-        "2.4.1",
-        "2.4.2",
-        "2.4.6"
-      ],
+      "criteria": ["1.3.1", "2.4.1", "2.4.2", "2.4.6"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness: FAIL — missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-aria.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-data-tables.html (1.3.1) | concurrent harness: FAIL — missed bad-form-grouping.html (1.3.1) | concurrent harness: FAIL — missed bad-form-labels.html (1.3.1) | (+2 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+2 more)"
     },
     {
       "id": "label-in-name",
-      "criteria": [
-        "2.5.3"
-      ],
+      "criteria": ["2.5.3"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-input-modalities.html (2.5.3) | concurrent harness: FAIL — false positive on good-label-in-name.html (2.5.3)"
+      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3) | concurrent harness FAIL: false positive on good-label-in-name.html (2.5.3)"
     },
     {
       "id": "status-messages",
-      "criteria": [
-        "4.1.3",
-        "3.3.1"
-      ],
+      "criteria": ["4.1.3", "3.3.1"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-form-errors.html (3.3.1) | concurrent harness: FAIL — missed bad-status-messages.html (4.1.3)"
+      "trustReason": "concurrent harness FAIL: missed bad-form-errors.html (3.3.1) | concurrent harness FAIL: missed bad-status-messages.html (4.1.3)"
     },
     {
       "id": "advanced-aria",
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
+      "criteria": ["4.1.2", "1.3.1"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — missed bad-aria-state-updates.html (4.1.2) | concurrent harness: FAIL — missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-data-tables.html (1.3.1) | concurrent harness: FAIL — missed bad-form-grouping.html (1.3.1) | concurrent harness: FAIL — missed bad-form-labels.html (1.3.1) | concurrent harness: FAIL — missed bad-icon-accessibility.html (4.1.2) | (+4 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | concurrent harness FAIL: missed bad-icon-accessibility.html (4.1.2) | (+4 more)"
     },
     {
       "id": "seizure-prevention",
-      "criteria": [
-        "2.3.1",
-        "2.3.2",
-        "2.3.3"
-      ],
+      "criteria": ["2.3.1", "2.3.2", "2.3.3"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -224,20 +163,15 @@
     },
     {
       "id": "timing-controls",
-      "criteria": [
-        "2.2.1",
-        "2.2.2"
-      ],
+      "criteria": ["2.2.1", "2.2.2"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness: FAIL — false positive on good-timing-controls.html (2.2.1,2.2.2)"
+      "trustReason": "concurrent harness FAIL: false positive on good-timing-controls.html (2.2.1,2.2.2)"
     },
     {
       "id": "multiple-ways",
-      "criteria": [
-        "2.4.5"
-      ],
+      "criteria": ["2.4.5"],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
@@ -245,11 +179,7 @@
     },
     {
       "id": "keyboard-navigation",
-      "criteria": [
-        "2.1.1",
-        "2.1.2",
-        "2.1.4"
-      ],
+      "criteria": ["2.1.1", "2.1.2", "2.1.4"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -257,11 +187,7 @@
     },
     {
       "id": "focus-management",
-      "criteria": [
-        "2.4.3",
-        "2.4.7",
-        "2.4.11"
-      ],
+      "criteria": ["2.4.3", "2.4.7", "2.4.11"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -269,14 +195,7 @@
     },
     {
       "id": "input-modalities",
-      "criteria": [
-        "2.5.1",
-        "2.5.2",
-        "2.5.3",
-        "2.5.4",
-        "2.5.7",
-        "2.5.8"
-      ],
+      "criteria": ["2.5.1", "2.5.2", "2.5.3", "2.5.4", "2.5.7", "2.5.8"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -284,11 +203,7 @@
     },
     {
       "id": "responsive-design",
-      "criteria": [
-        "1.4.4",
-        "1.4.10",
-        "1.4.12"
-      ],
+      "criteria": ["1.4.4", "1.4.10", "1.4.12"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -296,9 +211,7 @@
     },
     {
       "id": "mobile-specific",
-      "criteria": [
-        "1.4.10"
-      ],
+      "criteria": ["1.4.10"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -306,9 +219,7 @@
     },
     {
       "id": "hover-focus-content",
-      "criteria": [
-        "1.4.13"
-      ],
+      "criteria": ["1.4.13"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -316,9 +227,7 @@
     },
     {
       "id": "concurrent-input",
-      "criteria": [
-        "2.5.6"
-      ],
+      "criteria": ["2.5.6"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -326,10 +235,7 @@
     },
     {
       "id": "dynamic-spa",
-      "criteria": [
-        "4.1.2",
-        "4.1.3"
-      ],
+      "criteria": ["4.1.2", "4.1.3"],
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
@@ -369,100 +275,67 @@
     },
     {
       "id": "llm-semantic-text",
-      "criteria": [
-        "3.1.3",
-        "3.1.4",
-        "3.1.6",
-        "2.4.9",
-        "2.4.10",
-        "1.3.6"
-      ],
+      "criteria": ["3.1.3", "3.1.4", "3.1.6", "2.4.9", "2.4.10", "1.3.6"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-auth",
-      "criteria": [
-        "3.3.8",
-        "3.3.9"
-      ],
+      "criteria": ["3.3.8", "3.3.9"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-media-alternatives",
-      "criteria": [
-        "1.2.6",
-        "1.2.7",
-        "1.2.8",
-        "1.2.9"
-      ],
+      "criteria": ["1.2.6", "1.2.7", "1.2.8", "1.2.9"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-visual-presentation",
-      "criteria": [
-        "1.4.7",
-        "1.4.8",
-        "1.4.9"
-      ],
+      "criteria": ["1.4.7", "1.4.8", "1.4.9"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-behavioral",
-      "criteria": [
-        "2.2.3",
-        "2.2.4",
-        "2.2.5",
-        "2.2.6",
-        "3.2.5",
-        "3.3.5"
-      ],
+      "criteria": ["2.2.3", "2.2.4", "2.2.5", "2.2.6", "3.2.5", "3.3.5"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-focus-appearance",
-      "criteria": [
-        "2.4.12",
-        "2.4.13"
-      ],
+      "criteria": ["2.4.12", "2.4.13"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-sensory-characteristics",
-      "criteria": [
-        "1.3.3"
-      ],
+      "criteria": ["1.3.3"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-reading-level",
-      "criteria": [
-        "3.1.5"
-      ],
+      "criteria": ["3.1.5"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-incomplete-reviewer",
@@ -470,37 +343,31 @@
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-redundant-entry",
-      "criteria": [
-        "3.3.7"
-      ],
+      "criteria": ["3.3.7"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-consistent-help",
-      "criteria": [
-        "3.2.6"
-      ],
+      "criteria": ["3.2.6"],
       "kind": "llm",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     },
     {
       "id": "llm-alt-quality",
-      "criteria": [
-        "1.1.1"
-      ],
+      "criteria": ["1.1.1"],
       "kind": "llm",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "LLM scanner — measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
     }
   ],
   "rows": [
@@ -523,9 +390,7 @@
         "svg-img-alt"
       ],
       "deterministic": [],
-      "llm": [
-        "llm-alt-quality"
-      ],
+      "llm": ["llm-alt-quality"],
       "fixtures": {
         "good": [
           "good-accessibility.html",
@@ -540,10 +405,7 @@
           "bad-image-alt.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "llm"
-      ],
+      "harness": ["axe-e2e", "llm"],
       "outcome": null
     },
     {
@@ -555,32 +417,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "audio-caption"
-      ],
-      "deterministic": [
-        "media-accessibility"
-      ],
+      "axeRules": ["audio-caption"],
+      "deterministic": ["media-accessibility"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-media-alternatives.html"
-        ],
-        "bad": [
-          "bad-media-alternatives.html"
-        ]
+        "good": ["good-media-alternatives.html"],
+        "bad": ["bad-media-alternatives.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -592,32 +441,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "video-caption"
-      ],
-      "deterministic": [
-        "media-accessibility"
-      ],
+      "axeRules": ["video-caption"],
+      "deterministic": ["media-accessibility"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-media-alternatives.html"
-        ],
-        "bad": [
-          "bad-media-alternatives.html"
-        ]
+        "good": ["good-media-alternatives.html"],
+        "bad": ["bad-media-alternatives.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -630,28 +466,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "media-accessibility"
-      ],
+      "deterministic": ["media-accessibility"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-media-alternatives.html"
-        ],
-        "bad": [
-          "bad-media-alternatives.html"
-        ]
+        "good": ["good-media-alternatives.html"],
+        "bad": ["bad-media-alternatives.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -667,12 +493,8 @@
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-captions-live.html"
-        ],
-        "bad": [
-          "bad-captions-live.html"
-        ]
+        "good": ["good-captions-live.html"],
+        "bad": ["bad-captions-live.html"]
       },
       "harness": [],
       "outcome": null
@@ -687,28 +509,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "media-accessibility"
-      ],
+      "deterministic": ["media-accessibility"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-audio-description.html"
-        ],
-        "bad": [
-          "bad-audio-description.html"
-        ]
+        "good": ["good-audio-description.html"],
+        "bad": ["bad-audio-description.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -722,22 +534,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": ["llm-media-alternatives"],
       "fixtures": {
-        "good": [
-          "good-media-aaa.html",
-          "good-media-alternatives-de.html"
-        ],
-        "bad": [
-          "bad-media-aaa.html",
-          "bad-media-alternatives-de.html"
-        ]
+        "good": ["good-media-aaa.html", "good-media-alternatives-de.html"],
+        "bad": ["bad-media-aaa.html", "bad-media-alternatives-de.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -751,20 +553,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": ["llm-media-alternatives"],
       "fixtures": {
-        "good": [
-          "good-media-aaa.html"
-        ],
-        "bad": [
-          "bad-media-aaa.html"
-        ]
+        "good": ["good-media-aaa.html"],
+        "bad": ["bad-media-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -778,22 +572,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": ["llm-media-alternatives"],
       "fixtures": {
-        "good": [
-          "good-media-aaa.html",
-          "good-media-alternatives-de.html"
-        ],
-        "bad": [
-          "bad-media-aaa.html",
-          "bad-media-alternatives-de.html"
-        ]
+        "good": ["good-media-aaa.html", "good-media-alternatives-de.html"],
+        "bad": ["bad-media-aaa.html", "bad-media-alternatives-de.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -807,20 +591,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": ["llm-media-alternatives"],
       "fixtures": {
-        "good": [
-          "good-media-aaa.html"
-        ],
-        "bad": [
-          "bad-media-aaa.html"
-        ]
+        "good": ["good-media-aaa.html"],
+        "bad": ["bad-media-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -850,11 +626,7 @@
         "td-headers-attr",
         "th-has-data-cells"
       ],
-      "deterministic": [
-        "screen-reader",
-        "page-structure",
-        "advanced-aria"
-      ],
+      "deterministic": ["screen-reader", "page-structure", "advanced-aria"],
       "llm": [],
       "fixtures": {
         "good": [
@@ -877,17 +649,12 @@
           "bad-landmarks.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 42,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -903,12 +670,8 @@
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-meaningful-sequence.html"
-        ],
-        "bad": [
-          "bad-meaningful-sequence.html"
-        ]
+        "good": ["good-meaningful-sequence.html"],
+        "bad": ["bad-meaningful-sequence.html"]
       },
       "harness": [],
       "outcome": null
@@ -924,14 +687,9 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-sensory-characteristics"
-      ],
+      "llm": ["llm-sensory-characteristics"],
       "fixtures": {
-        "good": [
-          "good-sensory-characteristics-de.html",
-          "good-sensory-characteristics.html"
-        ],
+        "good": ["good-sensory-characteristics-de.html", "good-sensory-characteristics.html"],
         "bad": [
           "bad-long-page-de.html",
           "bad-prompt-injection.html",
@@ -939,9 +697,7 @@
           "bad-sensory-characteristics.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -953,32 +709,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "css-orientation-lock"
-      ],
-      "deterministic": [
-        "orientation"
-      ],
+      "axeRules": ["css-orientation-lock"],
+      "deterministic": ["orientation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-orientation.html"
-        ],
-        "bad": [
-          "bad-orientation.html"
-        ]
+        "good": ["good-orientation.html"],
+        "bad": ["bad-orientation.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -990,32 +733,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "autocomplete-valid"
-      ],
-      "deterministic": [
-        "input-purpose"
-      ],
+      "axeRules": ["autocomplete-valid"],
+      "deterministic": ["input-purpose"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-autocomplete.html"
-        ],
-        "bad": [
-          "bad-autocomplete.html"
-        ]
+        "good": ["good-autocomplete.html"],
+        "bad": ["bad-autocomplete.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1029,20 +759,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": ["llm-semantic-text"],
       "fixtures": {
-        "good": [
-          "good-identify-purpose.html"
-        ],
-        "bad": [
-          "bad-identify-purpose.html"
-        ]
+        "good": ["good-identify-purpose.html"],
+        "bad": ["bad-identify-purpose.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -1050,39 +772,23 @@
       "level": "A",
       "title": "Use of Color",
       "mechanism": "axe-core",
-      "supporting": [
-        "use-of-color (experimental)"
-      ],
+      "supporting": ["use-of-color (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "link-in-text-block"
-      ],
-      "deterministic": [
-        "use-of-color"
-      ],
+      "axeRules": ["link-in-text-block"],
+      "deterministic": ["use-of-color"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-css-background-accessible.html"
-        ],
-        "bad": [
-          "bad-css-background-info.html",
-          "bad-use-of-color.html"
-        ]
+        "good": ["good-css-background-accessible.html"],
+        "bad": ["bad-css-background-info.html", "bad-use-of-color.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 3,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1094,22 +800,14 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "no-autoplay-audio"
-      ],
+      "axeRules": ["no-autoplay-audio"],
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-audio-control.html"
-        ],
-        "bad": [
-          "bad-audio-control.html"
-        ]
+        "good": ["good-audio-control.html"],
+        "bad": ["bad-audio-control.html"]
       },
-      "harness": [
-        "axe-e2e"
-      ],
+      "harness": ["axe-e2e"],
       "outcome": null
     },
     {
@@ -1121,12 +819,8 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "color-contrast"
-      ],
-      "deterministic": [
-        "color-contrast"
-      ],
+      "axeRules": ["color-contrast"],
+      "deterministic": ["color-contrast"],
       "llm": [],
       "fixtures": {
         "good": [
@@ -1134,22 +828,14 @@
           "good-color-contrast.html",
           "good-contrast-hidden-and-arbitrary-classes.html"
         ],
-        "bad": [
-          "bad-color-contrast.html",
-          "bad-focus-visible.html"
-        ]
+        "bad": ["bad-color-contrast.html", "bad-focus-visible.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 8,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1157,41 +843,23 @@
       "level": "AA",
       "title": "Resize Text",
       "mechanism": "hybrid:axe-core+text-resize",
-      "supporting": [
-        "responsive-design"
-      ],
+      "supporting": ["responsive-design"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "meta-viewport"
-      ],
-      "deterministic": [
-        "text-resize",
-        "responsive-design"
-      ],
+      "axeRules": ["meta-viewport"],
+      "deterministic": ["text-resize", "responsive-design"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-decorative-blur-blob.html",
-          "good-text-resize.html"
-        ],
-        "bad": [
-          "bad-text-resize.html"
-        ]
+        "good": ["good-decorative-blur-blob.html", "good-text-resize.html"],
+        "bad": ["bad-text-resize.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["axe-e2e", "exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1200,32 +868,22 @@
       "title": "Images of Text",
       "mechanism": "experimental:images-of-text",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: images-of-text: concurrent harness: FAIL — missed bad-images-of-text.html (1.4.5,1.4.9)",
+      "justification": "Only experimental scanners cover this criterion: images-of-text: concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
-      "deterministic": [
-        "images-of-text"
-      ],
+      "deterministic": ["images-of-text"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-images-of-text.html"
-        ],
-        "bad": [
-          "bad-images-of-text.html"
-        ]
+        "good": ["good-images-of-text.html"],
+        "bad": ["bad-images-of-text.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": false,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1237,33 +895,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "color-contrast-enhanced"
-      ],
-      "deterministic": [
-        "color-contrast"
-      ],
+      "axeRules": ["color-contrast-enhanced"],
+      "deterministic": ["color-contrast"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-bootstrap-patterns.html",
-          "good-contrast-enhanced.html"
-        ],
-        "bad": [
-          "bad-color-contrast.html"
-        ]
+        "good": ["good-bootstrap-patterns.html", "good-contrast-enhanced.html"],
+        "bad": ["bad-color-contrast.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 6,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1277,20 +921,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-visual-presentation"
-      ],
+      "llm": ["llm-visual-presentation"],
       "fixtures": {
-        "good": [
-          "good-low-background-audio.html"
-        ],
-        "bad": [
-          "bad-low-background-audio.html"
-        ]
+        "good": ["good-low-background-audio.html"],
+        "bad": ["bad-low-background-audio.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -1304,22 +940,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-visual-presentation"
-      ],
+      "llm": ["llm-visual-presentation"],
       "fixtures": {
-        "good": [
-          "good-visual-presentation-de.html",
-          "good-visual-presentation.html"
-        ],
-        "bad": [
-          "bad-visual-presentation-de.html",
-          "bad-visual-presentation.html"
-        ]
+        "good": ["good-visual-presentation-de.html", "good-visual-presentation.html"],
+        "bad": ["bad-visual-presentation-de.html", "bad-visual-presentation.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -1327,39 +953,23 @@
       "level": "AAA",
       "title": "Images of Text (No Exception)",
       "mechanism": "llm:llm-visual-presentation",
-      "supporting": [
-        "images-of-text (experimental)"
-      ],
+      "supporting": ["images-of-text (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "images-of-text"
-      ],
-      "llm": [
-        "llm-visual-presentation"
-      ],
+      "deterministic": ["images-of-text"],
+      "llm": ["llm-visual-presentation"],
       "fixtures": {
-        "good": [
-          "good-images-of-text-no-exception.html"
-        ],
-        "bad": [
-          "bad-images-of-text-no-exception.html",
-          "bad-images-of-text.html"
-        ]
+        "good": ["good-images-of-text-no-exception.html"],
+        "bad": ["bad-images-of-text-no-exception.html", "bad-images-of-text.html"]
       },
-      "harness": [
-        "concurrent",
-        "llm"
-      ],
+      "harness": ["concurrent", "llm"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1367,38 +977,23 @@
       "level": "AA",
       "title": "Reflow",
       "mechanism": "deterministic:responsive-design",
-      "supporting": [
-        "mobile-specific"
-      ],
+      "supporting": ["mobile-specific"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "responsive-design",
-        "mobile-specific"
-      ],
+      "deterministic": ["responsive-design", "mobile-specific"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-decorative-blur-blob.html",
-          "good-reflow.html"
-        ],
-        "bad": [
-          "bad-reflow.html"
-        ]
+        "good": ["good-decorative-blur-blob.html", "good-reflow.html"],
+        "bad": ["bad-reflow.html"]
       },
-      "harness": [
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1406,38 +1001,23 @@
       "level": "AA",
       "title": "Non-text Contrast",
       "mechanism": "deterministic:nontext-contrast",
-      "supporting": [
-        "advanced-contrast (experimental)"
-      ],
+      "supporting": ["advanced-contrast (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "advanced-contrast",
-        "nontext-contrast"
-      ],
+      "deterministic": ["advanced-contrast", "nontext-contrast"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-nontext-contrast.html"
-        ],
-        "bad": [
-          "bad-nontext-contrast.html"
-        ]
+        "good": ["good-nontext-contrast.html"],
+        "bad": ["bad-nontext-contrast.html"]
       },
-      "harness": [
-        "concurrent",
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["concurrent", "exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 4,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1449,33 +1029,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "avoid-inline-spacing"
-      ],
-      "deterministic": [
-        "responsive-design"
-      ],
+      "axeRules": ["avoid-inline-spacing"],
+      "deterministic": ["responsive-design"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-text-spacing-grid-cards.html",
-          "good-text-spacing.html"
-        ],
-        "bad": [
-          "bad-text-spacing.html"
-        ]
+        "good": ["good-text-spacing-grid-cards.html", "good-text-spacing.html"],
+        "bad": ["bad-text-spacing.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "exclusive"
-      ],
+      "harness": ["axe-e2e", "exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1483,38 +1049,23 @@
       "level": "AA",
       "title": "Content on Hover or Focus",
       "mechanism": "deterministic:hover-focus-content",
-      "supporting": [
-        "advanced-contrast (experimental)"
-      ],
+      "supporting": ["advanced-contrast (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "advanced-contrast",
-        "hover-focus-content"
-      ],
+      "deterministic": ["advanced-contrast", "hover-focus-content"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-hover-focus-content.html"
-        ],
-        "bad": [
-          "bad-hover-focus-content.html"
-        ]
+        "good": ["good-hover-focus-content.html"],
+        "bad": ["bad-hover-focus-content.html"]
       },
-      "harness": [
-        "concurrent",
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["concurrent", "exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1531,9 +1082,7 @@
         "scrollable-region-focusable",
         "server-side-image-map"
       ],
-      "deterministic": [
-        "keyboard-navigation"
-      ],
+      "deterministic": ["keyboard-navigation"],
       "llm": [],
       "fixtures": {
         "good": [
@@ -1549,17 +1098,12 @@
           "bad-scrollable-content.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "exclusive"
-      ],
+      "harness": ["axe-e2e", "exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 7,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1572,30 +1116,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "keyboard-navigation"
-      ],
+      "deterministic": ["keyboard-navigation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-keyboard-trap.html"
-        ],
-        "bad": [
-          "bad-keyboard-access.html",
-          "bad-keyboard-trap.html"
-        ]
+        "good": ["good-keyboard-trap.html"],
+        "bad": ["bad-keyboard-access.html", "bad-keyboard-trap.html"]
       },
-      "harness": [
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1607,22 +1139,14 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "scrollable-region-focusable"
-      ],
+      "axeRules": ["scrollable-region-focusable"],
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-keyboard-no-exception.html"
-        ],
-        "bad": [
-          "bad-keyboard-no-exception.html"
-        ]
+        "good": ["good-keyboard-no-exception.html"],
+        "bad": ["bad-keyboard-no-exception.html"]
       },
-      "harness": [
-        "axe-e2e"
-      ],
+      "harness": ["axe-e2e"],
       "outcome": null
     },
     {
@@ -1635,28 +1159,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "keyboard-navigation"
-      ],
+      "deterministic": ["keyboard-navigation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-character-key-shortcuts.html"
-        ],
-        "bad": [
-          "bad-character-key-shortcuts.html"
-        ]
+        "good": ["good-character-key-shortcuts.html"],
+        "bad": ["bad-character-key-shortcuts.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1664,38 +1178,23 @@
       "level": "A",
       "title": "Timing Adjustable",
       "mechanism": "axe-core",
-      "supporting": [
-        "timing-controls (experimental)"
-      ],
+      "supporting": ["timing-controls (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "meta-refresh"
-      ],
-      "deterministic": [
-        "timing-controls"
-      ],
+      "axeRules": ["meta-refresh"],
+      "deterministic": ["timing-controls"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-timing-controls.html"
-        ],
-        "bad": [
-          "bad-timing-controls.html"
-        ]
+        "good": ["good-timing-controls.html"],
+        "bad": ["bad-timing-controls.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1703,39 +1202,23 @@
       "level": "A",
       "title": "Pause, Stop, Hide",
       "mechanism": "axe-core",
-      "supporting": [
-        "timing-controls (experimental)"
-      ],
+      "supporting": ["timing-controls (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "blink",
-        "marquee"
-      ],
-      "deterministic": [
-        "timing-controls"
-      ],
+      "axeRules": ["blink", "marquee"],
+      "deterministic": ["timing-controls"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-timing-controls.html"
-        ],
-        "bad": [
-          "bad-timing-controls.html"
-        ]
+        "good": ["good-timing-controls.html"],
+        "bad": ["bad-timing-controls.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1749,22 +1232,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": ["llm-behavioral"],
       "fixtures": {
-        "good": [
-          "good-behavioral-de.html",
-          "good-timing-aaa.html"
-        ],
-        "bad": [
-          "bad-behavioral-de.html",
-          "bad-timing-aaa.html"
-        ]
+        "good": ["good-behavioral-de.html", "good-timing-aaa.html"],
+        "bad": ["bad-behavioral-de.html", "bad-timing-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -1776,25 +1249,14 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "meta-refresh-no-exceptions"
-      ],
+      "axeRules": ["meta-refresh-no-exceptions"],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": ["llm-behavioral"],
       "fixtures": {
-        "good": [
-          "good-timing-aaa.html"
-        ],
-        "bad": [
-          "bad-timing-aaa.html"
-        ]
+        "good": ["good-timing-aaa.html"],
+        "bad": ["bad-timing-aaa.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "llm"
-      ],
+      "harness": ["axe-e2e", "llm"],
       "outcome": null
     },
     {
@@ -1808,20 +1270,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": ["llm-behavioral"],
       "fixtures": {
-        "good": [
-          "good-timing-aaa.html"
-        ],
-        "bad": [
-          "bad-timing-aaa.html"
-        ]
+        "good": ["good-timing-aaa.html"],
+        "bad": ["bad-timing-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -1835,20 +1289,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": ["llm-behavioral"],
       "fixtures": {
-        "good": [
-          "good-timing-aaa.html"
-        ],
-        "bad": [
-          "bad-timing-aaa.html"
-        ]
+        "good": ["good-timing-aaa.html"],
+        "bad": ["bad-timing-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -1861,28 +1307,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "seizure-prevention"
-      ],
+      "deterministic": ["seizure-prevention"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-seizure-safe.html"
-        ],
-        "bad": [
-          "bad-seizure-risk.html"
-        ]
+        "good": ["good-seizure-safe.html"],
+        "bad": ["bad-seizure-risk.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -1895,17 +1331,11 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "seizure-prevention"
-      ],
+      "deterministic": ["seizure-prevention"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-seizure-safe.html"
-        ],
-        "bad": [
-          "bad-seizure-risk.html"
-        ]
+        "good": ["good-seizure-safe.html"],
+        "bad": ["bad-seizure-risk.html"]
       },
       "harness": [],
       "outcome": null
@@ -1920,17 +1350,11 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "seizure-prevention"
-      ],
+      "deterministic": ["seizure-prevention"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-motion-vestibular.html"
-        ],
-        "bad": [
-          "bad-motion-vestibular.html"
-        ]
+        "good": ["good-motion-vestibular.html"],
+        "bad": ["bad-motion-vestibular.html"]
       },
       "harness": [],
       "outcome": null
@@ -1940,42 +1364,23 @@
       "level": "A",
       "title": "Bypass Blocks",
       "mechanism": "axe-core",
-      "supporting": [
-        "page-structure (experimental)"
-      ],
+      "supporting": ["page-structure (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "bypass"
-      ],
-      "deterministic": [
-        "page-structure"
-      ],
+      "axeRules": ["bypass"],
+      "deterministic": ["page-structure"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-landing-page.html",
-          "good-landmarks.html",
-          "good-skip-links.html"
-        ],
-        "bad": [
-          "bad-beeproduced-real-issues.html",
-          "bad-landmarks.html",
-          "bad-skip-links.html"
-        ]
+        "good": ["good-landing-page.html", "good-landmarks.html", "good-skip-links.html"],
+        "bad": ["bad-beeproduced-real-issues.html", "bad-landmarks.html", "bad-skip-links.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": false,
         "fpClean": true,
         "runs": 5,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -1983,38 +1388,23 @@
       "level": "A",
       "title": "Page Titled",
       "mechanism": "axe-core",
-      "supporting": [
-        "page-structure (experimental)"
-      ],
+      "supporting": ["page-structure (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "document-title"
-      ],
-      "deterministic": [
-        "page-structure"
-      ],
+      "axeRules": ["document-title"],
+      "deterministic": ["page-structure"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-page-titled.html"
-        ],
-        "bad": [
-          "bad-page-titled.html"
-        ]
+        "good": ["good-page-titled.html"],
+        "bad": ["bad-page-titled.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2027,30 +1417,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "focus-management"
-      ],
+      "deterministic": ["focus-management"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-focus-management.html",
-          "good-two-column-tab-order.html"
-        ],
-        "bad": [
-          "bad-focus-management.html",
-          "bad-focus-order.html"
-        ]
+        "good": ["good-focus-management.html", "good-two-column-tab-order.html"],
+        "bad": ["bad-focus-management.html", "bad-focus-order.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2062,23 +1440,14 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "area-alt",
-        "link-name"
-      ],
+      "axeRules": ["area-alt", "link-name"],
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-accessibility.html"
-        ],
-        "bad": [
-          "bad-link-purpose.html"
-        ]
+        "good": ["good-accessibility.html"],
+        "bad": ["bad-link-purpose.html"]
       },
-      "harness": [
-        "axe-e2e"
-      ],
+      "harness": ["axe-e2e"],
       "outcome": null
     },
     {
@@ -2091,28 +1460,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "multiple-ways"
-      ],
+      "deterministic": ["multiple-ways"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-multiple-ways.html"
-        ],
-        "bad": [
-          "bad-multiple-ways.html"
-        ]
+        "good": ["good-multiple-ways.html"],
+        "bad": ["bad-multiple-ways.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2121,33 +1480,22 @@
       "title": "Headings and Labels",
       "mechanism": "experimental:page-structure",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: page-structure: concurrent harness: FAIL — missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness: FAIL — missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-aria.html (1.3.1) | concurrent harness: FAIL — missed bad-complex-data-tables.html (1.3.1) | concurrent harness: FAIL — missed bad-form-grouping.html (1.3.1) | concurrent harness: FAIL — missed bad-form-labels.html (1.3.1) | (+2 more)",
+      "justification": "Only experimental scanners cover this criterion: page-structure: concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+2 more)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
-      "deterministic": [
-        "page-structure"
-      ],
+      "deterministic": ["page-structure"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-headings-labels.html",
-          "good-landing-page.html"
-        ],
-        "bad": [
-          "bad-headings-labels.html"
-        ]
+        "good": ["good-headings-labels.html", "good-landing-page.html"],
+        "bad": ["bad-headings-labels.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2160,30 +1508,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "focus-management"
-      ],
+      "deterministic": ["focus-management"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-focus-management.html"
-        ],
-        "bad": [
-          "bad-focus-management.html",
-          "bad-focus-visible.html"
-        ]
+        "good": ["good-focus-management.html"],
+        "bad": ["bad-focus-management.html", "bad-focus-visible.html"]
       },
-      "harness": [
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2199,12 +1535,8 @@
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-navigation-aaa.html"
-        ],
-        "bad": [
-          "bad-navigation-aaa.html"
-        ]
+        "good": ["good-navigation-aaa.html"],
+        "bad": ["bad-navigation-aaa.html"]
       },
       "harness": [],
       "outcome": null
@@ -2218,29 +1550,18 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "identical-links-same-purpose"
-      ],
+      "axeRules": ["identical-links-same-purpose"],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": ["llm-semantic-text"],
       "fixtures": {
         "good": [
           "good-link-purpose-only.html",
           "good-navigation-aaa.html",
           "good-semantic-text-de.html"
         ],
-        "bad": [
-          "bad-link-purpose.html",
-          "bad-navigation-aaa.html",
-          "bad-semantic-text-de.html"
-        ]
+        "bad": ["bad-link-purpose.html", "bad-navigation-aaa.html", "bad-semantic-text-de.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "llm"
-      ],
+      "harness": ["axe-e2e", "llm"],
       "outcome": null
     },
     {
@@ -2254,20 +1575,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": ["llm-semantic-text"],
       "fixtures": {
-        "good": [
-          "good-navigation-aaa.html"
-        ],
-        "bad": [
-          "bad-navigation-aaa.html"
-        ]
+        "good": ["good-navigation-aaa.html"],
+        "bad": ["bad-navigation-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2280,29 +1593,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "focus-management"
-      ],
+      "deterministic": ["focus-management"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-focus-not-obscured.html"
-        ],
-        "bad": [
-          "bad-focus-not-obscured.html"
-        ]
+        "good": ["good-focus-not-obscured.html"],
+        "bad": ["bad-focus-not-obscured.html"]
       },
-      "harness": [
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2316,20 +1618,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-focus-appearance"
-      ],
+      "llm": ["llm-focus-appearance"],
       "fixtures": {
-        "good": [
-          "good-focus-not-obscured-enhanced.html"
-        ],
-        "bad": [
-          "bad-focus-not-obscured-enhanced.html"
-        ]
+        "good": ["good-focus-not-obscured-enhanced.html"],
+        "bad": ["bad-focus-not-obscured-enhanced.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2343,22 +1637,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-focus-appearance"
-      ],
+      "llm": ["llm-focus-appearance"],
       "fixtures": {
-        "good": [
-          "good-focus-appearance-de.html",
-          "good-focus-appearance.html"
-        ],
-        "bad": [
-          "bad-focus-appearance-de.html",
-          "bad-focus-appearance.html"
-        ]
+        "good": ["good-focus-appearance-de.html", "good-focus-appearance.html"],
+        "bad": ["bad-focus-appearance-de.html", "bad-focus-appearance.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2371,29 +1655,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "input-modalities"
-      ],
+      "deterministic": ["input-modalities"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-keyboard-native-override.html"
-        ],
-        "bad": [
-          "bad-input-modalities.html",
-          "bad-keyboard-native-override.html"
-        ]
+        "good": ["good-keyboard-native-override.html"],
+        "bad": ["bad-input-modalities.html", "bad-keyboard-native-override.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2406,29 +1679,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "input-modalities"
-      ],
+      "deterministic": ["input-modalities"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-pointer-cancellation.html"
-        ],
-        "bad": [
-          "bad-input-modalities.html",
-          "bad-pointer-cancellation.html"
-        ]
+        "good": ["good-pointer-cancellation.html"],
+        "bad": ["bad-input-modalities.html", "bad-pointer-cancellation.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2436,43 +1698,23 @@
       "level": "A",
       "title": "Label in Name",
       "mechanism": "hybrid:axe-core+input-modalities",
-      "supporting": [
-        "label-in-name (experimental)"
-      ],
+      "supporting": ["label-in-name (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "label-content-name-mismatch"
-      ],
-      "deterministic": [
-        "label-in-name",
-        "input-modalities"
-      ],
+      "axeRules": ["label-content-name-mismatch"],
+      "deterministic": ["label-in-name", "input-modalities"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-label-in-name.html"
-        ],
-        "bad": [
-          "bad-input-modalities.html",
-          "bad-label-in-name.html"
-        ]
+        "good": ["good-label-in-name.html"],
+        "bad": ["bad-input-modalities.html", "bad-label-in-name.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent",
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["axe-e2e", "concurrent", "exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 6,
-        "from": [
-          "concurrent",
-          "exclusive"
-        ]
+        "from": ["concurrent", "exclusive"]
       }
     },
     {
@@ -2485,29 +1727,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "input-modalities"
-      ],
+      "deterministic": ["input-modalities"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-motion-vestibular.html"
-        ],
-        "bad": [
-          "bad-input-modalities.html",
-          "bad-motion-vestibular.html"
-        ]
+        "good": ["good-motion-vestibular.html"],
+        "bad": ["bad-input-modalities.html", "bad-motion-vestibular.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2523,12 +1754,8 @@
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-target-size.html"
-        ],
-        "bad": [
-          "bad-target-size.html"
-        ]
+        "good": ["good-target-size.html"],
+        "bad": ["bad-target-size.html"]
       },
       "harness": [],
       "outcome": null
@@ -2543,28 +1770,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "concurrent-input"
-      ],
+      "deterministic": ["concurrent-input"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-concurrent-input.html"
-        ],
-        "bad": [
-          "bad-concurrent-input.html"
-        ]
+        "good": ["good-concurrent-input.html"],
+        "bad": ["bad-concurrent-input.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2577,28 +1794,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "input-modalities"
-      ],
+      "deterministic": ["input-modalities"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-dragging-movements.html"
-        ],
-        "bad": [
-          "bad-dragging-movements.html"
-        ]
+        "good": ["good-dragging-movements.html"],
+        "bad": ["bad-dragging-movements.html"]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": ["exclusive"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2610,33 +1817,19 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "target-size"
-      ],
-      "deterministic": [
-        "input-modalities"
-      ],
+      "axeRules": ["target-size"],
+      "deterministic": ["input-modalities"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-target-size-minimum.html"
-        ],
-        "bad": [
-          "bad-target-size-minimum.html"
-        ]
+        "good": ["good-target-size-minimum.html"],
+        "bad": ["bad-target-size-minimum.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "exclusive",
-        "golden"
-      ],
+      "harness": ["axe-e2e", "exclusive", "golden"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "exclusive"
-        ]
+        "from": ["exclusive"]
       }
     },
     {
@@ -2644,41 +1837,23 @@
       "level": "A",
       "title": "Language of Page",
       "mechanism": "axe-core",
-      "supporting": [
-        "language-detection (experimental)"
-      ],
+      "supporting": ["language-detection (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "html-has-lang",
-        "html-lang-valid",
-        "html-xml-lang-mismatch"
-      ],
-      "deterministic": [
-        "language-detection"
-      ],
+      "axeRules": ["html-has-lang", "html-lang-valid", "html-xml-lang-mismatch"],
+      "deterministic": ["language-detection"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-accessibility.html",
-          "good-language.html"
-        ],
-        "bad": [
-          "bad-language.html"
-        ]
+        "good": ["good-accessibility.html", "good-language.html"],
+        "bad": ["bad-language.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2686,40 +1861,23 @@
       "level": "AA",
       "title": "Language of Parts",
       "mechanism": "axe-core",
-      "supporting": [
-        "language-detection (experimental)"
-      ],
+      "supporting": ["language-detection (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "valid-lang"
-      ],
-      "deterministic": [
-        "language-detection"
-      ],
+      "axeRules": ["valid-lang"],
+      "deterministic": ["language-detection"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-language-override.html",
-          "good-language.html"
-        ],
-        "bad": [
-          "bad-language-override.html",
-          "bad-language.html"
-        ]
+        "good": ["good-language-override.html", "good-language.html"],
+        "bad": ["bad-language-override.html", "bad-language.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 4,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2733,22 +1891,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": ["llm-semantic-text"],
       "fixtures": {
-        "good": [
-          "good-language-aaa.html",
-          "good-semantic-text-de.html"
-        ],
-        "bad": [
-          "bad-language-aaa.html",
-          "bad-semantic-text-de.html"
-        ]
+        "good": ["good-language-aaa.html", "good-semantic-text-de.html"],
+        "bad": ["bad-language-aaa.html", "bad-semantic-text-de.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2762,22 +1910,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": ["llm-semantic-text"],
       "fixtures": {
-        "good": [
-          "good-language-aaa.html",
-          "good-semantic-text-de.html"
-        ],
-        "bad": [
-          "bad-language-aaa.html",
-          "bad-semantic-text-de.html"
-        ]
+        "good": ["good-language-aaa.html", "good-semantic-text-de.html"],
+        "bad": ["bad-language-aaa.html", "bad-semantic-text-de.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2791,20 +1929,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-reading-level"
-      ],
+      "llm": ["llm-reading-level"],
       "fixtures": {
-        "good": [
-          "good-reading-level.html"
-        ],
-        "bad": [
-          "bad-reading-level.html"
-        ]
+        "good": ["good-reading-level.html"],
+        "bad": ["bad-reading-level.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2818,20 +1948,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": ["llm-semantic-text"],
       "fixtures": {
-        "good": [
-          "good-language-aaa.html"
-        ],
-        "bad": [
-          "bad-language-aaa.html"
-        ]
+        "good": ["good-language-aaa.html"],
+        "bad": ["bad-language-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -2844,28 +1966,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "predictable-navigation"
-      ],
+      "deterministic": ["predictable-navigation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-context-change.html"
-        ],
-        "bad": [
-          "bad-context-change.html"
-        ]
+        "good": ["good-context-change.html"],
+        "bad": ["bad-context-change.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2878,30 +1990,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "predictable-navigation"
-      ],
+      "deterministic": ["predictable-navigation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-auto-submitting-form.html",
-          "good-context-change.html"
-        ],
-        "bad": [
-          "bad-auto-submitting-form.html",
-          "bad-context-change.html"
-        ]
+        "good": ["good-auto-submitting-form.html", "good-context-change.html"],
+        "bad": ["bad-auto-submitting-form.html", "bad-context-change.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 4,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2914,28 +2014,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "predictable-navigation"
-      ],
+      "deterministic": ["predictable-navigation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-consistent-navigation.html"
-        ],
-        "bad": [
-          "bad-consistent-navigation.html"
-        ]
+        "good": ["good-consistent-navigation.html"],
+        "bad": ["bad-consistent-navigation.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2948,28 +2038,18 @@
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "predictable-navigation"
-      ],
+      "deterministic": ["predictable-navigation"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-consistent-identification.html"
-        ],
-        "bad": [
-          "bad-consistent-identification.html"
-        ]
+        "good": ["good-consistent-identification.html"],
+        "bad": ["bad-consistent-identification.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -2981,27 +2061,14 @@
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "meta-refresh-no-exceptions"
-      ],
+      "axeRules": ["meta-refresh-no-exceptions"],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": ["llm-behavioral"],
       "fixtures": {
-        "good": [
-          "good-behavioral-de.html",
-          "good-change-on-request.html"
-        ],
-        "bad": [
-          "bad-behavioral-de.html",
-          "bad-change-on-request.html"
-        ]
+        "good": ["good-behavioral-de.html", "good-change-on-request.html"],
+        "bad": ["bad-behavioral-de.html", "bad-change-on-request.html"]
       },
-      "harness": [
-        "axe-e2e",
-        "llm"
-      ],
+      "harness": ["axe-e2e", "llm"],
       "outcome": null
     },
     {
@@ -3015,20 +2082,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-consistent-help"
-      ],
+      "llm": ["llm-consistent-help"],
       "fixtures": {
-        "good": [
-          "good-consistent-help.html"
-        ],
-        "bad": [
-          "bad-consistent-help.html"
-        ]
+        "good": ["good-consistent-help.html"],
+        "bad": ["bad-consistent-help.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -3037,14 +2096,11 @@
       "title": "Error Identification",
       "mechanism": "experimental:error-handling+status-messages",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2) ;; status-messages: concurrent harness: FAIL — missed bad-form-errors.html (3.3.1) | concurrent harness: FAIL — missed bad-status-messages.html (4.1.3)",
+      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2) ;; status-messages: concurrent harness FAIL: missed bad-form-errors.html (3.3.1) | concurrent harness FAIL: missed bad-status-messages.html (4.1.3)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
-      "deterministic": [
-        "error-handling",
-        "status-messages"
-      ],
+      "deterministic": ["error-handling", "status-messages"],
       "llm": [],
       "fixtures": {
         "good": [
@@ -3052,20 +2108,14 @@
           "good-form-errors.html",
           "good-js-validation.html"
         ],
-        "bad": [
-          "bad-form-errors.html"
-        ]
+        "bad": ["bad-form-errors.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 6,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -3073,18 +2123,12 @@
       "level": "A",
       "title": "Labels or Instructions",
       "mechanism": "axe-core",
-      "supporting": [
-        "error-handling (experimental)"
-      ],
+      "supporting": ["error-handling (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "form-field-multiple-labels"
-      ],
-      "deterministic": [
-        "error-handling"
-      ],
+      "axeRules": ["form-field-multiple-labels"],
+      "deterministic": ["error-handling"],
       "llm": [],
       "fixtures": {
         "good": [
@@ -3100,17 +2144,12 @@
           "bad-form-labels.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 7,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -3119,33 +2158,22 @@
       "title": "Error Suggestion",
       "mechanism": "experimental:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2)",
+      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
-      "deterministic": [
-        "error-handling"
-      ],
+      "deterministic": ["error-handling"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-error-tokens-not-error-messages.html",
-          "good-form-errors.html"
-        ],
-        "bad": [
-          "bad-form-errors.html"
-        ]
+        "good": ["good-error-tokens-not-error-messages.html", "good-form-errors.html"],
+        "bad": ["bad-form-errors.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -3154,33 +2182,22 @@
       "title": "Error Prevention (Legal, Financial, Data)",
       "mechanism": "experimental:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness: FAIL — false positive on good-cognitive-accessibility.html (3.3.2)",
+      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
-      "deterministic": [
-        "error-handling"
-      ],
+      "deterministic": ["error-handling"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-error-prevention.html"
-        ],
-        "bad": [
-          "bad-error-prevention.html",
-          "bad-form-errors.html"
-        ]
+        "good": ["good-error-prevention.html"],
+        "bad": ["bad-error-prevention.html", "bad-form-errors.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 3,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -3194,22 +2211,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": ["llm-behavioral"],
       "fixtures": {
-        "good": [
-          "good-behavioral-de.html",
-          "good-help-aaa.html"
-        ],
-        "bad": [
-          "bad-behavioral-de.html",
-          "bad-help-aaa.html"
-        ]
+        "good": ["good-behavioral-de.html", "good-help-aaa.html"],
+        "bad": ["bad-behavioral-de.html", "bad-help-aaa.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -3225,12 +2232,8 @@
       "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-error-prevention.html"
-        ],
-        "bad": [
-          "bad-error-prevention.html"
-        ]
+        "good": ["good-error-prevention.html"],
+        "bad": ["bad-error-prevention.html"]
       },
       "harness": [],
       "outcome": null
@@ -3246,20 +2249,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-redundant-entry"
-      ],
+      "llm": ["llm-redundant-entry"],
       "fixtures": {
-        "good": [
-          "good-redundant-entry.html"
-        ],
-        "bad": [
-          "bad-redundant-entry.html"
-        ]
+        "good": ["good-redundant-entry.html"],
+        "bad": ["bad-redundant-entry.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -3273,22 +2268,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-auth"
-      ],
+      "llm": ["llm-auth"],
       "fixtures": {
-        "good": [
-          "good-accessible-auth-de.html",
-          "good-accessible-auth.html"
-        ],
-        "bad": [
-          "bad-accessible-auth-de.html",
-          "bad-accessible-auth.html"
-        ]
+        "good": ["good-accessible-auth-de.html", "good-accessible-auth.html"],
+        "bad": ["bad-accessible-auth-de.html", "bad-accessible-auth.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -3302,20 +2287,12 @@
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-auth"
-      ],
+      "llm": ["llm-auth"],
       "fixtures": {
-        "good": [
-          "good-accessible-auth-enhanced.html"
-        ],
-        "bad": [
-          "bad-accessible-auth-enhanced.html"
-        ]
+        "good": ["good-accessible-auth-enhanced.html"],
+        "bad": ["bad-accessible-auth-enhanced.html"]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": ["llm"],
       "outcome": null
     },
     {
@@ -3328,26 +2305,18 @@
       "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "html-validation"
-      ],
+      "deterministic": ["html-validation"],
       "llm": [],
       "fixtures": {
         "good": [],
-        "bad": [
-          "bad-html-validation.html"
-        ]
+        "bad": ["bad-html-validation.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": null,
         "runs": 1,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -3393,12 +2362,7 @@
         "select-name",
         "summary-name"
       ],
-      "deterministic": [
-        "screen-reader",
-        "html-validation",
-        "advanced-aria",
-        "dynamic-spa"
-      ],
+      "deterministic": ["screen-reader", "html-validation", "advanced-aria", "dynamic-spa"],
       "llm": [],
       "fixtures": {
         "good": [
@@ -3420,17 +2384,12 @@
           "bad-icon-accessibility.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "concurrent"
-      ],
+      "harness": ["axe-e2e", "concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": false,
         "runs": 36,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     },
     {
@@ -3438,39 +2397,23 @@
       "level": "AA",
       "title": "Status Messages",
       "mechanism": "deterministic:dynamic-spa",
-      "supporting": [
-        "screen-reader (experimental)",
-        "status-messages (experimental)"
-      ],
+      "supporting": ["screen-reader (experimental)", "status-messages (experimental)"],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "screen-reader",
-        "status-messages",
-        "dynamic-spa"
-      ],
+      "deterministic": ["screen-reader", "status-messages", "dynamic-spa"],
       "llm": [],
       "fixtures": {
-        "good": [
-          "good-aria-state-updates.html"
-        ],
-        "bad": [
-          "bad-aria-state-updates.html",
-          "bad-status-messages.html"
-        ]
+        "good": ["good-aria-state-updates.html"],
+        "bad": ["bad-aria-state-updates.html", "bad-status-messages.html"]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": ["concurrent"],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 6,
-        "from": [
-          "concurrent"
-        ]
+        "from": ["concurrent"]
       }
     }
   ]

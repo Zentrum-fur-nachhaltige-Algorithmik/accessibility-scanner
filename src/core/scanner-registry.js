@@ -1,7 +1,8 @@
 /**
- * Scanner Registry — instantiates and registers all scanners with a ScanPipeline.
- *
- * LLM-powered scanners are conditionally registered when OPENROUTER_API_KEY is set.
+ * scanner-registry
+ * Instantiates and registers all scanners with a ScanPipeline, and defines scan profiles.
+ * LLM scanners are registered only when OPENROUTER_API_KEY is set; profile
+ * membership is filtered by trust tier from scanner-trust.json.
  */
 
 const ColorContrastScanner = require('../scanners/color-contrast');
@@ -76,8 +77,6 @@ function createLLMScanners({ llmClient } = {}) {
     new LLMFocusAppearanceScanner(client),
     new LLMSensoryCharacteristicsScanner(client),
     new LLMReadingLevelScanner(client),
-    // Sprint P2 additions — previously uncovered criteria plus the axe
-    // `incomplete` adjudicator (highest-leverage precision win on real pages).
     new LLMIncompleteReviewerScanner(client),
     new LLMRedundantEntryScanner(client),
     new LLMConsistentHelpScanner(client),
@@ -91,10 +90,7 @@ function createLLMScanners({ llmClient } = {}) {
  */
 function createAllScanners({ llmClient } = {}) {
   const scanners = [
-    // axe-core — high-precision static DOM analysis (replaces 10 heuristic scanners)
     new AxeCoreAdapter(),
-
-    // Concurrent scanners (perceivable)
     new ColorContrastScanner(),
     new UseOfColorScanner(),
     new ImagesOfTextScanner(),
@@ -105,48 +101,31 @@ function createAllScanners({ llmClient } = {}) {
     new MediaAccessibilityScanner(),
     new OrientationScanner(),
     new InputPurposeScanner(),
-
-    // Concurrent scanners (understandable)
     new LanguageDetectionScanner(),
     new PredictableNavigationScanner(),
     new ErrorHandlingScanner(),
-
-    // Concurrent scanners (robust)
     new HTMLValidationScanner(),
     new PageStructureScanner(),
     new LabelInNameScanner(),
     new StatusMessagesScanner(),
     new AdvancedAriaScanner(),
-
-    // Concurrent scanners (operable)
     new SeizurePreventionScanner(),
     new TimingControlsScanner(),
     new MultipleWaysScanner(),
-
-    // Exclusive scanners (operable)
     new KeyboardNavigationScanner(),
     new FocusManagementScanner(),
     new InputModalitiesScanner(),
     new ResponsiveDesignScanner(),
     new MobileSpecificScanner(),
-
-    // Exclusive scanners (perceivable — hover/focus content)
     new HoverFocusContentScanner(),
-
-    // Exclusive scanners (operable — reloads with listener instrumentation)
     new ConcurrentInputScanner(),
-
-    // Exclusive scanners (robust)
     new DynamicSPAScanner(),
-
-    // Exclusive scanners (EAA procedural — navigate to sub-pages)
     new AccessibilityStatementScanner(),
     new ContactMechanismScanner(),
     new ComplianceMonitoringScanner(),
     new EAAProcedureScanner(),
   ];
 
-  // Conditionally add LLM-powered scanners
   const llmScanners = createLLMScanners({ llmClient });
   scanners.push(...llmScanners);
 
@@ -154,7 +133,7 @@ function createAllScanners({ llmClient } = {}) {
 }
 
 /**
- * Scan profiles — subsets of scanners optimised for different speed/coverage
+ * Scan profiles: subsets of scanners optimised for different speed/coverage
  * trade-offs. `null` means "every scanner this profile is eligible for".
  *
  * IMPORTANT: these lists express SPEED/SCOPE intent only. Actual membership is
@@ -166,7 +145,7 @@ function createAllScanners({ llmClient } = {}) {
 const PROFILES = {
   fast: [
     'axe-core',
-    // Concurrent (no seizure-prevention — its 10s observation dominates)
+    // No seizure-prevention: its 10s observation dominates
     'color-contrast',
     'use-of-color',
     'images-of-text',
@@ -257,11 +236,11 @@ function allScannerIds() {
  * scanners currently rated `proven` in `src/core/scanner-trust.json` (derived from
  * the recorded battery results by `scripts/derive-scanner-trust.js`).
  *
- * Quarantined scanners are not deleted — pass `{ includeExperimental: true }`
+ * Quarantined scanners stay registered; pass `{ includeExperimental: true }`
  * to run them. Their findings are tagged `confidence: 'low'` by the pipeline so
  * a report can present them separately.
  *
- * @param {string} name — 'fast' | 'standard' | 'full'
+ * @param {string} name - 'fast' | 'standard' | 'full'
  * @param {{ includeExperimental?: boolean }} [opts]
  * @returns {{ scannerIds: string[], options: object, excluded: string[] }}
  */

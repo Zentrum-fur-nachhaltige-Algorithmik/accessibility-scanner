@@ -1,22 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Golden-corpus false-positive harness.
- *
- * Scans the static export of the med-websites template (5 themes × 8 routes,
- * `test-sites/realworld/med-templates/`, built to be WCAG 2.2 AA compliant)
- * with the FULL profile and asserts two things per route:
- *
- *   1. FORBIDDEN rules (known false-positive classes) fire at most `max`
- *      times (default 0).
- *   2. EXPECTED rules (the real defects the report verified by hand) still
- *      fire — so the fixes cannot "pass" by going blind.
- *
- * Plus two corpus-wide invariants: no `critical` finding anywhere, and no
- * scanner crash.
- *
- * Every theme is served from its own document root because the Next.js export
- * uses absolute `/_next/...` asset paths.
+ * golden.js: false-positive harness over the med-websites template export (5 themes x 8 routes,
+ * test-sites/realworld/med-templates/). Per route, FORBIDDEN rules fire at most `max` times and
+ * EXPECTED rules (hand-verified real defects) fire; corpus-wide, no critical finding and no crash.
  *
  * Usage:
  *   node scripts/harness/golden.js                   # all themes, no LLM
@@ -33,6 +20,8 @@ const fs = require('fs');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { isHardViolation, normalizeSeverity } = require(path.join(ROOT, 'src', 'core', 'severity'));
 const CORPUS = path.join(ROOT, 'test-sites', 'realworld', 'med-templates');
+// Every theme is served from its own document root because the Next.js export
+// uses absolute `/_next/...` asset paths.
 
 if (!fs.existsSync(CORPUS)) {
   console.log(`golden corpus not present (${path.relative(ROOT, CORPUS)}), nothing to check`);
@@ -62,9 +51,9 @@ const FORBIDDEN = {
   'touch-targets-too-close': { fp: 'FP-1', criteria: ['2.5.8'], max: 0 },
   'target-size-too-small': { fp: 'FP-1', criteria: ['2.5.8'], max: 0 },
   'target-size-underspaced': { fp: 'FP-1', criteria: ['2.5.8'], max: 0 },
-  // `real` = themes where the rule was RE-VERIFIED as a genuine defect on
-  // 2026-08-24 (screenshots in the FP report addendum); there it is allowed
-  // at most `realMax` times per route (grouped finding per overlay).
+  // `real`: themes where the rule is a verified genuine defect (screenshots in
+  // the FP report addendum); there it is allowed at most `realMax` times per
+  // route (one grouped finding per overlay).
   'interaction-blocked': {
     fp: 'FP-2',
     criteria: ['1.4.4'],
@@ -113,16 +102,16 @@ const EXPECTED = [
   },
   { rule: 'heading-order', why: 'h1 -> h4 jump in footer (axe-core)', themes: THEMES },
   { rule: 'accessibility-statement', why: 'no Barrierefreiheitserklärung (EAA)', themes: THEMES },
-  // FP-8 was re-verified on 2026-08-24: with 1.4.12 spacing injected the stat
-  // label "Ausführliche Gespräche" is clipped by its overflow:hidden grid
-  // (evergreen/clinic @1920 by 30px) — a real loss of content, not a FP.
+  // FP-8 is a real defect: with 1.4.12 spacing injected the stat label
+  // "Ausführliche Gespräche" is clipped by its overflow:hidden grid
+  // (evergreen/clinic at 1920px, by 30px).
   {
     rule: 'text-spacing-failure',
     why: 'stat label clipped under 1.4.12 spacing (1.4.12)',
     themes: ['evergreen', 'clinic'],
   },
   // Skip link painted under header.header{z-index:100} (lumen/warmth) and
-  // footer links under the fixed a.sticky-cta — real 2.4.11 template bugs.
+  // footer links under the fixed a.sticky-cta: real 2.4.11 template bugs.
   {
     rule: 'focus-obscured-by-sticky-element',
     why: 'skip link hidden behind header z-index (2.4.11)',
@@ -302,13 +291,12 @@ async function main() {
             `${critical.length} critical finding(s): ${[...new Set(critical.map(ruleOf))].join(', ')}`
           );
         for (const c of crashed) pageFail.push(`scanner error: ${c}`);
-        // EXPECTED matches against EVERY violation, not just `counts`: the
-        // harness counts only hard violations, but two of the real defects the
-        // report verified by hand are reported by axe-core rules that carry
-        // only the `best-practice` tag ('heading-order' is the h1->h4 footer
-        // jump). Those now normalise to severity 'best-practice' — correctly,
-        // that is axe's own taxonomy — and would otherwise look like a fix that
-        // went blind.
+        // EXPECTED matches against every violation, not just `counts`: the
+        // harness counts only hard violations, but some of the hand-verified
+        // real defects are reported by axe-core rules that carry only the
+        // `best-practice` tag ('heading-order' is the h1->h4 footer jump).
+        // Those normalise to severity 'best-practice' (axe's own taxonomy) and
+        // would otherwise look like a fix that went blind.
         for (const e of EXPECTED)
           for (const v of violations)
             if (ruleOf(v).includes(e.rule)) seenExpected[theme].add(e.rule);
@@ -346,7 +334,7 @@ async function main() {
 
   const elapsed = ((Date.now() - started) / 1000).toFixed(0);
   console.log(
-    `\n=== golden corpus: ${report.pages.length} pages in ${elapsed}s — ${failures.length ? `${failures.length} FAILURE(S)` : 'PASS'} ===`
+    `\n=== golden corpus: ${report.pages.length} pages in ${elapsed}s: ${failures.length ? `${failures.length} FAILURE(S)` : 'PASS'} ===`
   );
   const sorted = Object.entries(report.ruleTotals).sort((a, b) => b[1] - a[1]);
   console.log('\nrule totals across corpus' + (args.report ? '' : ' (top 15; --report for all)'));

@@ -1,19 +1,15 @@
+/**
+ * Media Accessibility Scanner.
+ * WCAG 1.1.1, 1.2.1, 1.2.2, 1.2.3, 1.2.5 (EN 301 549 9.1.1.1, 9.1.2.x).
+ * Checks text alternatives for images and captions/descriptions/transcripts for audio and video
+ * in a single DOM pass without script injection.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('media-accessibility');
 
-/**
- * Media Accessibility Scanner for WCAG compliance testing
- * PHASE 3: CSP-Independent Implementation
- *
- * Implements EN 301 549 criteria for media accessibility without script injection
- * Coverage: image-alt, area-alt, object-alt, input-image-alt, svg-img-alt,
- * audio-caption, video-description + 4 more media rules
- *
- * CSP-Immune: Uses pure DOM parsing and analysis (no script injection)
- */
 class MediaAccessibilityScanner extends BaseScanner {
   constructor() {
     super('media-accessibility', {
@@ -67,8 +63,7 @@ class MediaAccessibilityScanner extends BaseScanner {
   }
 
   /**
-   * Perform comprehensive media analysis with Phase 3 CSP-immune rules
-   * OPTIMIZED: Single DOM analysis pass for better performance
+   * Analyse all media elements in a single DOM pass.
    */
   async performMediaAnalysis(page, scanDir, options) {
     const violations = [];
@@ -85,11 +80,6 @@ class MediaAccessibilityScanner extends BaseScanner {
     } else {
       screenshotPromise = page.screenshot({ path: initialScreenshot, fullPage: true });
     }
-
-    // ============================================================================
-    // PHASE 3: OPTIMIZED CSP-IMMUNE MEDIA ANALYSIS
-    // Single DOM pass for all media elements to improve performance
-    // ============================================================================
 
     const mediaAnalysis = await page.evaluate(() => {
       // Helper function for element selector generation (browser context)
@@ -150,8 +140,7 @@ class MediaAccessibilityScanner extends BaseScanner {
        * alternatives. CSS visibility at load time is NOT a reliable signal of
        * whether media is content: custom players, lightboxes, tab panels and
        * accordions all hide the native element, and the UA stylesheet hides
-       * every <audio> that has no controls attribute (which is why the
-       * autoplay checks below were previously unreachable). A hidden media
+       * every <audio> that has no controls attribute. A hidden media
        * element is therefore still evaluated when it exposes a player
        * (controls) or plays by itself (autoplay). Hidden media with neither -
        * e.g. a JS-triggered notification sound - is skipped.
@@ -359,12 +348,10 @@ class MediaAccessibilityScanner extends BaseScanner {
       svgs.forEach((svg) => {
         const selector = getElementSelector(svg);
 
-        // Visibility gate. `offsetParent` is an HTMLElement property: on an
-        // SVGElement it is `undefined`, so the old `svg.offsetParent === null`
-        // test was ALWAYS false and every SVG in a `display:none` subtree
-        // (mobile-menu toggles, sticky mobile CTAs, closed drawers) was
-        // reported at desktop widths. WCAG only applies to content that is
-        // actually presented, so measure the rendered box instead.
+        // Visibility gate. `offsetParent` is an HTMLElement property and is
+        // `undefined` on an SVGElement, so it cannot detect a `display:none`
+        // subtree. WCAG only applies to content that is actually presented,
+        // so measure the rendered box instead.
         const rect = svg.getBoundingClientRect();
         const svgStyle = window.getComputedStyle(svg);
         const isHidden =

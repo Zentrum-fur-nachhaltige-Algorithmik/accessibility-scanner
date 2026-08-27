@@ -1,10 +1,11 @@
+/**
+ * Images of Text Scanner.
+ * WCAG 1.4.5, 1.4.9 (EN 301 549 9.1.4.5, 9.1.4.9).
+ * Detects images that present text which could be rendered as real text,
+ * using filename, alt and class heuristics; logos and decorative images are skipped.
+ */
 const BaseScanner = require('../core/base-scanner');
 
-/**
- * Images of Text Scanner for WCAG compliance testing
- * Implements EN 301 549 criterion 9.1.4.5 (Images of Text)
- * Detects when images are used to present text that could be presented as real text
- */
 class ImagesOfTextScanner extends BaseScanner {
   constructor() {
     super('images-of-text', {

@@ -2,7 +2,7 @@
   "generatedAt": "2026-08-24T15:30:00.000Z",
   "profile": "full",
   "llm": false,
-  "note": "merged from 5 per-theme runs after the FP-fix sprint 2026-08-24",
+  "note": "merged from 5 per-theme runs",
   "pages": [
     {
       "theme": "evergreen",

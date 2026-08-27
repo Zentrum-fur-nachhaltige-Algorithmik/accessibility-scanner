@@ -1,13 +1,13 @@
+/**
+ * Language Detection Scanner.
+ * WCAG 3.1.1, 3.1.2 (EN 301 549 9.3.1.1, 9.3.1.2).
+ * Validates the page language declaration and checks that language changes are marked.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const log = require('../utils/logger').createLogger('language-detection');
 
-/**
- * Language Detection Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.3.1.1, 9.3.1.2 (Language of Page, Language of Parts)
- * Detects page language declarations and multilingual content marking
- */
 class LanguageDetectionScanner extends BaseScanner {
   constructor() {
     super('language-detection', {
@@ -167,7 +167,7 @@ class LanguageDetectionScanner extends BaseScanner {
           declaredLanguage: pageLanguageInfo.declaredLanguage,
           description: `Page language code "${pageLanguageInfo.declaredLanguage}" is not a syntactically valid BCP 47 language tag`,
           suggestion:
-            "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word",
+            "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW'). Do not use underscores or a bare word",
         });
       }
     }
@@ -190,10 +190,8 @@ class LanguageDetectionScanner extends BaseScanner {
     // return value: on framework-rendered pages the nodes carry expando properties
     // (React attaches `__reactFiber$…` / `__reactProps$…`, which form a circular
     // object graph), CDP's returnByValue serialization then fails and Puppeteer
-    // silently resolves the whole evaluate to `undefined`. That used to blow up the
-    // consumer below with "Cannot read properties of undefined (reading 'map')" and,
-    // because the pipeline swallows scanner rejections, blanked out 3.1.1/3.1.2 on
-    // every React/Next.js page. Only plain, serializable data crosses the boundary.
+    // silently resolves the whole evaluate to `undefined`, which the pipeline then
+    // swallows. Only plain, serializable data crosses the boundary.
     const rawContentAnalysis = await page.evaluate(() => {
       // Always return the same fully-populated shape, on every code path.
       const textElements = [];
@@ -377,7 +375,7 @@ class LanguageDetectionScanner extends BaseScanner {
           declaredLanguage: element.langCode,
           description: `Element has a lang attribute ("${element.langCode}") that is not a syntactically valid BCP 47 language tag`,
           suggestion:
-            "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW') — not underscores, and not a bare word",
+            "Use a valid BCP 47 language tag (e.g., 'en', 'de', 'de-AT', 'deu', 'zh-Hant-TW'). Do not use underscores or a bare word",
         });
       }
     }
@@ -445,13 +443,13 @@ class LanguageDetectionScanner extends BaseScanner {
    * Validate language code format.
    *
    * The HTML `lang` attribute takes a BCP 47 language tag (RFC 5646), not a
-   * bare ISO 639-1 code — three-letter ISO 639-2/639-3 subtags (e.g. "deu",
+   * bare ISO 639-1 code: three-letter ISO 639-2/639-3 subtags (e.g. "deu",
    * "gsw", "nds"), script/region/variant-qualified tags (e.g. "zh-Hant-TW",
    * "es-419", "de-CH-1901"), and grandfathered/private-use tags (e.g.
    * "en-GB-oed", "x-klingon") are all valid. This checks SYNTAX per the
-   * RFC 5646 ABNF, not IANA Language Subtag Registry membership — there is
-   * deliberately no hardcoded list of "known" languages here, so any tag that
-   * is grammatically well-formed is accepted even if nobody has registered it.
+   * RFC 5646 ABNF, not IANA Language Subtag Registry membership: there is
+   * no hardcoded list of "known" languages here, so any tag that is
+   * grammatically well-formed is accepted even if nobody has registered it.
    *
    * RFC 5646 §2.1 ABNF (grandfathered tags aside):
    *
@@ -466,14 +464,13 @@ class LanguageDetectionScanner extends BaseScanner {
    *   singleton   = DIGIT / any ALPHA except "x"/"X"
    *   privateuse  = "x" 1*("-" (1*8alphanum))
    *
-   * One deliberate narrowing vs. the raw ABNF: RFC 5646 also allows a bare
-   * 5*8ALPHA primary subtag ("registered" for future use), but the RFC's own
-   * text says "there were no examples of this kind of subtag" and "future
-   * registrations of this type are discouraged" — none exist today either.
-   * Accepting it would mean accepting any plain English (or German, etc.)
-   * word of 5-8 letters — e.g. "english" itself — as a syntactically "valid
-   * language", which defeats the point of validating. That form is excluded;
-   * every other production above is implemented in full.
+   * One narrowing vs. the raw ABNF: RFC 5646 also allows a bare 5*8ALPHA
+   * primary subtag ("registered" for future use), but the RFC's own text
+   * says "there were no examples of this kind of subtag" and "future
+   * registrations of this type are discouraged", and none exist today.
+   * Accepting it would accept any plain word of 5-8 letters (e.g. "english"
+   * itself) as a valid language tag. That form is excluded; every other
+   * production above is implemented in full.
    */
   isValidLanguageCode(code) {
     if (!code || typeof code !== 'string') return false;
@@ -483,7 +480,7 @@ class LanguageDetectionScanner extends BaseScanner {
     // Grandfathered tags (RFC 5646 §2.2.8): a fixed, closed set of tags that
     // predate the subtag grammar and remain valid via the standard's own
     // exception clause. This is a syntactic constant of BCP 47 itself (there
-    // will never be a 18th entry without a new RFC) — not a language
+    // will never be a 18th entry without a new RFC), not a language
     // registry lookup.
     const GRANDFATHERED = new Set([
       // irregular

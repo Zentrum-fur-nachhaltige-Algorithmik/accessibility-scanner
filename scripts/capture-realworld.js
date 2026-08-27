@@ -1,26 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * capture-realworld.js — build the frozen real-world regression corpus.
- *
- * Captures a handful of REAL pages into `test-sites/realworld/*.html` and
- * sanitizes them so the corpus is offline-reproducible and side-effect free.
- *
- * WHY THIS EXISTS
- * ---------------
- * Every fundamental scanner bug found in the 2026-07 sprint came from real
- * page structures that the synthetic `test-sites/bad-*.html` corpus never
- * produces:
- *   - SVG `className` is an `SVGAnimatedString` object, not a string
- *   - an open JS dialog freezes the renderer for every later evaluate()
- *   - a dead <iframe> stalls axe-core injection
- *   - `language-detection` threw "Cannot read properties of undefined
- *     (reading 'map')" on Next.js pages
- * Hand-written fixtures are too tidy to reproduce any of that. These are not.
- *
- * The OUTPUT of this script is what gets committed — you should not need to
- * re-run it. Re-run only to refresh the corpus (which invalidates the sanity
- * bands hard-coded in test-realworld.js).
+ * capture-realworld.js: capture real pages into test-sites/realworld/*.html and
+ * sanitize them (analytics scripts dropped, external URLs rewritten) for offline scanning.
  *
  * Usage:
  *   node scripts/capture-realworld.js            # capture all
@@ -33,20 +15,22 @@
 const fs = require('fs');
 const path = require('path');
 
+// The captured files are committed. Re-run only to refresh the corpus, which
+// invalidates the sanity bands in scripts/harness/realworld.js.
 const OUT_DIR = path.join(__dirname, '..', 'test-sites', 'realworld');
 
 /**
  * Analytics / tag-manager / session-replay signatures.
- * Scripts whose `src` OR inline body match are DROPPED. Everything else is
- * kept on purpose — exercising real script-bearing markup is the whole point.
+ * Scripts whose `src` or inline body match are dropped. Everything else is
+ * kept: scanners must see real script-bearing markup.
  */
 const ANALYTICS_RE =
   'google-analytics|googletagmanager|gtag\\(|gtm\\.js|hotjar|segment\\.|plausible|matomo|piwik|facebook\\.net|fbq\\(|clarity\\.ms|doubleclick|sentry|datadog|intercom|hubspot';
 
 /**
- * Elements whose resource URLs get neutralised. `<a href>` is deliberately
- * absent — navigation targets are page CONTENT (scanners inspect them), not
- * resources to be fetched.
+ * Elements whose resource URLs get neutralised. `<a href>` is excluded:
+ * navigation targets are page content that scanners inspect, not resources
+ * to be fetched.
  */
 const RESOURCE_SELECTOR = 'img, script, link, video, audio, source, iframe';
 
@@ -56,30 +40,30 @@ const TARGETS = [
     url: 'http://localhost:3111/audit',
     fallbackUrl: 'http://localhost:3111/',
     purpose:
-      "this repo's own Next.js /audit route — hydration markup and the __next-route-announcer__ live region; live repro for the language-detection undefined.map crash. NOTE: this route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
+      "this repo's own Next.js /audit route: hydration markup and the __next-route-announcer__ live region; reproduces the language-detection undefined.map crash. This route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
   },
   {
     name: 'med-theme',
     url: 'https://dr-mauermann-urologe.vercel.app',
     purpose:
-      'med-websites theme export — German medical content, the actual production target of this scanner',
+      'med-websites theme export: German medical content, the production target of this scanner',
   },
   {
     name: 'beeproduced',
     url: 'https://beeproduced.com',
-    purpose: 'agency marketing site — the original real-world page this project was built to audit',
+    purpose: 'agency marketing site: the original real-world page this project was built to audit',
   },
   {
     name: 'wiki-medical-de',
     url: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
     purpose:
-      "long German medical article — content-rich, data tables, inline lang switches; far exceeds the LLM extractors' old 15,000-char cutoff",
+      'long German medical article: content-rich, data tables, inline lang switches, several hundred thousand characters of text',
   },
   {
     name: 'modern-commercial',
     url: 'https://www.mozilla.org/de/',
     purpose:
-      'modern commercial page — cookie banner, fixed header, heavy inline-SVG icon usage, German locale',
+      'modern commercial page: cookie banner, fixed header, heavy inline-SVG icon usage, German locale',
   },
 ];
 
@@ -93,16 +77,12 @@ async function loadPuppeteer() {
 }
 
 /**
- * Sanitize IN THE LIVE DOM, immediately before serialising.
+ * Sanitize in the live DOM, immediately before serialising.
  *
- * Done in-page rather than by regexing the HTML string for two reasons:
- *   1. attribute rewriting is exact (no risk of mangling `<a href>` or of
- *      tripping over quoting styles), and
- *   2. it also catches analytics tags that scripts INJECTED at runtime,
- *      which a string pass over the original source would miss.
- *
- * It does not reformat anything: `page.content()` serialises the DOM as-is,
- * so structural fidelity is preserved.
+ * Done in-page rather than by regexing the HTML string: attribute rewriting is
+ * exact (no risk of mangling `<a href>` or of tripping over quoting styles),
+ * and it also catches analytics tags that scripts injected at runtime.
+ * `page.content()` serialises the DOM as-is, so structure is preserved.
  */
 async function sanitizeInPage(page, analyticsRe, resourceSelector) {
   return page.evaluate(
@@ -210,9 +190,9 @@ function header(sourceUrl, purpose) {
 async function captureOne(browser, target) {
   const page = await browser.newPage();
 
-  // MUST be installed before navigation: puppeteer leaves a dialog open while
+  // Must be installed before navigation: puppeteer leaves a dialog open while
   // no listener is attached, and an open dialog blocks the renderer main
-  // thread forever. This is the exact freeze that bit the pipeline.
+  // thread forever.
   page.on('dialog', (d) => d.dismiss().catch(() => {}));
   page.on('pageerror', () => {});
 
@@ -225,13 +205,13 @@ async function captureOne(browser, target) {
   try {
     const resp = await page.goto(target.url, { waitUntil: 'networkidle2', timeout: 45000 });
     if (resp && resp.status() === 404 && target.fallbackUrl) {
-      console.log(`  ${target.url} returned 404 — falling back to ${target.fallbackUrl}`);
+      console.log(`  ${target.url} returned 404, falling back to ${target.fallbackUrl}`);
       usedUrl = target.fallbackUrl;
       await page.goto(usedUrl, { waitUntil: 'networkidle2', timeout: 45000 });
     }
   } catch (err) {
     if (!target.fallbackUrl) throw err;
-    console.log(`  ${target.url} failed (${err.message}) — falling back to ${target.fallbackUrl}`);
+    console.log(`  ${target.url} failed (${err.message}), falling back to ${target.fallbackUrl}`);
     usedUrl = target.fallbackUrl;
     await page.goto(usedUrl, { waitUntil: 'networkidle2', timeout: 45000 });
   }
@@ -279,7 +259,7 @@ async function main() {
       try {
         const r = await captureOne(browser, t);
         console.log(
-          `  OK ${path.relative(process.cwd(), r.dest)} — ${r.bytes} bytes ` +
+          `  OK ${path.relative(process.cwd(), r.dest)}: ${r.bytes} bytes ` +
             `(${r.stats.scriptsRemoved} analytics scripts removed, ${r.stats.urlsRewritten} attr URLs ` +
             `+ ${r.stats.cssUrlsRewritten} css url() rewritten)`
         );

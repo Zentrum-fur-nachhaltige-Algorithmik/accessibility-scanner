@@ -1,3 +1,8 @@
+/**
+ * Accessibility Statement Scanner.
+ * EN 301 549 12.1.1 (European Accessibility Act statement requirements).
+ * Follows links to locate the statement, then checks its completeness.
+ */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('accessibility-statement');
@@ -6,11 +11,6 @@ const {
   missingStatementViolation,
 } = require('../utils/accessibility-statement');
 
-/**
- * Accessibility Statement Scanner for EAA Procedural Requirements
- * Implements European Accessibility Act compliance checking
- * EN 301 549 criteria 12.1.1 (Accessibility and compatibility features)
- */
 class AccessibilityStatementScanner extends BaseScanner {
   constructor() {
     super('accessibility-statement', {
@@ -78,8 +78,8 @@ class AccessibilityStatementScanner extends BaseScanner {
     if (!statementLinkResults.found) {
       // Exactly ONE finding, and not `critical`. Every other rule in this
       // scanner (and in eaa-procedure / contact-mechanism /
-      // compliance-monitoring) describes a property OF the statement — missing
-      // contact, missing review date, missing monitoring procedure — and is
+      // compliance-monitoring) describes a property OF the statement (missing
+      // contact, missing review date, missing monitoring procedure) and is
       // undecidable while no statement exists. See
       // src/utils/accessibility-statement.js.
       violations.push(missingStatementViolation());
@@ -201,8 +201,7 @@ class AccessibilityStatementScanner extends BaseScanner {
   async findAccessibilityStatementLink(page) {
     log.debug('  Looking for accessibility statement link...');
     // Detection lives in src/utils/accessibility-statement.js so that all four
-    // EAA scanners agree on whether a statement exists — they used to disagree,
-    // which is how one missing statement became a dozen findings.
+    // EAA scanners agree on whether a statement exists.
     return findStatementLink(page);
   }
 

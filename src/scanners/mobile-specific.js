@@ -1,3 +1,9 @@
+/**
+ * Mobile Specific Scanner.
+ * WCAG 1.4.10 (EN 301 549 9.1.4.10), plus orientation and viewport meta checks.
+ * Re-navigates the page per device viewport (400% zoom, landscape, viewport meta);
+ * touch targets are covered by input-modalities.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -6,12 +12,6 @@ const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: clipCode } = require('../utils/text-clipping');
 const log = require('../utils/logger').createLogger('mobile-specific');
 
-/**
- * Phase 6D: Mobile Specific Accessibility Scanner
- * Implements mobile-specific WCAG criteria: 400% zoom, orientation, viewport meta (touch targets live in input-modalities)
- * Critical for mobile accessibility compliance and responsive design testing
- * CSP-independent implementation using Puppeteer viewport simulation
- */
 class MobileSpecificScanner extends BaseScanner {
   constructor() {
     super('mobile-specific', {
@@ -32,7 +32,7 @@ class MobileSpecificScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method — receives an already-navigated Puppeteer page.
+   * Core scan method. Receives an already-navigated Puppeteer page.
    * Note: This scanner re-navigates internally (per-device viewport testing) since it has exclusive access.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
@@ -195,20 +195,20 @@ class MobileSpecificScanner extends BaseScanner {
           return true;
         }
 
-        // Collect elements whose width is *authored* as a fixed px value, either in an
-        // applicable CSS rule or in an inline style. This is the key distinction ported
-        // from responsive-design-scanner: a computed `width` is always resolved to px by
-        // layout, so `getComputedStyle(el).width === '900px'` is NOT evidence that the
-        // author set a fixed width — a fully responsive <li> reports px too. Only an
-        // explicit px declaration in the cascade means the element cannot reflow.
+        // Collect elements whose width is authored as a fixed px value, either in an
+        // applicable CSS rule or in an inline style. A computed `width` is always
+        // resolved to px by layout, so `getComputedStyle(el).width === '900px'` is not
+        // evidence that the author set a fixed width (a fully responsive <li> reports
+        // px too). Only an explicit px declaration in the cascade means the element
+        // cannot reflow.
         const authoredPxWidth = new Set();
 
         function collectAuthoredPxWidths(ruleList) {
           for (const rule of ruleList || []) {
-            // Style rules carry selectorText. Checked BEFORE the grouping branch
-            // because since CSS Nesting shipped, every CSSStyleRule in Chrome also
-            // exposes a (usually empty) .cssRules list — testing that first would
-            // silently skip every ordinary rule.
+            // Style rules carry selectorText. Checked before the grouping branch
+            // because with CSS Nesting every CSSStyleRule in Chrome also exposes a
+            // (usually empty) .cssRules list; testing that first would silently
+            // skip every ordinary rule.
             const sel = rule.selectorText;
             if (typeof sel === 'string' && sel && !sel.includes('::')) {
               const declaredWidth = rule.style && rule.style.width;
@@ -229,7 +229,7 @@ class MobileSpecificScanner extends BaseScanner {
                 try {
                   if (!window.matchMedia(rule.conditionText).matches) continue;
                 } catch (e) {
-                  /* unparseable condition — descend anyway */
+                  /* unparseable condition, descend anyway */
                 }
               }
               collectAuthoredPxWidths(rule.cssRules);
@@ -265,7 +265,7 @@ class MobileSpecificScanner extends BaseScanner {
           const hasInlineWidth = element.style.width && element.style.width.endsWith('px');
           const hasFixedCssWidth = hasInlineWidth || authoredPxWidth.has(element);
 
-          // Skip elements using responsive layout — computed px width is from layout, not fixed CSS
+          // Skip elements using responsive layout: computed px width is from layout, not fixed CSS
           const mw = maxWidth;
           const isResponsive = mw && (mw.endsWith('%') || mw.endsWith('vw') || mw === '100%');
 
@@ -311,11 +311,9 @@ class MobileSpecificScanner extends BaseScanner {
             }
           }
 
-          // `mobile-small-text-400-zoom` (font-size < 12px) was removed: browser
-          // and pinch zoom scale px text, so a small px font is never by itself a
-          // 1.4.4 failure — it produced 215 findings on a WCAG-AA-conformant
-          // corpus. The readability hint still exists once, viewport-independently,
-          // as `small-fixed-font` (severity info) in phase6a-text-resize-scanner.
+          // Small px fonts are not reported here: browser and pinch zoom scale px
+          // text, so a small font is never by itself a 1.4.4 failure. The
+          // viewport-independent readability hint lives in text-resize.
         }
 
         // Content that is actually clipped away at this viewport. Measured on the
@@ -331,7 +329,7 @@ class MobileSpecificScanner extends BaseScanner {
             severity: clip.truncationDeclared ? 'info' : 'moderate',
             element: clip.selector,
             description: clip.truncationDeclared
-              ? `Element truncates text on purpose (line-clamp/ellipsis) at ${viewportInfo.width}px viewport width`
+              ? `Element truncates text by design (line-clamp/ellipsis) at ${viewportInfo.width}px viewport width`
               : `Element with overflow:hidden clips text at ${viewportInfo.width}px viewport width`,
             details: {
               device: device,
@@ -686,12 +684,11 @@ class MobileSpecificScanner extends BaseScanner {
         const bodyHeight = document.body.scrollHeight;
         const windowHeight = window.innerHeight;
 
-        // `landscape-excessive-height` was removed: no WCAG criterion limits
-        // page length, and 1.3.4 (Orientation) is about *locking* an
-        // orientation, not about vertical scrolling. Every long landing page
-        // in the golden corpus tripped it (8/8 routes). What 1.3.4/1.4.10
-        // actually require in landscape — no horizontal scrolling, no content
-        // loss — is measured by the checks below and by test400PercentZoom.
+        // Page height is not a finding: no WCAG criterion limits page length,
+        // and 1.3.4 (Orientation) is about locking an orientation, not about
+        // vertical scrolling. What 1.3.4/1.4.10 require in landscape (no
+        // horizontal scrolling, no content loss) is measured by the checks
+        // below and by test400PercentZoom.
         void bodyHeight;
         void windowHeight;
 

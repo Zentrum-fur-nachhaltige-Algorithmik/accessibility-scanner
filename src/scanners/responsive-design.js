@@ -1,3 +1,9 @@
+/**
+ * Responsive Design Scanner.
+ * WCAG 1.4.4, 1.4.10, 1.4.12 (EN 301 549 9.1.4.4, 9.1.4.10, 9.1.4.12).
+ * Cycles viewports and emulated zoom levels, injects text-spacing overrides
+ * and measures clipped text and horizontal overflow; screenshots as evidence.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
@@ -6,11 +12,6 @@ const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: textClippingCode } = require('../utils/text-clipping');
 const log = require('../utils/logger').createLogger('responsive-design');
 
-/**
- * Responsive Design Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.1.4.4, 9.1.4.10, 9.1.4.12 (Resize Text, Reflow, Text Spacing)
- * Uses visual screenshot analysis for thorough responsive design testing
- */
 class ResponsiveDesignScanner extends BaseScanner {
   constructor() {
     super('responsive-design', {
@@ -24,8 +25,8 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method — receives an already-navigated Puppeteer page.
-   * Note: This scanner re-navigates internally (viewport/zoom testing) since it has exclusive access.
+   * Core scan method. Receives an already-navigated Puppeteer page.
+   * Re-navigates internally (viewport/zoom testing) since it has exclusive access.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
@@ -224,12 +225,12 @@ class ResponsiveDesignScanner extends BaseScanner {
   /**
    * Test specific zoom level for responsive issues.
    *
-   * Zoom is emulated by SHRINKING THE CSS VIEWPORT (width / zoom), which is
-   * what browser zoom actually does to layout. The former `body.style.zoom`
-   * approach broke position:fixed/sticky and vw units and produced phantom
-   * overflow. WCAG 1.4.10 only requires reflow down to 320 CSS px, so the
-   * emulated width is clamped at 320; a combination whose clamped width is
-   * already covered by a wider base viewport is skipped as redundant.
+   * Zoom is emulated by shrinking the CSS viewport (width / zoom), which is
+   * what browser zoom does to layout; `body.style.zoom` would break
+   * position:fixed/sticky and vw units. WCAG 1.4.10 only requires reflow
+   * down to 320 CSS px, so the emulated width is clamped at 320; a
+   * combination whose clamped width is already covered by a wider base
+   * viewport is skipped as redundant.
    */
   async testZoomLevel(page, scanDir, viewport, zoomLevel, violations) {
     const MIN_REFLOW_WIDTH = 320;
@@ -337,7 +338,7 @@ class ResponsiveDesignScanner extends BaseScanner {
         }
       });
 
-      // Check text readability — only flag if actual text content is affected
+      // Check text readability: only flag if actual text content is affected
       const textElements = document.querySelectorAll(
         'p, h1, h2, h3, h4, h5, h6, span, li, td, th, label, a'
       );
@@ -428,7 +429,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    * Test text spacing customization (WCAG 1.4.12).
    *
    * Measures clipping BEFORE and AFTER injecting the 1.4.12 values and reports
-   * only text that becomes NEWLY clipped — carousels, custom scrollbars and
+   * only text that becomes newly clipped: carousels, custom scrollbars and
    * decorative overflow:hidden containers that were already "overflowing"
    * before the injection are not 1.4.12 failures. One finding per element.
    */
@@ -558,7 +559,7 @@ class ResponsiveDesignScanner extends BaseScanner {
               const after = clippedPx(c.el, c.clipper);
               if (!__isRendered(c.el)) continue;
               // Text that WAS fully visible and is clipped by the injected spacing, or already clipped on a page
-              // that already applies 1.4.12 spacing (vertical clipping only — a
+              // that already applies 1.4.12 spacing (vertical clipping only; a
               // horizontally clipped baseline is a carousel/marquee/ellipsis, not 1.4.12).
               const newlyClipped = c.before === 0 && after > 0;
               const clippedAtSpec =
@@ -624,7 +625,7 @@ class ResponsiveDesignScanner extends BaseScanner {
    * Test content reflow at critical breakpoints
    *
    * `fixed-width-element` is derived from the *authored* CSS (inline style or a
-   * matching style rule), never from `getComputedStyle().width` — the computed
+   * matching style rule), never from `getComputedStyle().width`: the computed
    * value is always a used px length, so reading it would flag every element
    * that happens to be wider than 320px (fluid tables, `width:100%` wrappers)
    * as "fixed width".
@@ -656,7 +657,7 @@ class ResponsiveDesignScanner extends BaseScanner {
        * Authored (declared) width/min-width of an element in px, or null.
        * Looks at the inline style first, then at every matching CSSStyleRule
        * whose media query currently applies. Only absolute px declarations
-       * count — %, vw, rem-with-max-width etc. reflow by definition.
+       * count; %, vw, rem-with-max-width etc. reflow by definition.
        */
       const styleRules = [];
       try {
@@ -799,7 +800,7 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic text spacing check (WCAG 1.4.12) — concurrent-compatible, pure page.evaluate
+   * Heuristic text spacing check (WCAG 1.4.12): concurrent-compatible, pure page.evaluate.
    * Detects CSS patterns that would cause clipping when text spacing is increased
    */
   async heuristicTextSpacingCheck(page) {
@@ -923,7 +924,7 @@ class ResponsiveDesignScanner extends BaseScanner {
             const style = rule.style;
             const sel = rule.selectorText || '';
 
-            // Skip universal selectors — these are typically user-override styles,
+            // Skip universal selectors: these are typically user-override styles,
             // not author-lock styles (e.g. * { line-height: 1.5 !important })
             if (sel.trim() === '*') continue;
 
@@ -948,7 +949,7 @@ class ResponsiveDesignScanner extends BaseScanner {
           }
         }
       } catch (e) {
-        // stylesheet access error — non-fatal
+        // stylesheet access error, non-fatal
       }
 
       return { violations, clippingContainers, importantOverrides };
@@ -961,7 +962,7 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic reflow check (WCAG 1.4.10) — detects fixed-width elements that prevent reflow at 320px.
+   * Heuristic reflow check (WCAG 1.4.10): detects fixed-width elements that prevent reflow at 320px.
    * Scans CSS rules (not computed styles) to avoid false positives from responsive layouts.
    */
   async heuristicReflowCheck(page) {
@@ -1117,23 +1118,13 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic text resize check (WCAG 1.4.4) — concurrent-compatible, pure read.
+   * Heuristic text resize check (WCAG 1.4.4): concurrent-compatible, pure read.
    *
-   * Reports only text that is *measurably* cut off: `__findClippedText()`
+   * Reports only text that is measurably cut off: `__findClippedText()`
    * compares the painted line boxes of every text node against the padding box
-   * of its innermost clipping container. Two earlier heuristics were dropped
-   * because neither is evidence of a 1.4.4 failure:
-   *
-   *   - `text-resize-fixed-font` flagged every `font-size: …px` rule. Browser
-   *     zoom scales px text just like rem text, so a px font-size alone is not
-   *     a resize failure; the remaining useful signal (text below 16px) is
-   *     already reported as the informational `small-fixed-font` by the
-   *     text-resize scanner. It produced 390 `serious` findings on the corpus,
-   *     all false positives.
-   *   - the container check read `getComputedStyle(el).height`, which resolves
-   *     to a px used-value for *every* element — so each `overflow: hidden`
-   *     section (e.g. `section#hero` with `scrollHeight === clientHeight`,
-   *     zero clipped characters) was reported as a clipping risk.
+   * of its innermost clipping container. A px font-size alone is not a resize
+   * failure (browser zoom scales px text like rem text), and an
+   * `overflow: hidden` container with no clipped characters is not one either.
    */
   async heuristicTextResizeCheck(page) {
     log.debug('Running heuristic text resize check...');

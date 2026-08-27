@@ -1,10 +1,10 @@
+/**
+ * Use of Color Scanner.
+ * WCAG 1.4.1 (EN 301 549 9.1.4.1).
+ * Detects links, form errors and status indicators that rely on color alone.
+ */
 const BaseScanner = require('../core/base-scanner');
 
-/**
- * Use of Color Scanner for WCAG compliance testing
- * Implements EN 301 549 criterion 9.1.4.1 (Use of Color)
- * Detects when color is used as the only means of conveying information
- */
 class UseOfColorScanner extends BaseScanner {
   constructor() {
     super('use-of-color', {

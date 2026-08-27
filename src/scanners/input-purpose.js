@@ -1,10 +1,11 @@
+/**
+ * Input Purpose Scanner.
+ * WCAG 1.3.5 (EN 301 549 9.1.3.5).
+ * Checks form inputs for valid autocomplete tokens matching the purpose
+ * detected from their name, id, type and label text.
+ */
 const BaseScanner = require('../core/base-scanner');
 
-/**
- * Input Purpose Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criterion 9.1.3.5 (Identify Input Purpose)
- * Checks form inputs for valid autocomplete attributes matching their purpose
- */
 class InputPurposeScanner extends BaseScanner {
   constructor() {
     super('input-purpose', {
@@ -268,14 +269,14 @@ class InputPurposeScanner extends BaseScanner {
             }
           }
         } else {
-          // No autocomplete attribute — flag if purpose is detectable.
+          // No autocomplete attribute: flag if purpose is detectable.
           //
           // Radio buttons and checkboxes are excluded: SC 1.3.5's autocomplete
           // tokens describe fields that COLLECT the user's own data, not
           // preference selectors. A radio group "Bevorzugte Kontaktmethode:
           // E-Mail / Telefon" or a checkbox "E-Mail-Benachrichtigungen" has
           // label text that trips the purpose patterns while collecting no
-          // personal datum at all — there is no meaningful token to autofill
+          // personal datum at all; there is no meaningful token to autofill
           // into it. (Explicitly-authored WRONG tokens on these types are still
           // caught above, where the attribute is present.)
           const isPreferenceSelector = type === 'radio' || type === 'checkbox';

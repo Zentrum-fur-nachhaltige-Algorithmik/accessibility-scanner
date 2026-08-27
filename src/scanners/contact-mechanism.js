@@ -1,13 +1,13 @@
+/**
+ * Contact Mechanism Scanner.
+ * EN 301 549 12.1.2 (European Accessibility Act contact requirements).
+ * Looks for email, phone and form contact options for accessibility enquiries.
+ */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const { findStatementLink } = require('../utils/accessibility-statement');
 const log = require('../utils/logger').createLogger('contact-mechanism');
 
-/**
- * Contact Mechanism Scanner for EAA Procedural Requirements
- * Implements European Accessibility Act contact requirements
- * EN 301 549 criteria 12.1.2 (Accessible procurement)
- */
 class ContactMechanismScanner extends BaseScanner {
   constructor() {
     super('contact-mechanism', {
@@ -161,7 +161,7 @@ class ContactMechanismScanner extends BaseScanner {
       // A response-time commitment for accessibility enquiries is something the
       // accessibility statement has to declare (EN 301 549 clause 12.2.2). With
       // no statement published there is nothing to read it out of, and
-      // `accessibility-statement` already reports that root cause — reporting
+      // `accessibility-statement` already reports that root cause, and reporting
       // the consequence too would double-count one defect.
       if (!responseTimeStated && statementPresent) {
         violations.push({

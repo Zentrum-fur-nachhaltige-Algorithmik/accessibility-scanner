@@ -125,10 +125,9 @@ describe('MobileSpecificScanner', () => {
   }, 120000);
 
   it('leaves target-size findings to input-modalities (2.5.8)', async () => {
-    // The 44px touch-target check was removed from this scanner (FP-1). It used
-    // the AAA threshold, counted non-interactive elements and multiplied every
-    // hit by five device profiles. bad-target-size.html is therefore no longer
-    // this scanner's fixture — it is asserted by input-modalities.
+    // Target size (2.5.8) is asserted by input-modalities. This scanner emits
+    // no touch-target findings of its own (FP-1: an AAA threshold applied to
+    // non-interactive elements, multiplied by five device profiles).
     const url = `${getBaseUrl()}/bad-target-size.html`;
     const page = await getPage(url);
     try {

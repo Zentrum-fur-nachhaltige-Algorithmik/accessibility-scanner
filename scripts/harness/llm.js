@@ -1,24 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * LLM Scanner Smoke Test — single-run, violation-level ground truth.
- *
- * Every LLM scanner is exercised against good + bad fixtures, including one
- * German-language pair each (production content is German medical practice
- * sites), plus two robustness fixtures shared by all scanners:
- *
- *   - `bad-prompt-injection.html` — page copy that tries to talk the scanner
- *     out of reporting. Page HTML is fed into the prompt, so this is a real
- *     attack surface.
- *   - `bad-long-page-de.html`     — 47k characters of body markup with a
- *     seeded 1.3.3 violation past character 27,000, i.e. far beyond the old
- *     15,000-char extraction cutoff.
- *
- * Ground truth is violation-LEVEL, not count-level: a bad file counts as
- * detected only when a reported violation matches a criterion the FILE declares
- * AND the scanner claims. ">0 violations of any kind" is not detection.
- *
- * Single-run by design — no repetition, no majority voting. Runs cost money.
+ * llm.js: single-run smoke test for the LLM scanners against good/bad fixtures (including a
+ * German pair each), a prompt-injection fixture and a long-page fixture. A bad file counts as
+ * detected only when a violation matches a criterion the file declares and the scanner claims.
  *
  * Usage:
  *   node scripts/harness/llm.js
@@ -26,6 +11,8 @@
  *   node scripts/harness/llm.js --skip-german     # cheap iteration
  *   node scripts/harness/llm.js --skip-robustness
  *   node scripts/harness/llm.js --json out.json
+ *
+ * No repetition, no majority voting: runs cost money.
  */
 
 const path = require('path');
@@ -56,7 +43,7 @@ async function loadPuppeteer() {
 }
 
 /**
- * Scanner → fixtures.
+ * Scanner -> fixtures.
  *
  * `german` entries are separated from `bad`/`good` only so `--skip-german` can
  * drop them during cheap iteration; they are otherwise ordinary test cases.
@@ -113,19 +100,21 @@ const SCANNER_TESTS = {
       good: 'good-sensory-characteristics-de.html',
     },
     criteria: ['1.3.3'],
-    // Owns the shared robustness fixtures: both are 1.3.3 pages.
+    // Owns the shared robustness fixtures, both 1.3.3 pages: page copy that
+    // tries to talk the scanner out of reporting (page HTML is fed into the
+    // prompt, a real attack surface), and 47k characters of body markup with a
+    // violation seeded past character 27,000.
     robustness: ['bad-prompt-injection.html', 'bad-long-page-de.html'],
   },
   'llm-reading-level': {
     module: '../../src/scanners/llm/reading-level',
     bad: ['bad-reading-level.html'],
     good: ['good-reading-level.html'],
-    // Already German — the fixture pair IS the German pair.
+    // The fixture pair is already German.
     german: { bad: 'bad-reading-level.html', good: 'good-reading-level.html' },
     criteria: ['3.1.5'],
   },
 
-  // ---- Sprint P2 additions ------------------------------------------------
   'llm-redundant-entry': {
     module: '../../src/scanners/llm/redundant-entry',
     bad: ['bad-redundant-entry.html'],
@@ -161,11 +150,10 @@ const SCANNER_TESTS = {
 /**
  * Does a violation match any of `criteria` (bare or EN 301 549 "9."-prefixed)?
  *
- * Deliberately looks ONLY at the per-violation criterion (`criterion` /
- * `ruleId`). `violation.wcagCriteria` must not be consulted: `formatViolation()`
- * stamps every violation with the SCANNER's entire criteria list, so matching
- * against it makes every violation match every criterion — which silently
- * destroys the violation-level ground truth this harness exists to enforce.
+ * Looks only at the per-violation criterion (`criterion` / `ruleId`).
+ * `violation.wcagCriteria` is not consulted: `formatViolation()` stamps every
+ * violation with the scanner's entire criteria list, so matching against it
+ * would make every violation match every criterion.
  */
 function matchesCriteria(violation, criteria) {
   const fields = [violation.criterion, violation.ruleId].filter(Boolean).map(String);
@@ -174,14 +162,14 @@ function matchesCriteria(violation, criteria) {
   );
 }
 
-/** Criteria a bad file must actually produce: what it declares ∩ what the scanner covers. */
+/** Criteria a bad file must produce: those it declares that the scanner also covers. */
 function expectedCriteriaFor(filePath, scannerCriteria) {
   let declared = [];
   try {
     const meta = parseWcagMetadata(fs.readFileSync(filePath, 'utf-8'));
     declared = (meta && meta.criterion) || [];
   } catch {
-    /* file without metadata — fall back to the scanner's own list */
+    /* file without metadata, fall back to the scanner's own list */
   }
   const intersect = declared.filter((c) => scannerCriteria.includes(c));
   return intersect.length > 0 ? intersect : scannerCriteria;
@@ -400,9 +388,8 @@ async function main() {
             pass = violations.some((v) => matchesCriteria(v, ['1.3.3']));
             detail = `${violations.length} violations; injection ${pass ? 'resisted' : 'OBEYED'}`;
           } else {
-            // A violation is seeded past character 27,000 of the body markup —
-            // invisible to the old 15k truncation. Finding it proves the
-            // compressed/chunked extraction actually covers the whole page.
+            // A violation is seeded past character 27,000 of the body markup;
+            // finding it proves the extraction covers the whole page.
             const below = violations.some((v) =>
               /rund|symbol|überweisung|uberweisung|seeded-below/i.test(
                 `${v.description || ''} ${JSON.stringify(v.nodes || [])}`
@@ -484,7 +471,7 @@ async function main() {
   }
 }
 
-// Exported so `scripts/coverage-matrix.js` can read the real scanner→criteria
+// Exported so `scripts/coverage-matrix.js` can read the real scanner-to-criteria
 // table instead of regex-scraping this file. Guarded so requiring it never
 // launches a browser or spends money.
 module.exports = { SCANNER_TESTS, matchesCriteria, expectedCriteriaFor };

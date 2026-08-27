@@ -1,8 +1,8 @@
 /**
- * LLMBaseScanner — base class for scanners that use LLM analysis.
- *
- * Extends BaseScanner with LLM capabilities for semantic checks that
- * regex/DOM analysis cannot handle.
+ * LLMBaseScanner
+ * Base class for scanners that use LLM analysis for semantic checks that
+ * regex/DOM analysis cannot handle. Holds the shared system prompt, chunked
+ * page analysis, and JSON response recovery.
  */
 
 const BaseScanner = require('../../core/base-scanner');
@@ -10,10 +10,9 @@ const { getPageContextPack } = require('./page-context');
 const log = require('../../utils/logger').createLogger('llm-base');
 
 /**
- * The system prompt shared by BOTH the legacy `analyzeWithLLM` path and the
- * chunked `analyzePageChunked` path. It lives at module scope on purpose: the
- * provider's implicit prompt cache keys on an identical byte prefix, so every
- * LLM scanner must send the *same* system string, not an equivalent copy.
+ * System prompt shared by `analyzeWithLLM` and `analyzePageChunked`. Module
+ * scope: the provider's implicit prompt cache keys on an identical byte prefix,
+ * so every LLM scanner must send the same system string.
  */
 const DEFAULT_SYSTEM_PROMPT = `You are an accessibility auditor. Analyze HTML for WCAG 2.2 compliance issues.
 
@@ -28,9 +27,9 @@ Format: { "violations": [{ "criterion": "X.Y.Z", "description": "...", "impact":
 
 class LLMBaseScanner extends BaseScanner {
   /**
-   * @param {string} id       — unique scanner identifier
-   * @param {Object} metadata — WCAG metadata
-   * @param {import('../../llm/client')} llmClient — LLM client instance
+   * @param {string} id - unique scanner identifier
+   * @param {Object} metadata - WCAG metadata
+   * @param {import('../../llm/client')} llmClient - LLM client instance
    */
   constructor(id, metadata, llmClient) {
     super(id, metadata);
@@ -39,16 +38,16 @@ class LLMBaseScanner extends BaseScanner {
     }
     this.llmClient = llmClient;
     // Running count of LLM violations dropped for being off-criterion-list
-    // (prompt drift monitor — see convertViolations()).
+    // (prompt drift monitor, see convertViolations()).
     this.droppedViolationCount = 0;
   }
 
   /**
    * Send HTML snippet to LLM for analysis.
    *
-   * @param {string} htmlSnippet — HTML to analyze
-   * @param {string} prompt — analysis prompt
-   * @param {string} [systemPrompt] — system role prompt
+   * @param {string} htmlSnippet - HTML to analyze
+   * @param {string} prompt - analysis prompt
+   * @param {string} [systemPrompt] - system role prompt
    * @returns {Promise<Object>} Parsed JSON response
    */
   async analyzeWithLLM(htmlSnippet, prompt, systemPrompt) {
@@ -71,12 +70,12 @@ class LLMBaseScanner extends BaseScanner {
    * Parse an LLM response body into `{ violations, summary }`, applying the
    * two recovery strategies the pinned model needs (trailing-garbage salvage,
    * then bounded truncation repair). Shared by `analyzeWithLLM` and
-   * `analyzePageChunked` — the recovery logic must not diverge between paths.
+   * `analyzePageChunked` so the recovery logic cannot diverge between paths.
    *
    * Never throws: an unparseable response degrades to an empty violation list
    * rather than failing the whole scan.
    *
-   * @param {string|Object} content — raw `result.content` from the LLM client
+   * @param {string|Object} content - raw `result.content` from the LLM client
    * @returns {Object} parsed response object
    */
   _parseLLMContent(content) {
@@ -94,7 +93,7 @@ class LLMBaseScanner extends BaseScanner {
         } catch {
           // First recovery attempt: some responses are a complete, valid
           // JSON object followed by trailing garbage (an observed decoding
-          // degeneration in the pinned model — a repeated-token loop after
+          // degeneration in the pinned model: a repeated-token loop after
           // an otherwise well-formed answer). Salvage the first balanced
           // top-level JSON value and discard everything after it.
           const balanced = this._extractBalancedJson(text);
@@ -113,11 +112,11 @@ class LLMBaseScanner extends BaseScanner {
             // Second recovery attempt: the response was cut off mid-structure
             // (ran out of tokens) or has non-JSON garbage spliced in before
             // its true end (not just appended after it, which the first
-            // attempt already covers) — e.g. a stray quote/char breaking the
+            // attempt already covers), e.g. a stray quote/char breaking the
             // syntax right before what would have been the closing brace.
             // Progressively drop trailing lines (bounded) and try to repair
-            // each shorter candidate, so we back off past any such
-            // corruption to the last point the model was still coherent.
+            // each shorter candidate, backing off past any such corruption
+            // to the last point the model was still coherent.
             const lines = text.split('\n');
             const maxCut = Math.min(40, lines.length - 1);
 
@@ -161,15 +160,15 @@ class LLMBaseScanner extends BaseScanner {
    * system prompt + context block form an identical cacheable prefix across all
    * LLM scanners scanning the same page.
    *
-   * Chunks are sent SEQUENTIALLY on purpose: chunk 1 warms the provider's
+   * Chunks are sent SEQUENTIALLY: chunk 1 warms the provider's
    * implicit prompt cache for the prefix that chunks 2..n reuse.
    *
    * @param {import('puppeteer').Page} page
-   * @param {string} instructions — the scanner's prompt (and any pre-computed data)
-   * @param {Object} [options] — forwarded to getPageContextPack; plus { systemPrompt }
+   * @param {string} instructions - the scanner's prompt (and any pre-computed data)
+   * @param {Object} [options] - forwarded to getPageContextPack; plus { systemPrompt }
    * @returns {Promise<{ violations: Object[], summary: Object }>}
-   *   violations — RAW LLM violation objects (caller still runs convertViolations)
-   *   summary    — { analyzedFraction, rawChars, skeletonChars, compressionRatio,
+   *   violations: RAW LLM violation objects (caller still runs convertViolations)
+   *   summary: { analyzedFraction, rawChars, skeletonChars, compressionRatio,
    *                  chunkCount, truncated, failedChunks, llmModel,
    *                  promptTokens, cachedPromptTokens }
    */
@@ -187,7 +186,7 @@ class LLMBaseScanner extends BaseScanner {
     let lastError = null;
 
     for (let i = 0; i < pack.chunks.length; i++) {
-      // Context FIRST, instructions LAST — the shared prefix must be byte-
+      // Context FIRST, instructions LAST: the shared prefix must be byte-
       // identical across scanners for the implicit prompt cache to hit.
       const userMessage = `${pack.chunks[i]}\n\n${instructions}`;
 
@@ -255,7 +254,7 @@ class LLMBaseScanner extends BaseScanner {
    * Best-effort repair of a truncated/corrupted JSON candidate: closes an
    * unterminated string literal (if the content ends mid-string), strips a
    * trailing incomplete key/value fragment, then closes any still-open
-   * arrays/objects. Does not itself guarantee valid JSON — the caller must
+   * arrays/objects. Does not itself guarantee valid JSON: the caller must
    * still JSON.parse() the result.
    *
    * @param {string} content
@@ -267,7 +266,7 @@ class LLMBaseScanner extends BaseScanner {
     // Remove a trailing incomplete entry (e.g. dangling comma or an open key).
     fixed = fixed.replace(/,\s*(?:{\s*"[^"]*":\s*)?$/, '');
 
-    // If we're left mid-string-literal (an odd number of unescaped quotes),
+    // If the text ends mid-string-literal (an odd number of unescaped quotes),
     // close the string before closing the surrounding structure.
     let quoteCount = 0;
     let escaped = false;
@@ -296,7 +295,7 @@ class LLMBaseScanner extends BaseScanner {
 
   /**
    * Extract the first complete, well-formed top-level JSON value (object or
-   * array) from a string that may have garbage appended after it — observed
+   * array) from a string that may have garbage appended after it, observed
    * from the pinned model as a repeated-token decoding loop that continues
    * past an otherwise valid response (e.g. `... } \n 3.3."\n3.3."\n}\n}`).
    *
@@ -304,8 +303,8 @@ class LLMBaseScanner extends BaseScanner {
    * brace (fragile here, since the garbage itself contains stray quotes and
    * braces that desync any such counter), this tries JSON.parse at every
    * `}`/`]` position from the start and returns the first substring that
-   * parses cleanly. JSON.parse's own strictness — it rejects anything
-   * incomplete or with trailing content — does the validation, so a false
+   * parses cleanly. JSON.parse's own strictness (it rejects anything
+   * incomplete or with trailing content) does the validation, so a false
    * match is not possible; only the true end of the top-level value can
    * succeed.
    *
@@ -327,7 +326,7 @@ class LLMBaseScanner extends BaseScanner {
         JSON.parse(candidate);
         return candidate;
       } catch {
-        // Not yet a complete/valid value ending here — keep scanning.
+        // Not yet a complete/valid value ending here. Keep scanning.
       }
     }
 
@@ -337,9 +336,9 @@ class LLMBaseScanner extends BaseScanner {
   /**
    * Extract relevant HTML from a page, truncated to stay within token limits.
    *
-   * @param {import('puppeteer').Page} page — Puppeteer page
-   * @param {string} [selector='body'] — CSS selector for content to extract
-   * @param {number} [maxLength=15000] — Max characters to extract
+   * @param {import('puppeteer').Page} page - Puppeteer page
+   * @param {string} [selector='body'] - CSS selector for content to extract
+   * @param {number} [maxLength=15000] - Max characters to extract
    * @returns {Promise<string>} Truncated HTML string
    */
   async extractRelevantHTML(page, selector = 'body', maxLength = 15000) {
@@ -365,7 +364,7 @@ class LLMBaseScanner extends BaseScanner {
    * (e.g. "9.1.4.10" clause-numbering maps to bare WCAG SC "1.4.10") in
    * addition to plain "X.Y.Z" SC numbers.
    *
-   * @param {*} criterion — raw criterion value from the LLM response
+   * @param {*} criterion - raw criterion value from the LLM response
    * @returns {string|null} normalized "X.Y.Z" criterion, or null if missing/unparseable
    */
   _normalizeCriterion(criterion) {
@@ -385,12 +384,11 @@ class LLMBaseScanner extends BaseScanner {
    *
    * Filters out any violation whose `criterion` is not one this scanner is
    * responsible for (`this.wcagCriteria`). The system prompt already asks
-   * the LLM to restrict itself to the requested criteria, but nothing
-   * previously enforced it — off-list violations are dropped here (and
-   * logged) rather than silently passed through, so prompt drift is
-   * observable instead of just polluting reports.
+   * the LLM to restrict itself to the requested criteria; off-list violations
+   * are dropped here (and logged) rather than passed through, so prompt drift
+   * is observable instead of polluting reports.
    *
-   * @param {Object[]} llmViolations — from LLM response
+   * @param {Object[]} llmViolations - from LLM response
    * @returns {Object[]} Standard violation format, off-criterion entries removed
    */
   convertViolations(llmViolations) {

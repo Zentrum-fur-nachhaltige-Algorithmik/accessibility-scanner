@@ -1,10 +1,7 @@
 /**
  * LLM Visual Presentation Scanner
- *
- * Covers AAA visual criteria:
- * - 1.4.7 Low or No Background Audio (AAA)
- * - 1.4.8 Visual Presentation (AAA)
- * - 1.4.9 Images of Text (No Exception) (AAA)
+ * Covers 1.4.7 Low or No Background Audio, 1.4.8 Visual Presentation and
+ * 1.4.9 Images of Text (No Exception) (all AAA).
  */
 
 const LLMBaseScanner = require('./base');
@@ -105,16 +102,16 @@ ${JSON.stringify(styleData.images)}
 
 1. **1.4.7 Low or No Background Audio**: Flag ONLY audio/video elements listed
    above where the markup evidences speech content with background audio and no
-   way to turn the background off — in practice: autoplay audio without
+   way to turn the background off, in practice: autoplay audio without
    controls, or explicit markup describing background music behind narration.
    If the media list is empty, there is NOTHING to flag for 1.4.7.
 
-2. **1.4.8 Visual Presentation** — flag only what the measured data shows:
+2. **1.4.8 Visual Presentation**: flag only what the measured data shows:
    - Line length: THREE or more text blocks with approxCharsPerLine > 80 and
-     hasMaxWidth=false. One or two long blocks are not a pattern — do not flag.
+     hasMaxWidth=false. One or two long blocks are not a pattern, do not flag.
    - Justified text: text blocks with textAlign="justify" (flag each block).
    - Line spacing: THREE or more body-text blocks with lineHeightRatio < 1.5.
-   - Color mechanism: do NOT flag a missing theme switcher on its own — pages
+   - Color mechanism: do NOT flag a missing theme switcher on its own: pages
      using default/inherited colors satisfy this via user-agent settings. Only
      mention it (as "moderate") when the page ALSO fails another 1.4.8 bullet
      and hard-codes colors throughout.
@@ -123,7 +120,7 @@ ${JSON.stringify(styleData.images)}
    is strong that the image renders text: alt text that duplicates a heading or
    sentence-length wording, or a filename clearly indicating rendered text
    (e.g. "headline.png", "quote-banner.jpg"). Logotypes (logos containing the
-   brand name) are EXEMPT — never flag logos, favicons, or icons. Photographs
+   brand name) are EXEMPT: never flag logos, favicons, or icons. Photographs
    with descriptive alt text are NOT images of text.
 
 Do NOT flag:
@@ -131,7 +128,7 @@ Do NOT flag:
 - Blocks you cannot see in the data (the data is authoritative; the HTML
   excerpt may be truncated)
 - Navigation, buttons, badges, code snippets, or headings for line-length or
-  line-height rules — those rules apply to body text blocks only
+  line-height rules: those rules apply to body text blocks only
 - Missing zoom/resize capability (that is 1.4.4, not checked here)
 
 IMPORTANT: Err on the side of NOT flagging. Each violation must cite the

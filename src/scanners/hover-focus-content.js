@@ -1,15 +1,15 @@
+/**
+ * Hover/Focus Content Scanner.
+ * WCAG 1.4.13 (EN 301 549 9.1.4.13).
+ * Checks hover/focus-revealed content for dismissable, hoverable and persistent,
+ * via a heuristic CSS/DOM pass plus interactive hover/focus simulation.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const log = require('../utils/logger').createLogger('hover-focus-content');
 
-/**
- * Hover/Focus Content Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criterion 9.1.4.13 (Content on Hover or Focus)
- * Checks: dismissable, hoverable, persistent
- * Hybrid: heuristic CSS/DOM check + interactive hover/focus simulation
- */
 class HoverFocusContentScanner extends BaseScanner {
   constructor() {
     super('hover-focus-content', {
@@ -30,7 +30,7 @@ class HoverFocusContentScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic scan — concurrent-compatible, pure CSS/DOM analysis
+   * Heuristic scan: concurrent-compatible, pure CSS/DOM analysis
    */
   async heuristicScan(page) {
     log.debug('Running heuristic hover/focus content check...');
@@ -176,7 +176,7 @@ class HoverFocusContentScanner extends BaseScanner {
             criterion: '9.1.4.13',
             element: entry.selector,
             issue: 'hover-only-no-focus',
-            description: `Content (${entry.revealed.slice(0, 3).join(', ')}) is revealed on :hover but has no :focus / :focus-within equivalent — keyboard users cannot access it`,
+            description: `Content (${entry.revealed.slice(0, 3).join(', ')}) is revealed on :hover but has no :focus / :focus-within equivalent. Keyboard users cannot access it`,
             severity: 'serious',
             suggestion: 'Add a :focus or :focus-within CSS rule that shows the same content.',
           });
@@ -193,7 +193,7 @@ class HoverFocusContentScanner extends BaseScanner {
               element: getSelector(el),
               issue: 'hover-content-not-hoverable',
               description:
-                'Hover-revealed content has pointer-events:none — users cannot move pointer to read it',
+                'Hover-revealed content has pointer-events:none. Users cannot move the pointer to read it',
               severity: 'serious',
               suggestion:
                 'Remove pointer-events:none from hover-revealed content to make it hoverable.',
@@ -236,7 +236,7 @@ class HoverFocusContentScanner extends BaseScanner {
             element: getSelector(el),
             issue: 'hover-only-no-focus',
             description:
-              'Element has mouseenter/mouseover handler but no focus handler — content not accessible via keyboard',
+              'Element has mouseenter/mouseover handler but no focus handler. Content is not accessible via keyboard',
             severity: 'serious',
             suggestion:
               'Add onfocus/onfocusin handlers that show the same content as the hover handler.',
@@ -258,7 +258,7 @@ class HoverFocusContentScanner extends BaseScanner {
           element: 'script',
           issue: 'hover-content-not-persistent',
           description:
-            'JavaScript uses setTimeout to auto-hide content — content is not persistent until user dismisses it',
+            'JavaScript uses setTimeout to auto-hide content. Content is not persistent until the user dismisses it',
           severity: 'serious',
           suggestion:
             'Remove auto-close timers. Content should remain visible until the user dismisses it or moves focus/pointer away.',
@@ -296,7 +296,7 @@ class HoverFocusContentScanner extends BaseScanner {
   }
 
   /**
-   * Full interactive scan — hover and focus elements to test dismissable/hoverable/persistent
+   * Full interactive scan: hover and focus elements to test dismissable/hoverable/persistent
    */
   async fullScan(page, options = {}) {
     const screenshotDir = options.screenshotDir || this.screenshotDir;
@@ -504,7 +504,7 @@ class HoverFocusContentScanner extends BaseScanner {
                 element: hoverContent.contentSelector,
                 issue: 'hover-content-not-hoverable',
                 description:
-                  'Hover-triggered content disappears when pointer moves to it — content is not hoverable',
+                  'Hover-triggered content disappears when the pointer moves to it. Content is not hoverable',
                 severity: 'serious',
                 suggestion:
                   'Ensure hover content remains visible when the pointer moves from trigger to content.',

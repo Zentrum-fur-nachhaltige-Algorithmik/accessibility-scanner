@@ -101,9 +101,9 @@ describe('utils/rendered', () => {
 });
 
 // A skip link built the way Tailwind builds them: parked off-canvas while
-// unfocused, no outline at all, its only ring a box-shadow. Before the walk
-// stamped non-rendered elements it had no unfocused baseline, so the
-// box-shadow diff was undetectable and the element looked ring-less.
+// unfocused, no outline at all, its only ring a box-shadow. Without an
+// unfocused baseline for non-rendered elements the box-shadow diff is
+// undetectable and the element looks ring-less.
 const RING_PAGE = `<!doctype html><html><head><style>
   body { margin: 0 }
   .skip { position: fixed; top: 0; left: 0; transform: translateY(-100%); background: #fff; }
@@ -126,11 +126,11 @@ describe('utils/keyboard-focus baseline for hidden-until-focused controls', () =
     await closeBrowser();
   });
 
-  it('still sees :focus-visible while another tab is in front', async () => {
+  it('sees :focus-visible while another tab is in front', async () => {
     // Chromium only matches :focus while the document HAS focus. The scan
     // pipeline runs scanners in parallel tabs and screenshots bring their tab
-    // to the front, which used to strip the ring from every element measured
-    // afterwards. tabWalk pins the page with Emulation.setFocusEmulationEnabled.
+    // to the front, which would strip the ring from every element measured
+    // afterwards; tabWalk pins the page with Emulation.setFocusEmulationEnabled.
     const other = await getPage();
     await other.setContent('<a href="/z">other tab</a>', { waitUntil: 'load' });
     await other.bringToFront();

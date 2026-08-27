@@ -1,9 +1,8 @@
 /**
- * AxeCoreAdapter — wraps @axe-core/puppeteer as a BaseScanner-compatible scanner.
- *
- * Runs all 104 axe-core rules (WCAG 2.0–2.2 A/AA/AAA + best-practices).
- * Converts axe-core violations and incomplete results into the unified
- * superset violation format used by the scan pipeline.
+ * Axe-core Adapter.
+ * WCAG 2.0 to 2.2 A/AA/AAA rules as shipped by axe-core.
+ * Wraps @axe-core/puppeteer as a BaseScanner and converts its violations and
+ * incomplete results into the pipeline's unified violation format.
  */
 
 const BaseScanner = require('../core/base-scanner');
@@ -14,7 +13,7 @@ const log = require('../utils/logger').createLogger('axe-core');
 /**
  * Map axe-core tags to WCAG success criteria strings.
  * Tags like 'wcag143' → '1.4.3'. Level tags ('wcag2a', 'wcag2aa', 'wcag2aaa',
- * 'wcag21aa', 'wcag22aa') are not criteria and are skipped here — they stay on
+ * 'wcag21aa', 'wcag22aa') are not criteria and are skipped here. They stay on
  * the violation as `axeTags`, where src/wcag-levels.js levelOfViolation() reads
  * them as the conformance-level fallback.
  */
@@ -32,15 +31,12 @@ function extractWcagCriteria(tags) {
 /**
  * True for axe rules that are Deque best practices rather than WCAG failures.
  *
- * axe-core ships ~30 such rules ('region', 'landmark-one-main',
- * 'page-has-heading-one', 'scrollable-region-focusable', …). They carry the
+ * axe-core ships about 30 such rules ('region', 'landmark-one-main',
+ * 'page-has-heading-one', 'scrollable-region-focusable', ...). They carry the
  * 'best-practice' tag and NO 'wcag*' tag, and axe's own UI renders them in a
- * separate "Best practices" bucket. We used to map their impact straight to
- * a violation severity, so 'region' ("All page content should be contained by
- * landmarks") arrived as a moderate WCAG violation and cost score points on
- * every page of the golden corpus, next to real 1.4.3 failures.
+ * separate "Best practices" bucket.
  *
- * Note the guard is "has best-practice AND no wcag tag": a handful of rules
+ * The guard is "has best-practice AND no wcag tag": a handful of rules
  * (e.g. 'aria-allowed-role') are tagged both, and those stay violations.
  */
 function isBestPracticeOnly(tags) {
@@ -78,7 +74,7 @@ class AxeCoreAdapter extends BaseScanner {
    * axe-puppeteer refuses to inject axe-core into a document whose
    * `document.readyState` is not 'complete' and throws "Page/Frame is not ready".
    * A single stalled subresource pins the main document at 'interactive'
-   * indefinitely — e.g. a third-party <iframe> whose host does not resolve leaves
+   * indefinitely, e.g. a third-party <iframe> whose host does not resolve leaves
    * an error frame that never fires `load`, so the parent never completes either.
    * Without this guard the whole scan crashes and reports zero violations for a
    * page that is otherwise perfectly scannable.
@@ -96,7 +92,7 @@ class AxeCoreAdapter extends BaseScanner {
         .catch(() => null);
       if (await isComplete()) return true;
 
-      // Still stalled — abort pending loads so the document can settle.
+      // Still stalled: abort pending loads so the document can settle.
       await page.evaluate(() => window.stop());
       await page
         .waitForFunction(() => document.readyState === 'complete', { timeout: timeoutMs })
@@ -109,7 +105,7 @@ class AxeCoreAdapter extends BaseScanner {
       );
       return ready;
     } catch (e) {
-      // Page closed / detached — let the analyze() call surface the real error.
+      // Page closed / detached: let the analyze() call surface the real error.
       return false;
     }
   }
@@ -142,7 +138,7 @@ class AxeCoreAdapter extends BaseScanner {
     return {
       scannerId: this.id,
       // 'info' (axe incomplete) and 'best-practice' (Deque advice, not a WCAG
-      // failure) do not make a page fail — same rule the score uses.
+      // failure) do not make a page fail, the same rule the score uses.
       passed: violations.filter(isHardViolation).length === 0,
       violations,
       summary: {
@@ -193,7 +189,7 @@ class AxeCoreAdapter extends BaseScanner {
       type: null,
       category: null,
       recommendation: isIncomplete
-        ? 'Manual review required — axe-core could not fully evaluate this element.'
+        ? 'Manual review required: axe-core could not fully evaluate this element.'
         : node.failureSummary || null,
 
       // Metadata

@@ -31,12 +31,12 @@ describe('EAA statement gate', () => {
     expect(matchesStatementLink('Erklärung zur Barrierefreiheit', '/barrierefreiheit')).toBe(true);
     expect(matchesStatementLink('Impressum', '/impressum.html')).toBe(false);
     expect(matchesStatementLink('Datenschutz', '/datenschutz.html')).toBe(false);
-    // the old lists matched the bare words "statement" and "compliance"
+    // the bare words "statement" and "compliance" must not match
     expect(matchesStatementLink('Financial statement', '/investors/statement')).toBe(false);
     expect(matchesStatementLink('Accessibility', 'mailto:a11y@example.org')).toBe(false);
   });
 
-  it('reports one serious finding — not twelve, none critical — when no statement exists', async () => {
+  it('reports one serious finding (not twelve, none critical) when no statement exists', async () => {
     const url = `${getBaseUrl()}/statement-none.html`;
     const scanners = [
       new AccessibilityStatementScanner(),
@@ -65,7 +65,7 @@ describe('EAA statement gate', () => {
     expect(all.filter((v) => v.severity === 'critical' || v.severity === 'error')).toEqual([]);
   }, 120000);
 
-  it('still detects an existing but incomplete statement', async () => {
+  it('detects an existing but incomplete statement', async () => {
     const page = await getPage(`${getBaseUrl()}/statement-incomplete.html`);
     try {
       const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });

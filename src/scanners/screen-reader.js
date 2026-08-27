@@ -1,3 +1,9 @@
+/**
+ * Screen Reader Scanner.
+ * WCAG 1.3.1, 2.4.1, 4.1.2, 4.1.3 (EN 301 549 9.1.3.1, 9.2.4.1, 9.4.1.2, 9.4.1.3).
+ * Inspects heading structure, landmarks, data tables, images, forms and ARIA
+ * usage from the DOM; reports only findings axe-core does not cover.
+ */
 const BaseScanner = require('../core/base-scanner');
 
 class ScreenReaderScanner extends BaseScanner {
@@ -179,15 +185,12 @@ class ScreenReaderScanner extends BaseScanner {
         issues.push('Content found outside of landmarks');
       }
 
-      // ── SC 2.4.1 Bypass Blocks — evidence gate ──────────────────────
+      // SC 2.4.1 Bypass Blocks, evidence gate
       //
-      // The previous rule was "no <main> ⇒ 2.4.1 violation, severity high".
-      // That is not what 2.4.1 says (it asks for a *mechanism to bypass a
-      // repeated block*, not for a specific landmark), and it is a strict
-      // duplicate of axe-core's `landmark-one-main` best-practice rule —
-      // verified firing on the exact same four good-* fixtures this rule
-      // did. Replaced with: fire only when there IS a repeated block worth
-      // bypassing, and NO bypass mechanism works.
+      // 2.4.1 asks for a mechanism to bypass a repeated block, not for a
+      // specific landmark (a missing <main> is axe-core's `landmark-one-main`).
+      // Fire only when there is a repeated block worth bypassing and no
+      // bypass mechanism works.
       const totalText = (document.body.textContent || '').trim().length;
       function precedingTextLength(el) {
         try {
@@ -271,9 +274,8 @@ class ScreenReaderScanner extends BaseScanner {
    *
    * axe-core has no rule that catches a data table built entirely from
    * <td> (its `th-has-data-cells` / `td-headers-attr` rules only apply once
-   * headers already exist) — verified: axe reports 0 table findings on
-   * bad-complex-data-tables.html. This is the additive check, and it fires
-   * only on positive evidence that the table carries tabular DATA.
+   * headers already exist). This check fires only on positive evidence that
+   * the table carries tabular data.
    */
   async analyzeTables(page) {
     return await page.evaluate((helperScript) => {
@@ -283,7 +285,7 @@ class ScreenReaderScanner extends BaseScanner {
 
       for (const table of tables) {
         const role = (table.getAttribute('role') || '').toLowerCase();
-        // Author explicitly declared it a layout table — respect that.
+        // Author explicitly declared it a layout table.
         if (role === 'presentation' || role === 'none') continue;
         if (table.closest('[aria-hidden="true"]')) continue;
         if (table.offsetParent === null && getComputedStyle(table).position !== 'fixed') continue;
@@ -308,17 +310,17 @@ class ScreenReaderScanner extends BaseScanner {
         // SC 1.3.1 only requires relationships that are CONVEYED VISUALLY to
         // be programmatically determinable. A two-column key/value table
         // (opening hours, price list, contact facts) conveys exactly one
-        // relationship — "the two cells on this line belong together" — and
+        // relationship ("the two cells on this line belong together"), and
         // that relationship is already exposed by the row itself. There is no
         // visually marked header to lose. Requiring <th> there flags healthy
         // markup, so a missing header is only a defect when the table
         // actually presents a header axis:
-        //   (a) merged cells (colspan/rowspan) — the layout only parses with
+        //   (a) merged cells (colspan/rowspan): the layout only parses with
         //       headers to anchor the spans;
         //   (b) a visually emphasised first row (bold/strong or its own
-        //       background) — a header row the author drew but did not mark up
+        //       background): a header row the author drew but did not mark up
         //       (WCAG F91);
-        //   (c) three or more columns — each cell's meaning then depends on
+        //   (c) three or more columns: each cell's meaning then depends on
         //       its column, and the column's meaning is conveyed visually by
         //       the top row.
         const hasSpans = Array.from(table.querySelectorAll('td, th')).some(
@@ -633,11 +635,8 @@ class ScreenReaderScanner extends BaseScanner {
           correctUsage++;
         }
 
-        // aria-labelledby / aria-describedby take an ID *list*. The previous
-        // code passed the whole attribute value to getElementById(), so any
-        // multi-token reference (`aria-describedby="email-error email-hint"`,
-        // good-form-errors.html) was reported as dangling even when every id
-        // resolved. Resolve token by token and only report the missing ones.
+        // aria-labelledby / aria-describedby take an ID list. Resolve token
+        // by token and only report the missing ones.
         const resolveIdList = (value, attrName) => {
           const ids = String(value).split(/\s+/).filter(Boolean);
           const missing = ids.filter((id) => !document.getElementById(id));
@@ -715,19 +714,12 @@ class ScreenReaderScanner extends BaseScanner {
     const V = ScreenReaderScanner.violation;
     let score = 100;
 
-    // NOTE (2026-07-27): heading-structure findings are NO LONGER emitted as
-    // violations. Every issue analyzeHeadingStructure() produces is already
-    // reported by axe-core, which runs in every profile that runs this
-    // scanner: skipped levels → `heading-order`, empty heading →
-    // `empty-heading`, missing h1 → `page-has-heading-one` (all
-    // best-practice, and axe-core-adapter.js opts into that tag). Verified
-    // firing on the identical set of fixtures. The analysis stays in the
-    // result payload (`headingStructure`, `summary.headingIssues`) for the
-    // report; it just no longer double-counts as a violation.
+    // Heading-structure findings are not emitted as violations: axe-core
+    // reports them (`heading-order`, `empty-heading`, `page-has-heading-one`).
+    // The analysis stays in the result payload for the report.
 
-    // SC 1.3.1 — data tables with no programmatic header cells. This is the
-    // gap axe leaves open (it has no rule for a table built purely from
-    // <td>), so it is reported here rather than deferred.
+    // SC 1.3.1: data tables with no programmatic header cells. axe has no
+    // rule for a table built purely from <td>, so it is reported here.
     for (const table of analysisResults.tables?.problematic || []) {
       violations.push(
         V({
@@ -744,10 +736,9 @@ class ScreenReaderScanner extends BaseScanner {
       score -= 10;
     }
 
-    // SC 2.4.1 — Bypass Blocks. Evidence-gated: only when a repeated
-    // navigation block exists at the top of the page AND no bypass mechanism
-    // (main landmark or a working skip link) is available. See
-    // analyzeLandmarks() for why the old "no <main>" rule was dropped.
+    // SC 2.4.1 Bypass Blocks. Evidence-gated: only when a repeated
+    // navigation block exists at the top of the page and no bypass mechanism
+    // (main landmark or a working skip link) is available.
     const bypass = analysisResults.landmarks.bypass;
     if (bypass && bypass.repeatedBlock && !bypass.satisfied) {
       violations.push(

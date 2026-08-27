@@ -1,22 +1,8 @@
 /**
- * llm-page-context — the shared, compressed, chunked "page context pack" that
- * replaces the blind `outerHTML.slice(0, 12000)` truncation the LLM scanners
- * used to do individually.
- *
- * Three things it buys us:
- *
- * 1. COVERAGE — the old path fed each scanner the first 12k characters of
- *    `document.body`, so anything past that (and everything in `<head>`, e.g.
- *    `<meta http-equiv="refresh">`) was simply invisible. The pack compresses
- *    the DOM ~5-20x by dropping CSS/boilerplate and off-whitelist attributes
- *    while keeping ALL visible text, then chunks whatever is left over.
- *
- * 2. CACHEABILITY — the pack is memoized per Puppeteer Page, so every LLM
- *    scanner running against the same page sends BYTE-IDENTICAL context. That
- *    identical prefix is what the provider's implicit prompt cache keys on.
- *
- * 3. DETERMINISM — no scanner-specific knobs. Scanner-specific data belongs in
- *    the instructions half of the message, which is appended AFTER the pack.
+ * LLM page context pack
+ * Compressed, chunked DOM skeleton shared by every LLM scanner.
+ * Memoized per Puppeteer Page so all scanners send a byte-identical context
+ * prefix; scanner-specific data goes in the instructions appended after it.
  */
 
 'use strict';
@@ -39,7 +25,7 @@ let pageCache = new WeakMap();
  * Build the shared, compressed page context pack. MEMOIZED per Puppeteer Page
  * instance (module-level WeakMap keyed by the page object, plus the page's
  * current URL so a re-navigated page rebuilds) so that every LLM scanner
- * running against the same page sends BYTE-IDENTICAL context — that identical
+ * running against the same page sends BYTE-IDENTICAL context. That identical
  * prefix is what makes the provider's implicit prompt cache hit.
  *
  * @param {import('puppeteer').Page} page
@@ -94,7 +80,7 @@ function _clearPageContextCache() {
 function _assemblePack(extracted, opts) {
   const { headDigest, outline, segments, rawChars, skeletonChars } = extracted;
 
-  // Greedy packing at segment boundaries — a segment is one top-level element
+  // Greedy packing at segment boundaries: a segment is one top-level element
   // of the skeleton (or, for over-budget elements, a legal sub-slice of one).
   const groups = [];
   let current = [];
@@ -167,7 +153,7 @@ function _assemblePack(extracted, opts) {
  * @param {{maxCharsPerChunk: number}} cfg
  * @returns {{headDigest: string, outline: string[], segments: string[], rawChars: number, skeletonChars: number}}
  */
-/* istanbul ignore next — executed in the browser context */
+/* istanbul ignore next: executed in the browser context */
 function _extractInPage(cfg) {
   const BUDGET = cfg.maxCharsPerChunk;
 
@@ -363,7 +349,7 @@ function _extractInPage(cfg) {
 
   /**
    * A <div>/<span> carrying no kept attributes, wrapping exactly one element
-   * child and no text of its own, is pure layout scaffolding — emit the child
+   * child and no text of its own, is pure layout scaffolding: emit the child
    * directly. Applied repeatedly (wrapper chains are the norm in built output).
    */
   function unwrap(el) {
@@ -395,7 +381,7 @@ function _extractInPage(cfg) {
     if (DROP_TAGS.has(tag)) return '';
 
     if (tag === 'template') {
-      // Contents live in a DocumentFragment and are inert — keep the marker only.
+      // Contents live in a DocumentFragment and are inert. Keep the marker only.
       return openTag(el) + '</template>';
     }
 
@@ -407,7 +393,7 @@ function _extractInPage(cfg) {
     }
 
     if (tag === 'svg') {
-      // Children are path data — worthless to an auditor — but <title>/<desc>
+      // Children are path data (worthless to an auditor) but <title>/<desc>
       // are the accessible name/description and must survive.
       let inner = '';
       for (const t of el.querySelectorAll('title, desc')) {
@@ -437,7 +423,7 @@ function _extractInPage(cfg) {
   /**
    * Serialize `node` into one or more segments, each <= budget where possible.
    * Concatenating the returned segments reproduces serializeNode(node) exactly,
-   * so splitting never changes the skeleton — only where the chunker may cut.
+   * so splitting never changes the skeleton, only where the chunker may cut.
    */
   function segmentize(node, budget) {
     const serialized = serializeNode(node);
@@ -484,8 +470,7 @@ function _extractInPage(cfg) {
     );
   }
 
-  // VERBATIM — load-bearing evidence for 2.2.3 / 3.2.5, and invisible to the
-  // old body-only extraction.
+  // VERBATIM: load-bearing evidence for 2.2.3 / 3.2.5.
   for (const m of document.querySelectorAll('meta[http-equiv]')) {
     if ((m.getAttribute('http-equiv') || '').toLowerCase() === 'refresh') {
       headLines.push(m.outerHTML);

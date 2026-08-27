@@ -523,7 +523,9 @@ function renderSummary(rows) {
   L.push('|---|---:|---:|---:|---:|---:|');
   for (const b of bucketOrder) {
     if (!counts[b]) continue;
-    L.push(`| ${b} | ${counts[b]} | ${at('A', b)} | ${at('AA', b)} | ${at('AAA', b)} | ${at('REMOVED', b)} |`);
+    L.push(
+      `| ${b} | ${counts[b]} | ${at('A', b)} | ${at('AA', b)} | ${at('AAA', b)} | ${at('REMOVED', b)} |`
+    );
   }
   const n = (lvl) => rows.filter((r) => r.level === lvl).length;
   L.push(`| total | ${rows.length} | ${n('A')} | ${n('AA')} | ${n('AAA')} | ${n('REMOVED')} |`);
@@ -538,7 +540,9 @@ function renderSummary(rows) {
       'and do not count as covered.'
   );
   L.push('');
-  L.push('Full matrix with fixtures, harness evidence and justifications: tests/data/coverage-matrix.json.');
+  L.push(
+    'Full matrix with fixtures, harness evidence and justifications: tests/data/coverage-matrix.json.'
+  );
   return L.join('\n');
 }
 
@@ -567,7 +571,9 @@ function main() {
 
   if (checkOnly) {
     if (nextReadme !== readme || json !== currentJson) {
-      console.error('coverage-matrix: README.md or tests/data/coverage-matrix.json is stale; run: npm run coverage-matrix');
+      console.error(
+        'coverage-matrix: README.md or tests/data/coverage-matrix.json is stale; run: npm run coverage-matrix'
+      );
       process.exit(1);
     }
   } else {

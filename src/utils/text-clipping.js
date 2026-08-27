@@ -1,34 +1,13 @@
 /**
  * Measured text-clipping detection (WCAG 1.4.4 Resize Text / 1.4.10 Reflow).
- *
- * Why this exists
- * ---------------
- * The old checks in `phase6a-text-resize-scanner` and
- * `phase6d-mobile-specific-scanner` inferred "text is cut off" from
- * `el.scrollWidth > el.clientWidth` on any element with `overflow-x: hidden`.
- * That is not evidence of content loss:
- *
- *   - `scrollWidth` is rounded to integers and is driven by *boxes*, not text —
- *     a grid child whose border box sticks out by 3px makes `scrollWidth`
- *     exceed `clientWidth` while every glyph stays inside the scrollport
- *     (`div.hours` on the golden corpus: 281 vs 278, zero clipped characters).
- *   - Elements that clip a decorative/absolutely positioned box report the same
- *     way.
- *
- * What WCAG actually requires is that *information is not lost*. So we measure
- * the glyphs: for every text node inside a clipping container we take the
- * `Range.getClientRects()` (the real painted line boxes) and compare them with
- * the container's padding box — the box `overflow: hidden` clips at. Only text
- * that provably lies outside the scrollport, on an axis the user cannot scroll
- * (`hidden`/`clip`, not `auto`/`scroll`), is reported.
- *
- * Exposes `__findClippedText()` in page context; returns one entry per
- * innermost clipping container that actually swallows text.
+ * Exposes `__findClippedText()` in page context.
+ * Compares each text node's `Range.getClientRects()` with the padding box of its
+ * clipping container; only glyphs outside a non-scrollable axis are reported.
  */
 
 const injectableCode = `
 if (typeof window.__findClippedText !== 'function') {
-  window.__TEXT_CLIP_TOLERANCE = 2; // px — sub-pixel layout rounding
+  window.__TEXT_CLIP_TOLERANCE = 2; // px, sub-pixel layout rounding
 
   window.__clipModeOf = function (styleValue) {
     if (styleValue === 'hidden' || styleValue === 'clip') return 'clip';
@@ -56,7 +35,7 @@ if (typeof window.__findClippedText !== 'function') {
     return s.visibility !== 'hidden' && s.display !== 'none' && parseFloat(s.opacity) !== 0;
   };
 
-  /** sr-only / visually-hidden text is clipped on purpose and is read by AT. */
+  /** sr-only / visually-hidden text is clipped by design and is read by AT. */
   window.__isVisuallyHiddenText = function (el) {
     let p = el;
     while (p && p !== document.body) {
@@ -73,8 +52,8 @@ if (typeof window.__findClippedText !== 'function') {
 
   /**
    * @param {Object} [opts]
-   *   opts.root       — subtree to scan (default document.body)
-   *   opts.minChars   — ignore clipped runs shorter than this (default 2)
+   *   opts.root: subtree to scan (default document.body)
+   *   opts.minChars: ignore clipped runs shorter than this (default 2)
    * @returns {Array<{selector, axis, overshootX, overshootY, clippedChars, samples[], scrollWidth, clientWidth, scrollHeight, clientHeight, whiteSpace, textOverflow}>}
    */
   window.__findClippedText = function (opts) {
@@ -154,10 +133,10 @@ if (typeof window.__findClippedText !== 'function') {
       }
 
       if (!samples.length) continue;
-      // An author who wrote -webkit-line-clamp or text-overflow: ellipsis
-      // truncated on purpose and at every viewport alike (a teaser, a one-line
-      // label). The full text stays in the DOM for assistive technology, so this
-      // is a design decision, not a resize failure — callers report it as a hint.
+      // -webkit-line-clamp or text-overflow: ellipsis truncates at every
+      // viewport alike (a teaser, a one-line label) and the full text stays in
+      // the DOM for assistive technology, so this is a design decision, not a
+      // resize failure: callers report it as a hint.
       const lineClamp = s.webkitLineClamp || s['-webkit-line-clamp'] || 'none';
       const truncationDeclared = (lineClamp && lineClamp !== 'none') || s.textOverflow === 'ellipsis';
 

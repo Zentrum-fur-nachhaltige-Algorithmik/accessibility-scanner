@@ -1,12 +1,12 @@
+/**
+ * Advanced ARIA Complex Widgets Scanner.
+ * WCAG 4.1.2, 1.3.1 (EN 301 549 9.4.1.2, 9.1.3.1).
+ * Checks composite ARIA patterns: trees, grids, comboboxes, carousels, tabs,
+ * accordions, menubars, dialogs and live regions.
+ */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 
-/**
- * Phase 6B: Advanced ARIA Complex Widgets Scanner
- * Implements comprehensive testing for WCAG 4.1.2 (Name, Role, Value) complex widgets
- * Focuses on advanced ARIA patterns: trees, grids, combo boxes, carousels, tabs
- * Essential for single-page applications and modern web components
- */
 class AdvancedAriaScanner extends BaseScanner {
   constructor() {
     super('advanced-aria', {
@@ -524,15 +524,11 @@ class AdvancedAriaScanner extends BaseScanner {
         return `${tagName}${id}${className}`;
       }
 
-      // ── Candidate net ────────────────────────────────────────────
-      // A className substring is NOT evidence of a carousel. The old net
-      // alone flagged 8 elements belonging to ONE carousel in
-      // good-motion-vestibular.html: the container, its
-      // `.good-carousel-track`, all five `.good-carousel-slide` children
-      // and the `.carousel-controls` bar — seven of which are structural
-      // parts, not carousels. Widen the net (aria-roledescription is the
-      // APG marker) but treat every hit as a candidate that must prove
-      // itself below.
+      // Candidate net
+      // A className substring is NOT evidence of a carousel: one carousel's
+      // container, track, slides and controls bar all match. Cast a wide net
+      // (aria-roledescription is the APG marker) but treat every hit as a
+      // candidate that must prove itself below.
       const candidates = Array.from(
         document.querySelectorAll(
           '[aria-roledescription], [role="region"][aria-label*="carousel"], ' +
@@ -553,11 +549,11 @@ class AdvancedAriaScanner extends BaseScanner {
         (typeof el.className === 'string' ? el.className : '').split(/\s+/).filter(Boolean);
 
       // "slide"/"item" as a whole word inside a hyphen/underscore class
-      // name — `swiper-slide`, `carousel-item`, `good-carousel-slide`.
-      // Deliberately does NOT match `slider`, `slider-handle`, `slideshow`.
+      // name: `swiper-slide`, `carousel-item`, `good-carousel-slide`.
+      // Does NOT match `slider`, `slider-handle`, `slideshow`.
       const SLIDE_TOKEN = /(^|[-_])(slides?|items?)([-_]|$)/i;
 
-      // Evidence A — the author DECLARED a carousel (APG pattern).
+      // Evidence A: the author DECLARED a carousel (APG pattern).
       function hasDeclaredCarouselEvidence(el) {
         const rd = (el.getAttribute('aria-roledescription') || '').toLowerCase();
         if (/carousel|karussell|slideshow|diashow/.test(rd)) return true;
@@ -569,7 +565,7 @@ class AdvancedAriaScanner extends BaseScanner {
         return false;
       }
 
-      // Evidence B1 — slide children: ≥2 elements sharing one parent
+      // Evidence B1: slide children, i.e. at least 2 elements sharing one parent
       // (the track) that are marked as slides/items.
       function countSlides(el) {
         const marked = Array.from(
@@ -591,8 +587,8 @@ class AdvancedAriaScanner extends BaseScanner {
         return best;
       }
 
-      // Evidence B2 — something actually advances the slides: a prev/next
-      // affordance (en/de/glyph), a strip of ≥2 slide indicators, or
+      // Evidence B2: something actually advances the slides: a prev/next
+      // affordance (en/de/glyph), a strip of at least 2 slide indicators, or
       // declared/observable auto-rotation.
       const CONTROL_WORDS = /prev|previous|next|zur[üu]ck|weiter|vorheri|n[äa]chst|◀|▶|‹|›|←|→/i;
       function hasPrevNextControl(el) {
@@ -721,7 +717,7 @@ class AdvancedAriaScanner extends BaseScanner {
         }
 
         // Check for live region for auto-rotating carousels.
-        // `className` is an SVGAnimatedString on SVG/MathML elements —
+        // `className` is an SVGAnimatedString on SVG/MathML elements, so
         // guard before calling .includes() on it.
         const hasAutoRotate =
           !!carousel.querySelector('[data-autoplay], [data-auto]') ||
@@ -1312,18 +1308,11 @@ class AdvancedAriaScanner extends BaseScanner {
 
         const role = region.getAttribute('role');
 
-        // An INITIALLY EMPTY live region is not a violation — it is the correct
-        // implementation of SC 4.1.3. The announcing container must already be in
-        // the accessibility tree before the content arrives, otherwise assistive
-        // technology has nothing to observe and the update is never announced.
-        // Framework-generated, textbook-correct markup such as Next.js's route
-        // announcer (<p id="__next-route-announcer__" role="alert"
-        // aria-live="assertive"> rendered empty at load) was being flagged here.
-        // The old 'empty-live-region' finding is therefore dropped entirely; only
-        // the genuinely-broken cases below survive.
+        // An initially empty live region is correct SC 4.1.3 markup (the
+        // container must exist before content arrives), so it is not reported.
 
         // Contradictory politeness: role="alert"/"status"/"log" carry an implicit
-        // politeness setting, and an explicit aria-live="off" overrides it — the
+        // politeness setting, and an explicit aria-live="off" overrides it. The
         // author asks for an announcement and suppresses it in the same element.
         if (ariaLive === 'off' && (role === 'alert' || role === 'status' || role === 'log')) {
           violations.push({
@@ -1345,15 +1334,8 @@ class AdvancedAriaScanner extends BaseScanner {
         }
       });
 
-      // A display:none / visibility:hidden live region was considered as the other
-      // "genuinely broken" case, but it does not survive contact with real markup:
-      // `<p role="alert" hidden>` for an error message that is unhidden and filled
-      // together, and error containers toggled with display:none, are the standard
-      // working implementation of SC 4.1.3 — revealing and populating the region in
-      // the same task announces correctly. Measured against the test corpus that
-      // check produced 8 findings, all of them on good-* fixtures and all of them
-      // false positives, so it is deliberately not implemented. (Such regions are
-      // dropped by the isElementVisible() filter above anyway.)
+      // Hidden live regions (display:none / hidden attribute) are not reported:
+      // revealing and populating a region in the same task announces correctly.
 
       return violations;
     }, BaseScanner.visibilityFilterScript);

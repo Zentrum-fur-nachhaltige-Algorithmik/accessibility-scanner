@@ -1,12 +1,12 @@
+/**
+ * Label in Name Scanner.
+ * WCAG 2.5.3 (EN 301 549 9.2.5.3).
+ * Checks that the visible text of controls is contained in their accessible name.
+ */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const { injectableCode: accnameUtils } = require('../utils/accessible-name');
 
-/**
- * Label in Name Scanner for WCAG 2.5.3 compliance testing
- * Ensures visible text is contained in accessible name for voice control compatibility
- * Critical for Dragon NaturallySpeaking, Voice Control, and other speech recognition software
- */
 class LabelInNameScanner extends BaseScanner {
   constructor() {
     super('label-in-name', {
@@ -88,7 +88,7 @@ class LabelInNameScanner extends BaseScanner {
   async analyzeButtons(page, options) {
     return await page.evaluate(
       (scanOptions, accnameCode) => {
-        // Shared ACCNAME implementation — see src/utils/accessible-name.js.
+        // Shared ACCNAME implementation, see src/utils/accessible-name.js.
         eval(accnameCode);
 
         const violations = [];
@@ -106,14 +106,8 @@ class LabelInNameScanner extends BaseScanner {
           return normalized;
         }
 
-        // Accessible name, per ACCNAME.
-        //
-        // The previous local implementation returned `element.textContent`
-        // for BUTTON/A, so an icon button whose only child is
-        // `<img alt="Menu">` computed an EMPTY accessible name while
-        // getVisibleText() below deliberately DOES fold in that same alt
-        // text — the two disagreed and every icon button was reported as a
-        // 2.5.3 "visible text not in accessible name" failure.
+        // Accessible name, per ACCNAME. Uses the shared helper so that a
+        // child `<img alt>` counts on both the name and the visible side.
         function getAccessibleName(element) {
           return __accessibleName(element);
         }
@@ -165,13 +159,11 @@ class LabelInNameScanner extends BaseScanner {
 
           // The 2.5.3 decision lives in __labelInNameOk()
           // (src/utils/accessible-name.js) so that every scanner testing
-          // this criterion agrees. It normalises BOTH sides the same way
-          // (case, punctuation, whitespace — the visible side comes from
-          // text nodes, the name side from ACCNAME, and the two insert
-          // separators at different places), accepts the visible words as
+          // this criterion agrees. It normalises both sides the same way
+          // (case, punctuation, whitespace), accepts the visible words as
           // an ordered subsequence of the name, and compares against both
-          // the full visible text and the reduced LABEL (monograms and
-          // sub-headline taglines dropped). See that file for why.
+          // the full visible text and the reduced label (monograms and
+          // sub-headline taglines dropped).
           if (!__labelInNameOk(button, getAccessibleName(button))) {
             violations.push({
               type: 'label-not-in-name',
@@ -213,7 +205,7 @@ class LabelInNameScanner extends BaseScanner {
   async analyzeFormControls(page, options) {
     return await page.evaluate(
       (scanOptions, accnameCode) => {
-        // Shared ACCNAME + 2.5.3 helpers — see src/utils/accessible-name.js.
+        // Shared ACCNAME + 2.5.3 helpers, see src/utils/accessible-name.js.
         eval(accnameCode);
 
         const violations = [];
@@ -230,20 +222,11 @@ class LabelInNameScanner extends BaseScanner {
           return normalized;
         }
 
-        // NOT migrated to the shared __accessibleName() helper, on purpose.
-        //
-        // This variant is paired with getVisibleLabelText() below, and SC
-        // 2.5.3 here compares the control's VISIBLE label against its
-        // accessible name — both sides must read the label the same way.
-        // The shared helper resolves aria-labelledby BEFORE aria-label
-        // (which is correct per ACCNAME) and folds a label's child
-        // `<img alt>` into the name; swapping only this side in would
-        // change which pairs compare equal, and the 2.5.3 fixtures are not
-        // covered by the deterministic exclusive harness, so the change
-        // could not be verified loss-free here. It produces no member of
-        // the child-img-alt false-positive family: its selector excludes
-        // button/submit/reset/hidden inputs, and when the visible label is
-        // empty the control is skipped outright.
+        // Local name computation, paired with getVisibleLabelText() below:
+        // both sides must read the label the same way. The shared helper
+        // resolves aria-labelledby before aria-label and folds a label's
+        // child `<img alt>` into the name, which would change which pairs
+        // compare equal here.
         function getAccessibleName(element) {
           if (element.getAttribute('aria-label')) {
             return element.getAttribute('aria-label');
@@ -337,8 +320,8 @@ class LabelInNameScanner extends BaseScanner {
           // (__visibleLabelNormalize: case, punctuation, whitespace) and
           // the same ordered-subsequence test as every other 2.5.3 check
           // in the codebase. Without the punctuation step a perfectly
-          // conformant field — visible label "E-Mail:", accessible name
-          // "E-Mail-Adresse für Kontakt" — failed on the trailing colon
+          // conformant field (visible label "E-Mail:", accessible name
+          // "E-Mail-Adresse für Kontakt") would fail on the trailing colon
           // and the hyphen alone.
           if (
             !__nameContainsLabel(
@@ -388,7 +371,7 @@ class LabelInNameScanner extends BaseScanner {
   async analyzeLinks(page, options) {
     return await page.evaluate(
       (scanOptions, accnameCode) => {
-        // Shared ACCNAME implementation — see src/utils/accessible-name.js.
+        // Shared ACCNAME implementation, see src/utils/accessible-name.js.
         eval(accnameCode);
 
         const violations = [];
@@ -405,12 +388,9 @@ class LabelInNameScanner extends BaseScanner {
           return normalized;
         }
 
-        // Accessible name, per ACCNAME. The previous local implementation
-        // fell back to `element.textContent`, which is empty for a logo
-        // link `<a><img alt="Logo"></a>` — while getVisibleText() below
-        // folds that alt in, so the two disagreed and every image link was
-        // reported as a 2.5.3 failure. It also read `title` BEFORE the
-        // subtree and resolved aria-labelledby as a single id.
+        // Accessible name, per ACCNAME. Uses the shared helper so that a
+        // logo link `<a><img alt="Logo"></a>` gets the alt as its name, in
+        // line with getVisibleText() below.
         function getAccessibleName(element) {
           return __accessibleName(element);
         }
@@ -467,13 +447,11 @@ class LabelInNameScanner extends BaseScanner {
 
           // The 2.5.3 decision lives in __labelInNameOk()
           // (src/utils/accessible-name.js) so that every scanner testing
-          // this criterion agrees. It normalises BOTH sides the same way
-          // (case, punctuation, whitespace — the visible side comes from
-          // text nodes, the name side from ACCNAME, and the two insert
-          // separators at different places), accepts the visible words as
+          // this criterion agrees. It normalises both sides the same way
+          // (case, punctuation, whitespace), accepts the visible words as
           // an ordered subsequence of the name, and compares against both
-          // the full visible text and the reduced LABEL (monograms and
-          // sub-headline taglines dropped). See that file for why.
+          // the full visible text and the reduced label (monograms and
+          // sub-headline taglines dropped).
           if (!__labelInNameOk(link, getAccessibleName(link))) {
             violations.push({
               type: 'link-text-not-in-name',
@@ -514,7 +492,7 @@ class LabelInNameScanner extends BaseScanner {
   async analyzeImageButtons(page, options) {
     return await page.evaluate(
       (scanOptions, accnameCode) => {
-        // Shared ACCNAME implementation — see src/utils/accessible-name.js.
+        // Shared ACCNAME implementation, see src/utils/accessible-name.js.
         eval(accnameCode);
 
         const violations = [];
@@ -626,7 +604,7 @@ class LabelInNameScanner extends BaseScanner {
   async analyzeCustomControls(page, options) {
     return await page.evaluate(
       (scanOptions, accnameCode) => {
-        // Shared ACCNAME implementation — see src/utils/accessible-name.js.
+        // Shared ACCNAME implementation, see src/utils/accessible-name.js.
         eval(accnameCode);
 
         const violations = [];
@@ -643,8 +621,7 @@ class LabelInNameScanner extends BaseScanner {
           return normalized;
         }
 
-        // Accessible name, per ACCNAME — the local version read `title`
-        // before the subtree and ignored a descendant's own name
+        // Accessible name, per ACCNAME, including a descendant's own name
         // (`<img alt>`, `<svg><title>`, nested aria-label).
         function getAccessibleName(element) {
           return __accessibleName(element);
@@ -660,13 +637,11 @@ class LabelInNameScanner extends BaseScanner {
         // Only roles whose accessible name may come FROM CONTENT can fail
         // 2.5.3 this way: for those, the subtree text IS the visible label.
         //
-        // listbox/combobox/slider/spinbutton are deliberately NOT in this
-        // list. Their subtree is options or a value, not a label — a
-        // `<ul role="listbox" aria-label="Suchergebnisse">` holding
-        // "Laptop / Maus / Tastatur" was reported as a 2.5.3 failure
-        // because the option texts were treated as its visible label. ARIA
-        // gives those roles "namefrom: author" precisely because content
-        // and label are different things there.
+        // listbox/combobox/slider/spinbutton are not in this list: their
+        // subtree is options or a value, not a label (ARIA gives those
+        // roles "namefrom: author"), so a `<ul role="listbox"
+        // aria-label="Suchergebnisse">` holding "Laptop / Maus / Tastatur"
+        // must not be compared against its option texts.
         const customControls = document.querySelectorAll(
           '[role="button"], [role="checkbox"], [role="radio"], [role="switch"], ' +
             '[role="option"], [role="tab"], [role="menuitem"], [role="menuitemcheckbox"], ' +
@@ -684,7 +659,7 @@ class LabelInNameScanner extends BaseScanner {
 
           // The 2.5.3 decision lives in __labelInNameOk()
           // (src/utils/accessible-name.js) so that every scanner testing
-          // this criterion agrees — see that file for the normalisation
+          // this criterion agrees; see that file for the normalisation
           // and for why a monogram/tagline is not part of the label.
           if (!__labelInNameOk(control, getAccessibleName(control))) {
             violations.push({

@@ -1,14 +1,15 @@
+/**
+ * Predictable Navigation Scanner.
+ * WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 (EN 301 549 9.3.2.1 to 9.3.2.4).
+ * Simulates focus and input events and compares repeated navigation blocks
+ * and button labels within the page for consistency.
+ */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('predictable-navigation');
 
-/**
- * Predictable Navigation Scanner for WCAG 2.2 compliance testing
- * Implements EN 301 549 criteria 9.3.2.1, 9.3.2.2, 9.3.2.3, 9.3.2.4
- * Tests navigation consistency, predictable behavior, and user control
- */
 class PredictableNavigationScanner extends BaseScanner {
   constructor() {
     super('predictable-navigation', {
@@ -583,12 +584,11 @@ class PredictableNavigationScanner extends BaseScanner {
       // mechanism, so they must list those destinations in the same relative
       // order. A differing order is concrete evidence of a 3.2.3 failure.
       //
-      // Deliberately NOT checked here (all previously reported under 3.2.3,
-      // none of which is 3.2.3): "skip to main content" links belong to
-      // 2.4.1 Bypass Blocks, H1 presence and skipped heading levels belong
-      // to 1.3.1 / 2.4.6, and the presence of a navigation landmark belongs
-      // to 1.3.1 / 2.4.1. Those are covered by the keyboard-navigation,
-      // page-structure, html-validation and screen-reader scanners.
+      // Not checked here: "skip to main content" links belong to 2.4.1,
+      // H1 presence and skipped heading levels to 1.3.1 / 2.4.6, and the
+      // presence of a navigation landmark to 1.3.1 / 2.4.1. Those are
+      // covered by the keyboard-navigation, page-structure, html-validation
+      // and screen-reader scanners.
       // ----------------------------------------------------------------
 
       const MIN_SHARED_DESTINATIONS = 3; // below this, two blocks are not evidently the same mechanism
@@ -713,12 +713,9 @@ class PredictableNavigationScanner extends BaseScanner {
       }
 
       /**
-       * Two names count as "the same identification" only when both actually
-       * exist. Comparing two ABSENT names (both '') used to evaluate to
-       * `true`, which made every button pair look consistent and disabled
-       * this check entirely; `''.split(' ')[0]` is also `''`, and
-       * `anything.includes('')` is always true, which had the same effect
-       * whenever only one of the two carried an aria-label.
+       * Two names count as "the same identification" only when both exist:
+       * two absent names ('') are not similar, and `includes('')` is always
+       * true, so empty first words are rejected explicitly.
        */
       function namesSimilar(a, b) {
         if (!a || !b) return false;
@@ -740,14 +737,12 @@ class PredictableNavigationScanner extends BaseScanner {
         const ariaLabel = normalizeName(button.getAttribute('aria-label'));
         // Group buttons by similar function - be more specific.
         //
-        // Matching is on whole words: substring matching put "Newsletter
-        // abonnieren" into the "add" group (via "new") and similar accidents.
-        // The button's `type` is deliberately NOT used: HTMLButtonElement.type
-        // defaults to "submit" for every plain <button>, which collapsed every
-        // button on the page into one "submit" group and then demanded that a
-        // "Subscribe to newsletter" and an "Upload file" button carry the same
-        // label. Two forms' submit buttons are named after their own form's
-        // action; they are not "the same functionality" in the sense of 3.2.4.
+        // Matching is on whole words, so "Newsletter" does not land in the
+        // "add" group via "new". The button's `type` is not used:
+        // HTMLButtonElement.type defaults to "submit" for every plain <button>,
+        // which would collapse all buttons into one group. Two forms' submit
+        // buttons are named after their own form's action; they are not "the
+        // same functionality" in the sense of 3.2.4.
         const words = new Set(text.split(' ').filter(Boolean));
         const hasWord = (...candidates) => candidates.some((w) => words.has(w));
 

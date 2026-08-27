@@ -1,56 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * test-realworld.js — regression harness for the frozen real-world corpus.
- *
- * WHY
- * ---
- * The synthetic `test-sites/bad-*.html` fixtures are hand-written, tidy, and
- * small. Every fundamental scanner bug found in the 2026-07 sprint came from
- * structures those fixtures cannot produce:
- *
- *   - SVG `className` is an `SVGAnimatedString` object, not a string
- *     (`.includes` / regex on it throws) — needs a page with real inline SVG
- *   - an open JS dialog blocks the renderer main thread, so every later
- *     `page.evaluate()` from ANY concurrent scanner hangs forever
- *   - a dead <iframe> pins `document.readyState` at 'interactive', which made
- *     axe-core injection throw "Page/Frame is not ready" and silently zero out
- *   - `language-detection` threw "Cannot read properties of undefined
- *     (reading 'map')" on Next.js pages
- *
- * So this harness runs the REAL pipeline (not scanners in isolation) against
- * five frozen snapshots of real pages. See `capture-realworld.js`.
- *
- * WHAT IT ASSERTS (three layers)
- *   (a) NO-CRASH INVARIANT — the core assertion. Every selected scanner must
- *       complete on every file with `error === null`, and must not be missing
- *       from the results. A per-file wall-clock ceiling turns a hang into a
- *       failure rather than something swallowed as a timeout.
- *   (b) SANITY BANDS — total ensemble violation count per file must sit inside
- *       a recorded band. Catches silent-crash zeroing AND noise explosions.
- *   (c) SPOT-TRUTHS — hand-verified per-file assertions. Each was checked by
- *       READING the snapshot markup; the evidence is in a comment above it.
- *       Never derived from what the scanners happen to report, which would
- *       just freeze current behaviour including its bugs.
- *
- * These fixtures deliberately carry NO `<!-- WCAG-TEST -->` metadata and live
- * in a SUBDIRECTORY, so the existing fixture harnesses do not pick them up —
- * `test-exclusive-scanners.js`, `test-concurrent-scanners.js` and
- * `tests/e2e/axe-core.test.js` all enumerate with
- * `readdirSync(testDir).filter(f => f.endsWith('.html'))`, which is
- * non-recursive and drops the `realworld` directory entry.
+ * realworld.js: regression harness for the frozen real-world corpus (test-sites/realworld).
+ * Runs the full pipeline against each snapshot and asserts (a) no scanner crash or hang,
+ * (b) a total violation count inside a recorded band, (c) hand-verified spot-truths.
  *
  * Usage:
  *   node scripts/harness/realworld.js --no-llm
  *   node scripts/harness/realworld.js --json /tmp/realworld.json
  *   node scripts/harness/realworld.js --only med-theme.html
  *
- * LLM scanners run only when OPENROUTER_API_KEY is in the environment AND
- * --no-llm was not passed. They cost money — use --no-llm while iterating.
- * Their spot-truths are deliberately lenient: single-run LLM output is not a
- * reliable hard assertion, so we only demand "did not crash, returned an array".
- *
- * Exit code 1 on any failure (the JSON report is written first).
+ * LLM scanners run only when OPENROUTER_API_KEY is set and --no-llm was not
+ * passed (they cost money); their only assertion is "did not crash, returned an
+ * array". Exit code 1 on any failure; the JSON report is written first.
  */
 
 const path = require('path');
@@ -60,21 +22,17 @@ const fs = require('fs');
 const ScanPipeline = require('../../src/core/scan-pipeline');
 const { registerAllScanners, getProfile } = require('../../src/core/scanner-registry');
 
+// The snapshots carry no `<!-- WCAG-TEST -->` metadata and live in a
+// subdirectory, so the fixture harnesses (which list test-sites non-recursively)
+// do not pick them up.
 const FIXTURE_DIR = path.join(__dirname, '..', '..', 'test-sites', 'realworld');
 const PROFILE = 'standard';
 
 /**
- * A hang is a failure, not a timeout to be swallowed.
- *
- * Started at 240s. Raised to 600s on 2026-07-27 after measuring the cause:
- * `responsive-design` alone takes 348s on wiki-medical-de.html (800 KB, 5101
- * DOM nodes) — it COMPLETES, it is just pathologically slow. At 240s that one
- * file produced no violation count and ran no spot-truths at all, so the
- * corpus lost every other signal it carries just to re-report a slowness we
- * already know about. 600s still fails a genuine hang.
- *
- * The slowness is NOT swallowed: any file over SLOW_FILE_MS is reported as a
- * SLOW line in the summary and flagged in the JSON.
+ * A hang is a failure, not a timeout to be swallowed. 600s because
+ * `responsive-design` alone takes about 350s on wiki-medical-de.html (800 KB,
+ * 5101 DOM nodes) and does complete; a genuine hang still fails. Any file over
+ * SLOW_FILE_MS is reported as SLOW in the summary and flagged in the JSON.
  */
 const PER_FILE_TIMEOUT_MS = 600000;
 const SLOW_FILE_MS = 240000;
@@ -121,9 +79,9 @@ function proseText(v) {
  * Find violations matching a spec.
  * @param {object[]} violations
  * @param {object} spec
- * @param {string|string[]} [spec.id]        — substring(s) matched against ruleId/criterion (ANY)
- * @param {string|string[]} [spec.selector]  — substring(s) matched against selector fields (ALL)
- * @param {string|string[]} [spec.prose]     — substring(s) matched against description/issue (ANY)
+ * @param {string|string[]} [spec.id] - substring(s) matched against ruleId/criterion (any)
+ * @param {string|string[]} [spec.selector] - substring(s) matched against selector fields (all)
+ * @param {string|string[]} [spec.prose] - substring(s) matched against description/issue (any)
  * @param {string} [spec.scannerId]
  */
 function findViolations(violations, spec = {}) {
@@ -153,31 +111,31 @@ function mentions(violations, needle) {
 }
 
 // ---------------------------------------------------------------------------
-// FIXTURES — bands + spot-truths
+// FIXTURES: bands + spot-truths
 //
-// BANDS were recorded on the first clean run (2026-07-27) and are deliberately
-// wide: [floor(actual*0.5), ceil(actual*2)]. They are a crash/explosion alarm,
-// not a precision baseline. Re-running capture-realworld.js invalidates them.
+// Bands are [floor(recorded*0.5), ceil(recorded*2)] of the recorded total: a
+// crash/explosion alarm, not a precision target. Re-running
+// capture-realworld.js invalidates them. Each spot-truth was verified by reading
+// the snapshot markup; the evidence is in the comment above it.
 // ---------------------------------------------------------------------------
 
 const FIXTURES = [
   {
     file: 'own-audit-ui.html',
     source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
-    // observed 2026-07-27: 28 total ensemble violations (profile=standard, --no-llm);
-    // also observed 32 on an earlier run — run-to-run drift is normal.
-    // Band is deliberately wide — a crash/explosion alarm, not a baseline.
+    // recorded: 28 total ensemble violations (profile=standard, --no-llm), 32 on
+    // another run; run-to-run drift is normal.
     band: [14, 56],
     spotTruths: [
       {
         name: 'REGRESSION: language-detection completes without error',
         kind: 'must-pass',
-        // verified 2026-07-27: this file is the live repro for
-        // "Cannot read properties of undefined (reading 'map')". It is a real
-        // Next.js document — <html lang="de"> plus a hydrated <div id="__next">
-        // whose child carries its own lang="en", <!-- --> hydration comment
+        // This file reproduces the language-detection crash "Cannot read
+        // properties of undefined (reading 'map')". It is a real Next.js
+        // document: <html lang="de"> plus a hydrated <div id="__next"> whose
+        // child carries its own lang="en", <!-- --> hydration comment
         // separators, and a <script id="__NEXT_DATA__" type="application/json">
-        // payload. That combination is what the old code walked with .map().
+        // payload.
         check: ({ scanners }) => {
           const s = scanners['language-detection'];
           if (!s) return 'language-detection missing from results entirely';
@@ -188,14 +146,14 @@ const FIXTURES = [
       {
         name: 'REGRESSION: __next-route-announcer__ empty live region NOT flagged',
         kind: 'must-not-flag',
-        // verified 2026-07-27: last element before </body> is
+        // Last element before </body> is
         //   <next-route-announcer><p aria-live="assertive"
         //     id="__next-route-announcer__" role="alert"
         //     style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px;
         //            margin: -1px; overflow: hidden; padding: 0px;
         //            position: absolute; top: 0px; width: 1px; ..."></p>
         //   </next-route-announcer>
-        // It is EMPTY BY DESIGN — Next.js injects the new page title into it on
+        // It is empty by design: Next.js injects the new page title into it on
         // client-side route change. An empty aria-live/role=alert region that a
         // framework fills at runtime is correct, not a violation.
         check: ({ violations }) => {
@@ -212,7 +170,7 @@ const FIXTURES = [
       {
         name: 'CLEAN: labelled url input not flagged as unlabelled',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the form field is properly labelled —
+        // The form field is properly labelled:
         //   <label for="url">Target address <span aria-hidden="true">*</span>
         //     <span class="sr-only">(required)</span></label>
         //   <input type="url" id="url" placeholder="https://example.com" required
@@ -237,7 +195,7 @@ const FIXTURES = [
       {
         name: 'REAL: <html lang="de"> contradicts English content / inner lang="en"',
         kind: 'must-detect',
-        // verified 2026-07-27: document declares German —
+        // The document declares German:
         //   <html lang="de">
         // but every word of content is English ("Web accessibility audit",
         // "Enter the address of a publicly reachable page, choose a scan
@@ -246,13 +204,10 @@ const FIXTURES = [
         // language is not the language of its content is WCAG 3.1.1 (and the
         // nested contradiction is 3.1.2).
         //
-        // KNOWN GAP as of 2026-07-27: the ensemble does NOT detect this, so
-        // this assertion is currently RED. It is deliberately left failing —
-        // the violation is real and hand-verified, and weakening the assertion
-        // to make the suite green would hide a true false-negative. When
-        // language-detection learns to compare declared vs. actual page
-        // language (or to flag a child lang that contradicts <html lang>),
-        // this turns green on its own.
+        // Known gap: the ensemble does not detect this, so this assertion fails.
+        // It stays because the violation is real and hand-verified; it passes
+        // once language-detection compares declared vs. actual page language
+        // (or flags a child lang that contradicts <html lang>).
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['3.1.1', '3.1.2', 'html-lang', 'valid-lang', 'html-has-lang'],
@@ -267,20 +222,19 @@ const FIXTURES = [
   {
     file: 'med-theme.html',
     source: 'https://dr-mauermann-urologe.vercel.app',
-    // observed 2026-07-27: 44 total ensemble violations (profile=standard, --no-llm);
-    // 44 on both recorded runs.
-    // Band is deliberately wide — a crash/explosion alarm, not a baseline.
+    // recorded: 44 total ensemble violations (profile=standard, --no-llm) on
+    // both runs.
     band: [22, 88],
     spotTruths: [
       {
         name: 'REAL: heading level skips h2 -> h4',
         kind: 'must-detect',
-        // verified 2026-07-27: in the #services section the document goes
+        // In the #services section the document goes
         //   <h2 class="h1" style="margin-bottom:14px">Urologische
         //     Vorsorge&nbsp;&amp; Behandlung</h2>
         //   ... <div class="tile-grid"><div class="tile">
         //   <h4>Vorsorge &amp; Diagnostik</h4>
-        // h3 is never used — the outline jumps 2 -> 4. Four <h4> tiles follow
+        // h3 is never used: the outline jumps 2 -> 4. Four <h4> tiles follow
         // that <h2>. WCAG 1.3.1 / axe rule `heading-order`.
         check: ({ violations }) => {
           const hits = findViolations(violations, {
@@ -294,13 +248,13 @@ const FIXTURES = [
       {
         name: 'CLEAN: brand logo has a descriptive alt',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the only <img> in the document is
+        // The only <img> in the document is
         //   <img class="brand__logo" src="/images/c1bee693c1e44f10.png"
-        //     alt="Dr. Julian Mauermann – Facharzt für Urologie"
+        //     alt="Dr. Julian Mauermann - Facharzt für Urologie"
         //     width="44" height="44">
         // Non-empty, descriptive, not filename-ish. Must not be flagged as a
-        // missing / inadequate text alternative — even though the src is dead
-        // at test time (the image 404s, which is the point).
+        // missing or inadequate text alternative, even though the src is dead
+        // at test time (the image 404s by design).
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['image-alt', 'alt', '1.1.1'],
@@ -308,7 +262,7 @@ const FIXTURES = [
           });
           if (hits.length === 0) return null;
           return (
-            `logo img (alt="Dr. Julian Mauermann – Facharzt für Urologie") flagged: ` +
+            `logo img (class brand__logo, descriptive alt) flagged: ` +
             hits
               .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
               .join('; ')
@@ -318,7 +272,7 @@ const FIXTURES = [
       {
         name: 'CLEAN: <html lang="de"> matches the German content',
         kind: 'must-not-flag',
-        // verified 2026-07-27: <html lang="de"> and the content is German
+        // <html lang="de"> and the content is German
         // throughout ("Herzlich willkommen in unserer barrierefreien Ordination
         // im Wohnpark Alt Erlaa."). No missing/invalid lang, no mismatch.
         check: ({ violations }) => {
@@ -340,37 +294,36 @@ const FIXTURES = [
   {
     file: 'beeproduced.html',
     source: 'https://beeproduced.com',
-    // observed 2026-07-27: 379 total ensemble violations (profile=standard, --no-llm);
-    // also observed 436 on a run where keyboard-navigation did not time out.
-    // Band is deliberately wide — a crash/explosion alarm, not a baseline.
+    // recorded: 379 total ensemble violations (profile=standard, --no-llm), 436
+    // on a run where keyboard-navigation did not time out.
     band: [189, 758],
     spotTruths: [
       {
         name: 'REGRESSION: axe-core survives the dead <iframe> and still reports',
         kind: 'must-pass',
-        // verified 2026-07-27: this document contains
+        // The document contains
         //   <iframe id="__framer-editorbar" src="./_offline/edit"
         //     aria-hidden="true" allow="autoplay" tabindex="-1"
         //     class="status_hidden">
         // whose src 404s at test time, so the frame never fires `load` and the
-        // parent document can sit at readyState 'interactive'. That is exactly
-        // what made AxePuppeteer throw "Page/Frame is not ready" and silently
-        // report zero violations for an otherwise scannable page. Assert both
-        // that it did not error AND that it produced findings (a crash that
-        // degrades to an empty array would otherwise pass unnoticed).
+        // parent document can sit at readyState 'interactive'. Unhandled, that
+        // makes AxePuppeteer throw "Page/Frame is not ready" and report zero
+        // violations for an otherwise scannable page. Assert both that it did
+        // not error and that it produced findings (a crash that degrades to an
+        // empty array would otherwise pass unnoticed).
         check: ({ scanners }) => {
           const s = scanners['axe-core'];
           if (!s) return 'axe-core missing from results entirely';
           if (s.error) return `axe-core returned error: ${s.error}`;
           if (!s.violationCount)
-            return 'axe-core reported 0 violations — suspicious silent-zero on a dead-iframe page';
+            return 'axe-core reported 0 violations: suspicious silent zero on a dead-iframe page';
           return null;
         },
       },
       {
         name: 'REAL: positive tabindex="1" on 5 elements',
         kind: 'must-detect',
-        // verified 2026-07-27: the document contains exactly 5 occurrences of
+        // The document contains exactly 5 occurrences of
         // tabindex="1", e.g. the header logo link
         //   <a as="a" class="framer-1jpi8d1 framer-ew8aek" data-framer-name="Logo"
         //     tabindex="1" href="./" data-framer-page-link-current="true">
@@ -389,7 +342,7 @@ const FIXTURES = [
       {
         name: 'REAL: heading level skips h1 -> h5',
         kind: 'must-detect',
-        // verified 2026-07-27: the document's heading sequence in DOM order is
+        // The document's heading sequence in DOM order is
         //   h1 > h5 > h5 > h2 > h3 > h3 > h3 > h2 > h2 > h4 > h5 > h5 > h2 >
         //   h2 > h5 > h5 > h5 > h2 > h4
         // The very first transition h1 -> h5 skips three levels
@@ -408,15 +361,15 @@ const FIXTURES = [
       {
         name: 'CLEAN: logo link has an accessible name via its inner img alt',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the header logo anchor has no text node of its
-        // own, but its only child image supplies the name —
+        // The header logo anchor has no text node of its own, but its only
+        // child image supplies the name:
         //   <a ... data-framer-name="Logo" tabindex="1" href="./">
         //     <div data-framer-background-image-wrapper="true">
         //       <img decoding="auto" width="299" height="140"
         //         src="./_offline/L1q6sRo7cc7kr6S5uR31PWm4KD0.svg" alt="Logo" ...>
         //     </div></a>
-        // So it is NOT an empty link. (Checked deliberately: a naive
-        // text-content scan of this anchor returns "", which is the trap.)
+        // So it is not an empty link, although a naive text-content scan of
+        // this anchor returns "".
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['link-name', 'empty-link', '2.4.4', '4.1.2'],
@@ -437,17 +390,16 @@ const FIXTURES = [
   {
     file: 'wiki-medical-de.html',
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
-    // observed 2026-07-27: 1620 total ensemble violations (profile=standard, --no-llm);
-    // single recorded run, 415.9s wall clock.
-    // Band is deliberately wide — a crash/explosion alarm, not a baseline.
+    // recorded: 1620 total ensemble violations (profile=standard, --no-llm),
+    // single run, 415.9s wall clock.
     band: [810, 3240],
     spotTruths: [
       {
         name: 'REAL: images with no alt attribute at all',
         kind: 'must-detect',
-        // verified 2026-07-27: 12 of the 30 <img> elements carry no alt
-        // attribute whatsoever. 8 of them are in-article figure images — plainly
-        // visible body content, not a hideable banner — e.g.
+        // 12 of the 30 <img> elements carry no alt attribute. 8 of them are
+        // in-article figure images (visible body content, not a hideable
+        // banner), e.g.
         //   <figure class="mw-default-size" typeof="mw:File/Thumb" id="mwNw">
         //     <a href="https://de.wikipedia.org/wiki/Datei:Prostatakarzinom_01.svg"
         //        class="mw-file-description" id="mwOA">
@@ -470,12 +422,11 @@ const FIXTURES = [
       {
         name: 'CLEAN: <html lang="de"> itself is not flagged',
         kind: 'must-not-flag',
-        // verified 2026-07-27: <html class="client-js vector-feature-..." lang="de">
-        // on a German-language article ("Prostatakarzinom"). Valid BCP-47,
-        // matches the content.
-        // NOTE: scoped to the <html> element on purpose. An earlier version of
-        // this check matched ANY 3.1.1 violation and so also caught the
-        // interlanguage-link subtag findings below, which are a different bug.
+        // <html class="client-js vector-feature-..." lang="de"> on a
+        // German-language article ("Prostatakarzinom"). Valid BCP-47, matches
+        // the content. Scoped to the <html> element: an unscoped 3.1.1 match
+        // would also catch the interlanguage-link subtag findings below, which
+        // are a different bug.
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['html-has-lang', 'html-lang-valid', '3.1.1'],
@@ -496,10 +447,10 @@ const FIXTURES = [
       {
         name: 'CLEAN: valid ISO 639-3 subtags on interlanguage links',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the sidebar interlanguage links each declare the
+        // The sidebar interlanguage links each declare the
         // target wiki's language, e.g.
         //   <a href="https://arz.wikipedia.org/wiki/..."
-        //      title="سرطان بروستاتا – Ägyptisches Arabisch"
+        //      title="سرطان بروستاتا - Ägyptisches Arabisch"
         //      lang="arz" hreflang="arz"
         //      data-language-local-name="Ägyptisches Arabisch"
         //      class="interlanguage-link-target"><span>مصرى</span></a>
@@ -509,7 +460,7 @@ const FIXTURES = [
         // Ghanaian Pidgin, Newari, Rakhine, Wu Chinese, Cantonese) and hence
         // valid BCP-47. Rejecting them is a false positive.
         //
-        // This is the SAME underlying bug modern-commercial.html reproduces,
+        // This is the same underlying bug modern-commercial.html reproduces,
         // but it surfaces through a different code path: here it is reported
         // as 3.1.1 "Invalid lang attribute value", there as 3.1.2 "Element has
         // invalid language code". Both are asserted so a partial fix is visible.
@@ -533,7 +484,7 @@ const FIXTURES = [
       {
         name: 'CLEAN: inline <span lang="en"> correctly marks a language change',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the sister-projects box marks its English label
+        // The sister-projects box marks its English label
         //   <span lang="en">Commons</span>
         // (2 occurrences). A correctly declared inline language change must not
         // be reported as a WCAG 3.1.2 "language of parts" violation.
@@ -553,8 +504,7 @@ const FIXTURES = [
       {
         name: 'REAL: data table has a completely empty <th> corner cell',
         kind: 'must-detect',
-        // verified 2026-07-27: the PSA-screening comparison table opens with an
-        // empty corner header —
+        // The PSA-screening comparison table opens with an empty corner header:
         //   <table class="wikitable" id="mwAU8">
         //     <caption id="mwAVA">Im Verlauf von 21 Jahren haben 1000 Männer
         //       im Alter von 55-69 Jahren ...</caption>
@@ -563,11 +513,10 @@ const FIXTURES = [
         //       <th id="mwAVQ">Diagnose PK</th>
         //       <th id="mwAVU">Diagnose Metastasen</th>
         //       <th id="mwAVY">Tod durch PK</th></tr>
-        // <th id="mwAVM"> has no text, no aria-label, no title — the row-header
-        // column is left unnamed. WCAG 1.3.1 / axe `empty-table-header`. This
-        // is the table-structure signal the article was chosen for (6 tables,
-        // ~330,000 characters of text — >20x the LLM extractors' old
-        // 15,000-char cutoff).
+        // <th id="mwAVM"> has no text, no aria-label, no title, so the row-header
+        // column is unnamed. WCAG 1.3.1 / axe `empty-table-header`. This is the
+        // table-structure signal the article was chosen for (6 tables, ~330,000
+        // characters of text).
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['empty-table-header', '1.3.1'],
@@ -583,16 +532,15 @@ const FIXTURES = [
   {
     file: 'modern-commercial.html',
     source: 'https://www.mozilla.org/de/',
-    // observed 2026-07-27: 223 total ensemble violations (profile=standard, --no-llm);
-    // 223 on both recorded runs.
-    // Band is deliberately wide — a crash/explosion alarm, not a baseline.
+    // recorded: 223 total ensemble violations (profile=standard, --no-llm) on
+    // both runs.
     band: [111, 446],
     spotTruths: [
       {
         name: 'REAL: a literal <blink> element in the navigation',
         kind: 'must-detect',
-        // verified 2026-07-27: exactly ONE occurrence in the document, used as
-        // a layout shim at the end of the nav container —
+        // Exactly one occurrence in the document, used as a layout shim at the
+        // end of the nav container:
         //   </div><!-- close .m24-c-navigation-items -->
         //   <blink class="spacer-gif"></blink>
         //   </div><!-- close .m24-c-navigation-container -->
@@ -608,8 +556,8 @@ const FIXTURES = [
       {
         name: 'CLEAN: decorative images correctly use alt=""',
         kind: 'must-not-flag',
-        // verified 2026-07-27: of 23 <img> elements, ZERO lack an alt attribute
-        // and 19 use alt="" — correct for purely decorative product/menu icons
+        // Of 23 <img> elements, none lacks an alt attribute and 19 use alt="",
+        // correct for purely decorative product/menu icons
         // that sit next to a text label, e.g.
         //   <img ... class="m24-c-menu-item-icon" width="32" height="32" alt="">
         //   <h2 class="m24-c-menu-item-title">Tabstack</h2>
@@ -631,19 +579,19 @@ const FIXTURES = [
       {
         name: 'CLEAN: heading whose accessible name comes from an image alt',
         kind: 'must-not-flag',
-        // verified 2026-07-27: of the 31 <h2> elements in this document exactly
-        // ONE has empty textContent — the footer advertising heading, which is
-        // named entirely by its child image:
+        // Of the 31 <h2> elements in this document exactly one has empty
+        // textContent: the footer advertising heading, which is named entirely
+        // by its child image:
         //   <h2>
         //     <img src="./_offline/Mozilla_Ads_Logo.6ed26d0eac2b.svg"
         //       alt="Mozilla Anzeigen" width="250" height="33"
         //       class="moz24-footer-advertising-logo">
         //   </h2>
         // textContent is whitespace, but the accessible name is "Mozilla
-        // Anzeigen", so it is NOT an empty heading. Because it is the only
-        // text-empty h2 in the document, ANY "empty heading" violation on an
-        // h2 here necessarily refers to it. (The trap: a naive textContent
-        // check reports this as empty — and two scanners currently do.)
+        // Anzeigen", so it is not an empty heading. Because it is the only
+        // text-empty h2 in the document, any "empty heading" violation on an
+        // h2 here necessarily refers to it. (A naive textContent check reports
+        // it as empty.)
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             prose: ['empty heading', 'heading element is empty', 'heading "[empty]"'],
@@ -663,8 +611,8 @@ const FIXTURES = [
       {
         name: 'CLEAN: nav logo link is named by its inner img alt',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the header logo link has no text node but its
-        // only child image supplies the accessible name —
+        // The header logo link has no text node but its only child image
+        // supplies the accessible name:
         //   <a class="m24-c-navigation-logo-link" href="/de/"
         //      data-link-text="mozilla home icon" data-link-position="nav">
         //     <img class="m24-c-navigation-logo-image"
@@ -690,7 +638,7 @@ const FIXTURES = [
       {
         name: 'CLEAN: valid 3-letter BCP-47 subtags are not "invalid language codes"',
         kind: 'must-not-flag',
-        // verified 2026-07-27: the language picker declares each option in its
+        // The language picker declares each option in its
         // own language, e.g.
         //   <option lang="ast" ...>   <option lang="cak" ...>
         //   <option lang="dsb" ...>   <option lang="hsb" ...>
@@ -729,9 +677,9 @@ const FIXTURES = [
 // ---------------------------------------------------------------------------
 
 /**
- * Static server over the fixture directory. 404s are EXPECTED and intentional:
- * every ./_offline/* path is a deliberately dead resource, and exercising the
- * scanners against missing images/fonts/scripts is part of the point.
+ * Static server over the fixture directory. 404s are expected: every
+ * ./_offline/* path is a dead resource, and scanning against missing
+ * images/fonts/scripts is part of the test.
  */
 function startServer(dir) {
   const server = http.createServer((req, res) => {
@@ -793,7 +741,7 @@ async function scanFile(url, scannerIds, scanOptions) {
       () =>
         rej(
           new Error(
-            `WALL-CLOCK TIMEOUT after ${PER_FILE_TIMEOUT_MS}ms — treated as a hang, not a soft skip`
+            `WALL-CLOCK TIMEOUT after ${PER_FILE_TIMEOUT_MS}ms: treated as a hang, not a soft skip`
           )
         ),
       PER_FILE_TIMEOUT_MS
@@ -824,12 +772,10 @@ async function main() {
   }
   const llmEnabled = !args.noLlm && !!process.env.OPENROUTER_API_KEY;
 
-  // `includeExperimental: true` is deliberate and load-bearing. The default
-  // profiles quarantine unproven scanners, but the no-crash invariant below is
-  // exactly the evidence a quarantined scanner needs to earn its way back —
-  // and the crash it is quarantined for must stay visible until it is fixed.
-  // Running only the proven set here would make this harness blind to the
-  // failures it exists to catch.
+  // `includeExperimental: true`: the default profiles quarantine unproven
+  // scanners, but the no-crash invariant below is the evidence a quarantined
+  // scanner needs to be promoted, and the crash it is quarantined for must stay
+  // visible until it is fixed.
   const { scannerIds: profileIds, options: profileOptions } = getProfile(PROFILE, {
     includeExperimental: true,
   });
@@ -985,11 +931,11 @@ async function main() {
       }
       entry.spotTruths.push({ name: st.name, kind: st.kind, ok: !problem, detail: problem });
       if (problem) {
-        failures.push({ layer: 'spot-truth', file: fx.file, detail: `${st.name} — ${problem}` });
+        failures.push({ layer: 'spot-truth', file: fx.file, detail: `${st.name}: ${problem}` });
       }
     }
 
-    // Slowness is reported, never swallowed — see PER_FILE_TIMEOUT_MS.
+    // Slowness is reported, never swallowed (see PER_FILE_TIMEOUT_MS).
     entry.slow = elapsedMs > SLOW_FILE_MS;
 
     entry.noise = noise
@@ -1056,7 +1002,7 @@ async function main() {
   const slow = report.files.filter((f) => f.slow);
   if (slow.length) {
     console.log(
-      `\nSLOW FILES (> ${SLOW_FILE_MS / 1000}s — not a failure, but a real performance finding):`
+      `\nSLOW FILES (> ${SLOW_FILE_MS / 1000}s, not a failure but a performance finding):`
     );
     for (const f of slow) console.log(`  ${f.file}: ${(f.elapsedMs / 1000).toFixed(1)}s`);
   }
@@ -1064,7 +1010,7 @@ async function main() {
   const crashFailures = failures.filter((f) => f.layer === 'no-crash');
   if (crashFailures.length) {
     console.log(
-      `\nSCANNER CRASHES / HANGS (${crashFailures.length}) — these are REAL FINDINGS, not harness bugs:`
+      `\nSCANNER CRASHES / HANGS (${crashFailures.length}), real findings, not harness bugs:`
     );
     for (const f of crashFailures) {
       console.log(`  ${f.file} :: ${f.scanner || '(whole file)'}`);

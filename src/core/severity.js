@@ -1,11 +1,8 @@
 /**
+ * severity
  * One severity vocabulary for the scoring pipeline and the report.
- *
- * Scanners emit a zoo of values: axe impacts (critical/serious/moderate/minor),
- * legacy words (error/major/high/warning), the BaseScanner.formatViolation
- * default 'violation', and null. Before this module the pipeline and the
- * report normalised them differently: 'violation' weighed 0 in the score but
- * rendered as Moderate in the report.
+ * Normalises axe impacts (critical/serious/moderate/minor), scanner words
+ * (error/major/high/warning), the default 'violation' and null to one scale.
  */
 const KNOWN = ['critical', 'serious', 'moderate', 'minor', 'best-practice', 'info'];
 
@@ -58,7 +55,7 @@ function ruleKey(violation) {
  *
  * WCAG conformance is judged per success criterion, not per node: an audit
  * records "1.4.11 fails", once, however many footer links share the offending
- * rule. The instance count is triage detail — useful, but it may not dominate
+ * rule. The instance count is triage detail: useful, but it may not dominate
  * the score. So repeats add `log10(n)/2`, capped at +50 %:
  * 1 node -> x1.00, 3 -> x1.24, 8 -> x1.45, 100+ -> x1.50.
  */
@@ -66,9 +63,7 @@ const BREADTH_CAP = 1.5;
 const BREADTH_SCALE = 0.5;
 
 /**
- * Severity-weighted penalty for a set of violations — the input to the score.
- *
- * Two properties the old `sum of per-violation weights` lacked:
+ * Severity-weighted penalty for a set of violations, the input to the score.
  *
  * 1. **Instances of one rule are one defect.** A single footer rule with a
  *    1.41:1 focus ring produces eight `insufficient-focus-indicator-contrast`
@@ -77,7 +72,7 @@ const BREADTH_SCALE = 0.5;
  *    instead of multiplying the weight by the node count.
  * 2. **Breadth over depth.** Because repeats saturate, a page failing five
  *    different criteria always scores worse than a page failing one criterion
- *    fifty times — which is the ranking an auditor wants.
+ *    fifty times, which is the ranking an auditor wants.
  *
  * Grouping is by (rule, severity), so the same rule reported at two severities
  * is not silently merged into one.

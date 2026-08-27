@@ -1,23 +1,8 @@
 /**
  * LLM Redundant Entry Scanner
- *
- * Covers:
- * - 3.3.7 Redundant Entry (Level A, new in WCAG 2.2)
- *
- * "Information previously entered by or provided to the user that is required
- * to be entered again in the same process is either auto-populated, or
- * available for the user to select."
- *
- * Single-page heuristic: a multi-step process rendered on one page (or a form
- * with repeated sections) that asks for the same datum twice without
- * pre-filling it and without offering a "same as above" selection.
- *
- * The LLM's job is only the SEMANTIC step — deciding that "Nachname" in step 1
- * and "Familienname" in step 3 are the same datum, which no attribute
- * comparison can do. Everything measurable (which fields exist, in which
- * section, whether they carry a value, whether a copy-from control exists) is
- * pre-computed in the browser and handed over as evidence, so the model never
- * has to guess at page structure.
+ * Covers 3.3.7 Redundant Entry (Level A).
+ * Field structure, values and copy-from controls are measured in the browser;
+ * the LLM only decides whether two differently labelled fields are the same datum.
  */
 
 const LLMBaseScanner = require('./base');
@@ -39,7 +24,7 @@ class LLMRedundantEntryScanner extends LLMBaseScanner {
     const form = await this._collectFormStructure(page);
 
     // 3.3.7 only applies inside a multi-step process. One section, or fewer
-    // than two fields, cannot contain a redundant re-entry — skip the call.
+    // than two fields, cannot contain a redundant re-entry. Skip the call.
     if (form.sections.length < 2 || form.totalFields < 4) {
       return this._empty(form, 'not a multi-step process');
     }
@@ -211,10 +196,10 @@ Return violations as JSON.`;
 
 const PROMPT = `Check this page for WCAG 2.2 criterion 3.3.7 (Redundant Entry, Level A).
 
-The criterion: information the user already entered earlier IN THE SAME PROCESS must not have to be entered again — it must be auto-populated, or offered for selection. It applies to multi-step processes (checkout, registration, booking, application forms) presented as steps or sections.
+The criterion: information the user already entered earlier IN THE SAME PROCESS must not have to be entered again: it must be auto-populated, or offered for selection. It applies to multi-step processes (checkout, registration, booking, application forms) presented as steps or sections.
 
 Flag a field ONLY if ALL of the following are true:
-1. The page presents a MULTI-STEP process — two or more sections/steps that are part of one continuous task (the measured structure below names them).
+1. The page presents a MULTI-STEP process: two or more sections/steps that are part of one continuous task (the measured structure below names them).
 2. A field in a LATER section asks for the SAME piece of information as a field in an EARLIER section. Same information means the same real-world datum, even under a different wording ("Nachname" / "Familienname", "E-Mail" / "E-Mail-Adresse", "Telefon" / "Mobilnummer" when clearly the same contact number).
 3. The later field is EMPTY: its measured "hasValue" is false.
 4. That later section offers NO way to reuse the earlier answer: its "reuseControls" list is empty (no "same as above" checkbox, no "copy from step 1" button, no selection of saved values).
@@ -224,12 +209,12 @@ Examples of violations:
 - Step 1 collects "Telefonnummer"; Step 4 "Bestätigung" asks for "Kontakt-Telefonnummer" again, empty, with no reuse control.
 
 Examples that are NOT violations (do NOT flag these):
-- A later field asking for the same datum that is already pre-filled (hasValue true) — that IS auto-population, which is exactly what the criterion asks for.
-- A section that has a "Same as billing address" checkbox, a "Wie oben übernehmen" control, or a select of saved addresses in its reuseControls — the information is available for selection.
-- Password confirmation ("Passwort" then "Passwort wiederholen") — explicitly excepted by the criterion; re-entry is essential here.
+- A later field asking for the same datum that is already pre-filled (hasValue true): that IS auto-population, which is exactly what the criterion asks for.
+- A section that has a "Same as billing address" checkbox, a "Wie oben übernehmen" control, or a select of saved addresses in its reuseControls: the information is available for selection.
+- Password confirmation ("Passwort" then "Passwort wiederholen"): explicitly excepted by the criterion; re-entry is essential here.
 - A second, genuinely DIFFERENT datum that merely sounds similar: billing address vs. delivery address, patient name vs. insured person's name, contact person vs. account holder. These are different people or different addresses, not redundant entry.
-- Fields with autocomplete tokens but no earlier counterpart on the page — browser autofill is not what this criterion is about, and a first-time question is never redundant.
-- Any repetition across what are clearly SEPARATE processes (a newsletter signup box next to a contact form) — 3.3.7 only applies within one process.
+- Fields with autocomplete tokens but no earlier counterpart on the page: browser autofill is not what this criterion is about, and a first-time question is never redundant.
+- Any repetition across what are clearly SEPARATE processes (a newsletter signup box next to a contact form): 3.3.7 only applies within one process.
 - A single-section form, however long.
 
 CRITICAL: base every judgement on the measured form structure below, not on impressions from the markup. Each violation you report must name the earlier field (section + label) and the later field (section + label) it duplicates, and state that the later field's hasValue was false and its reuseControls list was empty. If you cannot cite that evidence, do not report it. Err on the side of NOT flagging.

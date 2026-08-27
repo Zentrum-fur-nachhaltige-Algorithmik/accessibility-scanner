@@ -1,3 +1,8 @@
+/**
+ * server
+ * Express HTTP API: async and sync scan endpoints, job polling and report delivery.
+ * Applies bearer auth, rate limiting and the SSRF URL guard before any scan runs.
+ */
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -19,7 +24,7 @@ const app = express();
 const port = config.port;
 
 /**
- * Ids we accept in a path parameter before they reach path.join().
+ * Ids accepted in a path parameter before they reach path.join().
  * Rejects traversal ("../../etc/passwd"), absolute paths and NUL bytes.
  */
 const SAFE_ID = /^[a-zA-Z0-9_-]{1,64}$/;
@@ -47,7 +52,7 @@ app.use(express.json({ limit: '25mb' }));
 app.use(createAuthMiddleware());
 logAuthStartupState();
 
-// Serve reports directory — the same generated files as /api/report/:id, so it
+// Serve reports directory: the same generated files as /api/report/:id, so it
 // is covered by the auth middleware above.
 const reportsDir = config.reportsDir;
 fs.ensureDirSync(reportsDir);
@@ -95,13 +100,13 @@ function resolveScanRequest({ profile, scannerIds, options = {} }) {
   return { scannerIds: scannerIds || null, options: { ...options } };
 }
 
-// Async job store — jobs run through the shared queue above.
+// Async job store: jobs run through the shared queue above.
 const scanJobs = new ScanJobStore({
   getQueue,
   runScan: (url, opts) => pipeline.scan(url, opts),
 });
 
-// ── Routes ──────────────────────────────────────────────────────
+// Routes
 
 /**
  * POST /api/scan
@@ -110,8 +115,8 @@ const scanJobs = new ScanJobStore({
  * Body: { url: string, profile?: string, scannerIds?: string[],
  *         options?: object, sync?: boolean }
  *
- * Default (async):  202 { jobId, status, statusUrl } — poll /api/scan/job/:jobId
- * Legacy (sync:true): 200 <pipeline result>, connection held for the whole scan.
+ * Default (async): 202 { jobId, status, statusUrl }, poll /api/scan/job/:jobId
+ * sync:true: 200 <pipeline result>, connection held for the whole scan.
  */
 app.post('/api/scan', scanLimiter, async (req, res) => {
   const { url, profile, scannerIds, options = {}, sync = false } = req.body || {};
@@ -120,7 +125,7 @@ app.post('/api/scan', scanLimiter, async (req, res) => {
     return res.status(400).json({ error: 'url is required' });
   }
 
-  // SSRF guard — must run before the URL reaches the browser.
+  // SSRF guard: must run before the URL reaches the browser.
   try {
     await assertScannableUrl(url);
   } catch (error) {
@@ -229,7 +234,7 @@ app.get('/api/report/:id/pdf', async (req, res) => {
 });
 
 /**
- * Catch-all for id-bearing routes with extra path segments — i.e. a raw
+ * Catch-all for id-bearing routes with extra path segments, i.e. a raw
  * traversal attempt such as `/api/report/../../etc/passwd`, which express
  * would otherwise answer with its default HTML 404. Report the same 400 the id
  * validator produces for the percent-encoded form, so the response does not

@@ -1,29 +1,7 @@
 /**
  * Real keyboard focus traversal for Puppeteer pages.
- *
- * Why: `element.focus()` from page.evaluate() does NOT put Chromium into the
- * `:focus-visible` state, so every site that (correctly) styles only
- * `:focus-visible { outline: … }` looks like it has no focus indicator at all.
- * Pressing Tab through the CDP keyboard does trigger it. This module is the
- * single place that knows how to do that; scanners consume its steps instead
- * of rolling their own focus loops.
- *
- * Identity is by a `data-a11y-tab-id` marker stamped on every
- * keyboard-reachable element before the walk — never by a selector string,
- * because two sibling `a.nav__link`s produce the same string and used to be
- * mis-detected as a keyboard trap.
- *
- *   const { tabWalk } = require('./utils/keyboard-focus');
- *   for await (const step of tabWalk(page, { maxSteps: 60 })) {
- *     step.tabId, step.selector, step.tag, step.rect,
- *     step.before / step.after   // computed-style snapshots (unfocused / focused)
- *     step.indicator             // { visible, reasons[], lowContrast, ratio,
- *                                //   backdrop, baselineKnown, confirmed }
- *     step.stuck                 // true if Tab did not move focus (trap)
- *   }
- *
- * The walk stops at the end of the document (focus returns to <body> or
- * leaves the page), on a cycle, on a stuck Tab, or at maxSteps.
+ * Drives Tab through the CDP keyboard, since `element.focus()` from page.evaluate()
+ * never triggers `:focus-visible`. Elements are tracked by a `data-a11y-tab-id` marker.
  */
 
 const { injectableCode: contrastCode } = require('./browser-contrast');
@@ -43,12 +21,10 @@ const focusEmulation = new WeakMap();
  * Why this is not optional: Chromium only matches `:focus` (and therefore
  * `:focus-visible`) while the document HAS focus. CDP key events still move
  * `document.activeElement` in a background tab, so a focus walk keeps
- * stepping — but every element it measures reports the UNFOCUSED style and
+ * stepping, but every element it measures reports the UNFOCUSED style and
  * looks like it has no focus ring. The scan pipeline runs scanners in parallel
  * tabs and `page.screenshot()` brings its own tab to the front, so the walking
- * tab loses focus at an unpredictable moment: that was the last source of
- * flaky `missing-focus-indicator` findings on pages whose ring is fine
- * (observed as hasFocus:false / activeElement set / matches(':focus') false).
+ * tab would lose focus at an unpredictable moment.
  * `Emulation.setFocusEmulationEnabled` pins the page to "focused".
  */
 async function enableFocusEmulation(page) {
@@ -176,7 +152,7 @@ const helperCode = `
     // baselineKnown === false means the unfocused snapshot is a copy of the
     // focused one, so every DIFF-based reason above (box-shadow, border,
     // background, colour, pseudo ring) is structurally undetectable. Saying
-    // "no indicator" from that is a guess, not a measurement — tabWalk turns
+    // "no indicator" from that is a guess, not a measurement, so tabWalk turns
     // such a step into a confirmed second measurement instead.
     return {
       visible: reasons.length > 0,
@@ -235,11 +211,11 @@ async function prepareTabWalk(page) {
       for (const el of all) {
         // Structural focusability, NOT __isFocusableRendered: a skip link parked
         // off-canvas (translateY(-100%)) or a reveal-on-scroll CTA is invisible
-        // while unfocused but is still reached by Tab. Skipping them here left
-        // them without an unfocused baseline, and a baseline-less step can only
-        // ever be judged by its outline — the box-shadow ring that the common
-        // "focus-visible:outline-none focus-visible:ring-2" skip link relies on
-        // was invisible to the detector. Whether an element is painted is decided
+        // while unfocused but is still reached by Tab. Skipping it here would
+        // leave it without an unfocused baseline, and a baseline-less step can
+        // only be judged by its outline, so a box-shadow ring (the common
+        // "focus-visible:outline-none focus-visible:ring-2" skip link) would be
+        // invisible to the detector. Whether an element is painted is decided
         // per step (step.rendered), at the moment focus is actually on it.
         if (!__isFocusable(el)) {
           el.removeAttribute(ATTR);
@@ -270,6 +246,11 @@ async function cleanupTabWalk(page) {
 }
 
 /**
+ * Walk the page with real Tab key presses and yield one step per focused element:
+ * { tabId, selector, tag, rect, before, after, indicator, stuck, rendered }
+ * where before/after are computed-style snapshots (unfocused/focused) and
+ * indicator is { visible, reasons[], lowContrast, ratio, backdrop, baselineKnown, confirmed }.
+ * Stops at the end of the document, on a cycle, on a stuck Tab, or at maxSteps.
  * @param {import('puppeteer').Page} page
  * @param {{maxSteps?: number, settleMs?: number, confirmMs?: number, prepare?: boolean}} opts
  */
@@ -299,7 +280,7 @@ async function* tabWalk(page, opts = {}) {
         if (!el || el === document.body || el === document.documentElement) return null;
         let id = el.getAttribute(ATTR);
         if (id === null) {
-          // Reached something we did not stamp (revealed dynamically) — stamp it now.
+          // Reached something not yet stamped (revealed dynamically): stamp it now.
           id = 'dyn-' + Object.keys(window.__a11yTabSnapshots || {}).length;
           el.setAttribute(ATTR, id);
           (window.__a11yTabSnapshots = window.__a11yTabSnapshots || {})[id] = null;
@@ -364,14 +345,12 @@ async function* tabWalk(page, opts = {}) {
     }
     yielded++;
 
-    // "No focus indicator at all" is the one verdict that is made from the
-    // ABSENCE of evidence, and it was the single remaining source of flaky
-    // `missing-focus-indicator` findings on pages that do have a ring: one
-    // sample, taken `settleMs` after the key event, decided it. Re-measure
-    // such a candidate deliberately — read the focused style again a moment
-    // later, blur the element to obtain a REAL unfocused baseline, then put
-    // focus back so the walk continues where it was. Only a step whose
-    // indicator says `confirmed` may be reported as missing.
+    // "No focus indicator at all" is the one verdict made from the ABSENCE of
+    // evidence, and a single sample taken `settleMs` after the key event is
+    // not enough for it. Re-measure such a candidate: read the focused style
+    // again a moment later, blur the element to obtain a REAL unfocused
+    // baseline, then put focus back so the walk continues where it was. Only
+    // a step whose indicator says `confirmed` may be reported as missing.
     const isStuck = info.tabId === prevId; // Tab did not move focus
     if (!isStuck && info.rendered && info.focusValid === false) {
       // The tab lost document focus (another tab was brought to front). Take
@@ -418,7 +397,7 @@ async function* tabWalk(page, opts = {}) {
         info.after = confirmed.after;
         info.indicator = { ...confirmed.indicator, confirmed: true };
       } else {
-        // Focus moved on its own (page script) or the element vanished — the
+        // Focus moved on its own (page script) or the element vanished, so the
         // measurement cannot be repeated, so it stays an unknown, not a defect.
         info.indicator = { ...info.indicator, confirmed: false };
       }

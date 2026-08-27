@@ -1,6 +1,7 @@
 /**
- * OpenRouter LLM client - ported from Python openrouter_client.py
- * Zero external dependencies, uses Node 18+ built-in fetch.
+ * client
+ * OpenRouter chat-completions client used by the LLM scanners.
+ * No external dependencies; uses the Node 18+ built-in fetch.
  */
 
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -82,13 +83,12 @@ class LLMClient {
       // The pinned default model (google/gemini-3.5-flash) makes reasoning
       // mandatory, and its reasoning tokens are billed out of the same
       // completion budget as the visible JSON. At 4096 that reasoning
-      // overhead alone was empirically enough to exhaust the budget and
-      // truncate the response mid-object for our more verbose scanner
-      // prompts (verified against OpenRouter directly), so the cap is set
+      // overhead alone exhausts the budget and truncates the response
+      // mid-object for the more verbose scanner prompts, so the cap is set
       // high enough to leave room for both. Explicitly forcing low
-      // reasoning effort to reclaim budget was tried and rejected — it
-      // measurably increased malformed/garbage-trailer JSON responses from
-      // this model, which is worse than the truncation it avoided.
+      // reasoning effort to reclaim budget is not used: it measurably
+      // increases malformed/garbage-trailer JSON responses from this model,
+      // which is worse than the truncation it avoids.
       max_tokens: 8192,
     };
 
@@ -179,10 +179,10 @@ class LLMClient {
     }
 
     // Cached-prompt accounting. Providers disagree on the field name, so probe
-    // all three shapes we have observed via OpenRouter (OpenAI-style nested
+    // all three shapes seen via OpenRouter (OpenAI-style nested
     // details, a flat `cached_tokens`, and the Anthropic-style
-    // `cache_read_input_tokens`). 0 means "no cache hit reported" — which is
-    // NOT the same as "no cache field exists", so callers should treat a
+    // `cache_read_input_tokens`). 0 means "no cache hit reported", which is
+    // not the same as "no cache field exists", so callers should treat a
     // consistent 0 as unproven rather than as a proven miss.
     const usage = {
       promptTokens: data.usage?.prompt_tokens ?? 0,

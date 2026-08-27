@@ -1,35 +1,8 @@
 /**
- * LLM axe-`incomplete` Result Reviewer
- *
- * axe-core returns three result buckets: `violations` (definitive),
- * `passes`, and `incomplete` — checks it started but could not decide.
- * `AxeCoreAdapter` currently forwards every incomplete node into the report as
- * a `severity: 'info'` "Manual review required" line, which is noise: the
- * reader gets a to-do list, not a finding.
- *
- * This scanner re-runs axe for the incomplete bucket only, builds a small
- * evidence dossier per node (element markup, ancestor chain, and the computed
- * values the specific axe rule was unable to resolve), and asks the LLM for a
- * verdict per node:
- *
- *   fail            → promoted to a real violation
- *   pass            → dropped (recorded in summary.suppressed so the axe `info`
- *                     entry for the same rule+selector can be reconciled away)
- *   still-uncertain → kept as `info`, i.e. genuinely needs a human
- *
- * Design notes
- * ------------
- * - It re-runs axe itself instead of consuming the adapter's output. The
- *   pipeline runs concurrent scanners through `Promise.allSettled` with no
- *   ordering or data channel between them, so consuming another scanner's
- *   results would be a race. A second axe injection costs ~1s and makes this
- *   scanner self-contained and testable in isolation.
- * - It does NOT use the shared page-context pack: its input is node-scoped, not
- *   page-scoped. Sending whole-page context per batch would multiply cost for no
- *   analytic gain. It keeps the shared system prompt so the cacheable prefix is
- *   still shared with the other LLM scanners.
- * - `wcagCriteria` is dynamic (whatever the reviewed rules map to), so the
- *   base-class off-list filter is bypassed deliberately — see `_criteriaFor()`.
+ * LLM axe-incomplete Result Reviewer
+ * Reviews axe-core's `incomplete` bucket; criteria are those of the reviewed rules.
+ * Re-runs axe itself, builds a per-node evidence dossier, and asks the LLM for
+ * a fail / pass / still-uncertain verdict per node.
  */
 
 const LLMBaseScanner = require('./base');
@@ -44,8 +17,8 @@ const MAX_HTML_CHARS = 700;
 
 /**
  * axe rules worth reviewing, with the extra computed evidence each one needs.
- * Anything not listed is left as `info` untouched — an LLM verdict on a rule we
- * have not designed evidence extraction for would be a guess.
+ * Anything not listed is left as `info` untouched: an LLM verdict on a rule
+ * without designed evidence extraction would be a guess.
  */
 const REVIEWABLE_RULES = {
   'color-contrast': { evidence: 'contrast' },
@@ -114,8 +87,8 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
     let decidedInCode = 0;
 
     // Gradient backgrounds are decided arithmetically, never by the model:
-    // an LLM "estimating" a gradient's contrast produced confirmed false
-    // positives (FP-13). min ratio passes → pass; max ratio fails → fail;
+    // an LLM "estimating" a gradient's contrast produces false positives.
+    // min ratio passes → pass; max ratio fails → fail;
     // anything in between stays uncertain.
     const dossiers = [];
     for (const d of allDossiers) {
@@ -155,7 +128,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
           severity: 'violation',
           confidence: 'high',
           description:
-            `${d.help} — text colour ${d.measured.contrast.color} against every stop of the gradient ` +
+            `${d.help}: text colour ${d.measured.contrast.color} against every stop of the gradient ` +
             `background is below ${threshold}:1 (best stop ${g.max}:1, computed).`,
         });
       } else {
@@ -166,9 +139,9 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
           severity: 'info',
           confidence: 'low',
           description:
-            `[Needs human review] ${d.help} — gradient/image background` +
+            `[Needs human review] ${d.help}: gradient/image background` +
             (g
-              ? ` (contrast ranges ${g.min}:1 – ${g.max}:1 across stops, threshold ${threshold}:1)`
+              ? ` (contrast ranges ${g.min}:1 to ${g.max}:1 across stops, threshold ${threshold}:1)`
               : ' could not be resolved') +
             '.',
         });
@@ -213,7 +186,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
             impact: d.impact || 'moderate',
             severity: 'violation',
             description:
-              `${d.help} — confirmed by review of the element axe-core could not ` +
+              `${d.help}: confirmed by review of the element axe-core could not ` +
               `decide. Evidence: ${evidence}`,
             nodes: [{ selector: d.selector }],
             helpUrl: d.helpUrl,
@@ -237,7 +210,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
             impact: 'minor',
             severity: 'info',
             description:
-              `[Needs human review] ${d.help} — automated review could not decide` +
+              `[Needs human review] ${d.help}: automated review could not decide` +
               (evidence ? `: ${evidence}` : '.'),
             nodes: [{ selector: d.selector }],
             helpUrl: d.helpUrl,
@@ -282,6 +255,10 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
     return out;
   }
 
+  /**
+   * Re-runs axe for the incomplete bucket instead of consuming the adapter's
+   * output: concurrent scanners have no ordering or data channel between them.
+   */
   async _collectIncomplete(page) {
     const results = await new AxePuppeteer(page)
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
@@ -492,8 +469,8 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
     return (
       requests
         .map((r) => ({ ...r, measured: byRef.get(r.ref) }))
-        // A node whose selector no longer resolves (DOM changed, cross-frame
-        // target) cannot be reviewed on evidence — leave it to a human.
+        // A node whose selector does not resolve (DOM changed, cross-frame
+        // target) cannot be reviewed on evidence. Leave it to a human.
         .filter((r) => r.measured && r.measured.resolved)
     );
   }
@@ -534,13 +511,12 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
 }
 
 /**
- * System prompt — deliberately different from the base class's violation-shaped
- * one, because this scanner asks for per-node verdicts rather than free-form
- * findings.
+ * System prompt. Differs from the base class's violation-shaped one because
+ * this scanner asks for per-node verdicts rather than free-form findings.
  */
 const SYSTEM_PROMPT = `You are an accessibility auditor adjudicating findings that the axe-core engine started but could not finish.
 
-axe-core already determined that each element below is IN SCOPE for its rule. Your only job is to decide, from the measurements provided, whether that element passes or fails — or whether the measurements are insufficient to decide.
+axe-core already determined that each element below is IN SCOPE for its rule. Your only job is to decide, from the measurements provided, whether that element passes or fails, or whether the measurements are insufficient to decide.
 
 CRITICAL RULES:
 1. Decide ONLY from the measurements given in the node dossier. You have no screenshot and no rendered page. If the dossier does not contain the values needed to decide, the answer is "still-uncertain".
@@ -559,19 +535,19 @@ Rule-specific decision guidance:
 **color-contrast / color-contrast-enhanced (1.4.3 / 1.4.6)**
 - \`computedRatioAgainstFirstSolid\` is the true WCAG ratio between the element's text colour and the nearest solid ancestor background.
 - Thresholds: color-contrast needs 4.5:1, or 3:1 for large text (>= 24px, or >= 18.66px when fontWeight >= 700). color-contrast-enhanced needs 7:1, or 4.5:1 for large text.
-- "fail" ONLY when \`hasBackgroundImageInChain\` is false AND the computed ratio is below the applicable threshold — then quote the ratio, the font size and the threshold.
-- "pass" ONLY when \`hasBackgroundImageInChain\` is false AND the ratio meets the threshold — quote the ratio.
+- "fail" ONLY when \`hasBackgroundImageInChain\` is false AND the computed ratio is below the applicable threshold, then quote the ratio, the font size and the threshold.
+- "pass" ONLY when \`hasBackgroundImageInChain\` is false AND the ratio meets the threshold, and quote the ratio.
 - If \`hasBackgroundImageInChain\` is true, or \`firstSolidBackground\` is null, or \`textShadow\` is set: answer "still-uncertain". An image or gradient behind the text makes a single ratio meaningless, which is exactly why axe gave up.
 
 **link-in-text-block (1.4.1)**
 - The question is whether the link is distinguishable from surrounding text by something other than colour.
 - "pass" when \`textDecorationLine\` includes "underline", OR \`borderBottom\` has a non-zero width with a non-none style, OR \`fontWeight\` is clearly heavier than \`surroundingFontWeight\`.
-- "fail" when the ONLY difference is colour: no underline, no border, same weight — and \`linkColor\` differs from \`surroundingColor\`.
+- "fail" when the ONLY difference is colour: no underline, no border, same weight, and \`linkColor\` differs from \`surroundingColor\`.
 - "still-uncertain" when \`surroundingColor\` is null or the link is not inside a text block (e.g. it is the only content of its parent).
 
 **aria-required-children / aria-required-parent / nested-interactive (4.1.2, 1.3.1)**
 - Decide only from \`subtree\` / \`ancestry\` open tags.
-- "fail" when the required role is demonstrably absent from the listed elements — name the role you looked for.
+- "fail" when the required role is demonstrably absent from the listed elements, and name the role you looked for.
 - "pass" when a listed element carries the required role.
 - "still-uncertain" when the subtree list is truncated (12 children shown) and the required role could plausibly be further down, or when the children are generic wrappers whose contents you cannot see.
 
@@ -588,7 +564,7 @@ Rule-specific decision guidance:
 **aria-allowed-attr / aria-valid-attr-value / presentation-role-conflict / frame-tested**
 - These are almost always "still-uncertain" from static attributes alone. Answer "fail" only when the \`attributes\` dump shows an unambiguous contradiction (e.g. \`aria-labelledby\` pointing at an id you can see does not exist in the shown markup). Otherwise "still-uncertain".
 
-Do NOT flag anything the node's rule is not about. Do NOT answer "pass" merely because you cannot find a problem — "pass" needs positive evidence, exactly like "fail" does.
+Do NOT flag anything the node's rule is not about. Do NOT answer "pass" merely because you cannot find a problem: "pass" needs positive evidence, exactly like "fail" does.
 
 Return the verdicts JSON now.`;
 

@@ -62,7 +62,7 @@ describe('TextResizeScanner', () => {
 
   it('treats px font sizes / px widths in CSS as info, never as violations', async () => {
     // WCAG 1.4.4 is satisfied by browser zoom, which scales px text. A px
-    // declaration is a hint at most — only measured clipping/overflow counts.
+    // declaration is a hint at most: only measured clipping/overflow counts.
     const url = `${getBaseUrl()}/bad-text-resize.html`;
     const page = await getPage(url);
     try {
@@ -89,12 +89,12 @@ describe('TextResizeScanner', () => {
     try {
       const result = await scanner.scan(page);
       expect(result).toBeDefined();
-      // must be real, measured findings — not just `info` CSS hints
+      // must be real, measured findings, not just `info` CSS hints
       const real = (result.violations || []).filter((v) => v.severity !== 'info');
       expect(real.length).toBeGreaterThan(0);
 
       // fixed-height/fixed-width containers with overflow:hidden really do
-      // swallow text at 200%/400% — with measured evidence attached
+      // swallow text at 200%/400%, with measured evidence attached
       const clipped = real.filter((v) => v.type === 'text-overflow');
       expect(clipped.length).toBeGreaterThan(0);
       for (const v of clipped) {

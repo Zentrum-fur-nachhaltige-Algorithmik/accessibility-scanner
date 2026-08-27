@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Exclusive Scanner True/False Positive Test
- *
- * Tests all exclusive (non-LLM) scanners against their specific good + bad test files.
- *  - Bad files: must produce >0 violations for the target criterion (true positive)
- *  - Good files: must produce 0 violations for the target criterion (no false positives)
- *
+ * exclusive.js: true/false-positive harness for the exclusive (non-LLM) scanners.
+ * Bad files must produce a violation for the target criterion, good files must not.
  * Each scanner gets its own fresh page (exclusive access).
+ *
+ * Usage:
+ *   node scripts/harness/exclusive.js
+ *   node scripts/harness/exclusive.js --json tests/data/harness/harness-exclusive.json
  */
 
 const path = require('path');
@@ -26,7 +26,7 @@ async function loadPuppeteer() {
 }
 
 /**
- * Scanner definitions: id → { module, criteria, scanOpts }
+ * Scanner definitions: id -> { module, criteria, scanOpts }
  * Each entry defines which WCAG criteria to filter violations by.
  */
 const EXCLUSIVE_SCANNERS = {
@@ -73,7 +73,7 @@ const EXCLUSIVE_SCANNERS = {
 };
 
 /**
- * Criterion → scanner mapping for test file routing.
+ * Criterion -> scanner mapping for test file routing.
  */
 const CRITERION_TO_SCANNER = {};
 for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
@@ -101,7 +101,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const jsonPath = argv.includes('--json') ? argv[argv.indexOf('--json') + 1] : null;
   // Machine-readable record of every assertion, consumed by
-  // tests/coverage-matrix.js to report per-criterion DETECTION (not just
+  // scripts/coverage-matrix.js to report per-criterion detection (not just
   // "a harness entry exists").
   const jsonResults = [];
 
@@ -229,12 +229,12 @@ async function main() {
         ]);
         restore();
 
-        // Violation-level ground truth: a bad file counts as DETECTED only when
-        // a violation matches a criterion the file declares AND that this
+        // Violation-level ground truth: a bad file counts as detected only when
+        // a violation matches a criterion the file declares and that this
         // scanner claims to cover. ">0 violations of any kind" is not detection,
         // and a scanner is never credited for a criterion outside its remit
         // (e.g. input-modalities must produce a real 2.5.1 finding on a file
-        // that declares "2.1.1, 2.5.1" — 2.1.1 findings belong to
+        // that declares "2.1.1, 2.5.1": 2.1.1 findings belong to
         // keyboard-navigation and do not count here).
         const allViolations = result.violations || [];
         const targetCriteria = t.criteria.filter((c) => scannerDef.criteria.includes(c));
@@ -325,8 +325,8 @@ async function main() {
         restore();
 
         const violations = result.violations || [];
-        // Viewport-tested violations (from responsive analysis) should have affectedViewports;
-        // CSS heuristic violations don't — only check structure on viewport violations
+        // Viewport-tested violations (from responsive analysis) carry affectedViewports;
+        // CSS heuristic violations do not, so only check structure on viewport violations
         const viewportViolations = violations.filter((v) => Array.isArray(v.affectedViewports));
         const hasAffectedViewports =
           viewportViolations.length > 0 &&
@@ -408,11 +408,10 @@ async function main() {
         silence();
         const result = await Promise.race([
           responsiveScanner.scan(page, { heuristicOnly: false }),
-          // 180s, not 120s: this is the second full viewport-matrix run over
+          // 180s: this is the second full viewport-matrix run over
           // bad-reflow.html in the same process (the FULL-MATRIX dedup test
           // above already did one), and the browser is measurably slower by
-          // then. At 120s it timed out here while passing there — a harness
-          // budget artefact, not a scanner defect.
+          // then.
           new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 180000)),
         ]);
         restore();
@@ -504,7 +503,7 @@ async function main() {
   }
 }
 
-// Exported so `tests/coverage-matrix.js` can read the real scanner→criteria
+// Exported so `scripts/coverage-matrix.js` can read the real scanner-to-criteria
 // table instead of regex-scraping this file. Guarded so requiring it never
 // launches a browser.
 module.exports = { EXCLUSIVE_SCANNERS, CRITERION_TO_SCANNER, matchesCriteria };

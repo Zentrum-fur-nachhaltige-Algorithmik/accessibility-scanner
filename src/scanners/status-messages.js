@@ -1,21 +1,20 @@
+/**
+ * Status Messages Scanner.
+ * WCAG 4.1.3, 3.3.1 (EN 301 549 9.4.1.3, 9.3.3.1).
+ * Installs a MutationObserver, simulates form and button interactions, and
+ * reports dynamic status regions that lack ARIA live-region wiring.
+ */
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('status-messages');
 
-/**
- * Status Messages Scanner for WCAG 4.1.3 compliance testing
- * Ensures status messages are programmatically determinable via ARIA live regions
- * Critical for screen reader users who need status change announcements
- */
 class StatusMessagesScanner extends BaseScanner {
   constructor() {
     super('status-messages', {
-      // 3.3.1 added alongside 4.1.3: the html5-validation-inaccessible
-      // check (see analyzeFormValidationMessages) is re-tagged to 3.3.1
-      // (Error Identification) below — it must be declared here or a
-      // downstream consumer that filters violations against this list
-      // would drop it as off-criteria.
+      // The html5-validation-inaccessible check (analyzeFormValidationMessages)
+      // is tagged 3.3.1 (Error Identification); it must be declared here or a
+      // consumer filtering violations against this list would drop it.
       wcagCriteria: ['4.1.3', '3.3.1'],
       wcagPrinciple: 'robust',
     });
@@ -23,16 +22,9 @@ class StatusMessagesScanner extends BaseScanner {
 
   /**
    * This scanner clicks submit/action buttons to reveal JS-driven status
-   * messages (see analyzeDynamicStatusMessages below) on the page it's
-   * given. scan-pipeline.js runs every non-exclusive scanner concurrently
-   * via Promise.allSettled against ONE shared page — so those clicks
-   * mutate DOM that other, purely read-only scanners inspect at the same
-   * time, and they end up independently reporting markup THIS scanner
-   * injected. Confirmed case: html-validation's missing-status-attributes
-   * flagging `div.good-status-success` in good-auto-submitting-form.html,
-   * which only exists in the DOM after a click made here. Exclusive access
-   * gives this scanner its own tab (with its own navigation) so its
-   * side-effecting interactions can't leak into concurrent scanners.
+   * messages (analyzeDynamicStatusMessages). Non-exclusive scanners share
+   * one page, so those clicks would mutate DOM that read-only scanners
+   * inspect concurrently. Exclusive access gives this scanner its own tab.
    */
   get needsExclusiveAccess() {
     return true;
@@ -60,11 +52,9 @@ class StatusMessagesScanner extends BaseScanner {
 
     const violations = [];
 
-    // Fix A (missing-live-region false positives): install the
-    // MutationObserver BEFORE any interaction happens, so it can witness
-    // whatever the interaction step below actually changes. Real
-    // dynamism evidence (source 2 of 3 — see installMutationObserver)
-    // only exists if the observer is live before we start clicking.
+    // Install the MutationObserver before any interaction happens, so it
+    // can witness whatever the interaction step below changes (evidence
+    // source 2 of 3, see installMutationObserver).
     await this.installMutationObserver(page);
 
     // Dynamic analysis - simulate interactions to detect missing status
@@ -74,13 +64,13 @@ class StatusMessagesScanner extends BaseScanner {
       const dynamicViolations = await this.analyzeDynamicStatusMessages(page, null, scanOptions);
       violations.push(...dynamicViolations);
     } else {
-      // No simulated interactions — still honor a minimum observation
+      // No simulated interactions: still honor a minimum observation
       // window in case content updates on its own (timers, etc.) before
       // the static pass reads the observer's evidence.
       await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(scanOptions)));
     }
 
-    // Static analysis of existing status message patterns — runs AFTER
+    // Static analysis of existing status message patterns. Runs after
     // interactions so it can use the mutation evidence gathered above.
     const staticViolations = await this.analyzeStaticStatusMessages(page, scanOptions);
     violations.push(...staticViolations);
@@ -119,10 +109,10 @@ class StatusMessagesScanner extends BaseScanner {
   }
 
   /**
-   * Fix A helper: minimum practical MutationObserver window (ms). Even
-   * under the "fast" scan profile (`observationTime: 0`), we still want a
-   * brief settle window so a same-tick DOM mutation from a click has a
-   * chance to be recorded before the static evidence pass reads it.
+   * Minimum practical MutationObserver window (ms). Even under the "fast"
+   * scan profile (`observationTime: 0`) a brief settle window is needed so
+   * a same-tick DOM mutation from a click is recorded before the static
+   * evidence pass reads it.
    */
   getObservationWindow(options = {}) {
     const MIN_WINDOW_MS = 400;
@@ -133,22 +123,20 @@ class StatusMessagesScanner extends BaseScanner {
   }
 
   /**
-   * Fix A: install a page-lifetime MutationObserver plus shared evidence
-   * helpers, used by every subsequent page.evaluate() call this scanner
-   * makes. This must run BEFORE any interaction (see scan()) so mutations
-   * caused by clicking buttons/submitting forms are actually witnessed.
+   * Install a page-lifetime MutationObserver plus shared evidence helpers,
+   * used by every subsequent page.evaluate() call this scanner makes. Must
+   * run before any interaction (see scan()) so mutations caused by clicking
+   * buttons/submitting forms are witnessed.
    *
-   * Replaces the old approach (analyzeStaticStatusMessages flagging any
-   * element whose className/id merely CONTAINED a keyword like "progress"
-   * or "success") with real evidence that a live region is warranted:
+   * A candidate needs real evidence that a live region is warranted:
    *   1. an ARIA role that implies dynamism (progressbar/timer, aria-busy)
    *      but lacks the live-region wiring to announce it;
-   *   2. the element (or a descendant/ancestor) was actually mutated
-   *      during the observation window below; or
-   *   3. it's empty at load and targeted by a form control's
-   *      aria-describedby/aria-errormessage (classic "error slot filled by
-   *      JS" pattern) — unless the page already has a separate aria-live
-   *      announcer as a compensating pattern.
+   *   2. the element (or a descendant/ancestor) was mutated during the
+   *      observation window; or
+   *   3. it is empty at load and targeted by a form control's
+   *      aria-describedby/aria-errormessage (an "error slot filled by JS"),
+   *      unless the page already has a separate aria-live announcer as a
+   *      compensating pattern.
    */
   async installMutationObserver(page) {
     await page.evaluate(() => {
@@ -220,11 +208,10 @@ class StatusMessagesScanner extends BaseScanner {
           return false;
         },
 
-        // Evidence source 3: classic "error slot filled by JS" —
-        // empty at load, targeted by a control's aria-describedby/
-        // aria-errormessage — unless a separate aria-live announcer
-        // elsewhere on the page already covers announcements (an
-        // accepted compensating pattern).
+        // Evidence source 3: an "error slot filled by JS" (empty at load,
+        // targeted by a control's aria-describedby/aria-errormessage),
+        // unless a separate aria-live announcer elsewhere on the page
+        // already covers announcements (an accepted compensating pattern).
         isDescribedbyErrorSlot(element) {
           if (!element || !element.id || element.textContent.trim()) return false;
           const referrer = document.querySelector(
@@ -256,12 +243,11 @@ class StatusMessagesScanner extends BaseScanner {
         return `${tagName}${id}${className}`;
       }
 
-      // Fix A: a candidate container is only a genuine missing-live-region
-      // violation when there's real evidence it's a dynamic status region.
-      // Bare className/id substring matching (the old sole trigger) no
-      // longer flags on its own — e.g. `.progress-container`/`.progress-fill`
-      // in good-accessibility.html and the static `.success` blurb in
-      // good-skip-links.html are never touched by any script.
+      // A candidate container is only a missing-live-region violation when
+      // there is real evidence it is a dynamic status region. A bare
+      // className/id substring match does not flag on its own: a static
+      // `.progress-container` or `.success` blurb never touched by a script
+      // is not a status message.
       function evaluateCandidate(container, meta) {
         if (helpers.hasLiveRegionAttributes(container)) return;
 
@@ -422,9 +408,8 @@ class StatusMessagesScanner extends BaseScanner {
         });
       }
 
-      // Check progress bars — dedicated selector/compliance check kept
-      // (aria-describedby or a nearby aria-live already satisfies it),
-      // now also evidence-gated like every other category above.
+      // Check progress bars. aria-describedby or a nearby aria-live
+      // satisfies the check; evidence-gated like every category above.
       const progressBars = document.querySelectorAll(
         'progress, [role="progressbar"], .progress-bar'
       );
@@ -469,7 +454,7 @@ class StatusMessagesScanner extends BaseScanner {
   /**
    * Block navigation caused by the clicks this scanner simulates.
    * A real submit/link navigation reloads the page under test: the validation
-   * messages we want to observe disappear with it, and the execution context
+   * messages under observation disappear with it, and the execution context
    * of every other scanner sharing the page is destroyed mid-scan.
    * Capture phase so the page's own submit/click handlers still run.
    */
@@ -495,16 +480,12 @@ class StatusMessagesScanner extends BaseScanner {
   async analyzeDynamicStatusMessages(page, scanDir, options) {
     const violations = [];
 
-    // Fast-profile short-circuit: PROFILE_OPTIONS.fast sets
-    // `heuristicOnly: true` (and `observationTime: 0`) specifically to
-    // avoid this kind of expensive click-and-wait simulation. Skip the
-    // form/button interaction loops entirely, but still hold open the
-    // minimum observation window (see getObservationWindow) so the
-    // MutationObserver installed in scan() has had a chance to run
-    // before the static evidence pass reads it. In this mode,
-    // missing-live-region evidence falls back to the static role/
-    // aria-describedby checks only (Fix A sources 1 and 3) — fewer
-    // findings, but still correct, never false.
+    // Fast-profile short-circuit: `heuristicOnly: true` skips the
+    // click-and-wait simulation. Still hold open the minimum observation
+    // window (see getObservationWindow) so the MutationObserver installed
+    // in scan() has had a chance to run before the static evidence pass
+    // reads it. In this mode missing-live-region evidence falls back to the
+    // static role/aria-describedby checks only (sources 1 and 3).
     if (options.heuristicOnly) {
       await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(options)));
       return violations;
@@ -655,9 +636,9 @@ class StatusMessagesScanner extends BaseScanner {
       log.warn('Error during dynamic interaction testing:', error.message);
     }
 
-    // Fix A: let the MutationObserver installed in scan() finish
-    // observing (and let any late microtask-scheduled DOM updates
-    // settle) before the static evidence pass reads its markers.
+    // Let the MutationObserver installed in scan() finish observing (and
+    // late microtask-scheduled DOM updates settle) before the static
+    // evidence pass reads its markers.
     await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(options)));
 
     return violations;
@@ -721,15 +702,14 @@ class StatusMessagesScanner extends BaseScanner {
           }
         }
 
-        // Fix B: check for HTML5 validation without proper
-        // accessibility — but only where there's real evidence of a
-        // problem. Native constraint validation IS exposed to
-        // assistive technology by evergreen browsers and is a
-        // WCAG-sufficient technique for simple cases, and SC 4.1.3 is
-        // specifically about messages presented WITHOUT a change of
-        // focus — native validation moves focus to the invalid
-        // field, so a plain `<input required>` in an otherwise
-        // untouched form is not, by itself, a violation of anything.
+        // Check for HTML5 validation without accessible feedback, but
+        // only where there is real evidence of a problem. Native
+        // constraint validation is exposed to assistive technology by
+        // evergreen browsers and is a WCAG-sufficient technique for
+        // simple cases, and SC 4.1.3 covers messages presented without
+        // a change of focus; native validation moves focus to the
+        // invalid field, so a plain `<input required>` in an otherwise
+        // untouched form is not, by itself, a violation.
         // Only flag when the page shows evidence it suppresses or
         // replaces that native behavior with JS that doesn't provide
         // accessible feedback: a `novalidate`/inline `onsubmit` on
@@ -825,13 +805,10 @@ class StatusMessagesScanner extends BaseScanner {
         return `${tagName}${id}${className}`;
       }
 
-      // Check for AJAX loading patterns. Fix A: this selector shares the
-      // exact same `[class*="loading"]`/`[class*="progress"]` substring-
-      // match bug as analyzeStaticStatusMessages (e.g. it also matches
-      // good-accessibility.html's static `.progress-container`/
-      // `.progress-fill`) — so it needs the same evidence gate, or the
-      // fix there would just resurface identical false positives here
-      // under the sibling 'loading-state-no-announcement' type instead.
+      // Check for AJAX loading patterns. This selector is a
+      // `[class*="loading"]`/`[class*="progress"]` substring match like the
+      // one in analyzeStaticStatusMessages, so it needs the same evidence
+      // gate to avoid flagging static containers.
       const loadingPatterns = document.querySelectorAll(
         [
           '[id*="loading"]',

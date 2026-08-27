@@ -278,32 +278,32 @@
     {
       "layer": "spot-truth",
       "file": "own-audit-ui.html",
-      "detail": "REAL: <html lang=\"de\"> contradicts English content / inner lang=\"en\" — no 3.1.1/3.1.2 language violation reported despite lang=\"de\" on an all-English page"
+      "detail": "REAL: <html lang=\"de\"> contradicts English content / inner lang=\"en\" : no 3.1.1/3.1.2 language violation reported despite lang=\"de\" on an all-English page"
     },
     {
       "layer": "spot-truth",
       "file": "beeproduced.html",
-      "detail": "CLEAN: logo link has an accessible name via its inner img alt — logo link (named by <img alt=\"Logo\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+      "detail": "CLEAN: logo link has an accessible name via its inner img alt: logo link (named by <img alt=\"Logo\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
     },
     {
       "layer": "spot-truth",
       "file": "wiki-medical-de.html",
-      "detail": "CLEAN: valid ISO 639-3 subtags on interlanguage links — 18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code \"arz\"; [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"bcl\"; [undefined/9.3.1.2] Element has invalid language code \"ckb\"; [undefined/9.3.1.2] Element has invalid language code \"gpe\"; [undefined/9.3.1.2] Element has invalid language code \"new\""
+      "detail": "CLEAN: valid ISO 639-3 subtags on : 18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code \"arz\"; [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"bcl\"; [undefined/9.3.1.2] Element has invalid language code \"ckb\"; [undefined/9.3.1.2] Element has invalid language code \"gpe\"; [undefined/9.3.1.2] Element has invalid language code \"new\""
     },
     {
       "layer": "spot-truth",
       "file": "modern-commercial.html",
-      "detail": "CLEAN: heading whose accessible name comes from an image alt — the only text-empty h2 (named by <img alt=\"Mozilla Anzeigen\">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading \"[empty]\" is not descriptive (empty-heading)"
+      "detail": "CLEAN: heading whose accessible name comes from an : the only text-empty h2 (named by <img alt=\"Mozilla Anzeigen\">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading \"[empty]\" is not descriptive (empty-heading)"
     },
     {
       "layer": "spot-truth",
       "file": "modern-commercial.html",
-      "detail": "CLEAN: nav logo link is named by its inner img alt — logo link (named by <img alt=\"Mozilla\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+      "detail": "CLEAN: nav logo link is named by its inner img alt: logo link (named by <img alt=\"Mozilla\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
     },
     {
       "layer": "spot-truth",
       "file": "modern-commercial.html",
-      "detail": "CLEAN: valid 3-letter BCP-47 subtags are not \"invalid language codes\" — 9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"cak\"; [undefined/9.3.1.2] Element has invalid language code \"dsb\"; [undefined/9.3.1.2] Element has invalid language code \"hsb\"; [undefined/9.3.1.2] Element has invalid language code \"kab\""
+      "detail": "CLEAN: valid 3-letter BCP-47 subtags are not \"invalid language codes\": 9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"cak\"; [undefined/9.3.1.2] Element has invalid language code \"dsb\"; [undefined/9.3.1.2] Element has invalid language code \"hsb\"; [undefined/9.3.1.2] Element has invalid language code \"kab\""
     }
   ],
   "passed": false

@@ -1,22 +1,18 @@
+/**
+ * csp-strategy
+ * CSP bypass strategies for injecting axe-core into pages that restrict inline scripts.
+ * Tried in order: plain script tag, evaluateOnNewDocument (before CSP loads),
+ * CDP Page.setBypassCSP, then a script tag with the source inlined.
+ */
 const fs = require('fs-extra');
 const path = require('path');
-
-/**
- * CSP (Content Security Policy) bypass strategies for injecting
- * axe-core into pages that restrict inline scripts.
- *
- * Strategies are tried in order of reliability:
- * 1. evaluateOnNewDocument — inject before CSP loads
- * 2. CDP bypass — use Chrome DevTools Protocol to disable CSP
- * 3. Content injection — add script tag with source inlined
- */
 
 /**
  * Try navigating with CSP fallback strategies.
  * Injects axe-core and runs it, returning results on success.
  *
- * @param {import('puppeteer').Page} page — already-open page
- * @param {string} url — target URL
+ * @param {import('puppeteer').Page} page - already-open page
+ * @param {string} url - target URL
  * @param {Object} options
  * @returns {Promise<Object|null>} axe results or null if all strategies fail
  */
@@ -31,10 +27,10 @@ async function navigateWithCSPFallback(page, url, options = {}) {
     const results = await runAxeOnPage(page);
     if (!results.error) return results;
   } catch (e) {
-    // CSP likely blocked — fall through to mitigations
+    // CSP likely blocked: fall through to mitigations
   }
 
-  // Strategy 2: evaluateOnNewDocument — inject axe before CSP loads
+  // Strategy 2: evaluateOnNewDocument, inject axe before CSP loads
   try {
     const axeSource = await fs.readFile(path.resolve('./node_modules/axe-core/axe.min.js'), 'utf8');
     await page.evaluateOnNewDocument(axeSource);

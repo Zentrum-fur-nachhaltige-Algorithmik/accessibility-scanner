@@ -8,6 +8,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
+const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('hover-focus-content');
 
 class HoverFocusContentScanner extends BaseScanner {
@@ -35,8 +36,8 @@ class HoverFocusContentScanner extends BaseScanner {
   async heuristicScan(page) {
     log.debug('Running heuristic hover/focus content check...');
 
-    const result = await page.evaluate((renderedCode) => {
-      eval(renderedCode);
+    const result = await page.evaluate((injectedCode) => {
+      eval(injectedCode);
       const violations = [];
 
       function getSelector(el) {
@@ -203,26 +204,32 @@ class HoverFocusContentScanner extends BaseScanner {
       }
       for (const e of hoverContentSelectors) delete e.revealedEls;
 
-      // 3. Flag title attributes on interactive elements
+      // 3. Controls whose only name is a title attribute.
+      //
+      // The tooltip a browser draws from `title` is user agent content, which
+      // 1.4.13 does not govern, and a link that carries its page summary in a
+      // title (every link on a MediaWiki page) is supplementary. What does
+      // fail is a control with no other name: its name appears only in a
+      // tooltip that a touch user never sees and a keyboard user cannot
+      // dismiss or hover.
       const interactiveWithTitle = document.querySelectorAll(
         'a[title], button[title], input[title], [role="button"][title], [tabindex][title]'
       );
       interactiveWithTitle.forEach((el) => {
         if (!__isRendered(el)) return;
-        const title = el.getAttribute('title');
-        if (!title || title.length < 5) return; // Skip trivially short titles
-        const text = el.textContent.trim();
-        const ariaLabel = el.getAttribute('aria-label') || '';
-        if (text.includes(title) || ariaLabel.includes(title)) return; // info already accessible
+        const title = (el.getAttribute('title') || '').trim();
+        if (!title) return;
+        const name = (__accessibleName(el) || '').trim();
+        if (name !== title) return;
 
         violations.push({
           criterion: '9.1.4.13',
           element: getSelector(el),
           issue: 'title-attribute-as-content',
-          description: `title="${title.substring(0, 50)}..." conveys content that is not dismissable or hoverable`,
+          description: `The only name of this control is title="${title.substring(0, 50)}", which is readable only as a browser tooltip that cannot be hovered or dismissed`,
           severity: 'moderate',
           suggestion:
-            'Use a visible tooltip pattern instead of the title attribute, with Escape to dismiss.',
+            'Give the control a visible label or an aria-label, and keep the title for supplementary information only.',
         });
       });
 
@@ -277,7 +284,7 @@ class HoverFocusContentScanner extends BaseScanner {
         hasAutoClose,
         hasEscapeHandler,
       };
-    }, renderedCode);
+    }, `${renderedCode}\n${accnameCode}`);
 
     return {
       scannerId: this.id,

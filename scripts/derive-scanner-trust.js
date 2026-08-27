@@ -35,17 +35,8 @@ function readJson(file) {
 }
 
 function collectScannerIds() {
-  const hadKey = Boolean(process.env.OPENROUTER_API_KEY);
-  if (!hadKey) process.env.OPENROUTER_API_KEY = 'trust-derivation-placeholder';
-  const origLog = console.log;
-  console.log = () => {};
-  let scanners;
-  try {
-    scanners = require(path.join(ROOT, 'src', 'core', 'scanner-registry.js')).createAllScanners();
-  } finally {
-    console.log = origLog;
-    if (!hadKey) delete process.env.OPENROUTER_API_KEY;
-  }
+  const { createAllScanners } = require(path.join(ROOT, 'src', 'core', 'scanner-registry.js'));
+  const scanners = createAllScanners({ llmClient: {} });
   return scanners.map((s) => ({
     id: s.id,
     kind: s.id === 'axe-core' ? 'axe' : s.id.startsWith('llm-') ? 'llm' : 'deterministic',

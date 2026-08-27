@@ -16,6 +16,10 @@ const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
 const http = require('http');
 const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
+const { FILE_TO_SCANNERS } = require('./exclusive');
+
+/** Fixtures an exclusive scanner claims by name; the concurrent plan skips them. */
+const CLAIMED_FILES = new Set(Object.keys(FILE_TO_SCANNERS));
 
 async function loadPuppeteer() {
   try {
@@ -49,10 +53,8 @@ const CONCURRENT_SCANNERS = {
   'language-detection': { module: '../../src/scanners/language-detection' },
   'predictable-navigation': { module: '../../src/scanners/predictable-navigation' },
   'error-handling': { module: '../../src/scanners/error-handling' },
-  'html-validation': { module: '../../src/scanners/html-validation' },
   'page-structure': { module: '../../src/scanners/page-structure' },
   'label-in-name': { module: '../../src/scanners/label-in-name' },
-  'status-messages': { module: '../../src/scanners/status-messages' },
   'advanced-aria': { module: '../../src/scanners/advanced-aria' },
   'timing-controls': { module: '../../src/scanners/timing-controls' },
 };
@@ -167,6 +169,10 @@ async function main() {
     if (!isGood && !isBad) continue;
 
     parsedFiles.push({ file, metadata, isGood, isBad });
+
+    // A fixture an exclusive scanner claims by name belongs to that scanner
+    // alone (see FILE_TO_SCANNERS in exclusive.js).
+    if (CLAIMED_FILES.has(file)) continue;
 
     for (const [sid, criteria] of Object.entries(scannerCriteria)) {
       const intersection = intersectCriteria(metadata.criterion, criteria);

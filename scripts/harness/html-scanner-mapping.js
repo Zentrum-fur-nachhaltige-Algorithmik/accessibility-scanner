@@ -333,13 +333,9 @@ const HTML_SCANNER_MAPPING = {
   },
 
   // Technical Implementation
-  'bad-html-validation.html': {
-    expectedScanners: ['html-validation'],
-    excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
-    testType: 'bad',
-    wcagCriteria: ['4.1.1'],
-    description: 'Invalid HTML markup affecting accessibility APIs',
-  },
+  // bad-html-validation.html has no entry: SC 4.1.1 was removed from WCAG 2.2
+  // and the scanner that owned the file is gone. axe-core still reports the
+  // ARIA and naming defects in it.
 
   'bad-css-background-info.html': {
     expectedScanners: ['page-structure', 'use-of-color'],
@@ -715,7 +711,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-redundant-aria.html': {
     expectedScanners: [],
-    excludedScanners: ['advanced-aria', 'page-structure', 'html-validation'],
+    excludedScanners: ['advanced-aria', 'page-structure'],
     testType: 'good',
     wcagCriteria: ['4.1.2', '1.3.1'],
     description:
@@ -918,7 +914,6 @@ const AVAILABLE_SCANNERS = [
   'use-of-color',
   'images-of-text',
   'language-detection',
-  'html-validation',
   'keyboard-navigation',
   'input-modalities',
   'timing-controls',

@@ -16,7 +16,6 @@ const MediaAccessibilityScanner = require('../scanners/media-accessibility');
 const LanguageDetectionScanner = require('../scanners/language-detection');
 const PredictableNavigationScanner = require('../scanners/predictable-navigation');
 const ErrorHandlingScanner = require('../scanners/error-handling');
-const HTMLValidationScanner = require('../scanners/html-validation');
 const PageStructureScanner = require('../scanners/page-structure');
 const SeizurePreventionScanner = require('../scanners/seizure-prevention');
 const TimingControlsScanner = require('../scanners/timing-controls');
@@ -104,7 +103,6 @@ function createAllScanners({ llmClient } = {}) {
     new LanguageDetectionScanner(),
     new PredictableNavigationScanner(),
     new ErrorHandlingScanner(),
-    new HTMLValidationScanner(),
     new PageStructureScanner(),
     new LabelInNameScanner(),
     new StatusMessagesScanner(),
@@ -156,7 +154,6 @@ const PROFILES = {
     'language-detection',
     'predictable-navigation',
     'error-handling',
-    'html-validation',
     'page-structure',
     'label-in-name',
     'status-messages',
@@ -184,7 +181,6 @@ const PROFILES = {
     'language-detection',
     'predictable-navigation',
     'error-handling',
-    'html-validation',
     'page-structure',
     'label-in-name',
     'status-messages',

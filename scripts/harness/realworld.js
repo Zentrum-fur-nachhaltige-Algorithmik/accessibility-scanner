@@ -1234,6 +1234,13 @@ async function main() {
     const violations = result.violations || [];
     entry.totalViolations = violations.length;
     entry.scannerCount = Object.keys(scanners).length;
+    // Per-scanner violation counts: the band is a total, so a scanner that
+    // trades false positives for false negatives stays invisible in it.
+    entry.perScanner = {};
+    for (const v of violations) {
+      const id = v.scannerId || 'unknown';
+      entry.perScanner[id] = (entry.perScanner[id] || 0) + 1;
+    }
     entry.expectedScannerCount = outcome.expectedIds.length;
 
     for (const id of outcome.expectedIds) {

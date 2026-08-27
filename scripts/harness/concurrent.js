@@ -27,12 +27,13 @@
  * avoids one fixture's DOM mutations leaking into the next test).
  *
  * Usage:
- *   node test-sites/test-concurrent-scanners.js
- *   node test-sites/test-concurrent-scanners.js --json /path/to/out.json
- *   node test-sites/test-concurrent-scanners.js --only color-contrast
+ *   node scripts/harness/concurrent.js
+ *   node scripts/harness/concurrent.js --json /path/to/out.json
+ *   node scripts/harness/concurrent.js --only color-contrast
  */
 
 const path = require('path');
+const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
 const http = require('http');
 const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
@@ -52,7 +53,7 @@ async function loadPuppeteer() {
  * `wcagCriteria` constructor metadata at instantiation time (see below),
  * per the task requirement to use each scanner's real, current metadata.
  *
- * Excludes axe-core (covered by tests/scanners/axe-core-e2e.test.js) and
+ * Excludes axe-core (covered by tests/e2e/axe-core.test.js) and
  * every scanner already covered by test-exclusive-scanners.js.
  */
 const CONCURRENT_SCANNERS = {
@@ -143,7 +144,7 @@ async function main() {
   const { json: jsonPath, only: onlyScanner } = parseArgs(process.argv.slice(2));
 
   const puppeteer = await loadPuppeteer();
-  const testDir = __dirname;
+  const testDir = TEST_SITES;
 
   // ---- Instantiate scanners first: we need each one's real wcagCriteria ----
   const scannerInstances = {};
@@ -428,7 +429,7 @@ async function main() {
   }
 }
 
-// Exported so `tests/coverage-matrix.js` can read the real scanner list instead
+// Exported so `scripts/coverage-matrix.js` can read the real scanner list instead
 // of regex-scraping this file. Criteria are intentionally absent here (they are
 // read from each scanner's own metadata at run time), so the matrix resolves
 // them from the scanner registry by id. Guarded so requiring this module never

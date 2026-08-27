@@ -5,11 +5,25 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "dev": "node --env-file=.env --watch src/server.js",
     "frontend:dev": "next dev frontend",
     "frontend:build": "next build frontend",
-    "frontend:start": "next start frontend"
+    "frontend:start": "next start frontend",
+    "test": "vitest run --project unit",
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "vitest run --project e2e",
+    "test:self-scan": "vitest run --project self-scan",
+    "test:all": "vitest run",
+    "test:watch": "vitest --project unit",
+    "coverage-matrix": "node scripts/coverage-matrix.js",
+    "coverage-matrix:check": "node scripts/coverage-matrix.js --check",
+    "trust:derive": "node scripts/derive-scanner-trust.js",
+    "trust:check": "node scripts/derive-scanner-trust.js --check",
+    "harness:exclusive": "node scripts/harness/exclusive.js",
+    "harness:concurrent": "node scripts/harness/concurrent.js",
+    "harness:llm": "node scripts/harness/llm.js",
+    "harness:golden": "node scripts/harness/golden.js",
+    "harness:realworld": "node scripts/harness/realworld.js"
   },
   "keywords": [
     "accessibility",

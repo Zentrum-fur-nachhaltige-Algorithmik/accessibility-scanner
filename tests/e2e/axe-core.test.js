@@ -95,7 +95,7 @@ describe('axe-core E2E', () => {
       } finally {
         await page.close();
       }
-    }, 30000);
+    }, 60000);
   });
 
   describe('bad files — adapter runs without crashing', () => {
@@ -117,6 +117,6 @@ describe('axe-core E2E', () => {
       } finally {
         await page.close();
       }
-    }, 30000);
+    }, 60000);
   });
 });

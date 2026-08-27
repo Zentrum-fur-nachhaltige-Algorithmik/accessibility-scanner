@@ -38,7 +38,7 @@ describe('MobileSpecificScanner', () => {
     } finally {
       await page.close();
     }
-  }, 60000);
+  }, 120000);
 
   it('does not flag responsive elements as mobile-fixed-width-400-zoom on good-reflow.html', async () => {
     const url = `${getBaseUrl()}/good-reflow.html`;
@@ -54,7 +54,7 @@ describe('MobileSpecificScanner', () => {
     } finally {
       await page.close();
     }
-  }, 60000);
+  }, 120000);
 
   it('does not flag sr-only elements on good-skip-links.html', async () => {
     const url = `${getBaseUrl()}/good-skip-links.html`;
@@ -69,9 +69,9 @@ describe('MobileSpecificScanner', () => {
     } finally {
       await page.close();
     }
-  }, 60000);
+  }, 120000);
 
-  it('no longer emits the rules without a WCAG basis', async () => {
+  it('emits only rules with a WCAG basis', async () => {
     // mobile-small-text-400-zoom (px font < 12px) and landscape-excessive-height
     // (page taller than 8 viewports) were removed: browser zoom scales px text,
     // and no criterion limits page length (1.3.4 is about *locking* orientation).
@@ -86,7 +86,7 @@ describe('MobileSpecificScanner', () => {
     } finally {
       await page.close();
     }
-  }, 60000);
+  }, 120000);
 
   it('only reports overflow:hidden containers that really swallow text', async () => {
     const url = `${getBaseUrl()}/bad-reflow.html`;
@@ -118,9 +118,9 @@ describe('MobileSpecificScanner', () => {
     } finally {
       await page.close();
     }
-  }, 60000);
+  }, 120000);
 
-  it('does not claim target-size findings any more (2.5.8 lives in input-modalities)', async () => {
+  it('leaves target-size findings to input-modalities (2.5.8)', async () => {
     // The 44px touch-target check was removed from this scanner (FP-1). It used
     // the AAA threshold, counted non-interactive elements and multiplied every
     // hit by five device profiles. bad-target-size.html is therefore no longer

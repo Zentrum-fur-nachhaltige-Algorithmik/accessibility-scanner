@@ -159,7 +159,7 @@ module.exports = {
 
 // CLI usage
 if (require.main === module) {
-  const dir = process.argv[2] || __dirname;
+  const dir = process.argv[2] || path.join(__dirname, '..', '..', 'test-sites');
   const { parsed, unparsed } = parseDirectory(dir);
 
   console.log(`Parsed ${parsed.length} files with WCAG-TEST metadata`);

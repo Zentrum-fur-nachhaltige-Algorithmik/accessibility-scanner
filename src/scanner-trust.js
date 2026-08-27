@@ -14,7 +14,7 @@
  * ever deleted; a scanner earns its way back by turning its harness red green.
  *
  * The tier data lives in `scanner-trust.json` and is DERIVED from the recorded
- * battery results by `tests/derive-scanner-trust.js` — membership is evidence,
+ * battery results by `scripts/derive-scanner-trust.js` — membership is evidence,
  * revisited each battery run, not opinion.
  */
 

@@ -19,20 +19,25 @@
  * uses absolute `/_next/...` asset paths.
  *
  * Usage:
- *   node test-sites/test-golden-corpus.js                   # all themes, no LLM
- *   node test-sites/test-golden-corpus.js --theme evergreen --route index
- *   node test-sites/test-golden-corpus.js --llm             # include LLM scanners (costs money)
- *   node test-sites/test-golden-corpus.js --json docs/sprints/p2-quality/raw/harness-golden.json
- *   node test-sites/test-golden-corpus.js --report          # print every rule, not only guarded ones
+ *   node scripts/harness/golden.js                   # all themes, no LLM
+ *   node scripts/harness/golden.js --theme evergreen --route index
+ *   node scripts/harness/golden.js --llm             # include LLM scanners (costs money)
+ *   node scripts/harness/golden.js --json tests/data/harness/harness-golden.json
+ *   node scripts/harness/golden.js --report          # print every rule, not only guarded ones
  */
 
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 const { isHardViolation, normalizeSeverity } = require(path.join(ROOT, 'src', 'severity'));
 const CORPUS = path.join(ROOT, 'test-sites', 'realworld', 'med-templates');
+
+if (!fs.existsSync(CORPUS)) {
+  console.log(`golden corpus not present (${path.relative(ROOT, CORPUS)}), nothing to check`);
+  process.exit(0);
+}
 const THEMES = ['evergreen', 'clinic', 'spectrum', 'lumen', 'warmth'];
 const ROUTES = ['index', 'leistungen', 'team', 'kontakt', 'preise', 'patienteninfo', 'impressum', 'datenschutz'];
 const PER_PAGE_TIMEOUT_MS = 600000;
@@ -127,7 +132,7 @@ function parseArgs(argv) {
     else if (argv[i] === '--json') out.json = argv[++i];
     else if (argv[i] === '--report') out.report = true;
     else if (argv[i] === '--help' || argv[i] === '-h') {
-      console.log('Usage: node test-sites/test-golden-corpus.js [--theme a,b] [--route x,y] [--llm] [--json <path>] [--report]');
+      console.log('Usage: node scripts/harness/golden.js [--theme a,b] [--route x,y] [--llm] [--json <path>] [--report]');
       process.exit(0);
     }
   }

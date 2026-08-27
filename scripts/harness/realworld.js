@@ -36,14 +36,14 @@
  * These fixtures deliberately carry NO `<!-- WCAG-TEST -->` metadata and live
  * in a SUBDIRECTORY, so the existing fixture harnesses do not pick them up —
  * `test-exclusive-scanners.js`, `test-concurrent-scanners.js` and
- * `tests/scanners/axe-core-e2e.test.js` all enumerate with
+ * `tests/e2e/axe-core.test.js` all enumerate with
  * `readdirSync(testDir).filter(f => f.endsWith('.html'))`, which is
  * non-recursive and drops the `realworld` directory entry.
  *
  * Usage:
- *   node test-sites/test-realworld.js --no-llm
- *   node test-sites/test-realworld.js --json /tmp/realworld.json
- *   node test-sites/test-realworld.js --only med-theme.html
+ *   node scripts/harness/realworld.js --no-llm
+ *   node scripts/harness/realworld.js --json /tmp/realworld.json
+ *   node scripts/harness/realworld.js --only med-theme.html
  *
  * LLM scanners run only when OPENROUTER_API_KEY is in the environment AND
  * --no-llm was not passed. They cost money — use --no-llm while iterating.
@@ -57,10 +57,10 @@ const path = require('path');
 const http = require('http');
 const fs = require('fs');
 
-const ScanPipeline = require('../src/scan-pipeline');
-const { registerAllScanners, getProfile } = require('../src/scanner-registry');
+const ScanPipeline = require('../../src/scan-pipeline');
+const { registerAllScanners, getProfile } = require('../../src/scanner-registry');
 
-const FIXTURE_DIR = path.join(__dirname, 'realworld');
+const FIXTURE_DIR = path.join(__dirname, '..', '..', 'test-sites', 'realworld');
 const PROFILE = 'standard';
 
 /**
@@ -698,7 +698,7 @@ function parseArgs(argv) {
     else if (argv[i] === '--only') out.only = argv[++i];
     else if (argv[i] === '--no-llm') out.noLlm = true;
     else if (argv[i] === '--help' || argv[i] === '-h') {
-      console.log('Usage: node test-sites/test-realworld.js [--no-llm] [--only <file>] [--json <path>]');
+      console.log('Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>]');
       process.exit(0);
     }
   }
@@ -763,7 +763,7 @@ async function main() {
   if (args.only) fixtures = fixtures.filter((f) => f.file === args.only || f.file === `${args.only}.html`);
 
   if (fixtures.length === 0) {
-    console.error(`No fixtures to run. Did you run: node test-sites/capture-realworld.js ?`);
+    console.error(`No fixtures to run. Did you run: node scripts/capture-realworld.js ?`);
     process.exit(1);
   }
 

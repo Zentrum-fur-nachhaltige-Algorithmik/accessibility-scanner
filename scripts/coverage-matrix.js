@@ -22,9 +22,9 @@
  * checked-in matrix can never silently drift from the code.
  *
  * Usage:
- *   node tests/coverage-matrix.js            # regenerate the markdown
- *   node tests/coverage-matrix.js --check    # validate only, write nothing
- *   node tests/coverage-matrix.js --json <p> # also emit machine-readable JSON
+ *   node scripts/coverage-matrix.js            # regenerate the markdown
+ *   node scripts/coverage-matrix.js --check    # validate only, write nothing
+ *   node scripts/coverage-matrix.js --json <p> # also emit machine-readable JSON
  */
 
 const fs = require('fs');
@@ -178,7 +178,7 @@ function collectAxeCriteria() {
 // ---------------------------------------------------------------------------
 
 function collectFixtures() {
-  const { parseDirectory } = require(path.join(TEST_SITES, 'wcag-metadata-parser.js'));
+  const { parseDirectory } = require('./harness/wcag-metadata-parser');
 
   // parseDirectory logs warnings for unparseable files; keep the output clean.
   const origErr = console.error;
@@ -214,7 +214,7 @@ function collectFixtures() {
  * `main()` behind `require.main === module`), so this reads the real tables
  * rather than regex-scraping source.
  *
- * `axe-e2e` is `tests/scanners/axe-core-e2e.test.js`, which runs the axe adapter
+ * `axe-e2e` is `tests/e2e/axe-core.test.js`, which runs the axe adapter
  * over EVERY good/bad fixture; it therefore verifies any criterion axe-core has
  * a rule for, provided fixtures exist for it.
  *
@@ -241,7 +241,7 @@ function collectHarnessCoverage(axeByCriterion, fixturesByCriterion, scanners) {
       : (byScannerId.get(id)?.criteria || []);
 
   const tryRequire = (rel) => {
-    const p = path.join(TEST_SITES, rel);
+    const p = path.join(ROOT, 'scripts', 'harness', rel);
     if (!fs.existsSync(p)) return null;
     try {
       return require(p);
@@ -251,24 +251,24 @@ function collectHarnessCoverage(axeByCriterion, fixturesByCriterion, scanners) {
     }
   };
 
-  const exclusive = tryRequire('test-exclusive-scanners.js');
+  const exclusive = tryRequire('exclusive.js');
   for (const [id, def] of Object.entries(exclusive?.EXCLUSIVE_SCANNERS || {})) {
     for (const c of criteriaOf(id, def)) add(c, 'exclusive');
   }
 
-  const concurrent = tryRequire('test-concurrent-scanners.js');
+  const concurrent = tryRequire('concurrent.js');
   for (const [id, def] of Object.entries(concurrent?.CONCURRENT_SCANNERS || {})) {
     for (const c of criteriaOf(id, def)) add(c, 'concurrent');
   }
 
-  const llm = tryRequire('test-llm-scanners.js');
+  const llm = tryRequire('llm.js');
   for (const [id, def] of Object.entries(llm?.SCANNER_TESTS || {})) {
     for (const c of criteriaOf(id, def)) add(c, 'llm');
   }
 
   // Golden corpus: real, healthy pages on which the listed criteria's rules
   // must stay silent (false-positive guard, not a detection guard).
-  const golden = tryRequire('test-golden-corpus.js');
+  const golden = tryRequire('golden.js');
   for (const c of golden?.GOLDEN_CRITERIA || []) add(c, 'golden');
 
   for (const sc of axeByCriterion.keys()) {
@@ -518,8 +518,8 @@ function renderMarkdown(rows, scanners, fileCount) {
   L.push('# WCAG 2.2 Coverage Matrix');
   L.push('');
   L.push('<!-- GENERATED FILE — do not edit by hand.');
-  L.push('     Regenerate with: node tests/coverage-matrix.js');
-  L.push('     Validate in CI with: node tests/coverage-matrix.js --check -->');
+  L.push('     Regenerate with: node scripts/coverage-matrix.js');
+  L.push('     Validate in CI with: node scripts/coverage-matrix.js --check -->');
   L.push('');
   L.push(`Generated: ${new Date().toISOString()}`);
   L.push('');
@@ -576,7 +576,7 @@ function renderMarkdown(rows, scanners, fileCount) {
   L.push('**`FP!`** = at least one good fixture produced a false positive; `—` = no recorded run.');
   L.push('');
   L.push('**Scope caveat:** these recorded runs cover the CUSTOM scanners only. axe-core is not');
-  L.push('part of them — its rules are exercised separately by `tests/scanners/axe-core-e2e.test.js`');
+  L.push('part of them — its rules are exercised separately by `tests/e2e/axe-core.test.js`');
   L.push('over every fixture. So a **`tp`** on a criterion whose primary mechanism is `axe-core` or');
   L.push('`hybrid:axe-core+…` means "our custom scanner adds nothing here", not "the criterion is');
   L.push('undetected".');

@@ -21,11 +21,11 @@
  * Single-run by design — no repetition, no majority voting. Runs cost money.
  *
  * Usage:
- *   node test-sites/test-llm-scanners.js
- *   node test-sites/test-llm-scanners.js --only llm-behavioral
- *   node test-sites/test-llm-scanners.js --skip-german     # cheap iteration
- *   node test-sites/test-llm-scanners.js --skip-robustness
- *   node test-sites/test-llm-scanners.js --json out.json
+ *   node scripts/harness/llm.js
+ *   node scripts/harness/llm.js --only llm-behavioral
+ *   node scripts/harness/llm.js --skip-german     # cheap iteration
+ *   node scripts/harness/llm.js --skip-robustness
+ *   node scripts/harness/llm.js --json out.json
  */
 
 const path = require('path');
@@ -34,7 +34,8 @@ const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
 
 // Load .env if present
-const envPath = path.join(__dirname, '..', '.env');
+const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
+const envPath = path.join(__dirname, '..', '..', '.env');
 if (fs.existsSync(envPath)) {
   const envContent = fs.readFileSync(envPath, 'utf-8');
   for (const line of envContent.split('\n')) {
@@ -199,7 +200,7 @@ async function main() {
   }
 
   const puppeteer = await loadPuppeteer();
-  const { LLMClient } = require('../src/llm-client');
+  const { LLMClient } = require('../../src/llm-client');
   const client = new LLMClient({
     apiKey: process.env.OPENROUTER_API_KEY,
     maxRetries: 3,
@@ -214,7 +215,7 @@ async function main() {
   }
 
   const staticServer = http.createServer((req, res) => {
-    const filePath = path.join(__dirname, decodeURIComponent(req.url.replace(/^\//, '').split('?')[0]));
+    const filePath = path.join(TEST_SITES, decodeURIComponent(req.url.replace(/^\//, '').split('?')[0]));
     if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
       res.writeHead(404);
       res.end('Not found');
@@ -270,7 +271,7 @@ async function main() {
 
     // ---- bad files: violation-level ground truth ------------------------
     for (const file of badFiles) {
-      const filePath = path.join(__dirname, file);
+      const filePath = path.join(TEST_SITES, file);
       if (!fs.existsSync(filePath)) {
         console.log(`  SKIP (not found): ${file}`);
         continue;
@@ -305,7 +306,7 @@ async function main() {
 
     // ---- good files: no false positives on the file's own criteria ------
     for (const file of goodFiles) {
-      const filePath = path.join(__dirname, file);
+      const filePath = path.join(TEST_SITES, file);
       if (!fs.existsSync(filePath)) {
         console.log(`  SKIP (not found): ${file}`);
         continue;
@@ -337,7 +338,7 @@ async function main() {
 
     // ---- lenient files: must not crash ----------------------------------
     for (const file of testConfig.lenient || []) {
-      const filePath = path.join(__dirname, file);
+      const filePath = path.join(TEST_SITES, file);
       if (!fs.existsSync(filePath)) continue;
       totalTests++;
       try {
@@ -361,7 +362,7 @@ async function main() {
     // ---- robustness fixtures --------------------------------------------
     if (!skipRobustness) {
       for (const file of testConfig.robustness || []) {
-        const filePath = path.join(__dirname, file);
+        const filePath = path.join(TEST_SITES, file);
         if (!fs.existsSync(filePath)) {
           console.log(`  SKIP (not found): ${file}`);
           continue;
@@ -457,7 +458,7 @@ async function main() {
   }
 }
 
-// Exported so `tests/coverage-matrix.js` can read the real scanner→criteria
+// Exported so `scripts/coverage-matrix.js` can read the real scanner→criteria
 // table instead of regex-scraping this file. Guarded so requiring it never
 // launches a browser or spends money.
 module.exports = { SCANNER_TESTS, matchesCriteria, expectedCriteriaFor };

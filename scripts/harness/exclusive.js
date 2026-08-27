@@ -11,6 +11,7 @@
  */
 
 const path = require('path');
+const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
 const http = require('http');
 const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
@@ -103,7 +104,7 @@ async function main() {
   const jsonResults = [];
 
   const puppeteer = await loadPuppeteer();
-  const testDir = __dirname;
+  const testDir = TEST_SITES;
 
   // Parse all test files and route to scanners
   const allFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.html'));

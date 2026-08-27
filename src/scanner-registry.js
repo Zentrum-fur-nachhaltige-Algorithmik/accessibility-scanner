@@ -220,7 +220,7 @@ function allScannerIds() {
  * Membership is TRUST-TIERED: the profile list above states the speed/scope
  * intent, and this filters it to axe-core + the LLM scanners + the custom
  * scanners currently rated `proven` in `src/scanner-trust.json` (derived from
- * the recorded battery results by `tests/derive-scanner-trust.js`).
+ * the recorded battery results by `scripts/derive-scanner-trust.js`).
  *
  * Quarantined scanners are not deleted — pass `{ includeExperimental: true }`
  * to run them. Their findings are tagged `confidence: 'low'` by the pipeline so

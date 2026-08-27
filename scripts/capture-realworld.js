@@ -23,8 +23,8 @@
  * bands hard-coded in test-realworld.js).
  *
  * Usage:
- *   node test-sites/capture-realworld.js            # capture all
- *   node test-sites/capture-realworld.js --only med-theme
+ *   node scripts/capture-realworld.js            # capture all
+ *   node scripts/capture-realworld.js --only med-theme
  *
  * The `own-audit-ui` target needs the repo's own Next.js frontend running:
  *   npx next start frontend -p 3111     (or: npx next dev frontend -p 3111)
@@ -33,7 +33,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const OUT_DIR = path.join(__dirname, 'realworld');
+const OUT_DIR = path.join(__dirname, '..', 'test-sites', 'realworld');
 
 /**
  * Analytics / tag-manager / session-replay signatures.

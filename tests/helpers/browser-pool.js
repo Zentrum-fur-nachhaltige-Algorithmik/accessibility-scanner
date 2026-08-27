@@ -22,7 +22,7 @@ async function getPage(url) {
   await page.setViewport({ width: 1920, height: 1080 });
 
   if (url) {
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.goto(url, { waitUntil: 'load', timeout: 30000 });
   }
 
   return page;

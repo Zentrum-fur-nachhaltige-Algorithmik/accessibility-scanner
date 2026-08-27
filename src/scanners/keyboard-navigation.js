@@ -1,7 +1,9 @@
 /**
  * Keyboard Navigation Scanner.
  * WCAG 2.1.1, 2.1.2, 2.1.4 (EN 301 549 9.2.1.1, 9.2.1.2, 9.2.1.4).
- * Drives real Tab presses through the page and analyses focus order, traps and shortcuts.
+ * Drives real Tab presses through the page and analyses keyboard reachability,
+ * traps and single character key shortcuts. Focus order (2.4.3) and focus
+ * visibility (2.4.7) belong to the focus-management scanner.
  */
 const fs = require('fs-extra');
 const path = require('path');
@@ -262,13 +264,13 @@ class KeyboardNavigationScanner extends BaseScanner {
     const shortcutResults = await this.testKeyboardShortcuts(page, violations);
     customShortcuts = shortcutResults.conflicts;
 
-    // Group 1: Skip Links and Bypass Mechanisms (replaces axe: skip-link, bypass)
+    // 6. Skip links whose target is missing
     await this.validateSkipLinks(page, violations);
 
-    // Group 2: Focusable Elements and Tab Order (replaces axe: focusable-element, focus-order-semantics)
+    // 7. Controls the tab order cannot reach, and focus stops with nothing on them
     await this.validateFocusableElements(page, violations);
 
-    // Group 4: Accesskey Management (replaces axe: accesskeys)
+    // 8. Accesskeys claimed twice or attached to something unfocusable
     await this.validateAccesskeys(page, violations);
 
     // Calculate summary
@@ -813,7 +815,10 @@ class KeyboardNavigationScanner extends BaseScanner {
   // CSP-independent keyboard checks (no script injection)
 
   /**
-   * Validate skip links (replaces axe: skip-link)
+   * Skip links whose fragment target does not exist (SC 2.4.1).
+   * Whether a page needs a skip link at all is not decided here: landmarks and
+   * headings satisfy 2.4.1 just as well, and axe reports the landmark advice
+   * as best practice, which axe-core.js filters out.
    */
   async validateSkipLinks(page, violations) {
     log.debug('Validating skip links...');
@@ -1037,7 +1042,9 @@ class KeyboardNavigationScanner extends BaseScanner {
   }
 
   /**
-   * Validate accesskeys (replaces axe: accesskeys)
+   * Accesskeys (SC 2.1.4).
+   * Reports a key that more than one element claims, since the browser reaches
+   * only one of them, and a key on an element that cannot take focus.
    */
   async validateAccesskeys(page, violations) {
     log.debug('Validating accesskeys...');

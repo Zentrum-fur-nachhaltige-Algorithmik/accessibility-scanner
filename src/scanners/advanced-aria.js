@@ -1,4 +1,5 @@
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 
 /**
  * Phase 6B: Advanced ARIA Complex Widgets Scanner
@@ -33,7 +34,7 @@ class AdvancedAriaScanner extends BaseScanner {
       checkLiveRegions: true,
       validateKeyboardInteraction: true,
       checkAriaStates: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

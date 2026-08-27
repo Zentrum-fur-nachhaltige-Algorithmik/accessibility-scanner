@@ -1,4 +1,5 @@
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('accessibility-statement');
 const {
   findStatementLink,
@@ -29,7 +30,7 @@ class AccessibilityStatementScanner extends BaseScanner {
   async scan(page, options = {}) {
     const defaultOptions = {
       searchDepth: 3,
-      timeout: 30000,
+      timeout: TIMEOUTS.navigation,
       language: 'auto',
     };
 

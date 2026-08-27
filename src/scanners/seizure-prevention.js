@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('seizure-prevention');
 
 /**
@@ -32,7 +33,7 @@ class SeizurePreventionScanner extends BaseScanner {
       testAnimationTriggers: true,
       testMotionSensitivity: true,
       observationTime: 10000,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

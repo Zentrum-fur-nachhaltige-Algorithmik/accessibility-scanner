@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('timing-controls');
 
 /**
@@ -28,7 +29,7 @@ class TimingControlsScanner extends BaseScanner {
       testAutoPlay: true,
       testMovingContent: true,
       observationTime: 5000,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

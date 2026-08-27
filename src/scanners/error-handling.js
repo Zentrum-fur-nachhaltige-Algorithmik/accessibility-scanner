@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
+const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('error-handling');
 
 /**
@@ -29,7 +30,7 @@ class ErrorHandlingScanner extends BaseScanner {
       testErrorSuggestions: true,
       testErrorPrevention: true,
       simulateErrors: true,
-      timeout: 60000,
+      timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };

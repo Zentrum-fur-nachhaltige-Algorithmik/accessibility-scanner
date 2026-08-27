@@ -1,522 +1,760 @@
-import { useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 
-function NemethLogo() {
-  // Nemeth Braille representation of the equals sign (⠀⠶)
-  // Dots: 2-3-5-6 in a standard 2x3 braille cell
-  const dotSize = 4;
-  const gap = 12;
-  const positions = [
-    // Cell: dots at positions 2,3,5,6 (0-indexed: row1-col1, row2-col0, row2-col1, row1-col0... )
-    // Standard braille: col0=dots 1,2,3 col1=dots 4,5,6
-    // Equals in Nemeth: dots 46 (prefix) then 13 = ⠐⠅
-    // Simplified: show two braille cells side by side
-    // Cell 1 (dot 4,6): positions (1,0) and (2,0) in col1
-    { cx: 28, cy: 8, filled: false },   // dot 1
-    { cx: 28, cy: 20, filled: false },  // dot 2
-    { cx: 28, cy: 32, filled: false },  // dot 3
-    { cx: 40, cy: 8, filled: true },    // dot 4
-    { cx: 40, cy: 20, filled: false },  // dot 5
-    { cx: 40, cy: 32, filled: true },   // dot 6
-    // Cell 2 (dots 1,3): positions (0,0) and (2,0) in col0
-    { cx: 56, cy: 8, filled: true },    // dot 1
-    { cx: 56, cy: 20, filled: false },  // dot 2
-    { cx: 56, cy: 32, filled: true },   // dot 3
-    { cx: 68, cy: 8, filled: false },   // dot 4
-    { cx: 68, cy: 20, filled: false },  // dot 5
-    { cx: 68, cy: 32, filled: false },  // dot 6
-  ];
+import ConformitySeal from '../components/ConformitySeal';
+import ScanHistoryList from '../components/ScanHistoryList';
+import ScanResults from '../components/ScanResults';
+import { APP_NAME } from '../lib/branding';
+import {
+  ApiError,
+  createReport,
+  fetchHealth,
+  fetchJob,
+  fetchReportHtml,
+  loadToken,
+  saveToken,
+  startScan,
+} from '../lib/scanClient';
+import { addHistoryEntry, clearHistory, loadHistory } from '../lib/scanHistory';
+import { NOT_AVAILABLE, formatDate, formatElapsed } from '../lib/violations';
 
-  return (
-    <svg
-      role="img"
-      aria-label="Logo der Abraham-Nemeth-Gesellschaft: Gleichheitszeichen in Nemeth-Braille"
-      viewBox="0 0 96 40"
-      width="96"
-      height="40"
-      className="landing-logo"
-    >
-      {positions.map((dot, i) => (
-        <circle
-          key={i}
-          cx={dot.cx}
-          cy={dot.cy}
-          r={dotSize}
-          fill={dot.filled ? '#1b2a4a' : 'none'}
-          stroke="#1b2a4a"
-          strokeWidth="1.5"
-        />
-      ))}
-    </svg>
-  );
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_FAILURES = 3;
+
+const PROFILES = [
+  {
+    id: 'fast',
+    label: 'Quick scan',
+    description: 'WCAG 2.2 AA, core checks, about 30 seconds',
+  },
+  {
+    id: 'standard',
+    label: 'Standard scan',
+    description: 'WCAG 2.2 AA, full check, 1 to 2 minutes',
+  },
+  {
+    id: 'full',
+    label: 'Full scan',
+    description: 'WCAG 2.2 A, AA and AAA with semantic analysis, 2 to 4 minutes',
+  },
+];
+
+const BUSY_PHASES = ['submitting', 'queued', 'running'];
+
+function profileLabel(id) {
+  return PROFILES.find((profile) => profile.id === id)?.label || id || '';
 }
 
-function NavBar() {
-  return (
-    <header className="landing-header" role="banner">
-      <a href="#hauptinhalt" className="skip-link">Zum Hauptinhalt springen</a>
-      <div className="landing-header-inner">
-        <div className="landing-brand">
-          <NemethLogo />
-          <span className="landing-org-name">
-            Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.
-          </span>
-        </div>
-        <nav aria-label="Hauptnavigation">
-          <ul className="landing-nav">
-            <li><a href="#ueber-uns">Über uns</a></li>
-            <li><a href="#forschung">Forschung</a></li>
-            <li><a href="#publikationen">Publikationen</a></li>
-            <li><a href="#wissenschaftler">Profile</a></li>
-            <li><a href="#veranstaltungen">Veranstaltungen</a></li>
-            <li><a href="#kontakt">Kontakt</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="landing-hero" aria-labelledby="hero-heading">
-      <h1 id="hero-heading" className="landing-hero-title">
-        Abraham-Nemeth-Gesellschaft{' '}
-        <span className="landing-hero-subtitle">für barrierefreie Wissenschaft</span>
-      </h1>
-      <p className="landing-hero-tagline">
-        <em>Barrierefreiheit ist kein Zusatz. Sie ist ein Prinzip der Wissenschaft.</em>
-      </p>
-      <p className="landing-hero-intro">
-        Die Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft ist eine unabhängige
-        wissenschaftliche Vereinigung mit Sitz in Wien. Sie erforscht die mathematischen und
-        technologischen Grundlagen barrierefreier Systeme, dokumentiert die Beiträge behinderter
-        Wissenschaftlerinnen und Wissenschaftler und setzt sich für strukturelle Barrierefreiheit
-        im Wissenschaftssystem ein. Die Gesellschaft ist benannt nach Abraham Nemeth (1918–2013),
-        dem blinden Mathematiker und Erfinder des Nemeth-Braille-Codes für mathematische Notation.
-      </p>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section id="ueber-uns" className="landing-section" aria-labelledby="ueber-uns-heading">
-      <h2 id="ueber-uns-heading" className="landing-section-heading">Über die Gesellschaft</h2>
-
-      <h3 id="selbstverstaendnis-heading">Selbstverständnis</h3>
-      <p>
-        Die Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft versteht Barrierefreiheit
-        nicht als technische Nachrüstung und nicht als Akt der Fürsorge, sondern als epistemisches
-        Grundprinzip. Wissenschaft, die nicht zugänglich ist, ist unvollständige Wissenschaft –
-        sie schließt Perspektiven aus, die sie bereichern würden, und reproduziert Barrieren, die
-        sie abzubauen vorgibt.
-      </p>
-      <p>
-        Die Gesellschaft wurde in der Überzeugung gegründet, dass die mathematischen,
-        algorithmischen und institutionellen Voraussetzungen barrierefreier Wissenschaft
-        eigenständiger Forschung bedürfen. Ihre Arbeit bewegt sich an der Schnittstelle von
-        Grundlagenforschung, Wissenschaftsgeschichte und Wissenschaftspolitik.
-      </p>
-
-      <h3 id="namensgebung-heading">Namensgebung</h3>
-      <p>
-        Abraham Nemeth, geboren 1918 in New York, erblindet von Geburt an, studierte Mathematik
-        gegen den ausdrücklichen Rat seiner Universität, die ihn in ein als geeigneter
-        betrachtetes Fach umlenken wollte. Er promovierte, lehrte jahrzehntelang und entwickelte
-        den nach ihm benannten Nemeth-Code – ein Braille-System, das erstmals die vollständige
-        Darstellung mathematischer Notation ermöglichte. Sein Lebenswerk steht exemplarisch für
-        das Anliegen der Gesellschaft: dass wissenschaftliche Erkenntnis nicht an der
-        Verfügbarkeit eines einzelnen Sinneskanals scheitern darf.
-      </p>
-
-      <h3 id="aufgaben-heading">Aufgaben und Ziele</h3>
-      <p>
-        Die Gesellschaft widmet sich vier Aufgabenbereichen. In der Grundlagenforschung untersucht
-        sie die mathematischen Strukturen, die technologischer Barrierefreiheit zugrunde liegen –
-        von maschinellem Sehen und Reinforcement Learning bis zur formalen Analyse assistiver
-        Systeme. Im Bereich der wissenschaftlichen Darstellung erforscht sie modalitätsunabhängige
-        Zugänge zu mathematischen, naturwissenschaftlichen und technischen Inhalten. In der
-        historischen und biografischen Forschung dokumentiert sie systematisch die Beiträge
-        behinderter Forschender, die in der Wissenschaftsgeschichtsschreibung bisher unzureichend
-        gewürdigt werden. Und in der Wissenschaftspolitik erarbeitet sie Analysen und Empfehlungen
-        zur strukturellen Barrierefreiheit an Hochschulen, in Verlagen und in Förderinstitutionen.
-      </p>
-    </section>
-  );
-}
-
-function Research() {
-  const areas = [
-    {
-      id: 'grundlagen',
-      title: 'Mathematische Grundlagen technologischer Barrierefreiheit',
-      text: `Assistive Technologien – von Navigationssystemen für blinde Nutzerinnen und Nutzer bis zu intelligenten Prothesen – beruhen auf mathematischen Modellen, deren Eigenschaften über die Qualität und Verlässlichkeit dieser Systeme entscheiden. Die Gesellschaft untersucht die formalen Grundlagen solcher Systeme mit besonderem Augenmerk auf geometrische und probabilistische Methoden der Umgebungswahrnehmung, auf lernende Systeme, die sich an individuelle Bedürfnisse anpassen, und auf die mathematischen Bedingungen, unter denen assistive Systeme verlässliche Sicherheitsgarantien bieten können.`,
-      detail: `Ein zentrales Forschungsinteresse gilt der Frage, wie visuelle Information formal so reduziert und transformiert werden kann, dass sie über nicht-visuelle Kanäle – taktil, auditiv, haptisch – zugänglich wird, ohne wesentlichen Informationsverlust.`,
-    },
-    {
-      id: 'darstellung',
-      title: 'Barrierefreie Darstellung wissenschaftlicher Inhalte',
-      text: `Wissenschaftliche Notation ist historisch auf visuelle Wahrnehmung ausgerichtet. Mathematische Formeln, chemische Strukturdiagramme, physikalische Schaltbilder und biologische Modelle setzen in ihrer konventionellen Darstellung das Sehen voraus. Die Gesellschaft untersucht, wie wissenschaftliche Inhalte modalitätsunabhängig dargestellt werden können, ohne ihre Präzision und Ausdruckskraft einzubüßen.`,
-      detail: `Dabei stehen sowohl bestehende Systeme wie der Nemeth-Code und MathML als auch experimentelle Ansätze wie die Sonifikation mathematischer Strukturen und die algorithmische Erzeugung taktiler Darstellungen im Fokus.`,
-    },
-    {
-      id: 'geschichte',
-      title: 'Wissenschaftsgeschichte und Biografik',
-      text: `Die Geschichte der Wissenschaft ist in erheblichem Maß auch eine Geschichte behinderter Forschender – eine Geschichte, die bislang fragmentarisch erzählt wird. Leonhard Euler verfasste einen wesentlichen Teil seines Werks nach seiner Erblindung. Bernard Morin, blind seit seiner Kindheit, leistete Beiträge zur Topologie, die bis heute grundlegend sind. Geerat Vermeij, ebenfalls blind, revolutionierte die Evolutionsbiologie durch einen Forschungsansatz, der auf taktiler Analyse beruhte.`,
-      detail: `Die Gesellschaft baut ein systematisches biografisches Archiv auf, das die Beiträge behinderter Wissenschaftlerinnen und Wissenschaftler dokumentiert und in ihren wissenschaftshistorischen Kontext einordnet.`,
-    },
-    {
-      id: 'politik',
-      title: 'Wissenschaftspolitik und Inklusion',
-      text: `Barrierefreie Wissenschaft erfordert neben technischen Lösungen strukturelle Veränderungen im Wissenschaftssystem. Die Gesellschaft analysiert die gegenwärtige Lage der Barrierefreiheit an Hochschulen, in wissenschaftlichen Verlagen und in Förderinstitutionen und erarbeitet auf dieser Grundlage Empfehlungen und Stellungnahmen.`,
-      detail: `Zu den untersuchten Themen zählen die Zugänglichkeit wissenschaftlicher Publikationen und Peer-Review-Verfahren, die Bedingungen inklusiver Hochschullehre insbesondere in den MINT-Fächern, und die Frage, inwieweit bestehende Förderstrukturen den Bedürfnissen behinderter Forschender gerecht werden.`,
-    },
-  ];
-
-  return (
-    <section id="forschung" className="landing-section landing-section-alt" aria-labelledby="forschung-heading">
-      <h2 id="forschung-heading" className="landing-section-heading">Forschungsschwerpunkte</h2>
-      <div className="landing-research-grid">
-        {areas.map((area) => (
-          <article key={area.id} className="landing-research-card">
-            <h3 id={`forschung-${area.id}`}>{area.title}</h3>
-            <p>{area.text}</p>
-            <p className="landing-research-detail">{area.detail}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function PublicationsPreview() {
-  const entries = [
-    {
-      id: 'ANG-AP-2026-001',
-      title: 'Zur informationstheoretischen Reduktion visueller Szenendaten für nicht-visuelle Ausgabekanäle.',
-      category: 'Arbeitspapier',
-      status: 'In Vorbereitung',
-    },
-    {
-      id: 'ANG-WP-2026-001',
-      title: 'Abraham Nemeth (1918–2013): Mathematiker, Pädagoge, Erfinder des Nemeth-Codes.',
-      category: 'Wissenschaftlerprofil',
-      status: 'Erschienen',
-    },
-    {
-      id: 'ANG-ST-2026-001',
-      title: 'Zur Barrierefreiheit mathematischer Notation in wissenschaftlichen Zeitschriften: Eine Bestandsaufnahme und Empfehlungen.',
-      category: 'Stellungnahme',
-      status: 'In Vorbereitung',
-    },
-    {
-      id: 'ANG-NF-2026-001',
-      title: 'Anmerkungen zur WCAG-Konformität mathematischer Darstellungen in Open-Access-Journalen.',
-      category: 'Forschungsnotiz',
-      status: 'In Vorbereitung',
-    },
-  ];
-
-  return (
-    <section id="publikationen" className="landing-section" aria-labelledby="publikationen-heading">
-      <h2 id="publikationen-heading" className="landing-section-heading">Publikationen</h2>
-      <p>
-        Die Gesellschaft veröffentlicht Arbeitspapiere, Wissenschaftlerprofile, Stellungnahmen
-        und kürzere Forschungsnotizen. Alle Veröffentlichungen stehen als frei zugängliche
-        Dokumente in barrierefreien Formaten zur Verfügung.
-      </p>
-      <ul className="landing-pub-list">
-        {entries.map((entry) => (
-          <li key={entry.id} className="landing-pub-item">
-            <span className="landing-pub-id">{entry.id}</span>
-            <span className="landing-pub-title">{entry.title}</span>
-            <span className="landing-pub-meta">
-              {entry.category} – {entry.status}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <p>
-        <a href="/publications" className="landing-more-link">
-          Alle Publikationen anzeigen
-        </a>
-      </p>
-    </section>
-  );
-}
-
-function ProfilesPreview() {
-  const profiles = [
-    {
-      name: 'Abraham Nemeth',
-      dates: '1918–2013',
-      summary: 'Mathematiker, Pädagoge, Erfinder des Nemeth-Codes. Von Geburt an blind, studierte er Mathematik gegen den Rat seiner Universität und entwickelte das weltweit verbreitete Braille-System für mathematische Notation.',
-    },
-    {
-      name: 'Leonhard Euler',
-      dates: '1707–1783',
-      summary: 'Euler verlor in seinen Vierzigern das Augenlicht nahezu vollständig. Ein wesentlicher Teil seines mathematischen Werks entstand nach der Erblindung.',
-    },
-    {
-      name: 'Bernard Morin',
-      dates: '1931–2018',
-      summary: 'Seit seinem sechsten Lebensjahr blind, bewies Morin 1959, dass eine Sphäre im dreidimensionalen Raum ohne Selbstdurchdringung umgestülpt werden kann – ein Ergebnis, an dem sehende Topologen gescheitert waren.',
-    },
-  ];
-
-  return (
-    <section id="wissenschaftler" className="landing-section landing-section-alt" aria-labelledby="wissenschaftler-heading">
-      <h2 id="wissenschaftler-heading" className="landing-section-heading">Wissenschaftlerprofile</h2>
-      <p>
-        Das biografische Archiv der Gesellschaft dokumentiert die Beiträge behinderter
-        Wissenschaftlerinnen und Wissenschaftler und ordnet sie in ihren
-        wissenschaftshistorischen Kontext ein.
-      </p>
-      <div className="landing-profiles-grid">
-        {profiles.map((profile) => (
-          <article key={profile.name} className="landing-profile-card">
-            <h3>{profile.name} <span className="landing-profile-dates">({profile.dates})</span></h3>
-            <p>{profile.summary}</p>
-          </article>
-        ))}
-      </div>
-      <p>
-        <a href="/profiles" className="landing-more-link">
-          Alle Profile anzeigen
-        </a>
-      </p>
-    </section>
-  );
-}
-
-function Events() {
-  return (
-    <section id="veranstaltungen" className="landing-section" aria-labelledby="veranstaltungen-heading">
-      <h2 id="veranstaltungen-heading" className="landing-section-heading">Veranstaltungen</h2>
-
-      <h3>Kommende Veranstaltungen</h3>
-      <dl className="landing-events-list">
-        <dt>
-          <time dateTime="2026-04">April 2026</time>
-        </dt>
-        <dd>
-          <strong>Lesekreis: Barrierefreie Wissenschaft</strong><br />
-          Monatlicher Lesekreis zu aktuellen Publikationen und Forschungsfragen im Bereich
-          barrierefreie Wissenschaft. Teilnahme nach Anmeldung. Details werden rechtzeitig
-          bekanntgegeben.
-        </dd>
-        <dt>
-          <time dateTime="2026-06">Juni 2026</time>
-        </dt>
-        <dd>
-          <strong>Workshop: Nemeth-Code für Einsteiger</strong><br />
-          Einführung in die Nemeth-Braille-Notation für mathematische Ausdrücke.
-          Keine Vorkenntnisse erforderlich.
-        </dd>
-      </dl>
-
-      <h3>Vergangene Veranstaltungen</h3>
-      <p className="landing-muted">
-        Die Gesellschaft befindet sich im Aufbau. Ein Archiv vergangener Veranstaltungen
-        wird nach den ersten durchgeführten Veranstaltungen hier zur Verfügung stehen.
-      </p>
-    </section>
-  );
-}
-
-function Contact() {
-  const [formErrors, setFormErrors] = useState({});
-  const emailRef = useRef(null);
-  const messageRef = useRef(null);
-
-  const validateForm = () => {
-    const errors = {};
-    const email = emailRef.current?.value.trim();
-    const message = messageRef.current?.value.trim();
-
-    if (!email) {
-      errors.email = 'Bitte geben Sie Ihre E-Mail-Adresse ein.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
-    }
-
-    if (!message) {
-      errors.message = 'Bitte geben Sie eine Nachricht ein.';
-    }
-
-    return errors;
-  };
-
-  const handleSubmit = (e) => {
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      e.preventDefault();
-      setFormErrors(errors);
-      if (errors.email) {
-        emailRef.current?.focus();
-      } else if (errors.message) {
-        messageRef.current?.focus();
-      }
-    }
-  };
-
-  const clearError = (field) => {
-    if (formErrors[field]) {
-      setFormErrors((prev) => {
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
-    }
-  };
-
-  return (
-    <section id="kontakt" className="landing-section landing-section-alt" aria-labelledby="kontakt-heading">
-      <h2 id="kontakt-heading" className="landing-section-heading">Kontakt und Mitgliedschaft</h2>
-
-      <div className="landing-contact-grid">
-        <div className="landing-contact-info">
-          <h3>Kontakt</h3>
-          <address className="landing-address">
-            Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.<br />
-            Vereinssitz Wien<br />
-            <a href="mailto:kontakt@nemeth-gesellschaft.org">kontakt@nemeth-gesellschaft.org</a>
-          </address>
-
-          <h3>Mitgliedschaft</h3>
-          <p>
-            Die Mitgliedschaft steht allen natürlichen und juristischen Personen offen, die die
-            Ziele der Gesellschaft unterstützen. Beitrittserklärungen können formlos per E-Mail
-            oder über das Kontaktformular eingereicht werden.
-          </p>
-        </div>
-
-        <div className="landing-contact-form-wrapper">
-          <form
-            className="landing-contact-form"
-            action="mailto:kontakt@nemeth-gesellschaft.org"
-            method="POST"
-            encType="text/plain"
-            onSubmit={handleSubmit}
-            noValidate
-          >
-            <fieldset>
-              <legend>Kontaktformular</legend>
-
-              {Object.keys(formErrors).length > 0 && (
-                <p className="error-text" role="alert">
-                  <strong>Fehler:</strong> Bitte korrigieren Sie die markierten Felder.
-                </p>
-              )}
-
-              <div className="landing-field">
-                <label htmlFor="contact-name">Name</label>
-                <input type="text" id="contact-name" name="name" autoComplete="name" />
-              </div>
-
-              <div className="landing-field">
-                <label htmlFor="contact-email">
-                  E-Mail <span className="required-indicator" aria-hidden="true">*</span>
-                  <span className="sr-only">(Pflichtfeld)</span>
-                </label>
-                <input
-                  ref={emailRef}
-                  type="email"
-                  id="contact-email"
-                  name="email"
-                  aria-required="true"
-                  aria-invalid={formErrors.email ? 'true' : 'false'}
-                  aria-describedby="contact-email-error"
-                  autoComplete="email"
-                  onChange={() => clearError('email')}
-                />
-                <p className="error-text" id="contact-email-error" aria-live="assertive">
-                  {formErrors.email || ''}
-                </p>
-              </div>
-
-              <div className="landing-field">
-                <label htmlFor="contact-subject">Betreff</label>
-                <input type="text" id="contact-subject" name="subject" />
-              </div>
-
-              <div className="landing-field">
-                <label htmlFor="contact-message">
-                  Nachricht <span className="required-indicator" aria-hidden="true">*</span>
-                  <span className="sr-only">(Pflichtfeld)</span>
-                </label>
-                <textarea
-                  ref={messageRef}
-                  id="contact-message"
-                  name="message"
-                  rows="5"
-                  aria-required="true"
-                  aria-invalid={formErrors.message ? 'true' : 'false'}
-                  aria-describedby="contact-message-error"
-                  onChange={() => clearError('message')}
-                />
-                <p className="error-text" id="contact-message-error" aria-live="assertive">
-                  {formErrors.message || ''}
-                </p>
-              </div>
-
-              <button type="submit" className="landing-submit-btn">Nachricht senden</button>
-            </fieldset>
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="landing-footer" role="contentinfo">
-      <div className="landing-footer-inner">
-        <div className="landing-footer-org">
-          <p>
-            Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.
-          </p>
-          <p className="landing-footer-meta">
-            Vereinsregisternummer: ZVR XXXXX · Vereinssitz: Wien
-          </p>
-        </div>
-        <nav aria-label="Rechtliche Hinweise und weitere Seiten">
-          <ul className="landing-footer-links">
-            <li><a href="/accessibility">Barrierefreiheitserklärung</a></li>
-            <li><a href="/audit">Audit-Service</a></li>
-          </ul>
-        </nav>
-        <p className="landing-footer-wcag">
-          Diese Website erfüllt WCAG 2.2 AA.
-        </p>
-      </div>
-    </footer>
-  );
+function validateUrl(value) {
+  if (!value) return 'Please enter the address of the page to scan.';
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    return 'Please enter a valid address, for example https://example.com.';
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    return 'The address must start with http:// or https://.';
+  }
+  return null;
 }
 
 export default function Home() {
+  const [url, setUrl] = useState('');
+  const [profile, setProfile] = useState('standard');
+
+  const [token, setToken] = useState('');
+  const [tokenOpen, setTokenOpen] = useState(false);
+  const [tokenVisible, setTokenVisible] = useState(false);
+
+  const [fieldError, setFieldError] = useState(null);
+  const [apiError, setApiError] = useState(null);
+
+  const [phase, setPhase] = useState('idle');
+  const [activeScan, setActiveScan] = useState(null);
+  const [queuePosition, setQueuePosition] = useState(null);
+  const [nowTs, setNowTs] = useState(0);
+
+  const [result, setResult] = useState(null);
+  const [resultMeta, setResultMeta] = useState(null);
+  const [reportPending, setReportPending] = useState(false);
+  const [reportLink, setReportLink] = useState(null);
+
+  const [history, setHistory] = useState([]);
+  const [historyNotice, setHistoryNotice] = useState('');
+
+  // Number of registered scanners as reported by /api/health.
+  const [registeredModules, setRegisteredModules] = useState(null);
+
+  const [pendingFocus, setPendingFocus] = useState(null);
+  // Set after mount: this page is prerendered, so "today" must not be baked in.
+  const [todayIso, setTodayIso] = useState('');
+
+  const urlRef = useRef(null);
+  const tokenRef = useRef(null);
+  const alertRef = useRef(null);
+  const submitRef = useRef(null);
+  const resultsHeadingRef = useRef(null);
+  const historyHeadingRef = useRef(null);
+  const reportLinkRef = useRef(null);
+  const blobUrlRef = useRef(null);
+
+  const isBusy = BUSY_PHASES.includes(phase);
+  const elapsed = activeScan
+    ? Math.max(0, Math.floor((nowTs - activeScan.startedAt) / 1000))
+    : 0;
+
+  // Startup: restore token and history from this browser.
+  useEffect(() => {
+    setToken(loadToken());
+    setHistory(loadHistory());
+    setTodayIso(new Date().toISOString());
+  }, []);
+
+  // Module count from the server; purely informational, so failures are ignored.
+  useEffect(() => {
+    let cancelled = false;
+    fetchHealth()
+      .then((health) => {
+        if (!cancelled && Number.isFinite(health?.scanners)) {
+          setRegisteredModules(health.scanners);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Focus management (runs after the DOM has been updated).
+  useEffect(() => {
+    if (!pendingFocus) return;
+    if (pendingFocus === 'url') urlRef.current?.focus();
+    else if (pendingFocus === 'token') tokenRef.current?.focus();
+    else if (pendingFocus === 'alert') alertRef.current?.focus();
+    else if (pendingFocus === 'submit') submitRef.current?.focus();
+    else if (pendingFocus === 'results') resultsHeadingRef.current?.focus();
+    else if (pendingFocus === 'history') historyHeadingRef.current?.focus();
+    else if (pendingFocus === 'report') reportLinkRef.current?.focus();
+    setPendingFocus(null);
+  }, [pendingFocus]);
+
+  // Blob URLs for authenticated report downloads must be released again.
+  const releaseReportBlob = useCallback(() => {
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => releaseReportBlob, [releaseReportBlob]);
+
+  // Elapsed-time ticker (kept outside the live region).
+  useEffect(() => {
+    if (!isBusy || !activeScan) return undefined;
+    setNowTs(Date.now());
+    const timer = setInterval(() => setNowTs(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [isBusy, activeScan]);
+
+  const showError = useCallback((error, { clearScan = true } = {}) => {
+    const isAuth = error instanceof ApiError && error.isAuthError;
+    if (clearScan) {
+      setPhase('error');
+      setActiveScan(null);
+      setQueuePosition(null);
+    }
+    setApiError({
+      message: error?.message || 'An unexpected error occurred.',
+      isAuth,
+    });
+    if (isAuth) setTokenOpen(true);
+    setPendingFocus(isAuth ? 'token' : 'alert');
+  }, []);
+
+  const finishScan = useCallback((context, scanResult) => {
+    const scannedAt = scanResult?.timestamp || new Date().toISOString();
+    const score =
+      typeof scanResult?.accessibilityScore === 'number'
+        ? scanResult.accessibilityScore
+        : null;
+    const violationCount =
+      typeof scanResult?.totalViolations === 'number'
+        ? scanResult.totalViolations
+        : Array.isArray(scanResult?.violations)
+          ? scanResult.violations.length
+          : null;
+
+    setResult(scanResult);
+    setResultMeta({
+      url: context.url,
+      profile: profileLabel(context.profile),
+      jobId: context.jobId || null,
+      scannedAt,
+      restored: false,
+    });
+    setPhase('done');
+    setActiveScan(null);
+    setQueuePosition(null);
+    setApiError(null);
+    setHistory(
+      addHistoryEntry({
+        jobId: context.jobId || null,
+        url: context.url,
+        profile: context.profile,
+        date: scannedAt,
+        score,
+        violationCount,
+        result: scanResult,
+      })
+    );
+  }, []);
+
+  const applyJob = useCallback(
+    (context, job) => {
+      const status = String(job?.status || '').toLowerCase();
+
+      if (status === 'done' || status === 'complete' || status === 'completed') {
+        if (job?.result) finishScan(context, job.result);
+        else
+          showError(
+            new ApiError(
+              'The scan finished but the server returned no result. Please start the scan again.'
+            )
+          );
+        return;
+      }
+      if (status === 'error' || status === 'failed') {
+        showError(
+          new ApiError(
+            job?.error ||
+              'The scan failed on the server. Please check the address and start the scan again.'
+          )
+        );
+        return;
+      }
+      if (status === 'running') {
+        setPhase('running');
+        setQueuePosition(null);
+        return;
+      }
+      if (status === 'queued' || status === 'pending' || status === 'waiting') {
+        setPhase('queued');
+        const position = Number(job?.queuePosition);
+        setQueuePosition(Number.isFinite(position) ? position : null);
+      }
+      // Unknown status: keep polling rather than guessing.
+    },
+    [finishScan, showError]
+  );
+
+  // Job polling.
+  // Depends on the scan context only: phase transitions (queued -> running)
+  // must not restart the interval, otherwise every transition costs an extra
+  // request. The effect stops when finishScan/showError/stop clears activeScan.
+  useEffect(() => {
+    const context = activeScan;
+    if (!context?.jobId) return undefined;
+
+    let cancelled = false;
+    let failures = 0;
+    const controller = new AbortController();
+
+    const poll = async () => {
+      try {
+        const job = await fetchJob(context.jobId, {
+          token: context.token,
+          signal: controller.signal,
+        });
+        if (cancelled) return;
+        failures = 0;
+        applyJob(context, job);
+      } catch (error) {
+        if (cancelled || error?.name === 'AbortError') return;
+        const transient = !(error instanceof ApiError) || error.isTransient;
+        failures += 1;
+        if (!transient || failures >= MAX_POLL_FAILURES) {
+          showError(
+            error instanceof ApiError
+              ? error
+              : new ApiError(
+                  'The connection to the scan server was lost. Please start the scan again.'
+                )
+          );
+        }
+      }
+    };
+
+    const timer = setInterval(poll, POLL_INTERVAL_MS);
+    poll();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+      clearInterval(timer);
+    };
+  }, [activeScan, applyJob, showError]);
+
+  // Handlers.
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const trimmed = url.trim();
+    const validation = validateUrl(trimmed);
+
+    setApiError(null);
+    if (validation) {
+      setFieldError(validation);
+      setPendingFocus('url');
+      return;
+    }
+    setFieldError(null);
+
+    const context = {
+      jobId: null,
+      url: trimmed,
+      profile,
+      token,
+      startedAt: Date.now(),
+    };
+
+    setResult(null);
+    setResultMeta(null);
+    setReportLink(null);
+    releaseReportBlob();
+    setQueuePosition(null);
+    setPhase('submitting');
+    setActiveScan(context);
+
+    try {
+      const { jobId, result: syncResult } = await startScan({
+        url: trimmed,
+        profile,
+        token,
+      });
+      // A legacy synchronous server answers with the finished result instead
+      // of a job id: render it straight away.
+      if (syncResult) {
+        finishScan(context, syncResult);
+        return;
+      }
+      setActiveScan({ ...context, jobId });
+      setPhase('queued');
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  // This button disappears afterwards, so hand focus to the submit button.
+  const handleStopWatching = () => {
+    setActiveScan(null);
+    setQueuePosition(null);
+    setPhase('stopped');
+    setPendingFocus('submit');
+  };
+
+  const handleTokenChange = (event) => {
+    const value = event.target.value;
+    setToken(value);
+    saveToken(value);
+  };
+
+  const handleRemoveToken = () => {
+    setToken('');
+    saveToken('');
+    setPendingFocus('token');
+  };
+
+  /**
+   * Generate the printable report and reveal a link to it.
+   *
+   * Without a token the report URL is a plain same-origin link. With a token
+   * the report endpoints require an Authorization header that a link cannot
+   * send, so the HTML is fetched here and served from a blob URL instead.
+   * Either way the user gets a real link (keyboard operable, focus is moved to
+   * it) rather than an automatic context change.
+   */
+  const handleGenerateReport = async () => {
+    if (!result) return;
+    setReportPending(true);
+    setApiError(null);
+    setReportLink(null);
+    releaseReportBlob();
+    try {
+      const reportUrl = await createReport(result, { token });
+      let href = reportUrl;
+      if (token) {
+        const html = await fetchReportHtml(reportUrl, { token });
+        href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+        blobUrlRef.current = href;
+      }
+      setReportLink({ href, authenticated: Boolean(token) });
+      setReportPending(false);
+      setPendingFocus('report');
+    } catch (error) {
+      setReportPending(false);
+      showError(error, { clearScan: false });
+    }
+  };
+
+  const handleOpenHistoryEntry = (entry) => {
+    if (!entry?.result) return;
+    setReportLink(null);
+    releaseReportBlob();
+    setResult(entry.result);
+    setResultMeta({
+      url: entry.url,
+      profile: profileLabel(entry.profile),
+      jobId: entry.jobId || null,
+      scannedAt: entry.date,
+      restored: true,
+    });
+    setPhase('done');
+    setApiError(null);
+    setHistoryNotice('');
+    setPendingFocus('results');
+  };
+
+  // The list and this button disappear afterwards: keep focus in the section.
+  const handleClearHistory = () => {
+    setHistory(clearHistory());
+    setHistoryNotice('Scan history cleared.');
+    setPendingFocus('history');
+  };
+
+  // Status text for the polite live region.
+  let statusMessage = '';
+  if (phase === 'submitting') {
+    statusMessage = 'Submitting the scan request to the server.';
+  } else if (phase === 'queued') {
+    statusMessage =
+      queuePosition === null || queuePosition === undefined
+        ? 'Scan in progress: waiting for a free scan slot.'
+        : `Scan in progress: position ${queuePosition} in the queue.`;
+  } else if (phase === 'running') {
+    statusMessage =
+      'Scan in progress: a full scan usually takes 1 to 4 minutes.';
+  } else if (phase === 'stopped') {
+    statusMessage =
+      'Stopped watching. The scan may still be running on the server.';
+  } else if (phase === 'done' && result) {
+    const findings = result.totalViolations ?? (result.violations || []).length;
+    const scoreText = Number.isFinite(Number(result.accessibilityScore))
+      ? `Score ${result.accessibilityScore} of 100, `
+      : '';
+    statusMessage = resultMeta?.restored
+      ? `Showing the stored result for ${resultMeta.url}. ${scoreText}${findings} findings.`
+      : `Scan complete. ${scoreText}${findings} findings. The result is in section 2.`;
+  }
+
+  const reportNumber = resultMeta?.jobId || activeScan?.jobId || null;
+  const documentDate = resultMeta?.scannedAt || todayIso;
+  const moduleCount = result?.scanners
+    ? Object.keys(result.scanners).length
+    : registeredModules;
+
   return (
     <>
       <Head>
-        <title>Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.</title>
-        <meta name="description" content="Die Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft erforscht die mathematischen und technologischen Grundlagen barrierefreier Systeme und setzt sich für strukturelle Barrierefreiheit im Wissenschaftssystem ein." />
+        <title>{`Accessibility Report | ${APP_NAME}`}</title>
+        <meta
+          name="description"
+          content="Automated conformity assessment against WCAG 2.2 AA and EN 301 549."
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="landing-page">
-        <NavBar />
-        <main id="hauptinhalt">
-          <Hero />
-          <About />
-          <Research />
-          <PublicationsPreview />
-          <ProfilesPreview />
-          <Events />
-          <Contact />
-        </main>
-        <Footer />
+      <div className="pb-shell">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+
+        <div className="pb-sheet">
+          <header className="pb-letterhead">
+            <div className="pb-letterhead-body">
+              <p className="pb-org">
+                <a href="/" className="pb-org-link">
+                  {APP_NAME}
+                </a>
+              </p>
+              <p className="pb-office">Automated WCAG 2.2 conformity assessment</p>
+              <nav aria-label="Main navigation" className="pb-nav">
+                <ul>
+                  <li>
+                    <a href="/" aria-current="page">
+                      Report
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/accessibility">Accessibility statement</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <ConformitySeal size={56} />
+          </header>
+
+          <main className="pb-main" id="main-content" tabIndex={-1}>
+            <h1 className="pb-h1">Accessibility Report</h1>
+
+            <table className="pb-meta">
+              <caption className="sr-only">Report details</caption>
+              <tbody>
+                <tr>
+                  <th scope="row">Report no.</th>
+                  <td className="pb-num">{reportNumber || NOT_AVAILABLE}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Date</th>
+                  <td className="pb-num">
+                    {documentDate ? (
+                      <time dateTime={documentDate}>{formatDate(documentDate)}</time>
+                    ) : (
+                      NOT_AVAILABLE
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Standard</th>
+                  <td>WCAG 2.2 AA · EN 301 549</td>
+                </tr>
+                <tr>
+                  <th scope="row">Method</th>
+                  <td>
+                    Automated
+                    {moduleCount ? ` (${moduleCount} scan modules)` : ''}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Status</th>
+                  <td>{result ? 'Complete' : 'Draft'}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <section className="pb-section" aria-labelledby="subject-heading">
+              <h2 className="pb-h2" id="subject-heading">
+                <span className="pb-secnum" aria-hidden="true">
+                  1
+                </span>
+                <span className="pb-eyebrow">Section 1</span>
+                Subject of the scan
+              </h2>
+
+              <form className="pb-form" onSubmit={handleSubmit} noValidate>
+                <div className="pb-field">
+                  <label htmlFor="url">
+                    Address of the page to scan{' '}
+                    <span aria-hidden="true">*</span>
+                    <span className="sr-only">(required)</span>
+                  </label>
+                  <input
+                    ref={urlRef}
+                    type="url"
+                    id="url"
+                    name="url"
+                    value={url}
+                    onChange={(event) => {
+                      setUrl(event.target.value);
+                      if (fieldError) setFieldError(null);
+                    }}
+                    placeholder="https://example.com"
+                    required
+                    aria-required="true"
+                    aria-invalid={fieldError ? 'true' : undefined}
+                    aria-describedby="url-help"
+                    autoComplete="url"
+                    inputMode="url"
+                  />
+                  {/* One description target: hint and error together. */}
+                  <div className="pb-field-help" id="url-help">
+                    <p className="pb-hint">
+                      Full address including https://. The page must be publicly
+                      reachable.
+                    </p>
+                    <p className="error error-text" id="url-error" aria-live="polite">
+                      {fieldError}
+                    </p>
+                  </div>
+                </div>
+
+                <fieldset className="pb-fieldset">
+                  <legend>Scan profile</legend>
+                  <div className="pb-profiles">
+                    {PROFILES.map((option) => (
+                      // One explicit label per radio, holding the complete
+                      // visible text: the accessible name then contains the
+                      // visible label (WCAG 2.5.3) and there is exactly one
+                      // label association per control.
+                      <div
+                        key={option.id}
+                        className={`pb-profile${profile === option.id ? ' is-selected' : ''}`}
+                      >
+                        <input
+                          type="radio"
+                          id={`profile-${option.id}`}
+                          name="profile"
+                          value={option.id}
+                          checked={profile === option.id}
+                          onChange={() => setProfile(option.id)}
+                        />
+                        <label
+                          className="pb-profile-label"
+                          htmlFor={`profile-${option.id}`}
+                        >
+                          <span className="pb-profile-name">{option.label}</span>
+                          <span className="pb-profile-desc">{option.description}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <details
+                  className="pb-disclosure"
+                  open={tokenOpen}
+                  onToggle={(event) => setTokenOpen(event.currentTarget.open)}
+                >
+                  <summary>API access token (optional)</summary>
+                  <div className="pb-disclosure-body">
+                    <p className="pb-hint" id="token-hint">
+                      Only needed when this server requires authentication. The
+                      token is stored in this browser only and sent in the
+                      Authorization header with every request.
+                    </p>
+                    <div className="pb-field">
+                      <label htmlFor="api-token">Access token</label>
+                      <input
+                        ref={tokenRef}
+                        id="api-token"
+                        name="api-token"
+                        type={tokenVisible ? 'text' : 'password'}
+                        value={token}
+                        onChange={handleTokenChange}
+                        aria-describedby="token-hint"
+                        autoComplete="current-password"
+                        spellCheck="false"
+                      />
+                    </div>
+                    <div className="pb-actions">
+                      <button
+                        type="button"
+                        className="pb-btn"
+                        aria-pressed={tokenVisible}
+                        onClick={() => setTokenVisible((value) => !value)}
+                      >
+                        Show token
+                      </button>
+                      {token && (
+                        <button
+                          type="button"
+                          className="pb-btn"
+                          onClick={handleRemoveToken}
+                        >
+                          Remove stored token
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </details>
+
+                <div className="pb-actions">
+                  <button
+                    type="submit"
+                    className="pb-btn pb-btn-primary"
+                    disabled={isBusy}
+                    ref={submitRef}
+                  >
+                    Start scan
+                  </button>
+                  {isBusy && (
+                    <button
+                      type="button"
+                      className="pb-btn"
+                      onClick={handleStopWatching}
+                    >
+                      Stop watching this scan
+                    </button>
+                  )}
+                </div>
+              </form>
+
+              {/* Single error surface. Always present so the alert role works. */}
+              <div className="pb-alert" role="alert" tabIndex={-1} ref={alertRef}>
+                {apiError && (
+                  <>
+                    <strong>The request failed.</strong> {apiError.message}
+                    {apiError.isAuth
+                      ? ' Please enter the token under "API access token" and start the scan again.'
+                      : ''}
+                  </>
+                )}
+              </div>
+
+              {/* Scan status. The elapsed time sits outside the live region so
+                  screen readers are not interrupted every second. */}
+              <div className="pb-state">
+                <p className="pb-state-line" role="status">
+                  {statusMessage}
+                </p>
+                {isBusy && (
+                  <p className="pb-elapsed">
+                    <span className="pb-busy" aria-hidden="true" />
+                    Elapsed time:{' '}
+                    <span className="pb-elapsed-value">{formatElapsed(elapsed)}</span>
+                  </p>
+                )}
+              </div>
+            </section>
+
+            {phase === 'done' && result ? (
+              <ScanResults
+                result={result}
+                meta={resultMeta}
+                headingRef={resultsHeadingRef}
+                onGenerateReport={handleGenerateReport}
+                reportPending={reportPending}
+                reportLink={reportLink}
+                reportLinkRef={reportLinkRef}
+              />
+            ) : (
+              <section className="pb-section" aria-labelledby="pending-heading">
+                <h2 className="pb-h2" id="pending-heading">
+                  <span className="pb-secnum" aria-hidden="true">
+                    2
+                  </span>
+                  <span className="pb-eyebrow">Section 2</span>
+                  Assessment result
+                </h2>
+                <p className="pb-body">
+                  No scan result yet. Start a scan in section 1.
+                </p>
+                <p className="pb-scope-note">
+                  Automated check against WCAG 2.2 AA. It does not replace a full
+                  conformity assessment with manual testing.
+                </p>
+              </section>
+            )}
+
+            <ScanHistoryList
+              entries={history}
+              activeJobId={resultMeta?.jobId || null}
+              headingRef={historyHeadingRef}
+              onOpen={handleOpenHistoryEntry}
+              onClear={handleClearHistory}
+            />
+            <p className="sr-only" role="status">
+              {historyNotice}
+            </p>
+          </main>
+
+          <footer className="pb-footer">
+            <p>{APP_NAME}: automated WCAG 2.2 conformity assessment</p>
+            <p>
+              <a href="/">Report</a> ·{' '}
+              <a href="/accessibility">Accessibility statement</a>
+            </p>
+          </footer>
+        </div>
       </div>
     </>
   );

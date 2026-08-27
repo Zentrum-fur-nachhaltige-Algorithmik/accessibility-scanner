@@ -4,6 +4,7 @@
  * Async job contract (current backend):
  *   POST /api/scan             -> 202 { jobId }
  *   GET  /api/scan/job/:jobId  -> { status: queued|running|done|error, queuePosition?, result?, error? }
+ *   GET  /api/health           -> { status, scanners, uptime }
  *
  * Authentication is optional: when the operator configures a token the requests
  * must carry `Authorization: Bearer <token>`.
@@ -45,7 +46,7 @@ export function saveToken(token) {
     if (token) window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
     else window.localStorage.removeItem(TOKEN_STORAGE_KEY);
   } catch {
-    /* storage unavailable (private mode / disabled) — token stays in memory */
+    /* storage unavailable (private mode / disabled): token stays in memory */
   }
 }
 
@@ -65,7 +66,7 @@ async function request(path, { method = 'GET', body, token, signal } = {}) {
   } catch (error) {
     if (error && error.name === 'AbortError') throw error;
     throw new ApiError(
-      'Der Prüfserver ist nicht erreichbar. Bitte prüfen Sie Ihre Verbindung und starten Sie die Prüfung erneut.',
+      'The scan server is not reachable. Please check your connection and start the scan again.',
       null
     );
   }
@@ -74,12 +75,12 @@ async function request(path, { method = 'GET', body, token, signal } = {}) {
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
-      throw new ApiError('Zugangsschlüssel erforderlich oder ungültig.', response.status);
+      throw new ApiError('Access token required or invalid.', response.status);
     }
     const message =
       payload?.error ||
       payload?.message ||
-      `Der Server hat die Anfrage abgelehnt (HTTP ${response.status}). Bitte versuchen Sie es später erneut.`;
+      `The server rejected the request (HTTP ${response.status}). Please try again later.`;
     throw new ApiError(String(message), response.status);
   }
 
@@ -108,7 +109,7 @@ export async function startScan({ url, profile, token, signal } = {}) {
   }
 
   throw new ApiError(
-    `Der Server hat den Auftrag angenommen (HTTP ${status}), aber keine Auftragsnummer geliefert. Bitte starten Sie die Prüfung erneut.`,
+    `The server accepted the request (HTTP ${status}) but returned no job id. Please start the scan again.`,
     status
   );
 }
@@ -121,7 +122,7 @@ export async function fetchJob(jobId, { token, signal } = {}) {
   );
   if (!payload || typeof payload !== 'object') {
     throw new ApiError(
-      'Die Statusmeldung des Servers war leer oder fehlerhaft. Bitte starten Sie die Prüfung erneut.',
+      'The server status response was empty or malformed. Please start the scan again.',
       null
     );
   }
@@ -144,20 +145,20 @@ export async function fetchReportHtml(reportUrl, { token } = {}) {
     response = await fetch(reportUrl, { headers });
   } catch {
     throw new ApiError(
-      'Der erstellte Bericht konnte nicht geladen werden. Bitte versuchen Sie es erneut.',
+      'The generated report could not be loaded. Please try again.',
       null
     );
   }
 
   if (response.status === 401 || response.status === 403) {
     throw new ApiError(
-      'Zugangsschlüssel erforderlich oder ungültig. Der Bericht konnte nicht geladen werden.',
+      'Access token required or invalid. The report could not be loaded.',
       response.status
     );
   }
   if (!response.ok) {
     throw new ApiError(
-      `Der Bericht konnte nicht geladen werden (HTTP ${response.status}). Bitte erstellen Sie ihn erneut.`,
+      `The report could not be loaded (HTTP ${response.status}). Please generate it again.`,
       response.status
     );
   }
@@ -174,9 +175,19 @@ export async function createReport(scanResult, { token } = {}) {
   const reportUrl = payload?.reportUrl;
   if (!reportUrl) {
     throw new ApiError(
-      'Der Server hat keine Adresse für den Bericht geliefert. Bitte erstellen Sie den Bericht erneut.',
+      'The server returned no address for the report. Please generate the report again.',
       null
     );
   }
   return String(reportUrl);
+}
+
+/**
+ * Server health, including the number of registered scanners.
+ * Unauthenticated: /api/health is exempt from the bearer guard.
+ * @returns {Promise<{status: string, scanners?: number, uptime?: number}>}
+ */
+export async function fetchHealth({ signal } = {}) {
+  const { payload } = await request('/api/health', { signal });
+  return payload && typeof payload === 'object' ? payload : {};
 }

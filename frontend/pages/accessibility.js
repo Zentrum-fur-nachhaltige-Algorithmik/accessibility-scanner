@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import Head from 'next/head';
+import { APP_NAME } from '../lib/branding';
 
 export default function Accessibility() {
   const [formErrors, setFormErrors] = useState({});
@@ -51,7 +52,7 @@ export default function Accessibility() {
   return (
     <>
       <Head>
-        <title>Accessibility Statement — Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.</title>
+        <title>{`Accessibility Statement | ${APP_NAME}`}</title>
         <meta name="description" content="Accessibility statement, feedback process, and compliance monitoring" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -63,10 +64,10 @@ export default function Accessibility() {
           <nav className="letterhead-inner" aria-label="Service">
             <h1 className="org-name">
               <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-                Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V.
+                {APP_NAME}
               </a>
             </h1>
-            <div className="service-title">Web Accessibility Audit Service</div>
+            <div className="service-title">Automated WCAG 2.2 conformity assessment</div>
           </nav>
         </header>
 
@@ -77,10 +78,9 @@ export default function Accessibility() {
             <section aria-labelledby="statement-heading">
               <h2 id="statement-heading">Commitment to Accessibility</h2>
               <p>
-                Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V. is
-                committed to ensuring digital accessibility for people with disabilities. This website strives
-                to be <strong>WCAG 2.2 AA</strong> compliant in accordance with the European Accessibility Act
-                (EAA) and EN 301 549.
+                {APP_NAME} is committed to digital accessibility for people with disabilities. This
+                website strives to be <strong>WCAG 2.2 AA</strong> compliant in accordance with the
+                European Accessibility Act (EAA) and EN 301 549.
               </p>
               <p>
                 <strong>Compliance level:</strong> This website is <strong>partially compliant</strong> with
@@ -107,8 +107,8 @@ export default function Accessibility() {
               <dl className="acc-contact-list">
                 <dt>Email</dt>
                 <dd><a href="mailto:accessibility@placeholder.org">accessibility@placeholder.org</a></dd>
-                <dt>Phone</dt>
-                <dd><a href="tel:+4930000000000">+49 30 000 000 000</a></dd>
+                <dt>Issue tracker</dt>
+                <dd><a href="https://github.com/">Project issue tracker</a></dd>
               </dl>
               <p>
                 <strong>Response time:</strong> We will respond within 5 business days of receiving your message.
@@ -230,14 +230,14 @@ export default function Accessibility() {
             </section>
 
             <p className="acc-back">
-              <a href="/">Back to homepage</a> · <a href="/audit">Audit service</a>
+              <a href="/">Back to the scanner</a>
             </p>
           </div>
         </main>
 
         <footer className="footer">
-          <p>Abraham-Nemeth-Gesellschaft für barrierefreie Wissenschaft e.V. — {new Date().getFullYear()}</p>
-          <p><a href="/">Startseite</a> · <a href="/audit">Audit Service</a> · <a href="/accessibility">Accessibility</a></p>
+          <p>{APP_NAME}</p>
+          <p><a href="/">Scanner</a> · <a href="/accessibility">Accessibility statement</a></p>
         </footer>
       </div>
     </>

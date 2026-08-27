@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import ConformitySeal from './ConformitySeal';
+import { APP_NAME } from '../lib/branding';
 import {
+  NOT_AVAILABLE,
   SEVERITY_LABELS,
   SEVERITY_TONE,
   countScannerErrors,
@@ -24,14 +26,14 @@ function SectionHeading({ number, id, children, headingRef }) {
       <span className="pb-secnum" aria-hidden="true">
         {number}
       </span>
-      <span className="pb-eyebrow">Abschnitt {number}</span>
+      <span className="pb-eyebrow">Section {number}</span>
       {children}
     </h2>
   );
 }
 
 function SeverityBadge({ severity, count }) {
-  // The label is always spelled out — the colour only reinforces it.
+  // The label is always spelled out; the colour only reinforces it.
   return (
     <span className={`pb-sev pb-tone-${SEVERITY_TONE[severity] || 'neutral'}`}>
       {count === undefined
@@ -43,7 +45,11 @@ function SeverityBadge({ severity, count }) {
 
 function shorten(text, max = 60) {
   const value = String(text);
-  return value.length > max ? `${value.slice(0, max - 1)}…` : value;
+  return value.length > max ? `${value.slice(0, max - 3)}...` : value;
+}
+
+function findingsWord(count) {
+  return count === 1 ? 'finding' : 'findings';
 }
 
 function Finding({ violation, number }) {
@@ -82,24 +88,24 @@ function Finding({ violation, number }) {
         )}
         {remediation && (
           <>
-            <dt>Empfehlung</dt>
+            <dt>Recommendation</dt>
             <dd>{remediation}</dd>
           </>
         )}
         {scanner && (
           <>
-            <dt>Prüfmodul</dt>
+            <dt>Scan module</dt>
             <dd>{scanner}</dd>
           </>
         )}
         {helpUrl && (
           <>
-            <dt>Quelle</dt>
+            <dt>Source</dt>
             <dd>
               <a href={helpUrl} target="_blank" rel="noopener noreferrer">
-                Technische Dokumentation
+                Technical documentation
                 <span className="sr-only">
-                  {` zu: ${shorten(text)} (öffnet in neuem Tab)`}
+                  {` for: ${shorten(text)} (opens in a new tab)`}
                 </span>
               </a>
             </dd>
@@ -130,7 +136,7 @@ function Group({ group, mode, number }) {
           </span>
           <span className="pb-group-name">{group.label}</span>
           <span className="pb-group-count">
-            {group.count} {group.count === 1 ? 'Feststellung' : 'Feststellungen'}
+            {group.count} {findingsWord(group.count)}
           </span>
           <span className="pb-group-sev">
             {group.severities.map((entry) => (
@@ -150,8 +156,7 @@ function Group({ group, mode, number }) {
                 <h4 className="pb-h4">
                   {subgroup.label}{' '}
                   <span className="pb-subgroup-count">
-                    ({subgroup.count}{' '}
-                    {subgroup.count === 1 ? 'Feststellung' : 'Feststellungen'})
+                    ({subgroup.count} {findingsWord(subgroup.count)})
                   </span>
                 </h4>
                 <FindingList violations={subgroup.items} />
@@ -167,7 +172,7 @@ function Group({ group, mode, number }) {
 }
 
 /**
- * Sections 2 to 4 of the report: assessment result, findings, test modules.
+ * Sections 2 to 4 of the report: assessment result, findings, scan modules.
  */
 export default function ScanResults({
   result,
@@ -196,13 +201,13 @@ export default function ScanResults({
     <>
       <section className="pb-section" aria-labelledby="results-heading">
         <SectionHeading number="2" id="results-heading" headingRef={headingRef}>
-          Ergebnis der Konformitätsbewertung
+          Assessment result
         </SectionHeading>
 
         {meta?.restored && (
           <p className="pb-note pb-note-boxed">
-            Gespeichertes Ergebnis aus der Prüfhistorie dieses Browsers. Für aktuelle
-            Werte bitte eine neue Prüfung starten.
+            Stored result from this browser&apos;s scan history. Start a new scan
+            for current values.
           </p>
         )}
 
@@ -210,61 +215,61 @@ export default function ScanResults({
           <div className="pb-verdict-stamp">
             <ConformitySeal
               size={104}
-              label={`Prüfsiegel der Prüfstelle. Automatisierte Prüfung nach WCAG 2.2 AA und EN 301 549. Ergebnis: ${band.label}.`}
+              label={`${APP_NAME} seal. Automated check against WCAG 2.2 AA and EN 301 549. Result: ${band.label}.`}
             />
             <p className="pb-seal-legend">{band.seal}</p>
           </div>
           <div className="pb-verdict-body">
-            <p className="pb-verdict-eyebrow">Bewertung</p>
+            <p className="pb-verdict-eyebrow">Score</p>
             <p className="pb-score">
-              <span className="pb-score-value">{hasScore ? score : '—'}</span>
+              <span className="pb-score-value">{hasScore ? score : NOT_AVAILABLE}</span>
               <span className="pb-score-max"> / 100</span>
             </p>
             <p className={`pb-verdict-label pb-tone-${band.tone}`}>{band.label}</p>
             <p className="pb-verdict-basis">
-              Automatisierte Prüfung · WCAG 2.2 · EN 301 549
+              Automated check · WCAG 2.2 · EN 301 549
             </p>
           </div>
         </div>
 
         <p className="pb-scope-note">
-          Automatisierte Prüfung nach WCAG 2.2 AA. Ersetzt keine vollständige
-          Konformitätsbewertung mit manueller Prüfung.
+          Automated check against WCAG 2.2 AA. It does not replace a full
+          conformity assessment with manual testing.
         </p>
 
         <table className="pb-table pb-table-key">
-          <caption className="sr-only">Angaben zur durchgeführten Prüfung</caption>
+          <caption className="sr-only">Details of the scan</caption>
           <tbody>
             <tr>
-              <th scope="row">Prüfgegenstand</th>
-              <td className="pb-url">{result?.url || meta?.url || '—'}</td>
+              <th scope="row">Scanned page</th>
+              <td className="pb-url">{result?.url || meta?.url || NOT_AVAILABLE}</td>
             </tr>
             <tr>
-              <th scope="row">Prüfzeitpunkt</th>
+              <th scope="row">Scanned at</th>
               <td>
                 {scannedAt ? (
-                  <time dateTime={scannedAt}>{formatDateTime(scannedAt)} Uhr</time>
+                  <time dateTime={scannedAt}>{formatDateTime(scannedAt)}</time>
                 ) : (
-                  '—'
+                  NOT_AVAILABLE
                 )}
               </td>
             </tr>
             <tr>
-              <th scope="row">Prüfprofil</th>
-              <td>{meta?.profile || '—'}</td>
+              <th scope="row">Scan profile</th>
+              <td>{meta?.profile || NOT_AVAILABLE}</td>
             </tr>
             <tr>
-              <th scope="row">Feststellungen gesamt</th>
+              <th scope="row">Total findings</th>
               <td className="pb-num">
                 {total}
                 {result?.omittedViolations > 0 &&
-                  ` (${result.omittedViolations} ältere Feststellungen wurden lokal nicht gespeichert)`}
+                  ` (${result.omittedViolations} older findings were not stored locally)`}
               </td>
             </tr>
             <tr>
-              <th scope="row">Prüfmodule mit Fehler</th>
+              <th scope="row">Scan modules with errors</th>
               <td className="pb-num">
-                {scannerErrors} von {scannerRows.length}
+                {scannerErrors} of {scannerRows.length}
               </td>
             </tr>
           </tbody>
@@ -274,10 +279,10 @@ export default function ScanResults({
           <span className="pb-subnum" aria-hidden="true">
             2.1
           </span>
-          Verteilung nach Schweregrad
+          Distribution by severity
         </h3>
         {severities.length === 0 ? (
-          <p className="pb-body">Es wurden keine Feststellungen gemeldet.</p>
+          <p className="pb-body">No findings were reported.</p>
         ) : (
           <ul className="pb-sev-list" aria-labelledby="severity-heading">
             {severities.map((entry) => (
@@ -294,24 +299,24 @@ export default function ScanResults({
               <span className="pb-subnum" aria-hidden="true">
                 2.2
               </span>
-              Verteilung nach WCAG-Prinzip
+              Distribution by WCAG principle
             </h3>
             <div
               className="pb-table-scroll"
               tabIndex={0}
               role="region"
-              aria-label="Tabelle: Verteilung nach WCAG-Prinzip"
+              aria-label="Table: distribution by WCAG principle"
             >
               <table className="pb-table pb-table-principles">
                 <caption>
-                  Anzahl der Feststellungen je Prinzip der WCAG 2.2, ermittelt aus dem
-                  Erfolgskriterium der jeweiligen Feststellung.
+                  Number of findings per WCAG 2.2 principle, derived from the
+                  success criterion of each finding.
                 </caption>
                 <thead>
                   <tr>
-                    <th scope="col">Prinzip</th>
+                    <th scope="col">Principle</th>
                     <th scope="col" className="pb-col-num">
-                      Feststellungen
+                      Findings
                     </th>
                   </tr>
                 </thead>
@@ -335,9 +340,7 @@ export default function ScanResults({
             onClick={onGenerateReport}
             disabled={reportPending}
           >
-            {reportPending
-              ? 'Bericht wird erstellt …'
-              : 'Vollständigen Prüfbericht erstellen'}
+            {reportPending ? 'Generating report...' : 'Generate full report'}
           </button>
           {reportLink && (
             <p className="pb-report-ready">
@@ -348,8 +351,8 @@ export default function ScanResults({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Prüfbericht öffnen
-                <span className="sr-only"> (öffnet in neuem Tab)</span>
+                Open report
+                <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </p>
           )}
@@ -358,15 +361,15 @@ export default function ScanResults({
 
       <section className="pb-section" aria-labelledby="findings-heading">
         <SectionHeading number="3" id="findings-heading">
-          Feststellungen
+          Findings
         </SectionHeading>
 
         {violations.length === 0 ? (
-          <p className="pb-body">Es liegen keine Feststellungen vor.</p>
+          <p className="pb-body">There are no findings.</p>
         ) : (
           <>
             <fieldset className="pb-groupmode">
-              <legend>Feststellungen gruppieren nach</legend>
+              <legend>Group findings by</legend>
               <div className="pb-groupmode-options">
                 <div className="pb-groupmode-option">
                   <input
@@ -377,7 +380,7 @@ export default function ScanResults({
                     checked={mode === 'criterion'}
                     onChange={() => setMode('criterion')}
                   />
-                  <label htmlFor="group-mode-criterion">Erfolgskriterium</label>
+                  <label htmlFor="group-mode-criterion">Success criterion</label>
                 </div>
                 <div className="pb-groupmode-option">
                   <input
@@ -388,14 +391,14 @@ export default function ScanResults({
                     checked={mode === 'scanner'}
                     onChange={() => setMode('scanner')}
                   />
-                  <label htmlFor="group-mode-scanner">Prüfmodul</label>
+                  <label htmlFor="group-mode-scanner">Scan module</label>
                 </div>
               </div>
             </fieldset>
 
             <p className="pb-note">
-              {groups.length} {groups.length === 1 ? 'Gruppe' : 'Gruppen'}. Öffnen Sie
-              eine Gruppe, um die einzelnen Feststellungen zu lesen.
+              {groups.length} {groups.length === 1 ? 'group' : 'groups'}. Open a
+              group to read its findings.
             </p>
 
             <ul className="pb-groups" aria-labelledby="findings-heading">
@@ -414,29 +417,29 @@ export default function ScanResults({
 
       <section className="pb-section" aria-labelledby="modules-heading">
         <SectionHeading number="4" id="modules-heading">
-          Prüfmodule
+          Scan modules
         </SectionHeading>
         <p className="pb-note">
-          Ergebnis der einzelnen Prüfmodule. Module mit Fehler konnten die Seite nicht
-          vollständig auswerten; ihre Feststellungen können unvollständig sein.
+          Result of each scan module. Modules with errors could not fully
+          evaluate the page; their findings may be incomplete.
         </p>
         <div
           className="pb-table-scroll"
           tabIndex={0}
           role="region"
-          aria-label="Tabelle: Ergebnis je Prüfmodul"
+          aria-label="Table: result per scan module"
         >
           <table className="pb-table pb-table-modules">
             <caption className="sr-only">
-              Prüfmodule mit Anzahl der Feststellungen und Ergebnis
+              Scan modules with number of findings and result
             </caption>
             <thead>
               <tr>
-                <th scope="col">Prüfmodul</th>
+                <th scope="col">Scan module</th>
                 <th scope="col" className="pb-col-num">
-                  Feststellungen
+                  Findings
                 </th>
-                <th scope="col">Ergebnis</th>
+                <th scope="col">Result</th>
               </tr>
             </thead>
             <tbody>
@@ -446,10 +449,10 @@ export default function ScanResults({
                   <td className="pb-num">{value?.violationCount ?? 0}</td>
                   <td>
                     {value?.error
-                      ? `Fehler: ${value.error}`
+                      ? `Error: ${value.error}`
                       : value?.passed
-                        ? 'Ohne Feststellung'
-                        : 'Feststellungen vorhanden'}
+                        ? 'No findings'
+                        : 'Findings present'}
                   </td>
                 </tr>
               ))}

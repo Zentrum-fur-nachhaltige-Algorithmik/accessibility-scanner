@@ -17,7 +17,7 @@ const require = createRequire(import.meta.url);
 
 const projectRoot = path.resolve(__dirname, '../..');
 
-// Increase timeouts — scanning is slow
+// Increase timeouts: scanning is slow
 const SCAN_TIMEOUT = 180_000;
 
 function postJSON(url, body) {
@@ -96,7 +96,7 @@ describe('Self-scan: frontend and report accessibility', () => {
 
   beforeAll(async () => {
     // 1. Start the backend API server on a random port.
-    // The SSRF guard rejects private hosts unless allowlisted — this test's
+    // The SSRF guard rejects private hosts unless allowlisted; this test's
     // whole point is scanning our own localhost fixture servers.
     process.env.SCAN_ALLOWED_HOSTS = '127.0.0.1,localhost';
     const app = require('../../src/server');
@@ -139,7 +139,7 @@ describe('Self-scan: frontend and report accessibility', () => {
   }, 30_000);
 
   it(
-    'frontend index page has zero critical/serious violations',
+    'scanner UI page (/) has zero critical/serious violations',
     async () => {
       const scanUrl = `http://127.0.0.1:${frontendPort}/`;
       const res = await postJSON(`http://127.0.0.1:${apiPort}/api/scan`, {
@@ -151,14 +151,14 @@ describe('Self-scan: frontend and report accessibility', () => {
       expect(res.status).toBe(200);
 
       const result = res.body;
-      // Filter out Next.js framework internals (next-route-announcer) — not user-facing
+      // Filter out Next.js framework internals (next-route-announcer), not user-facing
       const critical = (result.violations || []).filter(
         (v) => ['critical', 'serious'].includes((v.severity || v.impact || '').toLowerCase())
           && !(v.element || '').includes('next-route-announcer')
       );
 
       if (critical.length > 0) {
-        console.error('Frontend index — critical/serious violations:\n' + JSON.stringify(critical, null, 2));
+        console.error('Scanner UI page (/): critical/serious violations:\n' + JSON.stringify(critical, null, 2));
       }
 
       expect(critical).toHaveLength(0);
@@ -167,7 +167,7 @@ describe('Self-scan: frontend and report accessibility', () => {
   );
 
   it(
-    'frontend accessibility page has zero critical/serious violations',
+    'accessibility statement page (/accessibility) has zero critical/serious violations',
     async () => {
       const scanUrl = `http://127.0.0.1:${frontendPort}/accessibility`;
       const res = await postJSON(`http://127.0.0.1:${apiPort}/api/scan`, {
@@ -187,7 +187,7 @@ describe('Self-scan: frontend and report accessibility', () => {
       );
 
       if (critical.length > 0) {
-        console.error('Accessibility page — critical/serious violations:\n' + JSON.stringify(critical, null, 2));
+        console.error('Accessibility statement page (/accessibility): critical/serious violations:\n' + JSON.stringify(critical, null, 2));
       }
 
       expect(critical).toHaveLength(0);
@@ -198,7 +198,7 @@ describe('Self-scan: frontend and report accessibility', () => {
   it(
     'generated report HTML has zero critical/serious violations',
     async () => {
-      // First, scan a page to get scan results for report generation
+      // First, scan the scanner UI page (/) to get scan results for report generation
       const scanUrl = `http://127.0.0.1:${frontendPort}/`;
       const scanRes = await postJSON(`http://127.0.0.1:${apiPort}/api/scan`, {
         url: scanUrl,
@@ -238,7 +238,7 @@ describe('Self-scan: frontend and report accessibility', () => {
         const summary = critical.map(
           (v) => `[${v.severity || v.impact}] ${v.criterion || v.wcagCriteria || ''}: ${v.description || v.type || v.issue}`
         );
-        console.error('Report HTML — critical/serious violations:\n' + summary.join('\n'));
+        console.error('Report HTML: critical/serious violations:\n' + summary.join('\n'));
       }
 
       expect(critical).toHaveLength(0);

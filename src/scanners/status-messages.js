@@ -152,6 +152,19 @@ class StatusMessagesScanner extends BaseScanner {
         });
         window.__a11yStatusObserver = observer;
 
+        // SC 4.1.3 is about messages presented WITHOUT receiving focus, so
+        // where focus went in a step is part of the evidence.
+        const focused = new Map();
+        document.addEventListener(
+          'focusin',
+          (event) => {
+            const step = window.__a11yStatusStep;
+            if (!focused.has(step)) focused.set(step, new Set());
+            focused.get(step).add(event.target);
+          },
+          true
+        );
+
         const LIVE_SELECTOR = '[aria-live], [role="status"], [role="alert"], [role="log"]';
 
         window.__a11yStatusHelpers = {
@@ -181,12 +194,24 @@ class StatusMessagesScanner extends BaseScanner {
           },
 
           // Evidence: the element changed in at least one step in which no
-          // live region was updated.
+          // live region was updated and focus did not land on or inside it.
+          // A message the user is taken to is not a status message.
           unannouncedChange(element, announced) {
             const steps = mutations.get(element);
             if (!steps) return false;
             for (const step of steps) {
-              if (!announced.has(step)) return true;
+              if (announced.has(step)) continue;
+              const targets = focused.get(step);
+              let tookFocus = false;
+              if (targets) {
+                for (const target of targets) {
+                  if (element === target || element.contains(target)) {
+                    tookFocus = true;
+                    break;
+                  }
+                }
+              }
+              if (!tookFocus) return true;
             }
             return false;
           },

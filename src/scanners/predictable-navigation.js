@@ -585,8 +585,8 @@ class PredictableNavigationScanner extends BaseScanner {
       // Not checked here: "skip to main content" links belong to 2.4.1,
       // H1 presence and skipped heading levels to 1.3.1 / 2.4.6, and the
       // presence of a navigation landmark to 1.3.1 / 2.4.1. Those are
-      // covered by the keyboard-navigation, page-structure, html-validation
-      // and screen-reader scanners.
+      // covered by the keyboard-navigation, page-structure and screen-reader
+      // scanners.
       // ----------------------------------------------------------------
 
       const MIN_SHARED_DESTINATIONS = 3; // below this, two blocks are not evidently the same mechanism

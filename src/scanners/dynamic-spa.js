@@ -440,11 +440,20 @@ class DynamicSpaScanner extends BaseScanner {
         }
       });
 
-      // Check for counters and badges that update
-      const counters = document.querySelectorAll(
-        '.counter, .badge, .notification-count, [class*="count"], ' +
-          '[data-count], .cart-count, .unread-count'
-      );
+      // Check for counters and badges that update. Class names are matched
+      // word by word: "AccountButtons" contains "count" without being one, and
+      // a counter shows a number.
+      const COUNTER_WORDS = ['counter', 'count', 'badge', 'unread'];
+      const namesACounter = (el) => {
+        const cls = typeof el.className === 'string' ? el.className : '';
+        return cls
+          .split(/[^A-Za-z]+/)
+          .flatMap((token) => token.split(/(?=[A-Z])/))
+          .some((word) => COUNTER_WORDS.includes(word.toLowerCase()));
+      };
+      const counters = Array.from(
+        document.querySelectorAll('.counter, .badge, [data-count], [class]')
+      ).filter((el) => el.matches('.counter, .badge, [data-count]') || namesACounter(el));
 
       counters.forEach((counter, index) => {
         if (!counter.hasAttribute('aria-live') && !counter.closest('[aria-live]')) {

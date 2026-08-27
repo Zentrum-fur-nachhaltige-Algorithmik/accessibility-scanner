@@ -409,15 +409,21 @@ class SeizurePreventionScanner extends BaseScanner {
       const styleSheets = Array.from(document.styleSheets);
       let hasMotionSafeCSS = false;
 
+      // The preference lives in a media query's condition, not in a selector,
+      // and frameworks nest that query inside @supports or @layer.
+      const scanRules = (rules) => {
+        for (const rule of rules) {
+          if (rule.media && rule.media.mediaText.includes('prefers-reduced-motion')) {
+            hasMotionSafeCSS = true;
+            return;
+          }
+          if (rule.cssRules) scanRules(Array.from(rule.cssRules));
+        }
+      };
       try {
         styleSheets.forEach((sheet) => {
           try {
-            const rules = Array.from(sheet.cssRules || sheet.rules || []);
-            rules.forEach((rule) => {
-              if (rule.selectorText && rule.selectorText.includes('prefers-reduced-motion')) {
-                hasMotionSafeCSS = true;
-              }
-            });
+            scanRules(Array.from(sheet.cssRules || sheet.rules || []));
           } catch (e) {
             // Cross-origin stylesheet, skip
           }
@@ -468,16 +474,22 @@ class SeizurePreventionScanner extends BaseScanner {
       const issues = [];
       let supported = true;
 
-      // Check for vestibular disorder considerations
-      const motionKeywords = ['scroll', 'parallax', 'zoom', 'spin', 'rotate', 'tilt'];
-      const pageText = document.body.textContent.toLowerCase();
-
-      const hasMotionEffects = motionKeywords.some(
-        (keyword) =>
-          pageText.includes(keyword) ||
-          document.querySelector(`[class*="${keyword}"]`) ||
-          document.querySelector(`[id*="${keyword}"]`)
-      );
+      // Motion the page actually produces, read from computed styles. The word
+      // "scroll" in the text, or a class named "scroll-container", says
+      // nothing about whether anything moves.
+      const hasMotionEffects =
+        Array.from(document.querySelectorAll('*')).some((el) => {
+          const s = window.getComputedStyle(el);
+          if (s.animationName && s.animationName !== 'none') return true;
+          if (
+            /transform|all/.test(s.transitionProperty || '') &&
+            parseFloat(s.transitionDuration) > 0
+          )
+            return true;
+          // Parallax: a background that stays put while the page scrolls.
+          if (s.backgroundAttachment === 'fixed' && s.backgroundImage !== 'none') return true;
+          return false;
+        }) || window.getComputedStyle(document.documentElement).scrollBehavior === 'smooth';
 
       if (hasMotionEffects) {
         // Look for motion reduction controls
@@ -519,15 +531,21 @@ class SeizurePreventionScanner extends BaseScanner {
           const styleSheets = Array.from(document.styleSheets);
           let implementsReducedMotion = false;
 
+          // Recursive: a framework wraps its media queries in @supports and
+          // @layer, and the query is just as effective there.
+          const scanRules = (rules) => {
+            for (const rule of rules) {
+              if (rule.media && rule.media.mediaText.includes('prefers-reduced-motion')) {
+                implementsReducedMotion = true;
+                return;
+              }
+              if (rule.cssRules) scanRules(Array.from(rule.cssRules));
+            }
+          };
           try {
             styleSheets.forEach((sheet) => {
               try {
-                const rules = Array.from(sheet.cssRules || []);
-                rules.forEach((rule) => {
-                  if (rule.media && rule.media.mediaText.includes('prefers-reduced-motion')) {
-                    implementsReducedMotion = true;
-                  }
-                });
+                scanRules(Array.from(sheet.cssRules || []));
               } catch (e) {
                 // Cross-origin or restricted stylesheet
               }

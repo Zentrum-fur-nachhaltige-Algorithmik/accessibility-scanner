@@ -1,0 +1,368 @@
+{
+  "recordedAt": "2026-08-28T17:29:49.808Z",
+  "profile": "standard",
+  "labelsRecordedAt": "2026-08-28",
+  "snapshots": [
+    {
+      "file": "own-audit-ui.html",
+      "findings": 3
+    },
+    {
+      "file": "med-theme.html",
+      "findings": 14
+    },
+    {
+      "file": "beeproduced.html",
+      "findings": 14
+    },
+    {
+      "file": "wiki-medical-de.html",
+      "findings": 304
+    },
+    {
+      "file": "modern-commercial.html",
+      "findings": 47
+    },
+    {
+      "file": "gov-uk-guide.html",
+      "findings": 1
+    },
+    {
+      "file": "webaim-article.html",
+      "findings": 34
+    },
+    {
+      "file": "govuk-design-system.html",
+      "findings": 18
+    },
+    {
+      "file": "a11y-project-checklist.html",
+      "findings": 5
+    },
+    {
+      "file": "broadcaster-news.html",
+      "findings": 68
+    },
+    {
+      "file": "wiki-accessibility-en.html",
+      "findings": 19
+    }
+  ],
+  "rules": [
+    {
+      "rule": "target-too-small",
+      "scanners": [
+        "input-modalities"
+      ],
+      "reported": 313,
+      "true": 296,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 17,
+      "precision": 1
+    },
+    {
+      "rule": "color-contrast",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 117,
+      "true": 1,
+      "false": 0,
+      "review": 116,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "no-selected-tab",
+      "scanners": [
+        "advanced-aria"
+      ],
+      "reported": 16,
+      "true": 0,
+      "false": 0,
+      "review": 16,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "image-alt",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 12,
+      "true": 12,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "link-name",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 11,
+      "true": 11,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "link-name-identifies-nothing",
+      "scanners": [
+        "page-structure"
+      ],
+      "reported": 9,
+      "true": 9,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "missing-accessibility-statement",
+      "scanners": [
+        "accessibility-statement"
+      ],
+      "reported": 6,
+      "true": 6,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "group-no-name",
+      "scanners": [
+        "error-handling"
+      ],
+      "reported": 5,
+      "true": 5,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "label-not-in-name",
+      "scanners": [
+        "label-in-name"
+      ],
+      "reported": 4,
+      "true": 4,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "missing-autocomplete",
+      "scanners": [
+        "input-purpose"
+      ],
+      "reported": 4,
+      "true": 4,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "text-spacing-failure",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 4,
+      "true": 4,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "aria-hidden-focus",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 3,
+      "true": 2,
+      "false": 0,
+      "review": 1,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "outdated-statement",
+      "scanners": [
+        "accessibility-statement"
+      ],
+      "reported": 3,
+      "true": 0,
+      "false": 0,
+      "review": 3,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "reflow-failure",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 3,
+      "true": 1,
+      "false": 0,
+      "review": 2,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "aria-valid-attr-value",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 2,
+      "true": 0,
+      "false": 0,
+      "review": 2,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "fixed-width-element",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 2,
+      "true": 2,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "incomplete-content",
+      "scanners": [
+        "accessibility-statement"
+      ],
+      "reported": 2,
+      "true": 0,
+      "false": 0,
+      "review": 2,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "link-purpose-needs-context",
+      "scanners": [
+        "page-structure"
+      ],
+      "reported": 2,
+      "true": 0,
+      "false": 0,
+      "review": 2,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "reflow-content-clipped",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 2,
+      "true": 1,
+      "false": 0,
+      "review": 1,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "aria-prohibited-attr",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 1,
+      "true": 0,
+      "false": 0,
+      "review": 1,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "blink",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 1,
+      "true": 0,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
+    },
+    {
+      "rule": "button-name",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "insufficient-background-contrast",
+      "scanners": [
+        "nontext-contrast"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "insufficient-border-contrast",
+      "scanners": [
+        "nontext-contrast"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "insufficient-form-border-contrast",
+      "scanners": [
+        "nontext-contrast"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "link-in-text-block",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    }
+  ],
+  "missingTrue": [],
+  "failures": [],
+  "passed": true
+}

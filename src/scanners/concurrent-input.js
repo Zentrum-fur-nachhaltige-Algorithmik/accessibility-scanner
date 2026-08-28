@@ -289,7 +289,7 @@ class ConcurrentInputScanner extends BaseScanner {
 
       // `user-scalable=no` / `maximum-scale=1` is also a touch-modality
       // restriction, but axe-core already reports it
-      // under 1.4.4/1.4.10, so it is not emitted a third time here.
+      // under 1.4.4/1.4.10, so it is not emitted again here.
 
       return {
         violations,

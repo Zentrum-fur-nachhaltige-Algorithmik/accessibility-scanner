@@ -29,6 +29,7 @@
     "harness:llm": "node scripts/harness/llm.js",
     "harness:golden": "node scripts/harness/golden.js",
     "harness:realworld": "node scripts/harness/realworld.js",
+    "precision:check": "node scripts/precision-check.js",
     "lint": "eslint . && sh scripts/check-no-emdash.sh",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

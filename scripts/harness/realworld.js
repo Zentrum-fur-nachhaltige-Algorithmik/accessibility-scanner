@@ -1387,4 +1387,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { FIXTURES, findViolations, mentions };
+module.exports = { FIXTURES, FIXTURE_DIR, PROFILE, startServer, scanFile, findViolations, mentions };

@@ -186,7 +186,7 @@ class AccessibilityStatementScanner extends BaseScanner {
       violations,
       statementExists: true,
       statementAccessible: true,
-      statementUrl: statementLink.url,
+      statementUrl,
       conformanceStatus: content.conformanceStatus,
       contactMechanismProvided: content.contactMechanism,
       lastUpdated,

@@ -196,6 +196,9 @@ class ScanPipeline {
 
       if (result.violations) {
         for (const v of result.violations) {
+          // Which scanner said this. Only the axe adapter stamps itself, and a
+          // finding whose producer is unknown cannot be traced back to a rule.
+          if (!v.scannerId) v.scannerId = result.scannerId;
           // Quarantined scanners still report, but never at full confidence, so
           // a report can present them separately ("experimental check, low
           // confidence") instead of mixing them into the headline findings.
@@ -219,6 +222,7 @@ class ScanPipeline {
 
       if (Array.isArray(result.bestPractices)) {
         for (const v of result.bestPractices) {
+          if (!v.scannerId) v.scannerId = result.scannerId;
           if (tier === 'experimental') {
             v.experimental = true;
             v.confidence = 'low';

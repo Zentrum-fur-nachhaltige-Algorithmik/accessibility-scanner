@@ -31,7 +31,7 @@ async function loadPuppeteer() {
 }
 
 /**
- * Concurrent (non-exclusive) deterministic scanner definitions: id -> module.
+ * Concurrent (non-exclusive) deterministic scanner definitions: id -> { module, scanOpts }.
  * Criteria are not hardcoded here; they are read from each scanner's own
  * `wcagCriteria` constructor metadata at instantiation time. Routing is
  * many-to-many: a test file runs against every scanner whose criteria
@@ -42,10 +42,14 @@ async function loadPuppeteer() {
  * covered by scripts/harness/exclusive.js.
  */
 const CONCURRENT_SCANNERS = {
-  'color-contrast': { module: '../../src/scanners/color-contrast' },
+  // SC 1.4.6 is only measured for a scan that asks for AAA; SC 1.4.3 is
+  // axe-core's, see src/scanners/color-contrast.js.
+  'color-contrast': {
+    module: '../../src/scanners/color-contrast',
+    scanOpts: { wcagLevel: 'AAA' },
+  },
   'use-of-color': { module: '../../src/scanners/use-of-color' },
   'images-of-text': { module: '../../src/scanners/images-of-text' },
-  'advanced-contrast': { module: '../../src/scanners/advanced-contrast' },
   'screen-reader': { module: '../../src/scanners/screen-reader' },
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
   orientation: { module: '../../src/scanners/orientation' },
@@ -279,7 +283,11 @@ async function main() {
 
         silence();
         const result = await Promise.race([
-          scanner.scan(page, { observationTime: 0, heuristicOnly: true }),
+          scanner.scan(page, {
+            observationTime: 0,
+            heuristicOnly: true,
+            ...(CONCURRENT_SCANNERS[scannerId].scanOpts || {}),
+          }),
           new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 60000)),
         ]);
         restore();

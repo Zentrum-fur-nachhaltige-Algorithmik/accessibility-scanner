@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-27T22:26:00.191Z",
+  "generatedAt": "2026-08-28T08:19:32.044Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 77,
+    "passed": 80,
     "failed": 0
   },
   "results": [
@@ -254,7 +254,7 @@
       "criteria": [
         "2.5.7"
       ],
-      "matched": 7,
+      "matched": 6,
       "status": "PASS"
     },
     {
@@ -267,7 +267,7 @@
         "2.5.3",
         "2.5.4"
       ],
-      "matched": 9,
+      "matched": 5,
       "status": "PASS"
     },
     {
@@ -277,7 +277,7 @@
       "criteria": [
         "2.5.1"
       ],
-      "matched": 5,
+      "matched": 1,
       "status": "PASS"
     },
     {
@@ -291,23 +291,13 @@
       "status": "PASS"
     },
     {
-      "file": "bad-motion-vestibular.html",
-      "scanner": "input-modalities",
-      "expectViolations": true,
-      "criteria": [
-        "2.5.4"
-      ],
-      "matched": 15,
-      "status": "PASS"
-    },
-    {
       "file": "bad-pointer-cancellation.html",
       "scanner": "input-modalities",
       "expectViolations": true,
       "criteria": [
         "2.5.2"
       ],
-      "matched": 5,
+      "matched": 3,
       "status": "PASS"
     },
     {
@@ -361,21 +351,25 @@
       "status": "PASS"
     },
     {
-      "file": "good-motion-vestibular.html",
-      "scanner": "input-modalities",
-      "expectViolations": false,
-      "criteria": [
-        "2.5.4"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "good-pointer-cancellation.html",
       "scanner": "input-modalities",
       "expectViolations": false,
       "criteria": [
         "2.5.2"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-pointer-labels-and-alternatives.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.1",
+        "2.5.2",
+        "2.5.4",
+        "2.5.7",
+        "2.5.8"
       ],
       "matched": 0,
       "status": "PASS"
@@ -563,6 +557,59 @@
       "status": "PASS"
     },
     {
+      "file": "bad-motion-vestibular.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": true,
+      "criteria": [
+        "2.3.3"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-seizure-risk.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": true,
+      "criteria": [
+        "2.3.1",
+        "2.3.2"
+      ],
+      "matched": 5,
+      "status": "PASS"
+    },
+    {
+      "file": "good-motion-vestibular.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": false,
+      "criteria": [
+        "2.3.3"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-seizure-safe.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": false,
+      "criteria": [
+        "2.3.1",
+        "2.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-short-animations.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": false,
+      "criteria": [
+        "2.3.1",
+        "2.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
       "file": "bad-multiple-ways.html",
       "scanner": "multiple-ways",
       "expectViolations": true,
@@ -609,17 +656,7 @@
       "criteria": [
         "1.4.10"
       ],
-      "matched": 4,
-      "status": "PASS"
-    },
-    {
-      "file": "bad-text-resize.html",
-      "scanner": "responsive-design",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.4"
-      ],
-      "matched": 1,
+      "matched": 5,
       "status": "PASS"
     },
     {
@@ -629,7 +666,7 @@
       "criteria": [
         "1.4.12"
       ],
-      "matched": 12,
+      "matched": 1,
       "status": "PASS"
     },
     {
@@ -637,8 +674,18 @@
       "scanner": "responsive-design",
       "expectViolations": false,
       "criteria": [
+        "1.4.10"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-fluid-container-and-truncation.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
         "1.4.10",
-        "1.4.4"
+        "1.4.12"
       ],
       "matched": 0,
       "status": "PASS"
@@ -649,16 +696,6 @@
       "expectViolations": false,
       "criteria": [
         "1.4.10"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-text-resize.html",
-      "scanner": "responsive-design",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.4"
       ],
       "matched": 0,
       "status": "PASS"
@@ -684,26 +721,6 @@
       "status": "PASS"
     },
     {
-      "file": "bad-seizure-risk.html",
-      "scanner": "seizure-prevention",
-      "expectViolations": true,
-      "criteria": [
-        "2.3.1"
-      ],
-      "matched": 10,
-      "status": "PASS"
-    },
-    {
-      "file": "good-seizure-safe.html",
-      "scanner": "seizure-prevention",
-      "expectViolations": false,
-      "criteria": [
-        "2.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "bad-spa-route-change.html",
       "scanner": "dynamic-spa",
       "expectViolations": true,
@@ -721,6 +738,46 @@
       "criteria": [
         "2.4.2",
         "2.4.3"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-text-resize.html",
+      "scanner": "text-resize",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 2,
+      "status": "PASS"
+    },
+    {
+      "file": "good-decorative-blur-blob.html",
+      "scanner": "text-resize",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-text-resize.html",
+      "scanner": "text-resize",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-zoom-200-percent.html",
+      "scanner": "text-resize",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.4"
       ],
       "matched": 0,
       "status": "PASS"

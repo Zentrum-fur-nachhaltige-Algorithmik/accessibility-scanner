@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 206,
+  "fixtureCount": 210,
   "scanners": [
     {
       "id": "axe-core",
@@ -273,19 +273,8 @@
     {
       "id": "responsive-design",
       "criteria": [
-        "1.4.4",
         "1.4.10",
         "1.4.12"
-      ],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "mobile-specific",
-      "criteria": [
-        "1.4.10"
       ],
       "kind": "deterministic",
       "exclusive": true,
@@ -1146,9 +1135,7 @@
       "level": "AA",
       "title": "Resize Text",
       "mechanism": "hybrid:axe-core+text-resize",
-      "supporting": [
-        "responsive-design"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1156,14 +1143,14 @@
         "meta-viewport"
       ],
       "deterministic": [
-        "text-resize",
-        "responsive-design"
+        "text-resize"
       ],
       "llm": [],
       "fixtures": {
         "good": [
           "good-decorative-blur-blob.html",
-          "good-text-resize.html"
+          "good-text-resize.html",
+          "good-zoom-200-percent.html"
         ],
         "bad": [
           "bad-text-resize.html"
@@ -1177,7 +1164,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1356,21 +1343,19 @@
       "level": "AA",
       "title": "Reflow",
       "mechanism": "deterministic:responsive-design",
-      "supporting": [
-        "mobile-specific"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "responsive-design",
-        "mobile-specific"
+        "responsive-design"
       ],
       "llm": [],
       "fixtures": {
         "good": [
           "good-decorative-blur-blob.html",
+          "good-fluid-container-and-truncation.html",
           "good-reflow.html"
         ],
         "bad": [
@@ -1384,7 +1369,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1448,6 +1433,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-fluid-container-and-truncation.html",
           "good-text-spacing-grid-cards.html",
           "good-text-spacing.html"
         ],
@@ -1462,7 +1448,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1865,7 +1851,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
@@ -1877,7 +1864,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1899,14 +1886,24 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
         ]
       },
-      "harness": [],
-      "outcome": null
+      "harness": [
+        "exclusive"
+      ],
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 3,
+        "from": [
+          "exclusive"
+        ]
+      }
     },
     {
       "sc": "2.3.3",
@@ -1930,8 +1927,17 @@
           "bad-motion-vestibular.html"
         ]
       },
-      "harness": [],
-      "outcome": null
+      "harness": [
+        "exclusive"
+      ],
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 2,
+        "from": [
+          "exclusive"
+        ]
+      }
     },
     {
       "sc": "2.4.1",
@@ -2393,7 +2399,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-keyboard-native-override.html"
+          "good-keyboard-native-override.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2406,7 +2413,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2428,7 +2435,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-pointer-cancellation.html"
+          "good-pointer-cancellation.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2441,7 +2449,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2508,7 +2516,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-motion-vestibular.html"
+          "good-motion-vestibular.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2521,7 +2530,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 2,
         "from": [
           "exclusive"
         ]
@@ -2600,7 +2609,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-dragging-movements.html"
+          "good-dragging-movements.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-dragging-movements.html"
@@ -2612,7 +2622,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2636,6 +2646,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-pointer-labels-and-alternatives.html",
           "good-target-size-minimum.html"
         ],
         "bad": [
@@ -2650,7 +2661,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]

@@ -1,0 +1,88 @@
+<!-- WCAG-TEST
+criterion: 2.2.1, 2.2.2
+level: A
+title: Timing Adjustable, Pause Stop Hide
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: timing-controls
+description: Class names blink, scroll and moving on decorations that stay in place, a counter that counts up, and a page that writes about session timeouts without running one
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Static decorations</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        color: #1a1a1a;
+        background: #fff;
+        margin: 2rem;
+      }
+      .blink-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #1a6b3c;
+        animation: fade 2s ease-in-out infinite;
+      }
+      .scroll-hint {
+        animation: fade 3s ease-in-out infinite;
+      }
+      .moving-gradient {
+        height: 6px;
+        background: linear-gradient(90deg, #1a6b3c, #0051a8);
+        animation: tint 6s linear infinite;
+      }
+      @keyframes fade {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      @keyframes tint {
+        0% {
+          filter: hue-rotate(0deg);
+        }
+        100% {
+          filter: hue-rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Static decorations</h1>
+
+    <div class="blink-dot" aria-hidden="true"></div>
+    <p class="scroll-hint">Scroll down for the opening hours.</p>
+    <div class="moving-gradient" aria-hidden="true"></div>
+
+    <h2>Session timeouts</h2>
+    <p>
+      Our advice on session timeouts: give people a way to ask for more time, and warn them before
+      the session expires. This page explains time limits; it does not run one.
+    </p>
+    <p>The standard limit is <span>20:00</span> minutes of inactivity.</p>
+
+    <h2>Visitors so far today</h2>
+    <p>
+      Counted since midnight: <span id="visitors">1</span>
+      <button type="button" id="hold">Pause the counter</button>
+    </p>
+
+    <script>
+      // A counter that only ever grows is not a time limit, and this one stops
+      // when the user asks it to.
+      const visitors = document.getElementById('visitors');
+      const ticker = setInterval(() => {
+        visitors.textContent = String(Number(visitors.textContent) + 1);
+      }, 300);
+      document.getElementById('hold').addEventListener('click', () => clearInterval(ticker));
+    </script>
+  </body>
+</html>

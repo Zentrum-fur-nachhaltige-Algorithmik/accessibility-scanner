@@ -1107,6 +1107,15 @@ const HTML_SCANNER_MAPPING = {
     description:
       'A skip link that unclips on focus and paints no outline: its appearance is the indicator, so no-visible-focus must stay silent',
   },
+
+  'good-language-switcher-outside-form.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-purpose'],
+    testType: 'good',
+    wcagCriteria: ['1.3.5'],
+    description:
+      'A language switcher and a country filter outside any form, on a page that also carries a contact form: autocomplete-off-on-purpose-field must stay silent',
+  },
 };
 
 /**

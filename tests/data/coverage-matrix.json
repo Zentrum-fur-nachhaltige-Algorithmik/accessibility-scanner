@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 206,
+  "fixtureCount": 211,
   "scanners": [
     {
       "id": "axe-core",
@@ -76,8 +76,7 @@
       "id": "screen-reader",
       "criteria": [
         "1.3.1",
-        "4.1.2",
-        "4.1.3"
+        "2.4.1"
       ],
       "kind": "deterministic",
       "exclusive": false,
@@ -118,17 +117,6 @@
       "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
-      "id": "language-detection",
-      "criteria": [
-        "3.1.1",
-        "3.1.2"
-      ],
-      "kind": "deterministic",
-      "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-language-override.html (3.1.2)"
-    },
-    {
       "id": "predictable-navigation",
       "criteria": [
         "3.2.1",
@@ -157,10 +145,8 @@
     {
       "id": "page-structure",
       "criteria": [
-        "1.3.1",
-        "2.4.1",
-        "2.4.2",
-        "2.4.6"
+        "2.4.4",
+        "2.4.9"
       ],
       "kind": "deterministic",
       "exclusive": false,
@@ -819,7 +805,6 @@
       "mechanism": "axe-core",
       "supporting": [
         "screen-reader (experimental)",
-        "page-structure (experimental)",
         "advanced-aria (experimental)"
       ],
       "justification": "",
@@ -841,7 +826,6 @@
       ],
       "deterministic": [
         "screen-reader",
-        "page-structure",
         "advanced-aria"
       ],
       "llm": [],
@@ -951,6 +935,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-orientation-responsive.html",
           "good-orientation.html"
         ],
         "bad": [
@@ -1199,6 +1184,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-images-of-text-photographs.html",
           "good-images-of-text.html"
         ],
         "bad": [
@@ -1865,7 +1851,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
@@ -1899,7 +1886,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
@@ -1939,7 +1927,7 @@
       "title": "Bypass Blocks",
       "mechanism": "axe-core",
       "supporting": [
-        "page-structure (experimental)"
+        "screen-reader (experimental)"
       ],
       "justification": "",
       "isManual": false,
@@ -1948,7 +1936,7 @@
         "bypass"
       ],
       "deterministic": [
-        "page-structure"
+        "screen-reader"
       ],
       "llm": [],
       "fixtures": {
@@ -1983,9 +1971,7 @@
       "level": "A",
       "title": "Page Titled",
       "mechanism": "hybrid:axe-core+dynamic-spa",
-      "supporting": [
-        "page-structure (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1993,7 +1979,6 @@
         "document-title"
       ],
       "deterministic": [
-        "page-structure",
         "dynamic-spa"
       ],
       "llm": [],
@@ -2009,7 +1994,6 @@
       },
       "harness": [
         "axe-e2e",
-        "concurrent",
         "exclusive"
       ],
       "outcome": {
@@ -2071,7 +2055,9 @@
       "level": "A",
       "title": "Link Purpose (In Context)",
       "mechanism": "axe-core",
-      "supporting": [],
+      "supporting": [
+        "page-structure (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -2079,18 +2065,22 @@
         "area-alt",
         "link-name"
       ],
-      "deterministic": [],
+      "deterministic": [
+        "page-structure"
+      ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-accessibility.html"
+          "good-accessibility.html",
+          "good-link-purpose-in-context.html"
         ],
         "bad": [
           "bad-link-purpose.html"
         ]
       },
       "harness": [
-        "axe-e2e"
+        "axe-e2e",
+        "concurrent"
       ],
       "outcome": null
     },
@@ -2132,15 +2122,13 @@
       "sc": "2.4.6",
       "level": "AA",
       "title": "Headings and Labels",
-      "mechanism": "experimental:page-structure",
+      "mechanism": "MANUAL",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: page-structure: concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+2 more)",
-      "isManual": false,
-      "isExperimentalOnly": true,
+      "justification": "Headings and Labels: whether a heading or a label describes its topic is a judgement about meaning. An empty heading is axe-core `empty-heading` and an unnamed control is axe-core `label`; what is left needs a reader. axe-core ships no 2.4.6 rule either.",
+      "isManual": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "page-structure"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2151,9 +2139,7 @@
           "bad-headings-labels.html"
         ]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": [],
       "outcome": {
         "tp": true,
         "fpClean": true,
@@ -2229,19 +2215,24 @@
       "level": "AAA",
       "title": "Link Purpose (Link Only)",
       "mechanism": "hybrid:axe-core+llm-semantic-text",
-      "supporting": [],
+      "supporting": [
+        "page-structure (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [
         "identical-links-same-purpose"
       ],
-      "deterministic": [],
+      "deterministic": [
+        "page-structure"
+      ],
       "llm": [
         "llm-semantic-text"
       ],
       "fixtures": {
         "good": [
+          "good-link-purpose-in-context.html",
           "good-link-purpose-only.html",
           "good-navigation-aaa.html",
           "good-semantic-text-de.html"
@@ -2254,6 +2245,7 @@
       },
       "harness": [
         "axe-e2e",
+        "concurrent",
         "llm"
       ],
       "outcome": null
@@ -2393,7 +2385,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-keyboard-native-override.html"
+          "good-keyboard-native-override.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2428,7 +2421,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-pointer-cancellation.html"
+          "good-pointer-cancellation.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2508,7 +2502,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-motion-vestibular.html"
+          "good-motion-vestibular.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2600,7 +2595,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-dragging-movements.html"
+          "good-dragging-movements.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-dragging-movements.html"
@@ -2636,6 +2632,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-pointer-labels-and-alternatives.html",
           "good-target-size-minimum.html"
         ],
         "bad": [
@@ -2661,9 +2658,7 @@
       "level": "A",
       "title": "Language of Page",
       "mechanism": "axe-core",
-      "supporting": [
-        "language-detection (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -2672,9 +2667,7 @@
         "html-lang-valid",
         "html-xml-lang-mismatch"
       ],
-      "deterministic": [
-        "language-detection"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2686,8 +2679,7 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent"
+        "axe-e2e"
       ],
       "outcome": {
         "tp": true,
@@ -2703,18 +2695,14 @@
       "level": "AA",
       "title": "Language of Parts",
       "mechanism": "axe-core",
-      "supporting": [
-        "language-detection (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [
         "valid-lang"
       ],
-      "deterministic": [
-        "language-detection"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2727,8 +2715,7 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent"
+        "axe-e2e"
       ],
       "outcome": {
         "tp": true,
@@ -3369,7 +3356,6 @@
       "title": "Name, Role, Value",
       "mechanism": "axe-core",
       "supporting": [
-        "screen-reader (experimental)",
         "advanced-aria (experimental)"
       ],
       "justification": "",
@@ -3406,7 +3392,6 @@
         "summary-name"
       ],
       "deterministic": [
-        "screen-reader",
         "advanced-aria"
       ],
       "llm": [],
@@ -3449,15 +3434,12 @@
       "level": "AA",
       "title": "Status Messages",
       "mechanism": "deterministic:status-messages",
-      "supporting": [
-        "screen-reader (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "screen-reader",
         "status-messages"
       ],
       "llm": [],
@@ -3473,7 +3455,6 @@
         ]
       },
       "harness": [
-        "concurrent",
         "exclusive"
       ],
       "outcome": {

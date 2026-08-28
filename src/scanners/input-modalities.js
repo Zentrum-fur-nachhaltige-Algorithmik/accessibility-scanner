@@ -616,28 +616,67 @@ class InputModalitiesScanner extends BaseScanner {
       }
 
       /**
-       * 2.5.8 "Inline" exception: the target sits in a sentence and its box is
-       * constrained by the line height of the text around it. The parent tag
-       * is not what decides that: a link inside `<div class="prose">` or a
-       * `display: inline-block` link in running copy is just as constrained as
-       * one inside a `<p>`.
+       * 2.5.8 "Inline" exception, both of its clauses: the target is in a
+       * sentence (it shares a line box with text that belongs to no target),
+       * or its size is constrained by the line height of non-target text in
+       * the same block. Both are measured from painted rectangles, so a
+       * citation marker in `<sup><a>[1]</a></sup>` inside a paragraph is
+       * exempt and a link alone in a navigation row is not.
        */
       function isInlineTextTarget(el, style) {
         if (!['inline', 'inline-block', 'inline-flex'].includes(style.display)) return false;
-        const parent = el.parentElement;
-        if (!parent) return false;
-        const own = (el.textContent || '').trim().length;
-        const all = (parent.textContent || '').trim().length;
-        if (all <= own + 2) return false; // not surrounded by other text
-        const parentStyle = window.getComputedStyle(parent);
-        const fontSize = parseFloat(parentStyle.fontSize) || 16;
+
+        // Nearest block-level ancestor: the box whose line boxes the target sits in.
+        let block = el.parentElement;
+        while (block && block !== document.documentElement) {
+          const d = window.getComputedStyle(block).display;
+          if (!d.startsWith('inline') && d !== 'contents') break;
+          block = block.parentElement;
+        }
+        if (!block) return false;
+
+        const rect = el.getBoundingClientRect();
+        const blockStyle = window.getComputedStyle(block);
+        const fontSize = parseFloat(blockStyle.fontSize) || 16;
         const lineHeight =
-          parentStyle.lineHeight === 'normal'
+          blockStyle.lineHeight === 'normal'
             ? fontSize * 1.2
-            : parseFloat(parentStyle.lineHeight) || fontSize * 1.2;
-        // The target may not be taller than the line box it sits in, otherwise
-        // the author sized it and the exception does not apply.
-        return el.getBoundingClientRect().height <= lineHeight * 1.5;
+            : parseFloat(blockStyle.lineHeight) || fontSize * 1.2;
+        // A target taller than the line box was sized by its author, so no
+        // line height constrains it and the exception does not apply.
+        if (rect.height > lineHeight * 1.5) return false;
+
+        const range = document.createRange();
+        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+        let node;
+        let hasNonTargetText = false;
+        while ((node = walker.nextNode())) {
+          if (!node.nodeValue || !node.nodeValue.trim()) continue;
+          if (el.contains(node)) continue;
+          // Text inside another target is that target's label, not surrounding
+          // text: a row of navigation links does not make its links inline.
+          let owner = node.parentElement;
+          let inTarget = false;
+          while (owner && owner !== block) {
+            if (__isInteractiveTarget(owner)) {
+              inTarget = true;
+              break;
+            }
+            owner = owner.parentElement;
+          }
+          if (inTarget) continue;
+
+          range.selectNodeContents(node);
+          for (const r of range.getClientRects()) {
+            if (r.width === 0 || r.height === 0) continue;
+            hasNonTargetText = true;
+            const overlap = Math.min(rect.bottom, r.bottom) - Math.max(rect.top, r.top);
+            if (overlap > Math.min(rect.height, r.height) / 2) return true; // same line box
+          }
+        }
+        // Painted text elsewhere in the same block: the line height that
+        // formats that text formats the target's line too.
+        return hasNonTargetText;
       }
 
       /** 2.5.8 "User agent control" exception: size set by the UA, not the author. */

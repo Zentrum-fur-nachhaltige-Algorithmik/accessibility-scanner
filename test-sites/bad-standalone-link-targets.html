@@ -1,0 +1,67 @@
+<!-- WCAG-TEST
+criterion: 2.5.8
+level: AA
+title: Target Size (Minimum)
+test_type: bad
+expected_violations: 4
+testable_by: dom
+scanners: input-modalities
+description: Undersized links stacked in a navigation column and a footer list, with no surrounding text on their line
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Standalone link targets - Accessibility Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        font-size: 13px;
+        line-height: 1.1;
+      }
+      nav ul,
+      footer ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav li,
+      footer li {
+        margin: 0;
+        padding: 0;
+      }
+      nav a,
+      footer a {
+        display: inline-block;
+        font-size: 13px;
+        line-height: 15px;
+        height: 15px;
+        color: #0b57d0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Language editions</h1>
+
+    <nav aria-label="Language">
+      <ul>
+        <li><a href="#de">Deutsch</a></li>
+        <li><a href="#fr">Francais</a></li>
+        <li><a href="#it">Italiano</a></li>
+        <li><a href="#es">Espanol</a></li>
+      </ul>
+    </nav>
+
+    <footer>
+      <ul>
+        <li><a href="#imprint">Imprint</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </footer>
+  </body>
+</html>

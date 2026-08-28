@@ -1,0 +1,71 @@
+<!-- WCAG-TEST
+criterion: 2.5.8
+level: AA
+title: Target Size (Minimum)
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: Links and citation markers that share a line box with the running text around them, covered by the 2.5.8 Inline exception
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inline text links - Accessibility Test</title>
+    <style>
+      body {
+        font-family: Georgia, serif;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      sup.ref a {
+        font-size: 11px;
+        text-decoration: none;
+        color: #0b57d0;
+      }
+      p a {
+        color: #0b57d0;
+      }
+      .glossary {
+        border-bottom: 1px dotted #555;
+        color: #0b57d0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Prostate screening</h1>
+
+    <!-- Citation markers: the link is the whole content of its <sup>, but the
+         <sup> sits in the middle of a paragraph line. -->
+    <p>
+      Screening reduces mortality in the trial cohort<sup class="ref"><a href="#n1">[1]</a></sup>
+      while overdiagnosis remains the main harm<sup class="ref"><a href="#n2">[2]</a></sup> and the
+      absolute benefit stays small<sup class="ref"><a href="#n3">[3]</a></sup> in every age
+      group<sup class="ref"><a href="#n4">[4]</a></sup>.
+    </p>
+
+    <!-- Short inline links inside sentences, closer together than 24px. -->
+    <p>
+      The <a href="#a">PSA</a> value, the <a href="#b">DRE</a> result and the
+      <a href="#c">MRI</a> report are read together, and the
+      <a class="glossary" href="#d">Gleason</a> score is added afterwards.
+    </p>
+
+    <p>
+      A link inside a <span>span that carries no text of its own</span> still sits on a line with
+      the sentence: see <a href="#e">the protocol</a> for the sampling scheme.
+    </p>
+
+    <ol>
+      <li id="n1">Trial report.</li>
+      <li id="n2">Cohort follow-up.</li>
+      <li id="n3">Meta-analysis.</li>
+      <li id="n4">Registry data.</li>
+    </ol>
+  </body>
+</html>

@@ -1053,6 +1053,24 @@ const HTML_SCANNER_MAPPING = {
     description:
       'Status dots named by a visually hidden span or a title, identical decorative bullets and a colour picker of named buttons: color-coded-indicator must stay silent',
   },
+
+  'good-inline-text-links.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'Citation markers and short links that share a line box with the sentence around them: the 2.5.8 Inline exception applies, target-too-small must stay silent',
+  },
+
+  'bad-standalone-link-targets.html': {
+    expectedScanners: ['input-modalities'],
+    excludedScanners: ['color-contrast', 'use-of-color'],
+    testType: 'bad',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'Undersized links stacked in a navigation column and a footer list with no non-target text on their line',
+  },
 };
 
 /**

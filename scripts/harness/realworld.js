@@ -630,8 +630,8 @@ const FIXTURES = [
   {
     file: 'gov-uk-guide.html',
     source: 'https://www.gov.uk/vehicle-tax',
-    // recorded: 2 total ensemble violations (profile=standard, --no-llm).
-    band: [1, 4],
+    // recorded: 1 total ensemble violation (profile=standard, --no-llm).
+    band: [1, 3],
     spotTruths: [
       {
         name: 'REGRESSION: static prose about timeouts is not auto-updating content',
@@ -795,10 +795,10 @@ const FIXTURES = [
   {
     file: 'govuk-design-system.html',
     source: 'https://design-system.service.gov.uk/components/text-input/',
-    // recorded: 19 total ensemble violations (profile=standard, --no-llm) on
+    // recorded: 18 total ensemble violations (profile=standard, --no-llm) on
     // two runs of this file alone; in both, two exclusive scanners lost the 45s
     // reload on this 811KB page and contributed nothing.
-    band: [9, 38],
+    band: [9, 36],
     spotTruths: [
       {
         name: 'REGRESSION: iframes are not reported as missing a focus indicator',
@@ -887,18 +887,18 @@ const FIXTURES = [
         },
       },
       {
-        name: 'REAL: the skip link has no focus indicator of its own',
-        kind: 'must-detect',
+        name: 'REGRESSION: the skip link that appears on focus is indicated',
+        kind: 'must-not-flag',
         // <a class="u-text-transform-uppercase c-skipnav" href="#main">Skip to
-        // content.</a> comes into view on focus but draws no outline, box
-        // shadow or background change (outline: none 0px, box-shadow: none,
-        // confirmed by a blur comparison). WCAG 2.4.7.
+        // content.</a> is clipped to nothing (clip: rect(0 0 0 0)) until it is
+        // focused and then comes into view. That change of state is the focus
+        // indicator (technique C15), so 2.4.7 is met without an outline.
         check: ({ violations }) => {
           const hits = mentions(violations, 'c-skipnav').filter((v) =>
             /focus/i.test(`${v.issue || ''} ${v.description || ''}`)
           );
-          if (hits.length > 0) return null;
-          return 'no 2.4.7 finding for the skip link that shows no focus indicator';
+          if (hits.length === 0) return null;
+          return `skip link flagged: ${hits.map((v) => v.description || v.issue).join('; ')}`;
         },
       },
     ],

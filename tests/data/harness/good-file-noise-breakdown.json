@@ -662,17 +662,6 @@
       }
     },
     {
-      "scannerId": "advanced-contrast",
-      "type": "ui-component-contrast",
-      "criterion": "9.1.4.11",
-      "count": 3,
-      "fileCounts": {
-        "good-form-errors": 1,
-        "good-language-override": 1,
-        "good-motion-vestibular": 1
-      }
-    },
-    {
       "scannerId": "predictable-navigation",
       "type": "input-opens-modal-dialog",
       "criterion": "9.3.2.2",
@@ -735,24 +724,6 @@
       "count": 1,
       "fileCounts": {
         "good-form-errors": 1
-      }
-    },
-    {
-      "scannerId": "html-validation",
-      "type": "label",
-      "criterion": "4.1.2",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
-      }
-    },
-    {
-      "scannerId": "html-validation",
-      "type": "unlabeled-form-control",
-      "criterion": "9.4.1.1",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
       }
     },
     {

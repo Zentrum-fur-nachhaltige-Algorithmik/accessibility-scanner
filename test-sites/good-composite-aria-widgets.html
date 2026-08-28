@@ -1,0 +1,81 @@
+<!-- WCAG-TEST
+criterion: 4.1.2
+level: A
+title: Composite ARIA widgets built the way the APG prescribes
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: advanced-aria
+description: Roving tabindex in a tree, a disclosure accordion whose buttons carry aria-expanded and whose panel holds its own controls, a non-modal dialog without aria-modal, a collapsed combobox without aria-controls, navigation rendered as tabs that marks the current page with aria-current, a grid named through aria-labelledby and a menubar named through title. Every one of these was reported as a defect.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composite ARIA widgets</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 1rem; }
+  ul { list-style: none; padding-left: 1rem; }
+  .accordion-panel { border: 1px solid #767676; padding: .5rem; }
+  [role="tablist"] { display: flex; gap: .5rem; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid #767676; padding: .25rem .5rem; }
+</style>
+</head>
+<body>
+<h1>Composite widgets</h1>
+
+<h2 id="files-heading">Project files</h2>
+<ul role="tree" aria-labelledby="files-heading">
+  <li role="treeitem" tabindex="0" aria-expanded="true">
+    src
+    <ul role="group">
+      <li role="treeitem" tabindex="-1">index.js</li>
+      <li role="treeitem" tabindex="-1">styles.css</li>
+    </ul>
+  </li>
+  <li role="treeitem" tabindex="-1">README.md</li>
+</ul>
+
+<div class="accordion">
+  <h3>
+    <button class="accordion-toggle" aria-expanded="false" aria-controls="opening-hours">Opening hours</button>
+  </h3>
+  <div id="opening-hours" class="accordion-panel" hidden>
+    <p>Monday to Friday, 8:00 to 16:00.</p>
+    <button type="button">Add to calendar</button>
+    <a href="#files-heading">Back to the file list</a>
+  </div>
+</div>
+
+<dialog open aria-labelledby="tips-title">
+  <h2 id="tips-title">Keyboard tips</h2>
+  <p>Use the arrow keys inside the tree.</p>
+  <button type="button">Close</button>
+</dialog>
+
+<label for="city">City</label>
+<input id="city" role="combobox" aria-expanded="false" aria-autocomplete="list" autocomplete="off">
+
+<nav aria-label="Sections">
+  <div role="tablist" aria-label="Sections">
+    <a role="tab" href="#files-heading" aria-current="page">Files</a>
+    <a role="tab" href="#report-heading">Report</a>
+  </div>
+</nav>
+
+<h2 id="report-heading">Monthly report</h2>
+<table role="grid" aria-labelledby="report-heading">
+  <tr role="row"><td role="gridcell">January</td><td role="gridcell">128</td></tr>
+  <tr role="row"><td role="gridcell">February</td><td role="gridcell">143</td></tr>
+</table>
+
+<ul role="menubar" title="Editor commands">
+  <li role="menuitem" tabindex="0" aria-haspopup="true">File</li>
+  <li role="menuitem" tabindex="-1">Edit</li>
+</ul>
+
+<p role="status" aria-live="polite"></p>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 206,
+  "fixtureCount": 213,
   "scanners": [
     {
       "id": "axe-core",
@@ -12,7 +12,6 @@
     {
       "id": "color-contrast",
       "criteria": [
-        "1.4.3",
         "1.4.6"
       ],
       "kind": "deterministic",
@@ -27,8 +26,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-use-of-color.html (1.4.1) | concurrent harness FAIL: false positive on good-css-background-accessible.html (1.4.1)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "images-of-text",
@@ -40,17 +39,6 @@
       "exclusive": false,
       "trust": "experimental",
       "trustReason": "concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)"
-    },
-    {
-      "id": "advanced-contrast",
-      "criteria": [
-        "1.4.11",
-        "1.4.13"
-      ],
-      "kind": "deterministic",
-      "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-color-contrast.html (1.4.3,1.4.6) | concurrent harness FAIL: missed bad-focus-visible.html (1.4.3)"
     },
     {
       "id": "nontext-contrast",
@@ -1038,10 +1026,8 @@
       "sc": "1.4.1",
       "level": "A",
       "title": "Use of Color",
-      "mechanism": "axe-core",
-      "supporting": [
-        "use-of-color (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+use-of-color",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1054,7 +1040,9 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-css-background-accessible.html"
+          "good-color-coded-indicators.html",
+          "good-css-background-accessible.html",
+          "good-links-distinguished-in-text.html"
         ],
         "bad": [
           "bad-css-background-info.html",
@@ -1067,8 +1055,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 3,
+        "fpClean": true,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -1105,7 +1093,7 @@
       "sc": "1.4.3",
       "level": "AA",
       "title": "Contrast (Minimum)",
-      "mechanism": "hybrid:axe-core+color-contrast",
+      "mechanism": "axe-core",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1113,12 +1101,11 @@
       "axeRules": [
         "color-contrast"
       ],
-      "deterministic": [
-        "color-contrast"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
+          "good-aa-text-not-enhanced.html",
           "good-bootstrap-patterns.html",
           "good-color-contrast.html",
           "good-contrast-hidden-and-arbitrary-classes.html"
@@ -1129,17 +1116,9 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent"
+        "axe-e2e"
       ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 8,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "1.4.4",
@@ -1235,7 +1214,6 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-bootstrap-patterns.html",
           "good-contrast-enhanced.html"
         ],
         "bad": [
@@ -1249,7 +1227,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 6,
+        "runs": 2,
         "from": [
           "concurrent"
         ]
@@ -1395,35 +1373,33 @@
       "level": "AA",
       "title": "Non-text Contrast",
       "mechanism": "deterministic:nontext-contrast",
-      "supporting": [
-        "advanced-contrast (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "advanced-contrast",
         "nontext-contrast"
       ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-nontext-contrast.html"
+          "good-graphic-parts-contrast.html",
+          "good-nontext-contrast.html",
+          "good-state-styles-unused.html"
         ],
         "bad": [
           "bad-nontext-contrast.html"
         ]
       },
       "harness": [
-        "concurrent",
         "exclusive",
         "golden"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 6,
+        "runs": 4,
         "from": [
           "concurrent",
           "exclusive"
@@ -1473,15 +1449,12 @@
       "level": "AA",
       "title": "Content on Hover or Focus",
       "mechanism": "deterministic:hover-focus-content",
-      "supporting": [
-        "advanced-contrast (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "advanced-contrast",
         "hover-focus-content"
       ],
       "llm": [],
@@ -1496,7 +1469,6 @@
         ]
       },
       "harness": [
-        "concurrent",
         "exclusive",
         "golden"
       ],
@@ -1865,7 +1837,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
@@ -1899,7 +1872,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
@@ -2393,7 +2367,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-keyboard-native-override.html"
+          "good-keyboard-native-override.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2428,7 +2403,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-pointer-cancellation.html"
+          "good-pointer-cancellation.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2508,7 +2484,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-motion-vestibular.html"
+          "good-motion-vestibular.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2600,7 +2577,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-dragging-movements.html"
+          "good-dragging-movements.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-dragging-movements.html"
@@ -2636,6 +2614,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-pointer-labels-and-alternatives.html",
           "good-target-size-minimum.html"
         ],
         "bad": [

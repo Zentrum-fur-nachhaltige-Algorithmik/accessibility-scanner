@@ -17,11 +17,12 @@ const MIN_SAMPLE_MS = 1600;
 const MAX_SAMPLE_MS = 4000;
 
 /**
- * Motion window for 2.3.3, and the travel a box has to cover inside it before
- * the motion counts as large. Below this an animation is a state change (a
- * pulse, a hover lift, a 1.05 scale), not the movement 2.3.3 is about.
+ * Steps taken through one animation iteration for 2.3.3, and the travel a box
+ * has to cover across them before the motion counts as large. Below this an
+ * animation is a state change (a pulse, a hover lift, a 1.05 scale), not the
+ * movement 2.3.3 is about.
  */
-const MOTION_SAMPLE_MS = 700;
+const MOTION_SAMPLE_STEPS = 16;
 const MOTION_TRAVEL_PX = 100;
 
 class SeizurePreventionScanner extends BaseScanner {
@@ -350,89 +351,102 @@ class SeizurePreventionScanner extends BaseScanner {
   /**
    * Measure prefers-reduced-motion support (WCAG 2.3.3).
    *
-   * Large motion is measured, not declared: the box of every animated element
-   * is sampled over a short window and only an element whose centre travels
-   * at least MOTION_TRAVEL_PX, or whose box grows or shrinks by that much, is
-   * counted. That is the motion a vestibular disorder reacts to; a colour
-   * pulse, a hover lift or a 1.05 scale is not. The preference is then
-   * emulated and the same measurement is repeated, so a page whose motion
-   * stops is silent whether it implements the query in a cross-origin
-   * stylesheet or in script.
+   * Large motion is measured, not declared. Every running animation is seeked
+   * through one iteration with the Web Animations API and the box of its target
+   * is read at each step, so the travel a keyframe set produces is known
+   * whatever its duration: a parallax layer that drifts 100px over eight
+   * seconds counts, a colour pulse, a hover lift and a 1.05 scale do not. The
+   * preference is then emulated and the same measurement is repeated, so a page
+   * whose motion stops is silent whether it implements the query in a
+   * cross-origin stylesheet or in script.
    */
   async analyzeMotionSensitivity(page, violations) {
     log.debug('Measuring prefers-reduced-motion support');
 
     const measure = () =>
       page.evaluate(
-        async (renderedSrc, travelPx, windowMs) => {
+        async (renderedSrc, travelPx, steps) => {
           eval(renderedSrc);
-          const tracked = [];
-          for (const el of document.querySelectorAll('body *')) {
-            const s = window.getComputedStyle(el);
-            const duration = parseFloat(s.animationDuration) || 0;
-            if (s.animationName === 'none' || duration <= 0) continue;
-            if (s.animationPlayState === 'paused') continue;
-            if (!__isRendered(el)) continue;
-            const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
-            tracked.push({
-              el: el,
-              key: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}${cls ? `.${cls}` : ''}::${s.animationName}`,
-              minX: Infinity,
-              maxX: -Infinity,
-              minY: Infinity,
-              maxY: -Infinity,
-              minW: Infinity,
-              maxW: -Infinity,
-              minH: Infinity,
-              maxH: -Infinity,
-            });
-            if (tracked.length >= 60) break;
+
+          // One entry per animated element, with the animations driving it.
+          const byTarget = new Map();
+          for (const animation of document.getAnimations()) {
+            const effect = animation.effect;
+            const target = effect && effect.target;
+            if (!target || target.nodeType !== 1) continue;
+            if (animation.playState === 'idle' || animation.playState === 'finished') continue;
+            const duration = effect.getComputedTiming().duration;
+            if (typeof duration !== 'number' || !Number.isFinite(duration) || duration <= 0) {
+              continue;
+            }
+            if (!__isRendered(target)) continue;
+            if (!byTarget.has(target)) byTarget.set(target, []);
+            byTarget.get(target).push({ animation, duration });
+            if (byTarget.size >= 60) break;
           }
 
-          if (tracked.length) {
-            const start = performance.now();
-            await new Promise((resolve) => {
-              const step = () => {
-                for (const t of tracked) {
-                  const r = t.el.getBoundingClientRect();
-                  const cx = r.left + r.width / 2;
-                  const cy = r.top + r.height / 2;
-                  t.minX = Math.min(t.minX, cx);
-                  t.maxX = Math.max(t.maxX, cx);
-                  t.minY = Math.min(t.minY, cy);
-                  t.maxY = Math.max(t.maxY, cy);
-                  t.minW = Math.min(t.minW, r.width);
-                  t.maxW = Math.max(t.maxW, r.width);
-                  t.minH = Math.min(t.minH, r.height);
-                  t.maxH = Math.max(t.maxH, r.height);
-                }
-                if (performance.now() - start >= windowMs) {
-                  resolve();
-                  return;
-                }
-                requestAnimationFrame(step);
-              };
-              requestAnimationFrame(step);
-            });
-          }
+          const moving = [];
+          for (const [target, entries] of byTarget) {
+            const saved = entries.map((e) => ({
+              animation: e.animation,
+              time: e.animation.currentTime,
+              wasRunning: e.animation.playState === 'running',
+            }));
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+            let minW = Infinity;
+            let maxW = -Infinity;
+            let minH = Infinity;
+            let maxH = -Infinity;
 
-          const moving = tracked
-            .filter(
-              (t) =>
-                t.maxX - t.minX >= travelPx ||
-                t.maxY - t.minY >= travelPx ||
-                t.maxW - t.minW >= travelPx ||
-                t.maxH - t.minH >= travelPx
-            )
-            .map((t) => t.key);
+            try {
+              for (let step = 0; step <= steps; step++) {
+                for (const e of entries) {
+                  e.animation.pause();
+                  e.animation.currentTime = (e.duration * step) / steps;
+                }
+                const r = target.getBoundingClientRect();
+                const cx = r.left + r.width / 2;
+                const cy = r.top + r.height / 2;
+                minX = Math.min(minX, cx);
+                maxX = Math.max(maxX, cx);
+                minY = Math.min(minY, cy);
+                maxY = Math.max(maxY, cy);
+                minW = Math.min(minW, r.width);
+                maxW = Math.max(maxW, r.width);
+                minH = Math.min(minH, r.height);
+                maxH = Math.max(maxH, r.height);
+              }
+            } finally {
+              for (const s of saved) {
+                s.animation.currentTime = s.time;
+                if (s.wasRunning) s.animation.play();
+              }
+            }
+
+            if (
+              maxX - minX >= travelPx ||
+              maxY - minY >= travelPx ||
+              maxW - minW >= travelPx ||
+              maxH - minH >= travelPx
+            ) {
+              const cls =
+                typeof target.className === 'string' ? target.className.trim().split(/\s+/)[0] : '';
+              moving.push(
+                `${target.tagName.toLowerCase()}${target.id ? `#${target.id}` : ''}${cls ? `.${cls}` : ''}`
+              );
+            }
+          }
 
           const smoothScroll =
             window.getComputedStyle(document.documentElement).scrollBehavior === 'smooth';
-          return { moving: moving, smoothScroll: smoothScroll };
+          return { moving, smoothScroll };
         },
         renderedCode,
         MOTION_TRAVEL_PX,
-        MOTION_SAMPLE_MS
+        MOTION_SAMPLE_STEPS
       );
 
     let before;
@@ -459,11 +473,19 @@ class SeizurePreventionScanner extends BaseScanner {
 
     if (!unchanged) return { supported: true };
 
+    const evidence = [];
+    if (before.moving.length) {
+      evidence.push(
+        `${before.moving.length} element(s) keep moving by at least ${MOTION_TRAVEL_PX}px`
+      );
+    }
+    if (before.smoothScroll) evidence.push('scroll-behavior stays smooth');
+
     violations.push({
       criterion: '9.2.3.3',
       element: 'document',
       issue: 'no-reduced-motion-support',
-      description: `${before.moving.length} element(s) keep moving by at least ${MOTION_TRAVEL_PX}px with prefers-reduced-motion: reduce emulated; the page does not respond to the preference`,
+      description: `With prefers-reduced-motion: reduce emulated, ${evidence.join(' and ')}: the page does not respond to the preference`,
       severity: 'warning',
       details: {
         animationsBefore: before.moving.length,

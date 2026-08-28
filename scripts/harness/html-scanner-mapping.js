@@ -747,13 +747,31 @@ const HTML_SCANNER_MAPPING = {
       'overflow:hidden grid of cards whose text still fits under the 1.4.12 spacing overrides at 320/375/768/1920: text-spacing-failure must not fire',
   },
 
+  'good-fluid-container-and-truncation.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10', '1.4.12'],
+    description:
+      'width:1140px with max-width:100%, an inline px image width, a wide table in an overflow-x wrapper, a nowrap pill button, a line-clamped teaser and an important line-height: fixed-width-element and text-spacing-failure must not fire',
+  },
+
+  'good-zoom-200-percent.html': {
+    expectedScanners: [],
+    excludedScanners: ['text-resize'],
+    testType: 'good',
+    wcagCriteria: ['1.4.4'],
+    description:
+      'Fine print in px, a clipped avatar, a page width inside a min-width media query, a wide table in a scrolling wrapper and a carousel whose off-frame slides are parked at every zoom level: text-overflow and interaction-blocked must not fire at 200 percent zoom',
+  },
+
   'good-decorative-blur-blob.html': {
     expectedScanners: [],
-    excludedScanners: ['responsive-design', 'mobile-specific'],
+    excludedScanners: ['responsive-design'],
     testType: 'good',
     wcagCriteria: ['1.4.10', '1.4.4'],
     description:
-      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element / mobile-fixed-width-400-zoom must not fire',
+      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element must not fire',
   },
 
   'good-two-column-tab-order.html': {
@@ -927,7 +945,6 @@ const AVAILABLE_SCANNERS = [
   'contact-mechanism',
   'compliance-monitoring',
   'responsive-design',
-  'mobile-specific',
   'advanced-aria',
   'screen-reader',
   'advanced-contrast',

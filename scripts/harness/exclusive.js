@@ -49,8 +49,15 @@ const EXCLUSIVE_SCANNERS = {
   },
   'responsive-design': {
     module: '../../src/scanners/responsive-design',
-    criteria: ['1.4.4', '1.4.10', '1.4.12'],
-    scanOpts: { heuristicOnly: true }, // use heuristic mode for speed
+    criteria: ['1.4.10', '1.4.12'],
+    // Fast mode: the 320px reflow measurement and the 1.4.12 spacing
+    // injection without the full viewport matrix.
+    scanOpts: { heuristicOnly: true },
+  },
+  // Owns 1.4.4: the content and functionality lost at 200 percent zoom.
+  'text-resize': {
+    module: '../../src/scanners/text-resize',
+    criteria: ['1.4.4'],
   },
   'hover-focus-content': {
     module: '../../src/scanners/hover-focus-content',
@@ -59,7 +66,7 @@ const EXCLUSIVE_SCANNERS = {
   },
   'seizure-prevention': {
     module: '../../src/scanners/seizure-prevention',
-    criteria: ['2.3.1'],
+    criteria: ['2.3.1', '2.3.2', '2.3.3'],
   },
   'multiple-ways': {
     module: '../../src/scanners/multiple-ways',
@@ -418,12 +425,10 @@ async function main() {
     }
   }
 
-  // ---- Full-mode responsive tests for 1.4.4 (text resize) and 1.4.10 (reflow) ----
+  // ---- Full-mode responsive test for 1.4.10 (reflow) ----
   origLog(`\n--- responsive-design FULL-MODE criterion tests ---`);
   if (responsiveScanner) {
     for (const { file, criteria, expectViolations } of [
-      { file: 'bad-text-resize.html', criteria: ['1.4.4'], expectViolations: true },
-      { file: 'good-text-resize.html', criteria: ['1.4.4'], expectViolations: false },
       { file: 'bad-reflow.html', criteria: ['1.4.10'], expectViolations: true },
       { file: 'good-reflow.html', criteria: ['1.4.10'], expectViolations: false },
     ]) {

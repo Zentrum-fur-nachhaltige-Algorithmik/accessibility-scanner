@@ -126,6 +126,17 @@ class NonTextContrastScanner extends BaseScanner {
           return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')';
         }
 
+        // Name the reported element the way a reader can find it again. Only
+        // ever used for reporting, never fed back into querySelector.
+        function describe(element, index) {
+          const tag = element.tagName.toLowerCase();
+          if (element.id) return tag + '#' + element.id;
+          const raw = typeof element.className === 'string' ? element.className : '';
+          const classes = raw.trim().split(/\s+/).filter(Boolean).slice(0, 3);
+          if (classes.length) return tag + '.' + classes.join('.');
+          return tag + '[' + index + ']';
+        }
+
         /**
          * Evaluate one UI component against SC 1.4.11.
          *
@@ -157,7 +168,7 @@ class NonTextContrastScanner extends BaseScanner {
             incomplete.push({
               type: 'indeterminate-component-background',
               category: 'ui-component',
-              element: `${element.tagName.toLowerCase()}[${index}]`,
+              element: describe(element, index),
               description:
                 'Component sits on an image or gradient background; its rendered contrast cannot be computed from CSS and needs manual review.',
               details: {
@@ -193,7 +204,7 @@ class NonTextContrastScanner extends BaseScanner {
                   type: config.borderType,
                   category: 'ui-component',
                   severity: 'serious',
-                  element: `${element.tagName.toLowerCase()}[${index}]`,
+                  element: describe(element, index),
                   description: config.borderDescription,
                   details: {
                     borderColor: renderedBorder.color,
@@ -227,7 +238,7 @@ class NonTextContrastScanner extends BaseScanner {
                   type: 'insufficient-background-contrast',
                   category: 'ui-component',
                   severity: 'moderate',
-                  element: `${element.tagName.toLowerCase()}[${index}]`,
+                  element: describe(element, index),
                   description: 'Component background has insufficient contrast',
                   details: {
                     backgroundColor: styles.backgroundColor,
@@ -427,7 +438,7 @@ class NonTextContrastScanner extends BaseScanner {
               type: 'insufficient-progress-border-contrast',
               category: 'ui-component',
               severity: 'moderate',
-              element: `progress[${i}]`,
+              element: progress.id ? `progress#${progress.id}` : `progress[${i}]`,
               description: 'Progress bar border has insufficient contrast',
               details: {
                 borderColor: renderedBorder.color,
@@ -754,7 +765,9 @@ class NonTextContrastScanner extends BaseScanner {
               type: 'insufficient-interactive-state-contrast',
               category: 'state-change',
               severity: 'moderate',
-              element: `${element.tagName.toLowerCase()}[${i}]`,
+              element: element.id
+                ? `${element.tagName.toLowerCase()}#${element.id}`
+                : `${element.tagName.toLowerCase()}[${i}]`,
               description:
                 'Component state is signalled by a colour change that is not distinguishable from the resting colour',
               details: {

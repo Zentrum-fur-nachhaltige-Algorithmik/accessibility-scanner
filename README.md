@@ -201,7 +201,8 @@ Scoring per task:
 
 ```
 nOpt  shortest command sequence that solves the task, computed
-      deterministically along the sighted reference path (optimal-path.js)
+      deterministically along the sighted reference path, or along a link
+      that leads straight to the target when the page has one (optimal-path.js)
 nSr   commands the agent used
 R     = min(1, nOpt / nSr), 0 when the task was not solved
 ```
@@ -211,6 +212,14 @@ R     = min(1, nOpt / nSr), 0 when the task was not solved
 or from the task generator, which solves the page sighted first, derives an
 oracle for each task and validates it by deterministic replay; a task that
 cannot be replayed is excluded, never scored.
+
+Every task is written in the language of the page and carries the words a user
+would look for on it ("Kontakt", "Termin vereinbaren"). A task in the wrong
+language cannot be solved by anyone matching words against what is spoken, and
+it hands the model a goal in a language the site does not use. Neither route is
+allowed to be longer than the page really is either: when the sighted solution
+wandered through a menu but the start page links straight to the destination,
+that single click is what `nSighted` and `nOpt` are measured against.
 
 Findings are read off the trace without an LLM and use the same shape as the
 scanners' violations: `focus-lost` (2.4.3), `dialog-not-trapped` (2.4.3),

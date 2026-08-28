@@ -3,12 +3,16 @@
  * `instantiateGenericTasks(page)` inspects an already-navigated page and returns
  * a Task[] for every applicable template. Heuristics are simple and text-driven
  * (English and German wording); `validateTask()` catches bad guesses afterwards.
+ * Descriptions and keywords are emitted in the language of the page (see
+ * `TEXTS`), because both agents match the task's words against what the page
+ * says.
  */
 
 'use strict';
 
 const { escapeRegExp, evaluate } = require('./oracle');
 const { ensureHelpers } = require('./dom-helpers');
+const { normaliseLanguage, DEFAULT_LANGUAGE } = require('./page-language');
 
 // Wording heuristics (shared with the in-page collector as strings)
 
@@ -208,16 +212,97 @@ function sampleValue(field) {
   return 'Testeingabe';
 }
 
+/**
+ * Template wording per language. A task on a German page has to be stated in
+ * German, otherwise no word of it can ever meet a word of the page.
+ * `keywords` are what a user would look for on the page while doing the task;
+ * the greedy agent matches them against spoken phrases and the optimum may
+ * search for them (see greedy-agent.js and optimal-path.js `findWordsFor`).
+ * Languages without an entry fall back to English.
+ */
+const TEXTS = {
+  en: {
+    'cookie-banner-dismiss': {
+      description: () => 'Close the cookie notice so that you can use the website.',
+      keywords: () => ['cookies', 'accept', 'agree'],
+    },
+    'main-navigation': {
+      description: (v) => `Open the page "${v.label}" from the main menu of this website.`,
+      keywords: (v) => [v.label],
+    },
+    'site-search': {
+      description: (v) => `Use the search of this website to search for "${v.term}".`,
+      keywords: (v) => ['search', v.term],
+    },
+    'contact-page': {
+      description: () => 'Find the page where you can see how to get in touch with this company.',
+      keywords: () => ['contact', 'phone', 'email', 'address'],
+    },
+    login: {
+      description: () => 'Get to the place where you can log in with your user account.',
+      keywords: () => ['login', 'sign in', 'account', 'password'],
+    },
+    'simple-form': {
+      description: () => 'Fill in the form on this page with your details and send it off.',
+      keywords: () => ['form', 'name', 'message', 'send'],
+    },
+  },
+  de: {
+    'cookie-banner-dismiss': {
+      description: () => 'Schließen Sie den Cookie-Hinweis, damit Sie die Website nutzen können.',
+      keywords: () => ['Cookies', 'akzeptieren', 'zustimmen'],
+    },
+    'main-navigation': {
+      description: (v) => `Öffnen Sie die Seite "${v.label}" über das Hauptmenü dieser Website.`,
+      keywords: (v) => [v.label],
+    },
+    'site-search': {
+      description: (v) => `Suchen Sie auf dieser Website nach "${v.term}".`,
+      keywords: (v) => ['Suche', 'suchen', v.term],
+    },
+    'contact-page': {
+      description: () =>
+        'Finden Sie die Seite, auf der Sie sehen, wie man dieses Unternehmen erreicht.',
+      keywords: () => ['Kontakt', 'Telefon', 'E-Mail', 'Adresse'],
+    },
+    login: {
+      description: () =>
+        'Gelangen Sie dorthin, wo Sie sich mit Ihrem Benutzerkonto anmelden können.',
+      keywords: () => ['Anmelden', 'Login', 'Konto', 'Passwort'],
+    },
+    'simple-form': {
+      description: () =>
+        'Füllen Sie das Formular auf dieser Seite mit Ihren Daten aus und schicken Sie es ab.',
+      keywords: () => ['Formular', 'Name', 'Nachricht', 'senden'],
+    },
+  },
+};
+
+/** The wording table of a language, falling back to English. */
+function textsFor(language) {
+  const code = normaliseLanguage(language) || DEFAULT_LANGUAGE;
+  return TEXTS[code] || TEXTS[DEFAULT_LANGUAGE];
+}
+
+/** Description + keywords of one template, in the page language. */
+function wordingFor(language, template, values = {}) {
+  const entry = textsFor(language)[template] || TEXTS[DEFAULT_LANGUAGE][template];
+  const keywords = (entry.keywords(values) || [])
+    .map((k) => String(k == null ? '' : k).trim())
+    .filter(Boolean);
+  return { description: entry.description(values), ...(keywords.length ? { keywords } : {}) };
+}
+
 // Template builders: each returns a Task or null. Descriptions are plain user
 // language without element names or selectors, since the SR agent sees them.
 
 const TEMPLATES = {
-  'cookie-banner-dismiss'(c) {
+  'cookie-banner-dismiss'(c, language) {
     if (!c.cookie || !c.cookie.button) return null;
     return {
       id: 'generic-cookie-banner-dismiss',
       template: 'cookie-banner-dismiss',
-      description: 'Close the cookie notice so that you can use the website.',
+      ...wordingFor(language, 'cookie-banner-dismiss'),
       oracle: c.cookie.container
         ? { type: 'not', of: [{ type: 'elementVisible', selector: c.cookie.container }] }
         : { type: 'not', of: [{ type: 'elementVisible', selector: c.cookie.button }] },
@@ -225,18 +310,18 @@ const TEMPLATES = {
     };
   },
 
-  'main-navigation'(c) {
+  'main-navigation'(c, language) {
     if (!c.nav) return null;
     return {
       id: 'generic-main-navigation',
       template: 'main-navigation',
-      description: `Open the page "${c.nav.label}" from the main menu of this website.`,
+      ...wordingFor(language, 'main-navigation', { label: c.nav.label }),
       oracle: { type: 'urlMatches', pattern: pathPattern(c.nav.href) },
       sightedPath: [{ action: 'click', selector: c.nav.selector }],
     };
   },
 
-  'site-search'(c) {
+  'site-search'(c, language) {
     if (!c.search) return null;
     const term = 'kontakt';
     const param = c.search.name ? `[?&]${escapeRegExp(c.search.name)}=` : escapeRegExp(term);
@@ -249,7 +334,7 @@ const TEMPLATES = {
     return {
       id: 'generic-site-search',
       template: 'site-search',
-      description: `Use the search of this website to search for "${term}".`,
+      ...wordingFor(language, 'site-search', { term }),
       oracle: {
         type: 'any',
         of: [
@@ -261,12 +346,12 @@ const TEMPLATES = {
     };
   },
 
-  'contact-page'(c) {
+  'contact-page'(c, language) {
     if (!c.contact) return null;
     return {
       id: 'generic-contact-page',
       template: 'contact-page',
-      description: 'Find the page where you can see how to get in touch with this company.',
+      ...wordingFor(language, 'contact-page'),
       oracle: {
         type: 'any',
         of: [
@@ -278,20 +363,20 @@ const TEMPLATES = {
     };
   },
 
-  login(c) {
+  login(c, language) {
     if (!c.login || c.login.passwordVisible) return null; // already on/at a login form
     const of = [{ type: 'elementVisible', selector: 'input[type="password"]' }];
     if (c.login.href) of.push({ type: 'urlMatches', pattern: pathPattern(c.login.href) });
     return {
       id: 'generic-login',
       template: 'login',
-      description: 'Get to the place where you can log in with your user account.',
+      ...wordingFor(language, 'login'),
       oracle: { type: 'any', of },
       sightedPath: [{ action: 'click', selector: c.login.selector }],
     };
   },
 
-  'simple-form'(c) {
+  'simple-form'(c, language) {
     if (!c.form) return null;
     const path = c.form.fields
       .filter(
@@ -305,7 +390,7 @@ const TEMPLATES = {
     return {
       id: 'generic-simple-form',
       template: 'simple-form',
-      description: 'Fill in the form on this page with your details and send it off.',
+      ...wordingFor(language, 'simple-form'),
       oracle: {
         type: 'any',
         of: [
@@ -333,11 +418,13 @@ const TEMPLATE_IDS = Object.keys(TEMPLATES);
  * @param {import('puppeteer').Page} page - already navigated page
  * @param {object} [opts]
  * @param {string[]} [opts.only] - restrict to these template ids
+ * @param {string} [opts.language] - language of the page; descriptions and
+ *   keywords are emitted in it (English when it is not translated)
  * @param {boolean} [opts.skipSatisfied=true] - drop tasks whose oracle is already true
  * @returns {Promise<object[]>} Task[] (weight defaults applied)
  */
 async function instantiateGenericTasks(page, opts = {}) {
-  const { only = null, skipSatisfied = true } = opts;
+  const { only = null, skipSatisfied = true, language = DEFAULT_LANGUAGE } = opts;
   const candidates = await collectCandidates(page, WORDS);
 
   const tasks = [];
@@ -345,7 +432,7 @@ async function instantiateGenericTasks(page, opts = {}) {
     if (only && !only.includes(id)) continue;
     let task = null;
     try {
-      task = TEMPLATES[id](candidates);
+      task = TEMPLATES[id](candidates, language);
     } catch (_) {
       task = null; // a broken heuristic must never break the whole run
     }
@@ -377,6 +464,9 @@ async function instantiateGenericTasks(page, opts = {}) {
 module.exports = {
   TEMPLATE_IDS,
   WORDS,
+  TEXTS,
+  textsFor,
+  wordingFor,
   instantiateGenericTasks,
   collectCandidates,
   pathPattern,

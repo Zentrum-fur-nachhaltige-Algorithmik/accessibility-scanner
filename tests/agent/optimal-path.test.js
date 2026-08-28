@@ -8,6 +8,8 @@ const {
   computeOptimalPath,
   chooseReach,
   analyzeInPage,
+  targetMatcherFor,
+  urlPatternsOf,
   EVIDENCE_NOT_IN_READING_ORDER,
 } = require('../../src/agent/optimal-path');
 
@@ -134,7 +136,12 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     expect(res.nOpt).toBe(2);
     const step = res.steps[0];
     expect(step.reach).toMatchObject({ strategy: 'step', cost: 1 });
-    expect(step.reach.via).toMatchObject({ kind: 'buttons', command: 'nextButton', steps: 1, k: 0 });
+    expect(step.reach.via).toMatchObject({
+      kind: 'buttons',
+      command: 'nextButton',
+      steps: 1,
+      k: 0,
+    });
     // The rotor route to the same element is one command dearer, ...
     expect(step.analysis.rotor.cost).toBe(2);
     // ... and both beat tabbing there, which costs 11.
@@ -512,4 +519,103 @@ describe('agent/optimal-path: computeOptimalPath', () => {
       await page.close();
     }
   }, 60000);
+});
+
+describe('agent/optimal-path: the direct-link shortcut', () => {
+  const SHORTCUT = '/agent/bfs-shortcut.html';
+  // The sighted route: through the main navigation into Products, and from
+  // there to the contact page. The footer of the start page links straight to it.
+  const DETOUR = [
+    { action: 'click', selector: 'header nav ul li:nth-of-type(2) a' },
+    { action: 'click', selector: 'main p a' },
+  ];
+
+  beforeAll(async () => {
+    await startFixtureServer();
+    await launchBrowser();
+  }, 120000);
+
+  afterAll(async () => {
+    await closeBrowser();
+    await stopFixtureServer();
+  });
+
+  async function optimalFor(fixture, sightedPath, task = {}, options = {}) {
+    const page = await getPage(`${getBaseUrl()}${fixture}`);
+    try {
+      return await computeOptimalPath(page, { id: 't', sightedPath, ...task }, {}, options);
+    } finally {
+      await page.close();
+    }
+  }
+
+  it('collects the url targets an oracle requires, ignoring negated ones', () => {
+    expect(urlPatternsOf({ type: 'urlMatches', pattern: 'contact' })).toEqual(['contact']);
+    expect(
+      urlPatternsOf({
+        type: 'all',
+        of: [
+          { type: 'urlMatches', pattern: 'contact' },
+          { type: 'not', of: [{ type: 'urlMatches', pattern: 'home' }] },
+          { type: 'elementWithText', text: 'x' },
+        ],
+      })
+    ).toEqual(['contact']);
+    // Nothing names a url: there is no shortcut to look for.
+    expect(targetMatcherFor({ oracle: { type: 'titleMatches', pattern: 'x' } }, {})).toBeNull();
+  });
+
+  it('matches a link against the url the sighted path ends on', () => {
+    const matches = targetMatcherFor(null, { targetUrl: 'http://x.test/a/contact.html?q=1#top' });
+    expect(matches('http://x.test/a/contact.html?q=1')).toBe(true);
+    expect(matches('http://x.test/a/contact.html')).toBe(false);
+    expect(matches('http://x.test/a/products.html?q=1')).toBe(false);
+  });
+
+  it('prices the footer link instead of the two-click detour the sighted agent took', async () => {
+    const res = await optimalFor(SHORTCUT, DETOUR, {
+      oracle: { type: 'urlMatches', pattern: 'bfs-contact' },
+    });
+    expect(res.route).toBe('direct-link');
+    // One prevLink to the last link of the page, then activate.
+    expect(res.nOpt).toBe(2);
+    expect(res.guidedNOpt).toBeGreaterThan(res.nOpt);
+    expect(res.steps).toHaveLength(1);
+    expect(res.steps[0]).toMatchObject({ action: 'click', shortcut: true, actionCost: 1 });
+    expect(res.steps[0].reach.cost).toBe(1);
+    expect(res.shortcut.href).toMatch(/bfs-contact\.html$/);
+    expect(res.shortcut.index).toBe(0);
+    expect(res.shortcut.nOpt).toBe(2);
+  }, 120000);
+
+  it('finds the same shortcut from the url the sighted path ends on alone', async () => {
+    const res = await optimalFor(
+      SHORTCUT,
+      DETOUR,
+      {},
+      { targetUrl: `${getBaseUrl()}/agent/bfs-contact.html` }
+    );
+    expect(res.route).toBe('direct-link');
+    expect(res.nOpt).toBe(2);
+  }, 120000);
+
+  it('stays on the guided route when no link leads to the target', async () => {
+    const res = await optimalFor(
+      HOME,
+      [{ action: 'click', selector: CONTACT_LINK }],
+      { oracle: { type: 'urlMatches', pattern: 'generic-thanks' } },
+      {}
+    );
+    expect(res.route).toBe('guided');
+    expect(res.shortcut).toBeUndefined();
+    expect(res.nOpt).toBe(res.steps.reduce((a, s) => a + s.reach.cost + s.actionCost, 0));
+  }, 120000);
+
+  it('never shortens a task that names no url target at all', async () => {
+    const res = await optimalFor(SHORTCUT, DETOUR, {
+      oracle: { type: 'titleMatches', pattern: 'Contact' },
+    });
+    expect(res.route).toBe('guided');
+    expect(res.steps).toHaveLength(2);
+  }, 120000);
 });

@@ -76,7 +76,8 @@ const SELECTORY =
  * Returns a new task object with defaults applied (does not mutate the input).
  * Fields: id, description (plain user language, no selectors), weight = 1, oracle
  * (see oracle.js), sightedPath (>= 1 step), preconditions? (run before both agents),
- * kind = 'action', evidence? (required for kind 'information': the verbatim page
+ * keywords? (words of the page language a user would look for), kind = 'action',
+ * evidence? (required for kind 'information': the verbatim page
  * text the screen reader must have spoken), answer?/answerType? (the ground-truth
  * value and its kind, matched fuzzily by the harness), template? (generic-task template id),
  * meta? (free-form provenance).
@@ -98,6 +99,18 @@ function validateTaskShape(task) {
   }
   if (task.weight !== undefined && (typeof task.weight !== 'number' || !(task.weight > 0))) {
     throw new Error(`Task ${task.id}: "weight" must be a positive number`);
+  }
+  // The words a user would look for on the page while doing this task, in the
+  // language of the page. Optional: hand-written tasks may omit them, and both
+  // consumers (greedy-agent.js, optimal-path.js `findWordsFor`) fall back to the
+  // description.
+  if (task.keywords !== undefined) {
+    if (
+      !Array.isArray(task.keywords) ||
+      task.keywords.some((k) => typeof k !== 'string' || k.trim() === '')
+    ) {
+      throw new Error(`Task ${task.id}: "keywords" must be an array of non-empty strings`);
+    }
   }
   if (!task.oracle) throw new Error(`Task ${task.id}: "oracle" is required`);
   validateSpec(task.oracle, `Task ${task.id}.oracle`);

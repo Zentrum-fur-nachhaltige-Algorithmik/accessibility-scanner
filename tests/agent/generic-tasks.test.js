@@ -10,6 +10,7 @@ const {
   pathPattern,
   WORDS,
   TEMPLATE_IDS,
+  wordingFor,
 } = require('../../src/agent/generic-tasks');
 const { validateTaskShape } = require('../../src/agent/task');
 const { validateTask } = require('../../src/agent/replay');
@@ -124,6 +125,33 @@ describe('agent/generic-tasks', () => {
       await page.close();
     }
   });
+
+  it('writes descriptions and keywords in the language of the page', async () => {
+    const page = await getPage(`${getBaseUrl()}${HOME}`);
+    let german;
+    try {
+      german = await instantiateGenericTasks(page, { language: 'de-AT' });
+    } finally {
+      await page.close();
+    }
+    const byId = Object.fromEntries(german.map((t) => [t.template, t]));
+    expect(byId['contact-page'].description).toBe(
+      'Finden Sie die Seite, auf der Sie sehen, wie man dieses Unternehmen erreicht.'
+    );
+    expect(byId['contact-page'].keywords).toContain('Kontakt');
+    expect(byId['cookie-banner-dismiss'].description).toMatch(/^Schließen Sie den Cookie-Hinweis/);
+    // The interpolated ones keep the page's own wording inside the German frame.
+    expect(byId['main-navigation'].description).toMatch(/^Öffnen Sie die Seite "Products"/);
+    expect(byId['main-navigation'].keywords).toEqual(['Products']);
+    expect(byId['site-search'].description).toMatch(
+      /^Suchen Sie auf dieser Website nach "kontakt"/
+    );
+    for (const t of german) expect(() => validateTaskShape(t)).not.toThrow();
+    // A language nobody translated the templates into falls back to English.
+    expect(wordingFor('fr', 'contact-page').description).toBe(
+      wordingFor('en', 'contact-page').description
+    );
+  }, 60000);
 
   it('collectCandidates exposes the raw DOM anchors', async () => {
     const page = await getPage(`${getBaseUrl()}${HOME}`);

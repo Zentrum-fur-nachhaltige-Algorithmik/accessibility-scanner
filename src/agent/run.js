@@ -81,7 +81,10 @@ function printSummary(result) {
   const cols = [
     [38, 'task'],
     [8, 'nSighted'],
-    [6, 'nOpt'],
+    [7, 'nOpt'],
+    // 'link' when nOpt was priced along a direct link to the target instead of
+    // along the sighted path (see optimal-path.js).
+    [6, 'route'],
     // Of nOpt, the part spent reaching the phrase that speaks the answer
     // (information tasks only; blank for action tasks).
     [6, 'read'],
@@ -100,7 +103,8 @@ function printSummary(result) {
         [
           pad(t.task.id || t.task.description, 38),
           pad(t.nSighted, 8),
-          pad(t.nOpt == null ? '-' : `${t.nOpt}${t.nOptPartial ? '*' : ''}`, 6),
+          pad(t.nOpt == null ? '-' : `${t.nOpt}${t.nOptPartial ? '*' : ''}`, 7),
+          pad(t.optimalRoute === 'direct-link' ? 'link' : t.optimalRoute || '-', 6),
           pad(t.readDistance == null ? '' : t.readDistance, 6),
           pad(run.nSr, 6),
           pad(run.R.toFixed(2), 6),
@@ -231,6 +235,7 @@ async function main() {
     if (generated)
       result.generator = {
         siteType: generated.siteType,
+        language: generated.language,
         dropped: generated.dropped,
         usage: generated.usage,
       };

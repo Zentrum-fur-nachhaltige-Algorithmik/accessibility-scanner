@@ -32,6 +32,7 @@ const {
   ORACLE_TYPES,
 } = require('../../src/agent/task-generator');
 const { loadTasks, saveTasks } = require('../../src/agent/task');
+const { validateTask } = require('../../src/agent/replay');
 
 const HOME = '/agent/generic-home.html';
 
@@ -171,7 +172,8 @@ describe('agent/task-generator: tool schemas', () => {
     const p = PROPOSE_TASKS_TOOL.function.parameters;
     expect(p.required).toEqual(['siteType', 'tasks']);
     const item = p.properties.tasks.items;
-    expect(item.required).toEqual(['id', 'description', 'weight', 'expectedOutcome']);
+    expect(item.required).toEqual(['id', 'description', 'weight', 'expectedOutcome', 'keywords']);
+    expect(item.properties.keywords).toMatchObject({ minItems: 3, maxItems: 8 });
     expect(item.properties.weight).toMatchObject({ minimum: 1, maximum: 3 });
     expect(p.properties.tasks.maxItems).toBe(10);
   });
@@ -1039,4 +1041,69 @@ describe('agent/task-generator: concurrency (fake llm, real browser)', () => {
       expect(t.sightedPath).toHaveLength(1);
     });
   }, 300000);
+});
+
+describe('agent/task-generator: the language of the page and the direct link', () => {
+  const SHORTCUT = '/agent/bfs-shortcut.html';
+
+  const proposal = {
+    siteType: 'demo site',
+    tasks: [
+      {
+        id: 'reach-contact',
+        description: 'Reach the contact page of this website.',
+        weight: 2,
+        expectedOutcome: 'The contact page is shown.',
+        keywords: ['Contact', 'Products', '  ', 'contact'],
+      },
+    ],
+  };
+
+  // The sighted agent takes the menu detour: Products first, contact page second.
+  const solutions = {
+    'Reach the contact page of this website.': [
+      { name: 'click', target: 'Products' },
+      { name: 'click', target: 'Contact us about a product' },
+      { name: 'done', arguments: { summary: 'The contact page is shown.' } },
+    ],
+  };
+
+  let result;
+
+  beforeAll(async () => {
+    result = await generateTasks({
+      browser: getBrowser(),
+      url: `${baseUrl}${SHORTCUT}`,
+      llm: fakeLlm({ proposal, solutions, oracle: {} }),
+      model: 'fake',
+      logger: { info: () => {} },
+      options: { generic: false, explore: 0, maxTasks: 4, sightedMaxSteps: 6 },
+    });
+  }, 300000);
+
+  it('reports the language of the page and keeps the task keywords', () => {
+    expect(result.language).toBe('en');
+    const task = result.tasks[0];
+    // Trimmed, deduplicated case-insensitively, in the order the model gave them.
+    expect(task.keywords).toEqual(['Contact', 'Products']);
+  });
+
+  it('records the sighted path as the single click the start page offers', () => {
+    const task = result.tasks[0];
+    expect(task.sightedPath).toHaveLength(1);
+    expect(task.generator.shortened).toBe(true);
+    // The agent's own path is kept for the ambiguity signal.
+    expect(task.generator.agentPathLength).toBe(2);
+    expect(task.generator.pathLength).toBe(1);
+  });
+
+  it('the shortened path still replays into the same oracle', async () => {
+    const task = result.tasks[0];
+    const v = await validateTask(getBrowser(), `${baseUrl}${SHORTCUT}`, task, {
+      repeats: 1,
+      computeOptimal: false,
+    });
+    expect(v.valid).toBe(true);
+    expect(v.nSighted).toBe(1);
+  }, 120000);
 });

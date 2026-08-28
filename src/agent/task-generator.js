@@ -16,8 +16,12 @@ const { validateTaskShape, saveTasks } = require('./task');
 const { mapWithConcurrency, DEFAULT_CONCURRENCY } = require('./concurrency');
 const { collectSpokenPhrases } = require('./screenreader-env');
 const { ANSWER_TYPES, validateAnswerAgainstPage } = require('./answer-match');
+const { detectPageLanguage, languageName, DEFAULT_LANGUAGE } = require('./page-language');
 
 const secs = (ms) => `${(ms / 1000).toFixed(0)}s`;
+
+/** Upper bound on the page-language keywords a task carries. */
+const MAX_TASK_KEYWORDS = 8;
 
 /** How many spoken phrases the re-pick call is shown (see `resolveEvidence`). */
 const MAX_EVIDENCE_PHRASE_OFFER = 20;
@@ -83,8 +87,18 @@ const PROPOSE_TASKS_TOOL = {
                 description:
                   'How one can tell the task succeeded: what the page shows / where the user ends up.',
               },
+              keywords: {
+                type: 'array',
+                minItems: 3,
+                maxItems: 8,
+                items: { type: 'string' },
+                description:
+                  'Words IN THE LANGUAGE OF THE PAGE that a user would look for on the page while ' +
+                  'doing this task: the wording of the links, headings or texts that lead to the ' +
+                  'goal. Single words or very short phrases, no sentences.',
+              },
             },
-            required: ['id', 'description', 'weight', 'expectedOutcome'],
+            required: ['id', 'description', 'weight', 'expectedOutcome', 'keywords'],
             additionalProperties: false,
           },
         },
@@ -212,6 +226,11 @@ const PROPOSE_SYSTEM = [
   '  describe the clicks: the description is read by someone who cannot see the page.',
   '- Do not propose tasks that require logging in, paying, or sending personal data.',
   '- Prefer breadth: cover different parts of the site rather than five variations of one thing.',
+  '- Write description and expectedOutcome in the LANGUAGE OF THE PAGE, the way a visitor of this',
+  '  site would say it. Never translate them into another language: the task is measured against',
+  '  what the page says, so a task in the wrong language cannot be solved.',
+  '- Give 3 to 8 keywords per task, in that same language: the words a user would look for on the',
+  '  page (the wording of links, headings or texts on the way to the goal).',
 ].join('\n');
 
 const ORACLE_SYSTEM = [
@@ -268,7 +287,7 @@ const EVIDENCE_RETRY_SYSTEM = [
  * @param {string} [args.model]
  * @param {object} [args.options] - see DEFAULTS
  * @param {{info?: Function, warn?: Function}} [args.logger]
- * @returns {Promise<{url, siteType, tasks, dropped, usage, preconditions, explored, wallClockMs}>}
+ * @returns {Promise<{url, siteType, language, tasks, dropped, usage, preconditions, explored, wallClockMs}>}
  */
 async function generateTasks({ browser, url, llm, model, options = {}, logger = console }) {
   const opts = { ...DEFAULTS, ...options };
@@ -280,14 +299,15 @@ async function generateTasks({ browser, url, llm, model, options = {}, logger = 
   // 1. Explore
   log(`[generate] exploring ${url}`);
   const exploration = await explore({ browser, url, opts });
-  const { preconditions, views, genericTasks } = exploration;
+  const { preconditions, views, genericTasks, language } = exploration;
   log(
-    `[generate] explored ${views.length} page(s), ${genericTasks.length} generic task(s), ` +
+    `[generate] page language "${language}"; ` +
+      `explored ${views.length} page(s), ${genericTasks.length} generic task(s), ` +
       `${preconditions.length ? 'cookie banner dismissed as precondition' : 'no cookie banner'}`
   );
 
   // 2. Propose
-  const proposal = await proposeTasks({ llm, model, url, views, usage });
+  const proposal = await proposeTasks({ llm, model, url, views, usage, language });
   if (proposal.error) {
     log(`[generate] proposal failed: ${proposal.error}`);
   }
@@ -362,6 +382,7 @@ async function generateTasks({ browser, url, llm, model, options = {}, logger = 
   return {
     url,
     siteType,
+    language,
     tasks: kept,
     dropped,
     usage,
@@ -426,6 +447,7 @@ async function explore({ browser, url, opts }) {
   const views = [];
   let preconditions = [];
   let genericTasks = [];
+  let language = DEFAULT_LANGUAGE;
   try {
     await page.setViewport({ width: 1280, height: 900 });
     try {
@@ -433,6 +455,10 @@ async function explore({ browser, url, opts }) {
     } catch (err) {
       throw new Error(`cannot load ${url}: ${err.message}`);
     }
+
+    // Every task is stated in the language the page is written in, so it is the
+    // first thing observed (see page-language.js).
+    language = await detectPageLanguage(page);
 
     // A cookie banner has to go before anything else is observed: it covers the
     // page and it would otherwise be dismissed inside every single task.
@@ -443,7 +469,10 @@ async function explore({ browser, url, opts }) {
       // the dismissal; afterwards its oracle is already true.
       if (opts.generic) {
         genericTasks = genericTasks.concat(
-          await instantiateGenericTasks(page, { only: ['cookie-banner-dismiss'] }).catch(() => [])
+          await instantiateGenericTasks(page, {
+            only: ['cookie-banner-dismiss'],
+            language,
+          }).catch(() => [])
         );
       }
       await runPreconditions(page, { preconditions });
@@ -451,7 +480,7 @@ async function explore({ browser, url, opts }) {
 
     if (opts.generic) {
       genericTasks = genericTasks
-        .concat(await instantiateGenericTasks(page).catch(() => []))
+        .concat(await instantiateGenericTasks(page, { language }).catch(() => []))
         .filter(uniqueById());
     }
 
@@ -469,7 +498,7 @@ async function explore({ browser, url, opts }) {
     await page.close().catch(() => {});
     await context.close().catch(() => {});
   }
-  return { preconditions, views, genericTasks };
+  return { preconditions, views, genericTasks, language };
 }
 
 const uniqueById = () => {
@@ -517,7 +546,7 @@ function normalisePath(href) {
 
 // 2. Propose
 
-async function proposeTasks({ llm, model, url, views, usage }) {
+async function proposeTasks({ llm, model, url, views, usage, language }) {
   const pages = views
     .map((v, i) => `### PAGE ${i + 1}${i === 0 ? ' (start page)' : ''}\n${renderPageView(v)}`)
     .join('\n\n');
@@ -528,6 +557,8 @@ async function proposeTasks({ llm, model, url, views, usage }) {
         role: 'user',
         content:
           `Website: ${url}\n\n${pages}\n\n` +
+          `This website is written in ${languageName(language)}. Write every description, ` +
+          `expectedOutcome and keyword in ${languageName(language)}.\n` +
           'Report the site type and 5 to 10 core tasks by calling propose_tasks.',
       },
     ],
@@ -558,9 +589,30 @@ async function proposeTasks({ llm, model, url, views, usage }) {
         description: t.description.trim(),
         weight: clampWeight(t.weight),
         expectedOutcome: typeof t.expectedOutcome === 'string' ? t.expectedOutcome : '',
+        keywords: cleanKeywords(t.keywords),
         source: 'llm',
       })),
   };
+}
+
+/**
+ * The model's keywords, trimmed, deduplicated case-insensitively and capped at
+ * `MAX_TASK_KEYWORDS`. They are matched against spoken phrases, so anything
+ * empty or repeated only costs steps.
+ */
+function cleanKeywords(list) {
+  const out = [];
+  const seen = new Set();
+  for (const raw of Array.isArray(list) ? list : []) {
+    const word = String(raw == null ? '' : raw).trim();
+    if (!word) continue;
+    const key = word.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(word);
+    if (out.length >= MAX_TASK_KEYWORDS) break;
+  }
+  return out;
 }
 
 function clampWeight(w) {
@@ -597,6 +649,7 @@ function mergeCandidates({ proposed, genericTasks, maxTasks, dropped }) {
   const generics = genericTasks.map((t) => ({
     id: t.id,
     description: t.description,
+    keywords: Array.isArray(t.keywords) ? t.keywords : [],
     weight: t.weight || 1,
     source: 'generic',
     template: t.template,
@@ -780,64 +833,112 @@ async function buildTask({
     };
   }
 
-  // Validate
+  // Validate. The shortened path is tried first: when it replays and satisfies
+  // the same oracle, it is the shorter true path to the same destination.
+  const shortPath = await shortenSightedPath({
+    browser,
+    url,
+    preconditions,
+    sightedPath,
+    targetUrl: (solved.after && solved.after.url) || null,
+    opts,
+  });
+  const pathCandidates = shortPath ? [shortPath, sightedPath] : [sightedPath];
+
   const reasons = [];
   let retries = 0;
   for (const candidateOracle of oracleCandidates) {
-    let task;
-    try {
-      task = validateTaskShape({
-        id: cand.id,
-        description: cand.description,
-        weight: cand.weight || 1,
-        kind: corr.kind,
-        ...(corr.evidence ? { evidence: corr.evidence } : {}),
-        // The ground truth: the harness accepts any spelling of it, anywhere on
-        // the site (see answer-match.js), while `evidence` stays the read target
-        // of nOpt and the primary quick match.
-        ...(corr.kind === 'information' && corr.answer
-          ? { answer: corr.answer, answerType: corr.answerType }
-          : {}),
-        oracle: candidateOracle.spec,
-        sightedPath,
-        preconditions: preconditions.slice(),
-        meta: {
-          source: 'task-generator',
-          oracleOrigin: candidateOracle.origin,
-          expectedOutcome: cand.expectedOutcome || null,
-          sightedSummary: solved.summary || null,
-        },
-      });
-    } catch (err) {
-      reasons.push(`${candidateOracle.origin}: ${err.message}`);
+    for (const candidatePath of pathCandidates) {
+      let task;
+      try {
+        task = validateTaskShape({
+          id: cand.id,
+          description: cand.description,
+          ...(cand.keywords && cand.keywords.length ? { keywords: cand.keywords } : {}),
+          weight: cand.weight || 1,
+          kind: corr.kind,
+          ...(corr.evidence ? { evidence: corr.evidence } : {}),
+          // The ground truth: the harness accepts any spelling of it, anywhere on
+          // the site (see answer-match.js), while `evidence` stays the read target
+          // of nOpt and the primary quick match.
+          ...(corr.kind === 'information' && corr.answer
+            ? { answer: corr.answer, answerType: corr.answerType }
+            : {}),
+          oracle: candidateOracle.spec,
+          sightedPath: candidatePath,
+          preconditions: preconditions.slice(),
+          meta: {
+            source: 'task-generator',
+            oracleOrigin: candidateOracle.origin,
+            expectedOutcome: cand.expectedOutcome || null,
+            sightedSummary: solved.summary || null,
+          },
+        });
+      } catch (err) {
+        reasons.push(`${candidateOracle.origin}: ${err.message}`);
+        retries += 1;
+        continue;
+      }
+      const v = await validateTask(browser, url, task, { repeats: opts.repeats, analysisCache });
+      addValidationTime(v);
+      if (v.valid) {
+        return {
+          timings,
+          task: withTimings(
+            withGeneratorMeta(task, {
+              sightedAgentSteps: solved.steps,
+              pathLength: candidatePath.length,
+              // The ambiguity signal is about the TASK, so it stays measured
+              // against the path the sighted agent itself produced.
+              agentPathLength: sightedPath.length,
+              shortened: candidatePath !== sightedPath,
+              ratio: sightedPath.length > 0 ? solved.steps / sightedPath.length : null,
+              prunedSteps: solved.prunedSteps || 0,
+              corroboration: corr.corroboration,
+              corroborationScore: corr.score || 0,
+              retries,
+              source: 'llm',
+              ambiguityRatio: opts.ambiguityRatio,
+            }),
+            timings
+          ),
+        };
+      }
+      reasons.push(`${candidateOracle.origin}: ${firstReason(v)}`);
       retries += 1;
-      continue;
     }
-    const v = await validateTask(browser, url, task, { repeats: opts.repeats, analysisCache });
-    addValidationTime(v);
-    if (v.valid) {
-      return {
-        timings,
-        task: withTimings(
-          withGeneratorMeta(task, {
-            sightedAgentSteps: solved.steps,
-            pathLength: sightedPath.length,
-            ratio: sightedPath.length > 0 ? solved.steps / sightedPath.length : null,
-            prunedSteps: solved.prunedSteps || 0,
-            corroboration: corr.corroboration,
-            corroborationScore: corr.score || 0,
-            retries,
-            source: 'llm',
-            ambiguityRatio: opts.ambiguityRatio,
-          }),
-          timings
-        ),
-      };
-    }
-    reasons.push(`${candidateOracle.origin}: ${firstReason(v)}`);
-    retries += 1;
   }
   return { task: null, timings, reason: `no oracle validated: ${reasons.join(' | ')}` };
+}
+
+/**
+ * A one-click path to the same destination. The sighted agent may have reached
+ * the goal through a menu it did not need; if the START page carries a link that
+ * already leads where it ended, that single click is the site's real click depth
+ * and `nSighted` must not carry the model's detour. Returns the shortened path
+ * or null; it is validated by replay like any other path.
+ */
+async function shortenSightedPath({ browser, url, preconditions, sightedPath, targetUrl, opts }) {
+  if (!targetUrl || !Array.isArray(sightedPath) || sightedPath.length <= 1) return null;
+  const { targetMatcherFor, findDirectLinks } = require('./optimal-path');
+  const matches = targetMatcherFor(null, { targetUrl });
+  if (!matches || matches(url)) return null;
+
+  const context = await createIsolatedContext(browser);
+  const page = await context.newPage();
+  try {
+    await page.setViewport({ width: 1280, height: 900 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: opts.gotoTimeout });
+    const pre = await runPreconditions(page, { preconditions });
+    if (!pre.ok) return null;
+    const links = await findDirectLinks(page, matches);
+    return links.length ? [{ action: 'click', selector: links[0].selector }] : null;
+  } catch (_) {
+    return null;
+  } finally {
+    await page.close().catch(() => {});
+    await context.close().catch(() => {});
+  }
 }
 
 // Outcome corroboration

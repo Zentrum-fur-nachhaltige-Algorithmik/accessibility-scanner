@@ -7,8 +7,9 @@
  * or the oracle, and it makes no plan beyond the fixed policy below.
  *
  * Policy, deterministic, one command per step:
- *  1. The task description is tokenised into keywords (letters only, folded,
- *     stopwords out, >= 3 letters, stemmed). The similarity of a spoken phrase
+ *  1. The task's own `keywords` (in the language of the page) - or, without
+ *     them, its description - are tokenised into keywords (letters only,
+ *     folded, stopwords out, >= 3 letters, stemmed). The similarity of a phrase
  *     is the number of those keywords it carries, plus a small bonus when the
  *     phrase's role word is link, button or heading.
  *  2. On a fresh page: open the `links` list and `more` through it until an
@@ -149,6 +150,21 @@ function keywordsOf(description) {
 }
 
 /**
+ * The words the policy matches against. The generator supplies `task.keywords`
+ * in the language of the PAGE (link and heading words a user would look for);
+ * they beat the description, whose wording may not occur on the page at all.
+ * Without them - a hand-written task, or keywords that are all stopwords - the
+ * description is tokenised as before.
+ */
+function keywordsFor(task) {
+  const explicit = (Array.isArray(task && task.keywords) ? task.keywords : [])
+    .filter((k) => typeof k === 'string' && k.trim())
+    .join(' ');
+  const fromKeywords = explicit ? keywordsOf(explicit) : [];
+  return fromKeywords.length ? fromKeywords : keywordsOf(task.description);
+}
+
+/**
  * How well a spoken phrase matches the task: the number of task keywords it
  * carries (`score`), plus the role bonus for ranking (`rank`). The bonus only
  * applies on top of a real keyword match, so a role word alone never scores.
@@ -188,7 +204,7 @@ async function runGreedyAgent({ env, task, maxSteps, onStep }) {
   if (!task || !task.description)
     throw new Error('runGreedyAgent: task with a description is required');
 
-  const keywords = keywordsOf(task.description);
+  const keywords = keywordsFor(task);
   const wanted = keywords.map((k) => k.word).join(', ') || '(no keywords)';
   const info = task.kind === 'information';
   const budget = numberOr(maxSteps, numberOr(env.maxSteps, 30));
@@ -465,6 +481,7 @@ async function runGreedyAgent({ env, task, maxSteps, onStep }) {
 module.exports = {
   runGreedyAgent,
   keywordsOf,
+  keywordsFor,
   scorePhrase,
   ANSWER_SHAPES,
   ANSWER_KEYWORDS,

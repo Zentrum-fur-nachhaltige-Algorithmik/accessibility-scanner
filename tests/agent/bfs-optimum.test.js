@@ -275,22 +275,21 @@ describe('agent/bfs-optimum: search against real pages', () => {
     await stopFixtureServer();
   });
 
-  it('finds a route the guided optimum cannot see (footer shortcut)', async () => {
+  it('agrees with the guided optimum on the footer shortcut it now prices itself', async () => {
     const res = await compareOptima(browser, `${base}/agent/bfs-shortcut.html`, SHORTCUT_TASK, {
       ...CROSS_PAGE,
     });
     expect(res.error).toBeUndefined();
-    // Guided: reach + activate, twice (home → Products → Contact).
-    expect(res.nOptGuided).toBe(5);
-    // BFS: the footer "Contact" link is the last link of the page, so one
-    // Shift+L plus one activate reaches the goal.
+    // The sighted route is two clicks (home → Products → Contact), but the
+    // footer links straight to the target, and `computeOptimalPath` prices that
+    // direct link too: one Shift+L plus one activate.
+    expect(res.nOptGuided).toBe(2);
     expect(res.nOptBfs).toBe(2);
-    expect(res.nOptBfs).toBeLessThan(res.nOptGuided);
-    expect(res.delta).toBe(3);
+    expect(res.delta).toBe(0);
     expect(res.bfsPath).toEqual([{ type: 'prevLink' }, { type: 'activate' }]);
-    expect(res.explored.reason).toBe('optimal');
+    // Nothing can beat it, so the search stops at the guided bound.
+    expect(res.explored.reason).toBe('bounded-by-guided');
     expect(res.explored.truncated).toBe(false);
-    expect(res.bestFound.via.selector).toMatch(/footer/);
   }, 180000);
 
   it('stops as soon as the guided optimum cannot be beaten', async () => {

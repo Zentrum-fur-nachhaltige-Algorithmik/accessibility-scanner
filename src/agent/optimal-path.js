@@ -1,7 +1,9 @@
 /**
  * optimal-path: `n_opt`, the shortest screen-reader command sequence for a task.
  * Costs each sighted-path step in ScreenReaderEnv commands (reach the target, then act),
- * using the env's own in-page reading order and rotor lists. Deterministic, no LLM.
+ * using the env's own in-page reading order and rotor lists, and additionally
+ * prices the direct link to the target when one is on a page the walk visits.
+ * Deterministic, no LLM.
  * Score: `R = n_opt / n_sr`, capped at 1.
  */
 
@@ -13,6 +15,7 @@ const {
   ROTOR_KINDS,
   COMMAND_COSTS,
 } = require('./screenreader-env');
+const { ensureHelpers } = require('./dom-helpers');
 
 /** `{ headings: { next: 'nextHeading', prev: 'prevHeading' }, … }` */
 const STEP_COMMAND_BY_KIND = Object.entries(ROTOR_STEP_COMMANDS).reduce((acc, [cmd, def]) => {
@@ -45,10 +48,10 @@ const STRATEGY_ORDER = [
 
 /**
  * Words the OPTIMUM may search for: whole words of at least this many letters
- * taken from the TASK DESCRIPTION, minus the generator's stopwords. The optimum
- * must not use knowledge the user does not have, and the description is
- * everything the user was told; a real user searching for a word they read in
- * their task is exactly what this models.
+ * taken from the TASK DESCRIPTION and its `keywords`, minus the generator's
+ * stopwords. The optimum must not use knowledge the user does not have, and
+ * description plus keywords are everything the user was told; a real user
+ * searching for a word they read in their task is exactly what this models.
  */
 const MIN_FIND_WORD = 4;
 /** Cap on the searchable words, so the analysis stays linear in practice. */
@@ -71,6 +74,13 @@ const squashText = (s) =>
 
 /** Reported as `optimalPathError` when no spoken phrase contains the evidence. */
 const EVIDENCE_NOT_IN_READING_ORDER = 'evidence-not-in-reading-order';
+
+/**
+ * How many distinct link destinations the direct-link shortcut prices per page.
+ * Several links usually point at the same page; only distinct destinations are
+ * worth a second analysis, and three of them cover any real navigation.
+ */
+const MAX_SHORTCUT_LINKS = 3;
 
 /** Cap on how many matching reading-order phrases are costed. */
 const MAX_READ_CANDIDATES = 50;
@@ -684,19 +694,153 @@ function pageFingerprint() {
   return location.href + '#' + h.toString(16) + '#' + material.length;
 }
 
+/**
+ * Rendered links of the current page with their resolved href, for the
+ * direct-link shortcut. Uses the shared in-page helpers so the selectors are the
+ * ones `replay.executeStep` can replay.
+ */
+/* istanbul ignore next -- runs in the browser */
+function collectLinksInPage() {
+  const H = window.__A11YH;
+  const out = [];
+  const links = document.querySelectorAll('a[href]');
+  for (let i = 0; i < links.length; i += 1) {
+    const el = links[i];
+    if (!H.isVisible(el)) continue;
+    const selector = H.selectorFor(el);
+    if (!selector || !el.href) continue;
+    out.push({ selector, href: el.href, name: H.accName(el) });
+  }
+  return out;
+}
+
 // Node side
+
+/** Every `urlMatches` pattern the oracle requires; negated branches are ignored. */
+function urlPatternsOf(spec, out = []) {
+  if (!spec || typeof spec !== 'object' || spec.type === 'not') return out;
+  if (spec.type === 'urlMatches' && typeof spec.pattern === 'string') out.push(spec.pattern);
+  if (Array.isArray(spec.of)) for (const sub of spec.of) urlPatternsOf(sub, out);
+  return out;
+}
+
+/** Origin + path + query, lowercased, without a trailing slash or a fragment. */
+function normaliseUrl(href) {
+  try {
+    const u = new URL(href);
+    return `${u.origin}${u.pathname.replace(/\/$/, '')}${u.search}`.toLowerCase();
+  } catch (_) {
+    return String(href == null ? '' : href).toLowerCase();
+  }
+}
+
+/**
+ * Does a URL already satisfy what the task is after? Either it is the URL the
+ * sighted path ends on (recorded during validation, `options.targetUrl`) or it
+ * matches every `urlMatches` the oracle requires. Returns null when the task
+ * names no URL target at all - then there is no shortcut to look for.
+ */
+function targetMatcherFor(task, options = {}) {
+  const patterns = urlPatternsOf(task && task.oracle)
+    .map((p) => {
+      try {
+        return new RegExp(p, 'i');
+      } catch (_) {
+        return null;
+      }
+    })
+    .filter(Boolean);
+  const targetUrl =
+    typeof options.targetUrl === 'string' && options.targetUrl
+      ? normaliseUrl(options.targetUrl)
+      : null;
+  if (!patterns.length && !targetUrl) return null;
+  return (href) => {
+    if (targetUrl && normaliseUrl(href) === targetUrl) return true;
+    return patterns.length > 0 && patterns.every((re) => re.test(href));
+  };
+}
+
+/**
+ * The rendered links of `page` whose resolved href satisfies `matches`, in
+ * document order, with a selector `replay.executeStep` can click.
+ */
+async function findDirectLinks(page, matches) {
+  await ensureHelpers(page);
+  let links;
+  try {
+    links = await page.evaluate(collectLinksInPage);
+  } catch (_) {
+    return [];
+  }
+  return (links || []).filter((l) => matches(l.href));
+}
+
+/**
+ * The cheapest "reach a link that already leads to the target, then activate it"
+ * on the page as it is now, costed with exactly the strategies a sighted-path
+ * step uses. Returns null when no rendered link leads there.
+ */
+async function priceDirectLink(page, { matches, cursorSelector, findWords, runId }) {
+  const links = await findDirectLinks(page, matches);
+  const seen = new Set();
+  const targets = [];
+  for (const link of links) {
+    const key = normaliseUrl(link.href);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    targets.push(link);
+    if (targets.length >= MAX_SHORTCUT_LINKS) break;
+  }
+  if (!targets.length) return null;
+
+  let best = null;
+  for (const link of targets) {
+    let analysis;
+    try {
+      analysis = await page.evaluate(analyzeInPage, link.selector, cursorSelector, ROTOR_KINDS, {
+        runId,
+        action: 'click',
+        key: null,
+        typedSelectors: [],
+        stepCommands: STEP_COMMAND_BY_KIND,
+        findWords,
+        findCost: COMMAND_COSTS.find,
+      });
+    } catch (_) {
+      continue;
+    }
+    if (!analysis || analysis.error) continue;
+    for (const cand of analysis.candidates || []) {
+      const reach = chooseReach(cand.analysis);
+      if (!reach) continue;
+      const cost = reach.cost + ACTION_COST.click;
+      if (!best || cost < best.cost) {
+        best = {
+          cost,
+          reach,
+          selector: cand.selector || link.selector,
+          href: link.href,
+          name: link.name || null,
+        };
+      }
+    }
+  }
+  return best;
+}
 
 /**
  * The words the optimum is allowed to search for: the content words of the task
- * DESCRIPTION (at least `MIN_FIND_WORD` letters, no stopwords), folded like the
- * env's `find`. The agent may search for anything it likes; the optimum may
+ * DESCRIPTION and of its `keywords` (at least `MIN_FIND_WORD` letters, no
+ * stopwords), folded like the env's `find`. The agent may search for anything it likes; the optimum may
  * only use what the user was told, so it never buys a shortcut with knowledge
  * of the page.
  */
 function findWordsFor(task) {
   // Lazily required: task-generator pulls in replay, which pulls in this module.
   const { STOPWORDS } = require('./task-generator');
-  const source = String((task && task.description) || '');
+  const keywords = Array.isArray(task && task.keywords) ? task.keywords : [];
+  const source = [String((task && task.description) || ''), ...keywords].join(' ');
   const words = [];
   const seen = new Set();
   for (const raw of source.toLowerCase().split(/[^\p{L}\p{N}]+/u)) {
@@ -868,9 +1012,20 @@ function chooseReach(analysis) {
  *
  * @param {import('puppeteer').Page} page
  * @param {object} task
+ * A sighted agent that wandered through a menu makes the guided route longer
+ * than the page really is. So every page the walk stands on is additionally
+ * checked for a rendered link whose resolved href already satisfies the task's
+ * URL target (`options.targetUrl`, the URL the sighted path ends on, recorded
+ * during validation, or the oracle's `urlMatches`): "reach that link, activate
+ * it" is priced with the same strategies, and `nOpt` is the cheaper of the two
+ * routes. `route` says which one was taken and `shortcut` names the link. No
+ * cross-page search happens - only links that are on a page the walk visits.
+ *
  * @param {object} [ctx]      reserved (oracle context), unused
  * @param {object} [options]  replay timeout overrides, plus `analysisCache`
- * @returns {Promise<{nOpt: number|null, steps: object[], error?: string}>}
+ *                            and `targetUrl`
+ * @returns {Promise<{nOpt: number|null, steps: object[], route?: 'guided'|'direct-link',
+ *                    shortcut?: object, guidedNOpt?: number, error?: string}>}
  */
 async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   const { executeStep } = require('./replay');
@@ -884,9 +1039,45 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   const findWords = findWordsFor(task);
   // Cross-context cache of finished analyses, supplied by the caller.
   const shared = options.analysisCache instanceof Map ? options.analysisCache : null;
+  // The direct-link shortcut: the sighted agent may have taken a detour, and
+  // pricing only its route would charge the screen-reader user for it.
+  const matchesTarget = targetMatcherFor(task, options);
+  let shortcut = null;
 
   for (let i = 0; i < path.length; i += 1) {
     const step = path[i];
+
+    // Before the step is priced: does a link on THIS page already lead where the
+    // task wants to go? Then "get there and press Enter" is a route the guided
+    // walk never sees, and nOpt is the cheaper of the two. A remaining `type`
+    // step rules the shortcut out: what the user still has to fill in cannot be
+    // skipped by arriving at the right page.
+    const typeAhead = path.slice(i).some((s) => s.action === 'type');
+    if (
+      matchesTarget &&
+      !typeAhead &&
+      !matchesTarget(page.url()) &&
+      !(shortcut && shortcut.nOpt <= nOpt + 1)
+    ) {
+      await injectScreenReader(page);
+      const direct = await priceDirectLink(page, {
+        matches: matchesTarget,
+        cursorSelector,
+        findWords,
+        runId,
+      });
+      if (direct && (!shortcut || nOpt + direct.cost < shortcut.nOpt)) {
+        shortcut = {
+          ...direct,
+          index: i,
+          pageUrl: page.url(),
+          prefixCost: nOpt,
+          prefixSteps: steps.slice(),
+          nOpt: nOpt + direct.cost,
+        };
+      }
+    }
+
     const actionCost = ACTION_COST[step.action];
     if (actionCost === undefined) {
       return { nOpt: null, steps, error: `optimalPath[${i}]: unsupported action "${step.action}"` };
@@ -1033,12 +1224,28 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   // while the number itself sits 90 `next` presses down the home page, and the
   // step budget derived from nOpt would run out before the agent could ever
   // hear it. So the reading is appended as a final `read` step.
+  // The shortcut only replaces the guided route when that route really ended on
+  // the target: otherwise the sighted path did something beyond arriving there.
+  if (shortcut && !matchesTarget(page.url())) shortcut = null;
+
+  let readEntry = null;
   if (task && task.kind === 'information' && task.evidence) {
+    // Both routes end on the same page; the read may only be shared between
+    // them when the guided walk arrives there with the cursor at document
+    // start, which is where a navigation puts it.
+    const readFromDocumentStart = cursorSelector === null;
     const read = await costReadStep(page, task.evidence, cursorSelector, runId, findWords);
     if (read.error) {
       // A hard failure of the read analysis: keep the navigation part rather
       // than losing the whole measurement.
-      return { nOpt, steps, readDistance: null, nOptPartial: true, optimalPathError: read.error };
+      return {
+        nOpt,
+        steps,
+        readDistance: null,
+        nOptPartial: true,
+        optimalPathError: read.error,
+        route: 'guided',
+      };
     }
     if (!read.entry) {
       // The evidence exists visually but no spoken phrase contains it: a
@@ -1049,15 +1256,65 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
         readDistance: null,
         nOptPartial: true,
         optimalPathError: EVIDENCE_NOT_IN_READING_ORDER,
+        route: 'guided',
       };
     }
-    read.entry.index = steps.length;
-    steps.push(read.entry);
-    nOpt += read.entry.reach.cost + read.entry.actionCost;
-    return { nOpt, steps, readDistance: read.entry.reach.cost };
+    readEntry = read.entry;
+    if (!readFromDocumentStart) shortcut = null;
   }
 
-  return { nOpt, steps };
+  const readCost = readEntry ? readEntry.reach.cost + readEntry.actionCost : 0;
+  const guidedNOpt = nOpt + readCost;
+  const withRead = (list) => {
+    if (!readEntry) return list;
+    readEntry.index = list.length;
+    return [...list, readEntry];
+  };
+  const readFields = readEntry ? { readDistance: readEntry.reach.cost } : {};
+
+  if (shortcut && shortcut.nOpt + readCost < guidedNOpt) {
+    const shortcutStep = {
+      index: shortcut.prefixSteps.length,
+      action: 'click',
+      selector: shortcut.selector,
+      reach: shortcut.reach,
+      actionCost: ACTION_COST.click,
+      shortcut: true,
+      href: shortcut.href,
+      navigated: true,
+    };
+    return {
+      nOpt: shortcut.nOpt + readCost,
+      steps: withRead([...shortcut.prefixSteps, shortcutStep]),
+      route: 'direct-link',
+      guidedNOpt,
+      shortcut: describeShortcut(shortcut, readCost),
+      ...readFields,
+    };
+  }
+
+  return {
+    nOpt: guidedNOpt,
+    steps: withRead(steps),
+    route: 'guided',
+    ...(shortcut ? { shortcut: describeShortcut(shortcut, readCost) } : {}),
+    ...readFields,
+  };
+}
+
+/** The shortcut route as it is reported: which link, on which page, at what cost. */
+function describeShortcut(shortcut, readCost = 0) {
+  return {
+    index: shortcut.index,
+    pageUrl: shortcut.pageUrl,
+    selector: shortcut.selector,
+    href: shortcut.href,
+    name: shortcut.name,
+    reach: shortcut.reach,
+    cost: shortcut.cost,
+    prefixCost: shortcut.prefixCost,
+    nOpt: shortcut.nOpt + readCost,
+  };
 }
 
 /**
@@ -1145,6 +1402,11 @@ async function costReadStep(page, evidence, cursorSelector, runId, findWords = [
 }
 
 module.exports = {
+  targetMatcherFor,
+  findDirectLinks,
+  priceDirectLink,
+  urlPatternsOf,
+  normaliseUrl,
   computeOptimalPath,
   costReadStep,
   findWordsFor,

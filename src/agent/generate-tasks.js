@@ -72,7 +72,9 @@ function printSummary(result) {
     [10, 'status'],
   ];
   console.log('');
-  console.log(`site type: ${result.siteType || 'unknown'}`);
+  console.log(
+    `site type: ${result.siteType || 'unknown'} (page language: ${result.language || 'unknown'})`
+  );
   console.log(`explored:  ${(result.explored || []).length} page(s)`);
   if (result.preconditions && result.preconditions.length) {
     console.log(`preconditions: ${result.preconditions.length} step(s) (cookie banner)`);

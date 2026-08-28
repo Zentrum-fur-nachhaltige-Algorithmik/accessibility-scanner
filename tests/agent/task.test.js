@@ -81,3 +81,24 @@ describe('agent/task: the kind field', () => {
     expect(tasks[0].evidence).toBeUndefined();
   });
 });
+
+describe('agent/task: keywords', () => {
+  it('accepts an optional list of page-language keywords', () => {
+    const t = validateTaskShape(base({ keywords: ['Kontakt', 'Telefon'] }));
+    expect(t.keywords).toEqual(['Kontakt', 'Telefon']);
+    // A task without them stays valid: they are optional.
+    expect(validateTaskShape(base()).keywords).toBeUndefined();
+  });
+
+  it('rejects keywords that are not a list of non-empty strings', () => {
+    expect(() => validateTaskShape(base({ keywords: 'Kontakt' }))).toThrow(/keywords/);
+    expect(() => validateTaskShape(base({ keywords: ['Kontakt', ''] }))).toThrow(/keywords/);
+    expect(() => validateTaskShape(base({ keywords: ['Kontakt', 3] }))).toThrow(/keywords/);
+    expect(isValidTaskShape(base({ keywords: [] }))).toBe(true);
+  });
+
+  it('carries keywords through parseTasks', () => {
+    const { tasks } = parseTasks([base({ keywords: ['Termin'] })]);
+    expect(tasks[0].keywords).toEqual(['Termin']);
+  });
+});

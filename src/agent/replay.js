@@ -198,6 +198,7 @@ async function replaySightedPath(page, task, ctx = {}, options = {}, runner = nu
  * true and `nOpt` covers the navigation only.
  *
  * @returns {Promise<{ valid, reasons: string[], nSighted, nOpt: number|null,
+ *                     route: 'guided'|'direct-link'|null, shortcut?: object,
  *                     optimalPath: object[]|null, optimalPathError?: string,
  *                     readDistance: number|null, nOptPartial?: boolean,
  *                     timings: { validateMs: number, nOptMs: number } }>}
@@ -227,6 +228,10 @@ async function validateTask(
   }
   const nSighted = normalized.sightedPath.length;
   const { computeOptimalPath } = require('./optimal-path');
+  // Where the sighted path ends: the target the direct-link shortcut of
+  // `computeOptimalPath` looks for. Recorded by the plain repeats, so the fused
+  // last repeat already knows it.
+  let endUrl = null;
 
   /** One repeat on its own isolated context. Returns the reasons it collected. */
   const runRepeat = async (attempt, runner) => {
@@ -263,6 +268,8 @@ async function validateTask(
         }
         if (!res.ok) {
           found.push(`repeat ${attempt}: ${res.error || 'oracle false after replay'}`);
+        } else if (!endUrl) {
+          endUrl = page.url();
         }
       } finally {
         recorder.stop();
@@ -285,7 +292,16 @@ async function validateTask(
       runner = async (page, t, opts) => {
         const t0 = Date.now();
         try {
-          fused = await computeOptimalPath(page, t, {}, { ...opts, analysisCache });
+          fused = await computeOptimalPath(
+            page,
+            t,
+            {},
+            {
+              ...opts,
+              analysisCache,
+              targetUrl: endUrl,
+            }
+          );
         } finally {
           nOptMs += Date.now() - t0;
         }
@@ -321,11 +337,16 @@ async function validateTask(
   let opt = fused;
   if (!opt) {
     const t0 = Date.now();
-    opt = await measureOptimalPath(browser, url, normalized, options, analysisCache);
+    opt = await measureOptimalPath(browser, url, normalized, options, analysisCache, endUrl);
     nOptMs += Date.now() - t0;
   }
   result.nOpt = opt.nOpt;
   result.optimalPath = opt.steps || null;
+  // Which route nOpt was priced along: the sighted path, or a direct link to the
+  // target that was on one of its pages (see optimal-path.js).
+  result.route = opt.route || null;
+  if (opt.shortcut) result.shortcut = opt.shortcut;
+  if (opt.guidedNOpt !== undefined) result.guidedNOpt = opt.guidedNOpt;
   // Information tasks carry a final `read` step: the cost of actually HEARING
   // the evidence. `readDistance` is its reach cost; `nOptPartial` says nOpt
   // covers only the navigation because the read step could not be costed
@@ -342,7 +363,14 @@ async function validateTask(
  * (state 0, exactly what the SR agent sees) and walk the sighted path with the
  * screen-reader cost model.
  */
-async function measureOptimalPath(browser, url, task, options = {}, analysisCache = null) {
+async function measureOptimalPath(
+  browser,
+  url,
+  task,
+  options = {},
+  analysisCache = null,
+  targetUrl = null
+) {
   const { computeOptimalPath } = require('./optimal-path');
   const context = await createIsolatedContext(browser);
   const page = await context.newPage();
@@ -351,7 +379,7 @@ async function measureOptimalPath(browser, url, task, options = {}, analysisCach
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: DEFAULTS.gotoTimeout });
     const pre = await runPreconditions(page, task, options);
     if (!pre.ok) return { nOpt: null, steps: null, error: `precondition failed: ${pre.error}` };
-    return await computeOptimalPath(page, task, {}, { ...options, analysisCache });
+    return await computeOptimalPath(page, task, {}, { ...options, analysisCache, targetUrl });
   } catch (err) {
     return { nOpt: null, steps: null, error: err.message };
   } finally {

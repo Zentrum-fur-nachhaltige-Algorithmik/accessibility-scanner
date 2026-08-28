@@ -5,7 +5,12 @@ const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
 const ScreenReaderEnv = require('../../src/agent/screenreader-env');
-const { runGreedyAgent, keywordsOf, scorePhrase } = require('../../src/agent/greedy-agent');
+const {
+  runGreedyAgent,
+  keywordsOf,
+  keywordsFor,
+  scorePhrase,
+} = require('../../src/agent/greedy-agent');
 
 /** Run the greedy agent on `test-sites/agent/<file>` and return run + trace. */
 async function runOn(file, task, maxSteps = 30) {
@@ -64,6 +69,28 @@ describe('greedy agent scoring', () => {
   });
 });
 
+describe('greedy agent keyword source', () => {
+  it('prefers the task keywords over the description', () => {
+    const words = keywordsFor({
+      description: 'Find the page where you can see how to get in touch with this company.',
+      keywords: ['Kontakt', 'Telefon'],
+    }).map((k) => k.word);
+    expect(words).toEqual(['kontakt', 'telefon']);
+  });
+
+  it('falls back to the description without usable keywords', () => {
+    const fromDescription = keywordsOf('Find the contact page').map((k) => k.word);
+    expect(keywordsFor({ description: 'Find the contact page' }).map((k) => k.word)).toEqual(
+      fromDescription
+    );
+    expect(
+      keywordsFor({ description: 'Find the contact page', keywords: ['the', 'a'] }).map(
+        (k) => k.word
+      )
+    ).toEqual(fromDescription);
+  });
+});
+
 describe('greedy agent policy', () => {
   beforeAll(async () => {
     await startFixtureServer();
@@ -96,6 +123,27 @@ describe('greedy agent policy', () => {
       costKnown: true,
     });
   }, 60000);
+
+  it('solves a task whose description is in another language than the page', async () => {
+    const task = {
+      id: 'kontakt',
+      description: 'Finden Sie heraus, wie man dieses Unternehmen erreicht.',
+      kind: 'action',
+    };
+    // Without keywords no German word of the task ever meets the English page,
+    // so the policy never gets to the contact page.
+    const blind = await runOn('generic-home.html', task, 12);
+    expect(blind.trace[blind.trace.length - 1].obsAfter.url).not.toContain('generic-contact.html');
+    // The generator's page-language keywords are what the page really says.
+    const { run, trace } = await runOn(
+      'generic-home.html',
+      { ...task, keywords: ['Contact', 'Telefon'] },
+      12
+    );
+    expect(commands(trace)).toEqual(['links', 'jumpTo', 'activate', 'done']);
+    expect(run.stoppedBy).toBe('done');
+    expect(trace[trace.length - 1].obsAfter.url).toContain('generic-contact.html');
+  }, 90000);
 
   it('solves an information task by reading under the best heading', async () => {
     const { run, trace } = await runOn('quick-keys.html', {

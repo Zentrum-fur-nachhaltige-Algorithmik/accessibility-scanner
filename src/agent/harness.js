@@ -159,6 +159,9 @@ async function runSite({
         ? Number(validation.nOpt)
         : nSighted;
     const optimalPath = validation.optimalPath || null;
+    // 'direct-link' means nOpt was priced along a link that led straight to the
+    // target, not along the (possibly wandering) sighted path.
+    const optimalRoute = validation.route || null;
     const readDistance = Number.isFinite(validation.readDistance) ? validation.readDistance : null;
     const nOptPartial = !!validation.nOptPartial;
     // The evidence text is on the page but no spoken phrase carries it: the
@@ -219,6 +222,8 @@ async function runSite({
         ...(nOptPartial ? { nOptPartial: true } : {}),
         readDistance,
         optimalPath,
+        optimalRoute,
+        ...(validation.shortcut ? { optimalShortcut: validation.shortcut } : {}),
         runs,
         R,
         findings,

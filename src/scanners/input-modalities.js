@@ -145,10 +145,17 @@ class InputModalitiesScanner extends BaseScanner {
   /**
    * Analyze pointer gestures (WCAG 2.5.1).
    *
-   * Only a declared multipoint or path-based gesture handler counts. The word
-   * "swipe" or "slide" in a caption, a single `ontouchstart` (the ordinary way
-   * to make a tap responsive) and the `draggable` attribute say nothing about
-   * a multipoint or path gesture; dragging is 2.5.7 and is measured there.
+   * The gesture is taken from the platform API the element declares, never from
+   * a caption: a WebKit `ongesture*` handler, a touchstart / touchmove /
+   * touchend trio that tracks a path, or a touch handler whose body reads the
+   * multipoint part of the Touch API (`touches[1]`, `touches.length` compared
+   * with two or more). A lone `ontouchstart` is the ordinary way to make a tap
+   * responsive, and `draggable` is 2.5.7, which is measured separately.
+   *
+   * The element passes when a control that does the same job with one pointer
+   * is rendered and exposed to assistive technology: in the element, in the
+   * container that holds it, or bound to it with `aria-controls`. A control
+   * inside an `aria-hidden` subtree is not an alternative.
    */
   async analyzePointerGestures(page, violations) {
     log.debug('Analyzing pointer gestures...');
@@ -158,45 +165,92 @@ class InputModalitiesScanner extends BaseScanner {
       const issues = [];
       let accessible = true;
 
-      const gestureElements = document.querySelectorAll(
-        '[ongesturestart], [ongesturechange], [ongestureend]'
-      );
+      // A second touch point, which is what separates a multipoint gesture from
+      // the ordinary tap: touches[1] and up, or a length compared with a number
+      // that only two or more touches satisfy.
+      const MULTIPOINT =
+        /(?:changedT|t)ouches\s*(?:\[\s*[1-9]|\.\s*length\s*(?:>\s*=?\s*[1-9]|===?\s*[2-9]))/;
+      const TOUCH_EVENTS = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
 
-      gestureElements.forEach((element) => {
-        if (!__isRendered(element)) return;
+      const declares = (el, name) =>
+        el.hasAttribute(`on${name}`) || typeof el[`on${name}`] === 'function';
+      /**
+       * The handler body. An `on...` attribute is a one-line call into a named
+       * function, so that function is resolved and its source used instead.
+       */
+      const sourceOf = (el, name) => {
+        const handler = el[`on${name}`];
+        let source = typeof handler === 'function' ? handler.toString() : '';
+        const called = /(?:^|[^\w$.])([A-Za-z_$][\w$]*)\s*\(/.exec(
+          el.getAttribute(`on${name}`) || ''
+        );
+        if (called && typeof window[called[1]] === 'function') {
+          source += `\n${window[called[1]].toString()}`;
+        }
+        return source;
+      };
+
+      /** A rendered control exposed to assistive technology, in or around the element. */
+      const exposed = (el) =>
+        el && __isRendered(el) && __isInteractiveTarget(el) && !el.closest('[aria-hidden="true"]');
+      const hasSinglePointerAlternative = (el) => {
+        if (el.onclick || el.hasAttribute('onclick') || __isInteractiveTarget(el)) return true;
+        if (Array.from(el.querySelectorAll('*')).some(exposed)) return true;
+        if (el.id) {
+          const bound = document.querySelector(`[aria-controls~="${CSS.escape(el.id)}"]`);
+          if (exposed(bound)) return true;
+        }
+        const parent = el.parentElement;
+        if (!parent) return false;
+        return Array.from(parent.querySelectorAll('*')).some((c) => !el.contains(c) && exposed(c));
+      };
+
+      const candidates = new Set();
+      document
+        .querySelectorAll(
+          '[ongesturestart], [ongesturechange], [ongestureend], [ontouchstart], [ontouchmove], [ontouchend]'
+        )
+        .forEach((el) => candidates.add(el));
+      document.querySelectorAll('body *').forEach((el) => {
+        if (TOUCH_EVENTS.some((name) => typeof el[`on${name}`] === 'function')) candidates.add(el);
+        if (typeof el.ongesturestart === 'function') candidates.add(el);
+      });
+
+      for (const element of candidates) {
+        if (!__isRendered(element)) continue;
+
+        const webkitGesture =
+          declares(element, 'gesturestart') ||
+          declares(element, 'gesturechange') ||
+          declares(element, 'gestureend');
+        const path =
+          declares(element, 'touchstart') &&
+          declares(element, 'touchmove') &&
+          (declares(element, 'touchend') || declares(element, 'touchcancel'));
+        const multipoint = TOUCH_EVENTS.some((name) => MULTIPOINT.test(sourceOf(element, name)));
+
+        if (!webkitGesture && !path && !multipoint) continue;
+        if (hasSinglePointerAlternative(element)) continue;
+
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
-        const selector =
-          element.tagName.toLowerCase() +
-          (element.id ? `#${element.id}` : '') +
-          (className ? `.${className.split(' ')[0]}` : '');
-
-        // A gesture handler is acceptable when the same element can also be
-        // operated with a single tap or from the keyboard.
-        const hasSimpleActivation =
-          element.onclick ||
-          element.onkeydown ||
-          element.hasAttribute('onclick') ||
-          element.hasAttribute('onkeydown') ||
-          __isInteractiveTarget(element) ||
-          element.querySelector('button, [role="button"], a[href], input, select, textarea');
-
-        if (!hasSimpleActivation) {
-          issues.push({
-            type: 'complex-gesture-only',
-            element: selector,
-            description:
-              'Element handles a multipoint or path-based gesture and offers no single-pointer or keyboard activation',
-            severity: 'error',
-          });
-          accessible = false;
-        }
-      });
+        issues.push({
+          type: 'complex-gesture-only',
+          element:
+            element.tagName.toLowerCase() +
+            (element.id ? `#${element.id}` : '') +
+            (className ? `.${className.trim().split(/\s+/)[0]}` : ''),
+          description: multipoint
+            ? 'Element handles a multipoint gesture and no control that is exposed to assistive technology does the same with a single pointer'
+            : 'Element tracks a path-based gesture and no control that is exposed to assistive technology does the same with a single pointer',
+          severity: 'error',
+        });
+        accessible = false;
+      }
 
       return { issues, accessible };
     }, renderedCode);
 
-    // Create violations for gesture issues
     gestureAnalysis.issues.forEach((issue) => {
       violations.push({
         criterion: '9.2.5.1',
@@ -221,9 +275,7 @@ class InputModalitiesScanner extends BaseScanner {
    * all, and whether the abort changed it again. A page that reacts to the
    * abort has implemented the Abort or Undo clause, which is how the pressed
    * state and the "moving away cancels" hint of a correct control differ from
-   * a function that ran on the down-event and stays. The inline-attribute
-   * reasoning this replaces could not see a listener bound with
-   * addEventListener and guessed the rest from the button text.
+   * a function that ran on the down-event and stays.
    *
    * Pages that repaint on their own (clocks, carousels, tickers) are measured
    * once with no interaction first; when that idle baseline already changes
@@ -458,9 +510,8 @@ class InputModalitiesScanner extends BaseScanner {
    *
    * A synthetic `devicemotion` and `deviceorientation` event is dispatched at
    * the window; a page that acts on device motion changes its DOM in response,
-   * and a page that does not is untouched. That replaces the previous test,
-   * which read motion words out of the body text and inferred a feature from
-   * `window.DeviceMotionEvent !== undefined`, a constant in Chromium.
+   * and a page that does not is untouched. `window.DeviceMotionEvent` is a
+   * constant in Chromium and says nothing about the page.
    */
   async analyzeMotionActuation(page, violations) {
     log.debug('Analyzing motion actuation...');
@@ -569,7 +620,7 @@ class InputModalitiesScanner extends BaseScanner {
        * constrained by the line height of the text around it. The parent tag
        * is not what decides that: a link inside `<div class="prose">` or a
        * `display: inline-block` link in running copy is just as constrained as
-       * one inside a `<p>`, and both used to lose the exception.
+       * one inside a `<p>`.
        */
       function isInlineTextTarget(el, style) {
         if (!['inline', 'inline-block', 'inline-flex'].includes(style.display)) return false;
@@ -703,10 +754,8 @@ class InputModalitiesScanner extends BaseScanner {
    * (`draggable="true"`, an `ondragstart` handler, a drop target), never from
    * a class name containing "sortable". The single-pointer alternative is
    * looked for structurally: a rendered control inside the draggable item, in
-   * the container that holds it, or bound to it with `aria-controls`. The
-   * previous version searched sibling buttons for the English words
-   * up/down/move/sort/reorder, so a list whose buttons read "Nach oben" was
-   * reported although the alternative was right there.
+   * the container that holds it, or bound to it with `aria-controls`, so the
+   * alternative is recognised in any language.
    */
   async analyzeDraggingMovements(page, violations) {
     log.debug('Analyzing dragging movements...');

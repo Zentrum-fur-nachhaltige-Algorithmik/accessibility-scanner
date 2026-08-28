@@ -1080,6 +1080,15 @@ const HTML_SCANNER_MAPPING = {
     description:
       'External and document links carrying target attributes and unnamed icons and nothing a reader perceives: external-links-no-identification must stay silent',
   },
+
+  'good-statement-link-unresolvable.html': {
+    expectedScanners: [],
+    excludedScanners: ['accessibility-statement'],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1'],
+    description:
+      'A statement link to a path that is not served, resolved only against a loopback address: inaccessible-statement must stay silent',
+  },
 };
 
 /**

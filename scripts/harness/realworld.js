@@ -705,18 +705,18 @@ const FIXTURES = [
         },
       },
       {
-        name: 'REAL: the accessibility statement link is dead in this snapshot',
-        kind: 'must-detect',
+        name: 'REGRESSION: the statement link is not called broken inside the capture',
+        kind: 'must-not-flag',
         // The footer links /help/accessibility-statement, which is not part of
-        // the capture, so it answers 404. The finding must be about the broken
-        // link, not three claims about content nobody could read.
+        // the capture, so it answers 404 here and exists on gov.uk. A path
+        // that could only be resolved against the local server is unverifiable,
+        // and unverifiable is not a finding.
         check: ({ violations }) => {
-          const hits = findViolations(violations, { id: ['EAA-Statement'] });
-          if (hits.length === 0) return 'no accessibility-statement finding at all';
-          const rules = new Set(hits.map((v) => v.issue));
-          if (!rules.has('inaccessible-statement'))
-            return `expected inaccessible-statement, got: ${[...rules].join(', ')}`;
-          return null;
+          const hits = findViolations(violations, { id: ['EAA-Statement'] }).filter(
+            (v) => v.issue === 'inaccessible-statement'
+          );
+          if (hits.length === 0) return null;
+          return `statement link reported as broken: ${hits.map((v) => v.description).join('; ')}`;
         },
       },
     ],

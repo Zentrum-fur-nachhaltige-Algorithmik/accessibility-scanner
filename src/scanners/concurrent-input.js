@@ -1,8 +1,11 @@
 /**
  * Concurrent Input Mechanisms Scanner.
  * WCAG 2.5.6 (EN 301 549 9.2.5.6).
- * Reports only observable restrictions to one input modality (DOM, computed
- * styles, registered listeners); no "feels touch-first" heuristics.
+ * Reports a page that takes one input modality away: a touch handler that
+ * cancels the events every other modality is synthesised from, an interactive
+ * element the pointer cannot reach, and touch-action suppressed on the
+ * document. The presence of a handler for one modality is not a restriction of
+ * another, and no rule here reads a capability probe out of a script.
  */
 const BaseScanner = require('../core/base-scanner');
 const log = require('../utils/logger').createLogger('concurrent-input');
@@ -25,9 +28,14 @@ const INSTRUMENTATION = `
         if (/^(touch|mouse|pointer|key|click|dblclick|contextmenu|wheel|drag)/.test(t)) {
           var body = '';
           try { body = String(listener).slice(0, 1500); } catch (e) { body = ''; }
+          // A passive listener cannot call preventDefault(), so it never
+          // suppresses the events a browser synthesises from a touch.
+          var passive = !!(opts && typeof opts === 'object' && opts.passive);
+          var cancels = !passive && /preventDefault\\s*\\(|return\\s+false/.test(body);
           log.entries.push({
             type: t,
             isDocument: this === document || this === window || this === document.body,
+            cancels: cancels,
             body: body,
             node: (this && this.nodeType === 1) ? this : null,
           });
@@ -35,6 +43,12 @@ const INSTRUMENTATION = `
             var prev = this.getAttribute('data-a11y-listeners') || '';
             if (prev.split(' ').indexOf(t) === -1) {
               this.setAttribute('data-a11y-listeners', (prev + ' ' + t).trim());
+            }
+            if (cancels) {
+              var prevCancel = this.getAttribute('data-a11y-cancels') || '';
+              if (prevCancel.split(' ').indexOf(t) === -1) {
+                this.setAttribute('data-a11y-cancels', (prevCancel + ' ' + t).trim());
+              }
             }
           }
         }
@@ -128,6 +142,32 @@ class ConcurrentInputScanner extends BaseScanner {
         };
       }
 
+      /**
+       * Does a touch listener on this element call preventDefault()? Listeners
+       * registered with addEventListener are marked by the instrumentation;
+       * an inline ontouch* attribute is a function object whose source is read
+       * here, following the one call it usually is into the named function.
+       */
+      function cancelsTouch(el) {
+        const marked = (el.getAttribute('data-a11y-cancels') || '')
+          .split(/\s+/)
+          .some((t) => t.startsWith('touch'));
+        if (marked) return true;
+
+        for (const attr of el.attributes) {
+          if (!/^ontouch/i.test(attr.name)) continue;
+          // Desktop Chrome does not expose the ontouch* IDL attributes, so the
+          // handler is read from the attribute value and the function it calls.
+          let source = attr.value || '';
+          for (const call of source.match(/([A-Za-z_$][\w$]*)\s*\(/g) || []) {
+            const named = window[call.slice(0, -1).trim()];
+            if (typeof named === 'function') source += '\n' + String(named);
+          }
+          if (/preventDefault\s*\(|return\s+false/.test(source)) return true;
+        }
+        return false;
+      }
+
       function keyboardOperable(el) {
         if (el.matches(NATIVE_INTERACTIVE)) return true;
         const ti = el.getAttribute('tabindex');
@@ -139,22 +179,44 @@ class ConcurrentInputScanner extends BaseScanner {
         (el) => isElementVisible(el) && el.attributes.length > 0
       );
 
-      // ---- 1. touch-only interaction -----------------------------------
-      // Handlers exist for touch, but nothing a mouse, pen or keyboard user
-      // can trigger. This is the canonical 2.5.6 failure.
+      // A page that listens for clicks on the document operates every element
+      // through delegation, whatever each element carries itself.
+      const logEntries = (window.__a11yInputLog && window.__a11yInputLog.entries) || [];
+      const documentPointerDelegation = logEntries.some(
+        (e) => e.isDocument && /^(click|pointer|mouse)/.test(e.type)
+      );
+
+      /** Can any modality other than touch operate this element or an ancestor? */
+      function hasNonTouchPath(el) {
+        if (documentPointerDelegation) return true;
+        for (let node = el; node && node.nodeType === 1; node = node.parentElement) {
+          const m = modalities(node);
+          if (m.mouse || m.click || m.pointer) return true;
+          if (keyboardOperable(node)) return true;
+        }
+        return false;
+      }
+
+      // ---- 1. touch handling that cancels every other modality ----------
+      // A touch listener alone restricts nothing: the browser synthesises
+      // mouse events and a click from a tap, and a mouse produces those
+      // events directly. The modality is only taken away when the touch
+      // listener calls preventDefault(), which suppresses the synthesised
+      // events, and nothing else on the element or above it responds to a
+      // click, a pointer or the keyboard.
       for (const el of candidates) {
-        const m = modalities(el);
-        if (!m.touch) continue;
-        if (m.mouse || m.click || m.pointer) continue;
-        if (keyboardOperable(el)) continue;
+        if (!modalities(el).touch) continue;
+        if (!cancelsTouch(el)) continue;
+        if (hasNonTouchPath(el)) continue;
 
         push({
           element: selectorFor(el),
           issue: 'touch-only-interaction',
           description:
-            `<${el.tagName.toLowerCase()}> handles touch events but exposes no mouse, ` +
-            'pointer, click or keyboard equivalent. Mouse, pen, switch and keyboard ' +
-            'users cannot operate it.',
+            `<${el.tagName.toLowerCase()}> handles touch events, cancels them so the ` +
+            'browser synthesises no mouse or click event, and exposes no pointer, click ' +
+            'or keyboard equivalent. Mouse, pen, switch and keyboard users cannot ' +
+            'operate it.',
           severity: 'error',
           suggestion:
             'Register pointer/click handlers alongside the touch handlers, or add ' +
@@ -163,34 +225,15 @@ class ConcurrentInputScanner extends BaseScanner {
         });
       }
 
-      // ---- 2. mouse-only interaction -----------------------------------
-      // Low-level mouse events with no click, no touch and no pointer
-      // fallback: touch and pen users get nothing. (`click` is treated as
-      // modality-neutral because browsers synthesise it from taps.)
-      for (const el of candidates) {
-        const m = modalities(el);
-        if (!m.mouse) continue;
-        if (m.click || m.touch || m.pointer) continue;
-        if (el.matches(NATIVE_INTERACTIVE)) continue;
-
-        push({
-          element: selectorFor(el),
-          issue: 'mouse-only-interaction',
-          description:
-            `<${el.tagName.toLowerCase()}> reacts only to low-level mouse events ` +
-            '(mousedown/mouseup/mousemove) with no click, touch or pointer equivalent. ' +
-            'touch and pen users cannot operate it.',
-          severity: 'error',
-          suggestion:
-            'Use Pointer Events (pointerdown/pointerup), or add matching touch handlers, ' +
-            'or drive the behaviour from a click handler.',
-        });
-      }
-
-      // ---- 3. pointer input blocked on an interactive element ----------
+      // ---- 2. pointer input blocked on an interactive element ----------
+      // pointer-events: none is the standard way to let a click fall through
+      // to the control underneath, so the finding needs the hit test: the
+      // element is only unreachable when the point over its centre reaches
+      // neither it nor an interactive ancestor of it.
       for (const el of candidates) {
         const cs = getComputedStyle(el);
         if (cs.pointerEvents !== 'none') continue;
+        if (el.matches('[disabled], [aria-disabled="true"]')) continue;
 
         const m = modalities(el);
         const interactive =
@@ -200,12 +243,24 @@ class ConcurrentInputScanner extends BaseScanner {
         const rect = el.getBoundingClientRect();
         if (rect.width < 2 || rect.height < 2) continue;
 
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) continue;
+
+        const hit = document.elementFromPoint(x, y);
+        // The event lands on the element itself (a descendant re-enables
+        // pointer events), or on an ancestor that carries the same handler
+        // or is a control: the interaction still happens.
+        if (hit && (el.contains(hit) || (hit.contains(el) && hasNonTouchPath(hit)))) continue;
+
         push({
           element: selectorFor(el),
           issue: 'pointer-input-blocked',
           description:
             `Interactive <${el.tagName.toLowerCase()}> has computed ` +
-            'pointer-events: none, so mouse, touch and pen input cannot reach it at all.',
+            'pointer-events: none, and a click over its centre reaches ' +
+            `${hit ? `<${hit.tagName.toLowerCase()}>` : 'nothing'} instead, so mouse, ` +
+            'touch and pen input cannot operate it.',
           severity: 'error',
           suggestion:
             'Remove pointer-events: none from the interactive element (keep it only on ' +
@@ -213,7 +268,7 @@ class ConcurrentInputScanner extends BaseScanner {
         });
       }
 
-      // ---- 4. global touch suppression ---------------------------------
+      // ---- 3. global touch suppression ---------------------------------
       for (const el of [document.documentElement, document.body]) {
         if (!el) continue;
         const cs = getComputedStyle(el);
@@ -242,81 +297,6 @@ class ConcurrentInputScanner extends BaseScanner {
         instrumentedElements: document.querySelectorAll('[data-a11y-listeners]').length,
       };
     }, BaseScanner.visibilityFilterScript);
-
-    // ---- 5. document-level keyboard suppression (inline scripts) --------
-    const scriptFindings = await page.evaluate(() => {
-      const out = [];
-      const scripts = [...document.querySelectorAll('script:not([src])')]
-        .map((s) => s.textContent || '')
-        .filter(Boolean);
-
-      for (const src of scripts) {
-        // A document/window-level key listener that unconditionally calls
-        // preventDefault() swallows keyboard input for the whole page. Requiring
-        // the ABSENCE of any key discrimination is what keeps this specific:
-        // handlers that cancel a single named key (Escape, Tab traps, shortcut
-        // keys) are normal and are not flagged.
-        const listenerRe =
-          /(document|window)\s*\.\s*addEventListener\s*\(\s*['"](keydown|keypress|keyup)['"]\s*,([\s\S]{0,900}?)\n\s*\}\s*\)/g;
-        let m;
-        while ((m = listenerRe.exec(src)) !== null) {
-          const body = m[3];
-          const cancels = /\.preventDefault\s*\(\s*\)|return\s+false\s*;/.test(body);
-          const discriminates = /\.key\b|\.code\b|keyCode|charCode|\.which\b|isComposing/.test(
-            body
-          );
-          if (cancels && !discriminates) {
-            out.push({
-              target: m[1],
-              type: m[2],
-              excerpt: m[0].slice(0, 220),
-            });
-          }
-        }
-
-        // Modality sniffing: choosing ONE event family based on a capability
-        // probe is the classic 2.5.6 failure ("if touch device, only bind touch").
-        const probes = /(['"]ontouchstart['"]\s+in\s+window)|navigator\.maxTouchPoints/.test(src);
-        const bindsTouch = /addEventListener\s*\(\s*['"]touch/.test(src);
-        const bindsMouse = /addEventListener\s*\(\s*['"](mouse|pointer|click)/.test(src);
-        const branches = /\belse\b|\?\s*['"]/.test(src);
-        if (probes && bindsTouch && bindsMouse && branches) {
-          out.push({ target: 'inline-script', type: 'modality-sniffing', excerpt: null });
-        }
-      }
-      return out;
-    });
-
-    for (const f of scriptFindings) {
-      if (f.type === 'modality-sniffing') {
-        result.violations.push({
-          criterion: '9.2.5.6',
-          element: 'script',
-          issue: 'input-modality-sniffing',
-          description:
-            'An inline script probes for touch capability ("ontouchstart" in window / ' +
-            'navigator.maxTouchPoints) and binds touch OR mouse handlers in opposite ' +
-            'branches. Devices that support both modalities simultaneously (2-in-1 ' +
-            'laptops, tablets with a keyboard and mouse) lose one of them.',
-          severity: 'serious',
-          suggestion: 'Bind Pointer Events once instead of branching on a capability probe.',
-        });
-      } else {
-        result.violations.push({
-          criterion: '9.2.5.6',
-          element: `${f.target} (${f.type})`,
-          issue: 'keyboard-input-suppressed',
-          description:
-            `A ${f.target}-level "${f.type}" listener calls preventDefault() without ` +
-            'testing which key was pressed, suppressing keyboard input page-wide: ' +
-            `${f.excerpt}`,
-          severity: 'error',
-          suggestion:
-            'Only cancel the specific keys the feature handles; let every other key ' +
-            'reach the browser and assistive technology.',
-        });
-      }
-    }
 
     return {
       scannerId: this.id,

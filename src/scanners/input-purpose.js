@@ -74,6 +74,7 @@ class InputPurposeScanner extends BaseScanner {
         'impp',
         'url',
         'photo',
+        'webauthn',
         // Section/billing/shipping prefixes are allowed before any of these
         'on',
         'off', // also valid but "off" on purpose fields is a violation
@@ -168,6 +169,34 @@ class InputPurposeScanner extends BaseScanner {
         return false;
       }
 
+      // Purposes that only a form collecting the user's own data asks for.
+      // Two of them in one form is the evidence that SC 1.3.5 applies at all:
+      // the criterion covers "input fields that collect information about the
+      // user", not every field whose name happens to read like a token.
+      // City, region and country are deliberately absent: they are the fields
+      // of every hotel, shop and job filter as well.
+      const IDENTITY_PURPOSES = new Set([
+        'name',
+        'given-name',
+        'family-name',
+        'email',
+        'tel',
+        'tel-national',
+        'username',
+        'street-address',
+        'address-line1',
+        'address-line2',
+        'postal-code',
+        'cc-number',
+        'cc-name',
+        'cc-csc',
+        'cc-exp',
+        'bday',
+        'current-password',
+        'new-password',
+        'one-time-code',
+      ]);
+
       function detectPurpose(el) {
         const name = (el.name || '').toLowerCase();
         const id = (el.id || '').toLowerCase();
@@ -182,6 +211,28 @@ class InputPurposeScanner extends BaseScanner {
           }
         }
         return null;
+      }
+
+      // Does this field sit in a form that collects the user's own data? A
+      // field of type email, tel or password is that evidence by itself; any
+      // other field needs two identity fields in the same form. A lone address
+      // field ("enter the URL to check"), a country filter or a language
+      // switcher is somebody else's datum or none at all.
+      function collectsUserData(el) {
+        const ownType = (el.type || '').toLowerCase();
+        if (ownType === 'email' || ownType === 'tel' || ownType === 'password') return true;
+        const scope = el.form || document;
+        let identityFields = 0;
+        for (const field of scope.querySelectorAll('input, select, textarea')) {
+          const fieldType = (field.type || '').toLowerCase();
+          if (fieldType === 'email' || fieldType === 'tel' || fieldType === 'password') {
+            identityFields += 2;
+            continue;
+          }
+          const purposes = detectPurpose(field) || [];
+          if (purposes.some((p) => IDENTITY_PURPOSES.has(p))) identityFields++;
+        }
+        return identityFields >= 2;
       }
 
       const violations = [];
@@ -269,7 +320,8 @@ class InputPurposeScanner extends BaseScanner {
             }
           }
         } else {
-          // No autocomplete attribute: flag if purpose is detectable.
+          // No autocomplete attribute: flag if purpose is detectable and the
+          // form around the field collects the user's own data.
           //
           // Radio buttons and checkboxes are excluded: SC 1.3.5's autocomplete
           // tokens describe fields that COLLECT the user's own data, not
@@ -280,7 +332,7 @@ class InputPurposeScanner extends BaseScanner {
           // into it. (Explicitly-authored WRONG tokens on these types are still
           // caught above, where the attribute is present.)
           const isPreferenceSelector = type === 'radio' || type === 'checkbox';
-          if (detectedPurpose && !isPreferenceSelector) {
+          if (detectedPurpose && !isPreferenceSelector && collectsUserData(el)) {
             violations.push({
               criterion: '9.1.3.5',
               element: getSelector(el),

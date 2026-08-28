@@ -1071,6 +1071,15 @@ const HTML_SCANNER_MAPPING = {
     description:
       'Undersized links stacked in a navigation column and a footer list with no non-target text on their line',
   },
+
+  'good-external-links-icons-only.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.4'],
+    description:
+      'External and document links carrying target attributes and unnamed icons and nothing a reader perceives: external-links-no-identification must stay silent',
+  },
 };
 
 /**

@@ -1,0 +1,67 @@
+<!-- WCAG-TEST
+criterion: 3.2.4
+level: AA
+title: Consistent Identification
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: predictable-navigation
+description: External and PDF links that carry target attributes and unnamed icons, which say nothing to the reader about the destination, so the page identifies them consistently
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Partner links - Accessibility Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .card-icon {
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Partners</h1>
+
+    <!-- Some links hold a decorative icon, some a target attribute, some
+         neither: no reader sees a destination marker on any of them. -->
+    <ul>
+      <li>
+        <a href="https://example.org/one" target="_blank"
+          ><svg class="card-icon" aria-hidden="true" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="7" fill="#1565c0" /></svg
+          >Institute of Standards</a
+        >
+      </li>
+      <li><a href="https://example.net/two" target="_blank">Research Council</a></li>
+      <li><a href="https://example.com/three">Working Group</a></li>
+      <li>
+        <a href="https://example.org/four"
+          ><svg class="card-icon" aria-hidden="true" viewBox="0 0 16 16">
+            <rect width="16" height="16" fill="#1565c0" /></svg
+          >Advisory Board</a
+        >
+      </li>
+    </ul>
+
+    <h2>Downloads</h2>
+    <ul>
+      <li><a href="/files/report-2025.pdf">Annual report</a></li>
+      <li><a href="/files/minutes.pdf" target="_blank">Board minutes</a></li>
+      <li>
+        <a href="/files/budget.pdf"
+          ><svg class="card-icon" aria-hidden="true" viewBox="0 0 16 16">
+            <rect width="16" height="16" fill="#b71c1c" /></svg
+          >Budget</a
+        >
+      </li>
+    </ul>
+  </body>
+</html>

@@ -98,6 +98,14 @@ class AccessibilityStatementScanner extends BaseScanner {
         const status = response ? response.status() : 0;
         if (status >= 400) throw new Error(`HTTP ${status}`);
       } catch (error) {
+        // A transport failure on another origin is as likely to be the
+        // scanning environment (no route to that host) as a dead statement,
+        // and the statement of a site is often published on a sibling domain.
+        // Only a status code, or a failure on the origin that was just
+        // scanned successfully, is evidence about the link.
+        if (!/^HTTP \d/.test(error.message) && !this.isSameOrigin(page.url(), statementLink.url)) {
+          return { violations, ...empty, statementExists: true, statementUrl: statementLink.url };
+        }
         violations.push({
           criterion: 'EAA-Statement',
           issue: 'inaccessible-statement',
@@ -115,11 +123,11 @@ class AccessibilityStatementScanner extends BaseScanner {
     const lastUpdated = content.lastUpdated ? new Date(content.lastUpdated) : null;
 
     // A page that neither calls itself a statement nor declares a conformance
-    // status nor carries a date is a page about accessibility, not a
-    // declaration about this site: a guide, a marketing page, an article. The
-    // site has no statement, which is one finding, rather than a statement
-    // missing every one of its parts.
-    if (!content.selfIdentifies && !content.conformanceStatus && !lastUpdated) {
+    // status is a page about accessibility, not a declaration about this site:
+    // a guide, a marketing page, an article, or the page the scan started on
+    // when the statement link points back at it. The site has no statement,
+    // which is one finding, rather than a statement missing all of its parts.
+    if (!content.selfIdentifies && !content.conformanceStatus) {
       violations.push(missingStatementViolation());
       return { violations, ...empty };
     }
@@ -171,10 +179,15 @@ class AccessibilityStatementScanner extends BaseScanner {
     };
   }
 
-  /**
-   * Is the linked statement the page that is already open? Then it is read
-   * where it is, without a navigation that would only reload the same DOM.
-   */
+  /** Is the statement published on the origin that was just scanned? */
+  isSameOrigin(currentUrl, linkUrl) {
+    try {
+      return new URL(currentUrl).origin === new URL(linkUrl).origin;
+    } catch {
+      return false;
+    }
+  }
+
   isSameDocument(currentUrl, linkUrl) {
     try {
       const a = new URL(currentUrl);
@@ -207,7 +220,7 @@ class AccessibilityStatementScanner extends BaseScanner {
       // in its heading, and it is the one part of clause 12.2.2 that a guide
       // or a marketing page about accessibility never carries.
       const selfIdentifies =
-        /accessibility statement|accessibility policy|erkl[äa]rung zur barrierefreiheit|barrierefreiheitserkl[äa]rung|d[ée]claration d'accessibilit[ée]|verklaring toegankelijkheid/i.test(
+        /accessibility statement|accessibility policy|erkl[äa]e?rung zur barrierefreiheit|barrierefreiheitserkl[äa]e?rung|d[ée]claration d'accessibilit[ée]|verklaring toegankelijkheid/i.test(
           text
         );
 

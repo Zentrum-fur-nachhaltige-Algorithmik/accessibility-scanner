@@ -234,7 +234,7 @@ class AdvancedAriaScanner extends BaseScanner {
               category: 'tab-panel',
               severity: 'serious',
               element: getElementSelector(tabList),
-              description: 'No tab of this tablist is selected',
+              description: 'No tab of this tablist carries aria-selected="true"',
               details: { totalTabs: tabs.length },
               wcagCriteria: '4.1.2',
               impact: 'Screen reader users cannot tell which panel is showing',

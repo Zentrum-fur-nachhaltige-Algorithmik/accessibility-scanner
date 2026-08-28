@@ -1,0 +1,47 @@
+<!-- WCAG-TEST
+criterion: 2.4.5
+level: AA
+title: Multiple Ways
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: multiple-ways
+description: A checkout step: a posting form with its own fields and two links back into the shop, exempt from 2.4.5 as a step in a process
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout, step 2 of 3: delivery address</title>
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
+        label { display: block; margin-top: 1rem; }
+        input { padding: 0.4rem; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Step 2 of 3: delivery address</h1>
+        <p>Your basket holds 2 items.</p>
+
+        <form action="/checkout/payment" method="post">
+            <label for="fullname">Full name</label>
+            <input type="text" id="fullname" name="fullname" autocomplete="name" required>
+
+            <label for="street">Street and number</label>
+            <input type="text" id="street" name="street" autocomplete="street-address" required>
+
+            <label for="zip">Postal code</label>
+            <input type="text" id="zip" name="zip" autocomplete="postal-code" required>
+
+            <button type="submit">Continue to payment</button>
+        </form>
+
+        <p>
+            <a href="/checkout/basket">Back to the basket</a>
+            <a href="/checkout/cancel">Cancel this order</a>
+        </p>
+    </main>
+</body>
+</html>

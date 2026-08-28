@@ -1,19 +1,19 @@
 <!-- WCAG-TEST
 criterion: 2.1.4
 level: A
-title: Character Key Shortcuts, accesskeys and focus scoped keys
+title: Character Key Shortcuts and focus scoped keys
 test_type: good
 expected_violations: 0
 testable_by: dom
 scanners: keyboard-navigation
-description: Keyboard shortcuts that 2.1.4 allows and the old rules reported anyway: unique accesskeys on focusable links (the old check held a blacklist of twelve letters), an accesskey on a label that the browser forwards to its input, single character keys that only act while a listbox has focus, and a page that animates a counter so the shortcut probe has to calibrate its idle noise before judging a key press.
+description: Keyboard shortcuts that 2.1.4 allows: accesskeys, which every browser invokes with a modifier, single character keys that only act while a listbox has focus, and a page that animates a counter so the shortcut probe has to calibrate its idle noise before judging a key press.
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test: Accesskeys and focus scoped keys (GOOD)</title>
+<title>Test: Focus scoped keys and modifier shortcuts (GOOD)</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
   main { max-width: 900px; margin: 0 auto; padding: 24px; }

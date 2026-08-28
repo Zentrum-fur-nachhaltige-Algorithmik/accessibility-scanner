@@ -916,7 +916,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['2.1.4'],
     description:
-      'Unique accesskeys on links, an accesskey on a label, single character keys scoped to a focused listbox, and a counter that mutates the DOM every 100ms: character-key-shortcut and accesskeys must stay silent',
+      'Accesskeys on links and on a label, single character keys scoped to a focused listbox, and a counter that mutates the DOM every 100ms: character-key-shortcut must stay silent',
   },
 
   'good-bypass-landmarks-only.html': {

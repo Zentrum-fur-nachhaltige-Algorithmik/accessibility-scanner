@@ -19,10 +19,24 @@
   },
   {
    "snapshot": "a11y-project-checklist.html",
+   "rule": "incomplete-content",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "judges the live a11yproject.com statement page, fetched over the network, the way the audit treats the BBC pair"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
    "rule": "no-visible-focus",
    "selector": "a.u-text-transform-uppercase.c-skipnav",
    "verdict": "false",
    "reason": "a.c-skipnav goes from clip: rect(0 0 0 0) to visible on focus, which is the indicator (technique C15)"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "same live page, same question"
   },
   {
    "snapshot": "a11y-project-checklist.html",
@@ -593,6 +607,13 @@
   },
   {
    "snapshot": "gov-uk-guide.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "judges the live gov.uk accessibility statement, fetched over the network"
+  },
+  {
+   "snapshot": "gov-uk-guide.html",
    "rule": "region",
    "selector": ".gem-c-feedback__prompt-question",
    "verdict": "false",
@@ -753,6 +774,13 @@
    "reason": "the selector covers 2 link(s) inside running text and 6 standalone one(s), and the audit judged the two differently"
   },
   {
+   "snapshot": "med-theme.html",
+   "rule": "target-too-small",
+   "selector": "a.nav__link",
+   "verdict": "true",
+   "reason": "standalone navigation link at 60x17px; the only other text in its block belongs to the neighbouring links, which is not non-target text"
+  },
+  {
    "snapshot": "modern-commercial.html",
    "rule": "aria-valid-attr-value",
    "selector": "a[data-testid=\"m24-navigation-link-about-us\"]",
@@ -881,6 +909,13 @@
   {
    "snapshot": "modern-commercial.html",
    "rule": "target-too-small",
+   "selector": "a.m24-c-menu-title",
+   "verdict": "true",
+   "reason": "standalone menu category link at 58x17px; the rest of its block is other controls"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
    "selector": "a.spotify",
    "verdict": "true",
    "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
@@ -898,6 +933,13 @@
    "selector": "a.youtube",
    "verdict": "true",
    "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "button#moz-consent-banner-button-accept.moz-consent-banner-button",
+   "verdict": "true",
+   "reason": "standalone control in the cookie banner, 234x21px, with no non-target text on its line"
   },
   {
    "snapshot": "own-audit-ui.html",

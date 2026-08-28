@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-28T08:19:32.044Z",
+  "generatedAt": "2026-08-28T09:55:00.303Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 80,
+    "passed": 82,
     "failed": 0
   },
   "results": [
@@ -291,6 +291,16 @@
       "status": "PASS"
     },
     {
+      "file": "bad-motion-vestibular.html",
+      "scanner": "input-modalities",
+      "expectViolations": true,
+      "criteria": [
+        "2.5.4"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
       "file": "bad-pointer-cancellation.html",
       "scanner": "input-modalities",
       "expectViolations": true,
@@ -346,6 +356,16 @@
       "expectViolations": false,
       "criteria": [
         "2.5.3"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-motion-vestibular.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.4"
       ],
       "matched": 0,
       "status": "PASS"

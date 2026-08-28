@@ -64,18 +64,9 @@ const EXCLUSIVE_SCANNERS = {
     criteria: ['1.4.13'],
     scanOpts: { heuristicOnly: true },
   },
-  // Claims the motion fixtures by name: they declare 2.3.3 (animation from
-  // interactions) and 2.5.4, and it is the 2.3.3 half this scanner measures.
   'seizure-prevention': {
     module: '../../src/scanners/seizure-prevention',
     criteria: ['2.3.1', '2.3.2', '2.3.3'],
-    files: [
-      'bad-seizure-risk.html',
-      'good-seizure-safe.html',
-      'good-short-animations.html',
-      'bad-motion-vestibular.html',
-      'good-motion-vestibular.html',
-    ],
   },
   'multiple-ways': {
     module: '../../src/scanners/multiple-ways',

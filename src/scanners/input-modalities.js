@@ -1,20 +1,19 @@
 /**
  * Input Modalities Scanner.
- * WCAG 2.5.1, 2.5.2, 2.5.3, 2.5.4, 2.5.7, 2.5.8 (EN 301 549 9.2.5.x).
- * Tests pointer gestures, pointer cancellation, label in name, motion actuation,
- * dragging alternatives and target size.
+ * WCAG 2.5.1, 2.5.2, 2.5.4, 2.5.7, 2.5.8 (EN 301 549 9.2.5.x).
+ * Tests pointer gestures, pointer cancellation, motion actuation, dragging
+ * alternatives and target size. SC 2.5.3 belongs to the label-in-name scanner.
  */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
-const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('input-modalities');
 
 class InputModalitiesScanner extends BaseScanner {
   constructor() {
     super('input-modalities', {
-      wcagCriteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.7', '2.5.8'],
+      wcagCriteria: ['2.5.1', '2.5.2', '2.5.4', '2.5.7', '2.5.8'],
       wcagPrinciple: 'operable',
     });
   }
@@ -33,7 +32,6 @@ class InputModalitiesScanner extends BaseScanner {
     const scanOptions = {
       testPointerGestures: true,
       testMotionActuation: true,
-      testLabelMatching: true,
       ...options,
     };
 
@@ -48,13 +46,12 @@ class InputModalitiesScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ['9.2.5.1', '9.2.5.2', '9.2.5.3', '9.2.5.4', '9.2.5.7', '9.2.5.8'],
+      criteria: ['9.2.5.1', '9.2.5.2', '9.2.5.4', '9.2.5.7', '9.2.5.8'],
       passed: inputResults.violations.length === 0,
       violations: inputResults.violations,
       summary: {
         pointerGesturesAccessible: inputResults.pointerGesturesAccessible,
         pointerCancellationAvailable: inputResults.pointerCancellationAvailable,
-        labelNamesConsistent: inputResults.labelNamesConsistent,
         motionAlternativesProvided: inputResults.motionAlternativesProvided,
         draggingAlternativesProvided: inputResults.draggingAlternativesProvided,
         targetSizingAdequate: inputResults.targetSizingAdequate,
@@ -72,7 +69,6 @@ class InputModalitiesScanner extends BaseScanner {
     const visualEvidence = [];
     let pointerGesturesAccessible = true;
     let pointerCancellationAvailable = true;
-    let labelNamesConsistent = true;
     let motionAlternativesProvided = true;
     let draggingAlternativesProvided = true;
     let targetSizingAdequate = true;
@@ -89,30 +85,24 @@ class InputModalitiesScanner extends BaseScanner {
       pointerGesturesAccessible = gestureResults.accessible;
     }
 
-    // 2. Test label in name (WCAG 2.5.3)
-    if (options.testLabelMatching) {
-      const labelResults = await this.analyzeLabelInName(page, violations);
-      labelNamesConsistent = labelResults.consistent;
-    }
-
-    // 3. Test target size minimum (WCAG 2.5.8)
+    // 2. Test target size minimum (WCAG 2.5.8)
     const targetSizeResults = await this.analyzeTargetSize(page, violations);
     targetSizingAdequate = targetSizeResults.adequate;
 
-    // 4. Test dragging movements (WCAG 2.5.7)
+    // 3. Test dragging movements (WCAG 2.5.7)
     const draggingResults = await this.analyzeDraggingMovements(page, violations);
     draggingAlternativesProvided = draggingResults.alternativesProvided;
 
     // The two probes below dispatch events at the page and can leave it
     // changed, so every read-only measurement above runs first.
 
-    // 5. Test motion actuation (WCAG 2.5.4)
+    // 4. Test motion actuation (WCAG 2.5.4)
     if (options.testMotionActuation) {
       const motionResults = await this.analyzeMotionActuation(page, violations);
       motionAlternativesProvided = motionResults.alternativesProvided;
     }
 
-    // 6. Test pointer cancellation (WCAG 2.5.2)
+    // 5. Test pointer cancellation (WCAG 2.5.2)
     const cancellationResults = await this.analyzePointerCancellation(page, violations);
     pointerCancellationAvailable = cancellationResults.available;
 
@@ -122,7 +112,6 @@ class InputModalitiesScanner extends BaseScanner {
       screenshot: path.basename(initialScreenshot),
       gesturesAccessible: pointerGesturesAccessible,
       cancellationAvailable: pointerCancellationAvailable,
-      labelsConsistent: labelNamesConsistent,
       motionAlternatives: motionAlternativesProvided,
       draggingAlternatives: draggingAlternativesProvided,
       targetSizingAdequate,
@@ -135,7 +124,6 @@ class InputModalitiesScanner extends BaseScanner {
       visualEvidence,
       pointerGesturesAccessible,
       pointerCancellationAvailable,
-      labelNamesConsistent,
       motionAlternativesProvided,
       draggingAlternativesProvided,
       targetSizingAdequate,
@@ -433,76 +421,6 @@ class InputModalitiesScanner extends BaseScanner {
     });
 
     return { available: cancellationAnalysis.available };
-  }
-
-  /**
-   * Analyze label in name (WCAG 2.5.3)
-   */
-  async analyzeLabelInName(page, violations) {
-    log.debug('Analyzing label in name consistency...');
-
-    const labelAnalysis = await page.evaluate(
-      (accnameCode, renderedCode) => {
-        eval(accnameCode);
-        eval(renderedCode);
-        const issues = [];
-        let consistent = true;
-
-        // Visible label, normalisation and the containment test all come from
-        // src/utils/accessible-name.js (__visibleLabelText / __nameContainsLabel
-        // / __labelInNameOk) so this scanner and label-in-name cannot disagree
-        // about what "the visible label" is.
-        const norm = __visibleLabelNormalize;
-
-        const controls = document.querySelectorAll(
-          'button, [role="button"], [role="link"], [role="menuitem"], [role="tab"], a[href], input[type="button"], input[type="submit"], input[type="reset"]'
-        );
-        controls.forEach((element) => {
-          if (!__isRendered(element)) return;
-          const tag = element.tagName.toLowerCase();
-          const visible = __visibleLabelText(element);
-          const vis = visible.full;
-          if (!vis) return; // icon-only control: 2.5.3 does not apply (4.1.2 covers naming)
-          const name = norm(__accessibleName(element));
-          if (!name) return; // missing name is 4.1.2, reported elsewhere
-          if (__labelInNameOk(element, __accessibleName(element))) return;
-
-          const className = typeof element.className === 'string' ? element.className.trim() : '';
-          issues.push({
-            type: 'label-name-mismatch',
-            element:
-              tag +
-              (element.id ? `#${element.id}` : '') +
-              (className ? `.${className.split(/\s+/)[0]}` : ''),
-            visibleText: vis.substring(0, 50),
-            accessibleName: name.substring(0, 50),
-            description: 'Accessible name does not contain the visible label text',
-            severity: 'serious',
-          });
-          consistent = false;
-        });
-
-        return { issues, consistent };
-      },
-      accnameCode,
-      renderedCode
-    );
-
-    // Create violations for label consistency issues
-    labelAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.5.3',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        visibleText: issue.visibleText,
-        accessibleName: issue.accessibleName,
-        severity: issue.severity,
-        suggestion: this.getLabelSuggestion(issue.type),
-      });
-    });
-
-    return { consistent: labelAnalysis.consistent };
   }
 
   /**
@@ -949,20 +867,6 @@ class InputModalitiesScanner extends BaseScanner {
     return (
       suggestions[violationType] ||
       'Implement pointer cancellation mechanisms for better user control'
-    );
-  }
-
-  /**
-   * Get suggestion for label violations
-   */
-  getLabelSuggestion(violationType) {
-    const suggestions = {
-      'label-name-mismatch':
-        'Ensure accessible name contains the visible label text as a substring',
-    };
-    return (
-      suggestions[violationType] ||
-      'Ensure visible labels match accessible names for voice control users'
     );
   }
 

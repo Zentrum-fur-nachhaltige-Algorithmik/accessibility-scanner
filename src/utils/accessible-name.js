@@ -436,8 +436,12 @@ const injectableCode = `
     }
 
     // <input type=button|submit|reset> shows its \`value\`, not a text child.
+    // Every other input paints no label of its own: the \`value\` of a checkbox
+    // defaults to "on" and of a text field holds what the user typed.
     var tag = el.tagName.toLowerCase();
     if (tag === 'input') {
+      var itype = (el.getAttribute('type') || '').toLowerCase();
+      if (itype !== 'button' && itype !== 'submit' && itype !== 'reset') return segments;
       var v = (el.value || '').trim();
       if (v) {
         var ics = null;

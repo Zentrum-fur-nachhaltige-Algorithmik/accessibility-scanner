@@ -59,10 +59,10 @@ const EXCLUSIVE_SCANNERS = {
     module: '../../src/scanners/text-resize',
     criteria: ['1.4.4'],
   },
+  // Drives the pointer onto the content a hover reveals, so it needs its own tab.
   'hover-focus-content': {
     module: '../../src/scanners/hover-focus-content',
     criteria: ['1.4.13'],
-    scanOpts: { heuristicOnly: true },
   },
   'seizure-prevention': {
     module: '../../src/scanners/seizure-prevention',

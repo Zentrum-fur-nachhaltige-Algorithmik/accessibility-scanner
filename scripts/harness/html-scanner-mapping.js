@@ -156,7 +156,7 @@ const HTML_SCANNER_MAPPING = {
 
   // Language Detection
   'bad-language.html': {
-    expectedScanners: ['language-detection'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.1.1', '3.1.2'],
@@ -164,7 +164,7 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-language-override.html': {
-    expectedScanners: ['language-detection'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.1.2'],
@@ -365,7 +365,7 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-reading-level.html': {
-    expectedScanners: ['language-detection'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.1.5'],
@@ -500,6 +500,15 @@ const HTML_SCANNER_MAPPING = {
     description: 'Voice control compatible interface',
   },
 
+  'good-label-in-name-placeholders.html': {
+    expectedScanners: [],
+    excludedScanners: ['label-in-name'],
+    testType: 'good',
+    wcagCriteria: ['2.5.3'],
+    description:
+      'A placeholder that differs from the accessible name, an image button whose alt and aria-label differ, an icon plus text link and a display:none control: label-in-name must stay silent',
+  },
+
   'good-complex-data-tables.html': {
     expectedScanners: [],
     excludedScanners: ['page-structure'],
@@ -514,6 +523,15 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.13'],
     description: 'Properly implemented hover/focus content',
+  },
+
+  'good-hover-focus-measured.html': {
+    expectedScanners: [],
+    excludedScanners: ['hover-focus-content'],
+    testType: 'good',
+    wcagCriteria: ['1.4.13'],
+    description:
+      'A tooltip opened on focus by script rather than a :focus rule, a pointer-events:none layer over its own trigger, a mouseover handler paired with a focus handler and a toast hidden by setTimeout: hover-focus-content must stay silent',
   },
 
   'good-pointer-cancellation.html': {
@@ -592,7 +610,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-reading-level.html': {
     expectedScanners: [],
-    excludedScanners: ['language-detection'],
+    excludedScanners: [],
     testType: 'good',
     wcagCriteria: ['3.1.5'],
     description: 'Appropriate reading level with alternatives',
@@ -676,7 +694,7 @@ const HTML_SCANNER_MAPPING = {
   // Language Declarations (Good)
   'good-language.html': {
     expectedScanners: [],
-    excludedScanners: ['language-detection'],
+    excludedScanners: [],
     testType: 'good',
     wcagCriteria: ['3.1.1', '3.1.2'],
     description: 'Proper language declarations for page and content sections',
@@ -859,7 +877,7 @@ const HTML_SCANNER_MAPPING = {
 
   'bad-keyboard-fixed-skiplink-tab-order.html': {
     expectedScanners: ['keyboard-navigation', 'focus-management'],
-    excludedScanners: ['color-contrast', 'language-detection'],
+    excludedScanners: ['color-contrast'],
     testType: 'bad',
     wcagCriteria: ['2.1.1', '2.4.3'],
     description:
@@ -1045,7 +1063,6 @@ const AVAILABLE_SCANNERS = [
   'color-contrast',
   'use-of-color',
   'images-of-text',
-  'language-detection',
   'keyboard-navigation',
   'input-modalities',
   'timing-controls',

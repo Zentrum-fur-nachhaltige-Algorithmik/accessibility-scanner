@@ -1,11 +1,12 @@
 /**
  * Multiple Ways Scanner.
  * WCAG 2.4.5 (EN 301 549 9.2.4.5).
- * Counts navigation mechanisms (nav, search, sitemap, TOC, breadcrumb, footer nav, index)
- * and only asserts a violation when the page shows evidence of belonging to a larger site.
+ * Counts the navigation mechanisms a page offers and reports a page that
+ * belongs to a larger site, is not a step in a process, and offers fewer than two.
  */
 
 const BaseScanner = require('../core/base-scanner');
+const { injectableCode: renderedCode } = require('../utils/rendered');
 
 class MultipleWaysScanner extends BaseScanner {
   constructor() {
@@ -16,72 +17,76 @@ class MultipleWaysScanner extends BaseScanner {
   }
 
   async scan(page, options = {}) {
-    const data = await page.evaluate(() => {
+    const data = await page.evaluate((injectedCode) => {
+      eval(injectedCode);
       const mechanisms = [];
+      const allLinks = Array.from(document.querySelectorAll('a[href]'));
 
-      // 1. Nav elements with real links
-      const navs = document.querySelectorAll('nav, [role="navigation"]');
-      for (const nav of navs) {
+      const breadcrumbs = Array.from(
+        document.querySelectorAll(
+          '[class*="breadcrumb"], [aria-label*="breadcrumb" i], ol[class*="breadcrumb"]'
+        )
+      );
+
+      // 1. A navigation region with a link cluster.
+      for (const nav of document.querySelectorAll('nav, [role="navigation"]')) {
+        if (!__isRendered(nav)) continue;
+        if (breadcrumbs.includes(nav)) continue; // counted as a breadcrumb below
         const links = nav.querySelectorAll('a[href]');
         if (links.length > 2) {
-          const label = nav.getAttribute('aria-label') || nav.getAttribute('aria-labelledby') || '';
-          // Skip breadcrumb navs, counted separately
-          if (/breadcrumb/i.test(label) || /breadcrumb/i.test(nav.className)) continue;
-          mechanisms.push({
-            type: 'nav',
-            label: label.slice(0, 80),
-            linkCount: links.length,
-          });
+          mechanisms.push({ type: 'nav', linkCount: links.length });
+          break;
         }
       }
 
-      // 2. Search functionality
-      const searchForms = document.querySelectorAll('form[role="search"], [role="search"]');
-      const searchInputs = document.querySelectorAll('input[type="search"]');
-      if (searchForms.length > 0 || searchInputs.length > 0) {
-        mechanisms.push({ type: 'search' });
-      }
+      // 2. A search input.
+      const searchFields = Array.from(
+        document.querySelectorAll('input[type="search"], [role="search"] input, [role="search"]')
+      ).filter(__isRendered);
+      if (searchFields.length > 0) mechanisms.push({ type: 'search' });
 
-      // 3. Sitemap link
-      const allLinks = Array.from(document.querySelectorAll('a[href]'));
-      const sitemapLinks = allLinks.filter((a) =>
-        /sitemap|site[\s-]?map/i.test(a.textContent + ' ' + (a.getAttribute('href') || ''))
-      );
-      if (sitemapLinks.length > 0) {
-        mechanisms.push({ type: 'sitemap' });
-      }
+      // 3. A link to a sitemap. The mechanism is named by its destination, so
+      // this is the one place a word is the evidence.
+      const sitemapLinks = allLinks.filter((a) => {
+        const href = (a.getAttribute('href') || '').toLowerCase();
+        return /sitemap|site-map/.test(href) || /\bsite\s?map\b/i.test(a.textContent || '');
+      });
+      if (sitemapLinks.length > 0) mechanisms.push({ type: 'sitemap' });
 
-      // 4. Table of contents
-      const toc = document.querySelectorAll(
-        '[class*="toc"], [class*="table-of-contents"], [id*="toc"], ' +
-          '[role="directory"], nav[aria-label*="content" i], nav[aria-label*="Inhalt" i]'
-      );
-      if (toc.length > 0) {
-        mechanisms.push({ type: 'toc' });
+      // 4. A table of contents: three or more same-document links that resolve
+      // to a target, gathered in one list or navigation region.
+      const inPage = allLinks.filter((a) => {
+        const href = a.getAttribute('href') || '';
+        if (!href.startsWith('#') || href.length < 2) return false;
+        try {
+          return !!document.getElementById(decodeURIComponent(href.slice(1)));
+        } catch (e) {
+          return false;
+        }
+      });
+      const byContainer = new Map();
+      for (const link of inPage) {
+        const container = link.closest('nav, ol, ul, [role="directory"]');
+        if (!container) continue;
+        byContainer.set(container, (byContainer.get(container) || 0) + 1);
       }
+      const tocCount = Math.max(0, ...byContainer.values());
+      if (tocCount >= 3) mechanisms.push({ type: 'toc', linkCount: tocCount });
 
-      // 5. Breadcrumb (validate links are functional, not just href="#")
-      const breadcrumbs = document.querySelectorAll(
-        '[class*="breadcrumb"], [aria-label*="breadcrumb" i], ' +
-          'nav[aria-label*="Breadcrumb" i], ol[class*="breadcrumb"]'
-      );
-      if (breadcrumbs.length > 0) {
-        for (const bc of breadcrumbs) {
-          const links = bc.querySelectorAll('a[href]');
-          const functional = Array.from(links).filter((a) => {
-            const href = (a.getAttribute('href') || '').trim();
-            return href && href !== '#' && href !== '#!' && !href.startsWith('javascript:');
-          });
-          if (functional.length >= 2) {
-            mechanisms.push({ type: 'breadcrumb', linkCount: functional.length });
-            break;
-          }
+      // 5. A breadcrumb trail with at least two working steps.
+      for (const bc of breadcrumbs) {
+        const functional = Array.from(bc.querySelectorAll('a[href]')).filter((a) => {
+          const href = (a.getAttribute('href') || '').trim();
+          return href && href !== '#' && href !== '#!' && !href.startsWith('javascript:');
+        });
+        if (functional.length >= 2) {
+          mechanisms.push({ type: 'breadcrumb', linkCount: functional.length });
+          break;
         }
       }
 
-      // 6. Footer nav with substantial links
-      const footers = document.querySelectorAll('footer, [role="contentinfo"]');
-      for (const footer of footers) {
+      // 6. A footer link block listing pages of the site (technique G126).
+      for (const footer of document.querySelectorAll('footer, [role="contentinfo"]')) {
         const footerLinks = footer.querySelectorAll('a[href]');
         if (footerLinks.length > 3) {
           mechanisms.push({ type: 'footer-nav', linkCount: footerLinks.length });
@@ -89,144 +94,79 @@ class MultipleWaysScanner extends BaseScanner {
         }
       }
 
-      // 7. A-Z / Index links
-      const indexLinks = allLinks.filter((a) =>
-        /\b(index|a[\s-]?z|alle seiten|all pages)\b/i.test(a.textContent)
-      );
-      if (indexLinks.length > 0) {
-        mechanisms.push({ type: 'index' });
-      }
+      // 2.4.5 exempts a web page that is a step in a process. The structural
+      // evidence for a step is that the page's purpose is to submit data: a
+      // form that posts, or that asks for a password or a one-time code,
+      // holding at least two fields.
+      const isProcessStep = Array.from(document.querySelectorAll('form')).some((form) => {
+        const fields = form.querySelectorAll(
+          'input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select, textarea'
+        );
+        if (fields.length < 2) return false;
+        const method = (form.getAttribute('method') || '').toLowerCase();
+        const secret = form.querySelector(
+          'input[type="password"], input[autocomplete*="one-time"]'
+        );
+        return method === 'post' || !!secret;
+      });
 
-      // Process page heuristic: checkout/wizard/auth steps are exempt
-      // Only match on URL, page title, and H1 to avoid false positives from
-      // pages that merely mention these words in body content
-      const isProcess = (() => {
-        const url = window.location.href.toLowerCase();
-        const title = (document.title || '').toLowerCase();
-        const h1 = (document.querySelector('h1')?.textContent || '').toLowerCase();
-        const processContext = url + ' ' + title + ' ' + h1;
-        const processPatterns = [
-          /checkout/i,
-          /payment/i,
-          /step\s*\d/i,
-          /wizard/i,
-          /sign[\s-]?in/i,
-          /log[\s-]?in/i,
-          /register/i,
-          /registration/i,
-          /reset[\s-]?password/i,
-          /verify/i,
-          /confirmation/i,
-        ];
-        return processPatterns.some((p) => p.test(processContext));
-      })();
-
-      // Deduplicate by type
-      const uniqueTypes = [...new Set(mechanisms.map((m) => m.type))];
-
-      // Evidence that this page is part of a larger multi-page site (same
-      // logic as the 2.4.5 check in page-structure.js): either (a) at least
-      // 2 same-origin links to distinct paths (fragment-only, "javascript:",
-      // "mailto:" and "tel:" links do not count, since none of them point at
-      // another page), or (b) a breadcrumb-shaped trail with >= 2 steps.
-      // (b) is independent of link functionality: a breadcrumb's structure
-      // (Home > Section > Subsection) signals a position within a page
-      // hierarchy even in a static preview whose crumbs are placeholders.
+      // Evidence that this page is part of a larger site: at least two
+      // same-origin links to distinct paths (fragment, javascript:, mailto:
+      // and tel: links point at no other page), or a breadcrumb trail, whose
+      // structure places the page inside a hierarchy even when its crumbs are
+      // placeholders in a static preview.
       const internalPaths = new Set();
-      allLinks.forEach((link) => {
+      for (const link of allLinks) {
         const raw = (link.getAttribute('href') || '').trim();
-        if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) {
-          return;
-        }
+        if (!raw || raw.startsWith('#') || /^(javascript|mailto|tel):/i.test(raw)) continue;
         let url;
         try {
           url = new URL(raw, document.baseURI);
         } catch (e) {
-          return;
+          continue;
         }
-        if (url.origin !== location.origin) return;
+        if (url.origin !== location.origin) continue;
         internalPaths.add(url.pathname);
-      });
-
-      let breadcrumbSteps = 0;
-      for (const bc of breadcrumbs) {
-        const steps = bc.querySelectorAll('a, li').length;
-        if (steps > breadcrumbSteps) breadcrumbSteps = steps;
       }
-
+      const breadcrumbSteps = Math.max(
+        0,
+        ...breadcrumbs.map((bc) => bc.querySelectorAll('a, li').length)
+      );
       const hasEvidenceOfLargerSite = internalPaths.size >= 2 || breadcrumbSteps >= 2;
 
+      const uniqueTypes = [...new Set(mechanisms.map((m) => m.type))];
       return {
         mechanisms,
         uniqueTypes,
         count: uniqueTypes.length,
-        isProcess,
+        isProcessStep,
         hasEvidenceOfLargerSite,
       };
-    });
-
-    // Process pages are exempt from 2.4.5
-    if (data.isProcess) {
-      return {
-        scannerId: this.id,
-        passed: true,
-        violations: [],
-        summary: {
-          totalIssues: 0,
-          note: 'Page appears to be a process step (exempt from 2.4.5)',
-          mechanisms: data.uniqueTypes,
-        },
-      };
-    }
+    }, renderedCode);
 
     // SC 2.4.5 is defined over a set of web pages in a site or process, so a
-    // single page scanned in isolation cannot prove or disprove it: another
-    // page of the same site may supply the missing mechanism.
-    //
-    // A full-severity violation therefore requires both:
-    //  1. no explicit opt-out (`options.singlePageContext` or
-    //     `options.skipMultiPageCriteria`, set by callers scanning a
-    //     standalone page), and
-    //  2. `data.hasEvidenceOfLargerSite`: real distinct internal links or a
-    //     breadcrumb trail. Without that evidence a page with < 2 mechanisms
-    //     is as likely a single-page site (out of scope) as a multi-page site
-    //     missing navigation aids.
-    // Every other case downgrades to an informational, low-confidence note.
+    // single page scanned in isolation cannot decide it on its own: another
+    // page of the same site may carry the missing mechanism. It is reported
+    // only when the caller has not opted out of multi-page criteria
+    // (`options.singlePageContext` / `options.skipMultiPageCriteria`, set when
+    // scanning a standalone page), the page shows evidence of belonging to a
+    // larger site, and it is not a step in a process.
     const singlePageContext =
       options.singlePageContext === true || options.skipMultiPageCriteria === true;
-    const assertFullViolation = !singlePageContext && data.hasEvidenceOfLargerSite;
+    const applies = !singlePageContext && data.hasEvidenceOfLargerSite && !data.isProcessStep;
 
     const violations = [];
-
-    if (data.count < 2) {
-      if (assertFullViolation) {
-        violations.push(
-          this.formatViolation(
-            '2.4.5',
-            data.count === 0 ? 'serious' : 'moderate',
-            `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-              'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g., navigation menu, search, sitemap, table of contents, breadcrumb).',
-            [],
-            'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
-          )
-        );
-      } else {
-        // No evidence this page is part of a larger site: emit an
-        // informational, low-confidence note for whole-site review instead.
-        const violation = this.formatViolation(
+    if (applies && data.count < 2) {
+      violations.push(
+        this.formatViolation(
           '2.4.5',
-          'minor',
-          `This page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-            'WCAG 2.4.5 (Multiple Ways) is evaluated across an entire site or process, not one page in isolation. ' +
-            'This cannot be confirmed as a violation without checking whether other pages of the site provide search, ' +
-            'a sitemap, or another way to locate content.',
+          data.count === 0 ? 'serious' : 'moderate',
+          `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
+            'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g. navigation menu, search, sitemap, table of contents, breadcrumb).',
           [],
-          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html',
-          'info'
-        );
-        violation.confidence = 'low';
-        violations.push(violation);
-      }
+          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
+        )
+      );
     }
 
     return {
@@ -237,6 +177,7 @@ class MultipleWaysScanner extends BaseScanner {
         totalIssues: violations.length,
         mechanisms: data.uniqueTypes,
         mechanismCount: data.count,
+        isProcessStep: data.isProcessStep,
         details: data.mechanisms,
       },
     };

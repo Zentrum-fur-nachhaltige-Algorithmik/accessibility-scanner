@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-28T09:00:38.870Z",
+  "generatedAt": "2026-08-28T08:55:19.191Z",
   "harness": "concurrent",
   "totals": {
-    "passed": 101,
-    "failed": 30,
+    "passed": 83,
+    "failed": 23,
     "errored": 0
   },
   "byCriterion": {
@@ -18,8 +18,7 @@
           "bad-media-alternatives.html"
         ],
         "good": [
-          "good-media-alternatives.html",
-          "good-media-icons-and-background-video.html"
+          "good-media-alternatives.html"
         ]
       }
     },
@@ -34,8 +33,7 @@
           "bad-media-alternatives.html"
         ],
         "good": [
-          "good-media-alternatives.html",
-          "good-media-icons-and-background-video.html"
+          "good-media-alternatives.html"
         ]
       }
     },
@@ -71,11 +69,11 @@
     },
     "1.3.1": {
       "scanners": [
-        "screen-reader",
-        "page-structure"
+        "advanced-aria",
+        "screen-reader"
       ],
       "truePositive": true,
-      "falsePositiveClean": true,
+      "falsePositiveClean": false,
       "files": {
         "bad": [
           "bad-beeproduced-real-issues.html",
@@ -109,6 +107,7 @@
           "bad-orientation.html"
         ],
         "good": [
+          "good-orientation-responsive.html",
           "good-orientation.html"
         ]
       }
@@ -124,7 +123,8 @@
           "bad-autocomplete.html"
         ],
         "good": [
-          "good-autocomplete.html"
+          "good-autocomplete.html",
+          "good-input-purpose-not-user-data.html"
         ]
       }
     },
@@ -133,7 +133,7 @@
         "use-of-color"
       ],
       "truePositive": true,
-      "falsePositiveClean": true,
+      "falsePositiveClean": false,
       "files": {
         "bad": [
           "bad-css-background-info.html",
@@ -172,6 +172,7 @@
         ],
         "good": [
           "good-hover-focus-content.html",
+          "good-hover-focus-measured.html",
           "good-title-supplementing-name.html"
         ]
       }
@@ -181,7 +182,7 @@
         "color-contrast"
       ],
       "truePositive": true,
-      "falsePositiveClean": false,
+      "falsePositiveClean": true,
       "files": {
         "bad": [
           "bad-color-contrast.html",
@@ -198,13 +199,14 @@
       "scanners": [
         "images-of-text"
       ],
-      "truePositive": false,
+      "truePositive": true,
       "falsePositiveClean": true,
       "files": {
         "bad": [
           "bad-images-of-text.html"
         ],
         "good": [
+          "good-images-of-text-photographs.html",
           "good-images-of-text.html"
         ]
       }
@@ -245,8 +247,8 @@
       "scanners": [
         "timing-controls"
       ],
-      "truePositive": false,
-      "falsePositiveClean": true,
+      "truePositive": true,
+      "falsePositiveClean": false,
       "files": {
         "bad": [
           "bad-timing-controls.html"
@@ -261,7 +263,7 @@
         "timing-controls"
       ],
       "truePositive": true,
-      "falsePositiveClean": true,
+      "falsePositiveClean": false,
       "files": {
         "bad": [
           "bad-timing-controls.html"
@@ -274,9 +276,9 @@
     },
     "2.4.1": {
       "scanners": [
-        "page-structure"
+        "screen-reader"
       ],
-      "truePositive": false,
+      "truePositive": true,
       "falsePositiveClean": true,
       "files": {
         "bad": [
@@ -293,7 +295,7 @@
         ]
       }
     },
-    "2.4.2": {
+    "2.4.4": {
       "scanners": [
         "page-structure"
       ],
@@ -301,16 +303,15 @@
       "falsePositiveClean": true,
       "files": {
         "bad": [
-          "bad-page-titled.html",
-          "bad-spa-route-change.html"
+          "bad-link-purpose.html"
         ],
         "good": [
-          "good-page-titled.html",
-          "good-spa-route-change.html"
+          "good-accessibility.html",
+          "good-link-purpose-in-context.html"
         ]
       }
     },
-    "2.4.6": {
+    "2.4.9": {
       "scanners": [
         "page-structure"
       ],
@@ -318,11 +319,15 @@
       "falsePositiveClean": true,
       "files": {
         "bad": [
-          "bad-headings-labels.html"
+          "bad-link-purpose.html",
+          "bad-navigation-aaa.html",
+          "bad-semantic-text-de.html"
         ],
         "good": [
-          "good-headings-labels.html",
-          "good-landing-page.html"
+          "good-link-purpose-in-context.html",
+          "good-link-purpose-only.html",
+          "good-navigation-aaa.html",
+          "good-semantic-text-de.html"
         ]
       }
     },
@@ -339,40 +344,8 @@
         ],
         "good": [
           "good-icon-button-and-honeypot.html",
+          "good-label-in-name-placeholders.html",
           "good-label-in-name.html"
-        ]
-      }
-    },
-    "3.1.1": {
-      "scanners": [
-        "language-detection"
-      ],
-      "truePositive": true,
-      "falsePositiveClean": true,
-      "files": {
-        "bad": [
-          "bad-language.html"
-        ],
-        "good": [
-          "good-accessibility.html",
-          "good-language.html"
-        ]
-      }
-    },
-    "3.1.2": {
-      "scanners": [
-        "language-detection"
-      ],
-      "truePositive": true,
-      "falsePositiveClean": true,
-      "files": {
-        "bad": [
-          "bad-language-override.html",
-          "bad-language.html"
-        ],
-        "good": [
-          "good-language-override.html",
-          "good-language.html"
         ]
       }
     },
@@ -485,7 +458,7 @@
         "error-handling"
       ],
       "truePositive": true,
-      "falsePositiveClean": false,
+      "falsePositiveClean": true,
       "files": {
         "bad": [
           "bad-form-errors.html"
@@ -515,7 +488,6 @@
     },
     "4.1.2": {
       "scanners": [
-        "screen-reader",
         "advanced-aria"
       ],
       "truePositive": true,
@@ -533,7 +505,6 @@
           "good-aria-role-override.html",
           "good-aria-state-updates.html",
           "good-bootstrap-patterns.html",
-          "good-composite-aria-widgets.html",
           "good-hidden-modal.html",
           "good-icon-button-and-honeypot.html",
           "good-js-validation.html",
@@ -542,45 +513,26 @@
           "good-tabs-labelledby-only.html"
         ]
       }
-    },
-    "4.1.3": {
-      "scanners": [
-        "screen-reader"
-      ],
-      "truePositive": false,
-      "falsePositiveClean": true,
-      "files": {
-        "bad": [
-          "bad-aria-state-updates.html",
-          "bad-status-messages.html"
-        ],
-        "good": [
-          "good-account-menu-no-counter.html",
-          "good-aria-state-updates.html",
-          "good-static-status-containers.html"
-        ]
-      }
     }
   },
   "results": [
     {
       "file": "bad-aria-role-override.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "4.1.2"
       ],
-      "matched": 3,
+      "matched": 10,
       "status": "PASS",
-      "detail": "3 violations"
+      "detail": "10 violations"
     },
     {
       "file": "bad-aria-state-updates.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
-        "4.1.2",
-        "4.1.3"
+        "4.1.2"
       ],
       "matched": 0,
       "status": "FAIL",
@@ -588,19 +540,19 @@
     },
     {
       "file": "bad-beeproduced-real-issues.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "4.1.2",
         "1.3.1"
       ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
+      "matched": 2,
+      "status": "PASS",
+      "detail": "2 violations"
     },
     {
       "file": "bad-cognitive-accessibility.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "1.3.1"
@@ -611,10 +563,21 @@
     },
     {
       "file": "bad-complex-aria.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "4.1.2",
+        "1.3.1"
+      ],
+      "matched": 16,
+      "status": "PASS",
+      "detail": "16 violations"
+    },
+    {
+      "file": "bad-complex-data-tables.html",
+      "scanner": "advanced-aria",
+      "expectViolations": true,
+      "criteria": [
         "1.3.1"
       ],
       "matched": 0,
@@ -622,19 +585,8 @@
       "detail": "0 violations"
     },
     {
-      "file": "bad-complex-data-tables.html",
-      "scanner": "screen-reader",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 4,
-      "status": "PASS",
-      "detail": "4 violations"
-    },
-    {
       "file": "bad-form-grouping.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "1.3.1"
@@ -645,7 +597,7 @@
     },
     {
       "file": "bad-form-labels.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "1.3.1"
@@ -656,7 +608,7 @@
     },
     {
       "file": "bad-icon-accessibility.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "4.1.2"
@@ -667,7 +619,7 @@
     },
     {
       "file": "bad-landmarks.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": true,
       "criteria": [
         "1.3.1"
@@ -677,19 +629,8 @@
       "detail": "0 violations"
     },
     {
-      "file": "bad-status-messages.html",
-      "scanner": "screen-reader",
-      "expectViolations": true,
-      "criteria": [
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
       "file": "good-accessibility.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
         "1.3.1",
@@ -700,42 +641,8 @@
       "detail": "0 false positives"
     },
     {
-      "file": "good-account-menu-no-counter.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
       "file": "good-aria-role-override.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-aria-state-updates.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-bootstrap-patterns.html",
-      "scanner": "screen-reader",
+      "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
         "4.1.2"
@@ -745,218 +652,6 @@
       "detail": "2 false positives"
     },
     {
-      "file": "good-cognitive-accessibility.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-complex-data-tables.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-composite-aria-widgets.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-form-grouping.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-hidden-modal.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-icon-button-and-honeypot.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-js-validation.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-landing-page.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1",
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-landmarks.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-redundant-aria.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2",
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-static-status-containers.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-tabs-labelledby-only.html",
-      "scanner": "screen-reader",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-aria-role-override.html",
-      "scanner": "advanced-aria",
-      "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 2,
-      "status": "PASS",
-      "detail": "2 violations"
-    },
-    {
-      "file": "bad-aria-state-updates.html",
-      "scanner": "advanced-aria",
-      "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-beeproduced-real-issues.html",
-      "scanner": "advanced-aria",
-      "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-complex-aria.html",
-      "scanner": "advanced-aria",
-      "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 4,
-      "status": "PASS",
-      "detail": "4 violations"
-    },
-    {
-      "file": "bad-icon-accessibility.html",
-      "scanner": "advanced-aria",
-      "expectViolations": true,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "good-accessibility.html",
-      "scanner": "advanced-aria",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-aria-role-override.html",
-      "scanner": "advanced-aria",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
       "file": "good-aria-state-updates.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
@@ -974,16 +669,38 @@
       "criteria": [
         "4.1.2"
       ],
+      "matched": 1,
+      "status": "FAIL",
+      "detail": "1 false positives"
+    },
+    {
+      "file": "good-cognitive-accessibility.html",
+      "scanner": "advanced-aria",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 4,
+      "status": "FAIL",
+      "detail": "4 false positives"
+    },
+    {
+      "file": "good-complex-data-tables.html",
+      "scanner": "advanced-aria",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-composite-aria-widgets.html",
+      "file": "good-form-grouping.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
-        "4.1.2"
+        "1.3.1"
       ],
       "matched": 0,
       "status": "PASS",
@@ -994,18 +711,8 @@
       "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-icon-button-and-honeypot.html",
-      "scanner": "advanced-aria",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
+        "4.1.2",
+        "1.3.1"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1023,11 +730,11 @@
       "detail": "0 false positives"
     },
     {
-      "file": "good-landing-page.html",
+      "file": "good-landmarks.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
-        "4.1.2"
+        "1.3.1"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1038,214 +745,144 @@
       "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
-        "4.1.2"
+        "4.1.2",
+        "1.3.1"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-tabs-labelledby-only.html",
-      "scanner": "advanced-aria",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-audio-description.html",
-      "scanner": "media-accessibility",
+      "file": "bad-color-contrast.html",
+      "scanner": "advanced-contrast",
       "expectViolations": true,
       "criteria": [
-        "1.2.5"
+        "1.4.3",
+        "1.4.6"
       ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
     },
     {
-      "file": "bad-media-alternatives.html",
-      "scanner": "media-accessibility",
+      "file": "bad-focus-visible.html",
+      "scanner": "advanced-contrast",
       "expectViolations": true,
       "criteria": [
-        "1.2.1",
-        "1.2.2",
-        "1.2.3"
-      ],
-      "matched": 9,
-      "status": "PASS",
-      "detail": "9 violations"
-    },
-    {
-      "file": "good-audio-description.html",
-      "scanner": "media-accessibility",
-      "expectViolations": false,
-      "criteria": [
-        "1.2.5"
+        "1.4.3"
       ],
       "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
+      "status": "FAIL",
+      "detail": "0 violations"
     },
     {
-      "file": "good-media-alternatives.html",
-      "scanner": "media-accessibility",
-      "expectViolations": false,
-      "criteria": [
-        "1.2.1",
-        "1.2.2",
-        "1.2.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-media-icons-and-background-video.html",
-      "scanner": "media-accessibility",
-      "expectViolations": false,
-      "criteria": [
-        "1.2.1",
-        "1.2.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-auto-submitting-form.html",
-      "scanner": "predictable-navigation",
+      "file": "bad-nontext-contrast.html",
+      "scanner": "advanced-contrast",
       "expectViolations": true,
       "criteria": [
-        "3.2.2"
+        "1.4.11"
       ],
-      "matched": 18,
+      "matched": 27,
       "status": "PASS",
-      "detail": "18 violations"
+      "detail": "27 violations"
     },
     {
-      "file": "bad-consistent-identification.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.4"
-      ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
-    },
-    {
-      "file": "bad-consistent-navigation.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.3"
-      ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
-    },
-    {
-      "file": "bad-context-change.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.1",
-        "3.2.2"
-      ],
-      "matched": 6,
-      "status": "PASS",
-      "detail": "6 violations"
-    },
-    {
-      "file": "bad-external-link-identification.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.1",
-        "3.2.4"
-      ],
-      "matched": 2,
-      "status": "PASS",
-      "detail": "2 violations"
-    },
-    {
-      "file": "good-auto-submitting-form.html",
-      "scanner": "predictable-navigation",
+      "file": "good-bootstrap-patterns.html",
+      "scanner": "advanced-contrast",
       "expectViolations": false,
       "criteria": [
-        "3.2.2"
+        "1.4.3",
+        "1.4.6"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-consistent-identification.html",
-      "scanner": "predictable-navigation",
+      "file": "good-color-contrast.html",
+      "scanner": "advanced-contrast",
       "expectViolations": false,
       "criteria": [
-        "3.2.4"
+        "1.4.3"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-consistent-navigation.html",
-      "scanner": "predictable-navigation",
+      "file": "good-contrast-enhanced.html",
+      "scanner": "advanced-contrast",
       "expectViolations": false,
       "criteria": [
-        "3.2.3"
+        "1.4.6"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-context-change.html",
-      "scanner": "predictable-navigation",
+      "file": "good-nontext-contrast.html",
+      "scanner": "advanced-contrast",
       "expectViolations": false,
       "criteria": [
-        "3.2.1",
-        "3.2.2"
+        "1.4.11"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-focus-reveal-external-links.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "3.2.1",
-        "3.2.4"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-autocomplete.html",
-      "scanner": "input-purpose",
+      "file": "bad-color-contrast.html",
+      "scanner": "color-contrast",
       "expectViolations": true,
       "criteria": [
-        "1.3.5"
+        "1.4.3",
+        "1.4.6"
       ],
-      "matched": 21,
+      "matched": 22,
       "status": "PASS",
-      "detail": "21 violations"
+      "detail": "22 violations"
     },
     {
-      "file": "good-autocomplete.html",
-      "scanner": "input-purpose",
+      "file": "bad-focus-visible.html",
+      "scanner": "color-contrast",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.3"
+      ],
+      "matched": 23,
+      "status": "PASS",
+      "detail": "23 violations"
+    },
+    {
+      "file": "good-bootstrap-patterns.html",
+      "scanner": "color-contrast",
       "expectViolations": false,
       "criteria": [
-        "1.3.5"
+        "1.4.3",
+        "1.4.6"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-color-contrast.html",
+      "scanner": "color-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.3"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-contrast-enhanced.html",
+      "scanner": "color-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.6"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1342,18 +979,6 @@
       "detail": "0 false positives"
     },
     {
-      "file": "good-error-tokens-not-error-messages.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.3"
-      ],
-      "matched": 9,
-      "status": "FAIL",
-      "detail": "9 false positives"
-    },
-    {
       "file": "good-form-errors.html",
       "scanner": "error-handling",
       "expectViolations": false,
@@ -1377,459 +1002,12 @@
       "detail": "0 false positives"
     },
     {
-      "file": "good-icon-button-and-honeypot.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
       "file": "good-js-validation.html",
       "scanner": "error-handling",
       "expectViolations": false,
       "criteria": [
         "3.3.1",
         "3.3.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-landing-page.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-beeproduced-real-issues.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "2.4.1",
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-cognitive-accessibility.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-complex-aria.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-complex-data-tables.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-form-grouping.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-form-labels.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-headings-labels.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "2.4.6"
-      ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
-    },
-    {
-      "file": "bad-landmarks.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "1.3.1",
-        "2.4.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-page-titled.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "2.4.2"
-      ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
-    },
-    {
-      "file": "bad-skip-links.html",
-      "scanner": "page-structure",
-      "expectViolations": true,
-      "criteria": [
-        "2.4.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "good-accessibility.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-bypass-landmarks-only.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-cognitive-accessibility.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-complex-data-tables.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-form-grouping.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-headings-labels.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.6"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-hidden-modal.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-landing-page.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1",
-        "2.4.1",
-        "2.4.6"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-landmarks.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1",
-        "2.4.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-page-titled.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-redundant-aria.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "1.3.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-skip-link-lookalikes.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-skip-links.html",
-      "scanner": "page-structure",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-color-contrast.html",
-      "scanner": "color-contrast",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
-      "matched": 20,
-      "status": "PASS",
-      "detail": "20 violations"
-    },
-    {
-      "file": "bad-focus-visible.html",
-      "scanner": "color-contrast",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.3"
-      ],
-      "matched": 23,
-      "status": "PASS",
-      "detail": "23 violations"
-    },
-    {
-      "file": "good-bootstrap-patterns.html",
-      "scanner": "color-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.3",
-        "1.4.6"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-color-contrast.html",
-      "scanner": "color-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-contrast-enhanced.html",
-      "scanner": "color-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.6"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-contrast-hidden-and-arbitrary-classes.html",
-      "scanner": "color-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.3"
-      ],
-      "matched": 2,
-      "status": "FAIL",
-      "detail": "2 false positives"
-    },
-    {
-      "file": "bad-css-background-info.html",
-      "scanner": "use-of-color",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.1"
-      ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
-    },
-    {
-      "file": "bad-use-of-color.html",
-      "scanner": "use-of-color",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.1"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "good-css-background-accessible.html",
-      "scanner": "use-of-color",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-hover-focus-content.html",
-      "scanner": "advanced-contrast",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.13"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-nontext-contrast.html",
-      "scanner": "advanced-contrast",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 32,
-      "status": "PASS",
-      "detail": "32 violations"
-    },
-    {
-      "file": "bad-title-only-name.html",
-      "scanner": "advanced-contrast",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.13"
-      ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "good-hover-focus-content.html",
-      "scanner": "advanced-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.13"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-nontext-contrast.html",
-      "scanner": "advanced-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-title-supplementing-name.html",
-      "scanner": "advanced-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.13"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1854,9 +1032,9 @@
         "1.4.5",
         "1.4.9"
       ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
+      "matched": 4,
+      "status": "PASS",
+      "detail": "4 violations"
     },
     {
       "file": "good-images-of-text-no-exception.html",
@@ -1870,11 +1048,55 @@
       "detail": "0 false positives"
     },
     {
+      "file": "good-images-of-text-photographs.html",
+      "scanner": "images-of-text",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.5"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
       "file": "good-images-of-text.html",
       "scanner": "images-of-text",
       "expectViolations": false,
       "criteria": [
         "1.4.5"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "bad-autocomplete.html",
+      "scanner": "input-purpose",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.5"
+      ],
+      "matched": 21,
+      "status": "PASS",
+      "detail": "21 violations"
+    },
+    {
+      "file": "good-autocomplete.html",
+      "scanner": "input-purpose",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.5"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-input-purpose-not-user-data.html",
+      "scanner": "input-purpose",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.5"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1914,6 +1136,17 @@
       "detail": "0 false positives"
     },
     {
+      "file": "good-label-in-name-placeholders.html",
+      "scanner": "label-in-name",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.3"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
       "file": "good-label-in-name.html",
       "scanner": "label-in-name",
       "expectViolations": false,
@@ -1925,57 +1158,70 @@
       "detail": "0 false positives"
     },
     {
-      "file": "bad-language-override.html",
-      "scanner": "language-detection",
+      "file": "bad-audio-description.html",
+      "scanner": "media-accessibility",
       "expectViolations": true,
       "criteria": [
-        "3.1.2"
+        "1.2.5"
       ],
-      "matched": 0,
-      "status": "FAIL",
-      "detail": "0 violations"
-    },
-    {
-      "file": "bad-language.html",
-      "scanner": "language-detection",
-      "expectViolations": true,
-      "criteria": [
-        "3.1.1",
-        "3.1.2"
-      ],
-      "matched": 2,
+      "matched": 1,
       "status": "PASS",
-      "detail": "2 violations"
+      "detail": "1 violations"
     },
     {
-      "file": "good-accessibility.html",
-      "scanner": "language-detection",
+      "file": "bad-media-alternatives.html",
+      "scanner": "media-accessibility",
+      "expectViolations": true,
+      "criteria": [
+        "1.2.1",
+        "1.2.2",
+        "1.2.3"
+      ],
+      "matched": 10,
+      "status": "PASS",
+      "detail": "10 violations"
+    },
+    {
+      "file": "good-audio-description.html",
+      "scanner": "media-accessibility",
       "expectViolations": false,
       "criteria": [
-        "3.1.1"
+        "1.2.5"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-language-override.html",
-      "scanner": "language-detection",
+      "file": "good-media-alternatives.html",
+      "scanner": "media-accessibility",
       "expectViolations": false,
       "criteria": [
-        "3.1.2"
+        "1.2.1",
+        "1.2.2",
+        "1.2.3"
       ],
       "matched": 0,
       "status": "PASS",
       "detail": "0 false positives"
     },
     {
-      "file": "good-language.html",
-      "scanner": "language-detection",
+      "file": "bad-nontext-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 30,
+      "status": "PASS",
+      "detail": "30 violations"
+    },
+    {
+      "file": "good-nontext-contrast.html",
+      "scanner": "nontext-contrast",
       "expectViolations": false,
       "criteria": [
-        "3.1.1",
-        "3.1.2"
+        "1.4.11"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1988,9 +1234,20 @@
       "criteria": [
         "1.3.4"
       ],
-      "matched": 5,
+      "matched": 2,
       "status": "PASS",
-      "detail": "5 violations"
+      "detail": "2 violations"
+    },
+    {
+      "file": "good-orientation-responsive.html",
+      "scanner": "orientation",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.4"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
     },
     {
       "file": "good-orientation.html",
@@ -2004,6 +1261,399 @@
       "detail": "0 false positives"
     },
     {
+      "file": "bad-link-purpose.html",
+      "scanner": "page-structure",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.4",
+        "2.4.9"
+      ],
+      "matched": 34,
+      "status": "PASS",
+      "detail": "34 violations"
+    },
+    {
+      "file": "bad-navigation-aaa.html",
+      "scanner": "page-structure",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.9"
+      ],
+      "matched": 4,
+      "status": "PASS",
+      "detail": "4 violations"
+    },
+    {
+      "file": "bad-semantic-text-de.html",
+      "scanner": "page-structure",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.9"
+      ],
+      "matched": 3,
+      "status": "PASS",
+      "detail": "3 violations"
+    },
+    {
+      "file": "good-accessibility.html",
+      "scanner": "page-structure",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.4"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-link-purpose-in-context.html",
+      "scanner": "page-structure",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.4",
+        "2.4.9"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-link-purpose-only.html",
+      "scanner": "page-structure",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.9"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-navigation-aaa.html",
+      "scanner": "page-structure",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.9"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-semantic-text-de.html",
+      "scanner": "page-structure",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.9"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "bad-auto-submitting-form.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "3.2.2"
+      ],
+      "matched": 18,
+      "status": "PASS",
+      "detail": "18 violations"
+    },
+    {
+      "file": "bad-consistent-identification.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "3.2.4"
+      ],
+      "matched": 1,
+      "status": "PASS",
+      "detail": "1 violations"
+    },
+    {
+      "file": "bad-consistent-navigation.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "3.2.3"
+      ],
+      "matched": 1,
+      "status": "PASS",
+      "detail": "1 violations"
+    },
+    {
+      "file": "bad-context-change.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "3.2.1",
+        "3.2.2"
+      ],
+      "matched": 6,
+      "status": "PASS",
+      "detail": "6 violations"
+    },
+    {
+      "file": "good-auto-submitting-form.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "3.2.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-consistent-identification.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "3.2.4"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-consistent-navigation.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "3.2.3"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-context-change.html",
+      "scanner": "predictable-navigation",
+      "expectViolations": false,
+      "criteria": [
+        "3.2.1",
+        "3.2.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "bad-beeproduced-real-issues.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.1",
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "bad-cognitive-accessibility.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "bad-complex-aria.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "bad-complex-data-tables.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 4,
+      "status": "PASS",
+      "detail": "4 violations"
+    },
+    {
+      "file": "bad-form-grouping.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "bad-form-labels.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "bad-landmarks.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1",
+        "2.4.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "bad-skip-links.html",
+      "scanner": "screen-reader",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.1"
+      ],
+      "matched": 1,
+      "status": "PASS",
+      "detail": "1 violations"
+    },
+    {
+      "file": "good-accessibility.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-bypass-landmarks-only.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-cognitive-accessibility.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-complex-data-tables.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-form-grouping.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-hidden-modal.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-landing-page.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1",
+        "2.4.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-landmarks.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1",
+        "2.4.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-redundant-aria.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-skip-link-lookalikes.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-skip-links.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
       "file": "bad-timing-controls.html",
       "scanner": "timing-controls",
       "expectViolations": true,
@@ -2011,20 +1661,9 @@
         "2.2.1",
         "2.2.2"
       ],
-      "matched": 4,
+      "matched": 15,
       "status": "PASS",
-      "detail": "4 violations"
-    },
-    {
-      "file": "good-static-live-wording.html",
-      "scanner": "timing-controls",
-      "expectViolations": false,
-      "criteria": [
-        "2.2.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
+      "detail": "15 violations"
     },
     {
       "file": "good-timing-controls.html",
@@ -2034,9 +1673,42 @@
         "2.2.1",
         "2.2.2"
       ],
-      "matched": 0,
+      "matched": 2,
+      "status": "FAIL",
+      "detail": "2 false positives"
+    },
+    {
+      "file": "bad-css-background-info.html",
+      "scanner": "use-of-color",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.1"
+      ],
+      "matched": 1,
       "status": "PASS",
-      "detail": "0 false positives"
+      "detail": "1 violations"
+    },
+    {
+      "file": "bad-use-of-color.html",
+      "scanner": "use-of-color",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.1"
+      ],
+      "matched": 0,
+      "status": "FAIL",
+      "detail": "0 violations"
+    },
+    {
+      "file": "good-css-background-accessible.html",
+      "scanner": "use-of-color",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.1"
+      ],
+      "matched": 2,
+      "status": "FAIL",
+      "detail": "2 false positives"
     }
   ]
 }

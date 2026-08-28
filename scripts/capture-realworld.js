@@ -44,7 +44,7 @@ const TARGETS = [
     url: 'http://localhost:3111/audit',
     fallbackUrl: 'http://localhost:3111/',
     purpose:
-      "this repo's own Next.js /audit route: hydration markup and the __next-route-announcer__ live region; reproduces the language-detection undefined.map crash. This route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
+      "this repo's own Next.js /audit route: hydration markup and the __next-route-announcer__ live region. This route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
   },
   {
     name: 'med-theme',

@@ -60,6 +60,14 @@ const MANUAL_OVERRIDES = {
       'spacing exception) is automated in input-modalities; the 44x44 AAA size ' +
       'is a design review item.',
   },
+  '2.4.6': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Headings and Labels: whether a heading or a label describes its topic is a ' +
+      'judgement about meaning. An empty heading is axe-core `empty-heading` and an ' +
+      'unnamed control is axe-core `label`; what is left needs a reader. axe-core ' +
+      'ships no 2.4.6 rule either.',
+  },
   '2.4.8': {
     mechanism: MECHANISM.MANUAL,
     justification:

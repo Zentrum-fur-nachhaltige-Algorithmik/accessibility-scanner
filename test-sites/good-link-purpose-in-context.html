@@ -1,0 +1,75 @@
+<!-- WCAG-TEST
+criterion: 2.4.4, 2.4.9
+level: AAA
+title: Link Purpose (In Context), Link Purpose (Link Only)
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: page-structure
+description: Short titles and headings, an icon link named by aria-label, a one-character link with context, and links that name their destination
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Office Ergonomics</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
+        .toolbar a { padding: 0.25rem 0.5rem; }
+        table { border-collapse: collapse; }
+        th, td { border: 1px solid #767676; padding: 0.4rem 0.6rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav aria-label="Main">
+            <a href="/">Start</a>
+            <a href="/desks">Desks</a>
+            <a href="/chairs">Chairs</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Home Office Ergonomics</h1>
+
+        <!-- A three character heading and a numeric heading are not defects -->
+        <h2>FAQ</h2>
+        <p>Answers to the questions we are asked most often.</p>
+
+        <h2>2026</h2>
+        <p>What changed in this year's guidance.</p>
+
+        <!-- An icon link named by aria-label: an authored short name -->
+        <p class="toolbar">
+            <a href="/search" aria-label="Search"><span aria-hidden="true">&#9906;</span></a>
+        </p>
+
+        <!-- A one character link whose paragraph identifies the destination -->
+        <p>The full measurement protocol is in appendix <a href="/appendix-a">A</a>.</p>
+
+        <!-- Rows whose cell text identifies the target of the short link -->
+        <table>
+            <caption>Downloads</caption>
+            <thead>
+                <tr><th scope="col">Document</th><th scope="col">PDF</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Desk setup checklist</td><td><a href="/desk-checklist.pdf">PDF</a></td></tr>
+                <tr><td>Chair adjustment guide</td><td><a href="/chair-guide.pdf">PDF</a></td></tr>
+            </tbody>
+        </table>
+
+        <!-- Links that name their destination in their own text -->
+        <p><a href="/desks/standing">Read more about standing desks</a></p>
+        <p><a href="/newsletter">Subscribe to the ergonomics newsletter</a></p>
+
+        <!-- A labelled field: the label is the accessible name -->
+        <form action="/subscribe" method="post">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" autocomplete="email">
+            <button type="submit">Subscribe</button>
+        </form>
+    </main>
+</body>
+</html>

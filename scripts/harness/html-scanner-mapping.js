@@ -1089,6 +1089,15 @@ const HTML_SCANNER_MAPPING = {
     description:
       'A statement link to a path that is not served, resolved only against a loopback address: inaccessible-statement must stay silent',
   },
+
+  'good-reflow-dead-image-and-skip-link.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10'],
+    description:
+      'A responsive page whose widest box is an image that never loads and whose skip link is hidden with clip rect(0 0 0 0): reflow-failure and reflow-content-clipped must stay silent',
+  },
 };
 
 /**

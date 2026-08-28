@@ -270,9 +270,6 @@ class KeyboardNavigationScanner extends BaseScanner {
     // 7. Controls the tab order cannot reach, and focus stops with nothing on them
     await this.validateFocusableElements(page, violations);
 
-    // 8. Accesskeys claimed twice or attached to something unfocusable
-    await this.validateAccesskeys(page, violations);
-
     // Calculate summary
     tabbableElements = tabOrder.length;
     keyboardInaccessible = violations.filter((v) => v.issue === 'not-keyboard-accessible').length;
@@ -1032,96 +1029,6 @@ class KeyboardNavigationScanner extends BaseScanner {
     focusableIssues.forEach((issue) => {
       violations.push({
         criterion: '9.2.1.1',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: issue.suggestion,
-      });
-    });
-  }
-
-  /**
-   * Accesskeys (SC 2.1.4).
-   * Reports a key that more than one element claims, since the browser reaches
-   * only one of them, and a key on an element that cannot take focus.
-   */
-  async validateAccesskeys(page, violations) {
-    log.debug('Validating accesskeys...');
-
-    const accesskeyIssues = await page.evaluate((injectedCode) => {
-      eval(injectedCode);
-      // Helper function for element selector generation (browser context)
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      const issues = [];
-      const accesskeys = {};
-      const duplicates = {};
-
-      // Find all elements with accesskey
-      const elementsWithAccesskey = document.querySelectorAll('[accesskey]');
-
-      elementsWithAccesskey.forEach((element) => {
-        const selector = getElementSelector(element);
-        const accesskey = element.getAttribute('accesskey').toLowerCase();
-
-        // One finding per key that more than one element claims: the browser
-        // can only reach one of them, and naming both elements is enough.
-        if (accesskeys[accesskey]) {
-          duplicates[accesskey] = duplicates[accesskey] || {
-            first: accesskeys[accesskey],
-            others: [],
-          };
-          duplicates[accesskey].others.push(selector);
-        } else {
-          accesskeys[accesskey] = selector;
-        }
-
-        // An accesskey on something the keyboard cannot focus reaches nothing.
-        // `label` and `legend` are the exception: the browser forwards their
-        // accesskey to the control they belong to.
-        const tag = element.tagName.toLowerCase();
-        const forwards = tag === 'label' || tag === 'legend';
-        if (__isRendered(element) && !forwards && !__isInteractiveTarget(element)) {
-          issues.push({
-            type: 'accesskeys',
-            element: selector,
-            accesskey: accesskey,
-            description: 'Element with accesskey is not keyboard focusable',
-            severity: 'moderate',
-            suggestion: 'Ensure elements with accesskeys are also focusable via keyboard',
-          });
-        }
-      });
-
-      for (const [key, group] of Object.entries(duplicates)) {
-        issues.push({
-          type: 'accesskeys',
-          element: group.first,
-          accesskey: key,
-          description: `Accesskey "${key}" is claimed by ${group.others.length + 1} elements (${[group.first, ...group.others].join(', ')}), so it reaches only one of them`,
-          severity: 'serious',
-          occurrences: group.others.length + 1,
-          affectedElements: [group.first, ...group.others],
-          suggestion: 'Ensure each accesskey is unique on the page',
-        });
-      }
-
-      return issues;
-    }, renderedCode);
-
-    // Create violations for accesskey issues
-    accesskeyIssues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.1.4',
         element: issue.element,
         issue: issue.type,
         description: issue.description,

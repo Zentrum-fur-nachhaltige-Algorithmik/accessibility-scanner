@@ -30,6 +30,7 @@
     "harness:llm": "node scripts/harness/llm.js",
     "harness:golden": "node scripts/harness/golden.js",
     "harness:realworld": "node scripts/harness/realworld.js",
+    "precision:check": "node scripts/precision-check.js",
     "sr-agent": "node src/agent/run.js",
     "blind-mode": "node src/agent/blind-mode/server/index.js",
     "lint": "eslint . && sh scripts/check-no-emdash.sh",

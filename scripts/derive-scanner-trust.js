@@ -20,6 +20,9 @@ const OUT = path.join(ROOT, 'src', 'core', 'scanner-trust.json');
 /** Violations on the good-file corpus above which a scanner is a noise source. */
 const NOISE_LIMIT = 10;
 
+/** Judged findings a rule needs before its precision counts as evidence. */
+const MIN_JUDGED_FINDINGS = 3;
+
 /** Externally validated base engine; always in the default profiles. */
 const ALWAYS_PROVEN = new Set(['axe-core']);
 
@@ -45,9 +48,10 @@ function collectScannerIds() {
 
 /**
  * A scanner is `proven` when every deterministic-harness assertion about it
- * passed (no FAIL, no ERROR), it never crashed on a real-world fixture, and it
- * is not a top noise source on the good-file corpus (at most NOISE_LIMIT
- * violations). Otherwise it is `experimental`, with the evidence recorded
+ * passed (no FAIL, no ERROR), it never crashed on a real-world fixture, it is
+ * not a top noise source on the good-file corpus (at most NOISE_LIMIT
+ * violations), and none of its rules reports a finding that the real-world
+ * audit calls false. Otherwise it is `experimental`, with the evidence recorded
  * verbatim. axe-core is always proven; LLM scanners are always proven here
  * because scripts/harness/llm.js measures them separately.
  *
@@ -112,6 +116,25 @@ function derive() {
     }
   }
 
+  // ---- 4. precision on the labelled real-world corpus -------------------
+  // scripts/precision-check.js records, per rule id, how many of its findings
+  // a human judged real. A rule that reports a judged-false finding is a
+  // measured false positive, which is exactly what a proven tier denies.
+  const precision = readJson('harness-precision.json');
+  if (precision) {
+    for (const r of precision.rules || []) {
+      const judged = (r.true || 0) + (r.false || 0);
+      if (judged < MIN_JUDGED_FINDINGS || !r.false) continue;
+      for (const id of r.scanners || []) {
+        add(
+          id,
+          `precision: ${r.rule} reports ${r.false} finding(s) of ${judged} judged ` +
+            `on the real-world corpus that the audit calls false`
+        );
+      }
+    }
+  }
+
   // ---- verdicts ---------------------------------------------------------
   const trust = {};
   for (const { id, kind } of scanners) {
@@ -143,7 +166,8 @@ function derive() {
             kind,
             reason:
               'Clean record: every deterministic-harness assertion on its own criteria passed, ' +
-              'no crashes across the five real-world fixtures, not a top noise source.',
+              'no crashes on the real-world fixtures, not a top noise source, and no rule of ' +
+              'it reports a finding the real-world audit calls false.',
           }
         : {
             tier: 'experimental',
@@ -207,4 +231,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { derive, NOISE_LIMIT };
+module.exports = { derive, NOISE_LIMIT, MIN_JUDGED_FINDINGS };

@@ -123,8 +123,8 @@ const FIXTURES = [
   {
     file: 'own-audit-ui.html',
     source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
-    // recorded: 4 total ensemble violations (profile=standard, --no-llm).
-    band: [2, 8],
+    // recorded: 3 total ensemble violations (profile=standard, --no-llm).
+    band: [1, 6],
     spotTruths: [
       {
         name: 'REGRESSION: __next-route-announcer__ empty live region NOT flagged',
@@ -181,8 +181,8 @@ const FIXTURES = [
   {
     file: 'med-theme.html',
     source: 'https://dr-mauermann-urologe.vercel.app',
-    // recorded: 12 total ensemble violations (profile=standard, --no-llm).
-    band: [6, 24],
+    // recorded: 14 total ensemble violations (profile=standard, --no-llm).
+    band: [7, 28],
     spotTruths: [
       {
         name: 'REAL: heading level skips h2 -> h4',
@@ -252,8 +252,8 @@ const FIXTURES = [
   {
     file: 'beeproduced.html',
     source: 'https://beeproduced.com',
-    // recorded: 58 total ensemble violations (profile=standard, --no-llm).
-    band: [29, 116],
+    // recorded: 14 total ensemble violations (profile=standard, --no-llm).
+    band: [7, 28],
     spotTruths: [
       {
         name: 'REGRESSION: axe-core survives the dead <iframe> and still reports',
@@ -347,9 +347,9 @@ const FIXTURES = [
   {
     file: 'wiki-medical-de.html',
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
-    // recorded: 433 total ensemble violations (profile=standard, --no-llm),
+    // recorded: 304 total ensemble violations (profile=standard, --no-llm),
     // 281.5s wall clock.
-    band: [216, 866],
+    band: [152, 608],
     spotTruths: [
       {
         name: 'REAL: images with no alt attribute at all',
@@ -489,8 +489,8 @@ const FIXTURES = [
   {
     file: 'modern-commercial.html',
     source: 'https://www.mozilla.org/de/',
-    // recorded: 48 total ensemble violations (profile=standard, --no-llm).
-    band: [24, 96],
+    // recorded: 47 total ensemble violations (profile=standard, --no-llm).
+    band: [23, 94],
     spotTruths: [
       {
         name: 'REAL: a literal <blink> element in the navigation',
@@ -630,8 +630,8 @@ const FIXTURES = [
   {
     file: 'gov-uk-guide.html',
     source: 'https://www.gov.uk/vehicle-tax',
-    // recorded: 3 total ensemble violations (profile=standard, --no-llm).
-    band: [1, 6],
+    // recorded: 1 total ensemble violation (profile=standard, --no-llm).
+    band: [1, 3],
     spotTruths: [
       {
         name: 'REGRESSION: static prose about timeouts is not auto-updating content',
@@ -705,18 +705,18 @@ const FIXTURES = [
         },
       },
       {
-        name: 'REAL: the accessibility statement link is dead in this snapshot',
-        kind: 'must-detect',
+        name: 'REGRESSION: the statement link is not called broken inside the capture',
+        kind: 'must-not-flag',
         // The footer links /help/accessibility-statement, which is not part of
-        // the capture, so it answers 404. The finding must be about the broken
-        // link, not three claims about content nobody could read.
+        // the capture, so it answers 404 here and exists on gov.uk. A path
+        // that could only be resolved against the local server is unverifiable,
+        // and unverifiable is not a finding.
         check: ({ violations }) => {
-          const hits = findViolations(violations, { id: ['EAA-Statement'] });
-          if (hits.length === 0) return 'no accessibility-statement finding at all';
-          const rules = new Set(hits.map((v) => v.issue));
-          if (!rules.has('inaccessible-statement'))
-            return `expected inaccessible-statement, got: ${[...rules].join(', ')}`;
-          return null;
+          const hits = findViolations(violations, { id: ['EAA-Statement'] }).filter(
+            (v) => v.issue === 'inaccessible-statement'
+          );
+          if (hits.length === 0) return null;
+          return `statement link reported as broken: ${hits.map((v) => v.description).join('; ')}`;
         },
       },
     ],
@@ -725,8 +725,8 @@ const FIXTURES = [
   {
     file: 'webaim-article.html',
     source: 'https://webaim.org/techniques/skipnav/',
-    // recorded: 33 total ensemble violations (profile=standard, --no-llm).
-    band: [16, 66],
+    // recorded: 34 total ensemble violations (profile=standard, --no-llm).
+    band: [17, 68],
     spotTruths: [
       {
         name: 'REGRESSION: article links are not skip links',
@@ -795,10 +795,10 @@ const FIXTURES = [
   {
     file: 'govuk-design-system.html',
     source: 'https://design-system.service.gov.uk/components/text-input/',
-    // recorded: 31 total ensemble violations (profile=standard, --no-llm) on
+    // recorded: 18 total ensemble violations (profile=standard, --no-llm) on
     // two runs of this file alone; in both, two exclusive scanners lost the 45s
     // reload on this 811KB page and contributed nothing.
-    band: [15, 62],
+    band: [9, 36],
     spotTruths: [
       {
         name: 'REGRESSION: iframes are not reported as missing a focus indicator',
@@ -856,8 +856,8 @@ const FIXTURES = [
   {
     file: 'a11y-project-checklist.html',
     source: 'https://www.a11yproject.com/checklist/',
-    // recorded: 6 total ensemble violations (profile=standard, --no-llm).
-    band: [3, 12],
+    // recorded: 5 total ensemble violations (profile=standard, --no-llm).
+    band: [2, 10],
     spotTruths: [
       {
         name: 'REGRESSION: a checklist about timeouts does not have a timeout',
@@ -887,18 +887,18 @@ const FIXTURES = [
         },
       },
       {
-        name: 'REAL: the skip link has no focus indicator of its own',
-        kind: 'must-detect',
+        name: 'REGRESSION: the skip link that appears on focus is indicated',
+        kind: 'must-not-flag',
         // <a class="u-text-transform-uppercase c-skipnav" href="#main">Skip to
-        // content.</a> comes into view on focus but draws no outline, box
-        // shadow or background change (outline: none 0px, box-shadow: none,
-        // confirmed by a blur comparison). WCAG 2.4.7.
+        // content.</a> is clipped to nothing (clip: rect(0 0 0 0)) until it is
+        // focused and then comes into view. That change of state is the focus
+        // indicator (technique C15), so 2.4.7 is met without an outline.
         check: ({ violations }) => {
           const hits = mentions(violations, 'c-skipnav').filter((v) =>
             /focus/i.test(`${v.issue || ''} ${v.description || ''}`)
           );
-          if (hits.length > 0) return null;
-          return 'no 2.4.7 finding for the skip link that shows no focus indicator';
+          if (hits.length === 0) return null;
+          return `skip link flagged: ${hits.map((v) => v.description || v.issue).join('; ')}`;
         },
       },
     ],
@@ -907,8 +907,8 @@ const FIXTURES = [
   {
     file: 'broadcaster-news.html',
     source: 'https://www.bbc.com/news',
-    // recorded: 75 total ensemble violations (profile=standard, --no-llm).
-    band: [37, 150],
+    // recorded: 68 total ensemble violations (profile=standard, --no-llm).
+    band: [34, 136],
     spotTruths: [
       {
         name: 'REGRESSION: a described photograph is not a defect',
@@ -960,9 +960,9 @@ const FIXTURES = [
   {
     file: 'wiki-accessibility-en.html',
     source: 'https://en.wikipedia.org/wiki/Web_accessibility',
-    // recorded: 139 total ensemble violations (profile=standard, --no-llm),
+    // recorded: 19 total ensemble violations (profile=standard, --no-llm),
     // 334.7s wall clock, axe-core answered "Page/Frame is not ready" in that run.
-    band: [69, 278],
+    band: [9, 38],
     spotTruths: [
       {
         name: 'REGRESSION: a link title that summarises its target is not 1.4.13 content',
@@ -1181,7 +1181,11 @@ async function main() {
     const result = outcome.result;
     const scanners = result.scanners || {};
     const violations = result.violations || [];
+    // Best practices are reported beside the total, and a spot-truth asks
+    // whether a defect is reported at all, so the checks read both lists.
+    const findings = violations.concat(result.bestPractices || []);
     entry.totalViolations = violations.length;
+    entry.bestPractices = (result.bestPractices || []).length;
     entry.scannerCount = Object.keys(scanners).length;
     // Per-scanner violation counts: the band is a total, so a scanner that
     // trades false positives for false negatives stays invisible in it. Read
@@ -1259,7 +1263,7 @@ async function main() {
     for (const st of fx.spotTruths) {
       let problem = null;
       try {
-        problem = st.check({ violations, scanners, result });
+        problem = st.check({ violations: findings, scanners, result });
       } catch (err) {
         problem = `spot-truth check threw: ${err.message}`;
       }
@@ -1387,4 +1391,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { FIXTURES, findViolations, mentions };
+module.exports = { FIXTURES, FIXTURE_DIR, PROFILE, startServer, scanFile, findViolations, mentions };

@@ -605,14 +605,56 @@ class PredictableNavigationScanner extends BaseScanner {
         // 3.2.4 asks for consistency, not for a convention: a page where no
         // external link is marked identifies them consistently. Only a split,
         // where some carry an indicator and others do not, fails.
-        const namesIndicator =
-          /\b(external|new window|new tab)\b|extern|neues fenster|neuer tab|pdf|word|excel/i;
+        // Phrases a page adds to say where a link goes or what it opens.
+        const INDICATOR =
+          /\b(?:pdf|docx?|xlsx?|pptx?|word document|excel|powerpoint|external(?:\s+link)?|extern(?:er link)?|opens?\s+in\s+(?:a\s+)?new\s+(?:window|tab)|neues\s+fenster|neuer\s+tab|nouvelle\s+fen[ea]tre)\b/i;
+        // The same phrase standing on its own, so a title or a bracket that
+        // holds nothing but the marker counts and an article named
+        // "Wikipedia:External links" does not.
+        const INDICATOR_ONLY = new RegExp(`^[([\\s]*${INDICATOR.source}[^\\w]*$`, 'i');
 
+        /**
+         * Does the reader perceive where this link goes? Only from what is
+         * rendered: a marker in brackets in the link text, a title that is
+         * nothing but the marker, a graphic whose name is the marker, a file
+         * extension in the link text, or a marker CSS paints beside the link.
+         * A `target` attribute and an unnamed icon show the reader nothing.
+         */
         function isMarked(link) {
-          const name = `${__accessibleName(link) || ''} ${link.getAttribute('title') || ''}`;
-          if (namesIndicator.test(name)) return true;
-          if (link.hasAttribute('target')) return true;
-          return Array.from(link.querySelectorAll('img, svg')).some(__isRendered);
+          const text = (link.textContent || '').trim();
+          if (/\.(pdf|docx?|xlsx?|pptx?)\s*$/i.test(text)) return true;
+          for (const m of text.matchAll(/[([]([^)\]]{1,40})[)\]]/g)) {
+            if (INDICATOR_ONLY.test(m[1].trim())) return true;
+          }
+          const title = (link.getAttribute('title') || '').trim();
+          if (title && INDICATOR_ONLY.test(title)) return true;
+          const label = (link.getAttribute('aria-label') || '').trim();
+          if (label && label !== text && INDICATOR.test(label)) return true;
+
+          for (const graphic of link.querySelectorAll('img, svg, [role="img"]')) {
+            if (!__isRendered(graphic)) continue;
+            const titleEl = graphic.querySelector(':scope > title');
+            const name = [
+              graphic.getAttribute('alt') || '',
+              graphic.getAttribute('aria-label') || '',
+              titleEl ? titleEl.textContent : '',
+            ]
+              .join(' ')
+              .trim();
+            if (name && INDICATOR.test(name)) return true;
+          }
+
+          for (const pseudo of ['::after', '::before']) {
+            const style = window.getComputedStyle(link, pseudo);
+            const content = (style.content || '').trim();
+            if (!content || content === 'none' || content === 'normal') continue;
+            // A marker the reader sees: generated text, or an image standing in
+            // for it. `content: ""` paints nothing on its own.
+            const text = content.replace(/^["']|["']$/g, '').trim();
+            if (text) return true;
+            if (style.backgroundImage && style.backgroundImage !== 'none') return true;
+          }
+          return false;
         }
 
         const groups = { external: [], document: [] };

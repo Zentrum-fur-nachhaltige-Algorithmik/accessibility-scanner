@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 231,
+  "fixtureCount": 238,
   "scanners": [
     {
       "id": "axe-core",
@@ -17,7 +17,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "use-of-color",
@@ -27,7 +27,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "images-of-text",
@@ -38,7 +38,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "nontext-contrast",
@@ -48,7 +48,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "text-resize",
@@ -58,7 +58,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "screen-reader",
@@ -82,7 +82,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "orientation",
@@ -92,7 +92,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "input-purpose",
@@ -102,7 +102,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "predictable-navigation",
@@ -115,7 +115,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "error-handling",
@@ -127,7 +127,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "page-structure",
@@ -138,7 +138,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "label-in-name",
@@ -147,8 +147,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "status-messages",
@@ -158,7 +158,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "advanced-aria",
@@ -180,7 +180,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "timing-controls",
@@ -191,7 +191,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "multiple-ways",
@@ -201,7 +201,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "keyboard-navigation",
@@ -213,7 +213,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "focus-management",
@@ -225,14 +225,13 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "input-modalities",
       "criteria": [
         "2.5.1",
         "2.5.2",
-        "2.5.3",
         "2.5.4",
         "2.5.7",
         "2.5.8"
@@ -240,7 +239,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "responsive-design",
@@ -251,7 +250,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "hover-focus-content",
@@ -261,7 +260,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "concurrent-input",
@@ -271,7 +270,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "dynamic-spa",
@@ -282,7 +281,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "accessibility-statement",
@@ -290,7 +289,7 @@
       "kind": "deterministic",
       "exclusive": true,
       "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes on the real-world fixtures, not a top noise source, and no rule of it reports a finding the real-world audit calls false."
     },
     {
       "id": "llm-semantic-text",
@@ -926,7 +925,8 @@
       "fixtures": {
         "good": [
           "good-autocomplete.html",
-          "good-input-purpose-not-user-data.html"
+          "good-input-purpose-not-user-data.html",
+          "good-language-switcher-outside-form.html"
         ],
         "bad": [
           "bad-autocomplete.html"
@@ -939,7 +939,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -1294,6 +1294,7 @@
         "good": [
           "good-decorative-blur-blob.html",
           "good-fluid-container-and-truncation.html",
+          "good-reflow-dead-image-and-skip-link.html",
           "good-reflow.html"
         ],
         "bad": [
@@ -1307,7 +1308,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2114,6 +2115,7 @@
         "good": [
           "good-focus-management.html",
           "good-focus-within-indicator.html",
+          "good-skip-link-appears-on-focus.html",
           "good-skip-link-lookalikes.html"
         ],
         "bad": [
@@ -2128,7 +2130,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 6,
         "from": [
           "exclusive"
         ]
@@ -2399,10 +2401,8 @@
       "sc": "2.5.3",
       "level": "A",
       "title": "Label in Name",
-      "mechanism": "hybrid:axe-core+input-modalities",
-      "supporting": [
-        "label-in-name (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+label-in-name",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -2410,8 +2410,7 @@
         "label-content-name-mismatch"
       ],
       "deterministic": [
-        "label-in-name",
-        "input-modalities"
+        "label-in-name"
       ],
       "llm": [],
       "fixtures": {
@@ -2421,23 +2420,20 @@
           "good-label-in-name.html"
         ],
         "bad": [
-          "bad-input-modalities.html",
           "bad-label-in-name.html"
         ]
       },
       "harness": [
         "axe-e2e",
         "concurrent",
-        "exclusive",
         "golden"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 10,
+        "runs": 4,
         "from": [
-          "concurrent",
-          "exclusive"
+          "concurrent"
         ]
       }
     },
@@ -2588,10 +2584,12 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-inline-text-links.html",
           "good-pointer-labels-and-alternatives.html",
           "good-target-size-minimum.html"
         ],
         "bad": [
+          "bad-standalone-link-targets.html",
           "bad-target-size-minimum.html"
         ]
       },
@@ -2603,7 +2601,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2905,6 +2903,7 @@
       "fixtures": {
         "good": [
           "good-consistent-identification.html",
+          "good-external-links-icons-only.html",
           "good-focus-reveal-external-links.html",
           "good-repeated-cards-and-buttons.html"
         ],
@@ -2919,7 +2918,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 6,
         "from": [
           "exclusive"
         ]

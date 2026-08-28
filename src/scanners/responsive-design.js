@@ -28,6 +28,50 @@ const SPACING_CSS = `
   }
 `;
 
+/**
+ * Horizontal overflow of the whole page, measured without the images that
+ * show nothing: an image with no intrinsic width has delivered no pixels, and
+ * a dead <img width="1400"> laid out at its attribute width would otherwise be
+ * read as a reflow failure of a layout that reflows.
+ */
+const OVERFLOW_CODE = `
+if (typeof window.__pageOverflow !== 'function') {
+  window.__pageOverflow = function () {
+    var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    var width = function () {
+      return Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);
+    };
+    var scrollWidth = width();
+    // 1px tolerance: sub-pixel rounding of borders and shadows is not reflow
+    if (scrollWidth <= viewportWidth + 1) {
+      return { overflows: false, scrollWidth: scrollWidth, viewportWidth: viewportWidth, brokenImages: 0 };
+    }
+    var broken = [];
+    var images = document.querySelectorAll('img');
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      if (img.naturalWidth === 0 && img.getBoundingClientRect().width > 0) broken.push(img);
+    }
+    if (!broken.length) {
+      return { overflows: true, scrollWidth: scrollWidth, viewportWidth: viewportWidth, brokenImages: 0 };
+    }
+    var saved = broken.map(function (img) { return img.getAttribute('style'); });
+    broken.forEach(function (img) { img.style.setProperty('display', 'none', 'important'); });
+    var without = width();
+    broken.forEach(function (img, k) {
+      if (saved[k] === null) img.removeAttribute('style');
+      else img.setAttribute('style', saved[k]);
+    });
+    return {
+      overflows: without > viewportWidth + 1,
+      scrollWidth: without,
+      viewportWidth: viewportWidth,
+      brokenImages: broken.length
+    };
+  };
+}
+`;
+
 class ResponsiveDesignScanner extends BaseScanner {
   constructor() {
     super('responsive-design', {
@@ -169,7 +213,15 @@ class ResponsiveDesignScanner extends BaseScanner {
     }
 
     const reflow = await this.measureReflow(page, { scanDir });
-    if (reflow.some((v) => v.issue === 'reflow-failure')) reflowWorks = false;
+    if (reflow.some((v) => v.issue === 'reflow-failure')) {
+      reflowWorks = false;
+      // The page-level overflow is one failure of 1.4.10. The 320px reference
+      // measurement owns it; the zoom steps of the viewport matrix see the
+      // same overflow and must not report it a second time.
+      for (let i = violations.length - 1; i >= 0; i--) {
+        if (violations[i].issue === 'horizontal-scroll') violations.splice(i, 1);
+      }
+    }
     violations.push(...reflow);
 
     log.debug(`Responsive analysis complete: ${violations.length} raw violations`);
@@ -202,12 +254,15 @@ class ResponsiveDesignScanner extends BaseScanner {
     const screenshotName = `${viewport.name.replace(/\s+/g, '-')}-zoom-${zoomLevel}.png`;
     await page.screenshot({ path: path.join(scanDir, screenshotName), fullPage: true });
 
-    const scrollAnalysis = await page.evaluate(() => {
-      const scrollWidth = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);
-      const clientWidth = window.innerWidth;
-      // 1px tolerance: sub-pixel rounding of borders and shadows is not reflow
-      return { hasHorizontalScroll: scrollWidth > clientWidth + 1, scrollWidth, clientWidth };
-    });
+    const scrollAnalysis = await page.evaluate((overflowSrc) => {
+      eval(overflowSrc);
+      const measured = window.__pageOverflow();
+      return {
+        hasHorizontalScroll: measured.overflows,
+        scrollWidth: measured.scrollWidth,
+        clientWidth: measured.viewportWidth,
+      };
+    }, OVERFLOW_CODE);
 
     if (scrollAnalysis.hasHorizontalScroll) {
       violations.push({
@@ -443,9 +498,10 @@ class ResponsiveDesignScanner extends BaseScanner {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const reflowAnalysis = await page.evaluate(
-      (renderedSrc, clipSrc) => {
+      (renderedSrc, clipSrc, overflowSrc) => {
         eval(renderedSrc);
         eval(clipSrc);
+        eval(overflowSrc);
 
         const viewportWidth = window.innerWidth || 320;
 
@@ -555,19 +611,19 @@ class ResponsiveDesignScanner extends BaseScanner {
           (c) => !c.truncationDeclared
         );
 
+        const overflow = window.__pageOverflow();
+
         return {
-          // 1px tolerance for sub-pixel rounding of borders and shadows
-          hasHorizontalScroll:
-            Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) >
-            viewportWidth + 1,
-          documentWidth: Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
+          hasHorizontalScroll: overflow.overflows,
+          documentWidth: overflow.scrollWidth,
           viewportWidth,
           fixedElements: fixedElements.slice(0, 10),
           clipped: clipped.slice(0, 10),
         };
       },
       renderedCode,
-      textClippingCode
+      textClippingCode,
+      OVERFLOW_CODE
     );
 
     if (options.scanDir) {

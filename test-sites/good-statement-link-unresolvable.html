@@ -1,0 +1,29 @@
+<!-- WCAG-TEST
+criterion: EN 301 549 12.1
+level: AA
+title: Statement link that cannot be resolved to a real origin
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: accessibility-statement
+description: A footer link to a statement path that is not part of what is being served. The path was only ever resolved against the serving address, so its status is no evidence about the site and inaccessible-statement stays silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Company - Accessibility Test</title>
+  </head>
+  <body>
+    <main>
+      <h1>Company</h1>
+      <p>We build measuring instruments.</p>
+    </main>
+    <footer>
+      <ul>
+        <li><a href="/imprint">Imprint</a></li>
+        <li><a href="/help/accessibility-statement">Accessibility statement</a></li>
+      </ul>
+    </footer>
+  </body>
+</html>

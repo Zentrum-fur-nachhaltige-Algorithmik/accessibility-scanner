@@ -1,0 +1,63 @@
+<!-- WCAG-TEST
+criterion: 2.4.7
+level: AA
+title: Focus Visible
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: A skip link hidden with clip rect(0 0 0 0) that becomes visible on focus and paints no outline, so its appearance is the focus indicator (technique C15)
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skip link that appears on focus - Accessibility Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0 20px 40px;
+      }
+      .skip-link {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+        white-space: nowrap;
+        background: #ffffff;
+        color: #10367a;
+      }
+      .skip-link:focus {
+        position: static;
+        width: auto;
+        height: auto;
+        margin: 0;
+        padding: 12px 20px;
+        clip: auto;
+        overflow: visible;
+        outline: none;
+      }
+      a.body-link:focus {
+        outline: 3px solid #10367a;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the main content</a>
+    <header><h1>Field notes</h1></header>
+    <main id="main">
+      <p>
+        The <a class="body-link" href="#notes">measurement notes</a> record every reading taken in
+        the valley, together with the calibration of the morning it was taken.
+      </p>
+      <p id="notes">Readings are kept for ten years.</p>
+    </main>
+  </body>
+</html>

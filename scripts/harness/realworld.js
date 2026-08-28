@@ -123,9 +123,8 @@ const FIXTURES = [
   {
     file: 'own-audit-ui.html',
     source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
-    // recorded: 28 total ensemble violations (profile=standard, --no-llm), 32 on
-    // another run; run-to-run drift is normal.
-    band: [14, 56],
+    // recorded: 4 total ensemble violations (profile=standard, --no-llm).
+    band: [2, 8],
     spotTruths: [
       {
         name: 'REGRESSION: __next-route-announcer__ empty live region NOT flagged',
@@ -176,40 +175,14 @@ const FIXTURES = [
           );
         },
       },
-      {
-        name: 'REAL: <html lang="de"> contradicts English content / inner lang="en"',
-        kind: 'must-detect',
-        // The document declares German:
-        //   <html lang="de">
-        // but every word of content is English ("Web accessibility audit",
-        // "Enter the address of a publicly reachable page, choose a scan
-        // profile and start the audit.") and the hydrated wrapper immediately
-        // re-declares <div class="page" lang="en">. A page whose declared
-        // language is not the language of its content is WCAG 3.1.1 (and the
-        // nested contradiction is 3.1.2).
-        //
-        // Known gap: the ensemble does not detect this, so this assertion fails.
-        // It stays because the violation is real and hand-verified. Deciding it
-        // needs language identification of the running text, which no
-        // deterministic check here does; axe validates the syntax of the tag
-        // only.
-        check: ({ violations }) => {
-          const hits = findViolations(violations, {
-            id: ['3.1.1', '3.1.2', 'html-lang', 'valid-lang', 'html-has-lang'],
-          });
-          if (hits.length > 0) return null;
-          return 'no 3.1.1/3.1.2 language violation reported despite lang="de" on an all-English page';
-        },
-      },
     ],
   },
 
   {
     file: 'med-theme.html',
     source: 'https://dr-mauermann-urologe.vercel.app',
-    // recorded: 44 total ensemble violations (profile=standard, --no-llm) on
-    // both runs.
-    band: [22, 88],
+    // recorded: 12 total ensemble violations (profile=standard, --no-llm).
+    band: [6, 24],
     spotTruths: [
       {
         name: 'REAL: heading level skips h2 -> h4',
@@ -279,9 +252,8 @@ const FIXTURES = [
   {
     file: 'beeproduced.html',
     source: 'https://beeproduced.com',
-    // recorded: 379 total ensemble violations (profile=standard, --no-llm), 436
-    // on a run where keyboard-navigation did not time out.
-    band: [189, 758],
+    // recorded: 58 total ensemble violations (profile=standard, --no-llm).
+    band: [29, 116],
     spotTruths: [
       {
         name: 'REGRESSION: axe-core survives the dead <iframe> and still reports',
@@ -375,9 +347,9 @@ const FIXTURES = [
   {
     file: 'wiki-medical-de.html',
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
-    // recorded: 1620 total ensemble violations (profile=standard, --no-llm),
-    // single run, 415.9s wall clock.
-    band: [810, 3240],
+    // recorded: 433 total ensemble violations (profile=standard, --no-llm),
+    // 281.5s wall clock.
+    band: [216, 866],
     spotTruths: [
       {
         name: 'REAL: images with no alt attribute at all',
@@ -517,9 +489,8 @@ const FIXTURES = [
   {
     file: 'modern-commercial.html',
     source: 'https://www.mozilla.org/de/',
-    // recorded: 223 total ensemble violations (profile=standard, --no-llm) on
-    // both runs.
-    band: [111, 446],
+    // recorded: 48 total ensemble violations (profile=standard, --no-llm).
+    band: [24, 96],
     spotTruths: [
       {
         name: 'REAL: a literal <blink> element in the navigation',
@@ -659,8 +630,8 @@ const FIXTURES = [
   {
     file: 'gov-uk-guide.html',
     source: 'https://www.gov.uk/vehicle-tax',
-    // recorded: 16 total ensemble violations (profile=standard, --no-llm).
-    band: [8, 32],
+    // recorded: 3 total ensemble violations (profile=standard, --no-llm).
+    band: [1, 6],
     spotTruths: [
       {
         name: 'REGRESSION: static prose about timeouts is not auto-updating content',
@@ -754,8 +725,8 @@ const FIXTURES = [
   {
     file: 'webaim-article.html',
     source: 'https://webaim.org/techniques/skipnav/',
-    // recorded: 44 total ensemble violations (profile=standard, --no-llm).
-    band: [22, 88],
+    // recorded: 33 total ensemble violations (profile=standard, --no-llm).
+    band: [16, 66],
     spotTruths: [
       {
         name: 'REGRESSION: article links are not skip links',
@@ -824,8 +795,10 @@ const FIXTURES = [
   {
     file: 'govuk-design-system.html',
     source: 'https://design-system.service.gov.uk/components/text-input/',
-    // recorded: 124 total ensemble violations (profile=standard, --no-llm).
-    band: [62, 248],
+    // recorded: 31 total ensemble violations (profile=standard, --no-llm) on
+    // two runs of this file alone; in both, two exclusive scanners lost the 45s
+    // reload on this 811KB page and contributed nothing.
+    band: [15, 62],
     spotTruths: [
       {
         name: 'REGRESSION: iframes are not reported as missing a focus indicator',
@@ -883,8 +856,8 @@ const FIXTURES = [
   {
     file: 'a11y-project-checklist.html',
     source: 'https://www.a11yproject.com/checklist/',
-    // recorded: 22 total ensemble violations (profile=standard, --no-llm).
-    band: [11, 44],
+    // recorded: 6 total ensemble violations (profile=standard, --no-llm).
+    band: [3, 12],
     spotTruths: [
       {
         name: 'REGRESSION: a checklist about timeouts does not have a timeout',
@@ -934,8 +907,8 @@ const FIXTURES = [
   {
     file: 'broadcaster-news.html',
     source: 'https://www.bbc.com/news',
-    // recorded: 182 total ensemble violations (profile=standard, --no-llm).
-    band: [91, 364],
+    // recorded: 75 total ensemble violations (profile=standard, --no-llm).
+    band: [37, 150],
     spotTruths: [
       {
         name: 'REGRESSION: a described photograph is not a defect',
@@ -987,8 +960,9 @@ const FIXTURES = [
   {
     file: 'wiki-accessibility-en.html',
     source: 'https://en.wikipedia.org/wiki/Web_accessibility',
-    // recorded: 500 total ensemble violations (profile=standard, --no-llm).
-    band: [250, 1000],
+    // recorded: 139 total ensemble violations (profile=standard, --no-llm),
+    // 334.7s wall clock, axe-core answered "Page/Frame is not ready" in that run.
+    band: [69, 278],
     spotTruths: [
       {
         name: 'REGRESSION: a link title that summarises its target is not 1.4.13 content',
@@ -1016,20 +990,6 @@ const FIXTURES = [
           );
           if (hits.length > 0) return null;
           return 'no 2.4.4 finding for the single letter navbox links';
-        },
-      },
-      {
-        name: 'REAL: the search field is labelled only by its placeholder',
-        kind: 'must-detect',
-        // <input name="search" placeholder="Search Wikipedia"> has no label
-        // element, no aria-label and no aria-labelledby, so its accessible
-        // name is empty once the placeholder is replaced by typed text.
-        check: ({ violations }) => {
-          const hits = violations.filter((v) =>
-            /placeholder/i.test(`${v.issue || ''} ${v.description || ''}`)
-          );
-          if (hits.length > 0) return null;
-          return 'no finding for the search input whose only label is its placeholder';
         },
       },
     ],

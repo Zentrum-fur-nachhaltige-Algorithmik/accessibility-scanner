@@ -120,27 +120,33 @@ class AxeCoreAdapter extends BaseScanner {
     const axeResults = await axeBuilder.analyze();
 
     const violations = [];
+    // Deque best practices are advice about a criterion nothing fails, so they
+    // are reported beside the findings instead of among them.
+    const bestPractices = [];
 
     // Convert definitive violations
     for (const rule of axeResults.violations) {
+      const bucket = isBestPracticeOnly(rule.tags) ? bestPractices : violations;
       for (const node of rule.nodes) {
-        violations.push(this._convertNode(rule, node, 'violation'));
+        bucket.push(this._convertNode(rule, node, 'violation'));
       }
     }
 
     // Convert incomplete results as info severity
     for (const rule of axeResults.incomplete || []) {
+      const bucket = isBestPracticeOnly(rule.tags) ? bestPractices : violations;
       for (const node of rule.nodes) {
-        violations.push(this._convertNode(rule, node, 'incomplete'));
+        bucket.push(this._convertNode(rule, node, 'incomplete'));
       }
     }
 
     return {
       scannerId: this.id,
-      // 'info' (axe incomplete) and 'best-practice' (Deque advice, not a WCAG
-      // failure) do not make a page fail, the same rule the score uses.
+      // 'info' (axe incomplete) does not make a page fail, the same rule the
+      // score uses.
       passed: violations.filter(isHardViolation).length === 0,
       violations,
+      bestPractices,
       summary: {
         engine: 'axe-core',
         version: axeResults.testEngine?.version || 'unknown',
@@ -152,6 +158,7 @@ class AxeCoreAdapter extends BaseScanner {
         violationRules: axeResults.violations?.length || 0,
         incompleteRules: axeResults.incomplete?.length || 0,
         totalNodes: violations.length,
+        bestPracticeNodes: bestPractices.length,
       },
     };
   }

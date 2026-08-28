@@ -1,0 +1,82 @@
+<!-- WCAG-TEST
+criterion: 1.4.10
+level: AA
+title: Reflow
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: responsive-design
+description: A responsive layout whose only wide box is an image that never loads, laid out at its width attribute, and a skip link hidden with clip rect(0 0 0 0) that a min-height keeps larger than one pixel
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reflow with a dead image - Accessibility Test</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0 12px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 1140px;
+        margin: 0 auto;
+      }
+      p {
+        max-width: 100%;
+      }
+      /* The classic visually hidden pattern, with a min-height from a
+         component rule so the box is not one pixel tall. */
+      .skip-link {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      a.skip-link {
+        min-height: 44px;
+        padding: 12px 20px;
+        background: #fff;
+        color: #10367a;
+      }
+      .skip-link:focus {
+        position: static;
+        width: auto;
+        height: auto;
+        clip: auto;
+        overflow: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the main content of this page</a>
+    <div class="wrap">
+      <header><h1>Field notes</h1></header>
+      <main id="main">
+        <p>
+          The measurements below were taken in the field over three weeks, with the instrument
+          recalibrated every morning before the first reading was written down.
+        </p>
+        <!-- The source is not served, so the image shows nothing and is laid
+             out at its width attribute. -->
+        <img src="./missing-panorama.jpg" width="1400" height="700" alt="Panorama of the valley" />
+        <p>
+          Every reading was repeated three times and the median was kept, which removes the single
+          outlier the first series produced on the second day.
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

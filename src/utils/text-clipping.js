@@ -44,7 +44,11 @@ if (typeof window.__findClippedText !== 'function') {
       const s = window.getComputedStyle(p);
       const w = parseFloat(s.width), h = parseFloat(s.height);
       if ((s.position === 'absolute' || s.position === 'fixed') && w <= 1 && h <= 1) return true;
-      if (s.clipPath && s.clipPath.indexOf('inset(50%') === 0) return true;
+      // The clipping rectangle keeps nothing: the classic sr-only pattern,
+      // which a min-height or a padding elsewhere in the cascade can grow
+      // past the 1px test above.
+      if (s.clip && /^rect\\((\\s*0(px)?\\s*,?){4}\\)$/.test(s.clip.replace(/\\s+/g, ' '))) return true;
+      if (s.clipPath && (s.clipPath.indexOf('inset(50%') === 0 || s.clipPath.indexOf('inset(100%') === 0)) return true;
       p = p.parentElement;
     }
     return false;

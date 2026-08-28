@@ -246,7 +246,7 @@ const HTML_SCANNER_MAPPING = {
     expectedScanners: ['input-modalities'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
-    wcagCriteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4'],
+    wcagCriteria: ['2.5.1', '2.5.2', '2.5.4'],
     description: 'Pointer gestures without alternatives, missing pointer cancellation',
   },
 
@@ -916,7 +916,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['2.1.4'],
     description:
-      'Unique accesskeys on links, an accesskey on a label, single character keys scoped to a focused listbox, and a counter that mutates the DOM every 100ms: character-key-shortcut and accesskeys must stay silent',
+      'Accesskeys on links and on a label, single character keys scoped to a focused listbox, and a counter that mutates the DOM every 100ms: character-key-shortcut must stay silent',
   },
 
   'good-bypass-landmarks-only.html': {
@@ -1052,6 +1052,69 @@ const HTML_SCANNER_MAPPING = {
     wcagCriteria: ['1.4.1'],
     description:
       'Status dots named by a visually hidden span or a title, identical decorative bullets and a colour picker of named buttons: color-coded-indicator must stay silent',
+  },
+
+  'good-inline-text-links.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'Citation markers and short links that share a line box with the sentence around them: the 2.5.8 Inline exception applies, target-too-small must stay silent',
+  },
+
+  'bad-standalone-link-targets.html': {
+    expectedScanners: ['input-modalities'],
+    excludedScanners: ['color-contrast', 'use-of-color'],
+    testType: 'bad',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'Undersized links stacked in a navigation column and a footer list with no non-target text on their line',
+  },
+
+  'good-external-links-icons-only.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.4'],
+    description:
+      'External and document links carrying target attributes and unnamed icons and nothing a reader perceives: external-links-no-identification must stay silent',
+  },
+
+  'good-statement-link-unresolvable.html': {
+    expectedScanners: [],
+    excludedScanners: ['accessibility-statement'],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1'],
+    description:
+      'A statement link to a path that is not served, resolved only against a loopback address: inaccessible-statement must stay silent',
+  },
+
+  'good-reflow-dead-image-and-skip-link.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10'],
+    description:
+      'A responsive page whose widest box is an image that never loads and whose skip link is hidden with clip rect(0 0 0 0): reflow-failure and reflow-content-clipped must stay silent',
+  },
+
+  'good-skip-link-appears-on-focus.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.7'],
+    description:
+      'A skip link that unclips on focus and paints no outline: its appearance is the indicator, so no-visible-focus must stay silent',
+  },
+
+  'good-language-switcher-outside-form.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-purpose'],
+    testType: 'good',
+    wcagCriteria: ['1.3.5'],
+    description:
+      'A language switcher and a country filter outside any form, on a page that also carries a contact form: autocomplete-off-on-purpose-field must stay silent',
   },
 };
 

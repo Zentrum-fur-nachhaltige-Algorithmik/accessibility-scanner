@@ -1,0 +1,3864 @@
+{
+ "recordedAt": "2026-08-28",
+ "source": "audit of the 842 findings the eleven realworld snapshots report at 94b4848",
+ "note": "One entry per (snapshot, rule id, node selector). Verdicts are the audit's: true = a real failure of the criterion the rule claims, false = not a failure, review = only a human can decide, unlabelled = the audit did not judge this instance.",
+ "labels": [
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "group-no-name",
+   "selector": "fieldset.c-theme-switcher",
+   "verdict": "true",
+   "reason": "radio group named only by an unassociated heading (SC 3.3.2)"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "inaccessible-statement",
+   "selector": "a.c-footer__link",
+   "verdict": "false",
+   "reason": "the statement path 404s only because the corpus is one HTML file per site; the page exists live"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "incomplete-content",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "judges the live a11yproject.com statement page, fetched over the network, the way the audit treats the BBC pair"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "no-visible-focus",
+   "selector": "a.u-text-transform-uppercase.c-skipnav",
+   "verdict": "false",
+   "reason": "a.c-skipnav goes from clip: rect(0 0 0 0) to visible on focus, which is the indicator (technique C15)"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "same live page, same question"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "reflow-content-clipped",
+   "selector": "a.u-text-transform-uppercase",
+   "verdict": "false",
+   "reason": "the visually hidden skip link, clipped by design"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "reflow-failure",
+   "selector": "",
+   "verdict": "true",
+   "reason": "the document is 322px wide at the 320px reflow viewport"
+  },
+  {
+   "snapshot": "a11y-project-checklist.html",
+   "rule": "text-spacing-failure",
+   "selector": "a.c-primary-nav__link",
+   "verdict": "true",
+   "reason": "text newly clipped after the 1.4.12 values were injected"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "autocomplete-off-on-purpose-field",
+   "selector": "select#:Rbaqrlaupgqop:",
+   "verdict": "false",
+   "reason": "site language switcher, not a field about the user; the evidence came from a contact form it is not part of"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-12ypkqp-container > .framer-v-1dpv088.framer-ZX3B5[data-framer-name=\"Tertiary\"] > .framer-4v7upm[data-framer-name=\"Text Wrapper\"] > .framer-1882qo1[data-framer-name=\"Text Wrapper\"] > .framer-q9dx4i > .framer-1ungj5j[data-framer-component-type=\"RichTextContainer\"] > .framer-styles-preset-r37ba8[data-styles-preset=\"ndo0Djm8K\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-1cn1quv-container > .framer-v-54yxc1.framer-ZX3B5[data-framer-name=\"Primary Icon End\"] > .framer-4v7upm[data-framer-name=\"Text Wrapper\"] > .framer-1882qo1[data-framer-name=\"Text Wrapper\"] > .framer-q9dx4i > .framer-1ungj5j[data-framer-component-type=\"RichTextContainer\"] > .framer-styles-preset-r37ba8[data-styles-preset=\"ndo0Djm8K\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-1lznot7-container > .framer-v-9x36r7.framer-ZX3B5[data-framer-name=\"Secondary\"] > .framer-4v7upm[data-framer-name=\"Text Wrapper\"] > .framer-1882qo1[data-framer-name=\"Text Wrapper\"] > .framer-q9dx4i > .framer-1ungj5j[data-framer-component-type=\"RichTextContainer\"] > .framer-styles-preset-r37ba8[data-styles-preset=\"ndo0Djm8K\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-q8nsbm-container > .framer-v-1dpv088.framer-ZX3B5[data-framer-name=\"Tertiary\"] > .framer-4v7upm[data-framer-name=\"Text Wrapper\"] > .framer-1882qo1[data-framer-name=\"Text Wrapper\"] > .framer-q9dx4i > .framer-1ungj5j[data-framer-component-type=\"RichTextContainer\"] > .framer-styles-preset-r37ba8[data-styles-preset=\"ndo0Djm8K\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-qknjiz > .framer-styles-preset-7nh0vo[data-styles-preset=\"vryhxGsv1\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-styles-preset-rexa7o",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": ".framer-tmp4yj-container > .framer-v-9x36r7.framer-ZX3B5[data-framer-name=\"Secondary\"] > .framer-4v7upm[data-framer-name=\"Text Wrapper\"] > .framer-1882qo1[data-framer-name=\"Text Wrapper\"] > .framer-q9dx4i > .framer-1ungj5j[data-framer-component-type=\"RichTextContainer\"] > .framer-styles-preset-r37ba8[data-styles-preset=\"ndo0Djm8K\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "color-contrast",
+   "selector": "h1",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "external-links-no-identification",
+   "selector": "external links",
+   "verdict": "false",
+   "reason": "an image inside a link and a target attribute are not destination indicators (SC 3.2.4)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "fixed-width-element",
+   "selector": "div.framer-197z6l1",
+   "verdict": "true",
+   "reason": "element wider than the 320px reflow viewport with its text cut (SC 1.4.10)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "heading-order",
+   "selector": ".framer-13ep6g6 > h4",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "heading-order",
+   "selector": ".framer-b4r4ic > h4",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "heading-order",
+   "selector": ".framer-styles-preset-rexa7o",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "heading-order",
+   "selector": ".ssr-variant:nth-child(1) > .framer-1abqd3f-container > .framer-hvfcO.framer-Dwhy0.framer-190k49d > .framer-1smntiu[data-framer-name=\"Text Wrapper\"] > .framer-kso7fp[data-framer-component-type=\"RichTextContainer\"] > h5",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "landmark-one-main",
+   "selector": "html",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "no statement-shaped link anywhere on the page (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "missing-autocomplete",
+   "selector": "input[name=\"email\"]",
+   "verdict": "true",
+   "reason": "field collecting the user's own data with no autocomplete token (SC 1.3.5)"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "reflow-content-clipped",
+   "selector": "footer.framer-7jCph",
+   "verdict": "true",
+   "reason": "footer text cut at the 320px reflow viewport"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-1czk6s1",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-1kwm44",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-9s7upn",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-f4dpbs",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-form-text-input",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-hiani9",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-i0sqkd",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-l03h6w",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-mztg9r",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".framer-szd949",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": ".hidden-3shixg.hidden-1dvxe.ssr-variant:nth-child(4)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "#screenshot",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "fieldset",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(1)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(10)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(11)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(12)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(2)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(3)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(4)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(5)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(6)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(7)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(8)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "section > ul > li:nth-child(9)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(3)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(4)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(5)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(6)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(7)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(8)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "region",
+   "selector": "ul[draggable=\"false\"] > li:nth-child(9)",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "tabindex",
+   "selector": ".framer-1jpi8d1",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "tabindex",
+   "selector": ".framer-v-7jpp01",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "tabindex",
+   "selector": "#undefined-5brqdx > .framer-v-1x42xk8.framer-2Paz3[data-framer-name=\"Menu\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "tabindex",
+   "selector": "#undefined-abcthc > .framer-v-1x42xk8.framer-2Paz3[data-framer-name=\"Menu\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "tabindex",
+   "selector": "#undefined-gl8syg > .framer-v-1x42xk8.framer-2Paz3[data-framer-name=\"Menu\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "text-spacing-failure",
+   "selector": "p.framer-text.framer-styles-preset-16oc953",
+   "verdict": "true",
+   "reason": "text newly clipped after the 1.4.12 values were injected"
+  },
+  {
+   "snapshot": "beeproduced.html",
+   "rule": "text-spacing-failure",
+   "selector": "p.framer-text.framer-styles-preset-7nh0vo",
+   "verdict": "true",
+   "reason": "text newly clipped after the 1.4.12 values were injected"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "aria-hidden-focus",
+   "selector": ".LanguageDropdown-styles__DropdownContentWrapperStyled-sc-bc6bb5-4",
+   "verdict": "review",
+   "reason": "axe incomplete"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "button-name",
+   "selector": ".AccountButtons-styles__AccountMobileToggleButtonStyled-sc-32916240-0",
+   "verdict": "true",
+   "reason": "account toggle with no accessible name (SC 4.1.2)"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "color-contrast",
+   "selector": ".orb-banner-title > span",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "external-links-no-identification",
+   "selector": "external links",
+   "verdict": "false",
+   "reason": "an image inside a link and a target attribute are not destination indicators (SC 3.2.4)"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "incomplete-content",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "judges bbc.co.uk/accessibility, fetched live: a help hub the rule picked as the statement"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "landmark-unique",
+   "selector": "#main-navigation-container",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "link-in-text-block",
+   "selector": "p[dir=\"ltr\"]:nth-child(1) > a",
+   "verdict": "true",
+   "reason": "link distinguished from its paragraph by colour alone (SC 1.4.1)"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "same live page, same question"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "region",
+   "selector": ".orb-banner-content",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "region",
+   "selector": ".orb-banner-title",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "region",
+   "selector": "#\\:R35tbdm\\:",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "region",
+   "selector": "#bbccookies-settings",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "region",
+   "selector": "label",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "target-too-small",
+   "selector": "a.Anchor-styles__AnchorStyled-sc-651d33db-0",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "target-too-small",
+   "selector": "a.ContentLinks-styles__ContentLinkStyled-sc-9a221ef-2",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "target-too-small",
+   "selector": "a.LegalLinks-styles__LegalLinkItemStyled-sc-f9fd086a-3",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "target-too-small",
+   "selector": "a.London-styles__LondonMediaAnchorStyled-sc-269f9f6d-4",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "target-too-small",
+   "selector": "a.Navigation-styles__MainNavigationLink-sc-f1c1fa10-4",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "broadcaster-news.html",
+   "rule": "target-too-small",
+   "selector": "a.SkipLink-styles__SkipLinkAnchorStyled-sc-3b03ee65-1",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "gov-uk-guide.html",
+   "rule": "inaccessible-statement",
+   "selector": "a.govuk-footer__link",
+   "verdict": "false",
+   "reason": "the statement path 404s only because the corpus is one HTML file per site; the page exists live"
+  },
+  {
+   "snapshot": "gov-uk-guide.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "judges the live gov.uk accessibility statement, fetched over the network"
+  },
+  {
+   "snapshot": "gov-uk-guide.html",
+   "rule": "region",
+   "selector": ".gem-c-feedback__prompt-question",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "gov-uk-guide.html",
+   "rule": "region",
+   "selector": ".gem-c-skip-link",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "color-contrast",
+   "selector": "#app-site-search__input",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": ".app-example__frame--xl",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#example-of-a-text-input-asking-for-a-code-or-sequence-text-input-example > .app-example.app-example--tabs > .app-example__frame--m[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#example-of-an-input-asking-for-numbers-with-decimal-places-text-input-example > .app-example.app-example--tabs > .app-example__frame--m[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#number-input-text-input-example > .app-example.app-example--tabs > .app-example__frame--m[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#text-input-with-errors-text-input-example > .app-example.app-example--tabs > .app-example__frame--s[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#text-input-with-prefix-and-suffix-text-input-example > .app-example.app-example--tabs > .app-example__frame--s[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#text-input-with-prefix-and-suffix-with-error-text-input-example > .app-example.app-example--tabs > .app-example__frame--s[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#text-input-with-prefix-text-input-example > .app-example.app-example--tabs > .app-example__frame--s[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "#text-input-with-suffix-text-input-example > .app-example.app-example--tabs > .app-example__frame--s[loading=\"lazy\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "frame-tested",
+   "selector": "iframe[title=\"Hint text – Text input example\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, and an incomplete: axe could not enter the iframe"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "inaccessible-statement",
+   "selector": "a.govuk-service-navigation__link",
+   "verdict": "false",
+   "reason": "the statement path 404s only because the corpus is one HTML file per site; the page exists live"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "link-purpose-needs-context",
+   "selector": "a.app-subnav__link",
+   "verdict": "review",
+   "reason": "SC 2.4.9 is AAA and advisory: the link is identified by its context, which 2.4.4 allows"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "no-selected-tab",
+   "selector": "ul.app-tabs",
+   "verdict": "review",
+   "reason": "true of the served markup, but the GDS script that sets the state was killed by the capture"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "region",
+   "selector": ".app-back-to-top",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "govuk-design-system.html",
+   "rule": "region",
+   "selector": ".govuk-skip-link",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "med-theme.html",
+   "rule": "color-contrast",
+   "selector": ".footer__grid > div:nth-child(1) > p",
+   "verdict": "true",
+   "reason": "measured text contrast below the 1.4.3 threshold"
+  },
+  {
+   "snapshot": "med-theme.html",
+   "rule": "heading-order",
+   "selector": ".tile:nth-child(1) > h4",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "med-theme.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "no statement-shaped link anywhere on the page (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "med-theme.html",
+   "rule": "region",
+   "selector": ".sticky-cta",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "med-theme.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "unlabelled",
+   "reason": "the selector covers 2 link(s) inside running text and 6 standalone one(s), and the audit judged the two differently"
+  },
+  {
+   "snapshot": "med-theme.html",
+   "rule": "target-too-small",
+   "selector": "a.nav__link",
+   "verdict": "true",
+   "reason": "standalone navigation link at 60x17px; the only other text in its block belongs to the neighbouring links, which is not non-target text"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "aria-valid-attr-value",
+   "selector": "a[data-testid=\"m24-navigation-link-about-us\"]",
+   "verdict": "review",
+   "reason": "axe incomplete"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "aria-valid-attr-value",
+   "selector": "a[data-testid=\"m24-navigation-link-products\"]",
+   "verdict": "review",
+   "reason": "axe incomplete"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "blink",
+   "selector": "blink",
+   "verdict": "false",
+   "reason": "the <blink> element is empty and no engine blinks, so nothing has to be stoppable (SC 2.2.2)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "external-links-no-identification",
+   "selector": "external links",
+   "verdict": "false",
+   "reason": "an image inside a link and a target attribute are not destination indicators (SC 3.2.4)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "group-no-name",
+   "selector": "fieldset.mzp-c-newsletter-content",
+   "verdict": "true",
+   "reason": "radio group named only by an unassociated heading (SC 3.3.2)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "horizontal-scroll",
+   "selector": "",
+   "verdict": "false",
+   "reason": "the same overflow as reflow-failure, reported a second time from the viewport matrix, and produced by dead images"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "landmark-banner-is-top-level",
+   "selector": ".mzp-c-newsletter-header",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "link-purpose-needs-context",
+   "selector": "a.m24-c-cta",
+   "verdict": "review",
+   "reason": "SC 2.4.9 is AAA and advisory: the link is identified by its context, which 2.4.4 allows"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "no statement-shaped link anywhere on the page (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "missing-autocomplete",
+   "selector": "input#id_email",
+   "verdict": "true",
+   "reason": "field collecting the user's own data with no autocomplete token (SC 1.3.5)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "missing-autocomplete",
+   "selector": "select#id_country",
+   "verdict": "true",
+   "reason": "field collecting the user's own data with no autocomplete token (SC 1.3.5)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "missing-autocomplete",
+   "selector": "select#id_lang",
+   "verdict": "true",
+   "reason": "field collecting the user's own data with no autocomplete token (SC 1.3.5)"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "reflow-failure",
+   "selector": "",
+   "verdict": "review",
+   "reason": "the audit called this false because dead <img width=\"1400\"> elements were laid out at their attribute width; with those images out of the layout a 22px overflow of the newsletter fieldset remains, which the capture may itself have produced"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.bluesky",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.instagram",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.linkedin",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.m24-c-launchpad-link",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.m24-c-menu-title",
+   "verdict": "true",
+   "reason": "standalone menu category link at 58x17px; the rest of its block is other controls"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.spotify",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.tiktok",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "a.youtube",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "modern-commercial.html",
+   "rule": "target-too-small",
+   "selector": "button#moz-consent-banner-button-accept.moz-consent-banner-button",
+   "verdict": "true",
+   "reason": "standalone control in the cookie banner, 234x21px, with no non-target text on its line"
+  },
+  {
+   "snapshot": "own-audit-ui.html",
+   "rule": "inaccessible-statement",
+   "selector": "a[href=\"/accessibility\"]",
+   "verdict": "false",
+   "reason": "the statement path 404s only because the corpus is one HTML file per site; the page exists live"
+  },
+  {
+   "snapshot": "own-audit-ui.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "own-audit-ui.html",
+   "rule": "target-too-small",
+   "selector": "button.submit-btn",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": ".example > .title",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": ".important > .title",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": ".note > .title",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": ".phone",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#blog",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#checkpage > h2",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#copyright",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#footerabout",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#footercontact",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#footercopyright",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#footerli",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#footerrss",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#popular",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "#related > h2",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"community/\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"projects/\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"resources/\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"services/\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "color-contrast",
+   "selector": "h1",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "fixed-width-element",
+   "selector": "div#search",
+   "verdict": "true",
+   "reason": "element wider than the 320px reflow viewport with its text cut (SC 1.4.10)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "insufficient-background-contrast",
+   "selector": "input[0]",
+   "verdict": "true",
+   "reason": "control fill measured at 1.25:1 against the composited backdrop (SC 1.4.11)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "insufficient-border-contrast",
+   "selector": "input[0]",
+   "verdict": "true",
+   "reason": "button border measured below 3:1 against the composited backdrop (SC 1.4.11)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "insufficient-form-border-contrast",
+   "selector": "input#waveurl",
+   "verdict": "true",
+   "reason": "WAVE address field border measured at 1.29:1 against the composited backdrop (SC 1.4.11)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "landmark-unique",
+   "selector": "header > nav",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "no statement-shaped link anywhere on the page (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "webaim-article.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "accesskeys",
+   "selector": "a",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "accesskeys",
+   "selector": "a.cdx-button",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "external-links-no-identification",
+   "selector": "external links",
+   "verdict": "false",
+   "reason": "an image inside a link and a target attribute are not destination indicators (SC 3.2.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(28)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(29)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(30)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(661)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(662)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(663)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(681)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(682)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a:nth-of-type(683)",
+   "verdict": "true",
+   "reason": "navbox \"v / t / e\" link: one-letter accessible name and no word in the containing cell (SC 2.4.4)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "no statement-shaped link anywhere on the page (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "unlabelled",
+   "reason": "the selector covers 3 link(s) inside running text and 6 standalone one(s), and the audit judged the two differently"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mw-Q",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mw0w",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mw8Q",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA_4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA_M",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA-k",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA0U",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA1A",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA1k",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA2E",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA2s",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA30",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA3Q",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA48",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA4Y",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA5g",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA60",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA6M",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA7c",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA8E",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA8w",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA98",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA9Y",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAd0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAdk",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAg0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAhs",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAjc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAjM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAkc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAnA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAo4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAoo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAXY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAY0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAYc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAyE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAyw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAz4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAzU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBa4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBAg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBaM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBB0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBbg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBBI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBCg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBcI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBcw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBD0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBdI.mw-redirect",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBDM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBdw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBec",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBEg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBf0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBfI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBFI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBFw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBgg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBGY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBh4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBHA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBhI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBHo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBig",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBj0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBJ4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBjQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBJQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBK4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBkc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBKY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBl8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBLg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBlI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBlk",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBMI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBmo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBMo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBn8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBN8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBnQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBNU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBog",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBOo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBP8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBpI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBPQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBps",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBq4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBQk",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBqQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBrc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBRM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBRs",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBsA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBSc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBsk",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBTE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBtI",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBTs",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBUU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBV8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBWo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBXY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBY4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBYE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBZc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwKA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwLA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwnA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwTw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwvA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-accessibility-en.html",
+   "rule": "target-too-small",
+   "selector": "a#mwzw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": ".search-toggle",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": "#ca-edit > a[accesskey=\"e\"][data-mw-interface=\"\"]",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": "#ca-history > a[accesskey=\"h\"][data-mw-interface=\"\"]",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": "#ca-ve-edit > a[accesskey=\"v\"][data-mw-interface=\"\"]",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": "#pt-login-2 > a[accesskey=\"o\"][data-mw-interface=\"\"]",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": "a",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "accesskeys",
+   "selector": "a.cdx-button",
+   "verdict": "false",
+   "reason": "SC 2.1.4 exempts shortcuts that need a modifier, and every browser invokes accesskey with Alt"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#p-lang-btn-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-appearance-dropdown-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-main-menu-dropdown-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-page-titlebar-toc-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-page-tools-dropdown-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-sticky-header-toc-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-user-links-dropdown-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-allowed-role",
+   "selector": "#vector-variants-dropdown-checkbox",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-hidden-focus",
+   "selector": ".nomobile",
+   "verdict": "true",
+   "reason": "focusable element inside aria-hidden=\"true\" (SC 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-hidden-focus",
+   "selector": "#Vorlage_Exzellent > .noresize.noviewer[role=\"presentation\"]",
+   "verdict": "true",
+   "reason": "focusable element inside aria-hidden=\"true\" (SC 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "aria-prohibited-attr",
+   "selector": "#bodyContent",
+   "verdict": "review",
+   "reason": "axe incomplete: aria-labelledby on a div with no role"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwA0E > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwAR4 > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwARU > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwARY > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwAuA > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB_8",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB_Y",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB-M",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB0s",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB1o",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB2k",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB4U",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB6A",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB6g",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB6w",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB70",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwB9A",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBaE",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBCA > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBcU",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBf4",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBfY",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBgE",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBjE",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBjQ",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBk8",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBkc",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBlc",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBmI",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBms",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBow",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBpQ",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBqs",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBrY",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBu4",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBuI",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBv8",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBVE",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBvs",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBWA",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBxQ",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBYc",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBys",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwByY",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBz8",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBzI",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwBZQ",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCAU",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCCo",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCE0",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCF4",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCHs",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCII",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCJ0",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCKQ",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCPE",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCQ0",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCR0",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCSU",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCT8",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCTg",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCUw",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCUY",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCV8",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCVg",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwCVI",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#mwJQ > .hauptartikel-pfeil[title=\"siehe\"][role=\"presentation\"]",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#toc-Prognose_und_Auswirkungen_auf_die_Lebenserwartung > .vector-toc-link > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "#vector-page-titlebar-toc-label > .vector-dropdown-label-text",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Diagnostik_2\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Einzelnachweise\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Einzelnachweise\"] > .vector-toc-text > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Geschichte\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Geschichte\"] > .vector-toc-text > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Literatur\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Literatur\"] > .vector-toc-text > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Phytotherapie\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Phytotherapie\"] > .vector-toc-text > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Rehabilitation\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Rehabilitation\"] > .vector-toc-text > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Siehe_auch\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Weblinks\"] > .vector-toc-text > .vector-toc-numb",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"#Weblinks\"] > .vector-toc-text > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"de:Wikipedia:WikiDaheim\"] > span",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"de:Wikipedia:WikiDaheim\"] > span > span",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "button[aria-controls=\"toc-Veterinärmedizin-sublist\"] > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "color-contrast",
+   "selector": "span > b",
+   "verdict": "review",
+   "reason": "axe incomplete: no text whose contrast could be judged (non-text characters, background image, overlap)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "document-links-no-identification",
+   "selector": "document links",
+   "verdict": "false",
+   "reason": "same indicator proxy: 1 of 12 PDF links counted as marked because it contains an image"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "empty-table-header",
+   "selector": "#mwAVM",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "external-links-no-identification",
+   "selector": "external links",
+   "verdict": "false",
+   "reason": "an image inside a link and a target attribute are not destination indicators (SC 3.2.4)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "group-no-name",
+   "selector": "form",
+   "verdict": "true",
+   "reason": "radio group named only by an unassociated heading (SC 3.3.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "horizontal-scroll",
+   "selector": "",
+   "verdict": "review",
+   "reason": "the same overflow as reflow-failure, reported a second time from the viewport matrix"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwAis",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwAWk",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwAXE",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwAXY",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwAzI",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwBM4",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwBOY",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "#mwOQ",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "img[width=\"240\"]",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "img[width=\"70\"]",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "img[width=\"74\"]",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "image-alt",
+   "selector": "img[width=\"80\"]",
+   "verdict": "true",
+   "reason": "<img> carries no alt attribute at all (SC 1.1.1)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "label-name-mismatch",
+   "selector": "button.vector-pinnable-header-toggle-button",
+   "verdict": "false",
+   "reason": "second report of the same four controls under the same criterion as label-in-name label-not-in-name"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "label-not-in-name",
+   "selector": "button[180]",
+   "verdict": "true",
+   "reason": "visible label is not contained in the accessible name (SC 2.5.3)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "label-not-in-name",
+   "selector": "button[199]",
+   "verdict": "true",
+   "reason": "visible label is not contained in the accessible name (SC 2.5.3)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "label-not-in-name",
+   "selector": "button[29]",
+   "verdict": "true",
+   "reason": "visible label is not contained in the accessible name (SC 2.5.3)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "label-not-in-name",
+   "selector": "button[3]",
+   "verdict": "true",
+   "reason": "visible label is not contained in the accessible name (SC 2.5.3)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-contentinfo-is-top-level",
+   "selector": "div[role=\"contentinfo\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-no-duplicate-contentinfo",
+   "selector": "div[role=\"contentinfo\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": ".vector-header-start > .vector-main-menu-landmark[aria-label=\"Website\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": ".vector-user-links-main > .vector-appearance-landmark[aria-label=\"Erscheinungsbild\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": "#mw-panel-toc",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": "#mwAsg",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": "#mwAWY",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": "#mwJQ",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": "#right-navigation > .vector-page-tools-landmark[aria-label=\"Seitenwerkzeuge\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "landmark-unique",
+   "selector": "div[role=\"contentinfo\"]",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwAio",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwAWg",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwAXA",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwAXU",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwAzE",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwBM0",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwBOU",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwBvw",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#mwOA",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "#wda-banner\\ wikidaheim2026\\ class\\= > div:nth-child(1) > a",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "link-name",
+   "selector": "sup > .autonumber.external[rel=\"mw:ExtLink nofollow\"]",
+   "verdict": "true",
+   "reason": "link whose only content is an image with no alt, so it has no accessible name (SC 2.4.4, 4.1.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "no statement-shaped link anywhere on the page (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "reflow-content-clipped",
+   "selector": "div",
+   "verdict": "review",
+   "reason": "same table of contents panel"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "reflow-failure",
+   "selector": "",
+   "verdict": "review",
+   "reason": "the desktop table of contents is rendered because the skin script is dead"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "region",
+   "selector": "#wda-banner\\ wikidaheim2026\\ class\\=",
+   "verdict": "false",
+   "reason": "Deque best practice, no success criterion"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a.interlanguage-link-target",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a.noprint",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a.vector-toc-link",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA-E",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA3c",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA3w",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA6c",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA6M",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA7c",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA7s",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA8k",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwA9g",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAbw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAcE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAkQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAlk",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAoc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAos",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAQ4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAq8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAqs",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAx0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAYg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwAZA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB_4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB_U",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB-I",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB0o",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB0Q",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB1k",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB2g",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB3A",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB3s",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB4Q",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB58",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB6c",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB6s",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB7w",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB88",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwB8Q",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBaA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBBo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBbY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBcQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBf0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBfA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBfg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBfU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBgA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBgo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBjA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBjM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBk4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBkE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBkY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBlY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBmE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBmo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBos",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBpM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBPs",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBqA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBqo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBrU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBu0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBuE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBv4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBV8",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBVA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBvo",
+   "verdict": "true",
+   "reason": "standalone target in a navigation, footer or card list, undersized and closer than 24px to its neighbour"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBww",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBxM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwByo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwByU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBYY",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBz4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBzE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwBzg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCAQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCB4.external",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCCk",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCEw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCF0",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCHo",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCIE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCIg",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCJw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCKM",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCM4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCMA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCPA",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCPc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCQw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCRw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCSQ",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCSw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCT4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCTc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCUs",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCUU",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCV4",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCVc",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwCVE",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwng",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "target-too-small",
+   "selector": "a#mwQw",
+   "verdict": "false",
+   "reason": "the target shares its block with non-target text, so the 2.5.8 Inline exception applies"
+  },
+  {
+   "snapshot": "wiki-medical-de.html",
+   "rule": "text-spacing-failure",
+   "selector": "span",
+   "verdict": "true",
+   "reason": "text newly clipped after the 1.4.12 values were injected"
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-27T17:19:04.293Z",
+  "startedAt": "2026-08-28T17:00:47.962Z",
   "profile": "standard",
   "llmEnabled": false,
   "perFileTimeoutMs": 600000,
@@ -7,19 +7,16 @@
     {
       "file": "own-audit-ui.html",
       "source": "http://localhost:3111/audit (this repo's own Next.js frontend)",
-      "elapsedMs": 1865426,
+      "elapsedMs": 64079,
       "timedOut": false,
-      "totalViolations": 29,
-      "band": [14, 56],
+      "totalViolations": 3,
+      "band": [
+        1,
+        6
+      ],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
-        {
-          "name": "REGRESSION: language-detection completes without error",
-          "kind": "must-pass",
-          "ok": true,
-          "detail": null
-        },
         {
           "name": "REGRESSION: __next-route-announcer__ empty live region NOT flagged",
           "kind": "must-not-flag",
@@ -31,37 +28,28 @@
           "kind": "must-not-flag",
           "ok": true,
           "detail": null
-        },
-        {
-          "name": "REAL: <html lang=\"de\"> contradicts English content / inner lang=\"en\"",
-          "kind": "must-detect",
-          "ok": false,
-          "detail": "no 3.1.1/3.1.2 language violation reported despite lang=\"de\" on an all-English page"
         }
       ],
-      "scannerCount": 32,
-      "expectedScannerCount": 32,
+      "bestPractices": 0,
+      "scannerCount": 26,
+      "perScanner": {
+        "input-modalities": 3
+      },
+      "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": true,
-      "noise": [
-        "Starting error handling analysis...",
-        "Analyzing error identification...",
-        "Analyzing error suggestions...",
-        "Analyzing error prevention...",
-        "Simulating form errors for testing...",
-        "Error handling analysis complete: 0 violations found",
-        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id"
-      ]
+      "slow": false,
+      "noise": []
     },
     {
       "file": "med-theme.html",
       "source": "https://dr-mauermann-urologe.vercel.app",
-      "elapsedMs": 90853,
+      "elapsedMs": 67735,
       "timedOut": false,
-      "totalViolations": 41,
-      "band": [22, 88],
+      "totalViolations": 14,
+      "band": [
+        7,
+        28
+      ],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -84,29 +72,28 @@
           "detail": null
         }
       ],
-      "scannerCount": 32,
-      "expectedScannerCount": 32,
+      "bestPractices": 2,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 1,
+        "input-modalities": 12,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
       "bandOk": true,
       "slow": false,
-      "noise": [
-        "Starting error handling analysis...",
-        "Analyzing error identification...",
-        "Analyzing error suggestions...",
-        "Analyzing error prevention...",
-        "Simulating form errors for testing...",
-        "Error handling analysis complete: 0 violations found",
-        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id"
-      ]
+      "noise": []
     },
     {
       "file": "beeproduced.html",
       "source": "https://beeproduced.com",
-      "elapsedMs": 95418,
+      "elapsedMs": 98417,
       "timedOut": false,
-      "totalViolations": 430,
-      "band": [189, 758],
+      "totalViolations": 14,
+      "band": [
+        7,
+        28
+      ],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -131,31 +118,33 @@
         {
           "name": "CLEAN: logo link has an accessible name via its inner img alt",
           "kind": "must-not-flag",
-          "ok": false,
-          "detail": "logo link (named by <img alt=\"Logo\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+          "ok": true,
+          "detail": null
         }
       ],
-      "scannerCount": 32,
-      "expectedScannerCount": 32,
+      "bestPractices": 42,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 8,
+        "input-purpose": 1,
+        "responsive-design": 4,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
       "bandOk": true,
       "slow": false,
-      "noise": [
-        "Starting error handling analysis...",
-        "Analyzing error identification...",
-        "Analyzing error suggestions...",
-        "Analyzing error prevention...",
-        "Simulating form errors for testing...",
-        "Error handling analysis complete: 13 violations found",
-        "Error testing dropdown select#:Rbaqrlaupgqop:: Failed to execute 'querySelector' on 'Document': 'select#:Rbaqrlaupgqop:' is not a valid selector."
-      ]
+      "noise": []
     },
     {
       "file": "wiki-medical-de.html",
       "source": "https://de.wikipedia.org/wiki/Prostatakarzinom",
-      "elapsedMs": 360199,
+      "elapsedMs": 307005,
       "timedOut": false,
-      "totalViolations": 1637,
-      "band": [810, 3240],
+      "totalViolations": 304,
+      "band": [
+        152,
+        608
+      ],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -174,8 +163,8 @@
         {
           "name": "CLEAN: valid ISO 639-3 subtags on interlanguage links",
           "kind": "must-not-flag",
-          "ok": false,
-          "detail": "18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code \"arz\"; [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"bcl\"; [undefined/9.3.1.2] Element has invalid language code \"ckb\"; [undefined/9.3.1.2] Element has invalid language code \"gpe\"; [undefined/9.3.1.2] Element has invalid language code \"new\""
+          "ok": true,
+          "detail": null
         },
         {
           "name": "CLEAN: inline <span lang=\"en\"> correctly marks a language change",
@@ -190,37 +179,31 @@
           "detail": null
         }
       ],
-      "scannerCount": 32,
-      "expectedScannerCount": 32,
+      "bestPractices": 25,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 113,
+        "error-handling": 3,
+        "label-in-name": 4,
+        "input-modalities": 180,
+        "responsive-design": 3,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
       "bandOk": true,
       "slow": true,
-      "noise": [
-        "Starting error handling analysis...",
-        "Analyzing error identification...",
-        "Analyzing error suggestions...",
-        "Analyzing error prevention...",
-        "Simulating form errors for testing...",
-        "Error handling analysis complete: 2 violations found",
-        "Error testing modal trigger input#vector-main-menu-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-main-menu-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing modal trigger input#vector-appearance-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-appearance-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing modal trigger input#vector-user-links-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-user-links-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing modal trigger input#vector-page-titlebar-toc-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-page-titlebar-toc-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing modal trigger input#vector-variants-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-variants-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing modal trigger input#vector-page-tools-dropdown-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-page-tools-dropdown-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing modal trigger input#vector-sticky-header-toc-checkbox.vector-dropdown-checkbox.: Failed to execute 'querySelector' on 'Document': 'input#vector-sticky-header-toc-checkbox.vector-dropdown-checkbox.' is not a valid selector.",
-        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing search input 1: Node is either not clickable or not an Element"
-      ]
+      "noise": []
     },
     {
       "file": "modern-commercial.html",
       "source": "https://www.mozilla.org/de/",
-      "elapsedMs": 204583,
+      "elapsedMs": 160653,
       "timedOut": false,
-      "totalViolations": 250,
-      "band": [111, 446],
+      "totalViolations": 47,
+      "band": [
+        23,
+        94
+      ],
       "scannerErrors": [],
       "missingScanners": [],
       "spotTruths": [
@@ -239,71 +222,327 @@
         {
           "name": "CLEAN: heading whose accessible name comes from an image alt",
           "kind": "must-not-flag",
-          "ok": false,
-          "detail": "the only text-empty h2 (named by <img alt=\"Mozilla Anzeigen\">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading \"[empty]\" is not descriptive (empty-heading)"
+          "ok": true,
+          "detail": null
         },
         {
           "name": "CLEAN: nav logo link is named by its inner img alt",
           "kind": "must-not-flag",
-          "ok": false,
-          "detail": "logo link (named by <img alt=\"Mozilla\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
+          "ok": true,
+          "detail": null
         },
         {
           "name": "CLEAN: valid 3-letter BCP-47 subtags are not \"invalid language codes\"",
           "kind": "must-not-flag",
-          "ok": false,
-          "detail": "9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"cak\"; [undefined/9.3.1.2] Element has invalid language code \"dsb\"; [undefined/9.3.1.2] Element has invalid language code \"hsb\"; [undefined/9.3.1.2] Element has invalid language code \"kab\""
+          "ok": true,
+          "detail": null
         }
       ],
-      "scannerCount": 32,
-      "expectedScannerCount": 32,
+      "bestPractices": 1,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 3,
+        "error-handling": 1,
+        "page-structure": 1,
+        "input-purpose": 3,
+        "input-modalities": 37,
+        "responsive-design": 1,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
       "bandOk": true,
       "slow": false,
-      "noise": [
-        "Starting error handling analysis...",
-        "Analyzing error identification...",
-        "Analyzing error suggestions...",
-        "Analyzing error prevention...",
-        "Simulating form errors for testing...",
-        "Error handling analysis complete: 7 violations found",
-        "Error testing navigation link 1: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 2: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 3: Protocol error (DOM.describeNode): Could not find object with given id",
-        "Error testing navigation link 4: Protocol error (DOM.describeNode): Could not find object with given id"
-      ]
+      "noise": []
+    },
+    {
+      "file": "gov-uk-guide.html",
+      "source": "https://www.gov.uk/vehicle-tax",
+      "elapsedMs": 96210,
+      "timedOut": false,
+      "totalViolations": 1,
+      "band": [
+        1,
+        3
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: static prose about timeouts is not auto-updating content",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: the spam honeypot field is not audited",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: aria-autocomplete is a valid ARIA attribute",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: the icon search button is not a 2.5.3 failure",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: the statement link is not called broken inside the capture",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 2,
+      "scannerCount": 26,
+      "perScanner": {
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "webaim-article.html",
+      "source": "https://webaim.org/techniques/skipnav/",
+      "elapsedMs": 108051,
+      "timedOut": false,
+      "totalViolations": 34,
+      "band": [
+        17,
+        68
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: article links are not skip links",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: an article about accessibility is not an accessibility statement",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: timing-controls completes without error",
+          "kind": "must-pass",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: the WAVE url field has a low contrast boundary",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 1,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 19,
+        "nontext-contrast": 3,
+        "input-modalities": 10,
+        "responsive-design": 1,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "govuk-design-system.html",
+      "source": "https://design-system.service.gov.uk/components/text-input/",
+      "elapsedMs": 156809,
+      "timedOut": false,
+      "totalViolations": 18,
+      "band": [
+        9,
+        36
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: iframes are not reported as missing a focus indicator",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: a dropdown panel is not an unlabelled accordion panel",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: the example tabs never say which tab is selected",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 12,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 1,
+        "page-structure": 1,
+        "advanced-aria": 16
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "a11y-project-checklist.html",
+      "source": "https://www.a11yproject.com/checklist/",
+      "elapsedMs": 139092,
+      "timedOut": false,
+      "totalViolations": 5,
+      "band": [
+        2,
+        10
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: a checklist about timeouts does not have a timeout",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: the site name is not its accessibility statement",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: the skip link that appears on focus is indicated",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 0,
+      "scannerCount": 26,
+      "perScanner": {
+        "error-handling": 1,
+        "responsive-design": 2,
+        "accessibility-statement": 2
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "broadcaster-news.html",
+      "source": "https://www.bbc.com/news",
+      "elapsedMs": 152124,
+      "timedOut": false,
+      "totalViolations": 68,
+      "band": [
+        34,
+        136
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: a described photograph is not a defect",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: a photograph is not a complex data visualisation",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: a display:none iframe needs no title",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 6,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 4,
+        "input-modalities": 62,
+        "accessibility-statement": 2
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "wiki-accessibility-en.html",
+      "source": "https://en.wikipedia.org/wiki/Web_accessibility",
+      "elapsedMs": 394785,
+      "timedOut": false,
+      "totalViolations": 19,
+      "band": [
+        9,
+        38
+      ],
+      "scannerErrors": [
+        {
+          "scanner": "axe-core",
+          "error": "Page/Frame is not ready"
+        }
+      ],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: a link title that summarises its target is not 1.4.13 content",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REAL: the navbox view/talk/edit links read as \"v\", \"t\", \"e\"",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 0,
+      "scannerCount": 26,
+      "perScanner": {
+        "page-structure": 9,
+        "input-modalities": 9,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": true,
+      "noise": []
     }
   ],
-  "finishedAt": "2026-07-27T18:02:40.799Z",
+  "finishedAt": "2026-08-28T17:29:52.946Z",
   "failures": [
     {
-      "layer": "spot-truth",
-      "file": "own-audit-ui.html",
-      "detail": "REAL: <html lang=\"de\"> contradicts English content / inner lang=\"en\" : no 3.1.1/3.1.2 language violation reported despite lang=\"de\" on an all-English page"
-    },
-    {
-      "layer": "spot-truth",
-      "file": "beeproduced.html",
-      "detail": "CLEAN: logo link has an accessible name via its inner img alt: logo link (named by <img alt=\"Logo\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
-    },
-    {
-      "layer": "spot-truth",
-      "file": "wiki-medical-de.html",
-      "detail": "CLEAN: valid ISO 639-3 subtags on : 18 valid ISO 639-3 subtag(s) reported as invalid: [undefined/9.3.1.2] Element has invalid language code \"arz\"; [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"bcl\"; [undefined/9.3.1.2] Element has invalid language code \"ckb\"; [undefined/9.3.1.2] Element has invalid language code \"gpe\"; [undefined/9.3.1.2] Element has invalid language code \"new\""
-    },
-    {
-      "layer": "spot-truth",
-      "file": "modern-commercial.html",
-      "detail": "CLEAN: heading whose accessible name comes from an : the only text-empty h2 (named by <img alt=\"Mozilla Anzeigen\">) flagged as an empty heading: [undefined/9.4.1.1] h2 :: Heading element is empty; [undefined/9.2.4.6] h2:nth-child(39) :: Heading \"[empty]\" is not descriptive (empty-heading)"
-    },
-    {
-      "layer": "spot-truth",
-      "file": "modern-commercial.html",
-      "detail": "CLEAN: nav logo link is named by its inner img alt: logo link (named by <img alt=\"Mozilla\">) flagged as unnamed: [undefined/9.2.4.4] Link text \"[empty]\" does not clearly describe the link's purpose"
-    },
-    {
-      "layer": "spot-truth",
-      "file": "modern-commercial.html",
-      "detail": "CLEAN: valid 3-letter BCP-47 subtags are not \"invalid language codes\": 9 valid ISO 639-3 subtag(s) reported as invalid language codes: [undefined/9.3.1.2] Element has invalid language code \"ast\"; [undefined/9.3.1.2] Element has invalid language code \"cak\"; [undefined/9.3.1.2] Element has invalid language code \"dsb\"; [undefined/9.3.1.2] Element has invalid language code \"hsb\"; [undefined/9.3.1.2] Element has invalid language code \"kab\""
+      "layer": "no-crash",
+      "file": "wiki-accessibility-en.html",
+      "scanner": "axe-core",
+      "detail": "Page/Frame is not ready"
     }
   ],
   "passed": false

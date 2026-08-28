@@ -43,9 +43,10 @@ const EXCLUSIVE_SCANNERS = {
     module: '../../src/scanners/focus-management',
     criteria: ['2.4.3', '2.4.7', '2.4.11'],
   },
+  // SC 2.5.3 belongs to the label-in-name scanner, which runs concurrently.
   'input-modalities': {
     module: '../../src/scanners/input-modalities',
-    criteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.7', '2.5.8'],
+    criteria: ['2.5.1', '2.5.2', '2.5.4', '2.5.7', '2.5.8'],
   },
   'responsive-design': {
     module: '../../src/scanners/responsive-design',

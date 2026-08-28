@@ -292,14 +292,15 @@ async function main() {
             `${critical.length} critical finding(s): ${[...new Set(critical.map(ruleOf))].join(', ')}`
           );
         for (const c of crashed) pageFail.push(`scanner error: ${c}`);
-        // EXPECTED matches against every violation, not just `counts`: the
+        // EXPECTED matches against every finding, not just `counts`: the
         // harness counts only hard violations, but some of the hand-verified
         // real defects are reported by axe-core rules that carry only the
         // `best-practice` tag ('heading-order' is the h1->h4 footer jump).
-        // Those normalise to severity 'best-practice' (axe's own taxonomy) and
-        // would otherwise look like a fix that went blind.
+        // Those are reported in `bestPractices`, outside the total, and would
+        // otherwise look like a fix that went blind.
+        const findings = violations.concat(result.bestPractices || []);
         for (const e of EXPECTED)
-          for (const v of violations)
+          for (const v of findings)
             if (ruleOf(v).includes(e.rule)) seenExpected[theme].add(e.rule);
 
         const total = Object.values(counts).reduce((a, b) => a + b, 0);

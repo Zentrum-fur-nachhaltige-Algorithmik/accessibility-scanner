@@ -74,6 +74,19 @@ describe('EAA statement gate', () => {
     }
   }, 120000);
 
+  it('does not call a statement link broken when its path can only be resolved locally', async () => {
+    const page = await getPage(`${getBaseUrl()}/good-statement-link-unresolvable.html`);
+    try {
+      const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });
+      const rules = (result.violations || []).map(rule);
+      expect(rules).not.toContain('inaccessible-statement');
+      expect(rules).not.toContain(MISSING_STATEMENT_RULE);
+      expect(result.summary.statementExists).toBe(true);
+    } finally {
+      await page.close();
+    }
+  }, 120000);
+
   it('does not audit a page about accessibility as the statement', async () => {
     const page = await getPage(`${getBaseUrl()}/good-accessibility-marketing-page.html`);
     try {

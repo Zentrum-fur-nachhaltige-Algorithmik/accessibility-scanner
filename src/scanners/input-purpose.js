@@ -223,9 +223,12 @@ class InputPurposeScanner extends BaseScanner {
         if (ownType === 'email' || ownType === 'tel' || ownType === 'password') return true;
         // A one-time code is the user's own datum whatever else the form holds.
         if ((detectPurpose(el) || []).includes('one-time-code')) return true;
-        const scope = el.form || document;
+        // The evidence is the form the control belongs to. A control that is
+        // in no form is judged on its own: the fields of a contact form
+        // elsewhere on the page say nothing about a language switcher.
+        if (!el.form) return false;
         let identityFields = 0;
-        for (const field of scope.querySelectorAll('input, select, textarea')) {
+        for (const field of el.form.querySelectorAll('input, select, textarea')) {
           const fieldType = (field.type || '').toLowerCase();
           if (fieldType === 'email' || fieldType === 'tel' || fieldType === 'password') {
             identityFields += 2;

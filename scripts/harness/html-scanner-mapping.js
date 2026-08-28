@@ -208,11 +208,12 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-nontext-contrast.html': {
-    expectedScanners: ['color-contrast'],
+    expectedScanners: ['nontext-contrast'],
     excludedScanners: ['use-of-color', 'images-of-text'],
     testType: 'bad',
     wcagCriteria: ['1.4.11'],
-    description: 'Non-text UI components with insufficient contrast',
+    description:
+      'Non-text UI components, a focus ring and a labelled graphic with insufficient contrast',
   },
 
   // Timing and Motion
@@ -720,7 +721,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-bootstrap-patterns.html': {
     expectedScanners: [],
-    excludedScanners: ['color-contrast', 'advanced-contrast', 'advanced-aria', 'page-structure'],
+    excludedScanners: ['color-contrast', 'advanced-aria', 'page-structure'],
     testType: 'good',
     wcagCriteria: ['1.4.3', '1.4.6', '4.1.2'],
     description:
@@ -904,6 +905,51 @@ const HTML_SCANNER_MAPPING = {
     description:
       'A transparent full viewport fixed layer that takes the hit test above a form: focus-obscured-by-fixed-element must stay silent',
   },
+
+  'good-links-distinguished-in-text.html': {
+    expectedScanners: [],
+    excludedScanners: ['use-of-color'],
+    testType: 'good',
+    wcagCriteria: ['1.4.1'],
+    description:
+      'Links in body text carrying an underline, a bold weight, an icon, or a colour difference of 3.33:1 plus an underline on hover and focus (G183): link-color-only must stay silent',
+  },
+
+  'good-graphic-parts-contrast.html': {
+    expectedScanners: [],
+    excludedScanners: ['nontext-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.11'],
+    description:
+      'Labelled graphics whose colours come from CSS and currentColor and whose pale parts sit beside high-contrast ones: insufficient-graphic-contrast must stay silent',
+  },
+
+  'good-state-styles-unused.html': {
+    expectedScanners: [],
+    excludedScanners: ['nontext-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.11'],
+    description:
+      'aria-pressed and aria-selected colour rules for states the controls never expose, and a checked state that changes the border width: insufficient-interactive-state-contrast must stay silent',
+  },
+
+  'good-aa-text-not-enhanced.html': {
+    expectedScanners: [],
+    excludedScanners: ['color-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.3'],
+    description:
+      'Text between the AA and the AAA thresholds: axe-core owns SC 1.4.3, and color-contrast measures SC 1.4.6 only for a scan that asks for AAA',
+  },
+
+  'good-color-coded-indicators.html': {
+    expectedScanners: [],
+    excludedScanners: ['use-of-color'],
+    testType: 'good',
+    wcagCriteria: ['1.4.1'],
+    description:
+      'Status dots named by a visually hidden span or a title, identical decorative bullets and a colour picker of named buttons: color-coded-indicator must stay silent',
+  },
 };
 
 /**
@@ -930,7 +976,7 @@ const AVAILABLE_SCANNERS = [
   'mobile-specific',
   'advanced-aria',
   'screen-reader',
-  'advanced-contrast',
+  'nontext-contrast',
 ];
 
 /**

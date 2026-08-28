@@ -2,7 +2,7 @@
 
 axe-core covers the WCAG 2.2 criteria that can be decided from the DOM alone.
 This project extends it with checks that need a real browser session or
-judgement: 29 deterministic Puppeteer scanners (keyboard, focus, reflow, text
+judgement: 26 deterministic Puppeteer scanners (keyboard, focus, reflow, text
 resize, motion, timing, contrast of non-text content, the EAA accessibility
 statement) and 12 LLM-assisted scanners for criteria such as
 reading level, sensory characteristics or alt text quality. An agentic
@@ -181,7 +181,7 @@ npm run test:self-scan      # builds the UI and scans it with the API
 npm run lint                # eslint, prettier, dash check
 ```
 
-`test-sites/` holds about 180 `good-*.html` / `bad-*.html` fixture pairs with
+`test-sites/` holds about 230 `good-*.html` / `bad-*.html` fixtures with
 a `WCAG-TEST` metadata block naming the criteria they exercise. The axe e2e
 test runs every fixture; the harnesses in `scripts/harness/` measure true and
 false positives per scanner and write the JSON that feeds the trust tiers:
@@ -204,7 +204,7 @@ src/
   api/                   auth, url-guard (SSRF), scan-jobs
   core/                  base-scanner, scan-pipeline, scanner-registry, profiles,
                          scanner-trust, severity, wcag-levels, constants
-  scanners/              axe-core adapter and 29 deterministic scanners
+  scanners/              axe-core adapter and 26 deterministic scanners
   scanners/llm/          12 LLM scanners plus their base class and page context
   llm/client.js          OpenRouter client with retry and fallback models
   report/                HTML and PDF report generator

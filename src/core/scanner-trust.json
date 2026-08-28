@@ -163,21 +163,6 @@
       "kind": "deterministic",
       "reason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
-    "contact-mechanism": {
-      "tier": "proven",
-      "kind": "deterministic",
-      "reason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    "compliance-monitoring": {
-      "tier": "proven",
-      "kind": "deterministic",
-      "reason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    "eaa-procedure": {
-      "tier": "proven",
-      "kind": "deterministic",
-      "reason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
     "llm-semantic-text": {
       "tier": "proven",
       "kind": "llm",

@@ -285,12 +285,9 @@ class ScanPipeline {
    * Collapse the EAA/EN 301 549 procedural findings that several scanners
    * report about the same site-wide fact.
    *
-   * `accessibility-statement`, `eaa-procedure`, `contact-mechanism` and
-   * `compliance-monitoring` overlap by design: they all read the same footer
-   * and the same statement page. A missing statement is one defect, but it
-   * arrived from two scanners as two findings; these rules carry no element
-   * identity (they are about the website, not a node), so identity is
-   * (criterion, rule, element).
+   * A procedural rule speaks about the website rather than about a node, so
+   * two scanners reading the same footer and the same statement page report
+   * one defect twice. Identity is (criterion, rule, element).
    */
   dedupeProcedureFindings(violations) {
     const { ruleKey } = require('./severity');

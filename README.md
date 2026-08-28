@@ -2,9 +2,9 @@
 
 axe-core covers the WCAG 2.2 criteria that can be decided from the DOM alone.
 This project extends it with checks that need a real browser session or
-judgement: 30 deterministic Puppeteer scanners (keyboard, focus, reflow, text
-resize, motion, timing, contrast of non-text content, EAA statement and
-contact requirements) and 12 LLM-assisted scanners for criteria such as
+judgement: 29 deterministic Puppeteer scanners (keyboard, focus, reflow, text
+resize, motion, timing, contrast of non-text content, the EAA accessibility
+statement) and 12 LLM-assisted scanners for criteria such as
 reading level, sensory characteristics or alt text quality. An agentic
 screen-reader check, where an LLM has to complete tasks using only what a
 screen reader announces, is in progress on the `feat/sr-agent` branch.
@@ -205,7 +205,7 @@ src/
   api/                   auth, url-guard (SSRF), scan-jobs
   core/                  base-scanner, scan-pipeline, scanner-registry, profiles,
                          scanner-trust, severity, wcag-levels, constants
-  scanners/              axe-core adapter and 30 deterministic scanners
+  scanners/              axe-core adapter and 29 deterministic scanners
   scanners/llm/          12 LLM scanners plus their base class and page context
   llm/client.js          OpenRouter client with retry and fallback models
   report/                HTML and PDF report generator

@@ -30,7 +30,6 @@ const KeyboardNavigationScanner = require('../scanners/keyboard-navigation');
 const FocusManagementScanner = require('../scanners/focus-management');
 const InputModalitiesScanner = require('../scanners/input-modalities');
 const ResponsiveDesignScanner = require('../scanners/responsive-design');
-const MobileSpecificScanner = require('../scanners/mobile-specific');
 const DynamicSPAScanner = require('../scanners/dynamic-spa');
 const MultipleWaysScanner = require('../scanners/multiple-ways');
 const OrientationScanner = require('../scanners/orientation');
@@ -114,7 +113,6 @@ function createAllScanners({ llmClient } = {}) {
     new FocusManagementScanner(),
     new InputModalitiesScanner(),
     new ResponsiveDesignScanner(),
-    new MobileSpecificScanner(),
     new HoverFocusContentScanner(),
     new ConcurrentInputScanner(),
     new DynamicSPAScanner(),
@@ -170,7 +168,7 @@ const PROFILES = {
   ],
   standard: [
     'axe-core',
-    // Everything except text-resize, mobile-specific
+    // Everything except text-resize
     'color-contrast',
     'use-of-color',
     'images-of-text',

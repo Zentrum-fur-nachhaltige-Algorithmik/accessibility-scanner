@@ -749,11 +749,11 @@ const HTML_SCANNER_MAPPING = {
 
   'good-decorative-blur-blob.html': {
     expectedScanners: [],
-    excludedScanners: ['responsive-design', 'mobile-specific'],
+    excludedScanners: ['responsive-design'],
     testType: 'good',
     wcagCriteria: ['1.4.10', '1.4.4'],
     description:
-      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element / mobile-fixed-width-400-zoom must not fire',
+      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element must not fire',
   },
 
   'good-two-column-tab-order.html': {
@@ -927,7 +927,6 @@ const AVAILABLE_SCANNERS = [
   'contact-mechanism',
   'compliance-monitoring',
   'responsive-design',
-  'mobile-specific',
   'advanced-aria',
   'screen-reader',
   'advanced-contrast',

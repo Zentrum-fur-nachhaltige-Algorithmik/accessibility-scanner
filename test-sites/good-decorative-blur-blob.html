@@ -5,8 +5,8 @@ title: Decorative blurred background blob does not break reflow
 test_type: good
 expected_violations: 0
 testable_by: dom
-scanners: responsive-design, mobile-specific
-description: A purely decorative div (600x600, border-radius 50%, blur(120px), pointer-events:none, no text) is positioned absolutely inside an overflow:hidden hero. It carries no content, cannot be interacted with and produces no horizontal scrollbar at 320px. Reproduces the gsunde.website FP where fixed-width-element and mobile-fixed-width-400-zoom fired on div.w-[600px].
+scanners: responsive-design, text-resize
+description: A purely decorative div (600x600, border-radius 50%, blur(120px), pointer-events:none, no text) is positioned absolutely inside an overflow:hidden hero. It carries no content, cannot be interacted with and produces no horizontal scrollbar at 320px. Reproduces the gsunde.website false positive where fixed-width-element fired on div.w-[600px].
 -->
 <!DOCTYPE html>
 <html lang="de">

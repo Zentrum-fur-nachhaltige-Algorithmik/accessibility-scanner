@@ -61,6 +61,9 @@ class ReportGenerator {
     // otherwise decide what the report claims to be).
     const reportData = {
       ...scanData,
+      // Best practices are kept out of the scan's violation total; the report
+      // still lists them, at severity 'best-practice' and weight zero.
+      violations: [...(scanData.violations || []), ...(scanData.bestPractices || [])],
       id: reportId,
       timestamp,
       orgName: options.orgName || config.reportOrgName,

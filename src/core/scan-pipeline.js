@@ -183,6 +183,9 @@ class ScanPipeline {
    */
   assembleResult(url, scannerResults) {
     const allViolations = [];
+    // Advice a scanner offers about criteria nothing fails (the Deque best
+    // practice rules). Reported, never counted and never scored.
+    const bestPractices = [];
     const scannerSummaries = {};
 
     const { trustTier, trustReason } = require('./scanner-trust');
@@ -214,6 +217,16 @@ class ScanPipeline {
         }
       }
 
+      if (Array.isArray(result.bestPractices)) {
+        for (const v of result.bestPractices) {
+          if (tier === 'experimental') {
+            v.experimental = true;
+            v.confidence = 'low';
+          }
+          bestPractices.push(v);
+        }
+      }
+
       scannerSummaries[result.scannerId] = {
         passed: result.passed,
         violationCount: result.violations?.length || 0,
@@ -235,6 +248,7 @@ class ScanPipeline {
       accessibilityScore: this.computeViolationWeightedScore(violations),
       totalViolations: violations.length,
       violations,
+      bestPractices,
       scanners: scannerSummaries,
       categories,
     };

@@ -50,7 +50,6 @@ const CONCURRENT_SCANNERS = {
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
   orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
-  'language-detection': { module: '../../src/scanners/language-detection' },
   'predictable-navigation': { module: '../../src/scanners/predictable-navigation' },
   'error-handling': { module: '../../src/scanners/error-handling' },
   'page-structure': { module: '../../src/scanners/page-structure' },

@@ -13,7 +13,6 @@ const NonTextContrastScanner = require('../scanners/nontext-contrast');
 const TextResizeScanner = require('../scanners/text-resize');
 const ScreenReaderScanner = require('../scanners/screen-reader');
 const MediaAccessibilityScanner = require('../scanners/media-accessibility');
-const LanguageDetectionScanner = require('../scanners/language-detection');
 const PredictableNavigationScanner = require('../scanners/predictable-navigation');
 const ErrorHandlingScanner = require('../scanners/error-handling');
 const PageStructureScanner = require('../scanners/page-structure');
@@ -100,7 +99,6 @@ function createAllScanners({ llmClient } = {}) {
     new MediaAccessibilityScanner(),
     new OrientationScanner(),
     new InputPurposeScanner(),
-    new LanguageDetectionScanner(),
     new PredictableNavigationScanner(),
     new ErrorHandlingScanner(),
     new PageStructureScanner(),
@@ -151,7 +149,6 @@ const PROFILES = {
     'nontext-contrast',
     'screen-reader',
     'media-accessibility',
-    'language-detection',
     'predictable-navigation',
     'error-handling',
     'page-structure',
@@ -178,7 +175,6 @@ const PROFILES = {
     'nontext-contrast',
     'screen-reader',
     'media-accessibility',
-    'language-detection',
     'predictable-navigation',
     'error-handling',
     'page-structure',

@@ -128,22 +128,6 @@ const FIXTURES = [
     band: [14, 56],
     spotTruths: [
       {
-        name: 'REGRESSION: language-detection completes without error',
-        kind: 'must-pass',
-        // This file reproduces the language-detection crash "Cannot read
-        // properties of undefined (reading 'map')". It is a real Next.js
-        // document: <html lang="de"> plus a hydrated <div id="__next"> whose
-        // child carries its own lang="en", <!-- --> hydration comment
-        // separators, and a <script id="__NEXT_DATA__" type="application/json">
-        // payload.
-        check: ({ scanners }) => {
-          const s = scanners['language-detection'];
-          if (!s) return 'language-detection missing from results entirely';
-          if (s.error) return `language-detection returned error: ${s.error}`;
-          return null;
-        },
-      },
-      {
         name: 'REGRESSION: __next-route-announcer__ empty live region NOT flagged',
         kind: 'must-not-flag',
         // Last element before </body> is
@@ -205,9 +189,10 @@ const FIXTURES = [
         // nested contradiction is 3.1.2).
         //
         // Known gap: the ensemble does not detect this, so this assertion fails.
-        // It stays because the violation is real and hand-verified; it passes
-        // once language-detection compares declared vs. actual page language
-        // (or flags a child lang that contradicts <html lang>).
+        // It stays because the violation is real and hand-verified. Deciding it
+        // needs language identification of the running text, which no
+        // deterministic check here does; axe validates the syntax of the tag
+        // only.
         check: ({ violations }) => {
           const hits = findViolations(violations, {
             id: ['3.1.1', '3.1.2', 'html-lang', 'valid-lang', 'html-has-lang'],

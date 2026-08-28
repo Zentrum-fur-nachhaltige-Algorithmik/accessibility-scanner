@@ -314,7 +314,7 @@
       ]
     },
     "good-form-errors": {
-      "totalViolations": 2,
+      "totalViolations": 1,
       "breakdown": [
         {
           "scannerId": "predictable-navigation",
@@ -336,29 +336,6 @@
               }
             }
           ]
-        },
-        {
-          "scannerId": "advanced-contrast",
-          "type": "ui-component-contrast",
-          "criterion": "9.1.4.11",
-          "count": 1,
-          "samples": [
-            {
-              "element": "select#country-field",
-              "raw": {
-                "criterion": "9.1.4.11",
-                "element": "select#country-field",
-                "issue": "ui-component-contrast",
-                "description": "ui component background has insufficient contrast: 1.15:1",
-                "contrastRatio": 1.1498567656584315,
-                "requiredRatio": 3,
-                "elementType": "ui-component",
-                "suggestion": "Increase background contrast to meet 3:1 minimum ratio",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
         }
       ]
     },
@@ -367,132 +344,8 @@
       "breakdown": []
     },
     "good-language-override": {
-      "totalViolations": 9,
+      "totalViolations": 3,
       "breakdown": [
-        {
-          "scannerId": "screen-reader",
-          "type": "form-control-missing-label",
-          "criterion": "9.3.3.2",
-          "count": 1,
-          "samples": [
-            {
-              "element": "input",
-              "raw": {
-                "criterion": "9.3.3.2",
-                "clause": "9.3.3.2",
-                "type": "form-control-missing-label",
-                "issue": "form-control-missing-label",
-                "element": "input",
-                "description": "Labels or Instructions - search control is identified only by its placeholder, which is not an accessible name",
-                "severity": "high",
-                "suggestion": "Add a <label for=\"…\">, aria-label, or aria-labelledby pointing at visible text",
-                "details": ["No associated label found"],
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
-        },
-        {
-          "scannerId": "page-structure",
-          "type": "missing-label",
-          "criterion": "9.2.4.6",
-          "count": 1,
-          "samples": [
-            {
-              "element": "input:nth-child(5)",
-              "raw": {
-                "criterion": "9.2.4.6",
-                "element": "input:nth-child(5)",
-                "issue": "missing-label",
-                "description": "Form control (search) lacks a proper label",
-                "suggestion": "Add a proper <label> element in addition to placeholder text",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
-        },
-        {
-          "scannerId": "label-in-name",
-          "type": "form-label-not-in-name",
-          "criterion": "2.5.3",
-          "count": 1,
-          "samples": [
-            {
-              "element": "input[4]",
-              "raw": {
-                "type": "form-label-not-in-name",
-                "category": "form-control",
-                "severity": "serious",
-                "element": "input[4]",
-                "description": "Form control visible label is not contained in accessible name",
-                "details": {
-                  "visibleText": "Suchen Sie international...",
-                  "accessibleName": "",
-                  "visibleTextNormalized": "suchen sie international...",
-                  "accessibleNameNormalized": "",
-                  "tagName": "input",
-                  "type": "search",
-                  "id": null,
-                  "name": null,
-                  "placeholder": "Suchen Sie international...",
-                  "ariaLabel": null,
-                  "ariaLabelledby": null,
-                  "hasLabels": false
-                },
-                "wcagCriteria": "2.5.3",
-                "impact": "Voice control users cannot target this form field by speaking its visible label",
-                "voiceControlCommand": "\"Click Suchen Sie international...\" will fail",
-                "recommendation": "Ensure accessible name contains the visible label text",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
-        },
-        {
-          "scannerId": "html-validation",
-          "type": "label",
-          "criterion": "4.1.2",
-          "count": 1,
-          "samples": [
-            {
-              "element": "input",
-              "raw": {
-                "criterion": "4.1.2",
-                "element": "input",
-                "issue": "label",
-                "description": "Form control has no associated label",
-                "severity": "critical",
-                "suggestion": "Add label element, aria-label, or aria-labelledby to form control",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
-        },
-        {
-          "scannerId": "html-validation",
-          "type": "unlabeled-form-control",
-          "criterion": "9.4.1.1",
-          "count": 1,
-          "samples": [
-            {
-              "element": "input",
-              "raw": {
-                "criterion": "9.4.1.1",
-                "element": "input",
-                "issue": "unlabeled-form-control",
-                "description": "Form control missing accessible label",
-                "severity": "warning",
-                "suggestion": "Add label element, aria-label, or aria-labelledby attribute",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
-        },
         {
           "scannerId": "error-handling",
           "type": "field-no-label",
@@ -555,34 +408,11 @@
               }
             }
           ]
-        },
-        {
-          "scannerId": "advanced-contrast",
-          "type": "ui-component-contrast",
-          "criterion": "9.1.4.11",
-          "count": 1,
-          "samples": [
-            {
-              "element": "select#goodCountry",
-              "raw": {
-                "criterion": "9.1.4.11",
-                "element": "select#goodCountry",
-                "issue": "ui-component-contrast",
-                "description": "ui component background has insufficient contrast: 1.15:1",
-                "contrastRatio": 1.1498567656584315,
-                "requiredRatio": 3,
-                "elementType": "ui-component",
-                "suggestion": "Increase background contrast to meet 3:1 minimum ratio",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
         }
       ]
     },
     "good-motion-vestibular": {
-      "totalViolations": 19,
+      "totalViolations": 18,
       "breakdown": [
         {
           "scannerId": "color-contrast",
@@ -781,29 +611,6 @@
               }
             }
           ]
-        },
-        {
-          "scannerId": "advanced-contrast",
-          "type": "ui-component-contrast",
-          "criterion": "9.1.4.11",
-          "count": 1,
-          "samples": [
-            {
-              "element": "button#prevButton",
-              "raw": {
-                "criterion": "9.1.4.11",
-                "element": "button#prevButton",
-                "issue": "ui-component-contrast",
-                "description": "ui component background has insufficient contrast: 1.61:1",
-                "contrastRatio": 1.6059285649300714,
-                "requiredRatio": 3,
-                "elementType": "ui-component",
-                "suggestion": "Increase background contrast to meet 3:1 minimum ratio",
-                "experimental": true,
-                "confidence": "low"
-              }
-            }
-          ]
         }
       ]
     },
@@ -852,17 +659,6 @@
       "fileCounts": {
         "good-accessibility": 2,
         "good-css-background-accessible": 1
-      }
-    },
-    {
-      "scannerId": "advanced-contrast",
-      "type": "ui-component-contrast",
-      "criterion": "9.1.4.11",
-      "count": 3,
-      "fileCounts": {
-        "good-form-errors": 1,
-        "good-language-override": 1,
-        "good-motion-vestibular": 1
       }
     },
     {
@@ -928,51 +724,6 @@
       "count": 1,
       "fileCounts": {
         "good-form-errors": 1
-      }
-    },
-    {
-      "scannerId": "screen-reader",
-      "type": "form-control-missing-label",
-      "criterion": "9.3.3.2",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
-      }
-    },
-    {
-      "scannerId": "page-structure",
-      "type": "missing-label",
-      "criterion": "9.2.4.6",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
-      }
-    },
-    {
-      "scannerId": "label-in-name",
-      "type": "form-label-not-in-name",
-      "criterion": "2.5.3",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
-      }
-    },
-    {
-      "scannerId": "html-validation",
-      "type": "label",
-      "criterion": "4.1.2",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
-      }
-    },
-    {
-      "scannerId": "html-validation",
-      "type": "unlabeled-form-control",
-      "criterion": "9.4.1.1",
-      "count": 1,
-      "fileCounts": {
-        "good-language-override": 1
       }
     },
     {

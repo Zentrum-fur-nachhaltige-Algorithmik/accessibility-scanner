@@ -790,8 +790,9 @@ description: Cognitive accessibility best practices
             <div class="good-refresh-controls">
                 <!-- GUT: Benutzer kontrolliert alle Aktualisierungen -->
                 <div class="refresh-settings">
-                    <h4>⚙️ Aktualisierungs-Einstellungen</h4>
+                    <h4 id="goodRefreshModeHeading">⚙️ Aktualisierungs-Einstellungen</h4>
                     
+                    <div role="radiogroup" aria-labelledby="goodRefreshModeHeading">
                     <div class="refresh-option">
                         <label>
                             <input type="radio" name="refreshMode" value="manual" checked onchange="goodSetRefreshMode('manual')">
@@ -814,6 +815,7 @@ description: Cognitive accessibility best practices
                                 <option value="600">10 Minuten</option>
                             </select>
                         </label>
+                    </div>
                     </div>
                 </div>
                 
@@ -991,6 +993,7 @@ description: Cognitive accessibility best practices
                     ℹ️ Die Währungsumstellung erfolgt sofort und betrifft alle Preisanzeigen.
                 </div>
                 
+                <label for="goodCurrencySelect">Währung</label>
                 <select id="goodCurrencySelect" onchange="goodConfirmCurrencyChange(this.value)">
                     <option value="eur" selected>EUR (€) - Euro</option>
                     <option value="usd">USD ($) - US-Dollar</option>

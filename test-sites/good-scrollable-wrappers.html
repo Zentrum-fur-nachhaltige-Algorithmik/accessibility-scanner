@@ -1,0 +1,70 @@
+<!-- WCAG-TEST
+criterion: 2.1.1
+level: A
+title: Keyboard, scroll containers that need no tabindex
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: Overflow containers that the old check reported because scrollHeight exceeded clientHeight by a rounding pixel or because it never asked whether the container was painted: a table wrapper with a two pixel overflow, a scroller whose content is reachable through the links inside it, a code block that carries tabindex="0" itself, and a display:none drawer with a long list. scrollable-content-not-keyboard-accessible must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Scroll containers with keyboard access (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a { color: #0b4f6c; }
+  a:focus-visible, pre:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .table-wrap { overflow-x: auto; width: 320px; }
+  .table-wrap table { width: 322px; border-collapse: collapse; }
+  .table-wrap th, .table-wrap td { border: 1px solid #767676; padding: 4px 8px; white-space: nowrap; }
+  .link-scroller { overflow-y: auto; height: 90px; border: 1px solid #767676; padding: 8px; }
+  pre { overflow: auto; max-height: 80px; border: 1px solid #767676; padding: 8px; }
+  .drawer { display: none; overflow-y: auto; height: 100px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Scroll containers that no keyboard user is locked out of</h1>
+
+  <h2>Table wrapper with a rounding overflow</h2>
+  <div class="table-wrap">
+    <table>
+      <caption>Opening hours</caption>
+      <thead><tr><th scope="col">Day</th><th scope="col">Hours</th></tr></thead>
+      <tbody><tr><td>Monday</td><td>08:00 to 16:00</td></tr><tr><td>Tuesday</td><td>08:00 to 16:00</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>Scroller whose content is links</h2>
+  <div class="link-scroller">
+    <p><a href="#one">Chapter one</a></p>
+    <p><a href="#two">Chapter two</a></p>
+    <p><a href="#three">Chapter three</a></p>
+    <p><a href="#four">Chapter four</a></p>
+    <p><a href="#five">Chapter five</a></p>
+  </div>
+
+  <h2>Code block that takes focus itself</h2>
+  <pre tabindex="0" role="region" aria-label="Example code">const scanner = new Scanner();
+await scanner.scan(page);
+// several more lines so the block scrolls
+// line 4
+// line 5
+// line 6
+// line 7</pre>
+
+  <h2>Closed drawer</h2>
+  <div class="drawer">
+    <p>Item one</p><p>Item two</p><p>Item three</p><p>Item four</p>
+    <p>Item five</p><p>Item six</p><p>Item seven</p><p>Item eight</p>
+  </div>
+
+  <p id="one">One.</p><p id="two">Two.</p><p id="three">Three.</p><p id="four">Four.</p><p id="five">Five.</p>
+</main>
+</body>
+</html>

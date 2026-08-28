@@ -1,0 +1,68 @@
+<!-- WCAG-TEST
+criterion: 2.1.1
+level: A
+title: Keyboard, tabindex in composite widgets and on named containers
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: tabindex values the ARIA authoring practices prescribe and the old check reported anyway: a menu whose items all carry tabindex="-1" and wait for arrow keys, a tabpanel with tabindex="0", a named section used as a route change focus target, and a chevron button with tabindex="-1" inside a card that is already a link. focusable-element and tabindex must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: tabindex in composite widgets (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  ul[role="menu"] { list-style: none; padding: 0; border: 1px solid #767676; width: 220px; }
+  ul[role="menu"] li { padding: 6px 10px; }
+  .card { border: 1px solid #767676; border-radius: 8px; padding: 16px; max-width: 320px; }
+  [role="tabpanel"] { border: 1px solid #767676; padding: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>tabindex the authoring practices ask for</h1>
+
+  <h2>Menu with roving tabindex</h2>
+  <button type="button" id="menuButton" aria-haspopup="menu" aria-expanded="false" aria-controls="actionsMenu">Actions</button>
+  <ul role="menu" id="actionsMenu" aria-labelledby="menuButton">
+    <li role="menuitem" tabindex="-1">Rename</li>
+    <li role="menuitem" tabindex="-1">Duplicate</li>
+    <li role="menuitem" tabindex="-1">Archive</li>
+  </ul>
+
+  <h2>Tab panel as a focus target</h2>
+  <div role="tablist" aria-label="Report sections">
+    <button role="tab" id="tabOverview" aria-selected="true" aria-controls="panelOverview">Overview</button>
+    <button role="tab" id="tabDetails" aria-selected="false" aria-controls="panelDetails" tabindex="-1">Details</button>
+  </div>
+  <div role="tabpanel" id="panelOverview" aria-labelledby="tabOverview" tabindex="0">
+    <p>Numbers for this month.</p>
+  </div>
+  <div role="tabpanel" id="panelDetails" aria-labelledby="tabDetails" tabindex="0" hidden>
+    <p>Line by line.</p>
+  </div>
+
+  <h2>Named region used as a focus target after a route change</h2>
+  <section tabindex="0" aria-labelledby="resultsHeading">
+    <h3 id="resultsHeading">Search results</h3>
+    <p>Three results.</p>
+  </section>
+
+  <h2>Card link with a redundant inner control</h2>
+  <div class="card">
+    <h3><a href="#offer">Winter offer</a></h3>
+    <p>Everything on the card leads to the offer.</p>
+    <button type="button" tabindex="-1" aria-hidden="true">More</button>
+  </div>
+
+  <p id="offer">Offer section.</p>
+</main>
+</body>
+</html>

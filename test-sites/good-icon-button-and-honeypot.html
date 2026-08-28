@@ -1,0 +1,107 @@
+<!-- WCAG-TEST
+criterion: 2.5.3, 3.3.3, 4.1.2
+level: A
+title: Label in Name, Error Suggestion, Name Role Value
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: label-in-name, error-handling, advanced-aria
+description: An icon button whose only text is screen-reader-only, a visually hidden spam honeypot field, and a disclosure menu whose panel needs no label of its own
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Icon button, honeypot and disclosure</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 44rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      button {
+        font: inherit;
+        padding: 0.5rem 0.75rem;
+        border: 2px solid #0b0c0c;
+        background: #fff;
+        cursor: pointer;
+      }
+      button:focus {
+        outline: 3px solid #0b57d0;
+        outline-offset: 2px;
+      }
+      [hidden] {
+        display: none;
+      }
+      label {
+        display: block;
+        margin-top: 1rem;
+      }
+      input[type='text'] {
+        font: inherit;
+        padding: 0.4rem;
+        border: 2px solid #0b0c0c;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <!-- The name comes from aria-label; the only text in the button is
+           screen-reader-only, so there is no visible label to contain. -->
+      <button type="button" aria-label="Show search menu" aria-controls="search-menu"
+              aria-expanded="false">
+        <span class="visually-hidden">Search this site</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"></circle>
+          <line x1="12" y1="12" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
+        </svg>
+      </button>
+
+      <!-- A dropdown panel, not a labelled region: it needs no name of its own. -->
+      <div id="search-menu" hidden>
+        <p>Search is unavailable in this static example.</p>
+      </div>
+    </header>
+
+    <main>
+      <h1>Icon button, honeypot and disclosure</h1>
+
+      <form action="/subscribe" method="post">
+        <label for="email">Email address</label>
+        <p id="email-hint">For example, jane.doe@example.org</p>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          aria-describedby="email-hint"
+        />
+
+        <!-- Spam trap: hidden from everyone, out of the tab order, and needing
+             no format hint because no person ever fills it in. -->
+        <div class="visually-hidden" aria-hidden="true">
+          <label for="badger">This field is for robots only. Please leave blank</label>
+          <input id="badger" name="badger" type="text" pattern=".{0}" tabindex="-1"
+                 autocomplete="off" />
+        </div>
+
+        <p><button type="submit">Subscribe</button></p>
+      </form>
+    </main>
+  </body>
+</html>

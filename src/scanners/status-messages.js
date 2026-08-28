@@ -1,10 +1,11 @@
 /**
  * Status Messages Scanner.
- * WCAG 4.1.3, 3.3.1 (EN 301 549 9.4.1.3, 9.3.3.1).
- * Installs a MutationObserver, simulates form and button interactions, and
- * reports dynamic status regions that lack ARIA live-region wiring.
+ * WCAG 4.1.3 (EN 301 549 9.4.1.3).
+ * Installs a MutationObserver that records the nodes a page actually changes,
+ * drives the page's own buttons and form submits, and reports the containers
+ * that gained content during an interaction step in which no live region was
+ * updated.
  */
-const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('status-messages');
@@ -12,19 +13,16 @@ const log = require('../utils/logger').createLogger('status-messages');
 class StatusMessagesScanner extends BaseScanner {
   constructor() {
     super('status-messages', {
-      // The html5-validation-inaccessible check (analyzeFormValidationMessages)
-      // is tagged 3.3.1 (Error Identification); it must be declared here or a
-      // consumer filtering violations against this list would drop it.
-      wcagCriteria: ['4.1.3', '3.3.1'],
+      wcagCriteria: ['4.1.3'],
       wcagPrinciple: 'robust',
     });
   }
 
   /**
-   * This scanner clicks submit/action buttons to reveal JS-driven status
-   * messages (analyzeDynamicStatusMessages). Non-exclusive scanners share
-   * one page, so those clicks would mutate DOM that read-only scanners
-   * inspect concurrently. Exclusive access gives this scanner its own tab.
+   * This scanner clicks submit and action buttons to reveal JS-driven status
+   * messages. Non-exclusive scanners share one page, so those clicks would
+   * mutate DOM that read-only scanners inspect concurrently. Exclusive access
+   * gives this scanner its own tab.
    */
   get needsExclusiveAccess() {
     return true;
@@ -37,54 +35,33 @@ class StatusMessagesScanner extends BaseScanner {
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const defaultOptions = {
-      checkFormValidation: true,
-      checkLoadingStates: true,
-      checkDynamicContent: true,
-      checkErrorMessages: true,
-      checkSuccessMessages: true,
-      checkProgressIndicators: true,
+    const scanOptions = {
       simulateInteractions: true,
       timeout: TIMEOUTS.scanner,
+      ...options,
     };
 
-    const scanOptions = { ...defaultOptions, ...options };
+    // The clicks below reach handlers that call alert(), which blocks the
+    // page's JavaScript and with it every later click and evaluate.
+    const stopDismissingDialogs = BaseScanner.dismissDialogs(page);
 
-    const violations = [];
+    let violations;
+    try {
+      // The observer has to exist before anything is clicked, or the mutations
+      // the clicks cause are not witnessed.
+      await this.installMutationObserver(page);
 
-    // Install the MutationObserver before any interaction happens, so it
-    // can witness whatever the interaction step below changes (evidence
-    // source 2 of 3, see installMutationObserver).
-    await this.installMutationObserver(page);
+      if (scanOptions.simulateInteractions && !scanOptions.heuristicOnly) {
+        await this.simulateInteractions(page, scanOptions);
+      } else {
+        // No simulated interactions: hold the window open anyway so content
+        // that updates on its own (timers, deferred fetches) is recorded.
+        await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(scanOptions)));
+      }
 
-    // Dynamic analysis - simulate interactions to detect missing status
-    // messages. This ALSO feeds mutation evidence to the evidence-gated
-    // static analysis below, so it must run first.
-    if (scanOptions.simulateInteractions) {
-      const dynamicViolations = await this.analyzeDynamicStatusMessages(page, null, scanOptions);
-      violations.push(...dynamicViolations);
-    } else {
-      // No simulated interactions: still honor a minimum observation
-      // window in case content updates on its own (timers, etc.) before
-      // the static pass reads the observer's evidence.
-      await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(scanOptions)));
-    }
-
-    // Static analysis of existing status message patterns. Runs after
-    // interactions so it can use the mutation evidence gathered above.
-    const staticViolations = await this.analyzeStaticStatusMessages(page, scanOptions);
-    violations.push(...staticViolations);
-
-    // Analyze form validation feedback
-    if (scanOptions.checkFormValidation) {
-      const formViolations = await this.analyzeFormValidationMessages(page, null, scanOptions);
-      violations.push(...formViolations);
-    }
-
-    // Analyze loading states and progress indicators
-    if (scanOptions.checkLoadingStates) {
-      const loadingViolations = await this.analyzeLoadingStateMessages(page, scanOptions);
-      violations.push(...loadingViolations);
+      violations = await this.analyzeStatusRegions(page);
+    } finally {
+      stopDismissingDialogs();
     }
 
     return {
@@ -93,26 +70,22 @@ class StatusMessagesScanner extends BaseScanner {
       passed: violations.length === 0,
       violations: violations,
       summary: {
-        totalStatusElements: violations.length + this.getPassedElementsCount(violations),
-        formValidationIssues: violations.filter((v) => v.category === 'form-validation').length,
-        loadingStateIssues: violations.filter((v) => v.category === 'loading-state').length,
-        dynamicContentIssues: violations.filter((v) => v.category === 'dynamic-content').length,
         errorMessageIssues: violations.filter((v) => v.category === 'error-message').length,
         successMessageIssues: violations.filter((v) => v.category === 'success-message').length,
+        loadingStateIssues: violations.filter((v) => v.category === 'loading-state').length,
+        dynamicContentIssues: violations.filter((v) => v.category === 'dynamic-content').length,
         progressIndicatorIssues: violations.filter((v) => v.category === 'progress-indicator')
           .length,
-        missingLiveRegions: violations.filter((v) => v.type === 'missing-live-region').length,
       },
       recommendations: this.generateStatusMessagesRecommendations(violations),
-      screenReaderTesting: this.generateScreenReaderTestCases(violations),
     };
   }
 
   /**
    * Minimum practical MutationObserver window (ms). Even under the "fast"
-   * scan profile (`observationTime: 0`) a brief settle window is needed so
-   * a same-tick DOM mutation from a click is recorded before the static
-   * evidence pass reads it.
+   * scan profile (`observationTime: 0`) a brief settle window is needed so a
+   * DOM mutation caused by a click is recorded before the analysis pass reads
+   * it.
    */
   getObservationWindow(options = {}) {
     const MIN_WINDOW_MS = 400;
@@ -123,340 +96,149 @@ class StatusMessagesScanner extends BaseScanner {
   }
 
   /**
-   * Install a page-lifetime MutationObserver plus shared evidence helpers,
-   * used by every subsequent page.evaluate() call this scanner makes. Must
-   * run before any interaction (see scan()) so mutations caused by clicking
-   * buttons/submitting forms are witnessed.
+   * Install a page-lifetime MutationObserver plus the helpers every later
+   * page.evaluate() in this scanner uses.
    *
-   * A candidate needs real evidence that a live region is warranted:
-   *   1. an ARIA role that implies dynamism (progressbar/timer, aria-busy)
-   *      but lacks the live-region wiring to announce it;
-   *   2. the element (or a descendant/ancestor) was mutated during the
-   *      observation window; or
-   *   3. it is empty at load and targeted by a form control's
-   *      aria-describedby/aria-errormessage (an "error slot filled by JS"),
-   *      unless the page already has a separate aria-live announcer as a
-   *      compensating pattern.
+   * The observer records the elements that actually changed, by identity:
+   * the container whose children or text changed, every element node that was
+   * inserted, and the element whose aria-valuenow/aria-valuetext changed.
+   * `<html>`, `<head>` and `<body>` are never recorded: a script that appends
+   * a cookie banner to the body changes the body, and treating that as
+   * evidence about every element on the page is what made the previous
+   * `closest()` based gate fire everywhere.
+   *
+   * Every record carries the interaction step it happened in
+   * (window.__a11yStatusStep, advanced from Node before each click), which is
+   * what lets the analysis tell "this content changed and nothing was
+   * announced" from "this content changed and the page announced it in a live
+   * region at the same moment".
    */
   async installMutationObserver(page) {
-    await page.evaluate(() => {
-      if (window.__a11yStatusObserverInstalled) return;
-      window.__a11yStatusObserverInstalled = true;
+    await page.evaluate(`
+      (function () {
+        if (window.__a11yStatusObserverInstalled) return;
+        window.__a11yStatusObserverInstalled = true;
 
-      const MUTATED_ATTR = 'data-a11y-mutated';
+        window.__a11yStatusStep = 0;
+        // Element -> Set of interaction steps in which it changed.
+        const mutations = new Map();
 
-      function markMutated(node) {
-        const el = node && node.nodeType === 1 ? node : node && node.parentElement;
-        if (el && el.setAttribute && !el.hasAttribute(MUTATED_ATTR)) {
-          try {
-            el.setAttribute(MUTATED_ATTR, 'true');
-          } catch (e) {
-            /* detached node, ignore */
+        function record(node) {
+          if (!node || node.nodeType !== 1) return;
+          const tag = node.tagName;
+          if (tag === 'HTML' || tag === 'HEAD' || tag === 'BODY') return;
+          if (!mutations.has(node)) mutations.set(node, new Set());
+          mutations.get(node).add(window.__a11yStatusStep);
+        }
+
+        const observer = new MutationObserver((records) => {
+          for (const m of records) {
+            if (m.type === 'characterData') {
+              record(m.target.parentElement);
+              continue;
+            }
+            record(m.target);
+            if (m.type === 'childList') {
+              for (const added of m.addedNodes) record(added);
+            }
           }
-        }
-      }
+        });
+        observer.observe(document.documentElement, {
+          childList: true,
+          characterData: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['aria-valuenow', 'aria-valuetext'],
+        });
+        window.__a11yStatusObserver = observer;
 
-      const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          markMutated(mutation.target);
-        }
-      });
-      observer.observe(document.documentElement, {
-        childList: true,
-        characterData: true,
-        subtree: true,
-      });
-      window.__a11yStatusObserver = observer;
-
-      window.__a11yStatusHelpers = {
-        // Already-compliant check (unchanged semantics from the
-        // original code) plus: an element nested inside an existing
-        // live-region ancestor doesn't need its own aria-live either.
-        hasLiveRegionAttributes(element) {
-          if (!element) return false;
-          if (element.hasAttribute('aria-live')) return true;
-          const role = element.getAttribute('role');
-          if (role && ['status', 'alert', 'log'].includes(role)) return true;
-          if (element.hasAttribute('aria-atomic') || element.hasAttribute('aria-relevant'))
-            return true;
-          return !!(
-            element.closest &&
-            element.closest('[aria-live], [role="status"], [role="alert"], [role="log"]')
-          );
-        },
-
-        // Evidence source 1: role/state signals a dynamic status
-        // widget that still needs live-region wiring. role=status/
-        // alert/log are already handled (and exempted) above.
-        hasRoleEvidence(element) {
-          const role = element.getAttribute('role');
-          if (role === 'progressbar' || role === 'timer') return true;
-          if (element.tagName && element.tagName.toLowerCase() === 'progress') return true;
-          if (element.getAttribute('aria-busy') === 'true') return true;
-          return false;
-        },
-
-        // Evidence source 2: real runtime dynamism, observed. Checks
-        // self-or-ancestor (an ancestor mutation, e.g. an innerHTML
-        // replacement, can mean THIS element was just created) and
-        // self-or-descendant (a nested node changed under a stable
-        // container).
-        hasMutationEvidence(element) {
-          if (!element) return false;
-          if (element.closest && element.closest(`[${MUTATED_ATTR}]`)) return true;
-          if (element.querySelector && element.querySelector(`[${MUTATED_ATTR}]`)) return true;
-          return false;
-        },
-
-        // Evidence source 3: an "error slot filled by JS" (empty at load,
-        // targeted by a control's aria-describedby/aria-errormessage),
-        // unless a separate aria-live announcer elsewhere on the page
-        // already covers announcements (an accepted compensating pattern).
-        isDescribedbyErrorSlot(element) {
-          if (!element || !element.id || element.textContent.trim()) return false;
-          const referrer = document.querySelector(
-            `[aria-describedby~="${element.id}"], [aria-errormessage="${element.id}"]`
-          );
-          if (!referrer) return false;
-          return !document.querySelector('[aria-live]');
-        },
-      };
-    });
-  }
-
-  /**
-   * Analyze static status message patterns
-   */
-  async analyzeStaticStatusMessages(page, options) {
-    return await page.evaluate(() => {
-      const violations = [];
-      const helpers = window.__a11yStatusHelpers;
-
-      // Helper function to generate element selector
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // A candidate container is only a missing-live-region violation when
-      // there is real evidence it is a dynamic status region. A bare
-      // className/id substring match does not flag on its own: a static
-      // `.progress-container` or `.success` blurb never touched by a script
-      // is not a status message.
-      function evaluateCandidate(container, meta) {
-        if (helpers.hasLiveRegionAttributes(container)) return;
-
-        const evidence = {
-          role: helpers.hasRoleEvidence(container),
-          mutated: helpers.hasMutationEvidence(container),
-          describedbyErrorSlot: helpers.isDescribedbyErrorSlot(container),
-        };
-        if (!evidence.role && !evidence.mutated && !evidence.describedbyErrorSlot) return;
-
-        violations.push({
-          type: 'missing-live-region',
-          category: meta.category,
-          severity: meta.severity,
-          element: getElementSelector(container),
-          description: meta.description,
-          details: {
-            className: container.className,
-            id: container.id,
-            textContent: container.textContent.trim().substring(0, 100),
-            hasAriaLive: container.hasAttribute('aria-live'),
-            hasRole: container.hasAttribute('role'),
-            currentRole: container.getAttribute('role'),
-            evidence,
+        // SC 4.1.3 is about messages presented WITHOUT receiving focus, so
+        // where focus went in a step is part of the evidence.
+        const focused = new Map();
+        document.addEventListener(
+          'focusin',
+          (event) => {
+            const step = window.__a11yStatusStep;
+            if (!focused.has(step)) focused.set(step, new Set());
+            focused.get(step).add(event.target);
           },
-          wcagCriteria: '4.1.3',
-          impact: meta.impact,
-          recommendation: meta.recommendation,
-        });
-      }
+          true
+        );
 
-      // Look for error message containers
-      const errorContainers = document.querySelectorAll(
-        [
-          '.error',
-          '.error-message',
-          '.validation-error',
-          '.field-error',
-          '.alert-danger',
-          '.alert-error',
-          '.message-error',
-          '[class*="error"]',
-          '[id*="error"]',
-          '[class*="invalid"]',
-        ].join(', ')
-      );
+        const LIVE_SELECTOR = '[aria-live], [role="status"], [role="alert"], [role="log"]';
 
-      for (const container of errorContainers) {
-        evaluateCandidate(container, {
-          category: 'error-message',
-          severity: 'serious',
-          description: 'Error message container lacks ARIA live region attributes',
-          impact: 'Error messages not announced to screen readers',
-          recommendation: 'Add aria-live="assertive" or role="alert" for error messages',
-        });
-      }
-
-      // Look for success message containers
-      const successContainers = document.querySelectorAll(
-        [
-          '.success',
-          '.success-message',
-          '.alert-success',
-          '.message-success',
-          '.confirmation',
-          '.saved',
-          '.submitted',
-          '[class*="success"]',
-          '[id*="success"]',
-          '[class*="confirm"]',
-        ].join(', ')
-      );
-
-      for (const container of successContainers) {
-        evaluateCandidate(container, {
-          category: 'success-message',
-          severity: 'moderate',
-          description: 'Success message container lacks ARIA live region attributes',
-          impact: 'Success confirmations not announced to screen readers',
-          recommendation: 'Add aria-live="polite" or role="status" for success messages',
-        });
-      }
-
-      // Look for loading indicators
-      const loadingIndicators = document.querySelectorAll(
-        [
-          '.loading',
-          '.spinner',
-          '.loader',
-          '.progress',
-          '.loading-message',
-          '[class*="loading"]',
-          '[id*="loading"]',
-          '[class*="spinner"]',
-          '[class*="progress"]',
-        ].join(', ')
-      );
-
-      for (const indicator of loadingIndicators) {
-        evaluateCandidate(indicator, {
-          category: 'loading-state',
-          severity: 'moderate',
-          description: 'Loading indicator lacks ARIA live region attributes',
-          impact: 'Loading states not announced to screen readers',
-          recommendation: 'Add aria-live="polite" for loading state announcements',
-        });
-      }
-
-      // Look for notification/toast containers
-      const notificationContainers = document.querySelectorAll(
-        [
-          '.notification',
-          '.toast',
-          '.alert',
-          '.message',
-          '.notice',
-          '[class*="notification"]',
-          '[class*="toast"]',
-          '[class*="alert"]',
-        ].join(', ')
-      );
-
-      for (const container of notificationContainers) {
-        evaluateCandidate(container, {
-          category: 'dynamic-content',
-          severity: 'moderate',
-          description: 'Notification container lacks ARIA live region attributes',
-          impact: 'Notifications not announced to screen readers',
-          recommendation: 'Add appropriate aria-live attributes based on urgency',
-        });
-      }
-
-      // Look for shopping cart or counter updates. The "looks like a
-      // live number" text check is kept as a pre-filter (a counter that
-      // doesn't currently show a bare number isn't a useful candidate),
-      // but real evidence is still required before flagging it.
-      const counters = document.querySelectorAll(
-        [
-          '.cart-count',
-          '.badge',
-          '.counter',
-          '.count',
-          '.quantity',
-          '[class*="count"]',
-          '[id*="count"]',
-          '[class*="cart"]',
-        ].join(', ')
-      );
-
-      for (const counter of counters) {
-        if (!counter.textContent.trim().match(/^\d+$/)) continue;
-        evaluateCandidate(counter, {
-          category: 'dynamic-content',
-          severity: 'moderate',
-          description: 'Counter/badge lacks ARIA live region for updates',
-          impact: 'Count changes not announced to screen readers',
-          recommendation: 'Add aria-live="polite" for count updates',
-        });
-      }
-
-      // Check progress bars. aria-describedby or a nearby aria-live
-      // satisfies the check; evidence-gated like every category above.
-      const progressBars = document.querySelectorAll(
-        'progress, [role="progressbar"], .progress-bar'
-      );
-      for (const progress of progressBars) {
-        const hasLiveAnnouncement =
-          progress.hasAttribute('aria-live') ||
-          progress.hasAttribute('aria-describedby') ||
-          progress.parentElement.querySelector('[aria-live]');
-        if (hasLiveAnnouncement) continue;
-
-        const evidence = {
-          role: helpers.hasRoleEvidence(progress),
-          mutated: helpers.hasMutationEvidence(progress),
-          describedbyErrorSlot: false,
-        };
-        if (!evidence.role && !evidence.mutated) continue;
-
-        violations.push({
-          type: 'missing-live-region',
-          category: 'progress-indicator',
-          severity: 'moderate',
-          element: getElementSelector(progress),
-          description: 'Progress indicator lacks live region for status updates',
-          details: {
-            tagName: progress.tagName.toLowerCase(),
-            role: progress.getAttribute('role'),
-            ariaValueNow: progress.getAttribute('aria-valuenow'),
-            ariaValueText: progress.getAttribute('aria-valuetext'),
-            hasAriaDescribedby: progress.hasAttribute('aria-describedby'),
-            evidence,
+        window.__a11yStatusHelpers = {
+          // An element that is itself a live region, or sits inside one, is
+          // already announced and is never a finding.
+          hasLiveRegionAttributes(element) {
+            if (!element) return false;
+            if (element.hasAttribute('aria-live')) return true;
+            const role = element.getAttribute('role');
+            if (role && ['status', 'alert', 'log'].includes(role)) return true;
+            return !!(element.closest && element.closest(LIVE_SELECTOR));
           },
-          wcagCriteria: '4.1.3',
-          impact: 'Progress updates not announced to screen readers',
-          recommendation: 'Add aria-live region or aria-describedby for progress announcements',
-        });
-      }
 
-      return violations;
-    });
+          // The interaction steps in which some live region on the page was
+          // updated. A change that happened in one of those steps was
+          // accompanied by an announcement, so it is not reported: the
+          // announcement may well have described it, and this scanner does not
+          // read announcement text.
+          announcedSteps() {
+            const announced = new Set();
+            for (const [node, steps] of mutations) {
+              if (!node.isConnected) continue;
+              if (!node.closest(LIVE_SELECTOR)) continue;
+              for (const step of steps) announced.add(step);
+            }
+            return announced;
+          },
+
+          // Evidence: the element changed in at least one step in which no
+          // live region was updated and focus did not land on or inside it.
+          // A message the user is taken to is not a status message.
+          unannouncedChange(element, announced) {
+            const steps = mutations.get(element);
+            if (!steps) return false;
+            for (const step of steps) {
+              if (announced.has(step)) continue;
+              const targets = focused.get(step);
+              let tookFocus = false;
+              if (targets) {
+                for (const target of targets) {
+                  if (element === target || element.contains(target)) {
+                    tookFocus = true;
+                    break;
+                  }
+                }
+              }
+              if (!tookFocus) return true;
+            }
+            return false;
+          },
+
+          // Evidence for a slot that is empty at load, is referenced by a
+          // control's aria-describedby/aria-errormessage, and has no live
+          // region anywhere on the page to announce what will be written into
+          // it.
+          isDescribedbyErrorSlot(element) {
+            if (!element || !element.id || element.textContent.trim()) return false;
+            const referrer = document.querySelector(
+              '[aria-describedby~="' + element.id + '"], [aria-errormessage="' + element.id + '"]'
+            );
+            if (!referrer) return false;
+            return !document.querySelector(LIVE_SELECTOR);
+          },
+        };
+      })();
+    `);
   }
 
   /**
    * Block navigation caused by the clicks this scanner simulates.
-   * A real submit/link navigation reloads the page under test: the validation
-   * messages under observation disappear with it, and the execution context
-   * of every other scanner sharing the page is destroyed mid-scan.
-   * Capture phase so the page's own submit/click handlers still run.
+   * A real submit or link navigation reloads the page under test: the status
+   * messages under observation disappear with it, and the observer installed
+   * above dies with the document.
+   * Capture phase so the page's own submit and click handlers still run.
    */
   async suppressNavigation(page) {
     await page.evaluate(() => {
@@ -475,572 +257,232 @@ class StatusMessagesScanner extends BaseScanner {
   }
 
   /**
-   * Analyze dynamic status messages through interaction simulation
+   * Drive the page so it produces the status messages it produces for a user:
+   * submit up to three forms and click up to ten other buttons. Each
+   * activation is its own interaction step, so the observer can tell which
+   * change belongs to which activation. This produces no violations of its
+   * own; it produces the evidence analyzeStatusRegions() reads.
    */
-  async analyzeDynamicStatusMessages(page, scanDir, options) {
-    const violations = [];
+  async simulateInteractions(page, options) {
+    const nextStep = () =>
+      page.evaluate(() => {
+        window.__a11yStatusStep += 1;
+      });
 
-    // Fast-profile short-circuit: `heuristicOnly: true` skips the
-    // click-and-wait simulation. Still hold open the minimum observation
-    // window (see getObservationWindow) so the MutationObserver installed
-    // in scan() has had a chance to run before the static evidence pass
-    // reads it. In this mode missing-live-region evidence falls back to the
-    // static role/aria-describedby checks only (sources 1 and 3).
-    if (options.heuristicOnly) {
-      await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(options)));
-      return violations;
-    }
-
-    // Test form submissions and interactions
     try {
       await this.suppressNavigation(page);
 
-      // Look for forms to test
       const forms = await page.$$('form');
-
-      for (let i = 0; i < Math.min(forms.length, 3); i++) {
-        // Limit to 3 forms
-        const form = forms[i];
-
-        // Take screenshot before interaction (only if scanDir provided)
-        if (scanDir) {
-          await page.screenshot({
-            path: path.join(scanDir, `form-${i}-before.png`),
-          });
-        }
-
-        // Try to submit form to trigger validation
+      for (const form of forms.slice(0, 3)) {
+        const submitButton = await form.$(
+          'button[type="submit"], input[type="submit"], button:not([type])'
+        );
+        if (!submitButton) continue;
         try {
-          const submitButton = await form.$(
-            'button[type="submit"], input[type="submit"], button:not([type])'
-          );
-          if (submitButton) {
-            await submitButton.click();
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for validation messages
-
-            // Take screenshot after interaction (only if scanDir provided)
-            if (scanDir) {
-              await page.screenshot({
-                path: path.join(scanDir, `form-${i}-after.png`),
-              });
-            }
-
-            // Check if any new content appeared without live regions
-            const newErrors = await page.evaluate(() => {
-              const errorElements = document.querySelectorAll(
-                '.error:not([aria-live]), .invalid:not([aria-live]), .validation-error:not([aria-live])'
-              );
-              return Array.from(errorElements)
-                .map((el) => ({
-                  selector:
-                    el.tagName.toLowerCase() +
-                    (el.id ? `#${el.id}` : '') +
-                    (el.className ? `.${el.className.split(' ')[0]}` : ''),
-                  text: el.textContent.trim(),
-                  visible: el.offsetParent !== null,
-                }))
-                .filter((err) => err.visible && err.text);
-            });
-
-            for (const error of newErrors) {
-              violations.push({
-                type: 'dynamic-status-without-announcement',
-                category: 'form-validation',
-                severity: 'serious',
-                element: error.selector,
-                description: 'Form validation error appears without ARIA live region',
-                details: {
-                  errorText: error.text,
-                  triggeredBy: 'form submission',
-                  formIndex: i,
-                },
-                wcagCriteria: '4.1.3',
-                impact: 'Form validation errors not announced to screen readers',
-                recommendation: 'Add aria-live="assertive" to dynamically shown error messages',
-              });
-            }
-          }
+          await nextStep();
+          await submitButton.click();
+          await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (e) {
-          // Form submission might fail, that's okay for testing
+          // A control that cannot be clicked (covered, detached) is not a finding.
         }
       }
 
-      // Test interactive buttons that might show status
-      const interactiveButtons = await page.$$(
-        'button:not([type="submit"]), [role="button"], .btn:not([type="submit"])'
-      );
-
-      for (let i = 0; i < Math.min(interactiveButtons.length, 5); i++) {
-        // Limit to 5 buttons
-        const button = interactiveButtons[i];
-
+      const buttons = await page.$$('button:not([type="submit"]), [role="button"]');
+      for (const button of buttons.slice(0, 10)) {
         try {
-          const beforeContent = await page.evaluate(() => document.body.innerHTML.length);
+          await nextStep();
           await button.click();
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          const afterContent = await page.evaluate(() => document.body.innerHTML.length);
-
-          // If content changed, check for new status messages
-          if (afterContent !== beforeContent) {
-            const newMessages = await page.evaluate(() => {
-              // Look for recently added content that looks like status messages
-              const statusLikeElements = document.querySelectorAll(
-                [
-                  '*[style*="display: block"]:not([aria-live])',
-                  '.show:not([aria-live])',
-                  '.visible:not([aria-live])',
-                  '.message:not([aria-live])',
-                  '.alert:not([aria-live])',
-                ].join(', ')
-              );
-
-              return Array.from(statusLikeElements)
-                .map((el) => {
-                  const text = el.textContent.trim();
-                  if (text && text.length > 5 && text.length < 200) {
-                    return {
-                      selector: el.tagName.toLowerCase() + (el.id ? `#${el.id}` : ''),
-                      text: text,
-                      className: el.className,
-                    };
-                  }
-                  return null;
-                })
-                .filter(Boolean);
-            });
-
-            for (const message of newMessages) {
-              violations.push({
-                type: 'dynamic-status-without-announcement',
-                category: 'dynamic-content',
-                severity: 'moderate',
-                element: message.selector,
-                description: 'Dynamic content appears without ARIA live region',
-                details: {
-                  messageText: message.text,
-                  triggeredBy: 'button interaction',
-                  buttonIndex: i,
-                  className: message.className,
-                },
-                wcagCriteria: '4.1.3',
-                impact: 'Dynamic status changes not announced to screen readers',
-                recommendation: 'Add aria-live attributes to dynamically updated content',
-              });
-            }
-          }
+          await new Promise((resolve) => setTimeout(resolve, 400));
         } catch (e) {
-          // Button interaction might fail, continue testing
+          // Same as above.
         }
       }
     } catch (error) {
-      log.warn('Error during dynamic interaction testing:', error.message);
+      log.warn('Error during interaction simulation:', error.message);
     }
 
-    // Let the MutationObserver installed in scan() finish observing (and
-    // late microtask-scheduled DOM updates settle) before the static
-    // evidence pass reads its markers.
+    // Let late, microtask or timer scheduled updates land before the analysis
+    // pass reads the observer.
     await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(options)));
-
-    return violations;
   }
 
   /**
-   * Analyze form validation message patterns
+   * Report the status regions that changed without an announcement.
+   *
+   * A container is a candidate when a class or id token names it as a status
+   * region (whole words, so "discount" is not a counter and "AccountButtons"
+   * is not a count), it is painted, and it either changed during an
+   * interaction step in which no live region was updated, or is an empty error
+   * slot on a page with no live region at all. Each element is reported once,
+   * under the first category that matches it.
    */
-  async analyzeFormValidationMessages(page, scanDir, options) {
-    return await page.evaluate(() => {
-      const violations = [];
+  async analyzeStatusRegions(page) {
+    return await page.evaluate(`
+      ${BaseScanner.visibilityFilterScript}
+      (function () {
+        const violations = [];
+        const helpers = window.__a11yStatusHelpers;
+        const announced = helpers.announcedSteps();
+        const reported = new Set();
 
-      // Helper function to generate element selector
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Check form fields with validation patterns
-      const formFields = document.querySelectorAll('input, textarea, select');
-
-      for (const field of formFields) {
-        const fieldSelector = getElementSelector(field);
-
-        // Check for associated error message containers
-        const errorContainer =
-          field.parentElement.querySelector('.error, .invalid, .validation-error') ||
-          document.querySelector(`[id="${field.id}-error"]`) ||
-          document.querySelector(`[for="${field.id}"].error`);
-
-        if (errorContainer) {
-          const hasLiveRegion =
-            errorContainer.hasAttribute('aria-live') ||
-            (errorContainer.hasAttribute('role') &&
-              ['alert', 'status'].includes(errorContainer.getAttribute('role')));
-
-          if (!hasLiveRegion) {
-            violations.push({
-              type: 'form-validation-no-live-region',
-              category: 'form-validation',
-              severity: 'serious',
-              element: getElementSelector(errorContainer),
-              description: 'Form field error container lacks ARIA live region',
-              details: {
-                fieldSelector: fieldSelector,
-                fieldType: field.type || field.tagName.toLowerCase(),
-                fieldRequired: field.hasAttribute('required'),
-                errorContainerText: errorContainer.textContent.trim(),
-                fieldAriaDescribedby: field.getAttribute('aria-describedby'),
-                errorContainerRole: errorContainer.getAttribute('role'),
-              },
-              wcagCriteria: '4.1.3',
-              impact: 'Form validation errors not announced to screen readers',
-              recommendation: 'Add aria-live="assertive" or role="alert" to error containers',
-            });
-          }
+        function getElementSelector(element) {
+          const tagName = element.tagName.toLowerCase();
+          const id = element.id ? '#' + element.id : '';
+          const className =
+            element.className && typeof element.className === 'string'
+              ? '.' + element.className.trim().split(/\\s+/)[0]
+              : '';
+          return tagName + id + className;
         }
 
-        // Check for HTML5 validation without accessible feedback, but
-        // only where there is real evidence of a problem. Native
-        // constraint validation is exposed to assistive technology by
-        // evergreen browsers and is a WCAG-sufficient technique for
-        // simple cases, and SC 4.1.3 covers messages presented without
-        // a change of focus; native validation moves focus to the
-        // invalid field, so a plain `<input required>` in an otherwise
-        // untouched form is not, by itself, a violation.
-        // Only flag when the page shows evidence it suppresses or
-        // replaces that native behavior with JS that doesn't provide
-        // accessible feedback: a `novalidate`/inline `onsubmit` on
-        // the form (interactive constraint validation is skipped or
-        // intercepted), or the field is already marked
-        // aria-invalid="true" with no accessible error text reachable
-        // via aria-describedby/aria-errormessage.
-        if (
-          field.hasAttribute('required') ||
-          field.hasAttribute('pattern') ||
-          field.type === 'email'
-        ) {
-          const hasCustomValidation =
-            field.hasAttribute('aria-describedby') ||
-            field.hasAttribute('aria-invalid') ||
-            errorContainer;
-
-          const form = field.form;
-          const formSuppressesNativeValidation = !!(
-            form &&
-            (form.hasAttribute('novalidate') || form.hasAttribute('onsubmit'))
-          );
-
-          function hasAccessibleErrorText(f) {
-            const ids = [f.getAttribute('aria-describedby'), f.getAttribute('aria-errormessage')]
-              .filter(Boolean)
-              .join(' ')
-              .split(/\s+/)
-              .filter(Boolean);
-            if (ids.length === 0) return false;
-            return ids.some((id) => {
-              const el = document.getElementById(id);
-              if (!el) return false;
-              if (el.hasAttribute('hidden') || el.getAttribute('aria-hidden') === 'true')
-                return false;
-              return !!el.textContent.trim();
-            });
-          }
-
-          const invalidWithNoAccessibleText =
-            field.getAttribute('aria-invalid') === 'true' && !hasAccessibleErrorText(field);
-
-          const hasSuppressionEvidence =
-            formSuppressesNativeValidation || invalidWithNoAccessibleText;
-
-          if (!hasCustomValidation && hasSuppressionEvidence) {
-            violations.push({
-              type: 'html5-validation-inaccessible',
-              category: 'form-validation',
-              severity: 'moderate',
-              element: fieldSelector,
-              description: 'HTML5 validation without accessible error handling',
-              details: {
-                fieldType: field.type,
-                hasRequired: field.hasAttribute('required'),
-                hasPattern: field.hasAttribute('pattern'),
-                pattern: field.getAttribute('pattern'),
-                validationMessage: field.validationMessage || null,
-                formNovalidate: !!(form && form.hasAttribute('novalidate')),
-                formOnsubmit: !!(form && form.hasAttribute('onsubmit')),
-                ariaInvalid: field.getAttribute('aria-invalid'),
-              },
-              wcagCriteria: '3.3.1',
-              impact:
-                'JS suppresses or intercepts native HTML5 validation without providing an accessible replacement',
-              recommendation:
-                'When suppressing native constraint validation (novalidate/onsubmit), provide equivalent accessible error messaging via aria-describedby and aria-invalid',
-            });
-          }
+        function tokens(element) {
+          const raw =
+            (typeof element.className === 'string' ? element.className : '') +
+            ' ' +
+            (element.id || '');
+          return raw
+            .split(/[^A-Za-z]+/)
+            .flatMap(function (part) { return part.split(/(?=[A-Z])/); })
+            .map(function (word) { return word.toLowerCase(); })
+            .filter(Boolean);
         }
-      }
 
-      return violations;
-    });
-  }
-
-  /**
-   * Analyze loading state message patterns
-   */
-  async analyzeLoadingStateMessages(page, options) {
-    return await page.evaluate(() => {
-      const violations = [];
-      const helpers = window.__a11yStatusHelpers;
-
-      // Helper function to generate element selector
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Check for AJAX loading patterns. This selector is a
-      // `[class*="loading"]`/`[class*="progress"]` substring match like the
-      // one in analyzeStaticStatusMessages, so it needs the same evidence
-      // gate to avoid flagging static containers.
-      const loadingPatterns = document.querySelectorAll(
-        [
-          '[id*="loading"]',
-          '[class*="loading"]',
-          '[id*="spinner"]',
-          '[class*="spinner"]',
-          '.loader',
-          '.progress',
-          '[class*="progress"]',
-        ].join(', ')
-      );
-
-      for (const pattern of loadingPatterns) {
-        if (!pattern.textContent.trim()) continue;
-        if (helpers.hasLiveRegionAttributes(pattern)) continue;
-        if (!helpers.hasRoleEvidence(pattern) && !helpers.hasMutationEvidence(pattern)) continue;
-
-        violations.push({
-          type: 'loading-state-no-announcement',
-          category: 'loading-state',
-          severity: 'moderate',
-          element: getElementSelector(pattern),
-          description: 'Loading indicator lacks ARIA live region for status updates',
-          details: {
-            textContent: pattern.textContent.trim(),
-            className: pattern.className,
-            id: pattern.id,
-            tagName: pattern.tagName.toLowerCase(),
-            role: pattern.getAttribute('role'),
-            evidence: {
-              role: helpers.hasRoleEvidence(pattern),
-              mutated: helpers.hasMutationEvidence(pattern),
-            },
+        const CATEGORIES = [
+          {
+            category: 'error-message',
+            words: ['error', 'errors', 'invalid', 'danger'],
+            severity: 'serious',
+            description: 'Error message appeared without being announced in a live region',
+            impact: 'Error messages are not announced to screen readers',
+            recommendation: 'Add role="alert" or aria-live="assertive" to the error container',
           },
-          wcagCriteria: '4.1.3',
-          impact: 'Loading status changes not announced to screen readers',
-          recommendation: 'Add aria-live="polite" for loading state announcements',
-        });
-      }
-
-      // Check for buttons that might trigger loading states
-      const asyncButtons = document.querySelectorAll(
-        'button[onclick*="ajax"], button[onclick*="fetch"], button[class*="async"], .submit-button, .save-button'
-      );
-
-      for (const button of asyncButtons) {
-        // Look for nearby status containers
-        const nearbyStatusContainer =
-          button.parentElement.querySelector('.status, .message, .result') ||
-          button.nextElementSibling;
-
-        if (
-          nearbyStatusContainer &&
-          !nearbyStatusContainer.hasAttribute('aria-live') &&
-          !nearbyStatusContainer.hasAttribute('role')
-        ) {
-          violations.push({
-            type: 'async-action-no-status-announcement',
-            category: 'loading-state',
+          {
+            category: 'success-message',
+            words: ['success', 'confirmation', 'confirmed', 'saved', 'submitted'],
             severity: 'moderate',
-            element: getElementSelector(nearbyStatusContainer),
-            description: 'Container near async button lacks ARIA live region for status updates',
+            description: 'Success message appeared without being announced in a live region',
+            impact: 'Success confirmations are not announced to screen readers',
+            recommendation: 'Add role="status" or aria-live="polite" to the container',
+          },
+          {
+            category: 'loading-state',
+            words: ['loading', 'spinner', 'loader', 'progress'],
+            severity: 'moderate',
+            description: 'Loading state changed without being announced in a live region',
+            impact: 'Loading states are not announced to screen readers',
+            recommendation: 'Add aria-live="polite" for loading state announcements',
+          },
+          {
+            category: 'dynamic-content',
+            words: [
+              'notification',
+              'notifications',
+              'toast',
+              'alert',
+              'message',
+              'notice',
+              'status',
+              'result',
+              'results',
+              'feedback',
+            ],
+            severity: 'moderate',
+            description: 'Notification appeared without being announced in a live region',
+            impact: 'Notifications are not announced to screen readers',
+            recommendation: 'Add aria-live matching the urgency of the message',
+          },
+        ];
+
+        function report(element, meta, evidence) {
+          if (reported.has(element)) return;
+          reported.add(element);
+          violations.push({
+            type: 'missing-live-region',
+            category: meta.category,
+            severity: meta.severity,
+            element: getElementSelector(element),
+            description: meta.description,
             details: {
-              buttonSelector: getElementSelector(button),
-              buttonText: button.textContent.trim(),
-              containerSelector: getElementSelector(nearbyStatusContainer),
-              containerText: nearbyStatusContainer.textContent.trim(),
+              className: element.className,
+              id: element.id,
+              textContent: element.textContent.trim().substring(0, 100),
+              currentRole: element.getAttribute('role'),
+              evidence: evidence,
             },
             wcagCriteria: '4.1.3',
-            impact: 'Async operation results not announced to screen readers',
-            recommendation: 'Add aria-live region for async operation feedback',
+            impact: meta.impact,
+            recommendation: meta.recommendation,
           });
         }
-      }
 
-      return violations;
-    });
+        const named = Array.from(document.querySelectorAll('[class], [id]'));
+
+        for (const meta of CATEGORIES) {
+          for (const element of named) {
+            if (reported.has(element)) continue;
+            const words = tokens(element);
+            if (!words.some(function (word) { return meta.words.includes(word); })) continue;
+            if (helpers.hasLiveRegionAttributes(element)) continue;
+            // A control is not a status message: a toggle whose own label
+            // changes from "Pause" to "Resume" reports its new state through
+            // its role and name, not through an announcement.
+            if (__isInteractiveTarget(element)) continue;
+            if (!__isRendered(element)) continue;
+
+            const hasText = !!element.textContent.trim();
+            const changed = hasText && helpers.unannouncedChange(element, announced);
+            const errorSlot =
+              meta.category === 'error-message' && helpers.isDescribedbyErrorSlot(element);
+            if (!changed && !errorSlot) continue;
+
+            report(element, meta, { unannouncedChange: changed, describedbyErrorSlot: errorSlot });
+          }
+        }
+
+        // Progress indicators: reported only when the value or the rendered
+        // text was seen to change while nothing was announced. A static
+        // progress bar (a skills bar on a CV page) never updates and is not a
+        // status message.
+        for (const progress of document.querySelectorAll('progress, [role="progressbar"]')) {
+          if (reported.has(progress)) continue;
+          if (helpers.hasLiveRegionAttributes(progress)) continue;
+          if (progress.hasAttribute('aria-describedby')) continue;
+          if (!__isRendered(progress)) continue;
+          if (!helpers.unannouncedChange(progress, announced)) continue;
+
+          report(
+            progress,
+            {
+              category: 'progress-indicator',
+              severity: 'moderate',
+              description: 'Progress indicator changed without being announced in a live region',
+              impact: 'Progress updates are not announced to screen readers',
+              recommendation:
+                'Add aria-live, or point aria-describedby at a live region that carries the progress text',
+            },
+            { unannouncedChange: true, describedbyErrorSlot: false }
+          );
+        }
+
+        return violations;
+      })();
+    `);
   }
 
   /**
-   * Get count of passed elements (estimated)
-   */
-  getPassedElementsCount(violations) {
-    return Math.max(25 - violations.length, 0);
-  }
-
-  /**
-   * Generate recommendations for status message issues
+   * Generate recommendations for the reported status message issues.
    */
   generateStatusMessagesRecommendations(violations) {
-    const recommendations = [];
-    const issueTypes = [...new Set(violations.map((v) => v.type))];
-
-    if (issueTypes.includes('missing-live-region')) {
-      recommendations.push({
-        priority: 'critical',
-        issue: 'Status containers missing ARIA live regions',
-        solution: 'Add appropriate aria-live attributes to status message containers',
-        implementation:
-          'Use aria-live="assertive" for urgent alerts, aria-live="polite" for status updates, or role="alert" and role="status"',
-      });
-    }
-
-    if (issueTypes.includes('dynamic-status-without-announcement')) {
-      recommendations.push({
+    if (violations.length === 0) return [];
+    return [
+      {
         priority: 'high',
-        issue: 'Dynamic status changes not announced',
-        solution: 'Ensure dynamically shown content has ARIA live regions',
+        issue: 'Content changed without a live region announcement',
+        solution: 'Announce status changes through an ARIA live region',
         implementation:
-          'Add aria-live attributes before showing dynamic content, or inject content into existing live regions',
-      });
-    }
-
-    if (issueTypes.includes('form-validation-no-live-region')) {
-      recommendations.push({
-        priority: 'high',
-        issue: 'Form validation errors not announced',
-        solution: 'Implement accessible form validation with live regions',
-        implementation:
-          'Use aria-live="assertive" on error containers and aria-describedby to associate errors with fields',
-      });
-    }
-
-    if (issueTypes.includes('loading-state-no-announcement')) {
-      recommendations.push({
-        priority: 'medium',
-        issue: 'Loading states not announced to screen readers',
-        solution: 'Add live regions for loading and progress announcements',
-        implementation:
-          'Use aria-live="polite" for loading states and provide text alternatives to visual indicators',
-      });
-    }
-
-    if (issueTypes.includes('html5-validation-inaccessible')) {
-      recommendations.push({
-        priority: 'medium',
-        issue: 'HTML5 validation may not be accessible',
-        solution: 'Implement custom accessible validation',
-        implementation:
-          'Use aria-invalid, aria-describedby, and custom error messages with live regions instead of relying on browser validation',
-      });
-    }
-
-    return recommendations;
-  }
-
-  /**
-   * Generate screen reader test cases
-   */
-  generateScreenReaderTestCases(violations) {
-    const testCases = [];
-
-    violations.forEach((violation, index) => {
-      const testId = `screen-reader-test-${index + 1}`;
-
-      switch (violation.category) {
-        case 'form-validation':
-          testCases.push({
-            testId: testId,
-            element: violation.element,
-            category: violation.category,
-            testScenario: 'Submit form with invalid data',
-            expectedBehavior: 'Screen reader should announce validation errors',
-            currentBehavior: 'Validation errors shown visually but not announced',
-            screenReaderSoftware: ['NVDA', 'JAWS', 'VoiceOver'],
-            priority: violation.severity,
-            testSteps: [
-              '1. Navigate to form field',
-              '2. Enter invalid data or leave required field empty',
-              '3. Submit form or move to next field',
-              '4. Listen for error announcement',
-            ],
-          });
-          break;
-
-        case 'loading-state':
-          testCases.push({
-            testId: testId,
-            element: violation.element,
-            category: violation.category,
-            testScenario: 'Trigger loading/progress state',
-            expectedBehavior: 'Screen reader should announce loading status and completion',
-            currentBehavior: 'Loading states shown visually but not announced',
-            screenReaderSoftware: ['NVDA', 'JAWS', 'VoiceOver'],
-            priority: violation.severity,
-            testSteps: [
-              '1. Activate button or trigger that causes loading',
-              '2. Listen for loading announcement',
-              '3. Wait for operation to complete',
-              '4. Listen for completion announcement',
-            ],
-          });
-          break;
-
-        case 'dynamic-content':
-          testCases.push({
-            testId: testId,
-            element: violation.element,
-            category: violation.category,
-            testScenario: 'Trigger dynamic content change',
-            expectedBehavior: 'Screen reader should announce content updates',
-            currentBehavior: 'Content changes shown visually but not announced',
-            screenReaderSoftware: ['NVDA', 'JAWS', 'VoiceOver'],
-            priority: violation.severity,
-            testSteps: [
-              '1. Perform action that updates content',
-              '2. Listen for change announcement',
-              '3. Verify announced content matches visual update',
-            ],
-          });
-          break;
-
-        default:
-          testCases.push({
-            testId: testId,
-            element: violation.element,
-            category: violation.category,
-            testScenario: 'Test status message announcement',
-            expectedBehavior: 'Screen reader should announce status changes',
-            currentBehavior: 'Status changes not announced',
-            screenReaderSoftware: ['NVDA', 'JAWS', 'VoiceOver'],
-            priority: violation.severity,
-            testSteps: [
-              '1. Trigger status change',
-              '2. Listen for announcement',
-              '3. Verify message content and timing',
-            ],
-          });
-      }
-    });
-
-    return testCases;
+          'Use role="alert" or aria-live="assertive" for errors, role="status" or aria-live="polite" for other updates, and write the message into a region that exists before the update',
+      },
+    ];
   }
 }
 

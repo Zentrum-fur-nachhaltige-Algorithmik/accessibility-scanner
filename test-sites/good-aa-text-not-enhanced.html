@@ -1,0 +1,27 @@
+<!-- WCAG-TEST
+criterion: 1.4.3
+level: AA
+title: Contrast (Minimum), text between the AA and the AAA threshold
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: axe-core
+description: Body text at 6.2:1, a heading at 4.5:1 and a card at 6.3:1: axe-core color-contrast passes all three, and color-contrast measures the 7:1 threshold of SC 1.4.6 only for a scan that asks for AAA.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AA text is not an enhanced-contrast failure</title>
+<style>
+  body { font-family: sans-serif; background: #ffffff; color: #616161; margin: 2rem; }
+  h1 { color: #767676; font-size: 2.5rem; }
+  .card { background: #f2f2f2; color: #595959; padding: 1rem; }
+</style>
+</head>
+<body>
+<h1>Heading at 4.5:1</h1>
+<p>Body text at 6.2:1 against white passes SC 1.4.3 and fails SC 1.4.6.</p>
+<div class="card"><p>Text on a light grey card, still above the AA threshold.</p></div>
+</body>
+</html>

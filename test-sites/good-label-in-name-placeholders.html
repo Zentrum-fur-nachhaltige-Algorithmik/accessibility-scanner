@@ -1,0 +1,62 @@
+<!-- WCAG-TEST
+criterion: 2.5.3
+level: A
+title: Label in Name
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: label-in-name
+description: Fields whose placeholder differs from the accessible name, an image button with alt and aria-label, an icon plus text link, and a hidden control
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmeldung zur Sprechstunde</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
+        label { display: block; margin-top: 1rem; }
+        .drawer { display: none; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Anmeldung zur Sprechstunde</h1>
+
+        <form action="/anmeldung" method="post">
+            <!-- The placeholder shows an example, the accessible name names the field -->
+            <label for="geburtsdatum">Geburtsdatum</label>
+            <input type="text" id="geburtsdatum" name="geburtsdatum" placeholder="TT.MM.JJJJ" autocomplete="bday">
+
+            <!-- The label is contained in a longer accessible name -->
+            <label for="telefon">Telefon</label>
+            <input type="tel" id="telefon" name="telefon" aria-label="Telefonnummer für Rückfragen" placeholder="+49 30 123456" autocomplete="tel">
+
+            <!-- The visible label is a compound the name extends -->
+            <label for="land">Land</label>
+            <select id="land" name="land" aria-label="Bundesland auswählen">
+                <option>Berlin</option>
+                <option>Hamburg</option>
+            </select>
+
+            <!-- An image button: alt and aria-label say different things, and the
+                 alt is not text the user sees -->
+            <p><input type="image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='%23333' stroke-width='2'/%3E%3C/svg%3E" alt="Lupe" aria-label="Suche starten"></p>
+        </form>
+
+        <!-- The image alt is not visible text, so it need not be in the name -->
+        <p>
+            <a href="/berichte/fruehjahr" aria-label="Frühjahrsbericht öffnen">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Crect width='24' height='24' fill='%233b5a72'/%3E%3C/svg%3E" alt="Titelbild des Berichts" width="24" height="24">
+                Frühjahrsbericht
+            </a>
+        </p>
+
+        <!-- Not rendered: it shows no label to speak -->
+        <div class="drawer">
+            <button type="button" aria-label="Panel schließen">Abbrechen</button>
+        </div>
+    </main>
+</body>
+</html>

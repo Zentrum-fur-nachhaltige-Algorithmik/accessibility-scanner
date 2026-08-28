@@ -1,0 +1,82 @@
+<!-- WCAG-TEST
+criterion: 3.2.4
+level: AA
+title: Consistent Identification
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: predictable-navigation
+description: A grid of cards whose links are all named differently, buttons named Cancel, Close and Save, and a toolbar repeated with identical names
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Repeated cards and buttons</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        color: #1a1a1a;
+        background: #fff;
+        margin: 2rem;
+      }
+      .card {
+        border: 1px solid #666;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      .toolbar a,
+      .toolbar button {
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Repeated cards and buttons</h1>
+
+    <!-- Cards share their structure and name every link differently on purpose. -->
+    <section>
+      <div class="card">
+        <h2>Annual report</h2>
+        <a href="/reports/annual">Read the annual report</a>
+        <a href="/reports/annual/summary">Summary of the annual report</a>
+        <a href="/reports/annual/data">Download the figures</a>
+      </div>
+      <div class="card">
+        <h2>Winter timetable</h2>
+        <a href="/timetable/winter">Read the winter timetable</a>
+        <a href="/timetable/winter/changes">What changed this winter</a>
+        <a href="/timetable/winter/map">Open the network map</a>
+      </div>
+      <div class="card">
+        <h2>Ticket prices</h2>
+        <a href="/prices">Read the price list</a>
+        <a href="/prices/discounts">Discounts and passes</a>
+        <a href="/prices/refunds">Ask for a refund</a>
+      </div>
+    </section>
+
+    <!-- The same toolbar twice, with the same names both times. -->
+    <div class="toolbar">
+      <a href="/">Home</a>
+      <button type="button">Print</button>
+      <button type="button">Download</button>
+    </div>
+
+    <p>Two ways out of this form, and one way to keep it:</p>
+    <p>
+      <button type="button">Cancel</button>
+      <button type="button">Close</button>
+      <button type="button">Dismiss</button>
+      <button type="button">Save</button>
+      <button type="button">Store as draft</button>
+    </p>
+
+    <div class="toolbar">
+      <a href="/">Home</a>
+      <button type="button">Print</button>
+      <button type="button">Download</button>
+    </div>
+  </body>
+</html>

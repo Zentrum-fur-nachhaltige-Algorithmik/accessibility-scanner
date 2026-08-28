@@ -60,11 +60,26 @@ const MANUAL_OVERRIDES = {
       'spacing exception) is automated in input-modalities; the 44x44 AAA size ' +
       'is a design review item.',
   },
+  '2.4.6': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Headings and Labels: whether a heading or a label describes its topic is a ' +
+      'judgement about meaning. An empty heading is axe-core `empty-heading` and an ' +
+      'unnamed control is axe-core `label`; what is left needs a reader. axe-core ' +
+      'ships no 2.4.6 rule either.',
+  },
   '2.4.8': {
     mechanism: MECHANISM.MANUAL,
     justification:
       'Location (AAA): whether a user can determine their position requires the ' +
       'surrounding set of pages and its information architecture, not one page.',
+  },
+  '3.3.4': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Error Prevention (Legal, Financial, Data): the criterion applies only to pages that ' +
+      'commit the user legally or financially, and is met by reversibility, checking or ' +
+      'confirmation, all of which are server-side behaviour a static page does not expose.',
   },
   '3.3.6': {
     mechanism: MECHANISM.MANUAL,

@@ -1,0 +1,42 @@
+<!-- WCAG-TEST
+criterion: 2.4.11
+level: AA
+title: Focus Not Obscured, transparent fixed layer above the content
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: A full viewport position:fixed layer with a transparent background sits above the page in stacking order and takes the hit test, and a sticky wrapper with an empty backdrop pseudo element sits above the form. The old hit test treated any fixed or sticky ancestor of the hit element as an overlay and reported every focusable element on the page as entirely hidden. Nothing paints at the sample points, so focus-obscured-by-fixed-element must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Transparent fixed layer (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button, input { color: #1b1b1b; font: inherit; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .decor { position: fixed; inset: 0; z-index: 5; background: transparent; }
+  .sticky-wrap { position: sticky; top: 0; z-index: 4; }
+  .sticky-wrap::before { content: ""; display: block; height: 0; }
+  form p { margin: 24px 0; }
+</style>
+</head>
+<body>
+<div class="decor"></div>
+<main>
+  <h1>Focus stays visible under a transparent layer</h1>
+  <div class="sticky-wrap"></div>
+  <form>
+    <p><label for="name">Name</label> <input type="text" id="name"></p>
+    <p><label for="mail">Email</label> <input type="email" id="mail"></p>
+    <p><label for="note">Note</label> <input type="text" id="note"></p>
+    <p><button type="submit">Send</button></p>
+  </form>
+  <p><a href="#top">Back to top</a></p>
+</main>
+</body>
+</html>

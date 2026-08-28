@@ -1,0 +1,74 @@
+<!-- WCAG-TEST
+criterion: 1.4.13
+level: AA
+title: Content on Hover or Focus
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: hover-focus-content
+description: Title attributes that supplement a control which is already named by its text or its label, the pattern every encyclopedia link and search field uses
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Titles that supplement a name</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      label {
+        display: block;
+        margin-top: 1rem;
+      }
+      input {
+        font: inherit;
+        padding: 0.4rem;
+        border: 2px solid #0b0c0c;
+      }
+      a:focus,
+      input:focus,
+      button:focus {
+        outline: 3px solid #0b57d0;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Titles that supplement a name</h1>
+
+      <form action="/search" method="get">
+        <label for="q">Search this encyclopedia</label>
+        <input
+          id="q"
+          name="q"
+          type="search"
+          title="Search this encyclopedia [alt-shift-f]"
+          autocomplete="off"
+        />
+        <button type="submit" title="Run the search">Search</button>
+      </form>
+
+      <h2>Further reading</h2>
+      <ul>
+        <li>
+          <a href="/wiki/Assistive_technology" title="Assistive technology: devices and software that people with disabilities use to operate a computer">Assistive technology</a>
+        </li>
+        <li>
+          <a href="/wiki/Screen_reader" title="Screen reader: software that speaks or brailles the content of a screen">Screen reader</a>
+        </li>
+      </ul>
+      <p>
+        Each link is named by its own text. The title adds a summary of the target article, the way
+        an encyclopedia does, and nothing in the page depends on reading it.
+      </p>
+    </main>
+  </body>
+</html>

@@ -1,12 +1,12 @@
 <!-- WCAG-TEST
-criterion: EN 301 549 12.1, EN 301 549 12.2, EN 301 549 12.4
+criterion: EN 301 549 12.1
 level: AA
 title: Marketing page about accessibility law is not an accessibility statement
 test_type: good
 expected_violations: 1
 testable_by: dom
-scanners: accessibility-statement, eaa-procedure, contact-mechanism, compliance-monitoring
-description: A guide page titled "Barrierefreiheit & BaFG" that explains which laws (BGStG, BaFG, WZG, WCAG 2.2 AA) apply to Austrian doctors' websites. It is marketing copy, not a declaration about THIS site. The footer link labelled "Barrierefreiheit" points back at this same guide, which is what the statement detector accepts as "a statement exists" - so exactly ONE finding is correct, missing-accessibility-statement (no statement is published anywhere). Every follow-up rule (no-audit-schedule, no-issue-tracking, no-feedback-process, no-compliance-monitoring, no-response-time, no-accessibility-specific-contact ...) describes a property of a statement that does not exist and must stay silent. Reproduces the gsunde.website/barrierefreiheit FP cluster.
+scanners: accessibility-statement
+description: A guide page titled "Barrierefreiheit & BaFG" that explains which laws (BGStG, BaFG, WZG, WCAG 2.2 AA) apply to Austrian doctors' websites. It is marketing copy, not a declaration about THIS site: it names no conformance status for this site and no review date. The footer link labelled "Barrierefreiheit" points back at the guide itself, so exactly ONE finding is correct, missing-accessibility-statement. Reproduces the gsunde.website/barrierefreiheit FP cluster.
 -->
 <!DOCTYPE html>
 <html lang="de">

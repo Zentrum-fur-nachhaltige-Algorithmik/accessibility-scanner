@@ -1,14 +1,25 @@
 /**
  * Predictable Navigation Scanner.
  * WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 (EN 301 549 9.3.2.1 to 9.3.2.4).
- * Simulates focus and input events and compares repeated navigation blocks
- * and button labels within the page for consistency.
+ * Focuses every control and changes every setting to see whether the page
+ * changes the user's context on its own, and compares the navigation blocks and
+ * the repeated components of the page for consistency.
  */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
+const { injectableCode: renderedCode } = require('../utils/rendered');
+const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('predictable-navigation');
+
+/**
+ * Controls probed per page, and the time each one gets to act. Handlers
+ * routinely defer the context change into a timer, so the window has to
+ * outlast a short setTimeout.
+ */
+const MAX_PROBED_ELEMENTS = 40;
+const SETTLE_MS = 120;
 
 class PredictableNavigationScanner extends BaseScanner {
   constructor() {
@@ -19,23 +30,29 @@ class PredictableNavigationScanner extends BaseScanner {
   }
 
   /**
+   * Focuses controls, changes their settings and answers navigation requests
+   * with 204, so it must not share a page with another scanner.
+   */
+  get needsExclusiveAccess() {
+    return true;
+  }
+
+  /**
    * Core scan method. Receives an already-navigated Puppeteer page.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const defaultOptions = {
+    const scanOptions = {
       testOnFocus: true,
       testOnInput: true,
       testConsistentNavigation: true,
       testConsistentIdentification: true,
       timeout: TIMEOUTS.scanner,
+      ...options,
     };
 
-    const scanOptions = { ...defaultOptions, ...options };
-
-    // Create timestamped scan directory
     const timestamp = Date.now();
     const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
     await fs.ensureDir(scanDir);
@@ -63,542 +80,351 @@ class PredictableNavigationScanner extends BaseScanner {
   }
 
   /**
-   * Perform comprehensive predictable navigation analysis
+   * The two consistency checks only read the DOM, so they run before the
+   * probes, which operate the page's own controls.
    */
   async performPredictableNavigationAnalysis(page, scanDir, options) {
     const violations = [];
-    const visualEvidence = [];
-    let onFocusPredictable = true;
-    let onInputPredictable = true;
-    let navigationConsistent = true;
-    let identificationConsistent = true;
 
     log.debug('Starting predictable navigation analysis...');
 
-    // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'predictable-navigation-analysis.png');
     await page.screenshot({ path: initialScreenshot, fullPage: true });
 
-    // 1. Test on focus behavior (WCAG 3.2.1)
-    if (options.testOnFocus) {
-      const onFocusResults = await this.analyzeOnFocusBehavior(page, violations);
-      onFocusPredictable = onFocusResults.predictable;
-    }
-
-    // 2. Test on input behavior (WCAG 3.2.2)
-    if (options.testOnInput) {
-      const onInputResults = await this.analyzeOnInputBehavior(page, violations);
-      onInputPredictable = onInputResults.predictable;
-    }
-
-    // 3. Test consistent navigation (WCAG 3.2.3)
     if (options.testConsistentNavigation) {
-      const consistentNavResults = await this.analyzeConsistentNavigation(page, violations);
-      navigationConsistent = consistentNavResults.consistent;
+      await this.analyzeConsistentNavigation(page, violations);
     }
-
-    // 4. Test consistent identification (WCAG 3.2.4)
     if (options.testConsistentIdentification) {
-      const consistentIdResults = await this.analyzeConsistentIdentification(page, violations);
-      identificationConsistent = consistentIdResults.consistent;
+      await this.analyzeConsistentIdentification(page, violations);
     }
 
-    // Generate visual evidence
-    visualEvidence.push({
-      type: 'predictable-navigation',
-      screenshot: path.basename(initialScreenshot),
-      onFocusPredictable: onFocusPredictable,
-      onInputPredictable: onInputPredictable,
-      navigationConsistent: navigationConsistent,
-      identificationConsistent: identificationConsistent,
-    });
+    let probeFindings = { onFocus: [], onInput: [] };
+    if (options.testOnFocus || options.testOnInput) {
+      probeFindings = await this.probeContextChanges(page, options);
+    }
+
+    for (const issue of probeFindings.onFocus) {
+      violations.push({
+        criterion: '9.3.2.1',
+        element: issue.element,
+        issue: 'focus-causes-context-change',
+        description: `Focusing this element ${issue.what} without the user asking for it`,
+        severity: 'error',
+        evidence: issue.what,
+        suggestion:
+          'Trigger the change from an explicit user action such as a button press, not from focus',
+      });
+    }
+    for (const issue of probeFindings.onInput) {
+      violations.push({
+        criterion: '9.3.2.2',
+        element: issue.element,
+        issue: 'input-causes-context-change',
+        description: `Changing this control ${issue.what} without the user asking for it`,
+        severity: 'error',
+        evidence: issue.what,
+        suggestion:
+          'Add a submit or apply button, or state the behaviour on the control before it is used',
+      });
+    }
 
     log.debug(`Predictable navigation analysis complete: ${violations.length} violations found`);
 
+    const has = (criterion) => violations.some((v) => v.criterion === criterion);
+
     return {
       violations,
-      visualEvidence,
-      onFocusPredictable,
-      onInputPredictable,
-      navigationConsistent,
-      identificationConsistent,
+      visualEvidence: [
+        {
+          type: 'predictable-navigation',
+          screenshot: path.basename(initialScreenshot),
+          onFocusPredictable: !has('9.3.2.1'),
+          onInputPredictable: !has('9.3.2.2'),
+          navigationConsistent: !has('9.3.2.3'),
+          identificationConsistent: !has('9.3.2.4'),
+        },
+      ],
+      onFocusPredictable: !has('9.3.2.1'),
+      onInputPredictable: !has('9.3.2.2'),
+      navigationConsistent: !has('9.3.2.3'),
+      identificationConsistent: !has('9.3.2.4'),
     };
   }
 
   /**
-   * Analyze on focus behavior (WCAG 3.2.1)
+   * Focus every control, then change the setting of every control, and record
+   * what the page did about it (SC 3.2.1 and 3.2.2).
+   *
+   * Navigation requests are answered with 204 for the duration of the probe.
+   * A 204 leaves the current document in place, so a control that navigates is
+   * measured without losing the page; aborting the request instead would
+   * replace the document with a network error page.
    */
-  async analyzeOnFocusBehavior(page, violations) {
-    log.debug('Analyzing on focus behavior...');
+  async probeContextChanges(page, options) {
+    const onRequest = (request) => {
+      const isMainNavigation = request.isNavigationRequest() && request.frame() === page.mainFrame();
+      const settle = isMainNavigation
+        ? request.respond({ status: 204, body: '' })
+        : request.continue();
+      settle.catch(() => {});
+    };
 
-    const onFocusAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let predictable = true;
+    let intercepting = false;
+    try {
+      await page.setRequestInterception(true);
+      intercepting = true;
+      page.on('request', onRequest);
 
-      // Get all focusable elements
-      const focusableElements = document.querySelectorAll(
-        'input, button, select, textarea, a[href], [tabindex], [contenteditable]'
-      );
+      return await page.evaluate(
+        async (renderedHelpers, accnameHelpers, config) => {
+          eval(renderedHelpers);
+          eval(accnameHelpers);
 
-      focusableElements.forEach((element) => {
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (element.className ? `.${element.className.split(' ')[0]}` : ''),
-        };
+          const probe = {
+            navigated: false,
+            opened: false,
+            submitted: false,
+            history: false,
+            dialog: false,
+          };
+          const reset = () => {
+            probe.navigated = false;
+            probe.opened = false;
+            probe.submitted = false;
+            probe.history = false;
+            probe.dialog = false;
+          };
 
-        // Check for onfocus event handlers that might cause context changes
+          // Every construct that changes the user's context is redirected into
+          // the probe, so the page reports what it would have done instead of
+          // doing it.
+          const native = {
+            open: window.open,
+            submit: HTMLFormElement.prototype.submit,
+            requestSubmit: HTMLFormElement.prototype.requestSubmit,
+            alert: window.alert,
+            confirm: window.confirm,
+            prompt: window.prompt,
+            pushState: history.pushState,
+            replaceState: history.replaceState,
+          };
+          const onUnload = () => {
+            probe.navigated = true;
+          };
+          const onSubmit = (event) => {
+            probe.submitted = true;
+            event.preventDefault();
+          };
+          window.addEventListener('beforeunload', onUnload, true);
+          document.addEventListener('submit', onSubmit, true);
+          window.open = () => {
+            probe.opened = true;
+            return null;
+          };
+          HTMLFormElement.prototype.submit = function () {
+            probe.submitted = true;
+          };
+          HTMLFormElement.prototype.requestSubmit = function () {
+            probe.submitted = true;
+          };
+          window.alert = () => {
+            probe.dialog = true;
+          };
+          window.confirm = () => {
+            probe.dialog = true;
+            return false;
+          };
+          window.prompt = () => {
+            probe.dialog = true;
+            return null;
+          };
+          history.pushState = () => {
+            probe.history = true;
+          };
+          history.replaceState = () => {
+            probe.history = true;
+          };
 
-        if (element.hasAttribute('onfocus')) {
-          const focusCode = element.getAttribute('onfocus');
-
-          // Check for potentially disruptive focus actions
-          const disruptiveActions = [
-            'window.open',
-            'location.href',
-            'location.replace',
-            'location.assign',
-            'form.submit',
-            'document.location',
-            'window.location',
-            'history.pushState',
-            'history.replaceState',
-          ];
-
-          const hasDisruptiveAction = disruptiveActions.some((action) =>
-            focusCode.includes(action)
-          );
-
-          if (hasDisruptiveAction) {
-            issues.push({
-              type: 'focus-causes-context-change',
-              element: elementInfo.selector,
-              description: 'Focus event triggers unexpected context change without user initiation',
-              severity: 'error',
-              focusCode: focusCode.substring(0, 100),
-            });
-            predictable = false;
-          }
-        }
-
-        // Check for focus traps that might be disorienting
-        if (element.hasAttribute('tabindex')) {
-          const tabIndex = parseInt(element.getAttribute('tabindex'));
-
-          // Very high positive tabindex values can be disorienting
-          if (tabIndex > 10) {
-            issues.push({
-              type: 'high-tabindex-focus-jump',
-              element: elementInfo.selector,
-              description: 'High tabindex value may cause unpredictable focus behavior',
-              severity: 'warning',
-              tabIndex: tabIndex,
-            });
-          }
-        }
-
-        // Check for elements that auto-focus and might disrupt user flow
-        if (element.hasAttribute('autofocus')) {
-          // Auto-focus is generally ok on landing pages but problematic in modals/dynamic content
-          const isInModal =
-            element.closest('[role="dialog"]') ||
-            element.closest('.modal') ||
-            element.closest('[aria-modal="true"]');
-
-          const isDynamicContent =
-            element.closest('[aria-live]') || element.closest('[role="alert"]');
-
-          if (isInModal || isDynamicContent) {
-            // Check if there's user consent for the auto-focus
-            const hasUserControl =
-              document.querySelector('button[aria-controls]') ||
-              document.querySelector('[aria-expanded]');
-
-            if (!hasUserControl) {
-              issues.push({
-                type: 'autofocus-in-dynamic-content',
-                element: elementInfo.selector,
-                description: 'Auto-focus in modal or dynamic content without user initiation',
-                severity: 'warning',
-              });
-            }
-          }
-        }
-      });
-
-      // Check for CSS that might cause unexpected focus styling changes
-      const styleSheets = Array.from(document.styleSheets);
-      let hasUnpredictableFocusStyles = false;
-
-      try {
-        styleSheets.forEach((sheet) => {
-          try {
-            const rules = Array.from(sheet.cssRules || []);
-            rules.forEach((rule) => {
-              if (rule.selectorText && rule.selectorText.includes(':focus')) {
-                const focusRule = rule.cssText;
-
-                // Check for focus styles that might be disorienting
-                const problematicStyles = [
-                  'display: none',
-                  'visibility: hidden',
-                  'position: absolute',
-                ];
-                const hasProblematicStyle = problematicStyles.some((style) =>
-                  focusRule.includes(style)
-                );
-
-                if (hasProblematicStyle) {
-                  hasUnpredictableFocusStyles = true;
-                }
-              }
-            });
-          } catch (e) {
-            // Cross-origin stylesheet
-          }
-        });
-      } catch (e) {
-        // Error accessing stylesheets
-      }
-
-      if (hasUnpredictableFocusStyles) {
-        issues.push({
-          type: 'unpredictable-focus-styles',
-          element: 'document',
-          description: 'CSS focus styles may cause elements to disappear or move unexpectedly',
-          severity: 'warning',
-        });
-      }
-
-      return { issues, predictable };
-    });
-
-    // Create violations for on focus issues
-    onFocusAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.3.2.1',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getOnFocusSuggestion(issue.type),
-      });
-    });
-
-    return { predictable: onFocusAnalysis.predictable };
-  }
-
-  /**
-   * Analyze on input behavior (WCAG 3.2.2)
-   */
-  async analyzeOnInputBehavior(page, violations) {
-    log.debug('Analyzing on input behavior...');
-
-    const onInputAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let predictable = true;
-
-      /**
-       * Inline handlers almost never contain the context change themselves -
-       * they delegate: onchange="submitOrder(this.form)". Matching only the
-       * literal attribute text therefore misses every real-world case. Read
-       * the source of the global functions the handler calls (one level, no
-       * recursion) so the decision rests on what the code actually does.
-       */
-      function resolveHandlerCode(code) {
-        let resolved = code || '';
-        const calledNames = new Set();
-        const callPattern = /([A-Za-z_$][\w$]*)\s*\(/g;
-        let match;
-        while ((match = callPattern.exec(code || '')) !== null) calledNames.add(match[1]);
-
-        for (const name of calledNames) {
-          try {
-            const fn = window[name];
-            if (typeof fn === 'function') {
-              resolved += '\n' + Function.prototype.toString.call(fn);
-            }
-          } catch (e) {
-            // Inaccessible / cross-origin - ignore
-          }
-        }
-        return resolved;
-      }
-
-      // Concrete constructs that change the user's context per the WCAG
-      // definition (change of user agent, viewport, focus, or content that
-      // changes the meaning of the page).
-      const NAVIGATION_CONSTRUCTS = [
-        { pattern: /\.\s*submit\s*\(/, what: 'submits the form' },
-        { pattern: /\bwindow\s*\.\s*open\s*\(/, what: 'opens a new window' },
-        {
-          pattern: /\blocation\s*\.\s*(?:href|replace|assign)\s*[=(]/,
-          what: 'navigates to another URL',
-        },
-        { pattern: /\b(?:window|document)\s*\.\s*location\s*=/, what: 'navigates to another URL' },
-        {
-          pattern: /\bhistory\s*\.\s*(?:pushState|replaceState)\s*\(/,
-          what: 'replaces the browser history entry',
-        },
-      ];
-      const DIALOG_CONSTRUCTS = [
-        {
-          pattern: /\b(?:alert|confirm|prompt)\s*\(/,
-          what: 'opens a modal dialog which takes focus',
-        },
-        { pattern: /\.\s*showModal\s*\(/, what: 'opens a modal dialog which takes focus' },
-      ];
-
-      function detectContextChange(resolvedCode) {
-        for (const c of NAVIGATION_CONSTRUCTS) {
-          if (c.pattern.test(resolvedCode)) return { kind: 'navigation', what: c.what };
-        }
-        for (const c of DIALOG_CONSTRUCTS) {
-          if (c.pattern.test(resolvedCode)) return { kind: 'dialog', what: c.what };
-        }
-        return null;
-      }
-
-      // Check form inputs for unexpected context changes
-      const formElements = document.querySelectorAll('input, select, textarea');
-
-      formElements.forEach((element) => {
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (element.className ? `.${element.className.split(' ')[0]}` : ''),
-        };
-
-        // Check for onchange/oninput handlers that might cause context changes
-        ['onchange', 'oninput', 'onblur'].forEach((eventType) => {
-          if (element.hasAttribute(eventType)) {
-            const eventCode = element.getAttribute(eventType);
-
-            // Check for navigation/submission without user consent
-            const contextChangeActions = [
-              'form.submit',
-              'window.open',
-              'location.href',
-              'location.replace',
-              'document.location',
-              'window.location',
-              'history.pushState',
-            ];
-
-            const causesContextChange = contextChangeActions.some((action) =>
-              eventCode.includes(action)
+          function selectorFor(el) {
+            const className = typeof el.className === 'string' ? el.className : '';
+            return (
+              el.tagName.toLowerCase() +
+              (el.id ? `#${el.id}` : '') +
+              (className ? `.${className.split(' ')[0]}` : '')
             );
+          }
 
-            // The handler may only reference a function that performs the
-            // context change - resolve it so indirect handlers are caught too.
-            const indirect = causesContextChange
-              ? null
-              : detectContextChange(resolveHandlerCode(eventCode));
+          const settle = () => new Promise((resolve) => setTimeout(resolve, config.settleMs));
 
-            if (causesContextChange || indirect) {
-              // Check if it's a select dropdown (which is more acceptable)
-              const isSelectElement = element.tagName.toLowerCase() === 'select';
+          const openDialogs = () =>
+            Array.from(
+              document.querySelectorAll('dialog[open], [role="dialog"], [aria-modal="true"]')
+            ).filter(__isRendered).length;
 
-              // For select elements, check if there's a warning or submit button
-              if (isSelectElement) {
-                const hasWarning =
-                  element.parentElement.textContent.toLowerCase().includes('automatically') ||
-                  element.parentElement.textContent.toLowerCase().includes('automatisch') ||
-                  element.parentElement.querySelector('[role="alert"]') ||
-                  element.getAttribute('aria-describedby');
+          /** What the page did since the last reset, in the user's terms. */
+          function whatHappened(dialogsBefore) {
+            if (probe.navigated) return 'navigates to another page';
+            if (probe.opened) return 'opens a new window';
+            if (probe.submitted) return 'submits the form';
+            if (probe.history) return 'replaces the browser history entry';
+            if (probe.dialog || openDialogs() > dialogsBefore) {
+              return 'opens a modal dialog which takes focus';
+            }
+            return null;
+          }
 
-                if (!hasWarning) {
-                  issues.push({
-                    type: 'select-auto-submit-no-warning',
-                    element: elementInfo.selector,
-                    description: 'Select element auto-submits form without warning to user',
-                    severity: 'error',
-                    evidence: indirect
-                      ? `${eventType} handler ${indirect.what}`
-                      : `${eventType}="${eventCode.substring(0, 80)}"`,
-                  });
-                  predictable = false;
+          /**
+           * 3.2.2 is met when the user was advised of the behaviour before
+           * using the component, so a control whose own name or description
+           * announces it is exempt.
+           */
+          const announcesChange =
+            /\b(automatic\w*|immediately|reloads?|submits?)\b|automatisch|sofort|wird gesendet|neu geladen/i;
+          function isAnnounced(el) {
+            const ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+            const described = ids
+              .map((id) => {
+                const target = document.getElementById(id);
+                return target ? target.textContent : '';
+              })
+              .join(' ');
+            return (
+              announcesChange.test(__accessibleName(el) || '') ||
+              announcesChange.test(described) ||
+              announcesChange.test(el.getAttribute('title') || '')
+            );
+          }
+
+          const onFocus = [];
+          const onInput = [];
+
+          try {
+            if (config.testOnFocus) {
+              const focusable = Array.from(
+                document.querySelectorAll(
+                  'a[href], button, input, select, textarea, [tabindex], [contenteditable]'
+                )
+              )
+                .filter(__isFocusableRendered)
+                .slice(0, config.maxElements);
+
+              for (const el of focusable) {
+                reset();
+                const dialogsBefore = openDialogs();
+                try {
+                  el.focus();
+                } catch (e) {
+                  continue;
                 }
-              } else if (indirect && indirect.kind === 'dialog') {
-                issues.push({
-                  type: 'input-opens-modal-dialog',
-                  element: elementInfo.selector,
-                  description:
-                    'Changing this control automatically opens a modal dialog, moving focus without user request',
-                  severity: 'warning',
-                  evidence: `${eventType} handler ${indirect.what}`,
-                });
-                predictable = false;
-              } else {
-                issues.push({
-                  type: 'input-causes-context-change',
-                  element: elementInfo.selector,
-                  description: 'Input change triggers unexpected navigation or form submission',
-                  severity: 'error',
-                  evidence: indirect
-                    ? `${eventType} handler ${indirect.what}`
-                    : `${eventType}="${eventCode.substring(0, 80)}"`,
-                });
-                predictable = false;
+                await settle();
+                const what = whatHappened(dialogsBefore);
+                if (what) onFocus.push({ element: selectorFor(el), what });
+              }
+              if (document.activeElement && document.activeElement !== document.body) {
+                document.activeElement.blur();
               }
             }
-          }
-        });
 
-        // Check for radio buttons that auto-submit
-        if (element.type === 'radio') {
-          const radioGroup = document.querySelectorAll(`input[name="${element.name}"]`);
-          let hasAutoSubmit = false;
+            if (config.testOnInput) {
+              const controls = Array.from(
+                document.querySelectorAll('input, select, textarea')
+              ).filter((el) => {
+                const type = (el.type || '').toLowerCase();
+                if (['hidden', 'submit', 'button', 'reset', 'image', 'file'].includes(type)) {
+                  return false;
+                }
+                return !el.disabled && __isRendered(el);
+              });
 
-          radioGroup.forEach((radio) => {
-            if (radio.hasAttribute('onchange') || radio.hasAttribute('onclick')) {
-              const eventCode = radio.getAttribute('onchange') || radio.getAttribute('onclick');
-              if (eventCode.includes('submit') || eventCode.includes('location')) {
-                hasAutoSubmit = true;
+              for (const el of controls.slice(0, config.maxElements)) {
+                const before = {
+                  value: el.value,
+                  checked: el.checked,
+                  selectedIndex: el.selectedIndex,
+                };
+                const type = (el.type || '').toLowerCase();
+
+                // Set the control to a different setting than the one it has.
+                if (el.tagName === 'SELECT') {
+                  if (el.options.length < 2) continue;
+                  el.selectedIndex = el.selectedIndex === 0 ? 1 : 0;
+                } else if (type === 'checkbox' || type === 'radio') {
+                  el.checked = !el.checked;
+                } else {
+                  el.value = `${el.value || ''}a11y`;
+                }
+
+                reset();
+                const dialogsBefore = openDialogs();
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+                await settle();
+                const what = whatHappened(dialogsBefore);
+
+                if (el.tagName === 'SELECT') el.selectedIndex = before.selectedIndex;
+                else if (type === 'checkbox' || type === 'radio') el.checked = before.checked;
+                else el.value = before.value;
+
+                if (what && !isAnnounced(el)) {
+                  onInput.push({ element: selectorFor(el), what });
+                }
               }
             }
-          });
-
-          if (hasAutoSubmit) {
-            // Look for submit button or warning
-            const form = element.closest('form');
-            const hasSubmitButton =
-              form && form.querySelector('input[type="submit"], button[type="submit"]');
-            const hasWarning =
-              form &&
-              (form.textContent.toLowerCase().includes('automatically') ||
-                form.querySelector('[role="alert"]'));
-
-            if (!hasSubmitButton && !hasWarning) {
-              issues.push({
-                type: 'radio-auto-submit-no-control',
-                element: elementInfo.selector,
-                description: 'Radio button auto-submits without submit button or user warning',
-                severity: 'error',
-              });
-              predictable = false;
-            }
+          } finally {
+            window.removeEventListener('beforeunload', onUnload, true);
+            document.removeEventListener('submit', onSubmit, true);
+            window.open = native.open;
+            HTMLFormElement.prototype.submit = native.submit;
+            HTMLFormElement.prototype.requestSubmit = native.requestSubmit;
+            window.alert = native.alert;
+            window.confirm = native.confirm;
+            window.prompt = native.prompt;
+            history.pushState = native.pushState;
+            history.replaceState = native.replaceState;
           }
+
+          return { onFocus, onInput };
+        },
+        renderedCode,
+        accnameCode,
+        {
+          settleMs: SETTLE_MS,
+          maxElements: MAX_PROBED_ELEMENTS,
+          testOnFocus: Boolean(options.testOnFocus),
+          testOnInput: Boolean(options.testOnInput),
         }
-
-        // Check for checkboxes that immediately trigger actions
-        if (element.type === 'checkbox') {
-          const hasImmediateAction =
-            element.hasAttribute('onchange') || element.hasAttribute('onclick');
-
-          if (hasImmediateAction) {
-            const eventCode = element.getAttribute('onchange') || element.getAttribute('onclick');
-
-            // Allow simple UI state changes but not navigation
-            const hasNavigation =
-              eventCode.includes('location') ||
-              eventCode.includes('submit') ||
-              eventCode.includes('window.open');
-
-            if (hasNavigation) {
-              issues.push({
-                type: 'checkbox-causes-navigation',
-                element: elementInfo.selector,
-                description:
-                  'Checkbox change causes immediate navigation without user confirmation',
-                severity: 'error',
-              });
-              predictable = false;
-            }
-          }
-        }
-      });
-
-      // Check for forms that auto-submit on completion
-      const forms = document.querySelectorAll('form');
-      forms.forEach((form) => {
-        let hasAutoSubmitOnComplete = false;
-
-        // Check if form has script that monitors completion
-        if (form.hasAttribute('onchange') || form.hasAttribute('oninput')) {
-          const formCode = form.getAttribute('onchange') || form.getAttribute('oninput');
-          if (formCode.includes('submit') && formCode.includes('complete')) {
-            hasAutoSubmitOnComplete = true;
-          }
-        }
-
-        if (hasAutoSubmitOnComplete) {
-          const hasWarning =
-            form.textContent.toLowerCase().includes('automatically submit') ||
-            form.querySelector('[role="alert"]') ||
-            form.querySelector('.auto-submit-warning');
-
-          if (!hasWarning) {
-            issues.push({
-              type: 'form-auto-submit-no-warning',
-              element: 'form',
-              description: 'Form auto-submits when complete without user warning',
-              severity: 'error',
-            });
-            predictable = false;
-          }
-        }
-      });
-
-      return { issues, predictable };
-    });
-
-    // Create violations for on input issues
-    onInputAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.3.2.2',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        evidence: issue.evidence,
-        suggestion: this.getOnInputSuggestion(issue.type),
-      });
-    });
-
-    return { predictable: onInputAnalysis.predictable };
+      );
+    } catch (error) {
+      log.warn('Context change probe failed:', error.message);
+      return { onFocus: [], onInput: [] };
+    } finally {
+      page.off('request', onRequest);
+      if (intercepting) await page.setRequestInterception(false).catch(() => {});
+    }
   }
 
   /**
-   * Analyze consistent navigation (WCAG 3.2.3)
+   * Consistent navigation (SC 3.2.3).
+   *
+   * The only thing a single document can show is a navigational mechanism that
+   * is repeated inside it (header plus footer plus mobile menu). Two blocks
+   * that expose exactly the same destinations are the same mechanism, so they
+   * have to list them in the same relative order.
    */
   async analyzeConsistentNavigation(page, violations) {
     log.debug('Analyzing consistent navigation...');
 
-    const navigationAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let consistent = true;
-
-      // ----------------------------------------------------------------
-      // WCAG 3.2.3 Consistent Navigation
-      //
-      // "Navigational mechanisms that are repeated on multiple Web pages
-      //  ... occur in the same relative order each time they are repeated."
-      //
-      // The only thing a single-document scan can observe is a navigational
-      // mechanism that is REPEATED inside this document (header + footer +
-      // mobile menu, or the section-per-page pattern). Two navigation blocks
-      // that expose essentially the same set of destinations are the same
-      // mechanism, so they must list those destinations in the same relative
-      // order. A differing order is concrete evidence of a 3.2.3 failure.
-      //
-      // Not checked here: "skip to main content" links belong to 2.4.1,
-      // H1 presence and skipped heading levels to 1.3.1 / 2.4.6, and the
-      // presence of a navigation landmark to 1.3.1 / 2.4.1. Those are
-      // covered by the keyboard-navigation, page-structure, html-validation
-      // and screen-reader scanners.
-      // ----------------------------------------------------------------
-
-      const MIN_SHARED_DESTINATIONS = 3; // below this, two blocks are not evidently the same mechanism
+    const issues = await page.evaluate(() => {
+      const MIN_SHARED_DESTINATIONS = 3;
       const MAX_REPORTED_PAIRS = 5;
+      const found = [];
 
       function selectorFor(el) {
+        const className = typeof el.className === 'string' ? el.className : '';
         return (
           el.tagName.toLowerCase() +
           (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
+          (className ? `.${className.split(' ')[0]}` : '')
         );
       }
 
@@ -606,8 +432,8 @@ class PredictableNavigationScanner extends BaseScanner {
         document.querySelectorAll('nav, [role="navigation"], .navigation, .nav-menu, .main-nav')
       );
 
-      // Drop nested duplicates (e.g. <nav class="navigation">) and hidden blocks,
-      // so the same markup is never compared against itself.
+      // Drop nested duplicates and hidden blocks, so the same markup is never
+      // compared against itself.
       const navigationElements = allNavs.filter((nav) => {
         if (nav.closest('[aria-hidden="true"]')) return false;
         return !allNavs.some((other) => other !== nav && other.contains(nav));
@@ -628,456 +454,226 @@ class PredictableNavigationScanner extends BaseScanner {
       }
 
       const navProfiles = navigationElements
-        .map((nav) => ({ nav, selector: selectorFor(nav), destinations: destinationsOf(nav) }))
+        .map((nav) => ({ selector: selectorFor(nav), destinations: destinationsOf(nav) }))
         .filter((profile) => profile.destinations.length >= MIN_SHARED_DESTINATIONS);
 
-      let reportedPairs = 0;
-
-      for (let i = 0; i < navProfiles.length && reportedPairs < MAX_REPORTED_PAIRS; i++) {
-        for (let j = i + 1; j < navProfiles.length && reportedPairs < MAX_REPORTED_PAIRS; j++) {
+      for (let i = 0; i < navProfiles.length && found.length < MAX_REPORTED_PAIRS; i++) {
+        for (let j = i + 1; j < navProfiles.length && found.length < MAX_REPORTED_PAIRS; j++) {
           const a = navProfiles[i];
           const b = navProfiles[j];
 
           const setB = new Set(b.destinations);
           const shared = a.destinations.filter((name) => setB.has(name));
-
           if (shared.length < MIN_SHARED_DESTINATIONS) continue;
 
-          // Require the two blocks to expose exactly the same destinations.
-          // Anything less is not demonstrably the same navigational mechanism
-          // repeated - a footer menu that carries the main links plus
-          // "Impressum"/"Datenschutz" is its own mechanism and is free to
-          // order them differently, so it must not be flagged.
+          // Anything short of the same set of destinations is not demonstrably
+          // the same mechanism repeated: a footer menu that carries the main
+          // links plus "Impressum" is its own mechanism and may order them
+          // as it likes.
           const isSameMechanism =
             shared.length === a.destinations.length && shared.length === b.destinations.length;
           if (!isSameMechanism) continue;
 
-          const orderA = a.destinations;
-          const orderB = b.destinations;
-
-          if (orderA.join('|') !== orderB.join('|')) {
-            issues.push({
-              type: 'inconsistent-nav-order',
+          if (a.destinations.join('|') !== b.destinations.join('|')) {
+            found.push({
               element: `${a.selector} vs ${b.selector}`,
-              description:
-                'Repeated navigation blocks list the same destinations in a different relative order',
-              severity: 'error',
-              evidence: `"${orderA.join(' > ')}" vs "${orderB.join(' > ')}"`,
+              evidence: `"${a.destinations.join(' > ')}" vs "${b.destinations.join(' > ')}"`,
             });
-            consistent = false;
-            reportedPairs++;
           }
         }
       }
 
-      return { issues, consistent };
+      return found;
     });
 
-    // Create violations for navigation consistency issues
-    navigationAnalysis.issues.forEach((issue) => {
+    for (const issue of issues) {
       violations.push({
         criterion: '9.3.2.3',
         element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
+        issue: 'inconsistent-nav-order',
+        description:
+          'Repeated navigation blocks list the same destinations in a different relative order',
+        severity: 'error',
         evidence: issue.evidence,
-        suggestion: this.getNavigationConsistencySuggestion(issue.type),
+        suggestion:
+          'List the repeated navigation links in the same relative order everywhere the navigation is repeated',
       });
-    });
-
-    return { consistent: navigationAnalysis.consistent };
+    }
   }
 
   /**
-   * Analyze consistent identification (WCAG 3.2.4)
+   * Consistent identification (SC 3.2.4).
+   *
+   * Two things are measurable inside one document: a block of controls that is
+   * repeated and names one of its components differently in one copy, and a
+   * kind of destination that is marked on some links and not on others.
    */
   async analyzeConsistentIdentification(page, violations) {
     log.debug('Analyzing consistent identification...');
 
-    const identificationAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let consistent = true;
+    const issues = await page.evaluate(
+      (renderedHelpers, accnameHelpers) => {
+        eval(renderedHelpers);
+        eval(accnameHelpers);
+        const found = [];
 
-      /**
-       * Normalise an accessible name for comparison: drop icon glyphs,
-       * punctuation and whitespace noise so "* Search" and "Search" compare
-       * equal while "Search" and "Find" do not.
-       */
-      function normalizeName(value) {
-        return (value || '')
-          .toLowerCase()
-          .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-      }
-
-      /**
-       * Two names count as "the same identification" only when both exist:
-       * two absent names ('') are not similar, and `includes('')` is always
-       * true, so empty first words are rejected explicitly.
-       */
-      function namesSimilar(a, b) {
-        if (!a || !b) return false;
-        if (a === b) return true;
-        const aFirst = a.split(' ')[0];
-        const bFirst = b.split(' ')[0];
-        if (!aFirst || !bFirst) return false;
-        return a.includes(bFirst) || b.includes(aFirst);
-      }
-
-      // Check for consistent button identification
-      const buttons = document.querySelectorAll(
-        'button, [role="button"], input[type="button"], input[type="submit"]'
-      );
-      const buttonPatterns = new Map();
-
-      buttons.forEach((button) => {
-        const text = normalizeName(button.textContent);
-        const ariaLabel = normalizeName(button.getAttribute('aria-label'));
-        // Group buttons by similar function - be more specific.
-        //
-        // Matching is on whole words, so "Newsletter" does not land in the
-        // "add" group via "new". The button's `type` is not used:
-        // HTMLButtonElement.type defaults to "submit" for every plain <button>,
-        // which would collapse all buttons into one group. Two forms' submit
-        // buttons are named after their own form's action; they are not "the
-        // same functionality" in the sense of 3.2.4.
-        const words = new Set(text.split(' ').filter(Boolean));
-        const hasWord = (...candidates) => candidates.some((w) => words.has(w));
-
-        let functionType = 'other';
-        if (hasWord('cancel', 'close', 'dismiss')) {
-          functionType = 'cancel';
-        } else if (hasWord('save', 'store')) {
-          functionType = 'save';
-        } else if (hasWord('delete', 'remove', 'trash')) {
-          functionType = 'delete';
-        } else if (hasWord('edit', 'modify', 'change')) {
-          functionType = 'edit';
-        } else if (hasWord('add', 'create', 'new')) {
-          functionType = 'add';
-        } else if (hasWord('search', 'find')) {
-          functionType = 'search';
-        } else if (hasWord('next', 'continue', 'proceed')) {
-          functionType = 'navigate';
-        } else if (hasWord('back', 'previous', 'return')) {
-          functionType = 'back';
-        }
-
-        if (!buttonPatterns.has(functionType)) {
-          buttonPatterns.set(functionType, []);
-        }
-
-        buttonPatterns.get(functionType).push({
-          element: button,
-          text: text,
-          ariaLabel: ariaLabel,
-          selector:
-            button.tagName.toLowerCase() +
-            (button.id ? `#${button.id}` : '') +
-            (button.className ? `.${button.className.split(' ')[0]}` : ''),
-        });
-      });
-
-      // Check for inconsistent button labeling within same function type
-      buttonPatterns.forEach((buttons, functionType) => {
-        // Only check specific function types, not generic "other"
-        if (buttons.length > 1 && functionType !== 'other') {
-          const firstButton = buttons[0];
-          const inconsistentButtons = buttons.filter((button) => {
-            // Allow slight variations but flag major differences
-            const textSimilar = namesSimilar(button.text, firstButton.text);
-            const labelSimilar = namesSimilar(button.ariaLabel, firstButton.ariaLabel);
-
-            return !textSimilar && !labelSimilar;
-          });
-
-          if (inconsistentButtons.length > 0) {
-            issues.push({
-              type: 'inconsistent-button-identification',
-              element: 'multiple buttons',
-              description: `Buttons with similar function "${functionType}" have inconsistent labels`,
-              severity: 'warning',
-              functionType: functionType,
-              variations: buttons.map((b) => b.text).join(', '),
-            });
-            consistent = false;
-          }
-        }
-      });
-
-      // Check for consistent link identification
-      const links = document.querySelectorAll('a[href]');
-      const linkPatterns = new Map();
-
-      links.forEach((link) => {
-        const href = link.getAttribute('href');
-        const text = link.textContent.trim();
-        const ariaLabel = link.getAttribute('aria-label') || '';
-
-        // Group links by destination type
-        let destinationType = 'internal';
-        if (href.startsWith('http') && !href.includes(window.location.hostname)) {
-          destinationType = 'external';
-        } else if (href.startsWith('mailto:')) {
-          destinationType = 'email';
-        } else if (href.startsWith('tel:')) {
-          destinationType = 'phone';
-        } else if (href.startsWith('#')) {
-          destinationType = 'anchor';
-        } else if (href.includes('.pdf') || href.includes('.doc') || href.includes('.xls')) {
-          destinationType = 'document';
-        }
-
-        if (!linkPatterns.has(destinationType)) {
-          linkPatterns.set(destinationType, []);
-        }
-
-        linkPatterns.get(destinationType).push({
-          element: link,
-          text: text,
-          href: href,
-          ariaLabel: ariaLabel,
-          selector: `a[href="${href.substring(0, 50)}"]`,
-        });
-      });
-
-      // Check for missing external link indicators
-      if (linkPatterns.has('external')) {
-        const externalLinks = linkPatterns.get('external');
-        const hasExternalIndicators = externalLinks.some(
-          (link) =>
-            link.text.includes('(external)') ||
-            link.ariaLabel.includes('external') ||
-            link.element.querySelector('[class*="external"], [class*="icon"]') ||
-            link.element.hasAttribute('target')
-        );
-
-        if (!hasExternalIndicators && externalLinks.length > 0) {
-          issues.push({
-            type: 'external-links-no-identification',
-            element: 'external links',
-            description: 'External links lack consistent identification (visual indicator or text)',
-            severity: 'warning',
-          });
-        }
-      }
-
-      // Check for document link identification
-      if (linkPatterns.has('document')) {
-        const documentLinks = linkPatterns.get('document');
-        const hasDocumentIndicators = documentLinks.some((link) => {
-          const hasFileType =
-            link.text.includes('.pdf') ||
-            link.text.includes('.doc') ||
-            link.text.includes('PDF') ||
-            link.text.includes('Word');
-          const hasIcon = link.element.querySelector(
-            '[class*="pdf"], [class*="doc"], [class*="file"]'
+        function selectorFor(el) {
+          const className = typeof el.className === 'string' ? el.className : '';
+          return (
+            el.tagName.toLowerCase() +
+            (el.id ? `#${el.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : '')
           );
-          return hasFileType || hasIcon;
-        });
+        }
 
-        if (!hasDocumentIndicators && documentLinks.length > 0) {
-          issues.push({
-            type: 'document-links-no-identification',
-            element: 'document links',
-            description: 'Document links lack file type identification',
-            severity: 'warning',
+        // ---- repeated blocks of controls -------------------------------
+        // A toolbar that appears once per section is the same mechanism each
+        // time. Blocks count as the same mechanism when they hold the same
+        // sequence of control types and still share at least MIN_SHARED names,
+        // which is what separates a repeated toolbar from a grid of cards
+        // whose links are all named differently on purpose.
+        const MIN_CONTROLS = 3;
+        const MIN_SHARED_NAMES = 3;
+        const MAX_REPORTED_BLOCKS = 5;
+
+        const CONTROL_SELECTOR = 'a[href], button, input, select, textarea, [role="button"]';
+        const blocks = new Map();
+
+        for (const block of document.querySelectorAll('div, ul, ol, section, header, footer, nav')) {
+          const controls = Array.from(block.querySelectorAll(CONTROL_SELECTOR)).filter(__isRendered);
+          if (controls.length < MIN_CONTROLS) continue;
+          // The same mechanism is rendered from the same component, so the
+          // block itself has to match too: two menus that happen to list the
+          // same links each carry their own toggle and are not one mechanism.
+          const blockClass =
+            typeof block.className === 'string' ? block.className.split(' ')[0] : '';
+          const signature = [
+            block.tagName.toLowerCase(),
+            blockClass,
+            ...controls.map((el) => `${el.tagName.toLowerCase()}:${el.getAttribute('role') || ''}`),
+          ].join(',');
+          if (!blocks.has(signature)) blocks.set(signature, []);
+          blocks.get(signature).push({
+            node: block,
+            selector: selectorFor(block),
+            names: controls.map((el) => (__accessibleName(el) || '').trim().toLowerCase()),
           });
         }
-      }
 
-      // Check for consistent form field identification
-      const formFields = document.querySelectorAll('input, select, textarea');
-      const requiredFields = Array.from(formFields).filter((field) =>
-        field.hasAttribute('required')
-      );
-
-      if (requiredFields.length > 1) {
-        // Check what identification methods are used
-        const identificationMethods = {
-          asterisk: 0,
-          ariaRequired: 0,
-          requiredText: 0,
-          cssClass: 0,
-        };
-
-        requiredFields.forEach((field) => {
-          // Check for asterisk in label
-          const hasAsterisk =
-            field.labels &&
-            Array.from(field.labels).some(
-              (label) => label.textContent.includes('*') || label.className.includes('required')
-            );
-          if (hasAsterisk) identificationMethods.asterisk++;
-
-          // Check for aria-required
-          if (field.hasAttribute('aria-required')) identificationMethods.ariaRequired++;
-
-          // Check for "required" text in label
-          const hasRequiredText =
-            field.labels &&
-            Array.from(field.labels).some((label) =>
-              label.textContent.toLowerCase().includes('required')
-            );
-          if (hasRequiredText) identificationMethods.requiredText++;
-
-          // Check for CSS class indicating required
-          if (
-            field.className.includes('required') ||
-            (field.labels &&
-              Array.from(field.labels).some((label) => label.className.includes('required')))
-          ) {
-            identificationMethods.cssClass++;
-          }
-        });
-
-        // At least one method should be used consistently across all required fields
-        const hasConsistentMethod = Object.values(identificationMethods).some(
-          (count) => count === requiredFields.length
-        );
-
-        if (!hasConsistentMethod) {
-          issues.push({
-            type: 'inconsistent-required-field-identification',
-            element: 'form fields',
-            description: 'Required form fields lack consistent identification method',
-            severity: 'error',
-          });
-          consistent = false;
-        }
-      }
-
-      // Check for consistent error identification
-      const errorElements = document.querySelectorAll(
-        '[class*="error"], [role="alert"], [aria-invalid="true"]'
-      );
-      if (errorElements.length > 0) {
-        const errorPatterns = [];
-
-        errorElements.forEach((element) => {
-          const hasErrorClass = element.className.includes('error');
-          const hasAriaInvalid = element.hasAttribute('aria-invalid');
-          const hasRole = element.getAttribute('role') === 'alert';
-          const hasErrorText = element.textContent.toLowerCase().includes('error');
-
-          errorPatterns.push({
-            hasErrorClass,
-            hasAriaInvalid,
-            hasRole,
-            hasErrorText,
-          });
-        });
-
-        // Check if error identification is consistent
-        if (errorPatterns.length > 1) {
-          const firstPattern = errorPatterns[0];
-          const isConsistent = errorPatterns.every(
-            (pattern) =>
-              pattern.hasErrorClass === firstPattern.hasErrorClass ||
-              pattern.hasAriaInvalid === firstPattern.hasAriaInvalid ||
-              pattern.hasRole === firstPattern.hasRole
+        // A wrapper around a block holds the same controls in the same order,
+        // so it carries the same signature; comparing the two compares the
+        // same markup against itself.
+        for (const [signature, copies] of blocks) {
+          blocks.set(
+            signature,
+            copies.filter((copy) => !copies.some((o) => o !== copy && o.node.contains(copy.node)))
           );
+        }
 
-          if (!isConsistent) {
-            issues.push({
-              type: 'inconsistent-error-identification',
-              element: 'error elements',
-              description: 'Error states use inconsistent identification methods',
-              severity: 'warning',
+        // A block and the wrapper around it report the same divergence, so the
+        // evidence is reported once.
+        const reportedDivergences = new Set();
+
+        for (const copies of blocks.values()) {
+          if (copies.length < 2 || found.length >= MAX_REPORTED_BLOCKS) continue;
+          const [first] = copies;
+          for (const other of copies.slice(1)) {
+            const same = first.names.filter((name, i) => name && name === other.names[i]);
+            if (same.length < MIN_SHARED_NAMES) continue;
+            const differing = first.names
+              .map((name, i) => ({ name, otherName: other.names[i], i }))
+              .filter((pair) => pair.name !== pair.otherName);
+            if (!differing.length) continue;
+            const divergence = differing.map((pair) => `${pair.name}|${pair.otherName}`).join(',');
+            if (reportedDivergences.has(divergence)) continue;
+            reportedDivergences.add(divergence);
+            found.push({
+              type: 'inconsistent-component-identification',
+              element: `${first.selector} vs ${other.selector}`,
+              description:
+                'A repeated block of controls names the same component differently in one copy',
+              evidence: differing
+                .map((pair) => `"${pair.name}" vs "${pair.otherName}"`)
+                .slice(0, 5)
+                .join(', '),
             });
+            if (found.length >= MAX_REPORTED_BLOCKS) break;
           }
         }
-      }
 
-      return { issues, consistent };
-    });
+        // ---- links to the same kind of destination ----------------------
+        // 3.2.4 asks for consistency, not for a convention: a page where no
+        // external link is marked identifies them consistently. Only a split,
+        // where some carry an indicator and others do not, fails.
+        const namesIndicator =
+          /\b(external|new window|new tab)\b|extern|neues fenster|neuer tab|pdf|word|excel/i;
 
-    // Create violations for identification consistency issues
-    identificationAnalysis.issues.forEach((issue) => {
+        function isMarked(link) {
+          const name = `${__accessibleName(link) || ''} ${link.getAttribute('title') || ''}`;
+          if (namesIndicator.test(name)) return true;
+          if (link.hasAttribute('target')) return true;
+          return Array.from(link.querySelectorAll('img, svg')).some(__isRendered);
+        }
+
+        const groups = { external: [], document: [] };
+        for (const link of document.querySelectorAll('a[href]')) {
+          if (!__isRendered(link)) continue;
+          const href = link.getAttribute('href') || '';
+          let url;
+          try {
+            url = new URL(href, location.href);
+          } catch (e) {
+            continue;
+          }
+          if (/\.(pdf|docx?|xlsx?|pptx?)$/i.test(url.pathname)) groups.document.push(link);
+          else if (/^https?:$/.test(url.protocol) && url.host !== location.host) {
+            groups.external.push(link);
+          }
+        }
+
+        for (const [kind, links] of Object.entries(groups)) {
+          if (links.length < 2) continue;
+          const marked = links.filter(isMarked);
+          if (marked.length === 0 || marked.length === links.length) continue;
+          found.push({
+            type: `${kind}-links-no-identification`,
+            element: `${kind} links`,
+            description: `Links to the same kind of destination are identified inconsistently: ${marked.length} of ${links.length} carry an indicator`,
+            evidence: links
+              .filter((link) => !marked.includes(link))
+              .slice(0, 5)
+              .map((link) => `"${(__accessibleName(link) || '').trim()}"`)
+              .join(', '),
+          });
+        }
+
+        return found;
+      },
+      renderedCode,
+      accnameCode
+    );
+
+    for (const issue of issues) {
       violations.push({
         criterion: '9.3.2.4',
         element: issue.element,
         issue: issue.type,
         description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getIdentificationConsistencySuggestion(issue.type),
+        severity: 'warning',
+        evidence: issue.evidence,
+        suggestion: this.getIdentificationSuggestion(issue.type),
       });
-    });
-
-    return { consistent: identificationAnalysis.consistent };
+    }
   }
 
-  /**
-   * Get suggestion for on focus violations
-   */
-  getOnFocusSuggestion(violationType) {
+  getIdentificationSuggestion(violationType) {
     const suggestions = {
-      'focus-causes-context-change':
-        'Remove automatic navigation on focus - require user action (click/enter)',
-      'high-tabindex-focus-jump':
-        'Use lower tabindex values or rely on natural DOM order for predictable focus flow',
-      'autofocus-in-dynamic-content':
-        'Remove autofocus or ensure user initiated the modal/content display',
-      'unpredictable-focus-styles': 'Ensure focus styles maintain element visibility and position',
-    };
-    return suggestions[violationType] || 'Ensure focus behavior is predictable and user-controlled';
-  }
-
-  /**
-   * Get suggestion for on input violations
-   */
-  getOnInputSuggestion(violationType) {
-    const suggestions = {
-      'input-causes-context-change':
-        'Add submit button instead of automatic form submission on input change',
-      'input-opens-modal-dialog':
-        'Do not open dialogs from change/input/blur handlers - trigger them from an explicit user action such as a button press',
-      'select-auto-submit-no-warning':
-        'Add warning text about automatic submission or provide submit button',
-      'radio-auto-submit-no-control':
-        'Replace auto-submit with explicit submit button for user control',
-      'checkbox-causes-navigation':
-        'Replace immediate navigation with user-initiated action (button click)',
-      'form-auto-submit-no-warning': 'Add clear warning about automatic form submission behavior',
-    };
-    return (
-      suggestions[violationType] ||
-      'Require explicit user action for context changes rather than automatic triggers'
-    );
-  }
-
-  /**
-   * Get suggestion for navigation consistency violations
-   */
-  getNavigationConsistencySuggestion(violationType) {
-    const suggestions = {
-      'inconsistent-nav-order':
-        'List the repeated navigation links in the same relative order everywhere the navigation is repeated',
-    };
-    return (
-      suggestions[violationType] ||
-      'Maintain consistent navigation patterns and structure across pages'
-    );
-  }
-
-  /**
-   * Get suggestion for identification consistency violations
-   */
-  getIdentificationConsistencySuggestion(violationType) {
-    const suggestions = {
-      'inconsistent-button-identification':
-        'Use consistent button labels for similar functions across the site',
+      'inconsistent-component-identification':
+        'Give a component that does the same thing the same accessible name everywhere it is repeated',
       'external-links-no-identification':
-        'Add consistent indicators for external links (icon, text, or target="_blank")',
+        'Mark every link that leaves the site, or none of them, in the same way',
       'document-links-no-identification':
-        'Include file type in link text or add file type icons consistently',
-      'inconsistent-required-field-identification':
-        'Use consistent method to identify required fields (asterisk, "required" text, or aria-required)',
-      'inconsistent-error-identification':
-        'Standardize error identification with consistent classes, ARIA attributes, and visual styling',
+        'Name the file type on every link to a document, or on none of them',
     };
     return (
       suggestions[violationType] ||

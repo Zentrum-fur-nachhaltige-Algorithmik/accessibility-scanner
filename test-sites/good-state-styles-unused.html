@@ -1,0 +1,33 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast, state rules for states the controls do not expose
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: nontext-contrast
+description: A stylesheet that ships aria-pressed and aria-selected colour rules while the buttons on the page expose neither attribute, and a checkbox whose checked state changes the border width. insufficient-interactive-state-contrast must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unused state rules</title>
+<style>
+  body { font-family: sans-serif; background: #ffffff; color: #1a1a1a; margin: 2rem; }
+  .chip { background: #eeeeee; color: #1a1a1a; border: 1px solid #767676; padding: 0.4rem 0.8rem; }
+  .chip[aria-pressed="true"] { background: #e4e4e4; }
+  .tab { background: #ffffff; color: #1a1a1a; border: 1px solid #767676; padding: 0.4rem 0.8rem; }
+  .tab[aria-selected="true"] { color: #333333; }
+  .box { accent-color: #1f4e79; }
+  input[type="checkbox"] { border: 1px solid #767676; }
+  input[type="checkbox"]:checked { border-width: 3px; }
+</style>
+</head>
+<body>
+<h1>Unused state rules</h1>
+<p><button type="button" class="chip">Filter by date</button> <button type="button" class="chip">Filter by size</button></p>
+<p><button type="button" class="tab">Overview</button> <button type="button" class="tab">Details</button></p>
+<p><label><input type="checkbox" class="box" checked> Send me a copy</label></p>
+</body>
+</html>

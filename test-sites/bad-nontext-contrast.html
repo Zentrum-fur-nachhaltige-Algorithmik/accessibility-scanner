@@ -490,6 +490,19 @@ description: Non-text UI components with insufficient contrast
         </ul>
     </div>
 
+    <!-- VIOLATION 14: Labelled graphic whose only painted shapes stay under 3:1 -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 14: Graphic with a contrast of 1.2:1</div>
+        <p><strong>Problem:</strong> The graphic that carries the status is barely visible</p>
+        <div class="component-group">
+            <svg role="img" width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <title>Delivery status: on the way</title>
+                <circle cx="12" cy="12" r="10" fill="#f2f2f2"/>
+                <path d="M7 12l3 3 7-7" stroke="#efefef" stroke-width="2" fill="none"/>
+            </svg>
+        </div>
+    </div>
+
     <script>
         function toggleSwitch(element) {
             element.style.backgroundColor = element.style.backgroundColor === 'rgb(240, 240, 240)' ? '#f8f8f8' : '#f0f0f0';

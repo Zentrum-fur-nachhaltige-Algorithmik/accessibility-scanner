@@ -420,6 +420,10 @@ const injectableCode = `
 
     function hiddenFromTree(node) {
       if (node.nodeType !== 1) return false;
+      // Scripting is on in every scan, so <noscript> content never reaches the
+      // user, and script/style/template text is not rendered at all.
+      var t = node.tagName;
+      if (t === 'NOSCRIPT' || t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') return true;
       if (node.hasAttribute('hidden')) return true;
       if (node.getAttribute('aria-hidden') === 'true') return true;
       var cs = null;
@@ -432,8 +436,12 @@ const injectableCode = `
     }
 
     // <input type=button|submit|reset> shows its \`value\`, not a text child.
+    // Every other input paints no label of its own: the \`value\` of a checkbox
+    // defaults to "on" and of a text field holds what the user typed.
     var tag = el.tagName.toLowerCase();
     if (tag === 'input') {
+      var itype = (el.getAttribute('type') || '').toLowerCase();
+      if (itype !== 'button' && itype !== 'submit' && itype !== 'reset') return segments;
       var v = (el.value || '').trim();
       if (v) {
         var ics = null;

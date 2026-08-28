@@ -1,0 +1,47 @@
+<!-- WCAG-TEST
+criterion: 2.4.1, 2.1.1
+level: A
+title: Bypass Blocks through landmarks and headings
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: A page that meets 2.4.1 without an English skip link: landmarks, a heading structure and a German skip link reading "Zum Hauptbereich". The old rules reported a missing main landmark, a nav without an accessible name, a page without headings and "complex page lacks skip links" from a word list, all of which axe ships as best practice and axe-core.js filters out. No 2.4.1 finding may come from keyboard-navigation here.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Bereiche ueberspringen ohne englischen Skip-Link (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  header, main, footer, section { max-width: 900px; margin: 0 auto; padding: 16px 24px; }
+  a { color: #0b4f6c; }
+  a:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { position: static; }
+</style>
+</head>
+<body>
+<a class="skip" href="#hauptbereich">Zum Hauptbereich</a>
+<header>
+  <nav><a href="#hauptbereich">Start</a> <a href="#leistungen">Leistungen</a></nav>
+</header>
+<main id="hauptbereich">
+  <h1>Ordination Dr. Berger</h1>
+  <section id="leistungen">
+    <h2>Leistungen</h2>
+    <p>Vorsorge, Impfungen, Laborbefunde.</p>
+  </section>
+  <section id="termine">
+    <h2>Termine</h2>
+    <p>Telefonisch oder per Formular.</p>
+  </section>
+</main>
+<footer>
+  <h2>Kontakt</h2>
+  <p><a href="#hauptbereich">Nach oben</a></p>
+</footer>
+</body>
+</html>

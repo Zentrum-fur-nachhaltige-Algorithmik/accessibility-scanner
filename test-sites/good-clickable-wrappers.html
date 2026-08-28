@@ -1,0 +1,72 @@
+<!-- WCAG-TEST
+criterion: 2.1.1
+level: A
+title: Keyboard, click targets that already have a keyboard route
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: Patterns that the old class-name and cursor:pointer heuristic reported as mouse-only: a span.btn inside a link, a label.btn that operates a radio, a card div with cursor:pointer wrapping a real link, a td with cursor:pointer in a table sorted by a header button, and a div with an onclick handler whose only job is to forward the click to the button inside it. Every one of them is operable from the keyboard, so not-keyboard-accessible must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Click targets with a keyboard route (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button, label { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .btn { display: inline-block; padding: 8px 14px; border: 1px solid #0b4f6c; border-radius: 6px; }
+  .card { cursor: pointer; border: 1px solid #767676; border-radius: 8px; padding: 16px; margin: 16px 0; }
+  table { border-collapse: collapse; }
+  th, td { border: 1px solid #767676; padding: 8px 12px; text-align: left; }
+  td.sortable { cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Click targets that the keyboard can already reach</h1>
+
+  <h2>Link with a styled span inside</h2>
+  <p><a href="#buy"><span class="btn">Buy now</span></a></p>
+
+  <h2>Label styled as a button</h2>
+  <fieldset>
+    <legend>Delivery</legend>
+    <input type="radio" id="std" name="delivery" checked>
+    <label class="btn" for="std">Standard</label>
+    <input type="radio" id="exp" name="delivery">
+    <label class="btn" for="exp">Express</label>
+  </fieldset>
+
+  <h2>Card with a stretched link</h2>
+  <div class="card">
+    <h3><a href="#article">Reading the tab order</a></h3>
+    <p>The whole card looks clickable, the link carries the action.</p>
+  </div>
+
+  <h2>Sortable table</h2>
+  <table>
+    <caption>Orders</caption>
+    <thead>
+      <tr><th scope="col"><button type="button" id="sortByName">Name</button></th><th scope="col">Amount</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="sortable">Berger</td><td>12</td></tr>
+      <tr><td class="sortable">Toth</td><td>7</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Wrapper that forwards its click</h2>
+  <div id="forwarder" onclick="document.getElementById('inner').click()">
+    <button type="button" id="inner">Show details</button>
+  </div>
+
+  <p id="buy">Checkout section.</p>
+  <p id="article">Article section.</p>
+</main>
+</body>
+</html>

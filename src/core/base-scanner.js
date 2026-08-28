@@ -167,6 +167,27 @@ class BaseScanner {
       }
     `;
   }
+
+  /**
+   * Dismiss alert, confirm and prompt dialogs for as long as the returned
+   * cleanup function has not been called.
+   *
+   * A scanner that clicks the page's own controls will sooner or later hit a
+   * handler that calls alert(). A blocking dialog stops the page's JavaScript,
+   * so every later click and every page.evaluate() in that scanner hangs until
+   * its timeout. Puppeteer only dismisses dialogs by itself while nothing is
+   * listening, and several scanners in this pipeline share one page.
+   *
+   * @param {import('puppeteer').Page} page
+   * @returns {() => void} cleanup
+   */
+  static dismissDialogs(page) {
+    const onDialog = (dialog) => {
+      dialog.dismiss().catch(() => {});
+    };
+    page.on('dialog', onDialog);
+    return () => page.off('dialog', onDialog);
+  }
 }
 
 module.exports = BaseScanner;

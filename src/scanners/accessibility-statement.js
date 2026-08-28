@@ -1,7 +1,12 @@
 /**
  * Accessibility Statement Scanner.
- * EN 301 549 12.1.1 (European Accessibility Act statement requirements).
- * Follows links to locate the statement, then checks its completeness.
+ * EN 301 549 clause 12.2.2 (the accessibility statement of the European
+ * Accessibility Act / Directive (EU) 2016/2102).
+ * Answers two questions: does the site link a statement, and does that
+ * statement carry the three declarations the clause asks for (conformance
+ * status, feedback contact point, preparation or review date). Everything is
+ * read on the statement page itself; no other page of the site is audited as
+ * if it were the statement.
  */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
@@ -10,6 +15,13 @@ const {
   findStatementLink,
   missingStatementViolation,
 } = require('../utils/accessibility-statement');
+
+/** Twelve months, the review interval the directive asks for. */
+function isOlderThanAYear(date) {
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+  return date < twelveMonthsAgo;
+}
 
 class AccessibilityStatementScanner extends BaseScanner {
   constructor() {
@@ -20,135 +32,107 @@ class AccessibilityStatementScanner extends BaseScanner {
   }
 
   /**
-   * Core scan method. Receives an already-navigated Puppeteer page.
-   * This scanner needs to follow links to find the accessibility statement,
-   * so it will navigate from the provided starting page.
+   * Core scan method. Receives an already-navigated Puppeteer page and
+   * navigates to the statement it links, so it owns its tab.
    * @param {import('puppeteer').Page} page - Already-navigated Puppeteer page
    * @param {Object} options - Scanning options
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const defaultOptions = {
-      searchDepth: 3,
-      timeout: TIMEOUTS.navigation,
-      language: 'auto',
-    };
+    const scanOptions = { timeout: TIMEOUTS.navigation, ...options };
 
-    const scanOptions = { ...defaultOptions, ...options };
-
-    const statementResults = await this.analyzeAccessibilityStatement(page, scanOptions);
+    const results = await this.analyzeAccessibilityStatement(page, scanOptions);
 
     return {
       scannerId: this.id,
       criteria: ['EAA-Statement', 'EN-301-549-12.1.1'],
-      passed: statementResults.violations.length === 0,
-      violations: statementResults.violations,
+      passed: results.violations.length === 0,
+      violations: results.violations,
       summary: {
-        statementExists: statementResults.statementExists,
-        statementAccessible: statementResults.statementAccessible,
-        statementComplete: statementResults.statementComplete,
-        contactMechanismProvided: statementResults.contactMechanismProvided,
-        lastUpdated: statementResults.lastUpdated,
-        complianceLevel: statementResults.complianceLevel,
-        knownIssuesListed: statementResults.knownIssuesListed,
-        feedbackMechanismAvailable: statementResults.feedbackMechanismAvailable,
+        statementExists: results.statementExists,
+        statementAccessible: results.statementAccessible,
+        statementUrl: results.statementUrl,
+        conformanceStatus: results.conformanceStatus,
+        contactMechanismProvided: results.contactMechanismProvided,
+        lastUpdated: results.lastUpdated,
       },
     };
   }
 
   /**
-   * Analyze accessibility statement presence and completeness
+   * Find the statement, read it where it lives, and report what it omits.
    */
   async analyzeAccessibilityStatement(page, options) {
-    log.debug('Analyzing accessibility statement...');
-
     const violations = [];
-    let statementExists = false;
-    let statementAccessible = false;
-    let statementComplete = false;
-    let contactMechanismProvided = false;
-    let lastUpdated = null;
-    let complianceLevel = null;
-    let knownIssuesListed = false;
-    let feedbackMechanismAvailable = false;
+    const empty = {
+      statementExists: false,
+      statementAccessible: false,
+      statementUrl: null,
+      conformanceStatus: null,
+      contactMechanismProvided: false,
+      lastUpdated: null,
+    };
 
-    // 1. Look for accessibility statement link on main page
-    const statementLinkResults = await this.findAccessibilityStatementLink(page);
+    const statementLink = await findStatementLink(page);
 
-    if (!statementLinkResults.found) {
-      // Exactly ONE finding, and not `critical`. Every other rule in this
-      // scanner (and in eaa-procedure / contact-mechanism /
-      // compliance-monitoring) describes a property OF the statement (missing
-      // contact, missing review date, missing monitoring procedure) and is
-      // undecidable while no statement exists. See
-      // src/utils/accessibility-statement.js.
+    if (!statementLink.found) {
+      // Exactly ONE finding, and not `critical`. Every other rule of this
+      // scanner describes a property OF the statement (missing contact,
+      // missing review date, missing conformance status) and is undecidable
+      // while no statement exists. See src/utils/accessibility-statement.js.
       violations.push(missingStatementViolation());
-
-      return {
-        violations,
-        statementExists: false,
-        statementAccessible: false,
-        statementComplete: false,
-        contactMechanismProvided: false,
-        lastUpdated: null,
-        complianceLevel: null,
-        knownIssuesListed: false,
-        feedbackMechanismAvailable: false,
-      };
+      return { violations, ...empty };
     }
 
-    statementExists = true;
+    const sameDocument = this.isSameDocument(page.url(), statementLink.url);
 
-    // 2. Navigate to accessibility statement page
-    try {
-      await page.goto(statementLinkResults.url, {
-        waitUntil: 'networkidle0',
-        timeout: options.timeout,
-      });
-      statementAccessible = true;
-      log.debug(`  Found accessibility statement at: ${statementLinkResults.url}`);
-    } catch (error) {
-      violations.push({
-        criterion: 'EAA-Statement',
-        issue: 'inaccessible-statement',
-        description: `Accessibility statement link found but page is not accessible: ${error.message}`,
-        element: statementLinkResults.selector,
-        suggestion: 'Ensure accessibility statement page loads correctly and is accessible',
-        severity: 'serious',
-      });
-
-      return {
-        violations,
-        statementExists: true,
-        statementAccessible: false,
-        statementComplete: false,
-        contactMechanismProvided: false,
-        lastUpdated: null,
-        complianceLevel: null,
-        knownIssuesListed: false,
-        feedbackMechanismAvailable: false,
-      };
+    if (!sameDocument) {
+      try {
+        const response = await page.goto(statementLink.url, {
+          waitUntil: 'networkidle0',
+          timeout: options.timeout,
+        });
+        // An error page still loads, and its body would then be measured for a
+        // review date and a conformance level it can never contain. A broken
+        // link is one finding about the link, not three about its content.
+        const status = response ? response.status() : 0;
+        if (status >= 400) throw new Error(`HTTP ${status}`);
+      } catch (error) {
+        // A transport failure on another origin is as likely to be the
+        // scanning environment (no route to that host) as a dead statement,
+        // and the statement of a site is often published on a sibling domain.
+        // Only a status code, or a failure on the origin that was just
+        // scanned successfully, is evidence about the link.
+        if (!/^HTTP \d/.test(error.message) && !this.isSameOrigin(page.url(), statementLink.url)) {
+          return { violations, ...empty, statementExists: true, statementUrl: statementLink.url };
+        }
+        violations.push({
+          criterion: 'EAA-Statement',
+          issue: 'inaccessible-statement',
+          description: `Accessibility statement link found but page is not accessible: ${error.message}`,
+          element: statementLink.selector,
+          suggestion: 'Ensure accessibility statement page loads correctly and is accessible',
+          severity: 'serious',
+        });
+        return { violations, ...empty, statementExists: true };
+      }
     }
 
-    // 3. Analyze statement content
-    const contentAnalysis = await this.analyzeStatementContent(page);
+    log.debug(`  Reading the accessibility statement at: ${statementLink.url}`);
+    const content = await this.analyzeStatementContent(page);
+    const lastUpdated = content.lastUpdated ? new Date(content.lastUpdated) : null;
 
-    // Check last updated date
-    lastUpdated = contentAnalysis.lastUpdated;
-    if (!contentAnalysis.lastUpdated || this.isStatementOutdated(contentAnalysis.lastUpdated)) {
-      violations.push({
-        criterion: 'EAA-Statement',
-        issue: 'outdated-statement',
-        description: 'No last updated date found or statement is older than 12 months',
-        element: 'main',
-        suggestion: 'Add last updated date and ensure statement is reviewed at least annually',
-        severity: 'major',
-      });
+    // A page that neither calls itself a statement nor declares a conformance
+    // status is a page about accessibility, not a declaration about this site:
+    // a guide, a marketing page, an article, or the page the scan started on
+    // when the statement link points back at it. The site has no statement,
+    // which is one finding, rather than a statement missing all of its parts.
+    if (!content.selfIdentifies && !content.conformanceStatus) {
+      violations.push(missingStatementViolation());
+      return { violations, ...empty };
     }
 
-    // Check compliance level
-    complianceLevel = contentAnalysis.complianceLevel;
-    if (!contentAnalysis.complianceLevel) {
+    if (!content.conformanceStatus) {
       violations.push({
         criterion: 'EAA-Statement',
         issue: 'incomplete-content',
@@ -159,9 +143,7 @@ class AccessibilityStatementScanner extends BaseScanner {
       });
     }
 
-    // Check contact mechanism
-    contactMechanismProvided = contentAnalysis.contactMechanism;
-    if (!contentAnalysis.contactMechanism) {
+    if (!content.contactMechanism) {
       violations.push({
         criterion: 'EAA-Statement',
         issue: 'missing-contact',
@@ -173,189 +155,127 @@ class AccessibilityStatementScanner extends BaseScanner {
       });
     }
 
-    // Check known issues
-    knownIssuesListed = contentAnalysis.knownIssues;
-
-    // Check feedback mechanism
-    feedbackMechanismAvailable = contentAnalysis.feedbackMechanism;
-
-    // Statement is complete if no violations found
-    statementComplete = violations.length === 0;
+    if (!lastUpdated || isOlderThanAYear(lastUpdated)) {
+      violations.push({
+        criterion: 'EAA-Statement',
+        issue: 'outdated-statement',
+        description: lastUpdated
+          ? `The statement was last reviewed on ${lastUpdated.toISOString().slice(0, 10)}, more than twelve months ago`
+          : 'The statement names no preparation or review date',
+        element: 'main',
+        suggestion: 'Add last updated date and ensure statement is reviewed at least annually',
+        severity: 'major',
+      });
+    }
 
     return {
       violations,
-      statementExists,
-      statementAccessible,
-      statementComplete,
-      contactMechanismProvided,
+      statementExists: true,
+      statementAccessible: true,
+      statementUrl: statementLink.url,
+      conformanceStatus: content.conformanceStatus,
+      contactMechanismProvided: content.contactMechanism,
       lastUpdated,
-      complianceLevel,
-      knownIssuesListed,
-      feedbackMechanismAvailable,
     };
   }
 
-  /**
-   * Find accessibility statement link on the page
-   */
-  async findAccessibilityStatementLink(page) {
-    log.debug('  Looking for accessibility statement link...');
-    // Detection lives in src/utils/accessibility-statement.js so that all four
-    // EAA scanners agree on whether a statement exists.
-    return findStatementLink(page);
+  /** Is the statement published on the origin that was just scanned? */
+  isSameOrigin(currentUrl, linkUrl) {
+    try {
+      return new URL(currentUrl).origin === new URL(linkUrl).origin;
+    } catch {
+      return false;
+    }
+  }
+
+  isSameDocument(currentUrl, linkUrl) {
+    try {
+      const a = new URL(currentUrl);
+      const b = new URL(linkUrl);
+      return a.origin === b.origin && a.pathname === b.pathname && a.search === b.search;
+    } catch {
+      return false;
+    }
   }
 
   /**
-   * Analyze content of accessibility statement page
+   * Read the three declarations clause 12.2.2 asks for off the statement page.
    */
   async analyzeStatementContent(page) {
-    log.debug('  Analyzing statement content...');
+    return page.evaluate(() => {
+      const text = (document.body.textContent || '').replace(/\s+/g, ' ');
 
-    const contentAnalysis = await page.evaluate(() => {
-      const pageText = document.body.textContent.toLowerCase();
-
-      // Look for last updated date
-      let lastUpdated = null;
-      const datePatterns = [
-        /last updated[:\s]*([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})/i,
-        /updated[:\s]*([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})/i,
-        /([0-9]{4}[/.-][0-9]{1,2}[/.-][0-9]{1,2})/i,
-        /([0-9]{1,2}[/.-][0-9]{1,2}[/.-][0-9]{4})/i,
+      // Conformance status: a WCAG or EN 301 549 level, or one of the three
+      // status words the model statement uses, in English or German.
+      const CONFORMANCE = [
+        /wcag\s*2(\.\d)?\s*(level\s*)?(aaa|aa|a)\b/i,
+        /\ben\s*301\s*549\b/i,
+        /\b(fully|partially|not)\s+(compliant|conformant)\b/i,
+        /\b(voll|teilweise|nicht)\s+(konform|barrierefrei)/i,
+        /konformit[äa]tsstatus/i,
       ];
+      const conformance = CONFORMANCE.map((re) => text.match(re)).find(Boolean);
 
-      // Check time elements first
-      const timeElements = document.querySelectorAll('time[datetime]');
-      if (timeElements.length > 0) {
-        const datetime = timeElements[0].getAttribute('datetime');
-        lastUpdated = new Date(datetime);
-      } else {
-        // Fall back to text parsing
-        for (const pattern of datePatterns) {
-          const match = pageText.match(pattern);
-          if (match) {
-            try {
-              lastUpdated = new Date(match[1] || match[0]);
-              break;
-            } catch (e) {
-              // Continue to next pattern
-            }
-          }
+      // Does the page call itself a statement? A declaration usually says so
+      // in its heading, and it is the one part of clause 12.2.2 that a guide
+      // or a marketing page about accessibility never carries.
+      const selfIdentifies =
+        /accessibility statement|accessibility policy|erkl[äa]e?rung zur barrierefreiheit|barrierefreiheitserkl[äa]e?rung|d[ée]claration d'accessibilit[ée]|verklaring toegankelijkheid/i.test(
+          text
+        );
+
+      // Feedback contact point: a way to reach somebody, not the word
+      // "contact" somewhere in a sentence.
+      const contactMechanism =
+        document.querySelector('a[href^="mailto:"], a[href^="tel:"]') !== null ||
+        document.querySelector('form') !== null ||
+        Array.from(document.querySelectorAll('a[href]')).some((a) =>
+          /kontakt|contact|feedback|barriere\s*melden|report/i.test(
+            `${a.textContent} ${a.getAttribute('href')}`
+          )
+        );
+
+      // Preparation / review date. A <time datetime> is the machine readable
+      // one; otherwise a date has to sit next to wording that says it is the
+      // review date, so a copyright year or an article date is not mistaken
+      // for one.
+      const dates = [];
+      const pushDate = (value) => {
+        const d = new Date(value);
+        if (!isNaN(d.getTime())) dates.push(d);
+      };
+
+      for (const time of document.querySelectorAll('time[datetime]')) {
+        pushDate(time.getAttribute('datetime'));
+      }
+
+      const REVIEW_WORDING =
+        /(last\s+(updated|reviewed|review)|updated\s+on|reviewed\s+on|prepared\s+on|erstellt\s+am|zuletzt\s+(gepr[üu]ft|[üu]berpr[üu]ft|aktualisiert)|letzte\s+([üu]berpr[üu]fung|aktualisierung)|stand)/gi;
+      let match;
+      while ((match = REVIEW_WORDING.exec(text)) !== null) {
+        const context = text.slice(match.index, match.index + 120);
+        const iso = context.match(/(\d{4})-(\d{2})-(\d{2})/);
+        if (iso) {
+          pushDate(`${iso[1]}-${iso[2]}-${iso[3]}`);
+          continue;
+        }
+        const dmy = context.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
+        if (dmy) {
+          pushDate(
+            `${dmy[3]}-${String(dmy[2]).padStart(2, '0')}-${String(dmy[1]).padStart(2, '0')}`
+          );
         }
       }
 
-      // Look for compliance level
-      let complianceLevel = null;
-      const compliancePatterns = [
-        /wcag\s+2\.1\s+(aaa)/i,
-        /wcag\s+2\.1\s+(aa)/i,
-        /wcag\s+2\.1\s+(a)/i,
-        /wcag\s+(aaa)/i,
-        /wcag\s+(aa)/i,
-        /wcag\s+(a)/i,
-        /(fully\s+compliant)/i,
-        /(partially\s+compliant)/i,
-        /(non[‑\-\s]*compliant)/i,
-      ];
-
-      for (const pattern of compliancePatterns) {
-        const match = pageText.match(pattern);
-        if (match) {
-          const level = match[1].toLowerCase();
-          if (level.includes('aaa')) complianceLevel = 'AAA';
-          else if (level.includes('aa')) complianceLevel = 'AA';
-          else if (level === 'a') complianceLevel = 'A';
-          else if (level.includes('fully')) complianceLevel = 'AA';
-          else if (level.includes('partial')) complianceLevel = 'partial';
-          else if (level.includes('non')) complianceLevel = 'non-compliant';
-          break;
-        }
-      }
-
-      // Look for contact mechanism
-      const contactPatterns = [
-        /@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/, // Email
-        /\+?[0-9\s\-()]{10,}/, // Phone
-        /contact\s+us/i,
-        /feedback/i,
-        /report\s+issue/i,
-      ];
-
-      let contactMechanism = false;
-      for (const pattern of contactPatterns) {
-        if (pattern.test(pageText)) {
-          contactMechanism = true;
-          break;
-        }
-      }
-
-      // Also check for actual form elements or mailto links
-      const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
-      const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
-      const forms = document.querySelectorAll('form');
-
-      if (emailLinks.length > 0 || phoneLinks.length > 0 || forms.length > 0) {
-        contactMechanism = true;
-      }
-
-      // Look for known issues section
-      const knownIssuesPatterns = [
-        /known\s+issues/i,
-        /limitations/i,
-        /exceptions/i,
-        /accessibility\s+barriers/i,
-      ];
-
-      let knownIssues = false;
-      for (const pattern of knownIssuesPatterns) {
-        if (pattern.test(pageText)) {
-          knownIssues = true;
-          break;
-        }
-      }
-
-      // Look for feedback mechanism
-      const feedbackPatterns = [
-        /feedback/i,
-        /report\s+problem/i,
-        /contact\s+us/i,
-        /accessibility\s+support/i,
-      ];
-
-      let feedbackMechanism = false;
-      for (const pattern of feedbackPatterns) {
-        if (pattern.test(pageText)) {
-          feedbackMechanism = true;
-          break;
-        }
-      }
+      const newest = dates.length ? new Date(Math.max(...dates.map((d) => d.getTime()))) : null;
 
       return {
-        lastUpdated: lastUpdated ? lastUpdated.toISOString() : null,
-        complianceLevel,
+        conformanceStatus: conformance ? conformance[0].trim() : null,
+        selfIdentifies,
         contactMechanism,
-        knownIssues,
-        feedbackMechanism,
+        lastUpdated: newest ? newest.toISOString() : null,
       };
     });
-
-    // Convert lastUpdated back to Date object if it exists
-    if (contentAnalysis.lastUpdated) {
-      contentAnalysis.lastUpdated = new Date(contentAnalysis.lastUpdated);
-    }
-
-    return contentAnalysis;
-  }
-
-  /**
-   * Check if statement is outdated (older than 12 months)
-   */
-  isStatementOutdated(lastUpdated) {
-    if (!lastUpdated) return true;
-
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
-
-    return lastUpdated < twelveMonthsAgo;
   }
 
   get needsExclusiveAccess() {

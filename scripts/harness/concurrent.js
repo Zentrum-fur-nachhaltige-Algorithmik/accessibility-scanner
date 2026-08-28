@@ -16,6 +16,10 @@ const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
 const http = require('http');
 const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
+const { FILE_TO_SCANNERS } = require('./exclusive');
+
+/** Fixtures an exclusive scanner claims by name; the concurrent plan skips them. */
+const CLAIMED_FILES = new Set(Object.keys(FILE_TO_SCANNERS));
 
 async function loadPuppeteer() {
   try {
@@ -27,7 +31,7 @@ async function loadPuppeteer() {
 }
 
 /**
- * Concurrent (non-exclusive) deterministic scanner definitions: id -> module.
+ * Concurrent (non-exclusive) deterministic scanner definitions: id -> { module, scanOpts }.
  * Criteria are not hardcoded here; they are read from each scanner's own
  * `wcagCriteria` constructor metadata at instantiation time. Routing is
  * many-to-many: a test file runs against every scanner whose criteria
@@ -38,21 +42,21 @@ async function loadPuppeteer() {
  * covered by scripts/harness/exclusive.js.
  */
 const CONCURRENT_SCANNERS = {
-  'color-contrast': { module: '../../src/scanners/color-contrast' },
+  // SC 1.4.6 is only measured for a scan that asks for AAA; SC 1.4.3 is
+  // axe-core's, see src/scanners/color-contrast.js.
+  'color-contrast': {
+    module: '../../src/scanners/color-contrast',
+    scanOpts: { wcagLevel: 'AAA' },
+  },
   'use-of-color': { module: '../../src/scanners/use-of-color' },
   'images-of-text': { module: '../../src/scanners/images-of-text' },
-  'advanced-contrast': { module: '../../src/scanners/advanced-contrast' },
   'screen-reader': { module: '../../src/scanners/screen-reader' },
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
   orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
-  'language-detection': { module: '../../src/scanners/language-detection' },
-  'predictable-navigation': { module: '../../src/scanners/predictable-navigation' },
   'error-handling': { module: '../../src/scanners/error-handling' },
-  'html-validation': { module: '../../src/scanners/html-validation' },
   'page-structure': { module: '../../src/scanners/page-structure' },
   'label-in-name': { module: '../../src/scanners/label-in-name' },
-  'status-messages': { module: '../../src/scanners/status-messages' },
   'advanced-aria': { module: '../../src/scanners/advanced-aria' },
   'timing-controls': { module: '../../src/scanners/timing-controls' },
 };
@@ -65,8 +69,10 @@ const CONCURRENT_SCANNERS = {
  * misses:
  *
  *   1. `criterion` / `ruleId`: a per-violation criterion (most scanners,
- *      EN 301 549 "9.x.y.z" or bare "x.y.z"). Most precise; preferred.
- *   2. `wcagCriteria`: a per-violation array (nontext-contrast, label-in-name).
+ *      EN 301 549 "9.x.y.z" or bare "x.y.z").
+ *   2. `wcagCriteria`: a per-violation criterion or array of them
+ *      (nontext-contrast, label-in-name, images-of-text). A violation carrying
+ *      both fields cites both, so all of them are read.
  *   3. neither: the violation carries only element/measurement fields
  *      (color-contrast). The only sound attribution left is the scanner's own
  *      declared criteria, which the caller passes as `scannerCriteria`. This is
@@ -80,11 +86,11 @@ function matchesCriteria(violation, criteria, scannerCriteria = null) {
     return c && criteria.some((target) => c.includes(target) || c === `9.${target}`);
   };
 
-  if (violation.criterion || violation.ruleId) {
-    return hit(violation.criterion) || hit(violation.ruleId);
-  }
-  if (Array.isArray(violation.wcagCriteria) && violation.wcagCriteria.length) {
-    return violation.wcagCriteria.some(hit);
+  const own = [violation.criterion, violation.ruleId].filter(Boolean);
+  if (Array.isArray(violation.wcagCriteria)) own.push(...violation.wcagCriteria);
+  else if (violation.wcagCriteria) own.push(violation.wcagCriteria);
+  if (own.length) {
+    return own.some(hit);
   }
   if (Array.isArray(scannerCriteria) && scannerCriteria.length) {
     return scannerCriteria.some(hit);
@@ -167,6 +173,10 @@ async function main() {
     if (!isGood && !isBad) continue;
 
     parsedFiles.push({ file, metadata, isGood, isBad });
+
+    // A fixture an exclusive scanner claims by name belongs to that scanner
+    // alone (see FILE_TO_SCANNERS in exclusive.js).
+    if (CLAIMED_FILES.has(file)) continue;
 
     for (const [sid, criteria] of Object.entries(scannerCriteria)) {
       const intersection = intersectCriteria(metadata.criterion, criteria);
@@ -273,7 +283,11 @@ async function main() {
 
         silence();
         const result = await Promise.race([
-          scanner.scan(page, { observationTime: 0, heuristicOnly: true }),
+          scanner.scan(page, {
+            observationTime: 0,
+            heuristicOnly: true,
+            ...(CONCURRENT_SCANNERS[scannerId].scanOpts || {}),
+          }),
           new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 60000)),
         ]);
         restore();

@@ -23,6 +23,14 @@ const CONTRAST = {
   nonText: 3,
 };
 
+/**
+ * Length above which an alt attribute reads as a description rather than a
+ * text alternative. WCAG sets no limit, so this sits well clear of the
+ * descriptive alt text news sites and museums write, and only catches an alt
+ * that carries a whole paragraph.
+ */
+const ALT_TEXT_MAX_LENGTH = 250;
+
 /** Puppeteer setViewport shapes. reflow320 is the WCAG 1.4.10 reference width. */
 const DEVICES = {
   reflow320: {
@@ -46,4 +54,4 @@ const DEVICES = {
   desktop: { name: 'Desktop', width: 1920, height: 1080, deviceScaleFactor: 1, isMobile: false },
 };
 
-module.exports = { TIMEOUTS, VIEWPORTS, CONTRAST, DEVICES };
+module.exports = { TIMEOUTS, VIEWPORTS, CONTRAST, DEVICES, ALT_TEXT_MAX_LENGTH };

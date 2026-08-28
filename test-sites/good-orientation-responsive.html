@@ -1,0 +1,58 @@
+<!-- WCAG-TEST
+criterion: 1.3.4
+level: AA
+title: Orientation
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: orientation
+description: A wide scrollable table, help text about rotating a device and an orientationchange listener, none of which lock the orientation
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; color: #1a1a1a; background: #ffffff; }
+        .table-scroll { overflow-x: auto; }
+        table { min-width: 900px; border-collapse: collapse; }
+        th, td { border: 1px solid #767676; padding: 0.5rem 0.75rem; text-align: left; }
+        .hero { background: #12324f; color: #ffffff; padding: 2rem; min-width: 820px; overflow: hidden; }
+        @media (orientation: portrait) {
+            .table-scroll { margin-inline: -1rem; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Departure timetable</h1>
+
+    <div class="hero">
+        <p>Every departure of the day, in one place.</p>
+    </div>
+
+    <div class="table-scroll">
+        <table>
+            <caption>Departures</caption>
+            <thead>
+                <tr><th scope="col">Line</th><th scope="col">Departure</th><th scope="col">Platform</th><th scope="col">Destination</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>S1</td><td>08:14</td><td>3</td><td>Central Station</td></tr>
+                <tr><td>S4</td><td>08:22</td><td>1</td><td>Airport</td></tr>
+                <tr><td>RE9</td><td>08:31</td><td>7</td><td>Northport</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Help</h2>
+    <p>If the table is hard to read, you can rotate your device to landscape mode, or scroll the table sideways. Both orientations show the same departures.</p>
+
+    <script>
+        window.addEventListener('orientationchange', function () {
+            document.querySelector('.table-scroll').scrollLeft = 0;
+        });
+    </script>
+</body>
+</html>

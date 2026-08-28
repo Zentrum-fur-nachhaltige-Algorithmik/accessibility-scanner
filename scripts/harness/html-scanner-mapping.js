@@ -1098,6 +1098,15 @@ const HTML_SCANNER_MAPPING = {
     description:
       'A responsive page whose widest box is an image that never loads and whose skip link is hidden with clip rect(0 0 0 0): reflow-failure and reflow-content-clipped must stay silent',
   },
+
+  'good-skip-link-appears-on-focus.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.7'],
+    description:
+      'A skip link that unclips on focus and paints no outline: its appearance is the indicator, so no-visible-focus must stay silent',
+  },
 };
 
 /**

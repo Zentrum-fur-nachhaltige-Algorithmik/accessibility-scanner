@@ -71,6 +71,12 @@ const TRACKED_PROPS = [
   'textDecorationLine',
   'filter',
   'transform',
+  'clip',
+  'clipPath',
+  'position',
+  'visibility',
+  'width',
+  'height',
 ];
 
 /**
@@ -171,13 +177,26 @@ const helperCode = `
     if (before.filter !== after.filter) reasons.push('filter');
     if (before.transform !== after.transform) reasons.push('transform');
 
-    // 5. Pseudo-element ring
+    // 5. The element itself appears on focus: the visually hidden skip link
+    // that unclips, becomes visible or leaves its one-pixel box (technique
+    // C15). Nothing about it is painted while it is hidden, so the change of
+    // state IS the indicator.
+    const area = (s) => (parseFloat(s.width) || 0) * (parseFloat(s.height) || 0);
+    const appears =
+      before.clip !== after.clip ||
+      before.clipPath !== after.clipPath ||
+      before.visibility !== after.visibility ||
+      before.position !== after.position ||
+      (area(after) > 100 && area(after) > area(before) * 4);
+    if (appears) reasons.push('appears-on-focus');
+
+    // 6. Pseudo-element ring
     for (const k of ['pseudo::before', 'pseudo::after']) {
       const b = before[k], a = after[k];
       if (a && JSON.stringify(a) !== JSON.stringify(b)) reasons.push(k);
     }
 
-    // 6. Ring painted on a related element instead of on the control itself:
+    // 7. Ring painted on a related element instead of on the control itself:
     // a label styled through :focus-visible + label, or a wrapper styled
     // through :focus-within. Same evidence, one element further out.
     const beforeRel = before.related || [], afterRel = after.related || [];

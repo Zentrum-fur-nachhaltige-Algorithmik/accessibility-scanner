@@ -5,6 +5,7 @@
  */
 
 const { runSrAgent } = require('./sr-agent');
+const { runGreedyAgent } = require('./greedy-agent');
 const { mapWithConcurrency, DEFAULT_CONCURRENCY } = require('./concurrency');
 const { EVIDENCE_NOT_IN_READING_ORDER, MAX_EVIDENCE_PHRASE_SPAN } = require('./optimal-path');
 const { heardAnswer, JUDGE_PHRASE_WINDOW } = require('./answer-match');
@@ -66,6 +67,8 @@ function resolveFn(name, required = true) {
  * @param {object} args.llm - LLM client with `chat()`
  * @param {number} [args.k=1] - runs per task
  * @param {string} [args.model]
+ * @param {'llm'|'greedy'} [args.agent='llm'] - stage 3 (the LLM agent) or stage 2
+ *        (the deterministic word matcher of greedy-agent.js, which needs no LLM)
  * @param {number} [args.concurrency=3] - tasks measured at the same time; the
  *        k runs of one task stay sequential (they share nothing but must not
  *        interleave in the trace).
@@ -80,6 +83,7 @@ async function runSite({
   llm,
   k = 1,
   model,
+  agent = 'llm',
   concurrency = DEFAULT_CONCURRENCY,
   logger = console,
   deps,
@@ -96,7 +100,7 @@ async function runSite({
   const validateTask = d.validateTask || resolveFn('validateTask');
   const oracleMod = d.oracle || loadOracle();
   const ScreenReaderEnv = d.ScreenReaderEnv || loadEnv().ScreenReaderEnv;
-  const agentFn = d.runSrAgent || runSrAgent;
+  const agentFn = d.runSrAgent || (agent === 'greedy' ? runGreedyAgent : runSrAgent);
   // Preconditions: replay.runPreconditions(page, task) if available, else
   // replay the precondition list as a sighted path.
   const runPreconditions =

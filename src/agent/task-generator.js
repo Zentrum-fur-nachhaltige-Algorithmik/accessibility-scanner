@@ -1716,6 +1716,7 @@ module.exports = {
   withGeneratorMeta,
   isPlausible,
   keywordsOf,
+  stemOf,
   matchedKeywords,
   usableEvidence,
   spokenPhraseFor,

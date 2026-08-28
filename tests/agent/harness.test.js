@@ -1059,6 +1059,71 @@ describe('runSite', () => {
     });
   });
 
+  describe('agent selection', () => {
+    /** In-memory env: one links list, then a navigation, exactly what the greedy policy needs. */
+    function greedyEnv() {
+      const trace = [];
+      let steps = 0;
+      const env = {
+        maxSteps: 20,
+        trace,
+        start: vi.fn(async () => {}),
+        stop: vi.fn(async () => {}),
+        deriveFindings: vi.fn(() => []),
+        async step(cmd) {
+          const free = cmd.type === 'mark';
+          if (!free) steps += 1;
+          const obs = {
+            step: steps,
+            phrase: cmd.type === 'jumpTo' ? 'link, Contact' : '',
+            announcements: cmd.type === 'activate' ? ['page loaded: Contact'] : [],
+            rotor:
+              cmd.type === 'links'
+                ? {
+                    kind: 'links',
+                    items: [
+                      { index: 0, phrase: 'link, Home' },
+                      { index: 1, phrase: 'link, Contact' },
+                    ],
+                    from: 0,
+                    total: 2,
+                    hasMore: false,
+                  }
+                : null,
+            focus: null,
+            url: cmd.type === 'activate' ? 'http://x/contact' : 'http://x/',
+            urlChanged: cmd.type === 'activate',
+            budgetLeft: 20 - steps,
+            ...(free ? { free: true } : {}),
+          };
+          trace.push({ step: steps, cmd, ...(free ? { free: true } : {}), obsAfter: obs });
+          return obs;
+        },
+      };
+      return env;
+    }
+
+    it('runs the greedy agent without an LLM client', async () => {
+      const env = greedyEnv();
+      ScreenReaderEnv.mockImplementation(() => env);
+      const res = await runSite({
+        browser: fakeBrowser(),
+        url: 'http://x/',
+        tasks: [task()],
+        llm: null,
+        agent: 'greedy',
+        logger: null,
+        // No `runSrAgent` in the seam: the harness picks the agent itself.
+        deps: { ...deps, runSrAgent: undefined },
+      });
+      const run = res.tasks[0].runs[0];
+      expect(run.stoppedBy).toBe('done');
+      expect(run.nSr).toBeGreaterThan(0);
+      expect(run.usage).toMatchObject({ calls: 0, cost: 0 });
+      expect(env.trace.map((e) => e.cmd.type)).toEqual(['links', 'jumpTo', 'activate', 'done']);
+    });
+  });
+
   it('returns empty output for an empty task list', async () => {
     const res = await runSite({
       browser: fakeBrowser(),

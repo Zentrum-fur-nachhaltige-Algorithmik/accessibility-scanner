@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 /**
- * run CLI: the SR-agent measurement for one site. Needs OPENROUTER_API_KEY.
+ * run CLI: the SR-agent measurement for one site. Needs OPENROUTER_API_KEY,
+ * except for `--agent greedy --tasks FILE`, which runs the deterministic stage-2
+ * agent and calls no model at all.
  * Task source by precedence: `--tasks FILE`, `--generate` (sighted task
  * generator, saved as `<out>.tasks.json`), otherwise the generic templates.
  */
@@ -23,6 +25,9 @@ function parseArgs(argv) {
     out: null,
     tasks: null,
     url: null,
+    // Which rung of the metric ladder runs: 'llm' = stage 3 (sr-agent.js),
+    // 'greedy' = stage 2 (greedy-agent.js, word matching only).
+    agent: 'llm',
     generate: false,
     vision: false,
     allowSubmit: false,
@@ -36,6 +41,7 @@ function parseArgs(argv) {
     if (a === '--tasks') args.tasks = argv[++i];
     else if (a === '--k') args.k = parseInt(argv[++i], 10) || 1;
     else if (a === '--model') args.model = argv[++i];
+    else if (a === '--agent') args.agent = String(argv[++i] || '').trim();
     else if (a === '--out') args.out = argv[++i];
     else if (a === '--headless') args.headless = String(argv[++i]) !== 'false';
     else if (a === '--generate') args.generate = true;
@@ -63,7 +69,7 @@ function parseArgs(argv) {
 }
 
 const USAGE = `Usage: node src/agent/run.js <url> [--tasks tasks.json] [--generate] [--k 1] [--model ${DEFAULT_MODEL}]
-       [--out result.json] [--headless true] [--only id,id] [--exclude id,id] [--concurrency 3]
+       [--agent llm|greedy] [--out result.json] [--headless true] [--only id,id] [--exclude id,id] [--concurrency 3]
        generator options (with --generate): [--max-tasks 8] [--explore 4] [--vision] [--allow-submit]`;
 
 function pad(s, n) {
@@ -143,7 +149,24 @@ async function main() {
     process.exit(args.help ? 0 : 1);
   }
 
-  const llm = new LLMClient({ model: args.model });
+  if (args.agent !== 'llm' && args.agent !== 'greedy') {
+    console.error(`Unknown --agent "${args.agent}"; use "llm" or "greedy".`);
+    process.exit(1);
+  }
+
+  // The greedy agent calls no model. The task generator and the answer judge
+  // still do, so a client is built when one can be: without a key the greedy run
+  // simply loses the judge fallback.
+  let llm = null;
+  if (args.agent === 'greedy' && !args.generate) {
+    try {
+      llm = new LLMClient({ model: args.model });
+    } catch (err) {
+      console.log(`no LLM client (${err.message}); running greedy without the answer judge`);
+    }
+  } else {
+    llm = new LLMClient({ model: args.model });
+  }
 
   const browser = await puppeteer.launch({
     headless: args.headless,
@@ -202,6 +225,7 @@ async function main() {
       llm,
       k: args.k,
       model: args.model,
+      agent: args.agent,
       concurrency: args.concurrency,
     });
     if (generated)

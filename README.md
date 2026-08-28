@@ -229,6 +229,15 @@ same answer in another spelling or on another page - decided deterministically
 per answer type, and only if that fails and the agent gave up, by one cheap LLM
 judge call. Every run reports how it was solved (`successBy`).
 
+Three agents share the same environment, so a site's score can be read against
+a ladder rather than against one number: `nOpt` is the deterministic optimum,
+`--agent greedy` is a word matcher without any model (it compares the task
+description with what the screen reader speaks and follows a fixed policy:
+links list, jump, activate, read under the best heading, search for a keyword),
+and the default `--agent llm` is the model. The greedy agent answers "how far
+does a user get who can only match words, without understanding" and needs no
+API key.
+
 A run on gov.uk with generated tasks:
 
 ```
@@ -245,6 +254,7 @@ siteScore 0.94, 8 tasks, cost 0.056 USD
 export OPENROUTER_API_KEY=...
 npm run sr-agent -- https://example.com --generate --out result.json
 npm run sr-agent -- https://example.com --tasks tasks.json --k 3
+npm run sr-agent -- https://example.com --tasks tasks.json --agent greedy   # no LLM
 node src/agent/validate-nopt.js https://example.com --tasks tasks.json
 ```
 

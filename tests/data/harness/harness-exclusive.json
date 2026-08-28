@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-27T22:26:00.191Z",
+  "generatedAt": "2026-08-28T08:47:43.886Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 77,
-    "failed": 0
+    "passed": 78,
+    "failed": 2
   },
   "results": [
     {
@@ -234,11 +234,21 @@
       "criteria": [
         "2.5.6"
       ],
-      "matched": 14,
+      "matched": 2,
       "status": "PASS"
     },
     {
       "file": "good-concurrent-input.html",
+      "scanner": "concurrent-input",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.6"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-touch-and-pointer-alternatives.html",
       "scanner": "concurrent-input",
       "expectViolations": false,
       "criteria": [
@@ -254,7 +264,7 @@
       "criteria": [
         "2.5.7"
       ],
-      "matched": 7,
+      "matched": 6,
       "status": "PASS"
     },
     {
@@ -267,7 +277,7 @@
         "2.5.3",
         "2.5.4"
       ],
-      "matched": 9,
+      "matched": 2,
       "status": "PASS"
     },
     {
@@ -277,8 +287,8 @@
       "criteria": [
         "2.5.1"
       ],
-      "matched": 5,
-      "status": "PASS"
+      "matched": 0,
+      "status": "FAIL"
     },
     {
       "file": "bad-label-in-name.html",
@@ -297,8 +307,8 @@
       "criteria": [
         "2.5.4"
       ],
-      "matched": 15,
-      "status": "PASS"
+      "matched": 0,
+      "status": "FAIL"
     },
     {
       "file": "bad-pointer-cancellation.html",
@@ -307,7 +317,7 @@
       "criteria": [
         "2.5.2"
       ],
-      "matched": 5,
+      "matched": 3,
       "status": "PASS"
     },
     {
@@ -376,6 +386,20 @@
       "expectViolations": false,
       "criteria": [
         "2.5.2"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-pointer-labels-and-alternatives.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.1",
+        "2.5.2",
+        "2.5.4",
+        "2.5.7",
+        "2.5.8"
       ],
       "matched": 0,
       "status": "PASS"
@@ -690,11 +714,21 @@
       "criteria": [
         "2.3.1"
       ],
-      "matched": 10,
+      "matched": 5,
       "status": "PASS"
     },
     {
       "file": "good-seizure-safe.html",
+      "scanner": "seizure-prevention",
+      "expectViolations": false,
+      "criteria": [
+        "2.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-short-animations.html",
       "scanner": "seizure-prevention",
       "expectViolations": false,
       "criteria": [

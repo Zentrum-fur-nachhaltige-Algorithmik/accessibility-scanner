@@ -67,8 +67,10 @@ const CONCURRENT_SCANNERS = {
  * misses:
  *
  *   1. `criterion` / `ruleId`: a per-violation criterion (most scanners,
- *      EN 301 549 "9.x.y.z" or bare "x.y.z"). Most precise; preferred.
- *   2. `wcagCriteria`: a per-violation array (nontext-contrast, label-in-name).
+ *      EN 301 549 "9.x.y.z" or bare "x.y.z").
+ *   2. `wcagCriteria`: a per-violation criterion or array of them
+ *      (nontext-contrast, label-in-name, images-of-text). A violation carrying
+ *      both fields cites both, so all of them are read.
  *   3. neither: the violation carries only element/measurement fields
  *      (color-contrast). The only sound attribution left is the scanner's own
  *      declared criteria, which the caller passes as `scannerCriteria`. This is
@@ -82,11 +84,11 @@ function matchesCriteria(violation, criteria, scannerCriteria = null) {
     return c && criteria.some((target) => c.includes(target) || c === `9.${target}`);
   };
 
-  if (violation.criterion || violation.ruleId) {
-    return hit(violation.criterion) || hit(violation.ruleId);
-  }
-  if (Array.isArray(violation.wcagCriteria) && violation.wcagCriteria.length) {
-    return violation.wcagCriteria.some(hit);
+  const own = [violation.criterion, violation.ruleId].filter(Boolean);
+  if (Array.isArray(violation.wcagCriteria)) own.push(...violation.wcagCriteria);
+  else if (violation.wcagCriteria) own.push(violation.wcagCriteria);
+  if (own.length) {
+    return own.some(hit);
   }
   if (Array.isArray(scannerCriteria) && scannerCriteria.length) {
     return scannerCriteria.some(hit);

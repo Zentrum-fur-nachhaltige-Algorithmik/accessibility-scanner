@@ -1,10 +1,11 @@
 /**
  * Images of Text Scanner.
  * WCAG 1.4.5, 1.4.9 (EN 301 549 9.1.4.5, 9.1.4.9).
- * Detects images that present text which could be rendered as real text,
- * using filename, alt and class heuristics; logos and decorative images are skipped.
+ * Reports images whose own source proves they render text: an SVG referenced by
+ * an <img>, an <object> or a CSS background whose markup contains a text run.
  */
 const BaseScanner = require('../core/base-scanner');
+const { injectableCode: renderedCode } = require('../utils/rendered');
 
 class ImagesOfTextScanner extends BaseScanner {
   constructor() {
@@ -21,265 +22,144 @@ class ImagesOfTextScanner extends BaseScanner {
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const scanOptions = {
-      useOCR: options.useOCR || false,
-      skipLogos: options.skipLogos !== false,
-      skipDecorative: options.skipDecorative !== false,
-    };
+    const result = await page.evaluate(async (injectedCode) => {
+      eval(injectedCode);
 
-    const imageTextResults = await page.evaluate((options) => {
+      // Only images the scan can read the source of are decidable. A raster
+      // image would need OCR, which this scanner does not have, so a
+      // photograph, a screenshot and a logo are all left alone.
+      const MAX_SOURCES = 40;
+
+      function getSelector(el) {
+        return (
+          el.tagName.toLowerCase() +
+          (el.id ? `#${el.id}` : '') +
+          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
+        );
+      }
+
+      /** The SVG source behind a URL, or null when it is not readable SVG. */
+      async function svgSource(url) {
+        if (!url) return null;
+        if (url.startsWith('data:')) {
+          const head = url.slice(5, url.indexOf(','));
+          if (!/image\/svg\+xml/i.test(head)) return null;
+          const body = url.slice(url.indexOf(',') + 1);
+          try {
+            return /;base64/i.test(head) ? atob(body.replace(/\s+/g, '')) : decodeURIComponent(body);
+          } catch (e) {
+            return null; // truncated or invalid encoding: nothing is proven
+          }
+        }
+        let parsed;
+        try {
+          parsed = new URL(url, document.baseURI);
+        } catch (e) {
+          return null;
+        }
+        if (parsed.origin !== location.origin) return null; // unreadable, undecidable
+        if (!/\.svg$/i.test(parsed.pathname)) return null;
+        try {
+          const res = await fetch(parsed.href);
+          if (!res.ok) return null;
+          return await res.text();
+        } catch (e) {
+          return null;
+        }
+      }
+
+      /** The text runs an SVG paints, ignoring markup that is not rendered. */
+      function svgTextRuns(source) {
+        let doc;
+        try {
+          doc = new DOMParser().parseFromString(source, 'image/svg+xml');
+        } catch (e) {
+          return [];
+        }
+        if (!doc || doc.querySelector('parsererror')) return [];
+        const runs = [];
+        for (const node of doc.querySelectorAll('text, textPath')) {
+          if (node.closest('defs, clipPath, mask, symbol')) continue;
+          const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+          if (text) runs.push(text);
+        }
+        return runs;
+      }
+
+      // 1.4.5 exempts logotypes. A brand mark is the image of a link that
+      // leads back to the site root, which is how a site's logo is marked up.
+      function isLogotype(el) {
+        const link = el.closest('a[href]');
+        if (!link) return false;
+        let href;
+        try {
+          href = new URL(link.getAttribute('href'), document.baseURI);
+        } catch (e) {
+          return false;
+        }
+        return href.origin === location.origin && (href.pathname === '/' || href.pathname === '');
+      }
+
+      const candidates = [];
+      for (const img of document.querySelectorAll('img, object[data], embed[src]')) {
+        const url =
+          img.tagName === 'OBJECT' ? img.getAttribute('data') : img.getAttribute('src') || img.src;
+        candidates.push({ el: img, url, via: 'source' });
+      }
+      for (const el of document.querySelectorAll('*')) {
+        const bg = window.getComputedStyle(el).backgroundImage;
+        if (!bg || bg === 'none') continue;
+        const m = bg.match(/url\((['"]?)([^)]*?)\1\)/);
+        if (m && m[2]) candidates.push({ el, url: m[2], via: 'background-image' });
+      }
+
       const violations = [];
-      let totalImages = 0;
-      let suspectedTextImages = 0;
-      let confirmedTextImages = 0;
+      const sources = new Map();
+      const reported = new Set();
+      let inspected = 0;
 
-      // Helper function to generate element selector
-      function getElementSelector(element) {
-        let selector = element.tagName.toLowerCase();
-        if (element.id) selector += `#${element.id}`;
-        if (element.className) selector += `.${element.className.split(' ').join('.')}`;
-        return selector;
+      for (const candidate of candidates) {
+        if (!__isRendered(candidate.el)) continue;
+        if (reported.has(candidate.el)) continue;
+        if (!sources.has(candidate.url)) {
+          if (sources.size >= MAX_SOURCES) continue;
+          sources.set(candidate.url, await svgSource(candidate.url));
+        }
+        const source = sources.get(candidate.url);
+        if (!source) continue;
+        inspected++;
+        const runs = svgTextRuns(source);
+        if (runs.length === 0) continue;
+        if (isLogotype(candidate.el)) continue;
+        reported.add(candidate.el);
+        const text = runs.join(' ');
+        violations.push({
+          criterion: '9.1.4.5',
+          // The finding fails 1.4.5 and, since the image is not a logotype,
+          // 1.4.9 as well.
+          wcagCriteria: ['1.4.5', '1.4.9'],
+          element: getSelector(candidate.el),
+          issue: 'image-of-text',
+          description: `The image rendered by this ${candidate.via} is an SVG that paints the text "${text.substring(0, 80)}${text.length > 80 ? '...' : ''}", which the user cannot resize, recolour or select`,
+          severity: 'serious',
+          detectedText: text.substring(0, 200),
+          suggestion:
+            'Render the text as HTML text styled with CSS, and keep the image for what is not text.',
+        });
       }
 
-      // Helper function to check if image might be decorative
-      function isLikelyDecorative(img) {
-        const alt = img.getAttribute('alt') || '';
-        const src = img.src || '';
-        const className = img.className || '';
+      return { violations, imagesInspected: inspected, sourcesRead: sources.size };
+    }, renderedCode);
 
-        // Check for decorative indicators
-        const decorativeKeywords = ['decoration', 'ornament', 'separator', 'spacer', 'bullet'];
-        const isDecorative = decorativeKeywords.some(
-          (keyword) =>
-            alt.toLowerCase().includes(keyword) ||
-            src.toLowerCase().includes(keyword) ||
-            className.toLowerCase().includes(keyword)
-        );
-
-        // Empty alt attribute often indicates decorative image
-        return isDecorative || alt === '';
-      }
-
-      // Helper function to check if image might be a logo
-      function isLikelyLogo(img) {
-        const alt = img.getAttribute('alt') || '';
-        const src = img.src || '';
-        const className = img.className || '';
-
-        const logoKeywords = ['logo', 'brand', 'company'];
-        return logoKeywords.some(
-          (keyword) =>
-            alt.toLowerCase().includes(keyword) ||
-            src.toLowerCase().includes(keyword) ||
-            className.toLowerCase().includes(keyword)
-        );
-      }
-
-      // Helper function to detect potential text in images using heuristics
-      function analyzeImageForText(img) {
-        const alt = img.getAttribute('alt') || '';
-        const src = img.src || '';
-
-        // Heuristics for text detection (without actual OCR)
-        const textIndicators = {
-          // Alt text suggests text content
-          hasTextualAlt: alt.length > 0 && !isLikelyDecorative(img) && !isLikelyLogo(img),
-
-          // Filename suggests text content
-          filenameIndicatesText: /\b(text|caption|heading|title|quote|message)\b/i.test(src),
-
-          // Common text image patterns in filename
-          commonTextPatterns:
-            /\b(btn|button|banner|header|nav|menu)\b/i.test(src) &&
-            !/\b(bg|background|decoration)\b/i.test(src),
-
-          // Image dimensions suggest text (often wide and short)
-          dimensionsSuggestText: false, // Will be calculated below
-        };
-
-        // Check image dimensions
-        const rect = img.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) {
-          const aspectRatio = rect.width / rect.height;
-          // Text images often have high aspect ratios (wider than tall)
-          // or are small square buttons
-          textIndicators.dimensionsSuggestText =
-            aspectRatio > 2.5 || // Wide banners/headers
-            (rect.width < 200 && rect.height < 200 && aspectRatio > 1.5); // Small buttons
-        }
-
-        return textIndicators;
-      }
-
-      // Helper function to provide suggestions based on violation type
-      function getSuggestion(reason, element) {
-        switch (reason) {
-          case 'contains-text':
-            return 'Replace image with HTML text using appropriate styling (CSS) to achieve the same visual effect';
-          case 'essential-text':
-            return 'If text presentation is essential, ensure sufficient contrast and provide alternative text';
-          case 'customizable-text':
-            return 'Allow users to customize text appearance or provide text alternatives';
-          default:
-            return 'Consider replacing with HTML text or providing comprehensive alternative text';
-        }
-      }
-
-      // Find all images
-      const images = document.querySelectorAll('img');
-
-      images.forEach((img) => {
-        totalImages++;
-
-        // Skip if options indicate to skip certain types
-        if (options.skipDecorative && isLikelyDecorative(img)) return;
-        if (options.skipLogos && isLikelyLogo(img)) return;
-
-        const textAnalysis = analyzeImageForText(img);
-
-        // Calculate confidence score (0-100)
-        let confidence = 0;
-        let reasons = [];
-
-        if (textAnalysis.hasTextualAlt) {
-          confidence += 40;
-          reasons.push('has descriptive alt text suggesting text content');
-        }
-
-        if (textAnalysis.filenameIndicatesText) {
-          confidence += 25;
-          reasons.push('filename suggests text content');
-        }
-
-        if (textAnalysis.commonTextPatterns) {
-          confidence += 20;
-          reasons.push('filename matches common text element patterns');
-        }
-
-        if (textAnalysis.dimensionsSuggestText) {
-          confidence += 15;
-          reasons.push('dimensions typical of text images');
-        }
-
-        // Additional checks for button-like elements
-        const isInButton = img.closest('button, .btn, [role="button"]');
-        if (isInButton) {
-          confidence += 20;
-          reasons.push('contained within button element');
-        }
-
-        // Check for text-like class names
-        const className = img.className || '';
-        if (/\b(text|caption|heading|title)\b/i.test(className)) {
-          confidence += 15;
-          reasons.push('class name suggests text content');
-        }
-
-        // If confidence is above threshold, consider it a suspected text image
-        if (confidence > 60) {
-          suspectedTextImages++;
-
-          // Higher confidence means more likely to be confirmed
-          if (confidence > 60) {
-            confirmedTextImages++;
-          }
-
-          const alt = img.getAttribute('alt') || '';
-          let reason = 'contains-text';
-
-          // Determine specific reason
-          if (isInButton || /button|btn/i.test(img.src)) {
-            reason = 'essential-text'; // Button text might be considered essential
-          } else if (confidence > 80) {
-            reason = 'customizable-text'; // High confidence suggests customizable presentation
-          }
-
-          violations.push({
-            element: getElementSelector(img),
-            imageUrl: img.src,
-            detectedText: alt || 'Text detected in image',
-            confidence: Math.min(confidence, 100),
-            reason: reason,
-            suggestion: getSuggestion(reason, img),
-          });
-        }
-      });
-
-      // Check CSS background images - but only flag real problems
-      // Text over background images is GOOD accessibility practice, not a violation
-      // Only flag if there's evidence this is actually text rendered as an image
-      const allElements = document.querySelectorAll('*');
-
-      allElements.forEach((element) => {
-        const computed = window.getComputedStyle(element);
-        const bgImage = computed.backgroundImage;
-
-        if (bgImage && bgImage !== 'none' && bgImage.includes('url(')) {
-          const hasTextContent = element.textContent.trim().length > 0;
-          const rect = element.getBoundingClientRect();
-          const imageUrl = bgImage.match(/url\(['"]?([^'")]+)['"]?\)/)?.[1] || '';
-
-          // Only flag if there are strong indicators this is text rendered as image
-          let confidence = 0;
-          let reasons = [];
-
-          // Check if filename suggests text content (instead of decorative background)
-          if (/\b(text|caption|heading|title|quote|message|logo-text)\b/i.test(imageUrl)) {
-            confidence += 40;
-            reasons.push('filename suggests text content');
-          }
-
-          // Check if element is very small (likely a text button/badge)
-          if (rect.width < 150 && rect.height < 50 && hasTextContent && rect.width > 0) {
-            confidence += 30;
-            reasons.push('small element size suggests text image');
-          }
-
-          // Check if text content exactly matches common button/badge text
-          const text = element.textContent.trim().toLowerCase();
-          if (
-            text.length < 20 &&
-            /^(button|click|download|submit|login|signup|register)$/.test(text)
-          ) {
-            confidence += 25;
-            reasons.push('text matches common button patterns');
-          }
-
-          // Only flag if confidence is high enough
-          if (confidence > 60) {
-            totalImages++;
-            suspectedTextImages++;
-
-            violations.push({
-              element: getElementSelector(element),
-              imageUrl: imageUrl,
-              detectedText: element.textContent.trim().substring(0, 100),
-              confidence: Math.min(confidence, 100),
-              reason: 'contains-text',
-              suggestion: 'Replace background image text with HTML text and CSS styling',
-            });
-          }
-        }
-      });
-
-      return {
-        violations,
-        totalImages,
-        suspectedTextImages,
-        confirmedTextImages,
-      };
-    }, scanOptions);
-
-    // Create report according to interface
     return {
       scannerId: this.id,
       criterion: '9.1.4.5',
-      passed: imageTextResults.violations.length === 0,
-      violations: imageTextResults.violations,
+      passed: result.violations.length === 0,
+      violations: result.violations,
       summary: {
-        totalImages: imageTextResults.totalImages,
-        suspectedTextImages: imageTextResults.suspectedTextImages,
-        confirmedTextImages: imageTextResults.confirmedTextImages,
+        imagesWithReadableText: result.imagesInspected,
+        sourcesRead: result.sourcesRead,
+        violationCount: result.violations.length,
       },
     };
   }

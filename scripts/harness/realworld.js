@@ -1014,7 +1014,7 @@ const FIXTURES = [
         // whose purpose cannot be determined from their text. WCAG 2.4.4.
         check: ({ violations }) => {
           const hits = violations.filter(
-            (v) => v.issue === 'ambiguous-link' && /"[vte]"/.test(v.description || '')
+            (v) => v.issue === 'link-name-identifies-nothing' && /"[vte]"/.test(v.description || '')
           );
           if (hits.length > 0) return null;
           return 'no 2.4.4 finding for the single letter navbox links';

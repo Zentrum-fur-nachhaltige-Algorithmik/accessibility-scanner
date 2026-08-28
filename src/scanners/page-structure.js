@@ -116,11 +116,15 @@ class PageStructureScanner extends BaseScanner {
           nameInfo.source === 'aria-labelledby' ||
           nameInfo.source === 'title';
 
-        // Nothing to read: the name carries no letters or digits at all, or
-        // fewer than three characters of them. Reported only when the
-        // context adds no words either, which is what makes it a 2.4.4
-        // failure and not just a 2.4.9 one.
-        if (!authored && normalized.length < 3) {
+        // Nothing to read: the name carries no letter or digit at all, or a
+        // single one. Two characters can be a word ("UK") and one ideograph is
+        // a word already, so both are left alone; the shape this catches is
+        // the "v / t / e" of a navigation box and a bare arrow glyph. It is
+        // reported only when the context adds no word either, which is what
+        // makes it a 2.4.4 failure and not only a 2.4.9 one.
+        const ideographic =
+          /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(name);
+        if (!authored && !ideographic && normalized.length < 2) {
           if (contextWords(link).length > 0) return;
           violations.push({
             criterion: '9.2.4.4',

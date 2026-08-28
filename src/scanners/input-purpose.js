@@ -107,8 +107,8 @@ class InputPurposeScanner extends BaseScanner {
         },
         { pattern: /\b(zip|postal[_-]?code|postcode|plz)\b/i, expected: ['postal-code'] },
         { pattern: /\b(city|town|ort)\b/i, expected: ['address-level2'] },
-        { pattern: /\b(state|province|region|bundesland)\b/i, expected: ['address-level1'] },
         { pattern: /\b(country|land)\b/i, expected: ['country', 'country-name'] },
+        { pattern: /\b(state|province|region|bundesland)\b/i, expected: ['address-level1'] },
         { pattern: /\b(card[_-]?number|cc[_-]?num|credit[_-]?card)\b/i, expected: ['cc-number'] },
         { pattern: /\b(card[_-]?name|cardholder)\b/i, expected: ['cc-name'] },
         { pattern: /\b(cvv|cvc|csc|security[_-]?code)\b/i, expected: ['cc-csc'] },
@@ -221,6 +221,8 @@ class InputPurposeScanner extends BaseScanner {
       function collectsUserData(el) {
         const ownType = (el.type || '').toLowerCase();
         if (ownType === 'email' || ownType === 'tel' || ownType === 'password') return true;
+        // A one-time code is the user's own datum whatever else the form holds.
+        if ((detectPurpose(el) || []).includes('one-time-code')) return true;
         const scope = el.form || document;
         let identityFields = 0;
         for (const field of scope.querySelectorAll('input, select, textarea')) {
@@ -281,7 +283,7 @@ class InputPurposeScanner extends BaseScanner {
           }
 
           // Check autocomplete="off" on a field with recognizable purpose
-          if (lastToken === 'off' && detectedPurpose) {
+          if (lastToken === 'off' && detectedPurpose && collectsUserData(el)) {
             violations.push({
               criterion: '9.1.3.5',
               element: getSelector(el),
@@ -296,7 +298,12 @@ class InputPurposeScanner extends BaseScanner {
           }
 
           // Check if autocomplete value matches the detected purpose
-          if (detectedPurpose && lastToken !== 'on' && lastToken !== 'off') {
+          if (
+            detectedPurpose &&
+            lastToken !== 'on' &&
+            lastToken !== 'off' &&
+            collectsUserData(el)
+          ) {
             const matches = detectedPurpose.some((expected) => tokens.includes(expected));
             if (!matches) {
               // If the current value is a valid spec purpose, run detectPurpose

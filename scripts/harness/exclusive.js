@@ -81,6 +81,12 @@ const EXCLUSIVE_SCANNERS = {
     module: '../../src/scanners/status-messages',
     criteria: ['4.1.3'],
   },
+  // Focuses controls, changes their settings and answers navigation requests
+  // with 204, so it needs its own tab.
+  'predictable-navigation': {
+    module: '../../src/scanners/predictable-navigation',
+    criteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
+  },
   // Clicks the page's own links and reports what a client-side route change
   // did to the title and to focus.
   'dynamic-spa': {

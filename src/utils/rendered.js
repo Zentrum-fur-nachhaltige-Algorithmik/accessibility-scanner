@@ -1,7 +1,7 @@
 /**
  * Browser-injectable "is this element rendered / reachable?" helpers.
- * Exposes __isRendered, __isFocusable, __isFocusableRendered, __isInteractiveTarget
- * and __isSrOnly; `eval()` the exported string inside `page.evaluate`.
+ * Exposes __isRendered, __isFocusable, __isFocusableRendered, __isInteractiveTarget,
+ * __isKeyboardReachable and __isSrOnly; `eval()` the exported string inside `page.evaluate`.
  */
 
 const injectableCode = `
@@ -96,6 +96,21 @@ const injectableCode = `
 
   function __isFocusableRendered(el) {
     return __isFocusable(el) && __isRendered(el);
+  }
+
+  // Can Tab still land on this element, or inside it? Deliberately ignores
+  // aria-hidden: this is the question aria-hidden itself raises, since an
+  // element removed from the accessibility tree but left in the tab order is
+  // focus the user cannot have announced.
+  function __isKeyboardReachable(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.closest('[hidden], [inert]')) return false;
+    if (typeof el.checkVisibility === 'function') {
+      if (!el.checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true })) return false;
+    }
+    if (!el.getClientRects().length) return false;
+    if (__isFocusable(el)) return true;
+    return Array.from(el.querySelectorAll('*')).some(__isFocusable);
   }
 `;
 

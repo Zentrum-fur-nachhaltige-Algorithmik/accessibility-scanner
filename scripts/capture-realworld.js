@@ -34,13 +34,17 @@ const ANALYTICS_RE =
  */
 const RESOURCE_SELECTOR = 'img, script, link, video, audio, source, iframe';
 
+// Per-stylesheet ceiling for inlining, so one framework bundle cannot blow the
+// snapshot past the size the corpus is meant to stay within.
+const MAX_INLINE_CSS_BYTES = 400000;
+
 const TARGETS = [
   {
     name: 'own-audit-ui',
     url: 'http://localhost:3111/audit',
     fallbackUrl: 'http://localhost:3111/',
     purpose:
-      "this repo's own Next.js /audit route: hydration markup and the __next-route-announcer__ live region; reproduces the language-detection undefined.map crash. This route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
+      "this repo's own Next.js /audit route: hydration markup and the __next-route-announcer__ live region. This route renders no inline SVG (the icon-bearing ScanResults component only mounts after a scan completes)",
   },
   {
     name: 'med-theme',
@@ -64,6 +68,42 @@ const TARGETS = [
     url: 'https://www.mozilla.org/de/',
     purpose:
       'modern commercial page: cookie banner, fixed header, heavy inline-SVG icon usage, German locale',
+  },
+  {
+    name: 'gov-uk-guide',
+    url: 'https://www.gov.uk/vehicle-tax',
+    purpose:
+      'GOV.UK service guide: a page held up as a reference for accessible public-sector markup, GDS Transport webfont, skip link, breadcrumb, step-by-step navigation',
+  },
+  {
+    name: 'webaim-article',
+    url: 'https://webaim.org/techniques/skipnav/',
+    purpose:
+      'WebAIM technique article: hand-written reference markup by accessibility practitioners, a real skip link, code samples and a sidebar navigation',
+  },
+  {
+    name: 'govuk-design-system',
+    url: 'https://design-system.service.gov.uk/components/text-input/',
+    purpose:
+      'component library documentation: tabbed example/HTML/Nunjucks panels, iframe-embedded live examples, sub navigation, a page whose components are themselves the accessibility reference',
+  },
+  {
+    name: 'a11y-project-checklist',
+    url: 'https://www.a11yproject.com/checklist/',
+    purpose:
+      'community accessibility checklist: long list-heavy content, many in-page anchors and disclosure widgets, dark-mode-capable colour tokens',
+  },
+  {
+    name: 'broadcaster-news',
+    url: 'https://www.bbc.com/news',
+    purpose:
+      'public broadcaster news front page: dense card grid, many links whose accessible name comes from a heading, region landmarks and a live promo carousel',
+  },
+  {
+    name: 'wiki-accessibility-en',
+    url: 'https://en.wikipedia.org/wiki/Web_accessibility',
+    purpose:
+      'English encyclopedia article: reference lists, footnote superscript links, sidebar navigation and inline lang switches on a different Wikipedia skin path than the German capture',
   },
 ];
 
@@ -181,9 +221,47 @@ function header(sourceUrl, purpose) {
     '<!-- REALWORLD-FIXTURE\n' +
     `source: ${sourceUrl}\n` +
     `captured: ${new Date().toISOString()}\n` +
-    'sanitized: analytics scripts removed; external resource URLs rewritten to ./_offline/*\n' +
+    'sanitized: analytics scripts removed; stylesheets inlined; external resource URLs rewritten to ./_offline/*\n' +
     `purpose: ${purpose}\n` +
     '-->\n'
+  );
+}
+
+/**
+ * Inline the stylesheets the page loaded, so the snapshot renders with the
+ * layout and colours of the original. Without this every external sheet
+ * becomes a dead ./_offline/ URL and the snapshot is unstyled markup, which
+ * hides everything the contrast, reflow and text-resize scanners look at.
+ *
+ * `bodies` maps stylesheet URL to CSS text, collected from the responses of
+ * the live navigation.
+ */
+async function inlineStylesheets(page, bodies, maxBytes) {
+  return page.evaluate(
+    (map, limit) => {
+      let inlined = 0;
+      let skipped = 0;
+      for (const link of Array.from(document.querySelectorAll('link[rel~="stylesheet"]'))) {
+        const href = link.href;
+        const css = map[href];
+        if (!css) {
+          skipped++;
+          continue;
+        }
+        if (css.length > limit) {
+          skipped++;
+          continue;
+        }
+        const style = document.createElement('style');
+        if (link.media) style.media = link.media;
+        style.textContent = css;
+        link.replaceWith(style);
+        inlined++;
+      }
+      return { inlined, skipped };
+    },
+    bodies,
+    maxBytes
   );
 }
 
@@ -195,6 +273,18 @@ async function captureOne(browser, target) {
   // thread forever.
   page.on('dialog', (d) => d.dismiss().catch(() => {}));
   page.on('pageerror', () => {});
+
+  // Stylesheet bodies, keyed by URL, so they can be inlined before serialising.
+  const cssBodies = {};
+  page.on('response', async (resp) => {
+    const type = resp.headers()['content-type'] || '';
+    if (!/text\/css/i.test(type)) return;
+    try {
+      cssBodies[resp.url()] = await resp.text();
+    } catch {
+      // Redirects and aborted requests have no body: nothing to inline.
+    }
+  });
 
   await page.setViewport({ width: 1920, height: 1080 });
   await page.setUserAgent(
@@ -220,7 +310,10 @@ async function captureOne(browser, target) {
   // settle. For Next.js this is when __next-route-announcer__ gets created.
   await new Promise((r) => setTimeout(r, 2000));
 
+  const cssStats = await inlineStylesheets(page, cssBodies, MAX_INLINE_CSS_BYTES);
   const stats = await sanitizeInPage(page, ANALYTICS_RE, RESOURCE_SELECTOR);
+  stats.cssInlined = cssStats.inlined;
+  stats.cssSkipped = cssStats.skipped;
   const html = await page.content();
   await page.close().catch(() => {});
 
@@ -261,7 +354,8 @@ async function main() {
         console.log(
           `  OK ${path.relative(process.cwd(), r.dest)}: ${r.bytes} bytes ` +
             `(${r.stats.scriptsRemoved} analytics scripts removed, ${r.stats.urlsRewritten} attr URLs ` +
-            `+ ${r.stats.cssUrlsRewritten} css url() rewritten)`
+            `+ ${r.stats.cssUrlsRewritten} css url() rewritten, ${r.stats.cssInlined} stylesheets inlined, ` +
+            `${r.stats.cssSkipped} skipped)`
         );
       } catch (err) {
         failures++;

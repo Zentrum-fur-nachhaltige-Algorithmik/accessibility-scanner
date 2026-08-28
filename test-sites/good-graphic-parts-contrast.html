@@ -1,0 +1,40 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast, multi-part graphics and currentColor icons
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: nontext-contrast
+description: A labelled SVG whose outline is dark and whose inner highlight is a pale decorative shape, and an icon whose colour comes from CSS (fill currentColor). The graphic as a whole reaches 3:1, so insufficient-graphic-contrast must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Graphics whose contrast comes from the painted parts</title>
+<style>
+  body { font-family: sans-serif; background: #ffffff; color: #1a1a1a; margin: 2rem; }
+  .icon { width: 48px; height: 48px; color: #1a1a1a; }
+  .chart { width: 240px; height: 120px; }
+</style>
+</head>
+<body>
+<h1>Graphics whose contrast comes from the painted parts</h1>
+
+<svg class="icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Download</title>
+  <path fill="currentColor" d="M12 3v10l4-4 1.4 1.4L12 16.8 6.6 10.4 8 9l4 4V3z"/>
+  <rect fill="currentColor" x="4" y="19" width="16" height="2"/>
+</svg>
+
+<svg class="chart" role="img" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg">
+  <title>Revenue per quarter</title>
+  <rect x="0" y="0" width="240" height="120" fill="#fafafa"/>
+  <path d="M0 110 L240 110" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="20" y="40" width="30" height="70" fill="#1f4e79"/>
+  <rect x="70" y="20" width="30" height="90" fill="#1f4e79"/>
+  <rect x="120" y="60" width="30" height="50" fill="#1f4e79"/>
+</svg>
+</body>
+</html>

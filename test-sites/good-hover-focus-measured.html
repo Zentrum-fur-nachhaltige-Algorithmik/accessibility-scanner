@@ -1,0 +1,84 @@
+<!-- WCAG-TEST
+criterion: 1.4.13
+level: AA
+title: Content on Hover or Focus
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: hover-focus-content
+description: A tooltip shown on hover and, through JavaScript, on focus, a pointer-events:none tooltip inside its trigger, an onmouseover handler with a focus handler, and a page toast hidden by a timer
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking help</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
+        .tip-wrap { position: relative; display: inline-block; margin: 2rem 0; }
+        .tip { position: absolute; left: 0; top: 100%; width: 260px; padding: 0.75rem;
+               background: #1a1a1a; color: #ffffff; border-radius: 4px; display: none; z-index: 10; }
+        .tip-wrap:hover .tip, .tip-wrap.tip-open .tip { display: block; }
+        .tip-wrap.tip-dismissed .tip { display: none; }
+        .badge-wrap { position: relative; display: inline-block; margin: 2rem 0; }
+        .badge-tip { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+                     display: flex; align-items: center; justify-content: center;
+                     background: #12324f; color: #ffffff; opacity: 0; pointer-events: none; }
+        .badge-wrap:hover .badge-tip, .badge-wrap:focus-within .badge-tip { opacity: 1; }
+        .badge { padding: 0.75rem 1.5rem; border: 1px solid #12324f; background: #ffffff; font: inherit; }
+        #toast { background: #eef6ee; border: 1px solid #2d6a4f; padding: 0.75rem; margin: 1rem 0; }
+        .count { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Booking help</h1>
+
+        <div id="toast" role="status">Your seat is held for 10 minutes.</div>
+
+        <!-- Revealed on hover, and on focus by a script rather than a :focus rule.
+             The tooltip sits inside the hovered wrapper, so the pointer can reach
+             it, and Escape closes it even while the pointer stays on it. -->
+        <p class="tip-wrap">
+            <button type="button" id="fare-info" aria-describedby="fare-tip">Fare conditions</button>
+            <span class="tip" id="fare-tip">Changes are free up to 24 hours before departure. After that a fee of 15 euro applies.</span>
+        </p>
+
+        <!-- The revealed layer has pointer-events:none, but it covers its own
+             trigger, so moving the pointer onto it keeps the trigger hovered. -->
+        <p class="badge-wrap">
+            <button type="button" class="badge">Seat 14A</button>
+            <span class="badge-tip" aria-hidden="true">Window</span>
+        </p>
+
+        <!-- A mouseover handler paired with a focus handler -->
+        <p><span id="counter" tabindex="0" class="count" onmouseover="showSeats()">Seats left</span></p>
+        <p id="seats" hidden>4 seats left in this fare class.</p>
+    </main>
+
+    <script>
+        const wrap = document.querySelector('.tip-wrap');
+        document.getElementById('fare-info').addEventListener('focus', () => wrap.classList.add('tip-open'));
+        document.getElementById('fare-info').addEventListener('blur', () => wrap.classList.remove('tip-open'));
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            wrap.classList.remove('tip-open');
+            wrap.classList.add('tip-dismissed');
+        });
+        wrap.addEventListener('mouseleave', () => wrap.classList.remove('tip-dismissed'));
+
+        function showSeats() {
+            document.getElementById('seats').hidden = false;
+        }
+        const counter = document.getElementById('counter');
+        counter.addEventListener('focus', showSeats);
+        counter.addEventListener('blur', () => { document.getElementById('seats').hidden = true; });
+
+        setTimeout(() => {
+            const toast = document.getElementById('toast');
+            if (toast) toast.style.display = 'none';
+        }, 4000);
+    </script>
+</body>
+</html>

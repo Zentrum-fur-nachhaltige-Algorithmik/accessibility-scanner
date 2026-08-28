@@ -123,26 +123,9 @@ const FIXTURES = [
   {
     file: 'own-audit-ui.html',
     source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
-    // recorded: 28 total ensemble violations (profile=standard, --no-llm), 32 on
-    // another run; run-to-run drift is normal.
-    band: [14, 56],
+    // recorded: 4 total ensemble violations (profile=standard, --no-llm).
+    band: [2, 8],
     spotTruths: [
-      {
-        name: 'REGRESSION: language-detection completes without error',
-        kind: 'must-pass',
-        // This file reproduces the language-detection crash "Cannot read
-        // properties of undefined (reading 'map')". It is a real Next.js
-        // document: <html lang="de"> plus a hydrated <div id="__next"> whose
-        // child carries its own lang="en", <!-- --> hydration comment
-        // separators, and a <script id="__NEXT_DATA__" type="application/json">
-        // payload.
-        check: ({ scanners }) => {
-          const s = scanners['language-detection'];
-          if (!s) return 'language-detection missing from results entirely';
-          if (s.error) return `language-detection returned error: ${s.error}`;
-          return null;
-        },
-      },
       {
         name: 'REGRESSION: __next-route-announcer__ empty live region NOT flagged',
         kind: 'must-not-flag',
@@ -192,39 +175,14 @@ const FIXTURES = [
           );
         },
       },
-      {
-        name: 'REAL: <html lang="de"> contradicts English content / inner lang="en"',
-        kind: 'must-detect',
-        // The document declares German:
-        //   <html lang="de">
-        // but every word of content is English ("Web accessibility audit",
-        // "Enter the address of a publicly reachable page, choose a scan
-        // profile and start the audit.") and the hydrated wrapper immediately
-        // re-declares <div class="page" lang="en">. A page whose declared
-        // language is not the language of its content is WCAG 3.1.1 (and the
-        // nested contradiction is 3.1.2).
-        //
-        // Known gap: the ensemble does not detect this, so this assertion fails.
-        // It stays because the violation is real and hand-verified; it passes
-        // once language-detection compares declared vs. actual page language
-        // (or flags a child lang that contradicts <html lang>).
-        check: ({ violations }) => {
-          const hits = findViolations(violations, {
-            id: ['3.1.1', '3.1.2', 'html-lang', 'valid-lang', 'html-has-lang'],
-          });
-          if (hits.length > 0) return null;
-          return 'no 3.1.1/3.1.2 language violation reported despite lang="de" on an all-English page';
-        },
-      },
     ],
   },
 
   {
     file: 'med-theme.html',
     source: 'https://dr-mauermann-urologe.vercel.app',
-    // recorded: 44 total ensemble violations (profile=standard, --no-llm) on
-    // both runs.
-    band: [22, 88],
+    // recorded: 12 total ensemble violations (profile=standard, --no-llm).
+    band: [6, 24],
     spotTruths: [
       {
         name: 'REAL: heading level skips h2 -> h4',
@@ -294,9 +252,8 @@ const FIXTURES = [
   {
     file: 'beeproduced.html',
     source: 'https://beeproduced.com',
-    // recorded: 379 total ensemble violations (profile=standard, --no-llm), 436
-    // on a run where keyboard-navigation did not time out.
-    band: [189, 758],
+    // recorded: 58 total ensemble violations (profile=standard, --no-llm).
+    band: [29, 116],
     spotTruths: [
       {
         name: 'REGRESSION: axe-core survives the dead <iframe> and still reports',
@@ -390,9 +347,9 @@ const FIXTURES = [
   {
     file: 'wiki-medical-de.html',
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
-    // recorded: 1620 total ensemble violations (profile=standard, --no-llm),
-    // single run, 415.9s wall clock.
-    band: [810, 3240],
+    // recorded: 433 total ensemble violations (profile=standard, --no-llm),
+    // 281.5s wall clock.
+    band: [216, 866],
     spotTruths: [
       {
         name: 'REAL: images with no alt attribute at all',
@@ -532,9 +489,8 @@ const FIXTURES = [
   {
     file: 'modern-commercial.html',
     source: 'https://www.mozilla.org/de/',
-    // recorded: 223 total ensemble violations (profile=standard, --no-llm) on
-    // both runs.
-    band: [111, 446],
+    // recorded: 48 total ensemble violations (profile=standard, --no-llm).
+    band: [24, 96],
     spotTruths: [
       {
         name: 'REAL: a literal <blink> element in the navigation',
@@ -666,6 +622,374 @@ const FIXTURES = [
               .map((v) => `[${v.scannerId}/${v.ruleId || v.criterion}] ${v.description || v.issue}`)
               .join('; ')
           );
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'gov-uk-guide.html',
+    source: 'https://www.gov.uk/vehicle-tax',
+    // recorded: 3 total ensemble violations (profile=standard, --no-llm).
+    band: [1, 6],
+    spotTruths: [
+      {
+        name: 'REGRESSION: static prose about timeouts is not auto-updating content',
+        kind: 'must-not-flag',
+        // Nothing on this page updates itself. The section "If you live in
+        // Northern Ireland" used to make every ancestor of that sentence an
+        // auto-updating region without a pause control, because the word
+        // "live" appeared in the text.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: ['2.2.2'],
+            prose: ['auto-updating', 'pause or stop'],
+          });
+          if (hits.length === 0) return null;
+          return (
+            `${hits.length} auto-update finding(s) on a page with no auto-updating content: ` +
+            hits
+              .slice(0, 5)
+              .map((v) => `[${v.criterion}] ${v.element}`)
+              .join('; ')
+          );
+        },
+      },
+      {
+        name: 'REGRESSION: the spam honeypot field is not audited',
+        kind: 'must-not-flag',
+        // The feedback form carries
+        //   <div class="govuk-visually-hidden" aria-hidden="true">
+        //     <label for="giraffe">This field is for robots only. Please leave blank</label>
+        //     <input id="giraffe" name="giraffe" type="text" pattern=".{0}"
+        //       tabindex="-1" autocomplete="off">
+        // It is hidden from everyone and deliberately out of the tab order, so
+        // it needs no format hint and its tabindex is not a defect.
+        check: ({ violations }) => {
+          const hits = mentions(violations, '#giraffe');
+          if (hits.length === 0) return null;
+          return (
+            `${hits.length} finding(s) about the hidden honeypot input: ` +
+            hits.map((v) => `[${v.criterion || v.ruleId}] ${v.issue || v.description}`).join('; ')
+          );
+        },
+      },
+      {
+        name: 'REGRESSION: aria-autocomplete is a valid ARIA attribute',
+        kind: 'must-not-flag',
+        // The site search field declares
+        //   <input class="gem-c-search-with-autocomplete__input" role="combobox"
+        //     aria-autocomplete="list" aria-expanded="false" ...>
+        // aria-autocomplete has been part of WAI-ARIA since 1.0.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) =>
+            /aria-autocomplete/i.test(`${v.issue || ''} ${v.description || ''}`)
+          );
+          if (hits.length === 0) return null;
+          return `aria-autocomplete reported as invalid ${hits.length} time(s)`;
+        },
+      },
+      {
+        name: 'REGRESSION: the icon search button is not a 2.5.3 failure',
+        kind: 'must-not-flag',
+        // <button id="super-search-menu-toggle" aria-label="Show search menu">
+        //   <span class="govuk-visually-hidden">Search GOV.UK</span><svg .../>
+        // The only text in the button is screen-reader-only, so there is no
+        // visible label that the accessible name would have to contain.
+        check: ({ violations }) => {
+          const hits = mentions(violations, 'super-search-menu-toggle').filter((v) =>
+            /label|name/i.test(`${v.issue || ''} ${v.description || ''}`)
+          );
+          if (hits.length === 0) return null;
+          return `icon search button flagged: ${hits.map((v) => v.description || v.issue).join('; ')}`;
+        },
+      },
+      {
+        name: 'REAL: the accessibility statement link is dead in this snapshot',
+        kind: 'must-detect',
+        // The footer links /help/accessibility-statement, which is not part of
+        // the capture, so it answers 404. The finding must be about the broken
+        // link, not three claims about content nobody could read.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['EAA-Statement'] });
+          if (hits.length === 0) return 'no accessibility-statement finding at all';
+          const rules = new Set(hits.map((v) => v.issue));
+          if (!rules.has('inaccessible-statement'))
+            return `expected inaccessible-statement, got: ${[...rules].join(', ')}`;
+          return null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'webaim-article.html',
+    source: 'https://webaim.org/techniques/skipnav/',
+    // recorded: 33 total ensemble violations (profile=standard, --no-llm).
+    band: [16, 66],
+    spotTruths: [
+      {
+        name: 'REGRESSION: article links are not skip links',
+        kind: 'must-not-flag',
+        // The page is about skip links, so many of its links carry the word in
+        // their text or path, e.g.
+        //   <a href="/techniques/css/invisiblecontent/">Temporarily hidden skip links</a>
+        // Only the real skip link, <a href="#maincontent">, moves focus inside
+        // the page; a link to another page cannot point at a missing fragment.
+        check: ({ violations }) => {
+          const hits = violations.filter(
+            (v) => v.issue === 'skip-link' && /non-existent target/i.test(v.description || '')
+          );
+          if (hits.length === 0) return null;
+          return (
+            `${hits.length} article link(s) treated as broken skip links: ` +
+            hits.map((v) => v.description).join('; ')
+          );
+        },
+      },
+      {
+        name: 'REGRESSION: an article about accessibility is not an accessibility statement',
+        kind: 'must-not-flag',
+        // "Introduction to Web Accessibility" (/intro) was resolved as the
+        // site's accessibility statement and then audited for a review date, a
+        // conformance level and a contact point.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['EAA-Statement'] }).filter((v) =>
+            ['outdated-statement', 'incomplete-content', 'missing-contact'].includes(v.issue)
+          );
+          if (hits.length === 0) return null;
+          return `statement content audited although no statement is linked: ${hits.map((v) => v.issue).join(', ')}`;
+        },
+      },
+      {
+        name: 'REGRESSION: timing-controls completes without error',
+        kind: 'must-pass',
+        // The scanner dereferenced parentElement on the html element while
+        // walking every node of this page, and died with "Cannot read
+        // properties of null (reading 'querySelector')".
+        check: ({ scanners }) => {
+          const s = scanners['timing-controls'];
+          if (!s) return 'timing-controls missing from results entirely';
+          if (s.error) return `timing-controls returned error: ${s.error}`;
+          return null;
+        },
+      },
+      {
+        name: 'REAL: the WAVE url field has a low contrast boundary',
+        kind: 'must-detect',
+        // <input type="url" id="waveurl"> renders with a 1px #cccccc border
+        // against a #e5e6eb page background (1.29:1) and a white fill against
+        // that same background (1.25:1). Both are below the 3:1 that WCAG
+        // 1.4.11 asks of the visual boundary of a control.
+        check: ({ violations }) => {
+          const hits = mentions(violations, 'waveurl').filter((v) =>
+            /contrast/i.test(`${v.issue || ''} ${v.description || ''}`)
+          );
+          if (hits.length > 0) return null;
+          return 'no 1.4.11 finding for the #cccccc border of input#waveurl on #e5e6eb';
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'govuk-design-system.html',
+    source: 'https://design-system.service.gov.uk/components/text-input/',
+    // recorded: 31 total ensemble violations (profile=standard, --no-llm) on
+    // two runs of this file alone; in both, two exclusive scanners lost the 45s
+    // reload on this 811KB page and contributed nothing.
+    band: [15, 62],
+    spotTruths: [
+      {
+        name: 'REGRESSION: iframes are not reported as missing a focus indicator',
+        kind: 'must-not-flag',
+        // Every live example is an <iframe class="app-example__frame">. An
+        // iframe takes focus, but the ring the browser draws is inside the
+        // embedded document, where the host page's computed styles cannot see
+        // it, so its absence cannot be asserted from here.
+        check: ({ violations }) => {
+          const hits = violations.filter(
+            (v) =>
+              v.issue === 'no-visible-focus' &&
+              /iframe|iframeresizer/i.test(`${v.element || ''} ${v.selector || ''}`)
+          );
+          if (hits.length === 0) return null;
+          return `${hits.length} iframe(s) reported as having no focus indicator`;
+        },
+      },
+      {
+        name: 'REGRESSION: a dropdown panel is not an unlabelled accordion panel',
+        kind: 'must-not-flag',
+        // The mobile navigation toggles
+        //   <div id="app-mobile-navigation" ...>
+        // through aria-controls. A disclosure panel is not a landmark and needs
+        // no aria-labelledby of its own; only a panel with role="region" does.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) =>
+            /accordion panel/i.test(`${v.description || ''} ${v.issue || ''}`)
+          );
+          if (hits.length === 0) return null;
+          return `${hits.length} disclosure panel(s) reported as unlabelled accordion panels`;
+        },
+      },
+      {
+        name: 'REAL: the example tabs never say which tab is selected',
+        kind: 'must-detect',
+        // Each example is
+        //   <ul class="app-tabs" role="tablist">
+        //     <li role="presentation"><a role="tab" aria-controls="..."
+        //       aria-expanded="false">HTML</a></li>
+        //     ... Nunjucks ...
+        // The tabs use aria-expanded instead of aria-selected, so no tab in
+        // any tablist on the page is marked selected. WCAG 4.1.2.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) =>
+            /aria-selected|selected tab/i.test(`${v.description || ''} ${v.issue || ''}`)
+          );
+          if (hits.length > 0) return null;
+          return 'no finding about tabs without aria-selected';
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'a11y-project-checklist.html',
+    source: 'https://www.a11yproject.com/checklist/',
+    // recorded: 6 total ensemble violations (profile=standard, --no-llm).
+    band: [3, 12],
+    spotTruths: [
+      {
+        name: 'REGRESSION: a checklist about timeouts does not have a timeout',
+        kind: 'must-not-flag',
+        // The checklist item
+        //   <summary id="allow-extending-session-timeouts">
+        // made the page look like it ran a session that expires without warning
+        // and without a way to extend it. Nothing on the page counts down.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['2.2.1', '2.2.6'] });
+          if (hits.length === 0) return null;
+          return (
+            `${hits.length} time-limit finding(s) on a page with no time limit: ` +
+            hits.map((v) => `${v.issue}`).join(', ')
+          );
+        },
+      },
+      {
+        name: 'REGRESSION: the site name is not its accessibility statement',
+        kind: 'must-not-flag',
+        // The masthead link <a class="c-logo__link" href="/">The A11Y Project</a>
+        // matched the keyword "a11y" and was followed as the statement.
+        check: ({ violations }) => {
+          const hits = mentions(violations, 'c-logo__link');
+          if (hits.length === 0) return null;
+          return `the site logo link was audited as an accessibility statement: ${hits.map((v) => v.issue).join(', ')}`;
+        },
+      },
+      {
+        name: 'REAL: the skip link has no focus indicator of its own',
+        kind: 'must-detect',
+        // <a class="u-text-transform-uppercase c-skipnav" href="#main">Skip to
+        // content.</a> comes into view on focus but draws no outline, box
+        // shadow or background change (outline: none 0px, box-shadow: none,
+        // confirmed by a blur comparison). WCAG 2.4.7.
+        check: ({ violations }) => {
+          const hits = mentions(violations, 'c-skipnav').filter((v) =>
+            /focus/i.test(`${v.issue || ''} ${v.description || ''}`)
+          );
+          if (hits.length > 0) return null;
+          return 'no 2.4.7 finding for the skip link that shows no focus indicator';
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'broadcaster-news.html',
+    source: 'https://www.bbc.com/news',
+    // recorded: 75 total ensemble violations (profile=standard, --no-llm).
+    band: [37, 150],
+    spotTruths: [
+      {
+        name: 'REGRESSION: a described photograph is not a defect',
+        kind: 'must-not-flag',
+        // The front page carries around 20 <img class="Image-styles__ImageStyled...">
+        // whose alt text runs to 130 to 160 characters because the picture is
+        // worth describing. WCAG sets no length limit.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) =>
+            /alt text (is )?too long/i.test(`${v.issue || ''} ${v.description || ''}`)
+          );
+          if (hits.length === 0) return null;
+          return `${hits.length} descriptive alt attribute(s) reported as too long`;
+        },
+      },
+      {
+        name: 'REGRESSION: a photograph is not a complex data visualisation',
+        kind: 'must-not-flag',
+        // "photograph" contains "graph", which made every news picture a chart
+        // that needs a long description.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) => v.issue === 'complex-img-alt');
+          if (hits.length === 0) return null;
+          return `${hits.length} photograph(s) reported as complex images`;
+        },
+      },
+      {
+        name: 'REGRESSION: a display:none iframe needs no title',
+        kind: 'must-not-flag',
+        // The snapshot holds four <iframe> elements. The two without a title
+        // are the consent library's `__tcfapiLocator` and `__gppLocator`
+        // frames, both `style="display: none"`, so they are not in the
+        // accessibility tree and a name would never be announced. The two that
+        // are exposed both carry a title, and axe-core frame-title exempts the
+        // hidden ones.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) =>
+            /frame-title|frame or iframe lacks a title/i.test(
+              `${v.issue || ''} ${v.ruleId || ''} ${v.description || ''}`
+            )
+          );
+          if (hits.length === 0) return null;
+          return `${hits.length} hidden iframe(s) reported as lacking a title`;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'wiki-accessibility-en.html',
+    source: 'https://en.wikipedia.org/wiki/Web_accessibility',
+    // recorded: 139 total ensemble violations (profile=standard, --no-llm),
+    // 334.7s wall clock, axe-core answered "Page/Frame is not ready" in that run.
+    band: [69, 278],
+    spotTruths: [
+      {
+        name: 'REGRESSION: a link title that summarises its target is not 1.4.13 content',
+        kind: 'must-not-flag',
+        // Every article link carries a title with a summary of the target
+        // page, e.g. <a href="/wiki/Screen_reader" title="Screen reader">. The
+        // tooltip a browser draws from title is user agent content, and the
+        // links are named by their own text, so nothing here is content on
+        // hover that the user must be able to dismiss.
+        check: ({ violations }) => {
+          const hits = violations.filter((v) => v.issue === 'title-attribute-as-content');
+          if (hits.length <= 5) return null;
+          return `${hits.length} title attributes reported as hover content on a page of wiki links`;
+        },
+      },
+      {
+        name: 'REAL: the navbox view/talk/edit links read as "v", "t", "e"',
+        kind: 'must-detect',
+        // The template navboxes end with three single letter links
+        //   <a ...>v</a> <a ...>t</a> <a ...>e</a>
+        // whose purpose cannot be determined from their text. WCAG 2.4.4.
+        check: ({ violations }) => {
+          const hits = violations.filter(
+            (v) => v.issue === 'link-name-identifies-nothing' && /"[vte]"/.test(v.description || '')
+          );
+          if (hits.length > 0) return null;
+          return 'no 2.4.4 finding for the single letter navbox links';
         },
       },
     ],
@@ -859,6 +1183,16 @@ async function main() {
     const violations = result.violations || [];
     entry.totalViolations = violations.length;
     entry.scannerCount = Object.keys(scanners).length;
+    // Per-scanner violation counts: the band is a total, so a scanner that
+    // trades false positives for false negatives stays invisible in it. Read
+    // from the per-scanner summaries, because only axe-core stamps its id onto
+    // each violation.
+    entry.perScanner = {};
+    for (const [id, s] of Object.entries(scanners)) {
+      if (s && typeof s.violationCount === 'number' && s.violationCount > 0) {
+        entry.perScanner[id] = s.violationCount;
+      }
+    }
     entry.expectedScannerCount = outcome.expectedIds.length;
 
     for (const id of outcome.expectedIds) {

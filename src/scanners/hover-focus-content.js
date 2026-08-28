@@ -1,14 +1,16 @@
 /**
  * Hover/Focus Content Scanner.
  * WCAG 1.4.13 (EN 301 549 9.1.4.13).
- * Checks hover/focus-revealed content for dismissable, hoverable and persistent,
- * via a heuristic CSS/DOM pass plus interactive hover/focus simulation.
+ * Hovers the elements that can reveal content and measures the three
+ * requirements on what appears: hoverable, persistent, dismissable.
  */
-const fs = require('fs-extra');
-const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
+const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('hover-focus-content');
+
+/** Marks the trigger and the revealed content across page.evaluate calls. */
+const MARK = 'data-hover-focus-probe';
 
 class HoverFocusContentScanner extends BaseScanner {
   constructor() {
@@ -30,14 +32,13 @@ class HoverFocusContentScanner extends BaseScanner {
   }
 
   /**
-   * Heuristic scan: concurrent-compatible, pure CSS/DOM analysis
+   * Concurrent-compatible pass: the one 1.4.13 defect that is visible in the
+   * DOM without driving the pointer.
    */
   async heuristicScan(page) {
-    log.debug('Running heuristic hover/focus content check...');
-
-    const result = await page.evaluate((renderedCode) => {
-      eval(renderedCode);
-      const violations = [];
+    const violations = await page.evaluate((injectedCode) => {
+      eval(injectedCode);
+      const found = [];
 
       function getSelector(el) {
         return (
@@ -47,507 +48,89 @@ class HoverFocusContentScanner extends BaseScanner {
         );
       }
 
-      const norm = (sel) =>
-        sel
-          .replace(/\s+/g, ' ')
-          .replace(/\s*([>+~,])\s*/g, '$1')
-          .trim()
-          .toLowerCase();
-
-      /** Does this element currently count as NOT rendered (so a :hover rule could reveal it)? */
-      function isHiddenNow(el) {
-        if (!__isRendered(el)) return true;
-        const cs = window.getComputedStyle(el);
-        return cs.pointerEvents === 'none' && parseFloat(cs.opacity) === 0;
-      }
-
-      /** Would applying this declaration block to a hidden element make it rendered? */
-      function revealsHidden(style, el) {
-        const cs = window.getComputedStyle(el);
-        const reveals = [];
-        if (cs.display === 'none' && style.display && style.display !== 'none')
-          reveals.push('display');
-        if (
-          (cs.visibility === 'hidden' || cs.visibility === 'collapse') &&
-          style.visibility === 'visible'
-        )
-          reveals.push('visibility');
-        if (parseFloat(cs.opacity) === 0 && style.opacity && parseFloat(style.opacity) > 0)
-          reveals.push('opacity');
-        // Off-canvas brought on-canvas
-        for (const side of ['left', 'right', 'top', 'bottom']) {
-          const v = style[side];
-          if (!v) continue;
-          const cur = parseFloat(cs[side]);
-          if (
-            !isNaN(cur) &&
-            cur <= -Math.max(el.offsetWidth, el.offsetHeight, 50) &&
-            !String(v).trim().startsWith('-')
-          )
-            reveals.push(side);
-        }
-        if (
-          style.transform &&
-          cs.transform !== 'none' &&
-          (style.transform === 'none' || /translate[XY3d]*\(\s*0(px|%)?/.test(style.transform))
-        )
-          reveals.push('transform');
-        return reveals;
-      }
-
-      // 1. Walk every stylesheet once: collect :hover rules that REVEAL hidden targets,
-      //    and the normalized set of all :focus/:focus-within/:focus-visible selectors.
-      const hoverContentSelectors = [];
-      const focusSelectors = new Set();
-      const walk = (rules) => {
-        for (const rule of rules) {
-          if (rule.cssRules && !(rule instanceof CSSStyleRule)) {
-            try {
-              walk(rule.cssRules);
-            } catch (e) {
-              /* */
-            }
-            continue;
-          }
-          if (!(rule instanceof CSSStyleRule)) continue;
-          const sel = rule.selectorText || '';
-          if (!/:hover|:focus/i.test(sel)) continue;
-          const parts = sel.split(',').map((x) => x.trim());
-          for (const part of parts) {
-            if (/:focus(-within|-visible)?/i.test(part))
-              focusSelectors.add(norm(part.replace(/:focus(-within|-visible)?/gi, ':focus')));
-          }
-          for (const part of parts) {
-            if (!/:hover/i.test(part)) continue;
-            let targets;
-            try {
-              targets = document.querySelectorAll(part.replace(/:hover/gi, ''));
-            } catch (e) {
-              continue;
-            }
-            const revealed = [];
-            for (const t of targets) {
-              if (!isHiddenNow(t)) continue;
-              const r = revealsHidden(rule.style, t);
-              if (r.length) revealed.push({ el: t, via: r });
-            }
-            if (!revealed.length) continue;
-            const sameRuleFocus = parts.some((x) => /:focus/i.test(x));
-            hoverContentSelectors.push({
-              selector: part,
-              normalized: norm(part.replace(/:hover/gi, ':focus')),
-              type: 'hover',
-              hasFocusEquivalent: sameRuleFocus,
-              revealed: revealed.map((x) => getSelector(x.el)),
-              revealedEls: revealed.map((x) => x.el),
-            });
-          }
-        }
-      };
-      try {
-        for (const sheet of document.styleSheets) {
-          let rules;
-          try {
-            rules = sheet.cssRules || sheet.rules;
-          } catch (e) {
-            continue;
-          }
-          if (rules) walk(rules);
-        }
-      } catch (e) {
-        /* stylesheet access error */
-      }
-
-      // Focus equivalents may live in ANY sheet; compare normalized selectors.
-      for (const entry of hoverContentSelectors) {
-        if (entry.hasFocusEquivalent) continue;
-        if (focusSelectors.has(entry.normalized)) {
-          entry.hasFocusEquivalent = true;
-          continue;
-        }
-        // Also accept a :focus-within on any ancestor compound of the hover subject
-        // (e.g. ".menu:hover .sub" vs ".menu:focus-within .sub" already normalized above).
-      }
-
-      // Flag hover-only content (no focus equivalent)
-      for (const entry of hoverContentSelectors) {
-        if (!entry.hasFocusEquivalent) {
-          violations.push({
-            criterion: '9.1.4.13',
-            element: entry.selector,
-            issue: 'hover-only-no-focus',
-            description: `Content (${entry.revealed.slice(0, 3).join(', ')}) is revealed on :hover but has no :focus / :focus-within equivalent. Keyboard users cannot access it`,
-            severity: 'serious',
-            suggestion: 'Add a :focus or :focus-within CSS rule that shows the same content.',
-          });
-        }
-      }
-
-      // 2. pointer-events:none on hover-revealed elements
-      for (const entry of hoverContentSelectors) {
-        for (const el of entry.revealedEls) {
-          const style = window.getComputedStyle(el);
-          if (style.pointerEvents === 'none') {
-            violations.push({
-              criterion: '9.1.4.13',
-              element: getSelector(el),
-              issue: 'hover-content-not-hoverable',
-              description:
-                'Hover-revealed content has pointer-events:none. Users cannot move the pointer to read it',
-              severity: 'serious',
-              suggestion:
-                'Remove pointer-events:none from hover-revealed content to make it hoverable.',
-            });
-          }
-        }
-      }
-      for (const e of hoverContentSelectors) delete e.revealedEls;
-
-      // 3. Flag title attributes on interactive elements
-      const interactiveWithTitle = document.querySelectorAll(
+      // Controls whose only name is a title attribute.
+      //
+      // The tooltip a browser draws from `title` is user agent content, which
+      // 1.4.13 does not govern, and a link that carries its page summary in a
+      // title (every link on a MediaWiki page) is supplementary. What does
+      // fail is a control with no other name: its name appears only in a
+      // tooltip that a touch user never sees and a keyboard user cannot
+      // dismiss or hover.
+      const withTitle = document.querySelectorAll(
         'a[title], button[title], input[title], [role="button"][title], [tabindex][title]'
       );
-      interactiveWithTitle.forEach((el) => {
+      withTitle.forEach((el) => {
         if (!__isRendered(el)) return;
-        const title = el.getAttribute('title');
-        if (!title || title.length < 5) return; // Skip trivially short titles
-        const text = el.textContent.trim();
-        const ariaLabel = el.getAttribute('aria-label') || '';
-        if (text.includes(title) || ariaLabel.includes(title)) return; // info already accessible
+        const title = (el.getAttribute('title') || '').trim();
+        if (!title) return;
+        if ((__accessibleName(el) || '').trim() !== title) return;
 
-        violations.push({
+        // A wiki link is <a href="/wiki/X" title="X">X</a>: its name comes
+        // from its own text and merely happens to read like the title. The
+        // failure is a control with no other source of a name at all.
+        const labelledby = (el.getAttribute('aria-labelledby') || '')
+          .split(/\s+/)
+          .filter(Boolean)
+          .some((id) => document.getElementById(id));
+        const namedByImage = Array.from(el.querySelectorAll('img[alt], svg title')).some(
+          (child) => (child.getAttribute('alt') || child.textContent || '').trim().length > 0
+        );
+        const visible = __visibleLabelText(el);
+        const hasOtherName =
+          (visible && visible.full && visible.full.length > 0) ||
+          (el.getAttribute('aria-label') || '').trim().length > 0 ||
+          (el.getAttribute('value') || '').trim().length > 0 ||
+          labelledby ||
+          !!(el.labels && el.labels.length > 0) ||
+          namedByImage;
+        if (hasOtherName) return;
+
+        found.push({
           criterion: '9.1.4.13',
           element: getSelector(el),
           issue: 'title-attribute-as-content',
-          description: `title="${title.substring(0, 50)}..." conveys content that is not dismissable or hoverable`,
+          description: `The only name of this control is title="${title.substring(0, 50)}", which is readable only as a browser tooltip that cannot be hovered or dismissed`,
           severity: 'moderate',
           suggestion:
-            'Use a visible tooltip pattern instead of the title attribute, with Escape to dismiss.',
+            'Give the control a visible label or an aria-label, and keep the title for supplementary information only.',
         });
       });
 
-      // 4. Inline mouseenter/mouseover handlers without focus equivalents (rendered elements only)
-      document.querySelectorAll('[onmouseenter], [onmouseover]').forEach((el) => {
-        if (!__isRendered(el)) return;
-        const hasFocusHandler = el.hasAttribute('onfocus') || el.hasAttribute('onfocusin');
-        if (!hasFocusHandler) {
-          violations.push({
-            criterion: '9.1.4.13',
-            element: getSelector(el),
-            issue: 'hover-only-no-focus',
-            description:
-              'Element has mouseenter/mouseover handler but no focus handler. Content is not accessible via keyboard',
-            severity: 'serious',
-            suggestion:
-              'Add onfocus/onfocusin handlers that show the same content as the hover handler.',
-          });
-        }
-      });
-
-      // 5. setTimeout auto-dismiss patterns in inline scripts
-      let hasAutoClose = false;
-      document.querySelectorAll('script:not([src])').forEach((script) => {
-        const code = script.textContent || '';
-        const autoClosePattern =
-          /setTimeout\s*\([^)]*(?:display\s*=\s*['"]none|\.hide\(|\.remove\(|classList\.remove|\.close\(|opacity\s*=\s*['"]?0)/i;
-        if (autoClosePattern.test(code)) hasAutoClose = true;
-      });
-      if (hasAutoClose) {
-        violations.push({
-          criterion: '9.1.4.13',
-          element: 'script',
-          issue: 'hover-content-not-persistent',
-          description:
-            'JavaScript uses setTimeout to auto-hide content. Content is not persistent until the user dismisses it',
-          severity: 'serious',
-          suggestion:
-            'Remove auto-close timers. Content should remain visible until the user dismisses it or moves focus/pointer away.',
-        });
-      }
-
-      // Dismissability (Escape) is only decided by the interactive path in fullScan():
-      // grepping inline scripts for "Escape" is blind to external bundles and produced
-      // a page-level false positive on nearly every real site (FP-11).
-      const hasEscapeHandler = null;
-
-      return {
-        violations,
-        hoverSelectors: hoverContentSelectors.map((e) => e.selector),
-        hoverContentCount: hoverContentSelectors.length,
-        hasAutoClose,
-        hasEscapeHandler,
-      };
-    }, renderedCode);
+      return found;
+    }, `${renderedCode}\n${accnameCode}`);
 
     return {
       scannerId: this.id,
       criteria: ['9.1.4.13'],
-      passed: result.violations.length === 0,
-      violations: result.violations,
-      hoverSelectors: result.hoverSelectors || [],
-      summary: {
-        heuristicOnly: true,
-        hoverContentCount: result.hoverContentCount,
-        hasAutoClose: result.hasAutoClose,
-        hasEscapeHandler: result.hasEscapeHandler,
-        violationCount: result.violations.length,
-      },
+      passed: violations.length === 0,
+      violations,
+      summary: { heuristicOnly: true, violationCount: violations.length },
     };
   }
 
   /**
-   * Full interactive scan: hover and focus elements to test dismissable/hoverable/persistent
+   * Interactive pass: hover every element that can reveal content and measure
+   * what appears.
    */
   async fullScan(page, options = {}) {
-    const screenshotDir = options.screenshotDir || this.screenshotDir;
-    await fs.ensureDir(screenshotDir);
-    const timestamp = Date.now();
-    const scanDir = path.join(screenshotDir, `hover-focus-scan-${timestamp}`);
-    await fs.ensureDir(scanDir);
-
-    log.debug('Running full interactive hover/focus content check...');
-
-    // Run heuristic first to collect violations and identify hover content
     const heuristicResult = await this.heuristicScan(page);
     const violations = [...heuristicResult.violations];
 
-    // Find hover-triggered elements to test interactively: subjects of the CSS
-    // :hover rules that reveal content, plus the usual class-name candidates.
-    const hoverTriggers = await page.evaluate(
-      (renderedCode, hoverSelectors) => {
-        eval(renderedCode);
-        const triggers = [];
-        const seen = new Set();
-        const sel = (el) =>
-          el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string'
-            ? `.${el.className.split(' ')[0]}`
-            : '');
-        const add = (el) => {
-          if (seen.has(el) || !__isRendered(el)) return;
-          seen.add(el);
-          const rect = el.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return;
-          triggers.push({
-            selector: sel(el),
-            rect: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
-          });
-        };
-        for (const hs of hoverSelectors) {
-          // subject = compound that carries :hover
-          const m = hs.match(/^(.*?)(?=:hover)/i);
-          if (!m) continue;
-          try {
-            document.querySelectorAll(m[1].trim() || '*').forEach(add);
-          } catch (e) {
-            /* */
-          }
-        }
-        document
-          .querySelectorAll(
-            '[class*="tooltip"], [class*="dropdown"], [class*="popup"], [class*="popover"], [data-tooltip], [aria-describedby]'
-          )
-          .forEach(add);
-        return triggers.slice(0, 10);
-      },
-      renderedCode,
-      heuristicResult.hoverSelectors || []
-    );
+    const triggers = await this.collectTriggers(page);
+    log.debug(`Hovering ${triggers.length} candidate trigger(s)`);
 
-    const snapshotScript = `
-      (function () {
-        const out = [];
-        for (const el of document.querySelectorAll('body *')) {
-          if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE') continue;
-          out.push(el.checkVisibility ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) : (el.offsetWidth > 0 || el.offsetHeight > 0));
-        }
-        return out;
-      })()
-    `;
-
-    // Test each hover trigger interactively
-    for (const trigger of hoverTriggers) {
+    for (const trigger of triggers) {
       try {
-        // Pre/post diff: which elements became rendered because of the hover?
-        await page.mouse.move(0, 0);
-        await new Promise((resolve) => setTimeout(resolve, 250));
-        const before = await page.evaluate(snapshotScript);
-        await page.mouse.move(trigger.rect.x, trigger.rect.y);
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        const hoverContent = await page.evaluate(
-          (beforeVis, triggerSel) => {
-            const els = [...document.querySelectorAll('body *')].filter(
-              (el) => el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE'
-            );
-            const trigger = document.querySelector(triggerSel);
-            for (let i = 0; i < els.length && i < beforeVis.length; i++) {
-              const el = els[i];
-              const vis = el.checkVisibility
-                ? el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
-                : el.offsetWidth > 0 || el.offsetHeight > 0;
-              if (vis && !beforeVis[i]) {
-                // outermost newly revealed element
-                if (
-                  el.parentElement &&
-                  els.indexOf(el.parentElement) !== -1 &&
-                  !beforeVis[els.indexOf(el.parentElement)]
-                )
-                  continue;
-                const rect = el.getBoundingClientRect();
-                if (rect.width === 0 || rect.height === 0) continue;
-                if (trigger && trigger === el) continue;
-                // 1.4.13 exception: dismissal is only required when the revealed
-                // content obscures or replaces OTHER content. Check whether any
-                // unrelated rendered text sits under the revealed box.
-                let obscures = false;
-                const pad = 2;
-                for (const other of els) {
-                  if (other === el || el.contains(other) || other.contains(el)) continue;
-                  if (
-                    !(other.checkVisibility
-                      ? other.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
-                      : other.offsetWidth > 0)
-                  )
-                    continue;
-                  const hasOwnText = [...other.childNodes].some(
-                    (n) => n.nodeType === 3 && n.textContent.trim()
-                  );
-                  const isGraphic = /^(img|svg|video|canvas|input|button|select|textarea)$/i.test(
-                    other.tagName
-                  );
-                  if (!hasOwnText && !isGraphic) continue;
-                  const o = other.getBoundingClientRect();
-                  if (o.width === 0 || o.height === 0) continue;
-                  if (
-                    o.left < rect.right - pad &&
-                    o.right > rect.left + pad &&
-                    o.top < rect.bottom - pad &&
-                    o.bottom > rect.top + pad
-                  ) {
-                    obscures = true;
-                    break;
-                  }
-                }
-                // A close control inside the revealed content is an accepted dismiss mechanism.
-                const revealedAll = els.filter(
-                  (x, j) =>
-                    j < beforeVis.length &&
-                    !beforeVis[j] &&
-                    (x.checkVisibility
-                      ? x.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })
-                      : x.offsetWidth > 0)
-                );
-                const controls = new Set();
-                for (const r of revealedAll) {
-                  if (r.matches('button, [role="button"], a[href]')) controls.add(r);
-                  r.querySelectorAll('button, [role="button"], a[href]').forEach((c) =>
-                    controls.add(c)
-                  );
-                }
-                const hasCloseControl = [...controls].some((b) => {
-                  const name = (
-                    (b.getAttribute('aria-label') || '') +
-                    ' ' +
-                    (b.textContent || '') +
-                    ' ' +
-                    (b.className || '')
-                  ).toLowerCase();
-                  return /close|schlie|dismiss|×|✕|✖/.test(name);
-                });
-                return {
-                  found: true,
-                  obscures,
-                  hasCloseControl,
-                  contentRect: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
-                  contentSelector:
-                    el.tagName.toLowerCase() +
-                    (el.id ? `#${el.id}` : '') +
-                    (el.className && typeof el.className === 'string'
-                      ? `.${el.className.split(' ')[0]}`
-                      : ''),
-                };
-              }
-            }
-            return { found: false };
-          },
-          before,
-          trigger.selector
-        );
-
-        if (hoverContent && hoverContent.found) {
-          // Test hoverable: move pointer to the revealed content
-          await page.mouse.move(hoverContent.contentRect.x, hoverContent.contentRect.y);
-          await new Promise((resolve) => setTimeout(resolve, 300));
-
-          const contentStillVisible = await page.evaluate((contentSel) => {
-            const el = document.querySelector(contentSel);
-            if (!el) return false;
-            const style = window.getComputedStyle(el);
-            return (
-              style.display !== 'none' &&
-              style.visibility !== 'hidden' &&
-              parseFloat(style.opacity) > 0
-            );
-          }, hoverContent.contentSelector);
-
-          if (!contentStillVisible) {
-            // Check if already flagged by heuristic
-            const alreadyFlagged = violations.some(
-              (v) =>
-                v.issue === 'hover-content-not-hoverable' &&
-                v.element === hoverContent.contentSelector
-            );
-            if (!alreadyFlagged) {
-              violations.push({
-                criterion: '9.1.4.13',
-                element: hoverContent.contentSelector,
-                issue: 'hover-content-not-hoverable',
-                description:
-                  'Hover-triggered content disappears when the pointer moves to it. Content is not hoverable',
-                severity: 'serious',
-                suggestion:
-                  'Ensure hover content remains visible when the pointer moves from trigger to content.',
-              });
-            }
-          }
-
-          // Test dismissable: press Escape
-          await page.mouse.move(trigger.rect.x, trigger.rect.y);
-          await new Promise((resolve) => setTimeout(resolve, 400));
-          await page.keyboard.press('Escape');
-          await new Promise((resolve) => setTimeout(resolve, 300));
-
-          const dismissedByEscape = await page.evaluate((contentSel) => {
-            const el = document.querySelector(contentSel);
-            if (!el) return true;
-            const style = window.getComputedStyle(el);
-            return (
-              style.display === 'none' ||
-              style.visibility === 'hidden' ||
-              parseFloat(style.opacity) === 0
-            );
-          }, hoverContent.contentSelector);
-
-          if (!dismissedByEscape && hoverContent.obscures && !hoverContent.hasCloseControl) {
-            const alreadyFlagged = violations.some(
-              (v) => v.issue === 'hover-content-not-dismissable' && v.element !== 'document'
-            );
-            if (!alreadyFlagged) {
-              violations.push({
-                criterion: '9.1.4.13',
-                element: trigger.selector,
-                issue: 'hover-content-not-dismissable',
-                description: `Hover-triggered content (${hoverContent.contentSelector}) obscures other content and is not dismissed by pressing Escape`,
-                severity: 'serious',
-                suggestion:
-                  'Add Escape key handler to dismiss hover/focus-triggered content without moving the pointer.',
-              });
-            }
-          }
-        }
+        const finding = await this.probeTrigger(page, trigger);
+        violations.push(...finding);
       } catch (error) {
-        log.warn(`Error testing hover trigger ${trigger.selector}:`, error.message);
+        log.warn(`Error hovering ${trigger.selector}: ${error.message}`);
+      } finally {
+        await page
+          .evaluate((mark) => {
+            document.querySelectorAll(`[${mark}]`).forEach((el) => el.removeAttribute(mark));
+          }, MARK)
+          .catch(() => {});
       }
     }
 
@@ -557,13 +140,285 @@ class HoverFocusContentScanner extends BaseScanner {
       passed: violations.length === 0,
       violations,
       summary: {
-        hoverTriggersFound: hoverTriggers.length,
-        heuristicViolations: heuristicResult.violations.length,
-        interactiveViolations: violations.length - heuristicResult.violations.length,
+        triggersHovered: triggers.length,
         violationCount: violations.length,
       },
-      screenshotPath: scanDir,
     };
+  }
+
+  /**
+   * Elements that can reveal content under the pointer: the subject of a
+   * `:hover` rule that changes what is painted, an element with a mouseenter
+   * or mouseover handler attribute, and a control that describes itself
+   * through an element which is not painted yet.
+   */
+  async collectTriggers(page) {
+    return page.evaluate((injectedCode) => {
+      eval(injectedCode);
+
+      const REVEALING_PROPERTIES = [
+        'display',
+        'visibility',
+        'opacity',
+        'transform',
+        'left',
+        'right',
+        'top',
+        'bottom',
+        'height',
+        'max-height',
+        'width',
+        'max-width',
+        'clip',
+        'clip-path',
+        'pointer-events',
+      ];
+
+      const subjects = new Set();
+      const walk = (rules) => {
+        for (const rule of rules) {
+          if (rule.cssRules && !(rule instanceof CSSStyleRule)) {
+            try {
+              walk(rule.cssRules);
+            } catch (e) {
+              /* unreadable nested sheet */
+            }
+            continue;
+          }
+          if (!(rule instanceof CSSStyleRule)) continue;
+          const selector = rule.selectorText || '';
+          if (!/:hover/i.test(selector)) continue;
+          const changesPaint = REVEALING_PROPERTIES.some((p) => rule.style.getPropertyValue(p));
+          if (!changesPaint) continue;
+          for (const part of selector.split(',')) {
+            const i = part.toLowerCase().indexOf(':hover');
+            if (i < 0) continue;
+            const subject = part.slice(0, i).trim();
+            if (!subject) continue;
+            try {
+              document.querySelectorAll(subject).forEach((el) => subjects.add(el));
+            } catch (e) {
+              /* selector this document cannot parse */
+            }
+          }
+        }
+      };
+      for (const sheet of document.styleSheets) {
+        let rules;
+        try {
+          rules = sheet.cssRules || sheet.rules;
+        } catch (e) {
+          continue; // cross-origin stylesheet
+        }
+        if (rules) walk(rules);
+      }
+
+      document.querySelectorAll('[onmouseenter], [onmouseover]').forEach((el) => subjects.add(el));
+
+      document.querySelectorAll('[aria-describedby]').forEach((el) => {
+        const describedBy = (el.getAttribute('aria-describedby') || '')
+          .split(/\s+/)
+          .filter(Boolean);
+        const hidden = describedBy
+          .map((id) => document.getElementById(id))
+          .filter(Boolean)
+          .some((target) => !__isRendered(target));
+        if (hidden) subjects.add(el);
+      });
+
+      const triggers = [];
+      for (const el of subjects) {
+        if (triggers.length >= 10) break;
+        if (!__isRendered(el)) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) continue;
+        if (rect.bottom < 0 || rect.top > window.innerHeight) continue; // outside the viewport
+        triggers.push({
+          selector:
+            el.tagName.toLowerCase() +
+            (el.id ? `#${el.id}` : '') +
+            (el.className && typeof el.className === 'string'
+              ? `.${el.className.split(' ')[0]}`
+              : ''),
+          point: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
+        });
+      }
+      return triggers;
+    }, renderedCode);
+  }
+
+  /**
+   * One trigger: hover it, find what appears, then measure whether the content
+   * survives the pointer moving onto it, whether it stays while the pointer
+   * rests on the trigger, and whether Escape dismisses it.
+   */
+  async probeTrigger(page, trigger) {
+    const violations = [];
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    await page.mouse.move(0, 0);
+    await wait(250);
+    const before = await page.evaluate(this.constructor.paintedSnapshotScript);
+
+    await page.mouse.move(trigger.point.x, trigger.point.y);
+    await wait(500);
+
+    const content = await page.evaluate(
+      (beforePainted, mark, injectedCode) => {
+        eval(injectedCode);
+        const elements = Array.from(document.querySelectorAll('body *')).filter(
+          (el) => el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE'
+        );
+        const painted = (el) => __isRendered(el);
+
+        for (let i = 0; i < elements.length && i < beforePainted.length; i++) {
+          const el = elements[i];
+          if (!painted(el) || beforePainted[i]) continue;
+          // Report the outermost newly painted element only.
+          const parentIndex = el.parentElement ? elements.indexOf(el.parentElement) : -1;
+          if (
+            parentIndex !== -1 &&
+            parentIndex < beforePainted.length &&
+            !beforePainted[parentIndex]
+          )
+            continue;
+          const rect = el.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) continue;
+
+          // 1.4.13 asks for a dismiss mechanism only when the additional
+          // content obscures or replaces other content.
+          let obscures = false;
+          const pad = 2;
+          for (const other of elements) {
+            if (other === el || el.contains(other) || other.contains(el)) continue;
+            if (!painted(other)) continue;
+            const hasOwnText = Array.from(other.childNodes).some(
+              (n) => n.nodeType === 3 && n.textContent.trim()
+            );
+            const isGraphic = /^(img|svg|video|canvas|input|button|select|textarea)$/i.test(
+              other.tagName
+            );
+            if (!hasOwnText && !isGraphic) continue;
+            const o = other.getBoundingClientRect();
+            if (o.width === 0 || o.height === 0) continue;
+            if (
+              o.left < rect.right - pad &&
+              o.right > rect.left + pad &&
+              o.top < rect.bottom - pad &&
+              o.bottom > rect.top + pad
+            ) {
+              obscures = true;
+              break;
+            }
+          }
+
+          // A control that closes the content is itself a dismiss mechanism.
+          const controls = [el, ...el.querySelectorAll('button, [role="button"], a[href]')];
+          const hasCloseControl = controls.some((c) => {
+            if (!c.matches || !c.matches('button, [role="button"], a[href]')) return false;
+            const name = `${c.getAttribute('aria-label') || ''} ${c.textContent || ''} ${
+              typeof c.className === 'string' ? c.className : ''
+            }`.toLowerCase();
+            return /close|schlie|dismiss|×|✕|✖/.test(name);
+          });
+
+          el.setAttribute(mark, 'content');
+          return {
+            found: true,
+            obscures,
+            hasCloseControl,
+            point: { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 },
+            selector:
+              el.tagName.toLowerCase() +
+              (el.id ? `#${el.id}` : '') +
+              (el.className && typeof el.className === 'string'
+                ? `.${el.className.split(' ')[0]}`
+                : ''),
+          };
+        }
+        return { found: false };
+      },
+      before,
+      MARK,
+      renderedCode
+    );
+
+    if (!content.found) return violations;
+
+    const stillPainted = async () =>
+      page.evaluate(
+        (mark, injectedCode) => {
+          eval(injectedCode);
+          const el = document.querySelector(`[${mark}="content"]`);
+          return !!el && __isRendered(el);
+        },
+        MARK,
+        renderedCode
+      );
+
+    // Hoverable: the pointer moves from the trigger onto the content.
+    await page.mouse.move(content.point.x, content.point.y);
+    await wait(300);
+    if (!(await stillPainted())) {
+      violations.push({
+        criterion: '9.1.4.13',
+        element: content.selector,
+        issue: 'hover-content-not-hoverable',
+        description: `Content revealed by hovering ${trigger.selector} disappears as soon as the pointer moves onto it, so it cannot be read or used`,
+        severity: 'serious',
+        suggestion:
+          'Keep the content visible while the pointer is over the trigger or over the content itself.',
+      });
+      return violations;
+    }
+
+    // Persistent: the content stays while the pointer rests on the trigger.
+    await page.mouse.move(trigger.point.x, trigger.point.y);
+    await wait(1500);
+    if (!(await stillPainted())) {
+      violations.push({
+        criterion: '9.1.4.13',
+        element: content.selector,
+        issue: 'hover-content-not-persistent',
+        description: `Content revealed by hovering ${trigger.selector} disappears on its own while the pointer is still on the trigger`,
+        severity: 'serious',
+        suggestion:
+          'Keep the content visible until the pointer leaves, the user dismisses it, or the information becomes invalid.',
+      });
+      return violations;
+    }
+
+    // Dismissable: Escape, without moving the pointer.
+    await page.keyboard.press('Escape');
+    await wait(300);
+    if ((await stillPainted()) && content.obscures && !content.hasCloseControl) {
+      violations.push({
+        criterion: '9.1.4.13',
+        element: content.selector,
+        issue: 'hover-content-not-dismissable',
+        description: `Content revealed by hovering ${trigger.selector} covers other content, is not dismissed by Escape and offers no control to close it`,
+        severity: 'serious',
+        suggestion:
+          'Dismiss the content on Escape, or give it a close control, while the pointer stays where it is.',
+      });
+    }
+
+    return violations;
+  }
+
+  /** Painted state of every element under <body>, in document order. */
+  static get paintedSnapshotScript() {
+    return `
+      (function () {
+        ${renderedCode}
+        const out = [];
+        for (const el of document.querySelectorAll('body *')) {
+          if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE') continue;
+          out.push(__isRendered(el));
+        }
+        return out;
+      })()
+    `;
   }
 }
 

@@ -1,0 +1,69 @@
+<!-- WCAG-TEST
+criterion: 4.1.3
+level: AA
+title: Status Messages
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: dynamic-spa
+description: Static account controls whose class names contain the letters of "count", and a real notification counter that does announce its updates
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account menu and notification counter</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 44rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      .AccountButtonsContainer {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .AccountButtonsContainer a {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #666;
+        text-decoration: none;
+        color: #1a1a1a;
+      }
+      .notification-count {
+        display: inline-block;
+        min-width: 1.5rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 1rem;
+        background: #0b0c0c;
+        color: #fff;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <!-- "Account" contains the letters of "count" and is not a counter. -->
+      <div class="AccountButtonsContainer">
+        <a href="/register">Register</a>
+        <a href="/sign-in">Sign in</a>
+      </div>
+    </header>
+
+    <main>
+      <h1>Account menu and notification counter</h1>
+      <p>
+        <span class="notification-count" aria-live="polite">3</span>
+        unread notifications
+      </p>
+      <p>
+        The badge above is a real counter and announces its updates. The account links beside the
+        masthead are ordinary navigation.
+      </p>
+    </main>
+  </body>
+</html>

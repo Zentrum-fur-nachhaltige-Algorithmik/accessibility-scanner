@@ -8,15 +8,12 @@
 const ColorContrastScanner = require('../scanners/color-contrast');
 const UseOfColorScanner = require('../scanners/use-of-color');
 const ImagesOfTextScanner = require('../scanners/images-of-text');
-const AdvancedContrastScanner = require('../scanners/advanced-contrast');
 const NonTextContrastScanner = require('../scanners/nontext-contrast');
 const TextResizeScanner = require('../scanners/text-resize');
 const ScreenReaderScanner = require('../scanners/screen-reader');
 const MediaAccessibilityScanner = require('../scanners/media-accessibility');
-const LanguageDetectionScanner = require('../scanners/language-detection');
 const PredictableNavigationScanner = require('../scanners/predictable-navigation');
 const ErrorHandlingScanner = require('../scanners/error-handling');
-const HTMLValidationScanner = require('../scanners/html-validation');
 const PageStructureScanner = require('../scanners/page-structure');
 const SeizurePreventionScanner = require('../scanners/seizure-prevention');
 const TimingControlsScanner = require('../scanners/timing-controls');
@@ -24,14 +21,10 @@ const LabelInNameScanner = require('../scanners/label-in-name');
 const StatusMessagesScanner = require('../scanners/status-messages');
 const AdvancedAriaScanner = require('../scanners/advanced-aria');
 const AccessibilityStatementScanner = require('../scanners/accessibility-statement');
-const ContactMechanismScanner = require('../scanners/contact-mechanism');
-const ComplianceMonitoringScanner = require('../scanners/compliance-monitoring');
-const EAAProcedureScanner = require('../scanners/eaa-procedure');
 const KeyboardNavigationScanner = require('../scanners/keyboard-navigation');
 const FocusManagementScanner = require('../scanners/focus-management');
 const InputModalitiesScanner = require('../scanners/input-modalities');
 const ResponsiveDesignScanner = require('../scanners/responsive-design');
-const MobileSpecificScanner = require('../scanners/mobile-specific');
 const DynamicSPAScanner = require('../scanners/dynamic-spa');
 const MultipleWaysScanner = require('../scanners/multiple-ways');
 const OrientationScanner = require('../scanners/orientation');
@@ -94,17 +87,14 @@ function createAllScanners({ llmClient } = {}) {
     new ColorContrastScanner(),
     new UseOfColorScanner(),
     new ImagesOfTextScanner(),
-    new AdvancedContrastScanner(),
     new NonTextContrastScanner(),
     new TextResizeScanner(),
     new ScreenReaderScanner(),
     new MediaAccessibilityScanner(),
     new OrientationScanner(),
     new InputPurposeScanner(),
-    new LanguageDetectionScanner(),
     new PredictableNavigationScanner(),
     new ErrorHandlingScanner(),
-    new HTMLValidationScanner(),
     new PageStructureScanner(),
     new LabelInNameScanner(),
     new StatusMessagesScanner(),
@@ -116,14 +106,10 @@ function createAllScanners({ llmClient } = {}) {
     new FocusManagementScanner(),
     new InputModalitiesScanner(),
     new ResponsiveDesignScanner(),
-    new MobileSpecificScanner(),
     new HoverFocusContentScanner(),
     new ConcurrentInputScanner(),
     new DynamicSPAScanner(),
     new AccessibilityStatementScanner(),
-    new ContactMechanismScanner(),
-    new ComplianceMonitoringScanner(),
-    new EAAProcedureScanner(),
   ];
 
   const llmScanners = createLLMScanners({ llmClient });
@@ -149,14 +135,11 @@ const PROFILES = {
     'color-contrast',
     'use-of-color',
     'images-of-text',
-    'advanced-contrast',
     'nontext-contrast',
     'screen-reader',
     'media-accessibility',
-    'language-detection',
     'predictable-navigation',
     'error-handling',
-    'html-validation',
     'page-structure',
     'label-in-name',
     'status-messages',
@@ -173,18 +156,15 @@ const PROFILES = {
   ],
   standard: [
     'axe-core',
-    // Everything except text-resize, mobile-specific
+    // Everything except text-resize
     'color-contrast',
     'use-of-color',
     'images-of-text',
-    'advanced-contrast',
     'nontext-contrast',
     'screen-reader',
     'media-accessibility',
-    'language-detection',
     'predictable-navigation',
     'error-handling',
-    'html-validation',
     'page-structure',
     'label-in-name',
     'status-messages',
@@ -201,9 +181,6 @@ const PROFILES = {
     'concurrent-input',
     'dynamic-spa',
     'accessibility-statement',
-    'contact-mechanism',
-    'compliance-monitoring',
-    'eaa-procedure',
     'multiple-ways',
     'llm-sensory-characteristics',
     // The axe `incomplete` adjudicator belongs in `standard`: it turns

@@ -1,0 +1,64 @@
+<!-- WCAG-TEST
+criterion: 2.4.2, 2.4.3
+level: A
+title: Client side routing that keeps the old title and destroys focus
+test_type: bad
+expected_violations: 2
+testable_by: dom
+scanners: dynamic-spa
+description: A router that calls history.pushState, re-renders the whole application shell including the navigation, never touches document.title and moves focus nowhere. The activated link is removed from the document, so focus falls back to the body.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field guide</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; line-height: 1.5; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a { color: #0b4f6c; }
+  a:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  nav a { margin-right: 16px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+  var ROUTES = ['home', 'products', 'contact'];
+  var LABELS = { home: 'Home', products: 'Products', contact: 'Contact' };
+
+  function render(route) {
+    var nav = ROUTES.map(function (name) {
+      return '<a href="?route=' + name + '" data-route="' + name + '">' + LABELS[name] + '</a>';
+    }).join('');
+    // The whole shell is replaced, so the link that was activated (and had
+    // focus) is removed from the document.
+    document.getElementById('app').innerHTML =
+      '<nav aria-label="Main">' + nav + '</nav>' +
+      '<main><h1>' + LABELS[route] + '</h1><p>The ' + LABELS[route] + ' route.</p></main>';
+    bind();
+    // No document.title update and no focus target: focus ends up on the body.
+  }
+
+  function bind() {
+    document.querySelectorAll('a[data-route]').forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        var route = link.getAttribute('data-route');
+        history.pushState({ route: route }, '', '?route=' + route);
+        render(route);
+      });
+    });
+  }
+
+  window.addEventListener('popstate', function () {
+    var params = new URLSearchParams(location.search);
+    render(params.get('route') || 'home');
+  });
+
+  render('home');
+</script>
+</body>
+</html>

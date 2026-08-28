@@ -1,0 +1,167 @@
+<!-- WCAG-TEST
+criterion: 2.3.1, 2.3.2
+level: A
+title: Three Flashes or Below Threshold
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: seizure-prevention
+description: Short fade-ins, a loading spinner and elements whose class names contain flash, blink, red or error, none of which flashes
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Short animations that do not flash</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+        color: #1a1a1a;
+        background: #ffffff;
+        line-height: 1.6;
+      }
+
+      /* A 0.2s fade-in: one opacity ramp, no repeat, no flash. */
+      .dropdown-panel {
+        animation: fade-in 0.2s ease-out;
+        border: 1px solid #767676;
+        padding: 12px;
+        max-width: 24rem;
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* A 0.25s spinner: it rotates, its colour never changes. */
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 4px solid #c8c8c8;
+        border-top-color: #1a5490;
+        border-radius: 50%;
+        animation: spin 0.25s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Class names containing "flash", "blink", "red" and "error". */
+      .flash-sale-banner {
+        background: #fff4e5;
+        border-left: 4px solid #a15c00;
+        padding: 12px;
+        margin: 16px 0;
+        animation: fade-in 0.18s ease-out;
+      }
+      .flashcard {
+        display: inline-block;
+        border: 1px solid #767676;
+        padding: 8px 12px;
+        transition: transform 0.15s ease;
+      }
+      .blinker-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background: #1a5490;
+        border-radius: 50%;
+      }
+      .hundred-club {
+        border: 1px solid #767676;
+        padding: 12px;
+        margin: 16px 0;
+        animation: slide-in 0.3s ease-out;
+      }
+      .error-message {
+        background: #fdeaea;
+        border-left: 4px solid #b3261e;
+        padding: 12px;
+        margin: 16px 0;
+        animation: slide-in 0.3s ease-out;
+      }
+      @keyframes slide-in {
+        from {
+          transform: translateY(-8px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      /* A 2s pulse: 0.5 Hz, far below the 3 Hz threshold. */
+      .status-pulse {
+        width: 200px;
+        height: 100px;
+        background: #1a5490;
+        color: #ffffff;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.75;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .dropdown-panel,
+        .flash-sale-banner,
+        .hundred-club,
+        .error-message,
+        .spinner,
+        .status-pulse,
+        .flashcard {
+          animation: none;
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Short animations that do not flash</h1>
+
+    <div class="dropdown-panel">
+      <p>This panel fades in over 0.2 seconds when it opens. It changes brightness once.</p>
+    </div>
+
+    <h2>Loading</h2>
+    <div class="spinner" role="img" aria-label="Loading"></div>
+
+    <div class="flash-sale-banner">
+      <p>Flash sale: 20 percent off until Friday. The banner slides in once.</p>
+    </div>
+
+    <p><span class="flashcard">Vocabulary card</span> <span class="blinker-indicator"></span></p>
+
+    <div class="hundred-club">
+      <p>Hundred club: members who have completed one hundred courses.</p>
+    </div>
+
+    <div class="error-message" role="alert">
+      <p>Please enter a valid email address.</p>
+    </div>
+
+    <h2>Status</h2>
+    <div class="status-pulse">Live status</div>
+
+    <p style="color: #b3261e">This paragraph uses a red text colour and never animates.</p>
+  </body>
+</html>

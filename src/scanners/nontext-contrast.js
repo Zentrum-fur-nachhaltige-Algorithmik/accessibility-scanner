@@ -126,6 +126,17 @@ class NonTextContrastScanner extends BaseScanner {
           return 'rgb(' + c.r + ', ' + c.g + ', ' + c.b + ')';
         }
 
+        // Name the reported element the way a reader can find it again. Only
+        // ever used for reporting, never fed back into querySelector.
+        function describe(element, index) {
+          const tag = element.tagName.toLowerCase();
+          if (element.id) return tag + '#' + element.id;
+          const raw = typeof element.className === 'string' ? element.className : '';
+          const classes = raw.trim().split(/\s+/).filter(Boolean).slice(0, 3);
+          if (classes.length) return tag + '.' + classes.join('.');
+          return tag + '[' + index + ']';
+        }
+
         /**
          * Evaluate one UI component against SC 1.4.11.
          *
@@ -157,7 +168,7 @@ class NonTextContrastScanner extends BaseScanner {
             incomplete.push({
               type: 'indeterminate-component-background',
               category: 'ui-component',
-              element: `${element.tagName.toLowerCase()}[${index}]`,
+              element: describe(element, index),
               description:
                 'Component sits on an image or gradient background; its rendered contrast cannot be computed from CSS and needs manual review.',
               details: {
@@ -193,7 +204,7 @@ class NonTextContrastScanner extends BaseScanner {
                   type: config.borderType,
                   category: 'ui-component',
                   severity: 'serious',
-                  element: `${element.tagName.toLowerCase()}[${index}]`,
+                  element: describe(element, index),
                   description: config.borderDescription,
                   details: {
                     borderColor: renderedBorder.color,
@@ -227,7 +238,7 @@ class NonTextContrastScanner extends BaseScanner {
                   type: 'insufficient-background-contrast',
                   category: 'ui-component',
                   severity: 'moderate',
-                  element: `${element.tagName.toLowerCase()}[${index}]`,
+                  element: describe(element, index),
                   description: 'Component background has insufficient contrast',
                   details: {
                     backgroundColor: styles.backgroundColor,
@@ -248,7 +259,8 @@ class NonTextContrastScanner extends BaseScanner {
 
         // Buttons
         const buttons = document.querySelectorAll(
-          'button, input[type="button"], input[type="submit"], input[type="reset"]'
+          'button, input[type="button"], input[type="submit"], input[type="reset"], ' +
+            '[role="button"], [role="switch"]'
         );
         for (let i = 0; i < buttons.length; i++) {
           evaluateComponent(buttons[i], i, {
@@ -356,60 +368,53 @@ class NonTextContrastScanner extends BaseScanner {
           }
           const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
 
-          const shapes = svg.querySelectorAll('*[fill], *[stroke]');
-          for (let i = 0; i < shapes.length; i++) {
-            const element = shapes[i];
-            const fill = element.getAttribute('fill');
-            const stroke = element.getAttribute('stroke');
-
-            if (fill && fill !== 'none' && fill !== 'transparent' && fill !== 'currentColor') {
-              const contrast = ratioAgainst(fill, backdrop);
-              if (contrast !== null && contrast < contrastThreshold) {
-                violations.push({
-                  type: 'insufficient-svg-fill-contrast',
-                  category: 'graphical-object',
-                  severity: 'moderate',
-                  element: `svg ${element.tagName.toLowerCase()}[${i}]`,
-                  description: 'SVG element fill has insufficient contrast',
-                  details: {
-                    fillColor: fill,
-                    backgroundColor: rgbString(backdrop),
-                    contrastRatio: Math.round(contrast * 100) / 100,
-                    required: contrastThreshold,
-                    tagName: element.tagName.toLowerCase(),
-                  },
-                  wcagCriteria: '1.4.11',
-                  impact: 'Graphical content may not be clearly visible',
-                });
+          // One verdict per graphic. SC 1.4.11 asks that the graphical object
+          // can be perceived, not that every path in it can, so every painted
+          // part is measured and the graphic fails only when none of them
+          // reaches the threshold. Colours are read from computed style, which
+          // is where a CSS fill and an inherited `currentColor` are.
+          // The root <svg> paints nothing itself; only its shapes do.
+          const parts = svg.querySelectorAll(
+            'path, rect, circle, ellipse, line, polyline, polygon, text'
+          );
+          let best = null;
+          for (const part of parts) {
+            const partStyles = window.getComputedStyle(part);
+            for (const prop of ['fill', 'stroke']) {
+              let value = partStyles[prop];
+              if (!value || value === 'none') continue;
+              if (prop === 'stroke' && !(parseFloat(partStyles.strokeWidth) > 0)) continue;
+              if (/currentcolor/i.test(value)) value = partStyles.color;
+              const ratio = ratioAgainst(value, backdrop);
+              if (ratio === null) continue;
+              if (best === null || ratio > best.ratio) {
+                best = { ratio: ratio, property: prop, color: value };
               }
             }
+          }
 
-            if (
-              stroke &&
-              stroke !== 'none' &&
-              stroke !== 'transparent' &&
-              stroke !== 'currentColor'
-            ) {
-              const contrast = ratioAgainst(stroke, backdrop);
-              if (contrast !== null && contrast < contrastThreshold) {
-                violations.push({
-                  type: 'insufficient-svg-stroke-contrast',
-                  category: 'graphical-object',
-                  severity: 'moderate',
-                  element: `svg ${element.tagName.toLowerCase()}[${i}]`,
-                  description: 'SVG element stroke has insufficient contrast',
-                  details: {
-                    strokeColor: stroke,
-                    backgroundColor: rgbString(backdrop),
-                    contrastRatio: Math.round(contrast * 100) / 100,
-                    required: contrastThreshold,
-                    tagName: element.tagName.toLowerCase(),
-                  },
-                  wcagCriteria: '1.4.11',
-                  impact: 'Graphical boundaries may not be clearly visible',
-                });
-              }
-            }
+          if (best && best.ratio < contrastThreshold) {
+            violations.push({
+              type: 'insufficient-graphic-contrast',
+              category: 'graphical-object',
+              severity: 'moderate',
+              element: 'svg' + (svg.id ? '#' + svg.id : ''),
+              description: 'Graphic has insufficient contrast against its background',
+              details: {
+                property: best.property,
+                color: best.color,
+                backgroundColor: rgbString(backdrop),
+                contrastRatio: Math.round(best.ratio * 100) / 100,
+                required: contrastThreshold,
+                name:
+                  svg.getAttribute('aria-label') ||
+                  (svg.querySelector('title') && svg.querySelector('title').textContent.trim()) ||
+                  null,
+                id: svg.id || null,
+              },
+              wcagCriteria: '1.4.11',
+              impact: 'Graphical content is not clearly visible',
+            });
           }
         }
 
@@ -433,7 +438,7 @@ class NonTextContrastScanner extends BaseScanner {
               type: 'insufficient-progress-border-contrast',
               category: 'ui-component',
               severity: 'moderate',
-              element: `progress[${i}]`,
+              element: progress.id ? `progress#${progress.id}` : `progress[${i}]`,
               description: 'Progress bar border has insufficient contrast',
               details: {
                 borderColor: renderedBorder.color,
@@ -504,8 +509,12 @@ class NonTextContrastScanner extends BaseScanner {
         const ind = step.indicator;
         const outlineStyle = step.after.outlineStyle;
 
-        if (ind.visible) continue;
-
+        // Whether an indicator exists at all is SC 2.4.7 and is reported by
+        // focus-management from its own walk. What is measured here is the
+        // contrast of the ring that does exist: `lowContrast` means the walk
+        // found an outline and nothing else, and that outline stays under 3:1
+        // against the backdrop. `outline-style: auto` is the platform ring,
+        // which the browser paints with its own contrast handling.
         if (ind.lowContrast && outlineStyle !== 'auto') {
           const key = `${step.after.outlineColor}|${ind.backdrop}|${step.after.outlineWidth}`;
           let group = lowContrastGroups.get(key);
@@ -522,49 +531,7 @@ class NonTextContrastScanner extends BaseScanner {
             lowContrastGroups.set(key, group);
           }
           group.elements.push({ selector: step.selector, text: step.text, tagName: step.tag });
-          continue;
         }
-
-        // Positive evidence only. tabWalk re-measures every candidate
-        // (second focused read, then blur for a real unfocused
-        // baseline) and marks it `confirmed`; an unconfirmed candidate
-        // means focus moved on before the check could be repeated, and
-        // an absent-evidence guess is exactly what produced flaky
-        // `missing-focus-indicator` findings on pages that do have a
-        // :focus-visible ring.
-        if (!ind.confirmed) {
-          incomplete.push({
-            type: 'focus-indicator-not-determinable',
-            category: 'focus-indicator',
-            element: step.selector,
-            description:
-              'Focus moved away before the focus indicator could be re-measured; needs manual review.',
-            details: { tagName: step.tag, text: step.text, reasons: ind.reasons },
-            wcagCriteria: '2.4.7',
-          });
-          continue;
-        }
-
-        violations.push({
-          type: 'missing-focus-indicator',
-          category: 'focus-indicator',
-          severity: 'serious',
-          element: step.selector,
-          description: 'Element lacks visible focus indicator when focused via keyboard',
-          details: {
-            tagName: step.tag,
-            text: step.text,
-            outline: ind.outline,
-            boxShadow: step.after.boxShadow,
-            borderColor: step.after.borderTopColor,
-            unfocusedOutline: `${step.before.outlineStyle} ${step.before.outlineWidth} ${step.before.outlineColor}`,
-            unfocusedBoxShadow: step.before.boxShadow,
-            unfocusedBackgroundColor: step.before.backgroundColor,
-            confirmedByBlurComparison: true,
-          },
-          wcagCriteria: '2.4.7',
-          impact: 'Users cannot see which element has focus',
-        });
       }
     } finally {
       await cleanupTabWalk(page);
@@ -674,19 +641,25 @@ class NonTextContrastScanner extends BaseScanner {
             } catch (e) {
               continue;
             }
+            // Chromium exposes an (empty) `cssRules` on every style rule since
+            // CSS nesting, so a grouping rule is recognised by having nested
+            // rules, not by having the property.
             const walk = (list) => {
               for (const rule of list) {
-                if (rule.cssRules) {
-                  walk(Array.from(rule.cssRules));
-                  continue;
-                }
+                if (rule.cssRules && rule.cssRules.length) walk(Array.from(rule.cssRules));
                 if (!rule.selectorText || !rule.style) continue;
                 if (!STATE_PATTERN.test(rule.selectorText)) continue;
                 for (const part of rule.selectorText.split(',')) {
-                  if (!STATE_PATTERN.test(part)) continue;
+                  const state = STATE_PATTERN.exec(part);
+                  if (!state) continue;
                   const base = baseSelector(part);
                   if (!base) continue;
-                  out.push({ base: base, style: rule.style, selectorText: part.trim() });
+                  out.push({
+                    base: base,
+                    style: rule.style,
+                    selectorText: part.trim(),
+                    state: state[0].replace(/^[:[]/, ''),
+                  });
                 }
               }
             };
@@ -704,22 +677,50 @@ class NonTextContrastScanner extends BaseScanner {
             '[role="menuitemradio"], [aria-checked], [aria-selected], [aria-pressed], [aria-expanded]'
         );
 
+        // Can the element be in the state the rule styles? A stylesheet that
+        // ships `[aria-pressed="true"]` colours says nothing about a button
+        // that never carries aria-pressed, and a `:checked` rule says nothing
+        // about a text field.
+        function exposesState(element, state) {
+          if (state === 'checked' || state === 'indeterminate') {
+            const type = (element.getAttribute('type') || '').toLowerCase();
+            return (
+              type === 'checkbox' ||
+              type === 'radio' ||
+              element.hasAttribute('aria-checked') ||
+              element.tagName.toLowerCase() === 'option'
+            );
+          }
+          return element.hasAttribute(state);
+        }
+
+        // The declaration that wins is the one the cascade applies last, so
+        // every matching rule is merged in stylesheet order instead of
+        // stopping at the first match.
+        function declaredValue(rules, prop) {
+          for (let r = rules.length - 1; r >= 0; r--) {
+            const value = rules[r].style.getPropertyValue(prop);
+            if (value) return value;
+          }
+          return '';
+        }
+
         for (let i = 0; i < Math.min(candidates.length, 40); i++) {
           const element = candidates[i];
           if (__isInactive(element)) continue;
 
-          let matched = null;
+          const matchedRules = [];
           for (const rule of stateRules) {
             try {
-              if (element.matches(rule.base)) {
-                matched = rule;
-                break;
+              if (element.matches(rule.base) && exposesState(element, rule.state)) {
+                matchedRules.push(rule);
               }
             } catch (e) {
               /* invalid/unsupported selector */
             }
           }
-          if (!matched) continue;
+          if (matchedRules.length === 0) continue;
+          const matched = matchedRules[matchedRules.length - 1];
 
           const normal = window.getComputedStyle(element);
           const background = __resolveBackground(element.parentElement || element);
@@ -731,7 +732,7 @@ class NonTextContrastScanner extends BaseScanner {
           // indicated structurally and there is nothing to measure.
           let structuralChange = false;
           for (const prop of STRUCTURAL_PROPS) {
-            const declared = matched.style.getPropertyValue(prop);
+            const declared = declaredValue(matchedRules, prop);
             if (declared && declared !== normal.getPropertyValue(prop)) {
               structuralChange = true;
               break;
@@ -744,7 +745,7 @@ class NonTextContrastScanner extends BaseScanner {
           let bestRatio = null;
           let evidence = null;
           for (const prop of COLOUR_PROPS) {
-            const declared = matched.style.getPropertyValue(prop);
+            const declared = declaredValue(matchedRules, prop);
             if (!declared) continue;
             const before = __parseRgb(normal.getPropertyValue(prop));
             const after = __parseRgb(declared);
@@ -764,7 +765,9 @@ class NonTextContrastScanner extends BaseScanner {
               type: 'insufficient-interactive-state-contrast',
               category: 'state-change',
               severity: 'moderate',
-              element: `${element.tagName.toLowerCase()}[${i}]`,
+              element: element.id
+                ? `${element.tagName.toLowerCase()}#${element.id}`
+                : `${element.tagName.toLowerCase()}[${i}]`,
               description:
                 'Component state is signalled by a colour change that is not distinguishable from the resting colour',
               details: {

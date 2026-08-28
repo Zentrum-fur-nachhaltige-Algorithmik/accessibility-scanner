@@ -1,16 +1,24 @@
 /**
  * Advanced ARIA Complex Widgets Scanner.
- * WCAG 4.1.2, 1.3.1 (EN 301 549 9.4.1.2, 9.1.3.1).
- * Checks composite ARIA patterns: trees, grids, comboboxes, carousels, tabs,
- * accordions, menubars, dialogs and live regions.
+ * WCAG 4.1.2, 2.1.1 (EN 301 549 9.4.1.2, 9.2.1.1).
+ * Reports the composite-widget defects no axe-core rule covers: a widget whose
+ * name can only come from the author and has none, a tree that no keyboard can
+ * enter, a tablist with no or several selected tabs, a combobox that opens a
+ * popup it does not identify, and a live region whose role and aria-live
+ * contradict each other. Attribute validity (`aria-valid-attr-value`),
+ * required attributes (`aria-required-attr`), required children
+ * (`aria-required-children`) and dialog naming (`aria-dialog-name`) are
+ * axe-core rules running in the same profile and are not restated here.
  */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
+const { injectableCode: accnameCode } = require('../utils/accessible-name');
+const { injectableCode: renderedCode } = require('../utils/rendered');
 
 class AdvancedAriaScanner extends BaseScanner {
   constructor() {
     super('advanced-aria', {
-      wcagCriteria: ['4.1.2', '1.3.1'],
+      wcagCriteria: ['4.1.2'],
       wcagPrinciple: 'robust',
     });
   }
@@ -23,73 +31,30 @@ class AdvancedAriaScanner extends BaseScanner {
    */
   async scan(page, options = {}) {
     const defaultOptions = {
-      checkTreeViews: true,
-      checkDataGrids: true,
-      checkComboboxes: true,
+      checkCompositeWidgets: true,
       checkCarousels: true,
-      checkTabPanels: true,
-      checkAccordions: true,
-      checkMenubars: true,
-      checkDialogs: true,
       checkLiveRegions: true,
-      validateKeyboardInteraction: true,
-      checkAriaStates: true,
       timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
 
-    // Optionally trigger JS interactions to reveal hidden ARIA state
     if (scanOptions.jsInteraction) {
       await BaseScanner.triggerCommonInteractions(page);
     }
 
     const violations = [];
 
-    // Analyze different widget types
-    if (scanOptions.checkTreeViews) {
-      const treeViolations = await this.analyzeTreeViews(page, scanOptions);
-      violations.push(...treeViolations);
-    }
-
-    if (scanOptions.checkDataGrids) {
-      const gridViolations = await this.analyzeDataGrids(page, scanOptions);
-      violations.push(...gridViolations);
-    }
-
-    if (scanOptions.checkComboboxes) {
-      const comboViolations = await this.analyzeComboboxes(page, scanOptions);
-      violations.push(...comboViolations);
+    if (scanOptions.checkCompositeWidgets) {
+      violations.push(...(await this.analyzeCompositeWidgets(page)));
     }
 
     if (scanOptions.checkCarousels) {
-      const carouselViolations = await this.analyzeCarousels(page, scanOptions);
-      violations.push(...carouselViolations);
-    }
-
-    if (scanOptions.checkTabPanels) {
-      const tabViolations = await this.analyzeTabPanels(page, scanOptions);
-      violations.push(...tabViolations);
-    }
-
-    if (scanOptions.checkAccordions) {
-      const accordionViolations = await this.analyzeAccordions(page, scanOptions);
-      violations.push(...accordionViolations);
-    }
-
-    if (scanOptions.checkMenubars) {
-      const menuViolations = await this.analyzeMenubars(page, scanOptions);
-      violations.push(...menuViolations);
-    }
-
-    if (scanOptions.checkDialogs) {
-      const dialogViolations = await this.analyzeDialogs(page, scanOptions);
-      violations.push(...dialogViolations);
+      violations.push(...(await this.analyzeCarousels(page)));
     }
 
     if (scanOptions.checkLiveRegions) {
-      const liveRegionViolations = await this.analyzeLiveRegions(page, scanOptions);
-      violations.push(...liveRegionViolations);
+      violations.push(...(await this.analyzeLiveRegions(page)));
     }
 
     return {
@@ -98,19 +63,13 @@ class AdvancedAriaScanner extends BaseScanner {
       passed: violations.length === 0,
       violations: violations,
       summary: {
-        totalWidgetsChecked: violations.length + this.getPassedWidgetsCount(violations),
         treeViewIssues: violations.filter((v) => v.category === 'tree-view').length,
         dataGridIssues: violations.filter((v) => v.category === 'data-grid').length,
         comboboxIssues: violations.filter((v) => v.category === 'combobox').length,
         carouselIssues: violations.filter((v) => v.category === 'carousel').length,
         tabPanelIssues: violations.filter((v) => v.category === 'tab-panel').length,
-        accordionIssues: violations.filter((v) => v.category === 'accordion').length,
         menubarIssues: violations.filter((v) => v.category === 'menubar').length,
-        dialogIssues: violations.filter((v) => v.category === 'dialog').length,
         liveRegionIssues: violations.filter((v) => v.category === 'live-region').length,
-        ariaStateErrors: violations.filter((v) => v.type === 'aria-state-error').length,
-        keyboardAccessibilityIssues: violations.filter((v) => v.type === 'keyboard-inaccessible')
-          .length,
       },
       recommendations: this.generateAdvancedAriaRecommendations(violations),
       widgetPatterns: this.generateWidgetPatternGuidance(violations),
@@ -118,398 +77,199 @@ class AdvancedAriaScanner extends BaseScanner {
   }
 
   /**
-   * Analyze tree view widgets
+   * Trees, grids, menubars, tablists and comboboxes: the defects that make the
+   * widget unusable rather than merely different from the APG example.
    */
-  async analyzeTreeViews(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
+  async analyzeCompositeWidgets(page) {
+    return await page.evaluate(
+      (accScript, renderedScript) => {
+        eval(accScript);
+        eval(renderedScript);
+        const violations = [];
 
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find tree widgets (skip hidden)
-      const trees = Array.from(document.querySelectorAll('[role="tree"]')).filter(isElementVisible);
-
-      for (let i = 0; i < trees.length; i++) {
-        const tree = trees[i];
-        const treeSelector = getElementSelector(tree);
-
-        // Check tree has proper labeling
-        if (!tree.hasAttribute('aria-label') && !tree.hasAttribute('aria-labelledby')) {
-          violations.push({
-            type: 'missing-tree-label',
-            category: 'tree-view',
-            severity: 'serious',
-            element: treeSelector,
-            description: 'Tree widget lacks accessible name',
-            details: {
-              treeId: tree.id,
-              treeClass: tree.className,
-              hasAriaLabel: tree.hasAttribute('aria-label'),
-              hasAriaLabelledby: tree.hasAttribute('aria-labelledby'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen reader users cannot identify tree purpose',
-            recommendation: 'Add aria-label or aria-labelledby to tree container',
-          });
+        function getElementSelector(element) {
+          const tagName = element.tagName.toLowerCase();
+          const id = element.id ? `#${element.id}` : '';
+          const className =
+            element.className && typeof element.className === 'string'
+              ? `.${element.className.split(' ')[0]}`
+              : '';
+          return `${tagName}${id}${className}`;
         }
 
-        // Check tree items
-        const treeItems = tree.querySelectorAll('[role="treeitem"]');
-        for (let j = 0; j < treeItems.length; j++) {
-          const item = treeItems[j];
-          const itemSelector = getElementSelector(item);
+        // A tree, grid and menubar take their name from the author only
+        // (namefrom: author), so an unnamed one is announced as a bare
+        // "tree"/"grid"/"menu bar". The name is computed with the shared
+        // ACCNAME subset, which also reads title and aria-labelledby, instead
+        // of asking for two attributes.
+        const NAMED_WIDGET_ROLES = ['tree', 'grid', 'treegrid', 'menubar'];
+        const WIDGET_CATEGORY = {
+          tree: 'tree-view',
+          grid: 'data-grid',
+          treegrid: 'data-grid',
+          menubar: 'menubar',
+        };
 
-          // Check if tree item is focusable
-          const tabIndex = item.getAttribute('tabindex');
-          if (tabIndex === null) {
+        for (const role of NAMED_WIDGET_ROLES) {
+          for (const widget of document.querySelectorAll(`[role="${role}"]`)) {
+            if (!__isRendered(widget)) continue;
+            if (__accessibleName(widget)) continue;
+
             violations.push({
-              type: 'treeitem-not-focusable',
+              type: 'widget-missing-accessible-name',
+              category: WIDGET_CATEGORY[role],
+              severity: 'serious',
+              element: getElementSelector(widget),
+              description: `Composite widget with role="${role}" has no accessible name`,
+              details: { role, id: widget.id },
+              wcagCriteria: '4.1.2',
+              impact: 'The widget is announced by its role alone',
+              recommendation: 'Name the widget with aria-label or aria-labelledby',
+            });
+          }
+        }
+
+        // 2.1.1 for a tree: keyboard users enter it through a tabbable item,
+        // through the tree itself, or through aria-activedescendant. A tree
+        // that offers none of the three cannot be reached at all. Asking every
+        // treeitem for a tabindex instead reports the roving tabindex pattern
+        // the APG prescribes.
+        for (const tree of document.querySelectorAll('[role="tree"]')) {
+          if (!__isRendered(tree)) continue;
+          const items = Array.from(tree.querySelectorAll('[role="treeitem"]'));
+          if (items.length === 0) continue;
+
+          const tabbable = (el) => {
+            const ti = el.getAttribute('tabindex');
+            return ti !== null && parseInt(ti, 10) >= 0;
+          };
+          const reachable =
+            items.some(tabbable) ||
+            tabbable(tree) ||
+            tree.hasAttribute('aria-activedescendant') ||
+            items.some((item) => item.querySelector('a[href], button'));
+
+          if (!reachable) {
+            violations.push({
+              type: 'tree-not-keyboard-reachable',
               category: 'tree-view',
               severity: 'serious',
-              element: itemSelector,
-              description: 'Tree item lacks tabindex for keyboard navigation',
-              details: {
-                itemText: item.textContent.trim(),
-                tabIndex: tabIndex,
-                hasTabindex: item.hasAttribute('tabindex'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Tree item not keyboard accessible',
-              recommendation: 'Add tabindex="-1" to tree items (except currently selected)',
+              element: getElementSelector(tree),
+              description:
+                'No item of this tree is in the tab order and the tree has neither a tabindex nor aria-activedescendant',
+              details: { itemCount: items.length },
+              wcagCriteria: '2.1.1',
+              impact: 'Keyboard users cannot reach any node of the tree',
+              recommendation:
+                'Give the active item tabindex="0" (roving tabindex) or manage focus with aria-activedescendant on the tree',
             });
           }
 
-          // Check expandable items have aria-expanded
-          const hasChildren =
-            item.querySelectorAll('[role="treeitem"]').length > 0 ||
-            item.querySelector('[role="group"]');
-          if (hasChildren && !item.hasAttribute('aria-expanded')) {
+          // A node that owns a group of child nodes carries its expanded
+          // state; without it the node reads as a leaf.
+          for (const item of items) {
+            if (item.hasAttribute('aria-expanded')) continue;
+            const ownedGroup = Array.from(item.querySelectorAll('[role="group"]')).find(
+              (group) =>
+                group.querySelector('[role="treeitem"]') &&
+                group.closest('[role="treeitem"]') === item
+            );
+            if (!ownedGroup) continue;
+
             violations.push({
               type: 'missing-aria-expanded',
               category: 'tree-view',
               severity: 'serious',
-              element: itemSelector,
-              description: 'Expandable tree item lacks aria-expanded attribute',
-              details: {
-                itemText: item.textContent.trim(),
-                hasChildren: hasChildren,
-                hasAriaExpanded: item.hasAttribute('aria-expanded'),
-                currentExpanded: item.getAttribute('aria-expanded'),
-              },
+              element: getElementSelector(item),
+              description: 'Tree item that owns a group of child items has no aria-expanded',
+              details: { itemText: item.textContent.trim().substring(0, 60) },
               wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot determine if item is expanded',
-              recommendation: 'Add aria-expanded="true" or "false" to expandable items',
-            });
-          }
-
-          // Check selected state
-          if (
-            item.hasAttribute('aria-selected') &&
-            !['true', 'false'].includes(item.getAttribute('aria-selected'))
-          ) {
-            violations.push({
-              type: 'invalid-aria-selected',
-              category: 'tree-view',
-              severity: 'moderate',
-              element: itemSelector,
-              description: 'Tree item has invalid aria-selected value',
-              details: {
-                itemText: item.textContent.trim(),
-                ariaSelected: item.getAttribute('aria-selected'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers receive invalid state information',
-              recommendation: 'Use aria-selected="true" or "false" only',
+              impact: 'The node is announced as a leaf, and its expanded state is never conveyed',
+              recommendation: 'Set aria-expanded="true" or "false" on the parent node',
             });
           }
         }
 
-        // Check for proper group structure
-        const groups = tree.querySelectorAll('[role="group"]');
-        groups.forEach((group, k) => {
-          if (!group.getAttribute('aria-labelledby')) {
-            violations.push({
-              type: 'tree-group-unlabeled',
-              category: 'tree-view',
-              severity: 'moderate',
-              element: getElementSelector(group),
-              description: 'Tree group lacks aria-labelledby reference',
-              details: {
-                groupIndex: k,
-                hasAriaLabelledby: group.hasAttribute('aria-labelledby'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot identify group relationship',
-              recommendation: 'Add aria-labelledby pointing to parent tree item',
-            });
-          }
-        });
-      }
+        // An open combobox has to say which popup is open. While it is
+        // collapsed there is nothing to point at, and aria-expanded itself is
+        // axe's aria-required-attr.
+        for (const combobox of document.querySelectorAll('[role="combobox"]')) {
+          if (!__isRendered(combobox)) continue;
+          if (combobox.getAttribute('aria-expanded') !== 'true') continue;
+          if (combobox.hasAttribute('aria-controls') || combobox.hasAttribute('aria-owns'))
+            continue;
 
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Analyze data grid widgets
-   */
-  async analyzeDataGrids(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
-
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find grid widgets (skip hidden)
-      const grids = Array.from(document.querySelectorAll('[role="grid"]')).filter(isElementVisible);
-
-      for (let i = 0; i < grids.length; i++) {
-        const grid = grids[i];
-        const gridSelector = getElementSelector(grid);
-
-        // Check grid has proper labeling
-        if (!grid.hasAttribute('aria-label') && !grid.hasAttribute('aria-labelledby')) {
-          violations.push({
-            type: 'missing-grid-label',
-            category: 'data-grid',
-            severity: 'serious',
-            element: gridSelector,
-            description: 'Data grid lacks accessible name',
-            details: {
-              gridId: grid.id,
-              gridClass: grid.className,
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen reader users cannot identify grid purpose',
-            recommendation: 'Add aria-label or aria-labelledby to grid container',
-          });
-        }
-
-        // Check for row headers
-        const rows = grid.querySelectorAll('[role="row"]');
-        for (let j = 0; j < rows.length; j++) {
-          const row = rows[j];
-          const rowHeaders = row.querySelectorAll('[role="rowheader"]');
-          const gridCells = row.querySelectorAll('[role="gridcell"]');
-
-          if (gridCells.length > 0 && rowHeaders.length === 0 && j > 0) {
-            // Skip header row
-            violations.push({
-              type: 'missing-row-headers',
-              category: 'data-grid',
-              severity: 'moderate',
-              element: getElementSelector(row),
-              description: 'Data grid row lacks row header cells',
-              details: {
-                rowIndex: j,
-                cellCount: gridCells.length,
-                rowHeaderCount: rowHeaders.length,
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot identify row context',
-              recommendation: 'Use role="rowheader" for first cell in data rows',
-            });
-          }
-        }
-
-        // Check for column headers
-        const columnHeaders = grid.querySelectorAll('[role="columnheader"]');
-        const firstRow = grid.querySelector('[role="row"]');
-        if (firstRow && columnHeaders.length === 0) {
-          violations.push({
-            type: 'missing-column-headers',
-            category: 'data-grid',
-            severity: 'serious',
-            element: gridSelector,
-            description: 'Data grid lacks column headers',
-            details: {
-              hasFirstRow: !!firstRow,
-              columnHeaderCount: columnHeaders.length,
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify column purposes',
-            recommendation: 'Use role="columnheader" in first row for column headers',
-          });
-        }
-
-        // Check grid cells for proper structure
-        const gridCells = grid.querySelectorAll('[role="gridcell"]');
-        gridCells.forEach((cell, k) => {
-          // Check if interactive cells are focusable
-          const hasInteractiveContent = cell.querySelector(
-            'button, input, select, textarea, [tabindex]'
-          );
-          if (hasInteractiveContent && !cell.hasAttribute('tabindex')) {
-            violations.push({
-              type: 'gridcell-not-focusable',
-              category: 'data-grid',
-              severity: 'serious',
-              element: getElementSelector(cell),
-              description: 'Interactive grid cell lacks tabindex',
-              details: {
-                cellIndex: k,
-                cellText: cell.textContent.trim().substring(0, 50),
-                hasInteractiveContent: hasInteractiveContent,
-                hasTabindex: cell.hasAttribute('tabindex'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Grid cell not keyboard accessible',
-              recommendation: 'Add tabindex="-1" to grid cells with interactive content',
-            });
-          }
-        });
-      }
-
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Analyze combobox widgets
-   */
-  async analyzeComboboxes(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
-
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find combobox widgets
-      const comboboxes = Array.from(document.querySelectorAll('[role="combobox"]')).filter(
-        isElementVisible
-      );
-
-      for (let i = 0; i < comboboxes.length; i++) {
-        const combobox = comboboxes[i];
-        const comboboxSelector = getElementSelector(combobox);
-
-        // Check combobox has aria-expanded
-        if (!combobox.hasAttribute('aria-expanded')) {
-          violations.push({
-            type: 'missing-aria-expanded',
-            category: 'combobox',
-            severity: 'serious',
-            element: comboboxSelector,
-            description: 'Combobox lacks aria-expanded attribute',
-            details: {
-              comboboxId: combobox.id,
-              hasAriaExpanded: combobox.hasAttribute('aria-expanded'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot determine if combobox is expanded',
-            recommendation: 'Add aria-expanded="true" or "false" to combobox',
-          });
-        }
-
-        // Check combobox has aria-controls
-        if (!combobox.hasAttribute('aria-controls')) {
           violations.push({
             type: 'missing-aria-controls',
             category: 'combobox',
             severity: 'serious',
-            element: comboboxSelector,
-            description: 'Combobox lacks aria-controls reference to listbox',
-            details: {
-              comboboxId: combobox.id,
-              hasAriaControls: combobox.hasAttribute('aria-controls'),
-            },
+            element: getElementSelector(combobox),
+            description: 'Expanded combobox does not identify the popup it controls',
+            details: { id: combobox.id },
             wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify associated popup',
-            recommendation: 'Add aria-controls pointing to listbox/popup ID',
+            impact: 'Screen readers cannot move to the open list of options',
+            recommendation: 'Point aria-controls at the id of the open listbox, grid or tree',
           });
         }
 
-        // Check for associated listbox
-        const controlsId = combobox.getAttribute('aria-controls');
-        if (controlsId) {
-          const listbox = document.getElementById(controlsId);
-          if (!listbox) {
+        // Selected state of a tablist. An omitted aria-selected means "false",
+        // so the failure is the tablist as a whole: no tab selected, or
+        // several selected without aria-multiselectable.
+        for (const tabList of document.querySelectorAll('[role="tablist"]')) {
+          if (!__isRendered(tabList)) continue;
+          const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+          if (tabs.length === 0) continue;
+
+          const selected = tabs.filter((tab) => tab.getAttribute('aria-selected') === 'true');
+          // Navigation rendered as tabs marks the current page with
+          // aria-current instead, which conveys the same state.
+          const current = tabs.filter((tab) => {
+            const value = tab.getAttribute('aria-current');
+            return value !== null && value !== 'false';
+          });
+
+          if (selected.length === 0 && current.length === 0) {
             violations.push({
-              type: 'missing-controlled-listbox',
-              category: 'combobox',
+              type: 'no-selected-tab',
+              category: 'tab-panel',
               severity: 'serious',
-              element: comboboxSelector,
-              description: 'Combobox aria-controls references non-existent listbox',
-              details: {
-                controlsId: controlsId,
-                listboxExists: !!listbox,
-              },
+              element: getElementSelector(tabList),
+              description: 'No tab of this tablist carries aria-selected="true"',
+              details: { totalTabs: tabs.length },
               wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot find associated popup',
-              recommendation: 'Ensure aria-controls ID matches existing listbox element',
+              impact: 'Screen reader users cannot tell which panel is showing',
+              recommendation: 'Set aria-selected="true" on the active tab',
             });
-          } else if (!listbox.hasAttribute('role') || listbox.getAttribute('role') !== 'listbox') {
+          } else if (
+            selected.length > 1 &&
+            tabList.getAttribute('aria-multiselectable') !== 'true'
+          ) {
             violations.push({
-              type: 'invalid-controlled-element',
-              category: 'combobox',
+              type: 'multiple-selected-tabs',
+              category: 'tab-panel',
               severity: 'serious',
-              element: getElementSelector(listbox),
-              description: 'Combobox controls element that is not a listbox',
-              details: {
-                controlsId: controlsId,
-                controlledRole: listbox.getAttribute('role'),
-              },
+              element: getElementSelector(tabList),
+              description: `${selected.length} tabs are selected in a single-select tablist`,
+              details: { selectedTabCount: selected.length, totalTabs: tabs.length },
               wcagCriteria: '4.1.2',
-              impact: 'Screen readers receive incorrect semantic information',
-              recommendation: 'Add role="listbox" to controlled popup element',
+              impact: 'Screen readers receive conflicting state information',
+              recommendation:
+                'Keep aria-selected="true" on one tab, or declare aria-multiselectable="true" on the tablist',
             });
           }
         }
 
-        // Check autocomplete behavior
-        if (combobox.hasAttribute('aria-autocomplete')) {
-          const autoValue = combobox.getAttribute('aria-autocomplete');
-          if (!['none', 'list', 'inline', 'both'].includes(autoValue)) {
-            violations.push({
-              type: 'invalid-aria-autocomplete',
-              category: 'combobox',
-              severity: 'moderate',
-              element: comboboxSelector,
-              description: 'Combobox has invalid aria-autocomplete value',
-              details: {
-                autocompleteValue: autoValue,
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers receive invalid autocomplete information',
-              recommendation: 'Use valid aria-autocomplete values: none, list, inline, both',
-            });
-          }
-        }
-      }
-
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
+        return violations;
+      },
+      accnameCode,
+      renderedCode
+    );
   }
 
   /**
    * Analyze carousel widgets
    */
-  async analyzeCarousels(page, options) {
+  async analyzeCarousels(page) {
     return await page.evaluate((visScript) => {
       eval(visScript);
       const violations = [];
@@ -644,10 +404,9 @@ class AdvancedAriaScanner extends BaseScanner {
         (el) => !confirmed.some((other) => other !== el && other.contains(el))
       );
 
-      // Accessible-name resolution. The old check only looked at
-      // aria-label / aria-labelledby ON the element, so a carousel named
-      // by a wrapping labelled region, by title, or by a heading
-      // referenced through aria-labelledby was reported as nameless.
+      // Accessible-name resolution: a carousel named by a wrapping labelled
+      // region, by title, or by a heading referenced through aria-labelledby
+      // is identifiable.
       function textOfIds(idref) {
         if (!idref) return '';
         return idref
@@ -689,572 +448,29 @@ class AdvancedAriaScanner extends BaseScanner {
         return '';
       }
 
-      for (let i = 0; i < carousels.length; i++) {
-        const carousel = carousels[i];
-        const carouselSelector = getElementSelector(carousel);
+      for (const carousel of carousels) {
+        if (accessibleName(carousel)) continue;
 
-        // Check carousel has accessible name
-        if (!accessibleName(carousel)) {
-          violations.push({
-            type: 'missing-carousel-label',
-            category: 'carousel',
-            severity: 'serious',
-            element: carouselSelector,
-            description: 'Carousel lacks accessible name',
-            details: {
-              carouselId: carousel.id,
-              carouselClass: carousel.className,
-              evidence: {
-                declared: hasDeclaredCarouselEvidence(carousel),
-                slideCount: countSlides(carousel),
-                hasControls: hasCarouselControls(carousel),
-              },
+        violations.push({
+          type: 'missing-carousel-label',
+          category: 'carousel',
+          severity: 'serious',
+          element: getElementSelector(carousel),
+          description: 'Carousel lacks accessible name',
+          details: {
+            carouselId: carousel.id,
+            carouselClass: carousel.className,
+            evidence: {
+              declared: hasDeclaredCarouselEvidence(carousel),
+              slideCount: countSlides(carousel),
+              hasControls: hasCarouselControls(carousel),
             },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen reader users cannot identify carousel purpose',
-            recommendation: 'Add aria-label describing carousel content',
-          });
-        }
-
-        // Check for live region for auto-rotating carousels.
-        // `className` is an SVGAnimatedString on SVG/MathML elements, so
-        // guard before calling .includes() on it.
-        const hasAutoRotate =
-          !!carousel.querySelector('[data-autoplay], [data-auto]') ||
-          classTokens(carousel).some((t) => /auto/i.test(t)) ||
-          carousel.hasAttribute('data-interval');
-
-        if (hasAutoRotate && !carousel.hasAttribute('aria-live')) {
-          violations.push({
-            type: 'missing-carousel-live-region',
-            category: 'carousel',
-            severity: 'moderate',
-            element: carouselSelector,
-            description: 'Auto-rotating carousel lacks aria-live region',
-            details: {
-              hasAutoRotate: hasAutoRotate,
-              hasAriaLive: carousel.hasAttribute('aria-live'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers not notified of automatic slide changes',
-            recommendation: 'Add aria-live="polite" for auto-rotating carousels',
-          });
-        }
-
-        // Check carousel controls
-        const prevButton = carousel.querySelector(
-          '[aria-label*="previous"], [aria-label*="prev"], .prev, .previous'
-        );
-        const nextButton = carousel.querySelector('[aria-label*="next"], .next');
-
-        if (prevButton && !prevButton.hasAttribute('aria-label')) {
-          violations.push({
-            type: 'carousel-control-unlabeled',
-            category: 'carousel',
-            severity: 'serious',
-            element: getElementSelector(prevButton),
-            description: 'Carousel previous button lacks accessible name',
-            details: {
-              buttonText: prevButton.textContent.trim(),
-              hasAriaLabel: prevButton.hasAttribute('aria-label'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify button purpose',
-            recommendation: 'Add aria-label="Previous slide" to previous button',
-          });
-        }
-
-        if (nextButton && !nextButton.hasAttribute('aria-label')) {
-          violations.push({
-            type: 'carousel-control-unlabeled',
-            category: 'carousel',
-            severity: 'serious',
-            element: getElementSelector(nextButton),
-            description: 'Carousel next button lacks accessible name',
-            details: {
-              buttonText: nextButton.textContent.trim(),
-              hasAriaLabel: nextButton.hasAttribute('aria-label'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify button purpose',
-            recommendation: 'Add aria-label="Next slide" to next button',
-          });
-        }
-
-        // Check slide indicators
-        const indicators = carousel.querySelectorAll(
-          '.indicator, .dot, [role="button"][aria-label*="slide"]'
-        );
-        indicators.forEach((indicator, k) => {
-          if (
-            !indicator.hasAttribute('aria-label') &&
-            (!indicator.textContent || indicator.textContent.trim().length === 0)
-          ) {
-            violations.push({
-              type: 'carousel-indicator-unlabeled',
-              category: 'carousel',
-              severity: 'moderate',
-              element: getElementSelector(indicator),
-              description: 'Carousel slide indicator lacks accessible name',
-              details: {
-                indicatorIndex: k,
-                hasAriaLabel: indicator.hasAttribute('aria-label'),
-                textContent: indicator.textContent.trim(),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot identify slide indicators',
-              recommendation: `Add aria-label="Go to slide ${k + 1}" to indicator`,
-            });
-          }
+          },
+          wcagCriteria: '4.1.2',
+          impact: 'Screen reader users cannot identify carousel purpose',
+          recommendation: 'Add aria-label describing carousel content',
         });
       }
-
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Analyze tab panel widgets
-   */
-  async analyzeTabPanels(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
-
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find tab lists (skip hidden)
-      const tabLists = Array.from(document.querySelectorAll('[role="tablist"]')).filter(
-        isElementVisible
-      );
-
-      for (let i = 0; i < tabLists.length; i++) {
-        const tabList = tabLists[i];
-        const tabListSelector = getElementSelector(tabList);
-
-        // Check tabs within tablist
-        const tabs = tabList.querySelectorAll('[role="tab"]');
-
-        if (tabs.length === 0) {
-          violations.push({
-            type: 'tablist-without-tabs',
-            category: 'tab-panel',
-            severity: 'serious',
-            element: tabListSelector,
-            description: 'Tablist contains no tab elements',
-            details: {
-              tabCount: tabs.length,
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot navigate tab interface',
-            recommendation: 'Add role="tab" to tab elements within tablist',
-          });
-        }
-
-        tabs.forEach((tab, j) => {
-          const tabSelector = getElementSelector(tab);
-
-          // Check tab has aria-controls
-          if (!tab.hasAttribute('aria-controls')) {
-            violations.push({
-              type: 'tab-missing-controls',
-              category: 'tab-panel',
-              severity: 'serious',
-              element: tabSelector,
-              description: 'Tab lacks aria-controls reference to tabpanel',
-              details: {
-                tabIndex: j,
-                tabText: tab.textContent.trim(),
-                hasAriaControls: tab.hasAttribute('aria-controls'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot identify associated panel',
-              recommendation: 'Add aria-controls pointing to tabpanel ID',
-            });
-          }
-
-          // Check tab has aria-selected
-          if (!tab.hasAttribute('aria-selected')) {
-            violations.push({
-              type: 'tab-missing-selected',
-              category: 'tab-panel',
-              severity: 'serious',
-              element: tabSelector,
-              description: 'Tab lacks aria-selected attribute',
-              details: {
-                tabIndex: j,
-                tabText: tab.textContent.trim(),
-                hasAriaSelected: tab.hasAttribute('aria-selected'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot determine selected tab',
-              recommendation: 'Add aria-selected="true" to active tab, "false" to others',
-            });
-          }
-
-          // Check associated tabpanel exists
-          const controlsId = tab.getAttribute('aria-controls');
-          if (controlsId) {
-            const tabPanel = document.getElementById(controlsId);
-            if (!tabPanel) {
-              violations.push({
-                type: 'missing-tabpanel',
-                category: 'tab-panel',
-                severity: 'serious',
-                element: tabSelector,
-                description: 'Tab aria-controls references non-existent tabpanel',
-                details: {
-                  controlsId: controlsId,
-                  tabpanelExists: !!tabPanel,
-                },
-                wcagCriteria: '4.1.2',
-                impact: 'Screen readers cannot find associated content',
-                recommendation: 'Ensure aria-controls ID matches existing tabpanel',
-              });
-            } else if (tabPanel.getAttribute('role') !== 'tabpanel') {
-              violations.push({
-                type: 'invalid-tabpanel-role',
-                category: 'tab-panel',
-                severity: 'serious',
-                element: getElementSelector(tabPanel),
-                description: 'Tab controls element that is not a tabpanel',
-                details: {
-                  controlsId: controlsId,
-                  elementRole: tabPanel.getAttribute('role'),
-                },
-                wcagCriteria: '4.1.2',
-                impact: 'Screen readers receive incorrect semantic information',
-                recommendation: 'Add role="tabpanel" to controlled element',
-              });
-            }
-          }
-        });
-
-        // Check only one tab is selected
-        const selectedTabs = tabList.querySelectorAll('[role="tab"][aria-selected="true"]');
-        if (selectedTabs.length === 0) {
-          violations.push({
-            type: 'no-selected-tab',
-            category: 'tab-panel',
-            severity: 'serious',
-            element: tabListSelector,
-            description: 'Tablist has no selected tab',
-            details: {
-              selectedTabCount: selectedTabs.length,
-              totalTabs: tabs.length,
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify active tab',
-            recommendation: 'Set one tab to aria-selected="true"',
-          });
-        } else if (selectedTabs.length > 1) {
-          violations.push({
-            type: 'multiple-selected-tabs',
-            category: 'tab-panel',
-            severity: 'serious',
-            element: tabListSelector,
-            description: 'Tablist has multiple selected tabs',
-            details: {
-              selectedTabCount: selectedTabs.length,
-              totalTabs: tabs.length,
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers receive conflicting state information',
-            recommendation: 'Only one tab should have aria-selected="true"',
-          });
-        }
-      }
-
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Analyze accordion widgets
-   */
-  async analyzeAccordions(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
-
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find accordion headers and buttons (skip hidden)
-      const accordionButtons = Array.from(
-        document.querySelectorAll(
-          '[aria-expanded], .accordion-header button, .accordion-toggle, ' +
-            '[class*="accordion"] button, [role="button"][aria-controls]'
-        )
-      ).filter(isElementVisible);
-
-      accordionButtons.forEach((button, i) => {
-        const buttonSelector = getElementSelector(button);
-
-        // Check button has aria-expanded
-        if (!button.hasAttribute('aria-expanded')) {
-          violations.push({
-            type: 'accordion-missing-expanded',
-            category: 'accordion',
-            severity: 'serious',
-            element: buttonSelector,
-            description: 'Accordion button lacks aria-expanded attribute',
-            details: {
-              buttonIndex: i,
-              buttonText: button.textContent.trim(),
-              hasAriaExpanded: button.hasAttribute('aria-expanded'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot determine if accordion panel is expanded',
-            recommendation: 'Add aria-expanded="true" or "false" to accordion buttons',
-          });
-        }
-
-        // Check button has aria-controls
-        if (!button.hasAttribute('aria-controls')) {
-          violations.push({
-            type: 'accordion-missing-controls',
-            category: 'accordion',
-            severity: 'serious',
-            element: buttonSelector,
-            description: 'Accordion button lacks aria-controls reference',
-            details: {
-              buttonIndex: i,
-              buttonText: button.textContent.trim(),
-              hasAriaControls: button.hasAttribute('aria-controls'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify controlled panel',
-            recommendation: 'Add aria-controls pointing to accordion panel ID',
-          });
-        }
-
-        // Check controlled panel exists and is properly marked
-        const controlsId = button.getAttribute('aria-controls');
-        if (controlsId) {
-          const panel = document.getElementById(controlsId);
-          if (!panel) {
-            violations.push({
-              type: 'missing-accordion-panel',
-              category: 'accordion',
-              severity: 'serious',
-              element: buttonSelector,
-              description: 'Accordion button controls non-existent panel',
-              details: {
-                controlsId: controlsId,
-                panelExists: !!panel,
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot find associated content',
-              recommendation: 'Ensure aria-controls ID matches existing panel element',
-            });
-          } else {
-            // Check panel has proper labeling
-            if (!panel.hasAttribute('aria-labelledby')) {
-              violations.push({
-                type: 'accordion-panel-unlabeled',
-                category: 'accordion',
-                severity: 'moderate',
-                element: getElementSelector(panel),
-                description: 'Accordion panel lacks aria-labelledby reference',
-                details: {
-                  panelId: panel.id,
-                  hasAriaLabelledby: panel.hasAttribute('aria-labelledby'),
-                },
-                wcagCriteria: '4.1.2',
-                impact: 'Screen readers cannot identify panel heading',
-                recommendation: 'Add aria-labelledby pointing to accordion button ID',
-              });
-            }
-          }
-        }
-      });
-
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Analyze menubar widgets
-   */
-  async analyzeMenubars(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
-
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find menubar widgets (skip hidden)
-      const menubars = Array.from(document.querySelectorAll('[role="menubar"]')).filter(
-        isElementVisible
-      );
-
-      menubars.forEach((menubar, i) => {
-        const menubarSelector = getElementSelector(menubar);
-
-        // Check menubar has proper labeling
-        if (!menubar.hasAttribute('aria-label') && !menubar.hasAttribute('aria-labelledby')) {
-          violations.push({
-            type: 'menubar-unlabeled',
-            category: 'menubar',
-            severity: 'moderate',
-            element: menubarSelector,
-            description: 'Menubar lacks accessible name',
-            details: {
-              menubarIndex: i,
-              hasAriaLabel: menubar.hasAttribute('aria-label'),
-              hasAriaLabelledby: menubar.hasAttribute('aria-labelledby'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify menubar purpose',
-            recommendation: 'Add aria-label describing menubar purpose',
-          });
-        }
-
-        // Check menu items
-        const menuItems = menubar.querySelectorAll('[role="menuitem"]');
-        menuItems.forEach((item, j) => {
-          const itemSelector = getElementSelector(item);
-
-          // Check if item has submenu
-          const hasSubMenu =
-            item.hasAttribute('aria-haspopup') || item.getAttribute('aria-expanded') !== null;
-
-          if (hasSubMenu && !item.hasAttribute('aria-expanded')) {
-            violations.push({
-              type: 'submenu-missing-expanded',
-              category: 'menubar',
-              severity: 'serious',
-              element: itemSelector,
-              description: 'Menu item with submenu lacks aria-expanded',
-              details: {
-                itemIndex: j,
-                itemText: item.textContent.trim(),
-                hasAriaHaspopup: item.hasAttribute('aria-haspopup'),
-                hasAriaExpanded: item.hasAttribute('aria-expanded'),
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot determine submenu state',
-              recommendation: 'Add aria-expanded="true" or "false" to items with submenus',
-            });
-          }
-        });
-      });
-
-      return violations;
-    }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Analyze dialog widgets
-   */
-  async analyzeDialogs(page, options) {
-    return await page.evaluate((visScript) => {
-      eval(visScript);
-      const violations = [];
-
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      // Find dialog widgets (skip hidden)
-      const dialogs = Array.from(
-        document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog')
-      ).filter(isElementVisible);
-
-      dialogs.forEach((dialog, i) => {
-        const dialogSelector = getElementSelector(dialog);
-
-        // Check dialog has accessible name
-        if (!dialog.hasAttribute('aria-label') && !dialog.hasAttribute('aria-labelledby')) {
-          violations.push({
-            type: 'dialog-unlabeled',
-            category: 'dialog',
-            severity: 'serious',
-            element: dialogSelector,
-            description: 'Dialog lacks accessible name',
-            details: {
-              dialogIndex: i,
-              role: dialog.getAttribute('role') || dialog.tagName.toLowerCase(),
-              hasAriaLabel: dialog.hasAttribute('aria-label'),
-              hasAriaLabelledby: dialog.hasAttribute('aria-labelledby'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot identify dialog purpose',
-            recommendation: 'Add aria-labelledby pointing to dialog title or aria-label',
-          });
-        }
-
-        // Check dialog is modal (has aria-modal or proper focus management)
-        if (!dialog.hasAttribute('aria-modal')) {
-          violations.push({
-            type: 'dialog-missing-modal',
-            category: 'dialog',
-            severity: 'moderate',
-            element: dialogSelector,
-            description: 'Dialog lacks aria-modal attribute',
-            details: {
-              dialogIndex: i,
-              hasAriaModal: dialog.hasAttribute('aria-modal'),
-              ariaModal: dialog.getAttribute('aria-modal'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers may not understand modal behavior',
-            recommendation: 'Add aria-modal="true" for modal dialogs',
-          });
-        }
-
-        // Check for description if present
-        const describedBy = dialog.getAttribute('aria-describedby');
-        if (describedBy) {
-          const descElement = document.getElementById(describedBy);
-          if (!descElement) {
-            violations.push({
-              type: 'dialog-invalid-describedby',
-              category: 'dialog',
-              severity: 'moderate',
-              element: dialogSelector,
-              description: 'Dialog aria-describedby references non-existent element',
-              details: {
-                describedById: describedBy,
-                descElementExists: !!descElement,
-              },
-              wcagCriteria: '4.1.2',
-              impact: 'Screen readers cannot find dialog description',
-              recommendation: 'Ensure aria-describedby ID matches existing element',
-            });
-          }
-        }
-      });
 
       return violations;
     }, BaseScanner.visibilityFilterScript);
@@ -1263,7 +479,7 @@ class AdvancedAriaScanner extends BaseScanner {
   /**
    * Analyze live region implementation
    */
-  async analyzeLiveRegions(page, options) {
+  async analyzeLiveRegions(page) {
     return await page.evaluate((visScript) => {
       eval(visScript);
       const violations = [];
@@ -1278,74 +494,38 @@ class AdvancedAriaScanner extends BaseScanner {
         return `${tagName}${id}${className}`;
       }
 
-      // Find live regions (skip hidden)
       const liveRegions = Array.from(
-        document.querySelectorAll('[aria-live], [role="status"], [role="alert"], [role="log"]')
+        document.querySelectorAll('[role="status"], [role="alert"], [role="log"]')
       ).filter(isElementVisible);
 
-      liveRegions.forEach((region, i) => {
-        const regionSelector = getElementSelector(region);
-
-        // Check for proper aria-live values
-        const ariaLive = region.getAttribute('aria-live');
-        if (ariaLive && !['polite', 'assertive', 'off'].includes(ariaLive)) {
-          violations.push({
-            type: 'invalid-aria-live-value',
-            category: 'live-region',
-            severity: 'moderate',
-            element: regionSelector,
-            description: 'Live region has invalid aria-live value',
-            details: {
-              regionIndex: i,
-              ariaLive: ariaLive,
-              role: region.getAttribute('role'),
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers receive invalid live region information',
-            recommendation: 'Use valid aria-live values: polite, assertive, off',
-          });
-        }
-
+      liveRegions.forEach((region) => {
         const role = region.getAttribute('role');
-
-        // An initially empty live region is correct SC 4.1.3 markup (the
-        // container must exist before content arrives), so it is not reported.
-
         // Contradictory politeness: role="alert"/"status"/"log" carry an implicit
         // politeness setting, and an explicit aria-live="off" overrides it. The
         // author asks for an announcement and suppresses it in the same element.
-        if (ariaLive === 'off' && (role === 'alert' || role === 'status' || role === 'log')) {
-          violations.push({
-            type: 'contradictory-live-region-politeness',
-            category: 'live-region',
-            severity: 'moderate',
-            element: regionSelector,
-            description: `Element has role="${role}" but aria-live="off", which suppresses the announcement the role asks for`,
-            details: {
-              regionIndex: i,
-              role: role,
-              ariaLive: ariaLive,
-            },
-            wcagCriteria: '4.1.2',
-            impact: 'Updates to this region are never announced despite the live-region role',
-            recommendation:
-              'Remove aria-live="off", or drop the role if the region should stay silent',
-          });
-        }
+        if (region.getAttribute('aria-live') !== 'off') return;
+
+        violations.push({
+          type: 'contradictory-live-region-politeness',
+          category: 'live-region',
+          severity: 'moderate',
+          element: getElementSelector(region),
+          description: `Element has role="${role}" but aria-live="off", which suppresses the announcement the role asks for`,
+          details: { role, ariaLive: 'off' },
+          wcagCriteria: '4.1.2',
+          impact: 'Updates to this region are never announced despite the live-region role',
+          recommendation:
+            'Remove aria-live="off", or drop the role if the region should stay silent',
+        });
       });
 
-      // Hidden live regions (display:none / hidden attribute) are not reported:
-      // revealing and populating a region in the same task announces correctly.
+      // An initially empty live region is correct SC 4.1.3 markup (the
+      // container must exist before content arrives), and revealing and
+      // populating a hidden region in the same task announces correctly, so
+      // neither is reported.
 
       return violations;
     }, BaseScanner.visibilityFilterScript);
-  }
-
-  /**
-   * Get count of passed widgets (estimated)
-   */
-  getPassedWidgetsCount(violations) {
-    return Math.max(15 - violations.length, 0);
   }
 
   /**
@@ -1355,48 +535,48 @@ class AdvancedAriaScanner extends BaseScanner {
     const recommendations = [];
     const issueTypes = [...new Set(violations.map((v) => v.type))];
 
-    if (issueTypes.some((type) => type.includes('missing') && type.includes('label'))) {
+    if (issueTypes.includes('widget-missing-accessible-name')) {
       recommendations.push({
         priority: 'critical',
-        issue: 'Complex widgets missing accessible names',
-        solution: 'Add proper aria-label or aria-labelledby to all widgets',
-        implementation: 'Use descriptive labels that explain widget purpose and current state',
+        issue: 'Composite widgets missing accessible names',
+        solution: 'Add aria-label or aria-labelledby to the widget container',
+        implementation: 'Use a label that explains what the widget contains',
       });
     }
 
-    if (issueTypes.some((type) => type.includes('aria-expanded'))) {
+    if (issueTypes.includes('tree-not-keyboard-reachable')) {
       recommendations.push({
         priority: 'critical',
-        issue: 'Expandable widgets missing state information',
-        solution: 'Implement aria-expanded on all collapsible/expandable elements',
-        implementation: 'Set aria-expanded="true" when expanded, "false" when collapsed',
+        issue: 'Composite widget not reachable from the keyboard',
+        solution: 'Implement the roving tabindex or aria-activedescendant pattern',
+        implementation: 'Keep exactly one item at tabindex="0" and move it with the arrow keys',
       });
     }
 
-    if (issueTypes.some((type) => type.includes('aria-controls'))) {
+    if (issueTypes.some((type) => type.includes('selected-tab'))) {
+      recommendations.push({
+        priority: 'high',
+        issue: 'Tab selection state is missing or ambiguous',
+        solution: 'Maintain aria-selected across the tabs of a tablist',
+        implementation: 'Set aria-selected="true" on the active tab and "false" on the others',
+      });
+    }
+
+    if (issueTypes.includes('missing-aria-controls')) {
       recommendations.push({
         priority: 'high',
         issue: 'Widget relationships not properly defined',
-        solution: 'Use aria-controls to link widgets to controlled content',
+        solution: 'Use aria-controls to link the widget to the content it opens',
         implementation: 'Ensure aria-controls IDs match existing controlled elements',
       });
     }
 
-    if (issueTypes.some((type) => type.includes('tabindex') || type.includes('focusable'))) {
-      recommendations.push({
-        priority: 'high',
-        issue: 'Complex widgets not keyboard accessible',
-        solution: 'Implement proper focus management for all interactive widgets',
-        implementation: 'Use tabindex="-1" for widget parts, manage focus programmatically',
-      });
-    }
-
-    if (issueTypes.some((type) => type.includes('live-region'))) {
+    if (issueTypes.includes('contradictory-live-region-politeness')) {
       recommendations.push({
         priority: 'medium',
-        issue: 'Dynamic content changes not announced',
-        solution: 'Implement proper ARIA live regions for status updates',
-        implementation: 'Use aria-live="polite" for updates, "assertive" for urgent alerts',
+        issue: 'Live region silenced by its own aria-live value',
+        solution: 'Let the role decide the politeness, or drop the role',
+        implementation: 'Remove aria-live="off" from role="alert" / "status" / "log" containers',
       });
     }
 
@@ -1431,7 +611,7 @@ class AdvancedAriaScanner extends BaseScanner {
     const guides = {
       'tree-view': {
         requiredRoles: ['tree', 'treeitem', 'group'],
-        requiredAttributes: ['aria-expanded', 'tabindex', 'aria-selected'],
+        requiredAttributes: ['aria-expanded', 'tabindex', 'aria-label'],
         keyboardSupport: [
           'Arrow keys for navigation',
           'Enter/Space to activate',
@@ -1441,7 +621,7 @@ class AdvancedAriaScanner extends BaseScanner {
       },
       'data-grid': {
         requiredRoles: ['grid', 'row', 'columnheader', 'rowheader', 'gridcell'],
-        requiredAttributes: ['aria-rowcount', 'aria-colcount', 'aria-rowindex', 'aria-colindex'],
+        requiredAttributes: ['aria-label', 'aria-rowindex', 'aria-colindex'],
         keyboardSupport: [
           'Arrow keys for cell navigation',
           'Tab to move between grids',
@@ -1457,7 +637,7 @@ class AdvancedAriaScanner extends BaseScanner {
       },
       carousel: {
         requiredRoles: ['region', 'button', 'tab', 'tabpanel'],
-        requiredAttributes: ['aria-label', 'aria-live', 'aria-controls'],
+        requiredAttributes: ['aria-label', 'aria-roledescription'],
         keyboardSupport: [
           'Arrow keys or Tab to navigate slides',
           'Enter/Space to activate controls',
@@ -1474,19 +654,9 @@ class AdvancedAriaScanner extends BaseScanner {
         ],
         focusManagement: 'Only active tab should be tabbable',
       },
-      accordion: {
-        requiredRoles: ['button', 'region'],
-        requiredAttributes: ['aria-expanded', 'aria-controls', 'aria-labelledby'],
-        keyboardSupport: [
-          'Tab to navigate headers',
-          'Enter/Space to toggle',
-          'Arrow keys optional',
-        ],
-        focusManagement: 'Focus moves to accordion headers, not panels',
-      },
       menubar: {
         requiredRoles: ['menubar', 'menuitem', 'menu'],
-        requiredAttributes: ['aria-haspopup', 'aria-expanded'],
+        requiredAttributes: ['aria-label', 'aria-haspopup', 'aria-expanded'],
         keyboardSupport: [
           'Arrow keys for navigation',
           'Enter to activate',
@@ -1494,11 +664,11 @@ class AdvancedAriaScanner extends BaseScanner {
         ],
         focusManagement: 'Focus stays in menubar until menu is closed',
       },
-      dialog: {
-        requiredRoles: ['dialog', 'alertdialog'],
-        requiredAttributes: ['aria-modal', 'aria-labelledby', 'aria-describedby'],
-        keyboardSupport: ['Tab cycles within dialog', 'Escape to close'],
-        focusManagement: 'Focus moves to dialog on open, returns to trigger on close',
+      'live-region': {
+        requiredRoles: ['status', 'alert', 'log'],
+        requiredAttributes: ['aria-live', 'aria-atomic'],
+        keyboardSupport: ['No keyboard interaction'],
+        focusManagement: 'Announce without moving focus',
       },
     };
 
@@ -1522,9 +692,8 @@ class AdvancedAriaScanner extends BaseScanner {
       combobox: 'https://www.w3.org/WAI/ARIA/apg/patterns/combobox/',
       carousel: 'https://www.w3.org/WAI/ARIA/apg/patterns/carousel/',
       'tab-panel': 'https://www.w3.org/WAI/ARIA/apg/patterns/tabs/',
-      accordion: 'https://www.w3.org/WAI/ARIA/apg/patterns/accordion/',
       menubar: 'https://www.w3.org/WAI/ARIA/apg/patterns/menubar/',
-      dialog: 'https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/',
+      'live-region': 'https://www.w3.org/WAI/ARIA/apg/practices/live-regions/',
     };
 
     return references[category] || 'https://www.w3.org/WAI/ARIA/apg/patterns/';

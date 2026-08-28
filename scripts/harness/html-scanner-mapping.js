@@ -156,7 +156,7 @@ const HTML_SCANNER_MAPPING = {
 
   // Language Detection
   'bad-language.html': {
-    expectedScanners: ['language-detection'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.1.1', '3.1.2'],
@@ -164,7 +164,7 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-language-override.html': {
-    expectedScanners: ['language-detection'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.1.2'],
@@ -208,11 +208,12 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-nontext-contrast.html': {
-    expectedScanners: ['color-contrast'],
+    expectedScanners: ['nontext-contrast'],
     excludedScanners: ['use-of-color', 'images-of-text'],
     testType: 'bad',
     wcagCriteria: ['1.4.11'],
-    description: 'Non-text UI components with insufficient contrast',
+    description:
+      'Non-text UI components, a focus ring and a labelled graphic with insufficient contrast',
   },
 
   // Timing and Motion
@@ -278,16 +279,17 @@ const HTML_SCANNER_MAPPING = {
     expectedScanners: ['error-handling', 'page-structure'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
-    wcagCriteria: ['3.3.1', '3.3.3', '3.3.4'],
-    description: 'Poor error identification, suggestions, and prevention',
+    wcagCriteria: ['3.3.1', '3.3.3'],
+    description: 'Poor error identification and no format suggestion on pattern fields',
   },
 
   'bad-error-prevention.html': {
-    expectedScanners: ['error-handling'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.3.4', '3.3.6'],
-    description: 'Missing safeguards for critical actions and data submission',
+    description:
+      'Missing safeguards for critical actions and data submission: 3.3.4 and 3.3.6 are manual review items',
   },
 
   // Complex UI Patterns
@@ -308,7 +310,7 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-status-messages.html': {
-    expectedScanners: ['page-structure'],
+    expectedScanners: ['page-structure', 'status-messages'],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['4.1.3'],
@@ -333,13 +335,8 @@ const HTML_SCANNER_MAPPING = {
   },
 
   // Technical Implementation
-  'bad-html-validation.html': {
-    expectedScanners: ['html-validation'],
-    excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
-    testType: 'bad',
-    wcagCriteria: ['4.1.1'],
-    description: 'Invalid HTML markup affecting accessibility APIs',
-  },
+  // bad-html-validation.html has no entry: SC 4.1.1 was removed from WCAG 2.2.
+  // axe-core reports the ARIA and naming defects in it.
 
   'bad-css-background-info.html': {
     expectedScanners: ['page-structure', 'use-of-color'],
@@ -367,7 +364,7 @@ const HTML_SCANNER_MAPPING = {
   },
 
   'bad-reading-level.html': {
-    expectedScanners: ['language-detection'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.1.5'],
@@ -502,6 +499,15 @@ const HTML_SCANNER_MAPPING = {
     description: 'Voice control compatible interface',
   },
 
+  'good-label-in-name-placeholders.html': {
+    expectedScanners: [],
+    excludedScanners: ['label-in-name'],
+    testType: 'good',
+    wcagCriteria: ['2.5.3'],
+    description:
+      'A placeholder that differs from the accessible name, an image button whose alt and aria-label differ, an icon plus text link and a display:none control: label-in-name must stay silent',
+  },
+
   'good-complex-data-tables.html': {
     expectedScanners: [],
     excludedScanners: ['page-structure'],
@@ -516,6 +522,15 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.13'],
     description: 'Properly implemented hover/focus content',
+  },
+
+  'good-hover-focus-measured.html': {
+    expectedScanners: [],
+    excludedScanners: ['hover-focus-content'],
+    testType: 'good',
+    wcagCriteria: ['1.4.13'],
+    description:
+      'A tooltip opened on focus by script rather than a :focus rule, a pointer-events:none layer over its own trigger, a mouseover handler paired with a focus handler and a toast hidden by setTimeout: hover-focus-content must stay silent',
   },
 
   'good-pointer-cancellation.html': {
@@ -594,7 +609,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-reading-level.html': {
     expectedScanners: [],
-    excludedScanners: ['language-detection'],
+    excludedScanners: [],
     testType: 'good',
     wcagCriteria: ['3.1.5'],
     description: 'Appropriate reading level with alternatives',
@@ -678,7 +693,7 @@ const HTML_SCANNER_MAPPING = {
   // Language Declarations (Good)
   'good-language.html': {
     expectedScanners: [],
-    excludedScanners: ['language-detection'],
+    excludedScanners: [],
     testType: 'good',
     wcagCriteria: ['3.1.1', '3.1.2'],
     description: 'Proper language declarations for page and content sections',
@@ -715,7 +730,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-redundant-aria.html': {
     expectedScanners: [],
-    excludedScanners: ['advanced-aria', 'page-structure', 'html-validation'],
+    excludedScanners: ['advanced-aria', 'page-structure'],
     testType: 'good',
     wcagCriteria: ['4.1.2', '1.3.1'],
     description:
@@ -724,7 +739,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-bootstrap-patterns.html': {
     expectedScanners: [],
-    excludedScanners: ['color-contrast', 'advanced-contrast', 'advanced-aria', 'page-structure'],
+    excludedScanners: ['color-contrast', 'advanced-aria', 'page-structure'],
     testType: 'good',
     wcagCriteria: ['1.4.3', '1.4.6', '4.1.2'],
     description:
@@ -751,13 +766,31 @@ const HTML_SCANNER_MAPPING = {
       'overflow:hidden grid of cards whose text still fits under the 1.4.12 spacing overrides at 320/375/768/1920: text-spacing-failure must not fire',
   },
 
+  'good-fluid-container-and-truncation.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10', '1.4.12'],
+    description:
+      'width:1140px with max-width:100%, an inline px image width, a wide table in an overflow-x wrapper, a nowrap pill button, a line-clamped teaser and an important line-height: fixed-width-element and text-spacing-failure must not fire',
+  },
+
+  'good-zoom-200-percent.html': {
+    expectedScanners: [],
+    excludedScanners: ['text-resize'],
+    testType: 'good',
+    wcagCriteria: ['1.4.4'],
+    description:
+      'Fine print in px, a clipped avatar, a page width inside a min-width media query, a wide table in a scrolling wrapper and a carousel whose off-frame slides are parked at every zoom level: text-overflow and interaction-blocked must not fire at 200 percent zoom',
+  },
+
   'good-decorative-blur-blob.html': {
     expectedScanners: [],
-    excludedScanners: ['responsive-design', 'mobile-specific'],
+    excludedScanners: ['responsive-design'],
     testType: 'good',
     wcagCriteria: ['1.4.10', '1.4.4'],
     description:
-      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element / mobile-fixed-width-400-zoom must not fire',
+      'Decorative 600x600 blurred blob (no text, pointer-events:none) inside an overflow:hidden hero: fixed-width-element must not fire',
   },
 
   'good-two-column-tab-order.html': {
@@ -775,28 +808,59 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['4.1.2'],
     description:
-      'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference: valid per WAI-ARIA 1.2, tab-missing-controls must not fire',
+      'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference: valid per WAI-ARIA 1.2 and no advanced-aria finding',
+  },
+
+  'good-composite-aria-widgets.html': {
+    expectedScanners: [],
+    excludedScanners: ['advanced-aria', 'screen-reader'],
+    testType: 'good',
+    wcagCriteria: ['4.1.2'],
+    description:
+      'Roving tabindex, a disclosure accordion, a non-modal dialog, a collapsed combobox, tabs marked with aria-current, a grid named by aria-labelledby and a menubar named by title: no advanced-aria finding',
+  },
+
+  'good-media-icons-and-background-video.html': {
+    expectedScanners: [],
+    excludedScanners: ['media-accessibility'],
+    testType: 'good',
+    wcagCriteria: ['1.1.1', '1.2.1', '1.2.2'],
+    description:
+      'Inline SVG icons, a photograph with long alt, a 24px chart icon, an object and an image map with names, a decorative canvas and a muted looping background video: no media-accessibility finding',
+  },
+
+  'good-touch-and-pointer-alternatives.html': {
+    expectedScanners: [],
+    excludedScanners: ['concurrent-input'],
+    testType: 'good',
+    wcagCriteria: ['2.5.6'],
+    description:
+      'Swipe gestures beside buttons and arrow keys, a passive touch listener, pointer-events:none on an icon inside its button and on a decorative overlay, and one set of pointer handlers behind a touch probe: no 2.5.6 finding',
+  },
+
+  'good-contact-page-no-statement.html': {
+    expectedScanners: ['accessibility-statement'],
+    excludedScanners: [],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1'],
+    description:
+      'Contact page with e-mail, phone and a form on a site with no accessibility statement: missing-accessibility-statement is the only finding',
   },
 
   'good-accessibility-marketing-page.html': {
     expectedScanners: ['accessibility-statement'],
-    excludedScanners: ['eaa-procedure', 'contact-mechanism', 'compliance-monitoring'],
+    excludedScanners: [],
     testType: 'good',
-    wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+    wcagCriteria: ['EN 301 549 12.1'],
     description:
-      'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit": one missing-accessibility-statement is correct, the follow-up rules (no-audit-schedule, no-issue-tracking, no-feedback-process, ...) must stay silent',
+      'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit": one missing-accessibility-statement is the whole EAA verdict for this page',
   },
 
   'good-accessibility-statement-complete.html': {
     expectedScanners: [],
-    excludedScanners: [
-      'accessibility-statement',
-      'eaa-procedure',
-      'contact-mechanism',
-      'compliance-monitoring',
-    ],
+    excludedScanners: ['accessibility-statement'],
     testType: 'good',
-    wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+    wcagCriteria: ['EN 301 549 12.1'],
     description:
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
@@ -812,11 +876,182 @@ const HTML_SCANNER_MAPPING = {
 
   'bad-keyboard-fixed-skiplink-tab-order.html': {
     expectedScanners: ['keyboard-navigation', 'focus-management'],
-    excludedScanners: ['color-contrast', 'language-detection'],
+    excludedScanners: ['color-contrast'],
     testType: 'bad',
     wcagCriteria: ['2.1.1', '2.4.3'],
     description:
       'Off-canvas fixed skip link as first tab stop, then a div[onclick] without tabindex and a tabindex="5" jump: both defects must survive the tab walk',
+  },
+
+  'good-clickable-wrappers.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.1'],
+    description:
+      'span.btn inside a link, label.btn for a radio, a card with cursor:pointer around a link, a td with cursor:pointer next to a sorting header button, and a wrapper that forwards its click to the button inside it: not-keyboard-accessible must stay silent',
+  },
+
+  'good-scrollable-wrappers.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.1'],
+    description:
+      'Table wrapper with a two pixel overflow, a scroller full of links, a pre with tabindex="0" and a display:none drawer: scrollable-content-not-keyboard-accessible must stay silent',
+  },
+
+  'good-composite-widget-tabindex.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.1'],
+    description:
+      'Menu items all at tabindex="-1", a tabpanel and a named section at tabindex="0", and a tabindex="-1" chevron inside a card link: focusable-element must stay silent',
+  },
+
+  'good-accesskeys-and-widget-keys.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.4'],
+    description:
+      'Unique accesskeys on links, an accesskey on a label, single character keys scoped to a focused listbox, and a counter that mutates the DOM every 100ms: character-key-shortcut and accesskeys must stay silent',
+  },
+
+  'good-bypass-landmarks-only.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.4.1', '2.1.1'],
+    description:
+      'Landmarks, headings and a German skip link reading "Zum Hauptbereich": the deleted bypass and skip-link count rules must not come back',
+  },
+
+  'good-focus-within-indicator.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.7'],
+    description:
+      'Rings painted by :focus-within on a wrapper and by input:focus-visible + label, plus the :focus {outline:none} / :focus-visible reset: no-visible-focus must stay silent',
+  },
+
+  'good-rtl-tab-order.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'dir="rtl" page whose header navigation steps leftwards and whose menu opens upwards: illogical-tab-order must stay silent',
+  },
+
+  'good-dismiss-and-load-more.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A banner that removes itself, a show-more button that appends items, a select and a dropdown toggle: the deleted focus-lost-after-deletion, focus-lost-after-load-more and focus-not-restored rules must not come back',
+  },
+
+  'good-dialog-already-open.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A consent dialog on screen from the first paint next to buttons reading "PDF oeffnen" and "Popup Vorschau": focus-lost needs a dialog that opened as a result of the activation',
+  },
+
+  'good-transparent-fixed-overlay.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.11'],
+    description:
+      'A transparent full viewport fixed layer that takes the hit test above a form: focus-obscured-by-fixed-element must stay silent',
+  },
+
+  'good-predictable-controls.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.1', '3.2.2'],
+    description:
+      'Autofocus inside a dialog, a positive tabindex and controls whose change only rewrites text: no context change to report',
+  },
+
+  'good-repeated-cards-and-buttons.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.4'],
+    description:
+      'Cards that name every link differently, and Cancel/Close/Save buttons: neither is an inconsistent identification',
+  },
+
+  'good-form-fields-without-hints.html': {
+    expectedScanners: [],
+    excludedScanners: ['error-handling'],
+    testType: 'good',
+    wcagCriteria: ['3.3.1', '3.3.2', '3.3.3'],
+    description:
+      'A login password, an e-mail and a date field with no format hint, aria-invalid="false" and groups named without a legend',
+  },
+
+  'good-static-decorations.html': {
+    expectedScanners: [],
+    excludedScanners: ['timing-controls'],
+    testType: 'good',
+    wcagCriteria: ['2.2.1', '2.2.2'],
+    description:
+      'Decorations named blink, scroll and moving that stay in place, and a counter that counts up and can be paused',
+  },
+
+  'good-links-distinguished-in-text.html': {
+    expectedScanners: [],
+    excludedScanners: ['use-of-color'],
+    testType: 'good',
+    wcagCriteria: ['1.4.1'],
+    description:
+      'Links in body text carrying an underline, a bold weight, an icon, or a colour difference of 3.33:1 plus an underline on hover and focus (G183): link-color-only must stay silent',
+  },
+
+  'good-graphic-parts-contrast.html': {
+    expectedScanners: [],
+    excludedScanners: ['nontext-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.11'],
+    description:
+      'Labelled graphics whose colours come from CSS and currentColor and whose pale parts sit beside high-contrast ones: insufficient-graphic-contrast must stay silent',
+  },
+
+  'good-state-styles-unused.html': {
+    expectedScanners: [],
+    excludedScanners: ['nontext-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.11'],
+    description:
+      'aria-pressed and aria-selected colour rules for states the controls never expose, and a checked state that changes the border width: insufficient-interactive-state-contrast must stay silent',
+  },
+
+  'good-aa-text-not-enhanced.html': {
+    expectedScanners: [],
+    excludedScanners: ['color-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.3'],
+    description:
+      'Text between the AA and the AAA thresholds: axe-core owns SC 1.4.3, and color-contrast measures SC 1.4.6 only for a scan that asks for AAA',
+  },
+
+  'good-color-coded-indicators.html': {
+    expectedScanners: [],
+    excludedScanners: ['use-of-color'],
+    testType: 'good',
+    wcagCriteria: ['1.4.1'],
+    description:
+      'Status dots named by a visually hidden span or a title, identical decorative bullets and a colour picker of named buttons: color-coded-indicator must stay silent',
   },
 };
 
@@ -827,25 +1062,19 @@ const AVAILABLE_SCANNERS = [
   'color-contrast',
   'use-of-color',
   'images-of-text',
-  'language-detection',
-  'html-validation',
   'keyboard-navigation',
   'input-modalities',
   'timing-controls',
   'seizure-prevention',
   'predictable-navigation',
   'error-handling',
-  'eaa-procedure',
   'focus-management',
   'page-structure',
   'accessibility-statement',
-  'contact-mechanism',
-  'compliance-monitoring',
   'responsive-design',
-  'mobile-specific',
   'advanced-aria',
   'screen-reader',
-  'advanced-contrast',
+  'nontext-contrast',
 ];
 
 /**

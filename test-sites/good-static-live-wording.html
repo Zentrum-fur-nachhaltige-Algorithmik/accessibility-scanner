@@ -1,0 +1,63 @@
+<!-- WCAG-TEST
+criterion: 2.2.2
+level: A
+title: Pause Stop Hide
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: timing-controls
+description: Static prose that contains the words live, updating, ticker, feed and refresh but never updates itself, so it needs no pause control
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Where you live and how we update this guidance</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 40rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #1a1a1a;
+        background: #fff;
+        line-height: 1.6;
+      }
+      h1,
+      h2 {
+        color: #111;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Where you live and how we update this guidance</h1>
+
+      <p>
+        The rules are different depending on where you live. If you live in Northern Ireland you
+        must bring your insurance certificate with you.
+      </p>
+
+      <h2>How this page is kept up to date</h2>
+      <p>
+        We refresh this guidance whenever the law changes. Editors have a checklist for updating
+        each section, and every change is recorded so you can see what was amended and when.
+      </p>
+
+      <h2>Other ways to follow the guidance</h2>
+      <p>
+        You can subscribe to the email feed for this topic, or read the news ticker archive of past
+        announcements. Neither of them changes anything on this page: nothing here moves, blinks,
+        scrolls or reloads on its own, so there is nothing for a pause or stop control to act on.
+      </p>
+
+      <h2>Live services</h2>
+      <p>
+        The live application service opens at 7am. Once you start an application the page shows a
+        static summary of what you entered; it does not poll the server or rewrite itself while you
+        read it.
+      </p>
+    </main>
+  </body>
+</html>

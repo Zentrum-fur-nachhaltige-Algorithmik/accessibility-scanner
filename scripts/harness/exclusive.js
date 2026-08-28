@@ -26,8 +26,13 @@ async function loadPuppeteer() {
 }
 
 /**
- * Scanner definitions: id -> { module, criteria, scanOpts }
+ * Scanner definitions: id -> { module, criteria, scanOpts, files }
  * Each entry defines which WCAG criteria to filter violations by.
+ *
+ * `files` claims fixtures by name. A claimed fixture runs against the scanners
+ * that claim it and against no others, and a scanner that claims files is left
+ * out of the criterion routing below. That is how two scanners can share a
+ * criterion without being scored against each other's fixtures.
  */
 const EXCLUSIVE_SCANNERS = {
   'keyboard-navigation': {
@@ -44,17 +49,24 @@ const EXCLUSIVE_SCANNERS = {
   },
   'responsive-design': {
     module: '../../src/scanners/responsive-design',
-    criteria: ['1.4.4', '1.4.10', '1.4.12'],
-    scanOpts: { heuristicOnly: true }, // use heuristic mode for speed
+    criteria: ['1.4.10', '1.4.12'],
+    // Fast mode: the 320px reflow measurement and the 1.4.12 spacing
+    // injection without the full viewport matrix.
+    scanOpts: { heuristicOnly: true },
   },
+  // Owns 1.4.4: the content and functionality lost at 200 percent zoom.
+  'text-resize': {
+    module: '../../src/scanners/text-resize',
+    criteria: ['1.4.4'],
+  },
+  // Drives the pointer onto the content a hover reveals, so it needs its own tab.
   'hover-focus-content': {
     module: '../../src/scanners/hover-focus-content',
     criteria: ['1.4.13'],
-    scanOpts: { heuristicOnly: true },
   },
   'seizure-prevention': {
     module: '../../src/scanners/seizure-prevention',
-    criteria: ['2.3.1'],
+    criteria: ['2.3.1', '2.3.2', '2.3.3'],
   },
   'multiple-ways': {
     module: '../../src/scanners/multiple-ways',
@@ -70,15 +82,45 @@ const EXCLUSIVE_SCANNERS = {
     module: '../../src/scanners/nontext-contrast',
     criteria: ['1.4.11'],
   },
+  // Submits forms and clicks buttons to see which status messages the page
+  // produces, so it needs its own tab.
+  'status-messages': {
+    module: '../../src/scanners/status-messages',
+    criteria: ['4.1.3'],
+  },
+  // Focuses controls, changes their settings and answers navigation requests
+  // with 204, so it needs its own tab.
+  'predictable-navigation': {
+    module: '../../src/scanners/predictable-navigation',
+    criteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
+  },
+  // Clicks the page's own links and reports what a client-side route change
+  // did to the title and to focus.
+  'dynamic-spa': {
+    module: '../../src/scanners/dynamic-spa',
+    criteria: ['2.4.2', '2.4.3'],
+    files: ['good-spa-route-change.html', 'bad-spa-route-change.html'],
+  },
 };
 
 /**
- * Criterion -> scanner mapping for test file routing.
+ * Criterion -> scanner mapping for test file routing. Scanners that claim
+ * fixtures by name take part in file routing only.
  */
 const CRITERION_TO_SCANNER = {};
 for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
+  if (def.files) continue;
   for (const c of def.criteria) {
     CRITERION_TO_SCANNER[c] = id;
+  }
+}
+
+/** Fixture file -> the scanners that claim it. */
+const FILE_TO_SCANNERS = {};
+for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
+  for (const file of def.files || []) {
+    if (!FILE_TO_SCANNERS[file]) FILE_TO_SCANNERS[file] = [];
+    FILE_TO_SCANNERS[file].push(id);
   }
 }
 
@@ -126,11 +168,14 @@ async function main() {
     const isBad = metadata.testType === 'bad';
     if (!isGood && !isBad) continue;
 
-    // Find which exclusive scanner(s) cover this file's criteria
-    const scannerIds = new Set();
-    for (const c of metadata.criterion) {
-      const sid = CRITERION_TO_SCANNER[c];
-      if (sid) scannerIds.add(sid);
+    // Find which exclusive scanner(s) cover this file. A file a scanner
+    // claims by name runs against that scanner only.
+    const scannerIds = new Set(FILE_TO_SCANNERS[file] || []);
+    if (scannerIds.size === 0) {
+      for (const c of metadata.criterion) {
+        const sid = CRITERION_TO_SCANNER[c];
+        if (sid) scannerIds.add(sid);
+      }
     }
 
     for (const sid of scannerIds) {
@@ -386,12 +431,10 @@ async function main() {
     }
   }
 
-  // ---- Full-mode responsive tests for 1.4.4 (text resize) and 1.4.10 (reflow) ----
+  // ---- Full-mode responsive test for 1.4.10 (reflow) ----
   origLog(`\n--- responsive-design FULL-MODE criterion tests ---`);
   if (responsiveScanner) {
     for (const { file, criteria, expectViolations } of [
-      { file: 'bad-text-resize.html', criteria: ['1.4.4'], expectViolations: true },
-      { file: 'good-text-resize.html', criteria: ['1.4.4'], expectViolations: false },
       { file: 'bad-reflow.html', criteria: ['1.4.10'], expectViolations: true },
       { file: 'good-reflow.html', criteria: ['1.4.10'], expectViolations: false },
     ]) {
@@ -506,7 +549,7 @@ async function main() {
 // Exported so `scripts/coverage-matrix.js` can read the real scanner-to-criteria
 // table instead of regex-scraping this file. Guarded so requiring it never
 // launches a browser.
-module.exports = { EXCLUSIVE_SCANNERS, CRITERION_TO_SCANNER, matchesCriteria };
+module.exports = { EXCLUSIVE_SCANNERS, CRITERION_TO_SCANNER, FILE_TO_SCANNERS, matchesCriteria };
 
 if (require.main === module) {
   main().catch((err) => {

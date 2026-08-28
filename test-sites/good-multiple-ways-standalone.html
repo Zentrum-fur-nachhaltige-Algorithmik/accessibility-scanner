@@ -1,0 +1,41 @@
+<!-- WCAG-TEST
+criterion: 2.4.5
+level: AA
+title: Multiple Ways
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: multiple-ways
+description: A standalone one page site whose only links leave the origin, so nothing shows it belongs to a set of pages
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marta Feld, stone conservator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
+        section { margin: 2rem 0; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Marta Feld, stone conservator</h1>
+
+        <section id="work">
+            <h2>Work</h2>
+            <p>Conservation of sandstone facades and funerary monuments, since 2009.</p>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>
+                <a href="mailto:post@example.org">post@example.org</a><br>
+                <a href="tel:+493012345">+49 30 12345</a>
+            </p>
+            <p>Profile on <a href="https://www.example.com/marta-feld">the conservators' register</a>.</p>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!-- WCAG-TEST
+criterion: 2.4.3
+level: A
+title: Focus Order after dismissing, loading more and closing a dropdown
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: Three patterns the old probes clicked and then failed: a cookie banner whose "Close" button removes the banner (the element count drops, focus leaves the removed button), a "Show more" button that appends list items without moving focus, and a native select plus a dropdown toggle that the restoration probe opened with Enter and judged after Escape. None of the three is a WCAG failure, so focus-lost-after-deletion, focus-lost-after-load-more and focus-not-restored must produce nothing.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Schliessen, mehr laden, Dropdown (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button, select { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .banner { border: 1px solid #767676; padding: 12px; margin-bottom: 16px; }
+  .dropdown { border: 1px solid #767676; padding: 8px; display: none; max-width: 240px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="banner" id="cookieBanner">
+    <p>Diese Seite verwendet nur technisch notwendige Cookies.</p>
+    <button type="button" class="banner-close" onclick="document.getElementById('cookieBanner').remove()">Close</button>
+  </div>
+
+  <h1>Fokus nach dem Schliessen und Nachladen</h1>
+
+  <p><button type="button" class="load-more" onclick="loadMore()">Show more</button></p>
+  <ul id="newsList"><li>Beitrag 1</li><li>Beitrag 2</li></ul>
+
+  <h2>Sprache</h2>
+  <p>
+    <label for="lang">Sprache waehlen</label>
+    <select id="lang">
+      <option>Deutsch</option>
+      <option>English</option>
+    </select>
+  </p>
+
+  <h2>Filter</h2>
+  <button type="button" class="dropdown-toggle" aria-expanded="false" aria-controls="filterMenu" onclick="toggleFilter(this)">Filter</button>
+  <div class="dropdown" id="filterMenu">
+    <p><a href="#details">Nach Datum</a></p>
+    <p><a href="#details">Nach Name</a></p>
+  </div>
+
+  <h2 id="details">Details</h2>
+  <p>Ein Abschnitt, auf den die Links zeigen.</p>
+
+  <script>
+    function loadMore() {
+      var list = document.getElementById('newsList');
+      for (var i = 0; i < 3; i++) {
+        var item = document.createElement('li');
+        item.textContent = 'Beitrag ' + (list.children.length + 1);
+        list.appendChild(item);
+      }
+    }
+
+    function toggleFilter(button) {
+      var menu = document.getElementById('filterMenu');
+      var open = menu.style.display === 'block';
+      menu.style.display = open ? 'none' : 'block';
+      button.setAttribute('aria-expanded', String(!open));
+    }
+  </script>
+</main>
+</body>
+</html>

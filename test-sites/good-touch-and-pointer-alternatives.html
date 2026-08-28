@@ -1,0 +1,77 @@
+<!-- WCAG-TEST
+criterion: 2.5.6
+level: AAA
+title: Touch gestures beside pointer and keyboard alternatives
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: concurrent-input
+description: A swipe gallery whose touch handlers cancel the event but which is also operable with buttons and the arrow keys, a passive touch listener, an icon with pointer-events:none inside its button, a decorative overlay with pointer-events:none, a script that probes for touch support and binds pointer events once, and a document key handler that cancels only the two arrow keys. Every one of these was reported as a 2.5.6 restriction.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Touch, pointer and keyboard together</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 1rem; }
+  .gallery { width: 320px; height: 200px; border: 1px solid #767676; }
+  .icon { pointer-events: none; }
+  .overlay { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#ffffff00, #ffffff66); }
+  .stage { position: relative; width: 320px; height: 120px; }
+</style>
+</head>
+<body>
+<h1>Gallery</h1>
+
+<button type="button" id="prev">Previous image</button>
+<button type="button" id="next">Next image</button>
+
+<div class="gallery" id="gallery" tabindex="0" role="group"
+     aria-label="Image gallery, use the arrow keys or swipe"
+     ontouchstart="startSwipe(event)" ontouchmove="trackSwipe(event)" ontouchend="endSwipe(event)"
+     onkeydown="galleryKeys(event)">
+  <p id="caption">Image 1 of 5</p>
+</div>
+
+<div class="stage">
+  <div class="overlay"></div>
+  <p>Rendered under a decorative gradient.</p>
+</div>
+
+<button type="button" id="share">
+  <svg class="icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8"></circle></svg>
+  Share
+</button>
+
+<div id="map" tabindex="0" role="application" aria-label="Map, drag with the pointer or pan with the arrow keys">Map</div>
+
+<script>
+  var index = 1;
+  function render() { document.getElementById('caption').textContent = 'Image ' + index + ' of 5'; }
+  function startSwipe(event) { event.preventDefault(); }
+  function trackSwipe(event) { event.preventDefault(); }
+  function endSwipe(event) { event.preventDefault(); index = index % 5 + 1; render(); }
+  function galleryKeys(event) {
+    if (event.key === 'ArrowRight') { index = index % 5 + 1; render(); event.preventDefault(); }
+    if (event.key === 'ArrowLeft') { index = (index + 3) % 5 + 1; render(); event.preventDefault(); }
+  }
+  document.getElementById('prev').addEventListener('click', function () { index = (index + 3) % 5 + 1; render(); });
+  document.getElementById('next').addEventListener('click', function () { index = index % 5 + 1; render(); });
+
+  // The page knows the device has a touch screen and still binds one set of
+  // pointer handlers, which serves mouse, pen and touch at the same time.
+  var touchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  var map = document.getElementById('map');
+  map.addEventListener('pointerdown', function () { map.setAttribute('data-dragging', 'true'); });
+  map.addEventListener('pointerup', function () { map.removeAttribute('data-dragging'); });
+  map.addEventListener('touchmove', function () { /* keeps the page scrollable */ }, { passive: true });
+  map.dataset.touchCapable = String(touchCapable);
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') event.preventDefault();
+  });
+</script>
+</body>
+</html>

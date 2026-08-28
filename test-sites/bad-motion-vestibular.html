@@ -578,6 +578,7 @@ description: Motion-triggered functionality without static alternatives
                 <div class="bad-motion-display">
                     <div class="bad-motion-ball"></div>
                     <p style="margin-top: 50px;">Gerätebewegung wird automatisch verfolgt</p>
+                    <p id="badMotionReadout">x 0 / y 0</p>
                 </div>
                 <div style="background: rgba(255, 255, 255, 0.2); padding: 10px; border-radius: 4px; margin: 15px 0;">
                     <strong>⚠️ Problematisch:</strong><br>
@@ -808,6 +809,23 @@ description: Motion-triggered functionality without static alternatives
         
         // Check and violate reduced motion preference
         badIgnoreReducedMotion();
+
+        // VIOLATION 8b: the ball position is operated by device motion from the
+        // moment the page loads. No control moves it, and nothing switches the
+        // sensor off, which is what 2.5.4 Motion Actuation asks for.
+        window.addEventListener('devicemotion', function (event) {
+            const ball = document.querySelector('.bad-motion-ball');
+            const a = event.accelerationIncludingGravity || { x: 0, y: 0 };
+            if (!ball) return;
+            ball.style.left = Math.max(5, Math.min(95, 50 + (a.x || 0) * 5)) + '%';
+            ball.style.top = Math.max(5, Math.min(95, 50 + (a.y || 0) * 5)) + '%';
+            document.getElementById('badMotionReadout').textContent =
+                'x ' + Math.round(a.x || 0) + ' / y ' + Math.round(a.y || 0);
+        });
+        window.addEventListener('deviceorientation', function (event) {
+            document.getElementById('badMotionReadout').textContent +=
+                ' | gamma ' + Math.round(event.gamma || 0);
+        });
     </script>
 </body>
 </html>

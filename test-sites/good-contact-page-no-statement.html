@@ -1,0 +1,41 @@
+<!-- WCAG-TEST
+criterion: EN 301 549 12.1
+level: AA
+title: Contact page of a site without an accessibility statement
+test_type: good
+expected_violations: 1
+testable_by: dom
+scanners: accessibility-statement
+description: A contact page with an e-mail address, a phone number and a contact form, and no accessibility statement anywhere on the site. The one correct finding is missing-accessibility-statement; the contact quality, the feedback process and the monitoring procedure are properties of a statement that does not exist and are not reported.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 1rem; }
+  label { display: block; margin-top: .5rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kontakt</h1>
+  <p>Schreiben Sie an <a href="mailto:ordination@musterpraxis.at">ordination@musterpraxis.at</a>
+     oder rufen Sie unter <a href="tel:+4312345678">01 234 56 78</a> an.</p>
+
+  <form action="/kontakt" method="post">
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" autocomplete="name">
+    <label for="message">Ihre Nachricht</label>
+    <textarea id="message" name="message" rows="4"></textarea>
+    <button type="submit">Nachricht senden</button>
+  </form>
+</main>
+<footer>
+  <a href="/impressum.html">Impressum</a>
+  <a href="/datenschutz.html">Datenschutz</a>
+</footer>
+</body>
+</html>

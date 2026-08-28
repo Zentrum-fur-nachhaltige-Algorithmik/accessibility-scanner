@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 182,
+  "fixtureCount": 231,
   "scanners": [
     {
       "id": "axe-core",
@@ -12,7 +12,6 @@
     {
       "id": "color-contrast",
       "criteria": [
-        "1.4.3",
         "1.4.6"
       ],
       "kind": "deterministic",
@@ -27,8 +26,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-use-of-color.html (1.4.1) | concurrent harness FAIL: false positive on good-css-background-accessible.html (1.4.1)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "images-of-text",
@@ -38,19 +37,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)"
-    },
-    {
-      "id": "advanced-contrast",
-      "criteria": [
-        "1.4.11",
-        "1.4.13"
-      ],
-      "kind": "deterministic",
-      "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-color-contrast.html (1.4.3,1.4.6) | concurrent harness FAIL: missed bad-focus-visible.html (1.4.3)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "nontext-contrast",
@@ -76,13 +64,12 @@
       "id": "screen-reader",
       "criteria": [
         "1.3.1",
-        "4.1.2",
-        "4.1.3"
+        "2.4.1"
       ],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2,4.1.3) | concurrent harness FAIL: missed bad-beeproduced-real-issues.html (4.1.2,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (4.1.2,1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+4 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | concurrent harness FAIL: missed bad-landmarks.html (1.3.1,2.4.1)"
     },
     {
       "id": "media-accessibility",
@@ -118,17 +105,6 @@
       "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
-      "id": "language-detection",
-      "criteria": [
-        "3.1.1",
-        "3.1.2"
-      ],
-      "kind": "deterministic",
-      "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-language-override.html (3.1.2)"
-    },
-    {
       "id": "predictable-navigation",
       "criteria": [
         "3.2.1",
@@ -137,7 +113,7 @@
         "3.2.4"
       ],
       "kind": "deterministic",
-      "exclusive": false,
+      "exclusive": true,
       "trust": "proven",
       "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
@@ -146,37 +122,23 @@
       "criteria": [
         "3.3.1",
         "3.3.2",
-        "3.3.3",
-        "3.3.4"
+        "3.3.3"
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)"
-    },
-    {
-      "id": "html-validation",
-      "criteria": [
-        "4.1.1",
-        "4.1.2"
-      ],
-      "kind": "deterministic",
-      "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-complex-aria.html (4.1.2) | concurrent harness FAIL: false positive on good-aria-role-override.html (4.1.2) | concurrent harness FAIL: false positive on good-bootstrap-patterns.html (4.1.2)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "page-structure",
       "criteria": [
-        "1.3.1",
-        "2.4.1",
-        "2.4.2",
-        "2.4.6"
+        "2.4.4",
+        "2.4.9"
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+2 more)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "label-in-name",
@@ -186,29 +148,27 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3) | concurrent harness FAIL: false positive on good-label-in-name.html (2.5.3)"
+      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3)"
     },
     {
       "id": "status-messages",
       "criteria": [
-        "4.1.3",
-        "3.3.1"
+        "4.1.3"
       ],
       "kind": "deterministic",
       "exclusive": true,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-form-errors.html (3.3.1) | concurrent harness FAIL: missed bad-status-messages.html (4.1.3)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "advanced-aria",
       "criteria": [
-        "4.1.2",
-        "1.3.1"
+        "4.1.2"
       ],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | concurrent harness FAIL: missed bad-icon-accessibility.html (4.1.2) | (+4 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-beeproduced-real-issues.html (4.1.2) | concurrent harness FAIL: missed bad-icon-accessibility.html (4.1.2)"
     },
     {
       "id": "seizure-prevention",
@@ -230,8 +190,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: false positive on good-timing-controls.html (2.2.1,2.2.2)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "multiple-ways",
@@ -285,19 +245,8 @@
     {
       "id": "responsive-design",
       "criteria": [
-        "1.4.4",
         "1.4.10",
         "1.4.12"
-      ],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "mobile-specific",
-      "criteria": [
-        "1.4.10"
       ],
       "kind": "deterministic",
       "exclusive": true,
@@ -327,8 +276,8 @@
     {
       "id": "dynamic-spa",
       "criteria": [
-        "4.1.2",
-        "4.1.3"
+        "2.4.2",
+        "2.4.3"
       ],
       "kind": "deterministic",
       "exclusive": true,
@@ -337,30 +286,6 @@
     },
     {
       "id": "accessibility-statement",
-      "criteria": [],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "contact-mechanism",
-      "criteria": [],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "compliance-monitoring",
-      "criteria": [],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "eaa-procedure",
       "criteria": [],
       "kind": "deterministic",
       "exclusive": true,
@@ -530,7 +455,9 @@
         "good": [
           "good-accessibility.html",
           "good-css-background-accessible.html",
-          "good-image-alt-complex.html"
+          "good-descriptive-photo-alt.html",
+          "good-image-alt-complex.html",
+          "good-media-icons-and-background-video.html"
         ],
         "bad": [
           "bad-beeproduced-real-issues.html",
@@ -564,7 +491,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-media-alternatives.html"
+          "good-media-alternatives.html",
+          "good-media-icons-and-background-video.html"
         ],
         "bad": [
           "bad-media-alternatives.html"
@@ -577,7 +505,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -601,7 +529,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-media-alternatives.html"
+          "good-media-alternatives.html",
+          "good-media-icons-and-background-video.html"
         ],
         "bad": [
           "bad-media-alternatives.html"
@@ -614,7 +543,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -829,9 +758,7 @@
       "title": "Info and Relationships",
       "mechanism": "axe-core",
       "supporting": [
-        "screen-reader (experimental)",
-        "page-structure (experimental)",
-        "advanced-aria (experimental)"
+        "screen-reader (experimental)"
       ],
       "justification": "",
       "isManual": false,
@@ -851,9 +778,7 @@
         "th-has-data-cells"
       ],
       "deterministic": [
-        "screen-reader",
-        "page-structure",
-        "advanced-aria"
+        "screen-reader"
       ],
       "llm": [],
       "fixtures": {
@@ -883,8 +808,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 42,
+        "fpClean": true,
+        "runs": 15,
         "from": [
           "concurrent"
         ]
@@ -962,6 +887,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-orientation-responsive.html",
           "good-orientation.html"
         ],
         "bad": [
@@ -975,7 +901,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -999,7 +925,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-autocomplete.html"
+          "good-autocomplete.html",
+          "good-input-purpose-not-user-data.html"
         ],
         "bad": [
           "bad-autocomplete.html"
@@ -1012,7 +939,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1049,10 +976,8 @@
       "sc": "1.4.1",
       "level": "A",
       "title": "Use of Color",
-      "mechanism": "axe-core",
-      "supporting": [
-        "use-of-color (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+use-of-color",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1065,7 +990,9 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-css-background-accessible.html"
+          "good-color-coded-indicators.html",
+          "good-css-background-accessible.html",
+          "good-links-distinguished-in-text.html"
         ],
         "bad": [
           "bad-css-background-info.html",
@@ -1078,8 +1005,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 3,
+        "fpClean": true,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -1116,7 +1043,7 @@
       "sc": "1.4.3",
       "level": "AA",
       "title": "Contrast (Minimum)",
-      "mechanism": "hybrid:axe-core+color-contrast",
+      "mechanism": "axe-core",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1124,12 +1051,11 @@
       "axeRules": [
         "color-contrast"
       ],
-      "deterministic": [
-        "color-contrast"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
+          "good-aa-text-not-enhanced.html",
           "good-bootstrap-patterns.html",
           "good-color-contrast.html",
           "good-contrast-hidden-and-arbitrary-classes.html"
@@ -1140,26 +1066,16 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent"
+        "axe-e2e"
       ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 8,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "1.4.4",
       "level": "AA",
       "title": "Resize Text",
       "mechanism": "hybrid:axe-core+text-resize",
-      "supporting": [
-        "responsive-design"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1167,14 +1083,14 @@
         "meta-viewport"
       ],
       "deterministic": [
-        "text-resize",
-        "responsive-design"
+        "text-resize"
       ],
       "llm": [],
       "fixtures": {
         "good": [
           "good-decorative-blur-blob.html",
-          "good-text-resize.html"
+          "good-text-resize.html",
+          "good-zoom-200-percent.html"
         ],
         "bad": [
           "bad-text-resize.html"
@@ -1188,7 +1104,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1198,11 +1114,11 @@
       "sc": "1.4.5",
       "level": "AA",
       "title": "Images of Text",
-      "mechanism": "experimental:images-of-text",
+      "mechanism": "deterministic:images-of-text",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: images-of-text: concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)",
+      "justification": "",
       "isManual": false,
-      "isExperimentalOnly": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
         "images-of-text"
@@ -1210,6 +1126,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-images-of-text-photographs.html",
           "good-images-of-text.html"
         ],
         "bad": [
@@ -1220,9 +1137,9 @@
         "concurrent"
       ],
       "outcome": {
-        "tp": false,
+        "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1246,7 +1163,6 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-bootstrap-patterns.html",
           "good-contrast-enhanced.html"
         ],
         "bad": [
@@ -1260,7 +1176,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 6,
+        "runs": 2,
         "from": [
           "concurrent"
         ]
@@ -1326,10 +1242,8 @@
       "sc": "1.4.9",
       "level": "AAA",
       "title": "Images of Text (No Exception)",
-      "mechanism": "llm:llm-visual-presentation",
-      "supporting": [
-        "images-of-text (experimental)"
-      ],
+      "mechanism": "hybrid:images-of-text+llm-visual-presentation",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1367,21 +1281,19 @@
       "level": "AA",
       "title": "Reflow",
       "mechanism": "deterministic:responsive-design",
-      "supporting": [
-        "mobile-specific"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "responsive-design",
-        "mobile-specific"
+        "responsive-design"
       ],
       "llm": [],
       "fixtures": {
         "good": [
           "good-decorative-blur-blob.html",
+          "good-fluid-container-and-truncation.html",
           "good-reflow.html"
         ],
         "bad": [
@@ -1395,7 +1307,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1406,28 +1318,26 @@
       "level": "AA",
       "title": "Non-text Contrast",
       "mechanism": "deterministic:nontext-contrast",
-      "supporting": [
-        "advanced-contrast (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "advanced-contrast",
         "nontext-contrast"
       ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-nontext-contrast.html"
+          "good-graphic-parts-contrast.html",
+          "good-nontext-contrast.html",
+          "good-state-styles-unused.html"
         ],
         "bad": [
           "bad-nontext-contrast.html"
         ]
       },
       "harness": [
-        "concurrent",
         "exclusive",
         "golden"
       ],
@@ -1436,7 +1346,7 @@
         "fpClean": true,
         "runs": 4,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     },
@@ -1458,6 +1368,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-fluid-container-and-truncation.html",
           "good-text-spacing-grid-cards.html",
           "good-text-spacing.html"
         ],
@@ -1472,7 +1383,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1483,35 +1394,34 @@
       "level": "AA",
       "title": "Content on Hover or Focus",
       "mechanism": "deterministic:hover-focus-content",
-      "supporting": [
-        "advanced-contrast (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "advanced-contrast",
         "hover-focus-content"
       ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-hover-focus-content.html"
+          "good-hover-focus-content.html",
+          "good-hover-focus-measured.html",
+          "good-title-supplementing-name.html"
         ],
         "bad": [
-          "bad-hover-focus-content.html"
+          "bad-hover-focus-content.html",
+          "bad-title-only-name.html"
         ]
       },
       "harness": [
-        "concurrent",
         "exclusive",
         "golden"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -1538,8 +1448,12 @@
       "fixtures": {
         "good": [
           "good-accessibility.html",
+          "good-bypass-landmarks-only.html",
+          "good-clickable-wrappers.html",
+          "good-composite-widget-tabindex.html",
           "good-keyboard-native-override.html",
-          "good-scrollable-content.html"
+          "good-scrollable-content.html",
+          "good-scrollable-wrappers.html"
         ],
         "bad": [
           "bad-beeproduced-real-issues.html",
@@ -1556,7 +1470,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 7,
+        "runs": 12,
         "from": [
           "exclusive"
         ]
@@ -1641,6 +1555,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-accesskeys-and-widget-keys.html",
           "good-character-key-shortcuts.html"
         ],
         "bad": [
@@ -1653,7 +1568,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1663,10 +1578,8 @@
       "sc": "2.2.1",
       "level": "A",
       "title": "Timing Adjustable",
-      "mechanism": "axe-core",
-      "supporting": [
-        "timing-controls (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+timing-controls",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1679,6 +1592,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-static-decorations.html",
           "good-timing-controls.html"
         ],
         "bad": [
@@ -1691,8 +1605,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 2,
+        "fpClean": true,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1702,10 +1616,8 @@
       "sc": "2.2.2",
       "level": "A",
       "title": "Pause, Stop, Hide",
-      "mechanism": "axe-core",
-      "supporting": [
-        "timing-controls (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+timing-controls",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1719,6 +1631,8 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-static-decorations.html",
+          "good-static-live-wording.html",
           "good-timing-controls.html"
         ],
         "bad": [
@@ -1731,8 +1645,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 2,
+        "fpClean": true,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -1867,7 +1781,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
@@ -1879,7 +1794,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1901,14 +1816,24 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-seizure-safe.html"
+          "good-seizure-safe.html",
+          "good-short-animations.html"
         ],
         "bad": [
           "bad-seizure-risk.html"
         ]
       },
-      "harness": [],
-      "outcome": null
+      "harness": [
+        "exclusive"
+      ],
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 3,
+        "from": [
+          "exclusive"
+        ]
+      }
     },
     {
       "sc": "2.3.3",
@@ -1932,8 +1857,17 @@
           "bad-motion-vestibular.html"
         ]
       },
-      "harness": [],
-      "outcome": null
+      "harness": [
+        "exclusive"
+      ],
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 2,
+        "from": [
+          "exclusive"
+        ]
+      }
     },
     {
       "sc": "2.4.1",
@@ -1941,7 +1875,7 @@
       "title": "Bypass Blocks",
       "mechanism": "axe-core",
       "supporting": [
-        "page-structure (experimental)"
+        "screen-reader (experimental)"
       ],
       "justification": "",
       "isManual": false,
@@ -1950,13 +1884,15 @@
         "bypass"
       ],
       "deterministic": [
-        "page-structure"
+        "screen-reader"
       ],
       "llm": [],
       "fixtures": {
         "good": [
+          "good-bypass-landmarks-only.html",
           "good-landing-page.html",
           "good-landmarks.html",
+          "good-skip-link-lookalikes.html",
           "good-skip-links.html"
         ],
         "bad": [
@@ -1970,9 +1906,9 @@
         "concurrent"
       ],
       "outcome": {
-        "tp": false,
+        "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 8,
         "from": [
           "concurrent"
         ]
@@ -1982,10 +1918,8 @@
       "sc": "2.4.2",
       "level": "A",
       "title": "Page Titled",
-      "mechanism": "axe-core",
-      "supporting": [
-        "page-structure (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+dynamic-spa",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1993,27 +1927,29 @@
         "document-title"
       ],
       "deterministic": [
-        "page-structure"
+        "dynamic-spa"
       ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-page-titled.html"
+          "good-page-titled.html",
+          "good-spa-route-change.html"
         ],
         "bad": [
-          "bad-page-titled.html"
+          "bad-page-titled.html",
+          "bad-spa-route-change.html"
         ]
       },
       "harness": [
         "axe-e2e",
-        "concurrent"
+        "exclusive"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     },
@@ -2022,23 +1958,31 @@
       "level": "A",
       "title": "Focus Order",
       "mechanism": "deterministic:focus-management",
-      "supporting": [],
+      "supporting": [
+        "dynamic-spa"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "focus-management"
+        "focus-management",
+        "dynamic-spa"
       ],
       "llm": [],
       "fixtures": {
         "good": [
+          "good-dialog-already-open.html",
+          "good-dismiss-and-load-more.html",
           "good-focus-management.html",
+          "good-rtl-tab-order.html",
+          "good-spa-route-change.html",
           "good-two-column-tab-order.html"
         ],
         "bad": [
           "bad-focus-management.html",
-          "bad-focus-order.html"
+          "bad-focus-order.html",
+          "bad-spa-route-change.html"
         ]
       },
       "harness": [
@@ -2047,7 +1991,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 9,
         "from": [
           "exclusive"
         ]
@@ -2057,7 +2001,7 @@
       "sc": "2.4.4",
       "level": "A",
       "title": "Link Purpose (In Context)",
-      "mechanism": "axe-core",
+      "mechanism": "hybrid:axe-core+page-structure",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2066,20 +2010,31 @@
         "area-alt",
         "link-name"
       ],
-      "deterministic": [],
+      "deterministic": [
+        "page-structure"
+      ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-accessibility.html"
+          "good-accessibility.html",
+          "good-link-purpose-in-context.html"
         ],
         "bad": [
           "bad-link-purpose.html"
         ]
       },
       "harness": [
-        "axe-e2e"
+        "axe-e2e",
+        "concurrent"
       ],
-      "outcome": null
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 3,
+        "from": [
+          "concurrent"
+        ]
+      }
     },
     {
       "sc": "2.4.5",
@@ -2097,6 +2052,8 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-multiple-ways-process-step.html",
+          "good-multiple-ways-standalone.html",
           "good-multiple-ways.html"
         ],
         "bad": [
@@ -2109,7 +2066,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2119,15 +2076,13 @@
       "sc": "2.4.6",
       "level": "AA",
       "title": "Headings and Labels",
-      "mechanism": "experimental:page-structure",
+      "mechanism": "MANUAL",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: page-structure: concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+2 more)",
-      "isManual": false,
-      "isExperimentalOnly": true,
+      "justification": "Headings and Labels: whether a heading or a label describes its topic is a judgement about meaning. An empty heading is axe-core `empty-heading` and an unnamed control is axe-core `label`; what is left needs a reader. axe-core ships no 2.4.6 rule either.",
+      "isManual": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "page-structure"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2138,17 +2093,8 @@
           "bad-headings-labels.html"
         ]
       },
-      "harness": [
-        "concurrent"
-      ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 2,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "harness": [],
+      "outcome": null
     },
     {
       "sc": "2.4.7",
@@ -2166,7 +2112,9 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-focus-management.html"
+          "good-focus-management.html",
+          "good-focus-within-indicator.html",
+          "good-skip-link-lookalikes.html"
         ],
         "bad": [
           "bad-focus-management.html",
@@ -2180,7 +2128,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2213,20 +2161,25 @@
       "sc": "2.4.9",
       "level": "AAA",
       "title": "Link Purpose (Link Only)",
-      "mechanism": "hybrid:axe-core+llm-semantic-text",
-      "supporting": [],
+      "mechanism": "hybrid:axe-core+page-structure",
+      "supporting": [
+        "llm-semantic-text"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [
         "identical-links-same-purpose"
       ],
-      "deterministic": [],
+      "deterministic": [
+        "page-structure"
+      ],
       "llm": [
         "llm-semantic-text"
       ],
       "fixtures": {
         "good": [
+          "good-link-purpose-in-context.html",
           "good-link-purpose-only.html",
           "good-navigation-aaa.html",
           "good-semantic-text-de.html"
@@ -2239,9 +2192,17 @@
       },
       "harness": [
         "axe-e2e",
+        "concurrent",
         "llm"
       ],
-      "outcome": null
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 7,
+        "from": [
+          "concurrent"
+        ]
+      }
     },
     {
       "sc": "2.4.10",
@@ -2286,7 +2247,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-focus-not-obscured.html"
+          "good-focus-not-obscured.html",
+          "good-transparent-fixed-overlay.html"
         ],
         "bad": [
           "bad-focus-not-obscured.html"
@@ -2299,7 +2261,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2377,7 +2339,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-keyboard-native-override.html"
+          "good-keyboard-native-override.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2390,7 +2353,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2412,7 +2375,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-pointer-cancellation.html"
+          "good-pointer-cancellation.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2425,7 +2389,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2452,6 +2416,8 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-icon-button-and-honeypot.html",
+          "good-label-in-name-placeholders.html",
           "good-label-in-name.html"
         ],
         "bad": [
@@ -2467,8 +2433,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 6,
+        "fpClean": true,
+        "runs": 10,
         "from": [
           "concurrent",
           "exclusive"
@@ -2491,7 +2457,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-motion-vestibular.html"
+          "good-motion-vestibular.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2504,7 +2471,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2549,7 +2516,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-concurrent-input.html"
+          "good-concurrent-input.html",
+          "good-touch-and-pointer-alternatives.html"
         ],
         "bad": [
           "bad-concurrent-input.html"
@@ -2561,7 +2529,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2583,7 +2551,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-dragging-movements.html"
+          "good-dragging-movements.html",
+          "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
           "bad-dragging-movements.html"
@@ -2595,7 +2564,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2619,6 +2588,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-pointer-labels-and-alternatives.html",
           "good-target-size-minimum.html"
         ],
         "bad": [
@@ -2633,7 +2603,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2644,9 +2614,7 @@
       "level": "A",
       "title": "Language of Page",
       "mechanism": "axe-core",
-      "supporting": [
-        "language-detection (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -2655,9 +2623,7 @@
         "html-lang-valid",
         "html-xml-lang-mismatch"
       ],
-      "deterministic": [
-        "language-detection"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2669,35 +2635,23 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent"
+        "axe-e2e"
       ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 3,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.1.2",
       "level": "AA",
       "title": "Language of Parts",
       "mechanism": "axe-core",
-      "supporting": [
-        "language-detection (experimental)"
-      ],
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [
         "valid-lang"
       ],
-      "deterministic": [
-        "language-detection"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2710,17 +2664,9 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent"
+        "axe-e2e"
       ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 4,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.1.3",
@@ -2850,21 +2796,24 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-context-change.html"
+          "good-context-change.html",
+          "good-focus-reveal-external-links.html",
+          "good-predictable-controls.html"
         ],
         "bad": [
-          "bad-context-change.html"
+          "bad-context-change.html",
+          "bad-external-link-identification.html"
         ]
       },
       "harness": [
-        "concurrent"
+        "exclusive"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 5,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     },
@@ -2885,7 +2834,8 @@
       "fixtures": {
         "good": [
           "good-auto-submitting-form.html",
-          "good-context-change.html"
+          "good-context-change.html",
+          "good-predictable-controls.html"
         ],
         "bad": [
           "bad-auto-submitting-form.html",
@@ -2893,14 +2843,14 @@
         ]
       },
       "harness": [
-        "concurrent"
+        "exclusive"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     },
@@ -2927,14 +2877,14 @@
         ]
       },
       "harness": [
-        "concurrent"
+        "exclusive"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
         "runs": 2,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     },
@@ -2954,21 +2904,24 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-consistent-identification.html"
+          "good-consistent-identification.html",
+          "good-focus-reveal-external-links.html",
+          "good-repeated-cards-and-buttons.html"
         ],
         "bad": [
-          "bad-consistent-identification.html"
+          "bad-consistent-identification.html",
+          "bad-external-link-identification.html"
         ]
       },
       "harness": [
-        "concurrent"
+        "exclusive"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 5,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     },
@@ -3035,21 +2988,21 @@
       "sc": "3.3.1",
       "level": "A",
       "title": "Error Identification",
-      "mechanism": "experimental:error-handling+status-messages",
+      "mechanism": "deterministic:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2) ;; status-messages: concurrent harness FAIL: missed bad-form-errors.html (3.3.1) | concurrent harness FAIL: missed bad-status-messages.html (4.1.3)",
+      "justification": "",
       "isManual": false,
-      "isExperimentalOnly": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "error-handling",
-        "status-messages"
+        "error-handling"
       ],
       "llm": [],
       "fixtures": {
         "good": [
           "good-error-tokens-not-error-messages.html",
           "good-form-errors.html",
+          "good-form-fields-without-hints.html",
           "good-js-validation.html"
         ],
         "bad": [
@@ -3062,7 +3015,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 6,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -3072,10 +3025,8 @@
       "sc": "3.3.2",
       "level": "A",
       "title": "Labels or Instructions",
-      "mechanism": "axe-core",
-      "supporting": [
-        "error-handling (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+error-handling",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -3089,6 +3040,7 @@
       "fixtures": {
         "good": [
           "good-cognitive-accessibility.html",
+          "good-form-fields-without-hints.html",
           "good-form-grouping.html",
           "good-js-validation.html",
           "good-landing-page.html"
@@ -3106,8 +3058,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 7,
+        "fpClean": true,
+        "runs": 9,
         "from": [
           "concurrent"
         ]
@@ -3117,11 +3069,11 @@
       "sc": "3.3.3",
       "level": "AA",
       "title": "Error Suggestion",
-      "mechanism": "experimental:error-handling",
+      "mechanism": "deterministic:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
+      "justification": "",
       "isManual": false,
-      "isExperimentalOnly": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
         "error-handling"
@@ -3130,7 +3082,9 @@
       "fixtures": {
         "good": [
           "good-error-tokens-not-error-messages.html",
-          "good-form-errors.html"
+          "good-form-errors.html",
+          "good-form-fields-without-hints.html",
+          "good-icon-button-and-honeypot.html"
         ],
         "bad": [
           "bad-form-errors.html"
@@ -3142,7 +3096,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -3152,15 +3106,13 @@
       "sc": "3.3.4",
       "level": "AA",
       "title": "Error Prevention (Legal, Financial, Data)",
-      "mechanism": "experimental:error-handling",
+      "mechanism": "MANUAL",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
-      "isManual": false,
-      "isExperimentalOnly": true,
+      "justification": "Error Prevention (Legal, Financial, Data): the criterion applies only to pages that commit the user legally or financially, and is met by reversibility, checking or confirmation, all of which are server-side behaviour a static page does not expose.",
+      "isManual": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "error-handling"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -3171,17 +3123,8 @@
           "bad-form-errors.html"
         ]
       },
-      "harness": [
-        "concurrent"
-      ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 3,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "harness": [],
+      "outcome": null
     },
     {
       "sc": "3.3.5",
@@ -3328,36 +3271,26 @@
       "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "html-validation"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
-        "good": [],
+        "good": [
+          "good-modern-aria.html"
+        ],
         "bad": [
+          "bad-aria-hidden-focusable.html",
           "bad-html-validation.html"
         ]
       },
-      "harness": [
-        "concurrent"
-      ],
-      "outcome": {
-        "tp": true,
-        "fpClean": null,
-        "runs": 1,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "harness": [],
+      "outcome": null
     },
     {
       "sc": "4.1.2",
       "level": "A",
       "title": "Name, Role, Value",
-      "mechanism": "hybrid:axe-core+dynamic-spa",
+      "mechanism": "axe-core",
       "supporting": [
-        "screen-reader (experimental)",
-        "html-validation (experimental)",
         "advanced-aria (experimental)"
       ],
       "justification": "",
@@ -3394,10 +3327,7 @@
         "summary-name"
       ],
       "deterministic": [
-        "screen-reader",
-        "html-validation",
-        "advanced-aria",
-        "dynamic-spa"
+        "advanced-aria"
       ],
       "llm": [],
       "fixtures": {
@@ -3406,7 +3336,9 @@
           "good-aria-role-override.html",
           "good-aria-state-updates.html",
           "good-bootstrap-patterns.html",
+          "good-composite-aria-widgets.html",
           "good-hidden-modal.html",
+          "good-icon-button-and-honeypot.html",
           "good-js-validation.html",
           "good-landing-page.html",
           "good-redundant-aria.html",
@@ -3426,8 +3358,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 36,
+        "fpClean": true,
+        "runs": 16,
         "from": [
           "concurrent"
         ]
@@ -3437,24 +3369,21 @@
       "sc": "4.1.3",
       "level": "AA",
       "title": "Status Messages",
-      "mechanism": "deterministic:dynamic-spa",
-      "supporting": [
-        "screen-reader (experimental)",
-        "status-messages (experimental)"
-      ],
+      "mechanism": "deterministic:status-messages",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
-        "screen-reader",
-        "status-messages",
-        "dynamic-spa"
+        "status-messages"
       ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-aria-state-updates.html"
+          "good-account-menu-no-counter.html",
+          "good-aria-state-updates.html",
+          "good-static-status-containers.html"
         ],
         "bad": [
           "bad-aria-state-updates.html",
@@ -3462,14 +3391,14 @@
         ]
       },
       "harness": [
-        "concurrent"
+        "exclusive"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 6,
+        "runs": 5,
         "from": [
-          "concurrent"
+          "exclusive"
         ]
       }
     }

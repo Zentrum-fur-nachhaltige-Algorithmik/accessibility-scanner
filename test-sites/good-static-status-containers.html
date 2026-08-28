@@ -1,0 +1,109 @@
+<!-- WCAG-TEST
+criterion: 4.1.3
+level: AA
+title: Static status shaped containers and an announced update
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: status-messages
+description: Containers whose class or id contains error, success, progress, alert or status but that never change, a script that appends a cookie banner to the body on load (which used to mark every element on the page as dynamic), a static role=progressbar skills bar, and a details panel whose update is announced in a separate role=status region. None of these is a status message that goes unannounced.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Static status shaped containers (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; line-height: 1.5; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  button { font: inherit; color: #0b4f6c; background: #fff; border: 2px solid #0b4f6c; padding: 8px 14px; }
+  button:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .alert { border: 1px solid #767676; padding: 12px; margin: 16px 0; }
+  .alert-info { background: #eef4f7; }
+  .error-legend { border-left: 4px solid #a4262c; padding: 8px 12px; margin: 16px 0; }
+  .success-stories { margin: 16px 0; }
+  .progress-section { margin: 16px 0; }
+  .skill-bar { background: #e3e3e3; height: 16px; width: 320px; }
+  .skill-bar > span { display: block; background: #0b4f6c; height: 16px; }
+  .loading-overlay { display: none; }
+  .result-panel { padding: 4px 0; }
+  .error-message { color: #a4262c; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #cookieBanner { border: 1px solid #767676; padding: 12px; margin: 16px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quarterly report</h1>
+
+  <!-- A permanent informational callout. It is content, not a status message. -->
+  <div class="alert alert-info">This page was last updated on 3 February 2026.</div>
+
+  <!-- A static explanation of the error styling used in the form below. -->
+  <div class="error-legend">Fields marked in red are required.</div>
+
+  <section class="success-stories">
+    <h2>Success stories</h2>
+    <p>Three teams shipped their first accessible release this quarter.</p>
+  </section>
+
+  <section class="progress-section">
+    <h2>Project progress</h2>
+    <p>Two of four milestones are complete.</p>
+    <!-- A static progress bar: it shows a fixed value and never updates. -->
+    <div class="skill-bar" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Milestones complete">
+      <span style="width: 50%"></span>
+    </div>
+  </section>
+
+  <!-- Left in the DOM after the page finished loading, and never painted. -->
+  <div class="loading-overlay"></div>
+
+  <section>
+    <h2>Details</h2>
+    <button type="button" id="detailsToggle">Show details</button>
+    <!-- The panel gains content, and the page announces that in the live
+         region below, which is the announcement 4.1.3 asks for. -->
+    <div class="result-panel" id="detailsPanel"></div>
+    <p class="sr-only" role="status" id="announcer"></p>
+  </section>
+
+  <section>
+    <h2>Subscribe</h2>
+    <form id="subscribeForm">
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" required aria-describedby="email-error">
+      <!-- An error slot that is empty at load. The page has a live region, so
+           whatever is written here can be announced. -->
+      <span class="error-message" id="email-error"></span>
+      <button type="submit">Subscribe</button>
+    </form>
+  </section>
+</main>
+
+<script>
+  // A cookie banner appended to <body> after load. The body changes, but that
+  // says nothing about any other element on the page.
+  window.addEventListener('load', function () {
+    var banner = document.createElement('div');
+    banner.id = 'cookieBanner';
+    banner.innerHTML = '<p>This site uses only strictly necessary cookies.</p>';
+    var accept = document.createElement('button');
+    accept.type = 'button';
+    accept.textContent = 'Accept';
+    accept.addEventListener('click', function () {
+      banner.remove();
+    });
+    banner.appendChild(accept);
+    document.body.appendChild(banner);
+  });
+
+  document.getElementById('detailsToggle').addEventListener('click', function () {
+    var panel = document.getElementById('detailsPanel');
+    panel.innerHTML = '<p>The report covers January to March 2026.</p>';
+    document.getElementById('announcer').textContent = 'Details shown.';
+  });
+</script>
+</body>
+</html>

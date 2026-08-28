@@ -23,10 +23,6 @@ const CORPUS = path.join(ROOT, 'test-sites', 'realworld', 'med-templates');
 // Every theme is served from its own document root because the Next.js export
 // uses absolute `/_next/...` asset paths.
 
-if (!fs.existsSync(CORPUS)) {
-  console.log(`golden corpus not present (${path.relative(ROOT, CORPUS)}), nothing to check`);
-  process.exit(0);
-}
 const THEMES = ['evergreen', 'clinic', 'spectrum', 'lumen', 'warmth'];
 const ROUTES = [
   'index',
@@ -217,6 +213,11 @@ async function scanPage(url, scannerIds, scanOptions) {
 }
 
 async function main() {
+  if (!fs.existsSync(CORPUS)) {
+    console.log(`golden corpus not present (${path.relative(ROOT, CORPUS)}), nothing to check`);
+    return;
+  }
+
   const args = parseArgs(process.argv.slice(2));
   if (!args.llm) delete process.env.OPENROUTER_API_KEY;
   else {

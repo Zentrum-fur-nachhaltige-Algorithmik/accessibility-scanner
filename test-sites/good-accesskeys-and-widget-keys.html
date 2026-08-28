@@ -1,0 +1,71 @@
+<!-- WCAG-TEST
+criterion: 2.1.4
+level: A
+title: Character Key Shortcuts, accesskeys and focus scoped keys
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: Keyboard shortcuts that 2.1.4 allows and the old rules reported anyway: unique accesskeys on focusable links (the old check held a blacklist of twelve letters), an accesskey on a label that the browser forwards to its input, single character keys that only act while a listbox has focus, and a page that animates a counter so the shortcut probe has to calibrate its idle noise before judging a key press.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: Accesskeys and focus scoped keys (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a, button { color: #0b4f6c; font: inherit; }
+  a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  [role="listbox"] { border: 2px solid #0b4f6c; padding: 12px; max-width: 320px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Shortcuts that meet 2.1.4</h1>
+
+  <nav aria-label="Quick access">
+    <a href="#search" accesskey="s">Search</a>
+    <a href="#home" accesskey="h">Home</a>
+  </nav>
+
+  <h2 id="search">Search</h2>
+  <p>
+    <label for="query" accesskey="q">Search term</label>
+    <input type="search" id="query">
+  </p>
+
+  <h2>Colour picker with keys scoped to focus</h2>
+  <div tabindex="0" role="listbox" aria-label="Colour" id="picker">
+    <p>Focus this panel, then press r, g or b.</p>
+    <div role="option" aria-selected="true">Red</div>
+    <div role="option" aria-selected="false">Green</div>
+    <div role="option" aria-selected="false">Blue</div>
+  </div>
+
+  <h2 id="home">Visitors</h2>
+  <p>Counted since page load: <span id="counter">0</span></p>
+
+  <script>
+    // Keys act only while the picker has focus, which 2.1.4 allows.
+    document.getElementById('picker').addEventListener('keydown', function (e) {
+      if (e.key === 'r' || e.key === 'g' || e.key === 'b') {
+        e.preventDefault();
+        var options = this.querySelectorAll('[role="option"]');
+        var index = { r: 0, g: 1, b: 2 }[e.key];
+        options.forEach(function (o, i) { o.setAttribute('aria-selected', String(i === index)); });
+      }
+    });
+
+    // The page changes on its own, which a key probe has to account for.
+    var count = 0;
+    setInterval(function () {
+      count += 1;
+      document.getElementById('counter').textContent = String(count);
+    }, 100);
+  </script>
+</main>
+</body>
+</html>

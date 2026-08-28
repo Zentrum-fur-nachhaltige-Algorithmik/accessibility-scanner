@@ -1,0 +1,173 @@
+<!-- WCAG-TEST
+criterion: 2.5.1, 2.5.2, 2.5.4, 2.5.7, 2.5.8
+level: A
+title: Pointer Gestures, Pointer Cancellation, Motion Actuation, Dragging Movements, Target Size
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: input-modalities
+description: German control labels containing auto, a swipe caption, a spinner, a decorative rotation, inline prose links and drag interactions whose alternatives are labelled in German
+-->
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zeigereingaben mit Alternativen</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+        color: #1a1a1a;
+        background: #ffffff;
+        line-height: 1.6;
+      }
+      button,
+      .file-button {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px 16px;
+        font-size: 1rem;
+        background: #1a5490;
+        color: #ffffff;
+        border: 1px solid #10314f;
+        cursor: pointer;
+      }
+      .prose a {
+        display: inline-block;
+        color: #10314f;
+      }
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid #c8c8c8;
+        border-top-color: #1a5490;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .badge {
+        display: inline-block;
+        transform: rotate(-4deg);
+        background: #fff4e5;
+        border: 1px solid #a15c00;
+        padding: 2px 8px;
+      }
+      .task-list {
+        list-style: none;
+        padding: 0;
+        max-width: 32rem;
+      }
+      .task-list li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #767676;
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+      .task-list .title {
+        flex: 1;
+      }
+      .dropzone {
+        border: 2px dashed #767676;
+        padding: 24px;
+        max-width: 32rem;
+      }
+      .map {
+        width: 100%;
+        max-width: 32rem;
+        height: 200px;
+        background: #eef2f5;
+        border: 1px solid #767676;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Zeigereingaben mit Alternativen</h1>
+
+    <h2>Einstellungen</h2>
+    <p>
+      <button type="button" id="autoUpdate">Automatisch aktualisieren</button>
+      <button type="button" id="instantSearch">Sofortsuche einschalten</button>
+    </p>
+    <p id="settingsStatus" role="status">Status: bereit</p>
+
+    <h2>Beitrag</h2>
+    <p class="prose">
+      Der <a href="/autor/maria-schmidt">Autor: Maria Schmidt</a> hat diesen Beitrag geschrieben;
+      eine <a href="/quellen">Quellenliste</a> und ein <a href="/glossar">Glossar</a> stehen im
+      laufenden Text und sind nur so hoch wie die Zeile. <span class="badge">Neu</span>
+    </p>
+
+    <h2>Bildergalerie</h2>
+    <section role="region" aria-label="Bildergalerie">
+      <p>Slide 3 von 5</p>
+      <button type="button" id="prevSlide">Zurueck</button>
+      <button type="button" id="nextSlide">Weiter</button>
+    </section>
+
+    <h2>Wird geladen</h2>
+    <div class="spinner" role="img" aria-label="Wird geladen"></div>
+
+    <h2>Karte</h2>
+    <div class="map" id="map" ontouchstart="mapTouch(event)" tabindex="0" role="application"
+      aria-label="Karte, mit den Pfeiltasten verschiebbar"></div>
+
+    <h2>Aufgaben sortieren</h2>
+    <ul class="task-list" id="taskList">
+      <li draggable="true">
+        <span class="title">Pull Request pruefen</span>
+        <button type="button" aria-label="Pull Request pruefen nach oben">Nach oben</button>
+        <button type="button" aria-label="Pull Request pruefen nach unten">Nach unten</button>
+      </li>
+      <li draggable="true">
+        <span class="title">Datenbank aktualisieren</span>
+        <button type="button" aria-label="Datenbank aktualisieren nach oben">Nach oben</button>
+        <button type="button" aria-label="Datenbank aktualisieren nach unten">Nach unten</button>
+      </li>
+    </ul>
+
+    <h2>Dateien</h2>
+    <form>
+      <div class="dropzone" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+        <p>Dateien hierher ziehen</p>
+        <label class="file-button" for="fileInput">Dateien auswaehlen</label>
+        <input type="file" id="fileInput" multiple />
+      </div>
+    </form>
+
+    <script>
+      // Every action completes on click, which is the up-event, and pressing
+      // shows nothing that survives the pointer leaving the control.
+      function setStatus(text) {
+        document.getElementById('settingsStatus').textContent = text;
+      }
+      document.getElementById('autoUpdate').addEventListener('click', () => {
+        setStatus('Automatische Aktualisierung eingeschaltet');
+      });
+      document.getElementById('instantSearch').addEventListener('click', () => {
+        setStatus('Sofortsuche eingeschaltet');
+      });
+      document.getElementById('prevSlide').addEventListener('click', () => {
+        setStatus('Vorheriges Bild');
+      });
+      document.getElementById('nextSlide').addEventListener('click', () => {
+        setStatus('Naechstes Bild');
+      });
+      function mapTouch(event) {
+        // A single touchstart only marks the map as active; panning happens on
+        // move and with the arrow keys.
+        event.currentTarget.dataset.active = 'true';
+      }
+      function handleDrop(event) {
+        event.preventDefault();
+        setStatus('Datei uebernommen');
+      }
+    </script>
+  </body>
+</html>

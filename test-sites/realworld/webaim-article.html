@@ -1,0 +1,1917 @@
+<!-- REALWORLD-FIXTURE
+source: https://webaim.org/techniques/skipnav/
+captured: 2026-08-27T15:25:15.333Z
+sanitized: analytics scripts removed; stylesheets inlined; external resource URLs rewritten to ./_offline/*
+purpose: WebAIM technique article: hand-written reference markup by accessibility practitioners, a real skip link, code samples and a sidebar navigation
+-->
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>WebAIM: Skip Navigation Links</title>
+	<link rel="shortcut icon" href="/media/favicon.ico">
+	<link rel="home" href="/">
+	<link rel="search" href="/search/">
+	<link rel="alternate" href="./_offline/feed" type="application/rss+xml" title="WebAIM Blog">
+
+	
+	
+	
+	<style>/* Global styles.*/
+
+* {
+	margin:0;
+	padding:0;
+}
+
+html, body, form, fieldset, table, textarea {
+	font: 100% 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+a img {
+	border:none;
+}
+
+/* HTML5 elements. Silly IE! */
+main, article, aside, figcaption, figure, footer, header, hgroup, menu, nav, section {
+	display:block;
+}
+
+body {
+	width:100%;
+	margin:0 auto;
+	background:#fafafa url(/media/template/mainbg.png) repeat-y center;
+	color:#333;
+}
+
+/* Template styles */
+
+#skiptocontent a {
+	padding:6px;
+	position: absolute;
+	top:-40px;
+	left:0px;
+	color:white;
+	border-right:1px solid white;
+	border-bottom:1px solid white;
+	border-bottom-right-radius:8px;
+	background:#BF1722;
+	-webkit-transition: top .5s ease-out;
+    transition: top .5s ease-out;
+    z-index: 100;
+}
+
+#skiptocontent a:focus {
+	position:absolute;
+	left:0px;
+	top:0px;
+	outline-color:transparent;	
+	-webkit-transition: top .05s ease-in;
+    transition: top .05s ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#skiptocontent a {
+		transition-duration: 0.001ms !important;
+	}
+}
+
+#headcontainer {
+	background-repeat:no-repeat;
+	background-position: 50% 100px;
+	margin-bottom:30px;
+	height:333px;
+	position:relative;
+}
+
+header h2 {
+	background: url(/media/template/bg_logo.png) top left no-repeat;
+	background : none\9; /* IE8 and below. Silly things. */
+	background-size:315px 83px;
+	width:315px;
+	display:inline;
+	float: left;
+	position: absolute;
+	top:0px;
+	margin: 10px 0px 10px -3px;
+}
+
+header h2 a img {
+	transition: opacity .3s linear;
+}
+
+header h2 a:hover img, header h2 a:focus img {
+	opacity:0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	header h2 a img {
+		transition-duration: 0.001ms !important;
+	}
+}
+
+header, main, #footerresources {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 960px;
+}
+
+header nav {
+	width:auto;
+	display:inline;
+	float: right;
+	position: relative;
+	top:40px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+header nav ul {
+	float: right;
+	margin:0px;
+}
+
+header nav ul li {
+	float: left;
+	list-style: none;
+}
+
+header nav ul li a {
+	text-decoration: none;
+	font-weight: bold;
+	color: #363636; 
+	font: normal 120% 'Roboto', Helvetica, Arial, sans-serif;
+	display: block;
+	padding: 1px 13px 4px 13px;
+	text-transform: lowercase;
+}
+
+header nav ul li.current a {
+	background-color: #F0F0F0;
+	border-radius: 12px;
+}
+
+header nav ul li a:hover, header nav ul li a:focus {
+	color: #BF1722;
+	-webkit-transition:color 0.2s ease-in, text-shadow 0.2s ease-in;
+	transition:color 0.2s ease-in, text-shadow 0.2s ease-in;
+	text-shadow: #bbb 1px 1px 1px;
+}
+
+#search {
+	width:369px;
+	height: 165px;
+	display:inline;
+	float: left;
+	position: absolute;
+	bottom:23px;
+	padding:20px 10px 0 50px;
+	margin: 0 0 0 -40px;
+	border-radius: 30px;
+	border-top-left-radius: 30px;
+	background-color: rgba(247,247,247,.7);
+}
+
+#search p.search {
+	padding:5px 0 10px 40px;
+	background: url(/media/template/bg_search.svg) no-repeat;
+}
+#search p.search span {
+	background-color: #f1f5f7;
+	border:1px solid #00AFD8;
+	border-radius: 5px;
+	padding:4px;
+}
+
+#search input[type=text] {
+	color:#333;
+	padding-left:5px;
+	margin-top:-3px;
+    border-left: 1px solid #777;
+    border-right: none;
+    border-top: 1px solid #777;
+	border-bottom: 1px solid #777;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	height:23px;
+	width:57%;
+	font-size:100%;
+}
+
+#search input[type=text]:focus {
+	
+}
+
+#search input[type=image] {
+	width: 16px;
+	height: 16px;
+	padding:3px 5px 4px 5px;
+	margin-top:-3px;
+	background-color: #fff;
+	border-left: none;
+	border-right: 1px solid #777;
+	border-top: 1px solid #777;
+	border-bottom: 1px solid #777;
+	text-indent: -999em;
+	overflow: hidden;
+	border-bottom-right-radius: 5px;
+	border-top-right-radius: 5px;
+	cursor: pointer;
+}
+
+#search p.intro {
+	margin-top:17px;
+	padding:10px 0 10px 40px;
+	background: url(/media/template/bg_intro.svg) no-repeat;
+}
+
+#search p.training {
+	margin-top:20px;
+	padding:10px 0 10px 40px;
+	background: url(/media/template/bg_training.svg) no-repeat;
+}
+
+
+
+
+#search p a {
+	background-color: #f1f5f7;
+	color:#333;
+	border:1px solid #00AFD8;
+	text-decoration: none;
+	padding:3px;
+	border-radius: 5px;
+	-webkit-transition:all 0.15s ease-in-out;
+	transition:all 0.15s ease-in-out;
+}
+
+#search p a:hover, #search p a:focus {
+	background-color: #f6f6f6;
+	text-shadow: #bbb 1px 1px 1px;
+	-webkit-transition:all 0.15s ease-in-out;
+	transition:all 0.15s ease-in-out;
+}
+
+main {
+	background-color: #fff;
+}
+
+article {
+	width:700px;
+	display:inline;
+	float: left;
+	position: relative;
+	font-size:1.125em;
+	outline:0;
+	margin-bottom: 20px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+aside {
+	width:220px;
+	display:inline;
+	float: left;
+	position: relative;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+#updated, #translations, #related, .sidebox {
+	border:1px solid #ccc;
+	border-radius: 6px;
+	background-color: #FAFAFA;
+	color:#333;
+	padding:5px 10px 5px 10px;
+	font-size: 95%;
+	margin-bottom:10px;
+}
+
+#updated, .sidebox {
+	font-family: 'Kameron',Georgia,Times,serif;
+	text-align: center;
+}
+
+#translations h2, #related h2, .sidebox h2 {
+	padding:5px 0 10px 40px;
+	margin-bottom: 10px;
+	border-bottom: none;
+	font-size:1.125em;
+	font-family: 'Kameron',Georgia,Times,serif;
+	font-weight: normal;
+}
+
+#translations ul {
+	list-style: none;
+}
+
+#translations ul li {
+	margin-left:-15px;
+}
+
+.sidebox{
+	text-align: left;
+}
+
+.sidebox h2 {
+	padding-left:0;
+}
+
+#translations h2 {
+	background:#FAFAFA url(/media/template/bg_translations.svg) no-repeat;
+}
+
+#related h2 {
+	background:#FAFAFA url(/media/template/bg_related.svg) no-repeat;
+}
+
+#translations ul, #related ul, .sidebox ul {
+	margin-left:10px;
+}
+
+#translations li, #related li, .sidebox li {
+	line-height: 1.25em;
+	margin-bottom:4px;
+}
+
+#translations img {
+	padding-right:5px;
+}
+
+audio {
+	width: 100%;
+}
+
+footer {
+	background:url(/media/template/bg_footer.png) 50% top repeat-y;
+	color:#333;
+	margin:auto;
+	padding:15px 0;
+	font-size: 90%;
+}
+
+#footerresources {
+	background-color: #E5E6EB;
+}
+
+.footerblock {
+	width:310px;
+	display:inline;
+	float: left;
+	position: relative;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.copyrightblock {
+	width:240px;
+}
+
+footer h2 {
+	font-family: 'Roboto',Helvetica, Arial, sans-serif;
+	padding:6px 0 10px 40px;
+	font-weight: normal;
+}
+
+footer h2#copyright {
+	background: url(/media/template/bg_copyright.svg) no-repeat;
+}
+
+footer h2#blog {
+	background: url(/media/template/bg_blog.svg) no-repeat;
+}
+
+footer h2#popular {
+	background: url(/media/template/bg_popular.svg) no-repeat;
+}
+
+footer #contact .phone {
+	background:url(/media/template/bg_phone.svg) 0px 2px no-repeat;
+	padding-left:20px;
+	color:#333;
+	text-decoration: none;
+}
+
+footer a:link, footer a:visited {
+	color: #20399D;
+}
+
+footer a:hover,
+footer a:active,
+footer a:focus {
+	color:#0850F7;
+}
+
+#footerresources ul {
+	margin-left:14px;
+}
+
+.footerblock ul li {
+	line-height: 1.75em;
+}
+
+#checkpage h2 {
+	background: url(/media/template/bg_wave.svg) no-repeat;
+	margin-top: 30px;
+}
+
+#checkpage input[type=url] {
+	color:#333;
+	padding-left:5px;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ddd;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ddd;
+	border-radius: 5px;
+	height:23px;
+	width:200px;
+	font-size:90%;
+}
+
+#checkpage input[type=submit] {
+	color:#666;
+	padding:0 4px;
+	background-color: #fff;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ddd;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ddd;
+	border-radius: 5px;
+	height:25px;
+	cursor: pointer;
+}
+
+#checkpage input[type=submit]:hover, #checkpage input[type=submit]:focus {
+	color:#333;
+	background-color: #ddd;
+	border: 1px solid #999;
+}
+
+#footerlinks {
+	width:620px;
+	padding-top: 55px;
+	display:inline;
+	float: left;
+	position: relative;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+#footerlinks ul {
+	margin-left:0;
+}
+
+#footerlinks ul li {
+	display:inline;
+	list-style-type:none;
+	padding:0px 7px;
+}
+
+#footerlinks ul li:not(:first-child) {
+	
+}
+
+#footerlinks ul li a {
+	padding:0 0 2px 22px;
+}
+
+#footerlinks #footercontact {
+	background: url("/media/template/bg_contact.svg") no-repeat;
+}
+
+#footerlinks #footerabout {
+	background: url("/media/template/bg_about.svg") no-repeat;
+}
+
+#footerlinks #footerrss {
+	background: url("/media/template/bg_rss.svg") no-repeat;
+}
+
+#footerlinks #footerli {
+	background: url("/media/template/bg_li.svg") no-repeat;
+}
+
+#footerlinks #footercopyright {
+	background: url("/media/template/bg_terms.svg") no-repeat;}
+
+/* Responsive responsiveness is responsive */
+@media all and (max-width: 61em) {
+	header, main, #footerresources {
+		margin-left: auto;
+		margin-right: auto;
+		width:auto;
+	}
+	
+	header nav ul li a {
+		padding:2px 5px;
+		margin:0px;
+	}
+	
+	article {
+		width:auto;
+		display: block;
+		float: none;
+		padding:0 4px;
+	}
+
+	aside {
+		width:auto;
+		display:block;
+		float: none;
+		clear:both;
+		margin-left: 10%;
+		margin-right: 10%;
+	}
+	#footerlinks {
+		width:auto
+	}
+}
+
+@media all and (max-width: 46em) {
+	header nav {
+		top:0px;
+		right:32px;
+		padding:0 20px;
+		margin:5px 0;
+		background-color: #eee;
+		border-radius: 5px;
+	}
+	
+	header nav {
+		padding:0px;
+	}
+	
+	header nav ul li {
+		float:none;
+	}
+	
+	header nav ul li a {
+		padding:2px 0px;
+		margin:0px;
+		text-align: center;
+	}
+	
+	#footerlinks ul li {
+		display:block;
+	}
+}
+
+@media all and (max-width: 30em) {
+	header nav {
+		position:absolute;
+		top:95px;
+		left:10px;
+		right:auto;
+		float:none;
+		padding:0 20px;
+		margin:5px 0;
+		border-radius: 5px;
+	}
+	
+	header nav {
+		padding:0px;
+	}
+	
+	header nav ul li {
+		float:left;
+		padding-right: 10px;
+	}
+	
+	header nav ul li a {
+		padding:2px 0px;
+		margin:0px;
+		text-align: center;
+		font-size:100%;
+	}
+	
+	#search {
+		border-radius: 0px;
+		width:auto;
+		bottom:0px;
+	}
+}
+
+/* Various element styles */
+
+.hidden {
+	position:absolute; 
+	left:0;
+	top:-500px;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0); /* For older browsers (IE6/7) */
+	clip-path: inset(50%); /* Modern alternative to clip */
+	white-space: nowrap;   /* Prevents line-wrapping issues */
+	border: 0;
+}
+
+abbr[title], dfn[title] {
+	border-bottom:1px dotted;
+	cursor:help;
+}
+
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+}
+
+input, select {
+	vertical-align:middle;
+}
+
+/* LINKS */
+main a:link, main a:visited, aside a:link, aside a:visited {
+	color: #20399D;
+	-webkit-transition:background-color .25s linear;
+    transition:background-color .25s linear;
+}
+
+main a:active, main a:focus, main a:hover, aside a:active, aside a:focus, aside a:hover {
+	background-color:#ffffcc !important;
+	color: #BF1722;
+	border-top: 1px solid #bbb;
+	border-bottom: 1px solid #bbb;
+	border-radius: 4px;
+}
+
+/* Clearfix
+http://www.yuiblog.com/blog/2010/09/27/clearfix-reloaded-overflowhidden-demystified */
+.clearfix:before,
+.clearfix::after {
+  content: '\0020';
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+
+.clearfix::after {
+  clear: both;
+}
+
+/*
+  The following zoom:1 rule is specifically for IE6 + IE7.
+*/
+.clearfix {
+  zoom: 1;
+}
+
+.clear {
+  clear: both;
+  display: block;
+  overflow: hidden;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+
+/* Flying focus */
+
+#flying-focus {
+	position: absolute;
+	margin: 0;
+	background: transparent;
+	-webkit-transition-property: left, top, width, height, opacity;
+	transition-property: left, top, width, height, opacity;
+	-webkit-transition-timing-function: cubic-bezier(0, 0.2, 0, 1);
+	transition-timing-function: cubic-bezier(0, 0.2, 0, 1);
+	visibility: hidden;
+	pointer-events: none;
+	box-shadow: 0 0 2px 3px #78aeda, 0 0 2px #78aeda inset; border-radius: 2px;
+}
+#flying-focus.flying-focus_visible {
+	visibility: visible;
+	z-index: 9999;
+}
+.flying-focus_target {
+	outline: none !important; /* Doesn't work in Firefox :( */
+}
+/* http://stackoverflow.com/questions/71074/how-to-remove-firefoxs-dotted-outline-on-buttons-as-well-as-links/199319 */
+.flying-focus_target::-moz-focus-inner {
+	border: 0 !important;
+}
+/* Replace it with @supports rule when browsers catch up */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+	#flying-focus {
+		box-shadow: none;
+		outline: 5px auto -webkit-focus-ring-color;
+		outline-offset: -3px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#flying-focus {
+		transition-duration: 0.001ms !important;
+	}
+}</style>
+	<style media="print">/* Print styles */
+
+* {
+	padding:0;
+	margin:0;
+	}
+
+body {
+	font-family:Georgia, "Times New Roman", Times, serif;
+	font-size:85%;
+}
+
+#headcontainer {
+	background:none;
+	height:80px;
+}
+
+#skiptocontent, nav, [role=navigation], #search, aside, #breadcrumbs, footer, #nextpage {
+	display:none;
+}
+
+maincontent {
+	margin:0px;
+}
+
+header h2 {
+	float:none;
+	background:none;
+	position:relative;
+}
+
+header h2 a img {
+	border:none;
+	text-align:center;
+	position:relative;
+	float:none;
+	size:50%;
+}
+
+.section .section
+	{
+	margin:0px;
+	}
+
+.section h1 {
+	text-align:center;
+	padding:5px 0;
+}
+
+.section h2 {
+	margin:0 0 .5em -5px;
+}
+
+article a {
+	padding-right:0px !important;
+	background: none !important;
+}
+
+img	
+{
+	border:none;
+}</style>
+	<script src="/media/scripts/jquery.js"></script>
+	<script src="/media/scripts/main.js"></script>
+	<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmZiArmlw.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmQiArmlw.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmYiArmlw.woff2') format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmXiArmlw.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* math */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVnoiArmlw.woff2') format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVn6iArmlw.woff2') format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmbiArmlw.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmaiArmlw.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiAo.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+	<style>/* latin-ext */
+@font-face {
+  font-family: 'Kameron';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./_offline/vm82dR7vXErQxuzngLc6LtXI.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Kameron';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./_offline/vm82dR7vXErQxuzngLk6Lg.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Kameron';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./_offline/vm82dR7vXErQxuzngLc6LtXI.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Kameron';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./_offline/vm82dR7vXErQxuzngLk6Lg.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+	<style>article h1 {
+	font-family:'Roboto',Georgia,Times,serif;
+	font-weight:normal;
+	color:#1C205B;
+	margin:0 0 12px 0;
+	font-size:200%;
+	line-height:100%;
+}
+
+article h2 {
+	font-family:'Roboto',Georgia,Times,serif;
+	color:#BF1722;
+	font-size:150%;
+	border-bottom:1px solid;
+	margin:0;
+	margin-bottom:6px;
+	line-height:1.25em;
+	font-weight:normal;
+}
+
+article h1 code, article h2 code {
+	font-weight:bold;	/* JBN */
+}
+
+article h3 {
+	border-left: #AAD solid .5em;
+	border-bottom: #AAD solid 1px;
+	color:#1C205B;
+	font:1.2em 'Kameron',Georgia,Times,serif;
+	font-weight: normal;
+	letter-spacing:1px;
+	margin: .75em 0 .4em 0;
+	padding-left: .3em;
+}
+
+article h4 {
+	border-bottom: 1px solid #CCC;
+	font-family:'Kameron',Georgia,Times,serif;
+	font-weight: bold;
+	letter-spacing:1px;
+}
+
+article p, pre {
+	line-height:1.5em;
+	padding-bottom:1em;
+}
+
+section, .section {
+	outline:0;
+}
+
+section section, .section .section {
+	margin:.5em 15px .5em 15px;
+	padding-left:10px;
+	outline:0;
+}
+
+section ul, section ol, .section ul, .section ol {
+	line-height:1.5em;
+	margin-left:40px;
+	margin-bottom:1em;
+}
+
+section ul ul, section ol ol, .section ul ul, .section ol ol {
+	margin-bottom:0;
+}
+
+section dl dt, .section dl dt {
+	font-weight:bold;
+}
+
+section dl dd, .section dl dd {
+	margin:0 0 10px 20px;
+}
+
+#breadcrumbs {
+	font-weight:lighter;
+	font-family:'Kameron',Georgia,Times,serif;
+	font-size:110%;
+	letter-spacing:.4px;
+}
+
+article nav {
+	border-radius:6px;
+	margin-bottom:20px;
+	padding:10px 20px;
+	background-color:#F0F0F0;
+}	
+
+article nav h2 {
+	border:none;
+		margin:0;
+}
+
+article nav ol {
+	margin-bottom:0px;
+}
+
+article nav ol li {
+	margin-top:0px;
+	padding-left:14px;
+	list-style:none;
+}
+
+article nav ol li {
+	list-style:square;
+	padding-left:0px;
+	margin-left:20px;
+}
+
+article nav li.currentpage {
+	 list-style-image:url(/media/template/arrowbullet.svg);
+	 font-weight:bold;
+}
+
+article nav li.currentpage ol li {
+	padding-left:0px;
+	margin-left:30px;
+	font-weight:normal;
+	list-style:circle;
+	line-height:1.25em;
+}
+
+fieldset {
+	padding:6px;margin-bottom:10px;
+}
+
+
+table {
+	margin-bottom:1em;
+	border:2px solid #333;
+	border-collapse:separate;
+	}
+
+td, th {
+	padding:4px;
+	border:1px solid #333;
+	border-collapse:separate;
+}
+
+#nextpage {
+	text-align:right;
+}
+
+#nextpage a {
+	text-align:right;
+	padding:12px 40px 10px 8px;
+	margin-bottom:15px;
+	background:url(/media/template/bg_next.svg) 53px 6px no-repeat;
+}
+
+.important, .tip, .note, .example, .samp, .callout {
+	padding:4px 1.5em 0px 1.5em;
+	margin:1em auto;
+	border-radius:6px;
+}
+
+.important .title, .tip .title, .note .title, .example .title, .callout .title {
+	padding:3px 0 15px 35px;
+	display:block;
+	font:bold 1.25em 'Open Sans', sans-serif;
+}
+
+.important, .note {
+		background:#F3F3F3;
+		border-style:solid;
+		border-width:.2em .2em .2em 2em;
+}
+
+.important {
+	border-color:#BF1722;
+}
+
+.important .title {
+	background:url(/media/template/bg_important.svg) no-repeat;
+	color:#BF1722;
+}
+
+.note {
+	border-color:#1C205B;
+}
+
+.note .title {
+	background:url(/media/template/bg_note.svg) no-repeat;
+	color:#1C205B;
+}
+
+
+.example {
+	background-color:#F1F5F7;
+	border:1px solid #CCC;
+}
+
+.example .title {
+	background:url(/media/template/bg_example.svg) no-repeat;
+}
+
+.tip {
+		background-color:#FFECD5;
+		border:1px solid #CCC;
+}
+
+.tip .title {
+		background:url(/media/template/bg_note.svg) no-repeat;
+}
+
+.callout {
+	border:.2em solid #BF1722;
+	background:#F3F3F3;
+	border-radius:2px;
+}
+
+.callout .title {
+	background:url(/media/template/bg_webaim.svg) no-repeat;
+	color:#BF1722;
+}
+
+.calloutlink {
+	text-align: center;
+}
+
+.calloutlink a {
+	background-color:#fff;
+	padding:5px;
+	border:1px solid #1C205B;
+	border-radius:4px;
+	text-decoration: none;
+	font-weight: bold;
+	display: inline-block;	/* JBN: for tidy wrapping on narrow screens */
+}
+
+code, .code {
+	background:#F3F3F3;
+	font-family:Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-size:.9em;
+}
+
+.code {
+		border-radius:6px;
+		color:#000;
+		margin:0 0 1em 0;
+		padding:1em;
+}
+
+.samp {
+	border:2px solid #BF1722;
+	background-color:#f3f6f9;
+	font:.9em 'Open Sans';
+	padding:1em;
+}
+
+.samp select, .samp input:not([type=image]), .samp button {
+		border:1px solid #888;
+		border-radius:6px;
+		font-size:.9em;
+		padding:.2em;
+}
+
+.samp button, .samp input[type=submit], .samp input[type=reset] {
+		background-color:rgb(239, 243, 246);
+		background-image:linear-gradient(-180deg, rgb(250, 251, 252), rgb(239, 243, 246) 90%);
+		padding:.2em 1em;
+		vertical-align:middle;
+}
+
+figure {
+	text-align:center;
+}
+
+figcaption {
+	text-align:left;
+	font-style: italic; 
+}
+
+blockquote {
+	margin:.5em auto 1em auto;
+	width:70%;
+	border:1px #666 dashed;
+	border-radius:6px;
+	padding:.5em;
+	padding-bottom:0px;
+	background-color:#f1f1f1;
+	font-family:Geneva, Times, serif;
+}
+
+input, textarea, select {
+	font-size:100%;
+}
+
+#fade {
+	padding:6px;
+	border:1px dashed #BF1722;
+	border-radius: 6px;
+	outline-color: #BF1722;
+}
+
+.anchorlink {
+	float:left;
+	margin-left:-25px;
+	margin-top:2px;
+	padding-right:6px;
+}
+
+.anchorlink a:hover, .anchorlink a:focus {
+	background-color:transparent !important;
+	border:none;
+}
+
+.floatright {
+	float:right;
+	margin:8px 0px 1px 10px;
+}
+
+.floatleft {
+	float:left;
+	margin:8px 10px 1px 0px;
+}
+
+.border {
+	border:gray solid 1px;
+}
+
+.fullwidth {
+	margin:1em 0;
+	width:100%;
+}
+	
+.subtitle {
+	font-size:60%;
+}
+
+.center, .mediaobject {
+	text-align:center;
+	margin-bottom:1em;
+}
+
+.menuchoice
+	{
+	font-weight:bold;
+	color:#555;
+}
+
+kbd, .keycap {
+	background-color:#f1f1f1;
+	border:1px solid #666;
+	border-width:1px 2px 2px 1px;
+	border-radius:5px;
+	color:#333;
+	padding:0 2px;
+	margin:1px;
+	font-weight:bold;
+	font-family:Arial, Helvetica, sans-serif;
+	min-width:17px;
+	display:inline-block;
+	text-align:center;
+	font-style: normal;
+}
+		
+.keycombo {
+	font-weight:bold;
+}
+
+.smallcaps {
+	font-variant: small-caps;
+	font-weight: bold;
+	color:#222222;
+}
+
+/* Blog styles */
+
+#updated img {
+	max-width:100px;
+}
+
+.comments {
+	text-align:center !important;
+}
+
+#blogcomments {
+	border-top:3px #ccc dotted;
+	margin-top:25px;
+}
+
+#blogcomments h2, #respond h2 {
+	font-family:'Kameron',Georgia,Times,serif;
+}
+
+.post>h2, .post>h2 {
+	border:none;
+}
+
+#respond input, #respond textarea, .searchform input {
+	border-radius:3px;
+	border:1px solid #bbb;
+	border-collapse:collapse;
+	padding:3px;
+	margin-bottom:4px;
+}
+
+.commentlist {
+	list-style-type:none;
+}
+
+.commentlist li {
+	background-color:#fff;
+	border:1px solid #ccc;
+	border-radius:6px;
+	margin-bottom:10px;
+	margin-left:90px;
+	position:relative;
+	padding:5px;
+}
+
+.commentlist li:nth-child(even) {
+	background-color:#eee;
+}
+
+.commentlist .fn {
+	font-weight:bold;
+}
+
+.commentlist .commentdate {
+	display:block;
+	float:right;
+}
+
+.commentlist .avatar {
+	position:absolute;
+	left:-90px;
+	border-radius:6px;
+}
+
+/* Unordered List "tiles" (https://webaim.org/services/evaluation/ and https://webaim.org/intro/) */
+ul.tiles {
+	background:#F1F5F7;
+	border-radius:1em;
+	list-style:none;
+	margin:2em 0;
+}
+.tiles > li {
+	display:inline-block;
+	margin:0;
+	padding:2%;
+	text-align:center;
+	vertical-align:top;
+	width:45%;
+}
+.tiles > li > a {
+	border:1px solid transparent;	/* this is to prevent the link from "jumping" because of the added border on hover/focus. */
+	display:block;
+	font-weight:bold;
+	text-decoration:none;
+}
+.tiles span {
+	display:block;
+	font-size:5em;
+}
+.tiles li li {	/* https://webaim.org/services/evaluation/ */
+	list-style-type: disc;
+	margin-top: .5em;
+	text-align: left;
+}
+
+@media all and (max-width:30em) {
+	.tiles li {
+		display:block;
+		width:auto;
+	}
+}
+
+[id^="google-visualization-errors"] span span {
+	color:white !important; /* Prevents contrast errors when Google charts doesn't load */
+}</style>
+		<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWV0ewJER.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWVQewJER.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWVwewJER.woff2') format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWVMewJER.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* hebrew */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWVIewJER.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+/* math */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWSwewJER.woff2') format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWT4ewJER.woff2') format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWV8ewJER.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWV4ewJER.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memQYaGs126MiZpBA-UFUIcVXSCEkx2cmqvXlWq8tWZ0Pw86hd0Rk8ZkWVAewA.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSKmu1aB.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSumu1aB.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSOmu1aB.woff2') format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSymu1aB.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* hebrew */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS2mu1aB.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+/* math */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTVOmu1aB.woff2') format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTUGmu1aB.woff2') format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSCmu1aB.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSGmu1aB.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSKmu1aB.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSumu1aB.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSOmu1aB.woff2') format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSymu1aB.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* hebrew */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS2mu1aB.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+/* math */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTVOmu1aB.woff2') format('woff2');
+  unicode-range: U+0302-0303, U+0305, U+0307-0308, U+0310, U+0312, U+0315, U+031A, U+0326-0327, U+032C, U+032F-0330, U+0332-0333, U+0338, U+033A, U+0346, U+034D, U+0391-03A1, U+03A3-03A9, U+03B1-03C9, U+03D1, U+03D5-03D6, U+03F0-03F1, U+03F4-03F5, U+2016-2017, U+2034-2038, U+203C, U+2040, U+2043, U+2047, U+2050, U+2057, U+205F, U+2070-2071, U+2074-208E, U+2090-209C, U+20D0-20DC, U+20E1, U+20E5-20EF, U+2100-2112, U+2114-2115, U+2117-2121, U+2123-214F, U+2190, U+2192, U+2194-21AE, U+21B0-21E5, U+21F1-21F2, U+21F4-2211, U+2213-2214, U+2216-22FF, U+2308-230B, U+2310, U+2319, U+231C-2321, U+2336-237A, U+237C, U+2395, U+239B-23B7, U+23D0, U+23DC-23E1, U+2474-2475, U+25AF, U+25B3, U+25B7, U+25BD, U+25C1, U+25CA, U+25CC, U+25FB, U+266D-266F, U+27C0-27FF, U+2900-2AFF, U+2B0E-2B11, U+2B30-2B4C, U+2BFE, U+3030, U+FF5B, U+FF5D, U+1D400-1D7FF, U+1EE00-1EEFF;
+}
+/* symbols */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTUGmu1aB.woff2') format('woff2');
+  unicode-range: U+0001-000C, U+000E-001F, U+007F-009F, U+20DD-20E0, U+20E2-20E4, U+2150-218F, U+2190, U+2192, U+2194-2199, U+21AF, U+21E6-21F0, U+21F3, U+2218-2219, U+2299, U+22C4-22C6, U+2300-243F, U+2440-244A, U+2460-24FF, U+25A0-27BF, U+2800-28FF, U+2921-2922, U+2981, U+29BF, U+29EB, U+2B00-2BFF, U+4DC0-4DFF, U+FFF9-FFFB, U+10140-1018E, U+10190-1019C, U+101A0, U+101D0-101FD, U+102E0-102FB, U+10E60-10E7E, U+1D2C0-1D2D3, U+1D2E0-1D37F, U+1F000-1F0FF, U+1F100-1F1AD, U+1F1E6-1F1FF, U+1F30D-1F30F, U+1F315, U+1F31C, U+1F31E, U+1F320-1F32C, U+1F336, U+1F378, U+1F37D, U+1F382, U+1F393-1F39F, U+1F3A7-1F3A8, U+1F3AC-1F3AF, U+1F3C2, U+1F3C4-1F3C6, U+1F3CA-1F3CE, U+1F3D4-1F3E0, U+1F3ED, U+1F3F1-1F3F3, U+1F3F5-1F3F7, U+1F408, U+1F415, U+1F41F, U+1F426, U+1F43F, U+1F441-1F442, U+1F444, U+1F446-1F449, U+1F44C-1F44E, U+1F453, U+1F46A, U+1F47D, U+1F4A3, U+1F4B0, U+1F4B3, U+1F4B9, U+1F4BB, U+1F4BF, U+1F4C8-1F4CB, U+1F4D6, U+1F4DA, U+1F4DF, U+1F4E3-1F4E6, U+1F4EA-1F4ED, U+1F4F7, U+1F4F9-1F4FB, U+1F4FD-1F4FE, U+1F503, U+1F507-1F50B, U+1F50D, U+1F512-1F513, U+1F53E-1F54A, U+1F54F-1F5FA, U+1F610, U+1F650-1F67F, U+1F687, U+1F68D, U+1F691, U+1F694, U+1F698, U+1F6AD, U+1F6B2, U+1F6B9-1F6BA, U+1F6BC, U+1F6C6-1F6CF, U+1F6D3-1F6D7, U+1F6E0-1F6EA, U+1F6F0-1F6F3, U+1F6F7-1F6FC, U+1F700-1F7FF, U+1F800-1F80B, U+1F810-1F847, U+1F850-1F859, U+1F860-1F887, U+1F890-1F8AD, U+1F8B0-1F8BB, U+1F8C0-1F8C1, U+1F900-1F90B, U+1F93B, U+1F946, U+1F984, U+1F996, U+1F9E9, U+1FA00-1FA6F, U+1FA70-1FA7C, U+1FA80-1FA89, U+1FA8F-1FAC6, U+1FACE-1FADC, U+1FADF-1FAE9, U+1FAF0-1FAF8, U+1FB00-1FBFF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSCmu1aB.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSGmu1aB.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  src: url('./_offline/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+
+<!--[if lt IE 9]>
+	<script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+<body>
+
+
+<div id="headcontainer" class="clearfix" style="background-image: url(/media/banners/articles.jpg)">
+<header>
+	<div id="skiptocontent"><a href="#maincontent">skip to main content</a></div>
+	
+	<h2><a href="/"><img src="/media/logo.png" width="315" height="83" alt="WebAIM - Web Accessibility In Mind"></a></h2>
+
+	<nav>
+		<h2 class="hidden">Main Navigation</h2>
+		<ul>
+			<li><a href="/services/">Services</a></li>
+			<li class="current"><a href="/articles/">Articles</a></li>
+			<li><a href="/resources/">Resources</a></li>
+			<li><a href="/projects/">Projects</a></li>
+			<li><a href="/community/">Community</a></li>
+		</ul>
+	</nav>
+	<div id="search">
+		<form method="get" role="search" action="/search/" id="sitesearch">
+			<p class="search"><span><label for="q">Search:</label> <input type="text" name="q" id="q"><input type="image" src="/media/template/search.svg" alt="Submit Search"></span></p>
+		</form>
+		
+		<p class="intro"><a href="/intro">Introduction to Web Accessibility</a></p>
+		
+		<p class="training"><a href="/services/training">WebAIM Training</a></p>
+	</div>
+
+</header>
+</div>
+
+<main id="maincontainer" class="clearfix">
+
+<article id="maincontent">
+
+<h1>Skip Navigation Links</h1>
+
+<p id="breadcrumbs"><span class="hidden">You are here: </span><a href="/">Home</a> &gt; <a href="/articles/">Articles</a> &gt; "Skip Navigation" Links</p>
+
+
+<nav role="navigation">
+<h2>Article Contents</h2>
+<ol>
+	<li><a href="#overview">Overview</a></li>
+	<li><a href="#creating">Creating "Skip Navigation" Links</a>
+		<ol>
+			<li><a href="#visible">Visible skip links</a></li>
+			<li><a href="#hidden">Temporarily hidden skip links</a></li>
+			<li><a href="#wording">Which wording is best?</a></li>
+			<li><a href="#multiple">Multiple skip links are usually unnecessary</a></li>
+		</ol>
+	</li>
+	<li><a href="#other">Other In-page Navigation Options</a>
+		<ul>
+			<li><a href="#wcag">WCAG Conformance</a></li>
+			<li><a href="#headings">Headings and regions</a></li>
+			<li><a href="#altorders">Alternatives to skip navigation Links</a></li>
+		</ul>
+	</li>
+</ol>
+</nav>
+
+<div class="section" id="overview">
+<h2>Overview</h2>
+
+<p>On most pages, keyboard and screen reader users must navigate a long list of navigation links and other elements before ever arriving at the main content. This can be particularly difficult for users with some forms of motor disabilities. Consider users with no or limited arm movement who navigate a web page by tapping their heads on a switch or that use a stick in their mouth to press keyboard keys. Requiring users to perform any action numerous times before reaching the main content poses an accessibility barrier.</p>
+
+<p>Of course, sighted people who use their mouse do not have any trouble with web pages like this. They can almost immediately scan over the page and identify where the main content is. Skip navigation links are useful to give screen reader and keyboard users the same capability of navigating directly to the main content.</p>
+</div>
+
+<div class="section" id="creating">
+<h2>Creating "Skip Navigation" Links</h2>
+
+<p>The idea is simple enough: provide a link at the top of the page that, when activated, jumps the user to the beginning of the main content area.
+
+	</p><div class="section" id="visible">
+		<h3>Visible skip links</h3>
+
+		<p>The easiest method of creating a skip navigation link is to put it at or near the top of the page in regular text. The key is to <strong>make sure the link is one of the first items</strong> that screen readers hear and that keyboard users navigate to using the keyboard (typically by pressing the <span class="keycap">Tab</span> key). Otherwise, users may not realize there is a skip navigation link there and may waste time navigating through extraneous links. The link must also be apparent to be helpful.</p>
+		
+		<div class="example">
+			<div class="title">Example</div>
+
+			<p>The link is the first item in the page. The anchor or target for the link (where the link will jump the user to) is the main content region.</p>
+
+			<div class="code">	
+				&lt;body&gt;<br>
+				&lt;a href="#maincontent"&gt;Skip to main content&lt;/a&gt;
+				<br>
+				...<br>
+				
+				<strong>&lt;main id="maincontent"&gt;</strong><br>
+				&lt;h1&gt;Heading&lt;/h1&gt;<br>
+				&lt;p&gt;This is the first paragraph&lt;/p&gt;
+			</div>
+			
+			<p>The target is identified by its <code>id</code> attribute value matching the <code>href</code> value (minus the "#") of the skip link. When the skip link is activated, keyboard focus will go to the <code>&lt;main&gt;</code> element. Navigation and reading will proceed from this location in the page.</p>
+			
+			<p>Alternatively, you can use a named anchor to identify the target for the link, though named anchors are no longer conforming in HTML5.</p>
+			
+			<div class="code">
+				&lt;h1&gt;<strong>&lt;a name="maincontent" id="maincontent"&gt;&lt;/a&gt;</strong> Heading&lt;/h1&gt;<br>
+				&lt;p&gt;This is the first paragraph&lt;/p&gt;
+			</div>
+
+		</div>
+		
+	</div>
+
+	<div class="section" id="hidden">
+		<h3>Temporarily hidden skip links</h3>
+
+		<p>Many designers worry about the aesthetic impact of visible skip navigation links. They may think these links are unattractive or confusing to users who do not need them, so they may decide to make them invisible. A very small or hidden link does not benefit the audience that most needs skip links—sighted keyboard users. While screen readers have many mechanisms to jump around the page (e.g., headings and regions/landmarks), other keyboard users do not.</p>
+		
+		<p>To address the concerns that a visible skip link can be intrusive, but still create a skip link that is useful for sighted keyboard users, <strong>we recommend creating a link that is hidden until to the user navigates to it with a keyboard</strong>.</p>
+		
+		<p>To be usable by all keyboard users, particularly sighted keyboard users, the link must:</p>
+		<ul>
+			<li>be hidden by default</li>
+			<li>be accessible to keyboard navigation</li>
+			<li>become prominently visible when it is focused</li>
+			<li>properly set focus to the main content area when activated</li>
+		</ul>
+		
+		<p>Probably the most accessible method for visually hiding a skip link is to hide it off screen with CSS, then cause it to be positioned on screen when it receives keyboard focus. Because the link is still part of the accessible content on the page, keyboard and screen reader users can navigate it, and the link will become visible when accessed.</p>
+		
+		<p>Some techniques, such as hiding the skip link with CSS <code>display:none</code> or the <code>hidden</code> attribute, will remove the link from keyboard navigation making it inaccessible to all users. Making the link the same color as the background or fully transparent, sizing the link to 0 pixels, or placing it on a one-pixel transparent image can also pose accessibility issues.</p>
+		
+		<div class="important">
+			<div class="title">Important</div>
+			<p>Review the article on <a href="/techniques/css/invisiblecontent/">Invisible Content Just for Screen Reader Users</a> for details on using CSS to hide skip links off-screen.</p>
+		</div>
+		
+		<p>One potential issue with this approach is that if the user navigates very quickly using the <span class="keycap">Tab</span> key, the link may be visible on the page for only a fraction of a second and may be overlooked. This can be partially addressed by ensuring that the skip link is very visually distinctive at the top of the page when visible. Additionally, one could use scripting or CSS transitions to cause the link to animate so it remains visible on screen for more time.</p>
+		
+		<div class="note">
+			<div class="title">Note</div>
+			<p>Navigate the links at the beginning of this page using the <span class="keycap">Tab</span> key to see an example of a hidden skip link that becomes visible on keyboard focus using CSS transitions to make it visually distinctive and persistent on screen for at least a moment.</p>
+		</div>
+	</div>
+
+	<div class="section" id="wording">
+		<h3>Which wording is best?</h3>
+
+		<p>There are multiple ways that the skip link could be worded:</p>
+
+		<ul>
+			<li>Skip navigation</li>
+			<li>Skip main navigation</li>
+			<li>Skip navigation links</li>
+			<li>Skip to main content</li>
+			<li>Skip to content</li>
+		</ul>
+
+		<p>Any of these may be sufficient so long as the purpose of the link is clearly described. In general, we prefer "Skip to main content" as it explains where the user is navigating to versus what they are navigating past.</p>
+	</div>
+	
+	<div class="section" id="multiple">
+		<h3>Multiple skip links are usually unnecessary</h3>
+		
+		<p>What if a page has multiple sections or multiple levels of navigational links? Should developers provide a skip navigation link to each of these sections or to skip over each level of navigational?</p>
+		
+		<p><strong>In most cases, a single skip link is sufficient.</strong> For pages that have very few navigable items preceding the main content, a skip link may not be necessary at all. On the other hand, a very complex page with several repeated elements may necessitate additional skip links. Remember, the purpose of skip navigation links is to make keyboard navigation more efficient. Adding more links increases link-clutter. At what point will you need to add a "Skip the skip links" link?!</p>
+		
+		<p>In-page links elsewhere in a page can also be used to allow users to jump to or jump over other types of page content. The "Article Contents" at the top of this page, for example, includes in-page links to facilitate navigation to major page sections. A skip link could also be used to allow the user to quickly bypass confusing or potentially inaccessible content, such as ASCII art, complex tables, or complex social media feeds.</p>
+		
+	</div>
+</div>
+
+<div class="section" id="other">
+	<h2>Other In-page Navigation Options</h2>
+	
+	<div class="section" id="wcag">
+		
+		<h3>WCAG conformance</h3>
+	
+		<p><a href="/standards/wcag/checklist#sc2.4.1">WCAG 2.4.1 (Bypass Blocks - Level A)</a> states, "A mechanism is available to bypass blocks of content that are repeated on multiple Web pages." This does not necessarily require that a skip link be present. Beginning the main content with an <code>&lt;h1&gt;</code> or using a <code>&lt;main&gt;</code> region would be a sufficient "mechanism". However because neither of these techniques are highly useful for sighted keyboard users absent a screen reader or specialized software, a skip link is strongly recommended for optimal accessibility on pages with repeated navigation.</p>
+	
+	</div>
+	
+	<div class="section" id="headings">
+		<h3>Headings and regions</h3>
+		
+		<p>Implementing proper <a href="/techniques/semanticstructure/#headings">heading structures</a> (especially starting the main content with an <code>&lt;h1&gt;</code>) and <a href="/techniques/semanticstructure/#regions">regions</a> (especially <code>&lt;nav&gt;</code> and <code>&lt;main&gt;</code>) is a vital aspect of keyboard accessibility. Unfortunately, browsers do not yet natively support this type of navigation without the use of extensions or a screen reader. Even though skip navigation links are a rather clumsy and obtrusive solution to a real-world problem, they are still often necessary to best meet the needs of all keyboard users.</p>
+			
+		<p>Within web pages and applications, focus management may be necessary to ensure that keyboard focus is set on content elements when they are presented or activated. When a dialog pop-up appears, for example, focus will likely need to be set to it using JavaScript.</p>
+		
+	</div>
+
+	<div class="section" id="altorders">
+		<h3>Alternate reading orders</h3>
+
+		<p>Some web sites use CSS to change page layouts so that the main content is presented before the navigation in the underlying source code (which is what determines the screen reader reading and keyboard navigation order), but it comes after the navigation visually. Because the navigation is encountered first for keyboard and screen reader users, this method may make a skip navigation link unnecessary.</p>
+		
+		<p>When the visual order does not align with the navigation and reading order, sighted keyboard or screen reader users may be confused when what they are seeing or navigating to seemingly jumps around the visual page. These types of layouts are not recommended.</p>
+	</div>
+	
+</div>
+
+
+</article>
+<!--
+	-->
+<aside id="articlemeta">
+
+	<div id="updated">Last updated: <time datetime="2021-09-22">Sep 22, 2021</time></div>
+		
+				<div id="related">
+			<h2>Related Resources</h2>
+			<ul>
+			<li><a href="/articles/motor">Motor Disabilities</a></li>
+<li><a href="/techniques/hypertext/">Links and Hypertext</a></li>
+<li><a href="/techniques/css/invisiblecontent/">CSS in Action: Invisible Content Just for Screen Reader Users</a></li>
+<li><a href="/techniques/javascript/">Creating Accessible JavaScript</a></li>
+<li><a href="/techniques/sitetools/">Site Searches, Indexes, and Site Maps</a></li>
+			</ul>
+		</div>
+		
+		
+</aside>
+</main>
+
+<footer>
+	<div id="footerresources">
+		<div class="footerblock">
+			<h2 id="copyright">©2026 WebAIM</h2>
+			<p id="contact">			Utah State University<br>
+			6807 Old Main Hill<br>
+			Logan, UT 84322-6807<br>
+			<a class="phone" href="tel:4357977024">435.797.7024</a></p>
+		
+		<div id="checkpage">
+			<h2>Check Your Accessibility</h2>
+			<form action="https://wave.webaim.org/report" novalidate="">
+				<label for="waveurl">Web site address:</label>
+				<input type="url" id="waveurl" name="url" title="Web site address">
+				<input type="submit" value="WAVE">
+			</form>
+		</div>
+		</div>
+		<div class="footerblock">
+			<h2 id="blog">From the Blog</h2>
+			<ul><li><a href="/blog/an-extension-is-not-an-excuse/">An Extension is Not an Excuse</a></li><li><a href="/blog/tolerating-inaccessibility/">Tolerating Inaccessibility</a></li><li><a href="/blog/ask-aimee/">Ask AIMee: An accessible accessibility-focused AI chatbot</a></li><li><a href="/blog/a-new-path/">A New Path for Digital Accessibility?</a></li></ul>		</div>
+		<div class="footerblock">
+			<h2 id="popular">Popular Resources</h2>
+			<ul>
+				<li><a href="/services/training/">WebAIM Training</a></li>
+				<li><a href="/standards/wcag/checklist">WCAG 2 Checklist</a></li>
+				<li><a href="/AIMee">Ask AIMee Chatbot</a></li>
+				<li><a href="/resources/contrastchecker">Color Contrast Checker</a></li>
+				<li><a href="/resources/designers/">Web Accessibility for Designers</a></li>
+				<li><a href="http://wave.webaim.org/">WAVE Web Accessibility Evaluation Tool</a></li>
+			</ul>
+		</div>
+		
+		<div id="footerlinks">
+			<ul>
+				<li><a id="footercontact" href="/contact">Contact</a></li>
+				<li><a id="footerabout" href="/about">About</a></li>
+				<li><a id="footerrss" href="/community/rss">RSS Feeds</a></li>
+				<li><a id="footerli" href="https://www.linkedin.com/company/webaim/">LinkedIn</a></li>
+				<li><a id="footercopyright" href="/copyright">Copyright &amp; Terms of Use</a></li>
+			</ul>
+		</div>
+		
+		<div class="clear"></div>
+	</div>
+
+</footer>
+
+
+<flying-focus id="flying-focus" style="transition-duration: 0.1s;"></flying-focus></body></html>

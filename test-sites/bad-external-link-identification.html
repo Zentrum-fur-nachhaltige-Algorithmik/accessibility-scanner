@@ -1,0 +1,48 @@
+<!-- WCAG-TEST
+criterion: 3.2.1, 3.2.4
+level: A
+title: On Focus, Consistent Identification
+test_type: bad
+expected_violations: 2
+testable_by: regex
+scanners: predictable-navigation
+description: External links that carry an indicator on some occurrences and not on others, and a focus style that hides the focused element
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inconsistent external links</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        color: #1a1a1a;
+        background: #fff;
+      }
+      main {
+        padding: 1rem 2rem;
+      }
+      /* VIOLATION: the focused element disappears, so keyboard users lose it */
+      .teaser a:focus {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Inconsistent external links</h1>
+
+      <!-- VIOLATION: the same kind of destination, identified two ways -->
+      <ul>
+        <li><a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2 (external)</a></li>
+        <li><a href="https://www.w3.org/WAI/ARIA/apg/">ARIA Authoring Practices Guide</a></li>
+        <li><a href="https://html.spec.whatwg.org/">HTML Living Standard</a></li>
+        <li><a href="https://caniuse.com/">Can I Use (external)</a></li>
+      </ul>
+
+      <p class="teaser"><a href="/news/">Latest news</a></p>
+    </main>
+  </body>
+</html>

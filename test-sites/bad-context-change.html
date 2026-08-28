@@ -415,7 +415,7 @@ description: Unexpected context changes on focus or input
     </div>
 
     <!-- Hidden modal for demonstrations -->
-    <div id="helpModal" class="modal">
+    <div id="helpModal" class="modal" role="dialog" aria-modal="true" aria-label="Unexpected help">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <h3>Unexpected Help Modal</h3>
@@ -461,19 +461,19 @@ description: Unexpected context changes on focus or input
         function quickNavigate(value) {
             if (value) {
                 showNotification('Navigating to ' + value + ' page...', 'warning');
-                // In real scenario: window.location.href = value + '.html';
+                window.location.href = value + '.html';
             }
         }
         
         function changeLanguage(lang) {
             showNotification('Changing language to ' + lang + '...', 'warning');
-            // In real scenario: window.location.href = '/' + lang + '/';
+            window.location.href = '/' + lang + '/';
         }
         
         // VIOLATION: Auto-submit forms
         function submitRating(rating) {
             showNotification('Rating submitted: ' + rating, 'success');
-            // Form submits immediately without user confirmation
+            document.querySelector('input[name="rating"]').form.submit();
         }
         
         function applyPriceFilter(price) {

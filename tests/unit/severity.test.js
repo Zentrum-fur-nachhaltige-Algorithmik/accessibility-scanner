@@ -104,7 +104,7 @@ describe('severity', () => {
           ],
         },
         {
-          scannerId: 'eaa-procedure',
+          scannerId: 'llm-incomplete-reviewer',
           passed: false,
           violations: [
             {

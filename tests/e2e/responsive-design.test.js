@@ -6,137 +6,83 @@ const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helper
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
 const ResponsiveDesignScanner = require('../../src/scanners/responsive-design');
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-
 describe('ResponsiveDesignScanner', () => {
   let scanner;
-  let scanDir;
 
   beforeAll(async () => {
     await startFixtureServer();
     await launchBrowser();
     scanner = new ResponsiveDesignScanner();
-    scanDir = fs.mkdtempSync(path.join(os.tmpdir(), 'responsive-scan-'));
   }, 120000);
 
   afterAll(async () => {
     await closeBrowser();
     await stopFixtureServer();
-    if (scanDir) fs.rmSync(scanDir, { recursive: true, force: true });
   });
 
-  it('produces zero violations on good-reflow.html in heuristic-only mode', async () => {
-    const url = `${getBaseUrl()}/good-reflow.html`;
-    const page = await getPage(url);
+  it('produces zero violations on good-reflow.html', async () => {
+    const page = await getPage(`${getBaseUrl()}/good-reflow.html`);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result).toBeDefined();
       expect(result.violations).toEqual([]);
     } finally {
       await page.close();
     }
   }, 60000);
 
-  it('produces zero violations on good-text-resize.html in heuristic-only mode', async () => {
-    const url = `${getBaseUrl()}/good-text-resize.html`;
-    const page = await getPage(url);
+  it('produces zero 1.4.12 violations on good-text-spacing.html', async () => {
+    const page = await getPage(`${getBaseUrl()}/good-text-spacing.html`);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result).toBeDefined();
-      expect(result.violations).toEqual([]);
+      expect(result.violations.filter((v) => v.criterion === '9.1.4.12')).toEqual([]);
     } finally {
       await page.close();
     }
   }, 60000);
 
-  it('produces zero text-spacing violations on good-text-spacing.html in heuristic-only mode', async () => {
-    const url = `${getBaseUrl()}/good-text-spacing.html`;
-    const page = await getPage(url);
+  it('produces zero violations on good-fluid-container-and-truncation.html', async () => {
+    const page = await getPage(`${getBaseUrl()}/good-fluid-container-and-truncation.html`);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result).toBeDefined();
-      // Only check text-spacing-specific violations (this file is designed for text-spacing compliance)
-      const textSpacingViolations = result.violations.filter(
-        (v) => v.issue && v.issue.startsWith('text-spacing-')
-      );
-      expect(textSpacingViolations).toEqual([]);
+      expect(result.violations).toEqual([]);
     } finally {
       await page.close();
     }
   }, 60000);
 
   it('does not flag sr-only elements on good-skip-links.html', async () => {
-    const url = `${getBaseUrl()}/good-skip-links.html`;
-    const page = await getPage(url);
+    const page = await getPage(`${getBaseUrl()}/good-skip-links.html`);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result).toBeDefined();
-      // No violations should reference sr-only elements
       for (const v of result.violations) {
-        expect(v.element).not.toMatch(/sr-only|visually-hidden/);
+        expect(v.element || '').not.toMatch(/sr-only|visually-hidden/);
       }
     } finally {
       await page.close();
     }
   }, 60000);
 
-  it('deduplicates violations (no duplicate element+issue+criterion keys)', async () => {
-    const url = `${getBaseUrl()}/bad-reflow.html`;
-    const page = await getPage(url);
+  it('reports one finding per element and issue on bad-reflow.html', async () => {
+    const page = await getPage(`${getBaseUrl()}/bad-reflow.html`);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result).toBeDefined();
-
-      // Check for duplicates
-      const keys = result.violations.map((v) => `${v.element}::${v.issue}::${v.criterion}`);
-      const unique = new Set(keys);
-      expect(keys.length).toBe(unique.size);
-    } finally {
-      await page.close();
-    }
-  }, 60000);
-
-  it('detects violations in bad-reflow.html', async () => {
-    const url = `${getBaseUrl()}/bad-reflow.html`;
-    const page = await getPage(url);
-    try {
-      const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result).toBeDefined();
       expect(result.violations.length).toBeGreaterThan(0);
-    } finally {
-      await page.close();
-    }
-  }, 60000);
-  // --- full (non-heuristic) measurement paths -------------------------------
-
-  it('does not report fixed-width-element for fluid content wider than 320px', async () => {
-    // good-text-spacing.html contains a fluid table that renders ~626px wide at
-    // 320px viewport. Its computed width is a px length, but nothing declares a
-    // fixed width, so it must not be reported as a fixed-width element.
-    const url = `${getBaseUrl()}/good-text-spacing.html`;
-    const page = await getPage(url);
-    try {
-      const violations = [];
-      await scanner.testContentReflow(page, scanDir, violations, {});
-      const fixed = violations.filter((v) => v.issue === 'fixed-width-element');
-      expect(fixed).toEqual([]);
+      const keys = result.violations.map((v) => `${v.element}::${v.issue}::${v.criterion}`);
+      expect(new Set(keys).size).toBe(keys.length);
     } finally {
       await page.close();
     }
   }, 60000);
 
-  it('reports fixed-width-element for authored px widths in bad-reflow.html', async () => {
-    const url = `${getBaseUrl()}/bad-reflow.html`;
-    const page = await getPage(url);
+  it('reports the authored px width that overflows the 320px reference viewport', async () => {
+    const page = await getPage(`${getBaseUrl()}/bad-reflow.html`);
     try {
-      const violations = [];
-      await scanner.testContentReflow(page, scanDir, violations, {});
+      const violations = await scanner.measureReflow(page);
       const fixed = violations.filter((v) => v.issue === 'fixed-width-element');
       expect(fixed.length).toBeGreaterThan(0);
       for (const v of fixed) {
-        expect(v.description).toMatch(/width: \d+(\.\d+)?px/);
+        expect(v.description).toMatch(/(width|min-width): \d+(\.\d+)?px/);
+        expect(v.criterion).toBe('9.1.4.10');
       }
       expect(violations.some((v) => v.issue === 'reflow-failure')).toBe(true);
     } finally {
@@ -144,17 +90,28 @@ describe('ResponsiveDesignScanner', () => {
     }
   }, 60000);
 
-  it('reports text-spacing-failure only for text newly clipped by 1.4.12 spacing', async () => {
-    const viewport = { width: 1280, height: 800, name: 'Desktop' };
+  it('does not call fluid content wider than 320px a fixed-width element', async () => {
+    // The table in good-text-spacing.html renders about 626px wide at the
+    // reference viewport. Its computed width is a px length, but nothing in the
+    // cascade declares one.
+    const page = await getPage(`${getBaseUrl()}/good-text-spacing.html`);
+    try {
+      const violations = await scanner.measureReflow(page);
+      expect(violations.filter((v) => v.issue === 'fixed-width-element')).toEqual([]);
+    } finally {
+      await page.close();
+    }
+  }, 60000);
 
+  it('reports text-spacing-failure only for text the injected spacing clips', async () => {
     const badPage = await getPage(`${getBaseUrl()}/bad-text-spacing.html`);
     try {
-      const violations = [];
-      await badPage.setViewport({ width: viewport.width, height: viewport.height });
-      await scanner.testTextSpacing(badPage, scanDir, viewport, violations);
+      await badPage.setViewport({ width: 1280, height: 800 });
+      const violations = await scanner.measureTextSpacing(badPage);
       expect(violations.length).toBeGreaterThan(0);
       for (const v of violations) {
         expect(v.issue).toBe('text-spacing-failure');
+        expect(v.criterion).toBe('9.1.4.12');
         expect(v.element).toBeTruthy(); // one finding per element, not a page-level boolean
       }
     } finally {
@@ -163,47 +120,23 @@ describe('ResponsiveDesignScanner', () => {
 
     const goodPage = await getPage(`${getBaseUrl()}/good-text-spacing.html`);
     try {
-      const violations = [];
-      await goodPage.setViewport({ width: viewport.width, height: viewport.height });
-      await scanner.testTextSpacing(goodPage, scanDir, viewport, violations);
-      expect(violations).toEqual([]);
+      await goodPage.setViewport({ width: 1280, height: 800 });
+      expect(await scanner.measureTextSpacing(goodPage)).toEqual([]);
     } finally {
       await goodPage.close();
     }
   }, 120000);
-  it('does not report px font-size rules as a 1.4.4 failure', async () => {
-    // Browser zoom scales px text like rem text: a px font-size alone is not a
-    // resize failure (the small-text hint lives in the text-resize scanner).
-    const url = `${getBaseUrl()}/bad-text-resize.html`;
-    const page = await getPage(url);
+
+  it('does not claim 1.4.4, which text-resize owns', async () => {
+    const page = await getPage(`${getBaseUrl()}/bad-text-resize.html`);
     try {
       const result = await scanner.scan(page, { heuristicOnly: true });
-      expect(result.violations.some((v) => v.issue === 'text-resize-fixed-font')).toBe(false);
+      expect(scanner.wcagCriteria).toEqual(['1.4.10', '1.4.12']);
+      for (const v of result.violations) {
+        expect(['9.1.4.10', '9.1.4.12']).toContain(v.criterion);
+      }
     } finally {
       await page.close();
     }
   }, 60000);
-
-  it('reports text-resize-clip-risk only for measurably clipped text', async () => {
-    const badPage = await getPage(`${getBaseUrl()}/bad-text-resize.html`);
-    try {
-      const result = await scanner.scan(badPage, { heuristicOnly: true });
-      const clip = result.violations.filter((v) => v.issue === 'text-resize-clip-risk');
-      expect(clip.length).toBeGreaterThan(0);
-      for (const v of clip) {
-        // description carries the measured evidence, not just a CSS property
-        expect(v.description).toMatch(/\d+ characters extend \d+px/);
-      }
-    } finally {
-      await badPage.close();
-    }
-
-    const goodPage = await getPage(`${getBaseUrl()}/good-text-resize.html`);
-    try {
-      const result = await scanner.scan(goodPage, { heuristicOnly: true });
-      expect(result.violations).toEqual([]);
-    } finally {
-      await goodPage.close();
-    }
-  }, 90000);
 });

@@ -1,0 +1,156 @@
+<!-- WCAG-TEST
+criterion: 1.4.10, 1.4.12
+level: AA
+title: Reflow, Text Spacing
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: responsive-design
+description: A container with a px width and max-width 100 percent, an image with an inline px width under a responsive rule, a wide table in a scrolling wrapper, a nowrap pill button, a line-clamped teaser and an important line-height
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fluid container, nowrap button and declared truncation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        color: #1a1a1a;
+        background: #ffffff;
+      }
+
+      /* The single most common layout rule on the web: a px width that is
+         capped at the viewport, so it reflows. */
+      .container {
+        width: 1140px;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* A wide table the user can pan inside its own scrolling wrapper, which
+         1.4.10 allows for content that needs two dimensions. */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      .table-wrap table {
+        min-width: 420px;
+        border-collapse: collapse;
+      }
+      .table-wrap th,
+      .table-wrap td {
+        border: 1px solid #767676;
+        padding: 8px;
+        white-space: nowrap;
+      }
+
+      /* A pill button whose label uses a third of the box. */
+      .btn {
+        white-space: nowrap;
+        overflow: hidden;
+        padding: 12px 24px;
+        border: 1px solid #10314f;
+        background: #1a5490;
+        color: #ffffff;
+        display: inline-block;
+      }
+
+      /* Authored truncation: the full text stays in the DOM and a link opens it. */
+      .teaser__excerpt {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* A design-system override that already exceeds the 1.4.12 minimum. */
+      .prose p {
+        line-height: 1.6 !important;
+      }
+
+      /* A hero with a fixed height and a headline that has room to spare. */
+      .hero {
+        height: 480px;
+        overflow: hidden;
+        background: #eef2f5;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Fluid container</h1>
+
+      <div class="hero">
+        <h2>Plan your journey</h2>
+        <p>Two lines of headline in a box with plenty of vertical slack.</p>
+      </div>
+
+      <p>
+        <img
+          src="data:image/gif;base64,R0lGODlhAQABAIAAAMzMzP///yH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+          alt="Placeholder photograph"
+          style="width: 640px; height: 360px"
+        />
+      </p>
+
+      <p><a class="btn" href="/save">Save</a></p>
+
+      <div class="table-wrap">
+        <table>
+          <caption>
+            Opening hours
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Morning</th>
+              <th scope="col">Afternoon</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Monday</th>
+              <td>09:00 to 12:00</td>
+              <td>13:00 to 17:00</td>
+            </tr>
+            <tr>
+              <th scope="row">Tuesday</th>
+              <td>09:00 to 12:00</td>
+              <td>13:00 to 17:00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="teaser">
+        <h3>From the blog</h3>
+        <p class="teaser__excerpt">
+          The excerpt is clamped to three lines by the style sheet, and the whole text is still in
+          the document for assistive technology to read. Clamping looks the same at every viewport
+          width and at every zoom level, which is what makes it a design decision rather than a
+          resize failure. A link below opens the full article.
+        </p>
+        <p><a href="/blog/reflow">Read more about reflow</a></p>
+      </div>
+
+      <div class="prose">
+        <p>
+          The line height in this paragraph is set with an important declaration and already
+          exceeds the 1.4.12 minimum of 1.5. A user style sheet using important still wins in the
+          cascade, so nothing is locked.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

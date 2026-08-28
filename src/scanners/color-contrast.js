@@ -1,17 +1,20 @@
 /**
  * Color Contrast Scanner.
- * WCAG 1.4.3, 1.4.6 (EN 301 549 9.1.4.3, 9.1.4.6).
+ * WCAG 1.4.6 Contrast (Enhanced) (EN 301 549 9.1.4.6).
+ * SC 1.4.3 is axe-core's: its `color-contrast` rule (cat.color, wcag2aa, wcag143) runs in
+ * every profile of src/scanners/axe-core.js. Its AAA companion `color-contrast-enhanced`
+ * (wcag2aaa) does not, so the enhanced thresholds are measured here, and only for a scan
+ * that asks for AAA.
  * All colour maths comes from the shared helpers in src/utils/browser-contrast.js
  * (relative luminance, alpha compositing, ancestor background resolution).
  */
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
-const log = require('../utils/logger').createLogger('color-contrast');
 
 class ColorContrastScanner extends BaseScanner {
   constructor() {
     super('color-contrast', {
-      wcagCriteria: ['1.4.3', '1.4.6'],
+      wcagCriteria: ['1.4.6'],
       wcagPrinciple: 'perceivable',
     });
   }
@@ -20,13 +23,32 @@ class ColorContrastScanner extends BaseScanner {
    * Core scan method. Receives an already-navigated Puppeteer page.
    * @param {import('puppeteer').Page} page - Already-navigated page
    * @param {Object} options - Scanning options
+   * @param {string} [options.wcagLevel] - 'AAA' enables the enhanced-contrast measurement
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
+    const emptyResult = {
+      scannerId: this.id,
+      criterion: '9.1.4.6',
+      passed: true,
+      violations: [],
+      incomplete: [],
+      summary: {
+        totalElements: 0,
+        failedElements: 0,
+        passedElements: 0,
+        exemptElements: 0,
+        incompleteElements: 0,
+        minimumRatio: 7,
+        evaluated: false,
+      },
+    };
+
+    // An AA audit has no enhanced-contrast requirement, and reporting 7:1
+    // failures beside axe-core's 4.5:1 ones would report the same text twice.
+    if (options.wcagLevel !== 'AAA') return emptyResult;
+
     const scanOptions = {
-      wcagLevel: options.wcagLevel || 'AA',
-      includeGradients: options.includeGradients || false,
-      checkLargeText: options.checkLargeText !== false,
       ignoreTransparent: options.ignoreTransparent !== false,
     };
 
@@ -68,8 +90,9 @@ class ColorContrastScanner extends BaseScanner {
         let failedElements = 0;
         let exemptElements = 0;
 
-        const requiredRatio = options.wcagLevel === 'AAA' ? 7 : 4.5;
-        const requiredRatioLarge = options.wcagLevel === 'AAA' ? 4.5 : 3;
+        // SC 1.4.6: 7:1, and 4.5:1 for large text.
+        const requiredRatio = 7;
+        const requiredRatioLarge = 4.5;
 
         function describe(element) {
           let selector = element.tagName.toLowerCase();
@@ -86,7 +109,7 @@ class ColorContrastScanner extends BaseScanner {
             const computed = window.getComputedStyle(element);
             const foregroundColor = computed.getPropertyValue('color');
 
-            // SC 1.4.3 exception "Incidental": text that is part of an INACTIVE
+            // SC 1.4.6 exception "Incidental": text that is part of an INACTIVE
             // user interface component has no contrast requirement. A disabled
             // button rendered in grey-on-grey is the intended affordance, not a
             // defect.
@@ -116,7 +139,7 @@ class ColorContrastScanner extends BaseScanner {
             }
 
             // Fully transparent text paints nothing: there is no contrast to
-            // measure and no text to read, so 1.4.3 does not apply.
+            // measure and no text to read, so 1.4.6 does not apply.
             // Semi-transparent text is still measured; __blendOver() below
             // composites the alpha onto the backdrop.
             if (options.ignoreTransparent && fgRgb.a === 0) return;
@@ -126,7 +149,9 @@ class ColorContrastScanner extends BaseScanner {
 
             totalElements++;
 
-            const contrastRatio = __getContrastRatio(fgFlat, bgRgb);
+            // Rounded to the two decimals the report shows, so a ratio of
+            // 6.9996 is not reported as "7:1 is below 7:1".
+            const contrastRatio = Math.round(__getContrastRatio(fgFlat, bgRgb) * 100) / 100;
             const largeText = __isLargeText(computed);
             const minimumRatio = largeText ? requiredRatioLarge : requiredRatio;
 
@@ -139,15 +164,15 @@ class ColorContrastScanner extends BaseScanner {
               // `type` identifies the rule everywhere downstream
               // (report grouping, the golden-corpus harness, severity.ruleKey()).
               violations.push({
-                type: 'insufficient-text-contrast',
+                type: 'insufficient-enhanced-text-contrast',
                 category: 'contrast',
                 severity: 'serious',
-                wcagCriteria: '1.4.3',
-                description: `Text contrast ${Math.round(contrastRatio * 100) / 100}:1 is below the required ${minimumRatio}:1`,
+                wcagCriteria: '1.4.6',
+                description: `Text contrast ${contrastRatio}:1 is below the enhanced ${minimumRatio}:1`,
                 impact: 'Users with low vision cannot read this text',
                 recommendation: `Use ${suggestedForeground} for the text, or darken/lighten the background, to reach ${minimumRatio}:1`,
                 element: describe(element),
-                currentRatio: Math.round(contrastRatio * 100) / 100,
+                currentRatio: contrastRatio,
                 requiredRatio: minimumRatio,
                 foregroundColor: foregroundColor,
                 backgroundColor: rgbString(bgRgb),
@@ -157,8 +182,8 @@ class ColorContrastScanner extends BaseScanner {
             } else {
               passedElements++;
             }
-          } catch (error) {
-            log.warn('Error checking contrast for element:', error);
+          } catch (e) {
+            // A single unreadable element is not evidence of a contrast defect.
           }
         });
 
@@ -179,7 +204,7 @@ class ColorContrastScanner extends BaseScanner {
     // Create report according to interface
     return {
       scannerId: this.id,
-      criterion: '9.1.4.3',
+      criterion: '9.1.4.6',
       passed: contrastResults.violations.length === 0,
       violations: contrastResults.violations,
       // Elements whose rendered background could not be determined from CSS
@@ -193,6 +218,7 @@ class ColorContrastScanner extends BaseScanner {
         exemptElements: contrastResults.exemptElements,
         incompleteElements: contrastResults.incomplete.length,
         minimumRatio: contrastResults.minimumRatio,
+        evaluated: true,
       },
     };
   }

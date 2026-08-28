@@ -1,15 +1,16 @@
 /**
  * Screen Reader Scanner.
- * WCAG 1.3.1, 2.4.1, 4.1.2, 4.1.3 (EN 301 549 9.1.3.1, 9.2.4.1, 9.4.1.2, 9.4.1.3).
- * Inspects heading structure, landmarks, data tables, images, forms and ARIA
- * usage from the DOM; reports only findings axe-core does not cover.
+ * WCAG 1.3.1, 2.4.1 (EN 301 549 9.1.3.1, 9.2.4.1).
+ * Reports the two structural defects axe-core has no rule for: a data table
+ * with no header cells, and a repeated block of navigation with no way past it.
+ * Heading structure and landmarks are analysed for the report payload only.
  */
 const BaseScanner = require('../core/base-scanner');
 
 class ScreenReaderScanner extends BaseScanner {
   constructor() {
     super('screen-reader', {
-      wcagCriteria: ['1.3.1', '4.1.2', '4.1.3'],
+      wcagCriteria: ['1.3.1', '2.4.1'],
       wcagPrinciple: 'perceivable',
     });
   }
@@ -21,25 +22,15 @@ class ScreenReaderScanner extends BaseScanner {
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const [headingStructure, landmarks, tables, images, forms, ariaUsage] = await Promise.all([
+    const [headingStructure, landmarks, tables] = await Promise.all([
       this.analyzeHeadingStructure(page),
       this.analyzeLandmarks(page),
       this.analyzeTables(page),
-      this.analyzeImages(page),
-      this.analyzeForms(page),
-      this.analyzeAriaUsage(page),
     ]);
 
     const pageTitle = await page.title();
 
-    const euCompliance = this.calculateEUCompliance({
-      headingStructure,
-      landmarks,
-      tables,
-      images,
-      forms,
-      ariaUsage,
-    });
+    const euCompliance = this.calculateEUCompliance({ headingStructure, landmarks, tables });
 
     return {
       scannerId: this.id,
@@ -49,9 +40,6 @@ class ScreenReaderScanner extends BaseScanner {
       headingStructure,
       landmarks,
       tables,
-      images,
-      forms,
-      ariaUsage,
       euCompliance,
       violations: euCompliance.en301549.violations,
       summary: {
@@ -59,8 +47,6 @@ class ScreenReaderScanner extends BaseScanner {
         headingIssues: headingStructure.issues.length,
         landmarkIssues: landmarks.issues.length,
         tableIssues: tables.problematic.length,
-        imageIssues: images.problematic.length,
-        ariaIssues: ariaUsage.misusedAttributes.length,
       },
     };
   }
@@ -360,335 +346,6 @@ class ScreenReaderScanner extends BaseScanner {
     }, ScreenReaderScanner.selectorHelperScript);
   }
 
-  async analyzeImages(page) {
-    return await page.evaluate((helperScript) => {
-      eval(helperScript);
-      const images = Array.from(document.querySelectorAll('img'));
-      const problematic = [];
-      let withAlt = 0;
-      let decorative = 0;
-
-      images.forEach((img, index) => {
-        const alt = img.getAttribute('alt');
-        const src = img.src;
-        const selector = getElementSelector(img);
-        const isDecorative = alt === '';
-
-        if (isDecorative) {
-          decorative++;
-        } else if (alt && alt.trim()) {
-          withAlt++;
-        } else {
-          problematic.push({
-            index: index + 1,
-            selector,
-            src: src.substring(0, 100),
-            type: 'image-missing-alt',
-            issue: 'Missing alt attribute',
-            severity: 'critical',
-            suggestion: 'Add alt="…" describing the image, or alt="" if it is decorative',
-          });
-        }
-
-        if (alt && alt.length > 125) {
-          problematic.push({
-            index: index + 1,
-            selector,
-            src: src.substring(0, 100),
-            type: 'alt-text-too-long',
-            issue: `Alt text too long (${alt.length} characters)`,
-            severity: 'moderate',
-            suggestion:
-              'Keep alt short and move any long description into the page or a longdesc target',
-          });
-        }
-
-        if (alt && /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(alt)) {
-          problematic.push({
-            index: index + 1,
-            selector,
-            src: src.substring(0, 100),
-            type: 'alt-text-is-filename',
-            issue: 'Alt text contains file extension',
-            severity: 'minor',
-            suggestion: 'Replace the filename with a description of what the image conveys',
-          });
-        }
-      });
-
-      return {
-        total: images.length,
-        withAlt,
-        decorative,
-        problematic,
-      };
-    }, ScreenReaderScanner.selectorHelperScript);
-  }
-
-  async analyzeForms(page) {
-    return await page.evaluate((helperScript) => {
-      eval(helperScript);
-      const forms = Array.from(document.querySelectorAll('form'));
-      const inputs = Array.from(document.querySelectorAll('input, textarea, select'));
-      const requiredFields = [];
-      const unlabeled = [];
-      let labelsCorrect = true;
-      let errorHandling = false;
-
-      // Controls that take their accessible name from their own value/content
-      // (or that are not exposed at all) are out of scope for "needs a label".
-      const SELF_NAMING_TYPES = ['hidden', 'submit', 'reset', 'button', 'image'];
-
-      inputs.forEach((input, index) => {
-        const label =
-          (input.id ? document.querySelector(`label[for="${CSS.escape(input.id)}"]`) : null) ||
-          input.closest('label');
-
-        const ariaLabel = input.getAttribute('aria-label');
-        const ariaLabelledby = input.getAttribute('aria-labelledby');
-        const titleAttr = input.getAttribute('title');
-        const inputType = (input.getAttribute('type') || input.tagName.toLowerCase()).toLowerCase();
-
-        // `aria-labelledby` is an ID-list; it only names the control if at
-        // least one referenced element actually exists and has text.
-        const labelledbyResolves = !!(
-          ariaLabelledby &&
-          ariaLabelledby.split(/\s+/).some((id) => {
-            const t = document.getElementById(id);
-            return t && t.textContent.trim().length > 0;
-          })
-        );
-
-        // Not rendered ⇒ not exposed to assistive tech ⇒ no name required.
-        // (e.g. the `display:none` file input a styled button proxies for in
-        // good-pointer-cancellation.html.) Visually-hidden-but-focusable
-        // controls keep a non-null offsetParent, so they are still checked.
-        const notRendered =
-          input.offsetParent === null && getComputedStyle(input).position !== 'fixed';
-
-        const isExposed =
-          !notRendered &&
-          !input.closest('[aria-hidden="true"]') &&
-          !SELF_NAMING_TYPES.includes(inputType);
-
-        if (
-          isExposed &&
-          !label &&
-          !(ariaLabel && ariaLabel.trim()) &&
-          !labelledbyResolves &&
-          !(titleAttr && titleAttr.trim())
-        ) {
-          labelsCorrect = false;
-          const entry = {
-            index: index + 1,
-            selector: getElementSelector(input),
-            type: inputType,
-            id: input.id || '',
-            hasPlaceholderOnly: !!(input.getAttribute('placeholder') || '').trim(),
-            issue: 'No associated label found',
-          };
-          unlabeled.push(entry);
-          requiredFields.push(entry);
-        }
-
-        if (input.hasAttribute('required') || input.hasAttribute('aria-required')) {
-          const hasRequiredIndicator =
-            (label && label.textContent.includes('*')) ||
-            input.getAttribute('aria-required') === 'true' ||
-            input.hasAttribute('required');
-
-          requiredFields.push({
-            index: index + 1,
-            type: input.type || input.tagName.toLowerCase(),
-            id: input.id || '',
-            required: true,
-            hasIndicator: hasRequiredIndicator,
-          });
-        }
-      });
-
-      const errorElements = document.querySelectorAll(
-        '[role="alert"], .error, .invalid, [aria-invalid="true"]'
-      );
-      errorHandling = errorElements.length > 0;
-
-      return {
-        totalForms: forms.length,
-        totalInputs: inputs.length,
-        labelsCorrect,
-        errorHandling,
-        unlabeled,
-        requiredFields,
-      };
-    }, ScreenReaderScanner.selectorHelperScript);
-  }
-
-  async analyzeAriaUsage(page) {
-    return await page.evaluate((helperScript) => {
-      eval(helperScript);
-      const elementsWithAria = Array.from(
-        document.querySelectorAll(
-          '[aria-label], [aria-labelledby], [aria-describedby], [role], [aria-expanded], [aria-hidden], [aria-live], [aria-atomic], [aria-busy]'
-        )
-      );
-      const misusedAttributes = [];
-      const misuse = []; // structured twin of misusedAttributes (selector + type)
-      const recommendations = [];
-      let correctUsage = 0;
-
-      const validRoles = [
-        'alert',
-        'alertdialog',
-        'application',
-        'article',
-        'banner',
-        'button',
-        'cell',
-        'checkbox',
-        'columnheader',
-        'combobox',
-        'complementary',
-        'contentinfo',
-        'definition',
-        'dialog',
-        'directory',
-        'document',
-        'feed',
-        'figure',
-        'form',
-        'grid',
-        'gridcell',
-        'group',
-        'heading',
-        'img',
-        'link',
-        'list',
-        'listbox',
-        'listitem',
-        'log',
-        'main',
-        'marquee',
-        'math',
-        'menu',
-        'menubar',
-        'menuitem',
-        'menuitemcheckbox',
-        'menuitemradio',
-        'navigation',
-        'none',
-        'note',
-        'option',
-        'presentation',
-        'progressbar',
-        'radio',
-        'radiogroup',
-        'region',
-        'row',
-        'rowgroup',
-        'rowheader',
-        'scrollbar',
-        'search',
-        'searchbox',
-        'separator',
-        'slider',
-        'spinbutton',
-        'status',
-        'switch',
-        'tab',
-        'table',
-        'tablist',
-        'tabpanel',
-        'term',
-        'textbox',
-        'timer',
-        'toolbar',
-        'tooltip',
-        'tree',
-        'treegrid',
-        'treeitem',
-      ];
-
-      elementsWithAria.forEach((element, index) => {
-        const role = element.getAttribute('role');
-        const ariaLabel = element.getAttribute('aria-label');
-        const ariaLabelledby = element.getAttribute('aria-labelledby');
-        const ariaDescribedby = element.getAttribute('aria-describedby');
-        const ariaHidden = element.getAttribute('aria-hidden');
-
-        const selector = getElementSelector(element);
-
-        if (role && !validRoles.includes(role)) {
-          misusedAttributes.push(`Invalid role "${role}" on ${element.tagName}`);
-          misuse.push({
-            type: 'invalid-aria-role',
-            selector,
-            attribute: 'role',
-            value: role,
-            issue: `Invalid role "${role}" on ${element.tagName}`,
-            suggestion: 'Use a role from the ARIA 1.2 taxonomy, or remove the attribute',
-          });
-        } else if (role && validRoles.includes(role)) {
-          correctUsage++;
-        }
-
-        if (ariaLabel && ariaLabel.trim()) {
-          correctUsage++;
-        }
-
-        // aria-labelledby / aria-describedby take an ID list. Resolve token
-        // by token and only report the missing ones.
-        const resolveIdList = (value, attrName) => {
-          const ids = String(value).split(/\s+/).filter(Boolean);
-          const missing = ids.filter((id) => !document.getElementById(id));
-          if (missing.length === 0) {
-            correctUsage++;
-            return;
-          }
-          const text = `${attrName} references non-existent element${missing.length > 1 ? 's' : ''} "${missing.join(' ')}"`;
-          misusedAttributes.push(text);
-          misuse.push({
-            type: 'invalid-aria-reference',
-            selector,
-            attribute: attrName,
-            value: missing.join(' '),
-            issue: text,
-            suggestion: `Point ${attrName} at the id of an element that exists in the document`,
-          });
-        };
-
-        if (ariaLabelledby) resolveIdList(ariaLabelledby, 'aria-labelledby');
-        if (ariaDescribedby) resolveIdList(ariaDescribedby, 'aria-describedby');
-
-        if (ariaHidden === 'true' && element.offsetParent !== null) {
-          const hasVisibleText = element.textContent.trim().length > 0;
-          if (hasVisibleText) {
-            recommendations.push(`Element with aria-hidden="true" is visible and contains text`);
-          }
-        }
-      });
-
-      const imagesWithoutAlt = Array.from(document.querySelectorAll('img:not([alt])'));
-      if (imagesWithoutAlt.length > 0) {
-        recommendations.push(`Add alt attributes to ${imagesWithoutAlt.length} images`);
-      }
-
-      const buttonsWithoutLabels = Array.from(
-        document.querySelectorAll('button:not([aria-label]):not([aria-labelledby])')
-      ).filter((btn) => !btn.textContent.trim());
-      if (buttonsWithoutLabels.length > 0) {
-        recommendations.push(`Add labels to ${buttonsWithoutLabels.length} buttons`);
-      }
-
-      return {
-        totalAriaElements: elementsWithAria.length,
-        correctUsage,
-        misusedAttributes,
-        misuse,
-        recommendations,
-      };
-    }, ScreenReaderScanner.selectorHelperScript);
-  }
-
   /**
    * Build one violation in the shape the rest of the codebase expects:
    *   { criterion, element, type, issue, description, severity, suggestion }
@@ -765,60 +422,6 @@ class ScreenReaderScanner extends BaseScanner {
       score -= 10;
     }
 
-    for (const img of analysisResults.images.problematic) {
-      violations.push(
-        V({
-          criterion: '9.1.1.1',
-          type: img.type,
-          element: img.selector,
-          description: `Non-text Content - ${img.issue}`,
-          severity: img.severity,
-          suggestion: img.suggestion,
-          details: [img.src],
-        })
-      );
-    }
-    if (analysisResults.images.problematic.length > 0) {
-      score -= Math.min(20, analysisResults.images.problematic.length * 5);
-    }
-
-    for (const field of analysisResults.forms.unlabeled || []) {
-      violations.push(
-        V({
-          criterion: '9.3.3.2',
-          type: 'form-control-missing-label',
-          element: field.selector,
-          description: field.hasPlaceholderOnly
-            ? `Labels or Instructions - ${field.type} control is identified only by its placeholder, which is not an accessible name`
-            : `Labels or Instructions - ${field.type} control has no associated label`,
-          severity: 'high',
-          suggestion:
-            'Add a <label for="…">, aria-label, or aria-labelledby pointing at visible text',
-          details: [field.issue],
-        })
-      );
-    }
-    if (!analysisResults.forms.labelsCorrect) {
-      score -= 15;
-    }
-
-    for (const m of analysisResults.ariaUsage.misuse || []) {
-      violations.push(
-        V({
-          criterion: '9.4.1.2',
-          type: m.type,
-          element: m.selector,
-          description: `Name, Role, Value - ${m.issue}`,
-          severity: 'moderate',
-          suggestion: m.suggestion,
-          details: [m.issue],
-        })
-      );
-    }
-    if (analysisResults.ariaUsage.misusedAttributes.length > 0) {
-      score -= Math.min(10, analysisResults.ariaUsage.misusedAttributes.length * 2);
-    }
-
     const accessibilityStatement = false; // Would need to check for actual statement
     const contactMechanism = false; // Would need to check for contact info
 
@@ -856,9 +459,6 @@ class ScreenReaderScanner extends BaseScanner {
       headingStructure: { valid: false, issues: [], hierarchy: [] },
       landmarks: { main: false, navigation: false, issues: [], bypass: null },
       tables: { total: 0, problematic: [] },
-      images: { total: 0, withAlt: 0, decorative: 0, problematic: [] },
-      forms: { labelsCorrect: false, errorHandling: false, requiredFields: [] },
-      ariaUsage: { correctUsage: 0, misusedAttributes: [], recommendations: [] },
     };
   }
 }

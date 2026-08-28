@@ -1,20 +1,35 @@
 /**
  * Seizure Prevention Scanner.
  * WCAG 2.3.1, 2.3.2, 2.3.3 (EN 301 549 9.2.3.1, 9.2.3.3).
- * Observes the page for flashing content and interaction-triggered animation
- * and checks for prefers-reduced-motion support.
+ * Samples the rendered luminance of animated elements frame by frame and
+ * applies the WCAG general and red flash thresholds, and measures whether the
+ * page reacts to prefers-reduced-motion by emulating the preference.
  */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
+const { injectableCode: renderedCode } = require('../utils/rendered');
 const log = require('../utils/logger').createLogger('seizure-prevention');
+
+/** Shortest and longest luminance sampling window, in milliseconds. */
+const MIN_SAMPLE_MS = 1600;
+const MAX_SAMPLE_MS = 4000;
+
+/**
+ * Steps taken through one animation iteration for 2.3.3, and the travel a box
+ * has to cover across them before the motion counts as large. Below this an
+ * animation is a state change (a pulse, a hover lift, a 1.05 scale), not the
+ * movement 2.3.3 is about.
+ */
+const MOTION_SAMPLE_STEPS = 16;
+const MOTION_TRAVEL_PX = 100;
 
 class SeizurePreventionScanner extends BaseScanner {
   constructor() {
     super('seizure-prevention', {
-      // 2.3.3 (Animation from Interactions) is emitted by analyzeAnimationTriggers()
-      // as EN 301 549 clause 9.2.3.3.
+      // 2.3.3 (Animation from Interactions) is emitted by
+      // analyzeMotionSensitivity() as EN 301 549 clause 9.2.3.3.
       wcagCriteria: ['2.3.1', '2.3.2', '2.3.3'],
       wcagPrinciple: 'operable',
     });
@@ -29,15 +44,13 @@ class SeizurePreventionScanner extends BaseScanner {
   async scan(page, options = {}) {
     const defaultOptions = {
       testFlashingContent: true,
-      testAnimationTriggers: true,
       testMotionSensitivity: true,
-      observationTime: 10000,
+      observationTime: 3000,
       timeout: TIMEOUTS.scanner,
     };
 
     const scanOptions = { ...defaultOptions, ...options };
 
-    // Create timestamped scan directory
     const timestamp = Date.now();
     const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
     await fs.ensureDir(scanDir);
@@ -51,9 +64,10 @@ class SeizurePreventionScanner extends BaseScanner {
       violations: seizureResults.violations,
       summary: {
         noFlashingViolations: seizureResults.noFlashingViolations,
-        animationTriggersControlled: seizureResults.animationTriggersControlled,
         motionSensitivitySupported: seizureResults.motionSensitivitySupported,
         seizureRiskLevel: seizureResults.seizureRiskLevel,
+        sampledElements: seizureResults.sampledElements,
+        sampleWindowMs: seizureResults.sampleWindowMs,
       },
       screenshotPath: scanDir,
       visualEvidence: seizureResults.visualEvidence,
@@ -61,246 +75,249 @@ class SeizurePreventionScanner extends BaseScanner {
   }
 
   /**
-   * Perform comprehensive seizure prevention analysis - SAFETY CRITICAL
+   * Run the flash measurement and the reduced-motion measurement.
    */
   async performSeizurePreventionAnalysis(page, scanDir, options) {
     const violations = [];
     const visualEvidence = [];
     let noFlashingViolations = true;
-    let animationTriggersControlled = true;
     let motionSensitivitySupported = true;
     let seizureRiskLevel = 'LOW';
+    let sampledElements = 0;
+    let sampleWindowMs = 0;
 
     log.debug('Starting seizure prevention analysis');
 
-    // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'seizure-prevention-analysis.png');
     await page.screenshot({ path: initialScreenshot, fullPage: true });
 
-    // 1. CRITICAL: Test for dangerous flashing content (WCAG 2.3.1)
     if (options.testFlashingContent) {
-      const flashingResults = await this.analyzeFlashingContent(
-        page,
-        violations,
-        options.observationTime
+      sampleWindowMs = Math.min(
+        Math.max(options.observationTime || 0, MIN_SAMPLE_MS),
+        MAX_SAMPLE_MS
       );
+      const flashingResults = await this.analyzeFlashingContent(page, violations, sampleWindowMs);
       noFlashingViolations = flashingResults.safe;
       seizureRiskLevel = flashingResults.riskLevel;
+      sampledElements = flashingResults.sampledElements;
     }
 
-    // 2. Test animation from interactions (WCAG 2.3.3)
-    if (options.testAnimationTriggers) {
-      const animationResults = await this.analyzeAnimationFromInteractions(page, violations);
-      animationTriggersControlled = animationResults.controlled;
-    }
-
-    // 3. Test motion sensitivity support
     if (options.testMotionSensitivity) {
-      const motionSensitivityResults = await this.analyzeMotionSensitivity(page, violations);
-      motionSensitivitySupported = motionSensitivityResults.supported;
+      const motionResults = await this.analyzeMotionSensitivity(page, violations);
+      motionSensitivitySupported = motionResults.supported;
     }
 
-    // Generate visual evidence with SAFETY WARNING if needed
     visualEvidence.push({
       type: 'seizure-prevention',
       screenshot: path.basename(initialScreenshot),
       riskLevel: seizureRiskLevel,
       flashingSafe: noFlashingViolations,
-      animationControlled: animationTriggersControlled,
       motionSensitive: motionSensitivitySupported,
-      safetyWarning: seizureRiskLevel === 'HIGH' ? 'DANGER: High seizure risk detected!' : null,
+      safetyWarning: seizureRiskLevel === 'HIGH' ? 'DANGER: High seizure risk detected' : null,
     });
 
     log.debug(`Seizure prevention analysis complete: ${violations.length} violations found`);
-    log.debug(`Seizure risk level: ${seizureRiskLevel}`);
 
     return {
       violations,
       visualEvidence,
       noFlashingViolations,
-      animationTriggersControlled,
       motionSensitivitySupported,
       seizureRiskLevel,
+      sampledElements,
+      sampleWindowMs,
     };
   }
 
   /**
-   * Analyze flashing content - CRITICAL SAFETY CHECK (WCAG 2.3.1)
+   * Measure flashing (WCAG 2.3.1 / 2.3.2).
+   *
+   * The relative luminance and the colour of every candidate are sampled once
+   * per animation frame over the observation window. A flash is a pair of
+   * opposing luminance changes of at least 0.1 whose darker end is below 0.8,
+   * which is the WCAG general flash threshold; more than three such pairs per
+   * second is a failure, provided the flashing area is larger than a quarter
+   * of the 10-degree visual field (the small safe area exception). A pair
+   * whose endpoints include a saturated red (R / (R + G + B) >= 0.8) is
+   * reported under the red flash threshold instead.
    */
-  async analyzeFlashingContent(page, violations, observationTime) {
-    log.debug('Analyzing flashing content');
+  async analyzeFlashingContent(page, violations, sampleMs) {
+    log.debug(`Sampling rendered luminance for ${sampleMs}ms`);
 
-    // Set up flash detection monitoring
-    await page.evaluate(() => {
-      window.flashDetectionData = {
-        flashingElements: [],
-        flashCounts: {},
-        startTime: Date.now(),
-      };
+    const analysis = await page.evaluate(
+      async (renderedSrc, windowMs) => {
+        eval(renderedSrc);
 
-      // SVG and MathML elements expose `className` as an SVGAnimatedString, not
-      // a string; `.includes()` and `.split()` throw on them, which would abort
-      // the whole querySelectorAll('*') sweep below on a single inline <svg>.
-      const safeClass = (el) => (typeof el.className === 'string' ? el.className : '');
-      const safeSelector = (el) => {
-        const cls = safeClass(el).trim().split(/\s+/).filter(Boolean)[0];
-        return el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') + (cls ? `.${cls}` : '');
-      };
-      window.__seizureSafeClass = safeClass;
-      window.__seizureSafeSelector = safeSelector;
+        const safeClass = (el) => (typeof el.className === 'string' ? el.className : '');
+        const selectorOf = (el) => {
+          const cls = safeClass(el).trim().split(/\s+/).filter(Boolean)[0];
+          return el.tagName.toLowerCase() + (el.id ? `#${el.id}` : '') + (cls ? `.${cls}` : '');
+        };
 
-      // Monitor for rapid color/brightness changes
-      const observeFlashing = () => {
-        const allElements = document.querySelectorAll('*');
+        const parseColor = (value) => {
+          const m = /rgba?\(([^)]+)\)/.exec(value || '');
+          if (!m) return null;
+          const parts = m[1]
+            .split(/[\s,/]+/)
+            .filter(Boolean)
+            .map(parseFloat);
+          if (parts.length < 3 || parts.some(Number.isNaN)) return null;
+          return { r: parts[0], g: parts[1], b: parts[2], a: parts.length > 3 ? parts[3] : 1 };
+        };
 
-        allElements.forEach((element, index) => {
-          if (element.flashMonitor) return; // Already monitoring
+        const brightnessOf = (filterValue) => {
+          const m = /brightness\(([^)]+)\)/.exec(filterValue || '');
+          if (!m) return 1;
+          const raw = m[1].trim();
+          const value = raw.endsWith('%') ? parseFloat(raw) / 100 : parseFloat(raw);
+          return Number.isFinite(value) && value > 0 ? value : 1;
+        };
 
-          const elementKey = `element_${index}`;
-          const computedStyle = window.getComputedStyle(element);
+        // The painted colour of the element: its own background composited over
+        // white, or its text colour when the background is transparent, scaled
+        // by opacity and by any brightness() filter.
+        const paintedColor = (el) => {
+          const s = window.getComputedStyle(el);
+          const bg = parseColor(s.backgroundColor);
+          const fg = parseColor(s.color);
+          const base = bg && bg.a > 0.05 ? bg : fg;
+          if (!base) return null;
+          const opacity = parseFloat(s.opacity);
+          const alpha = base.a * (Number.isFinite(opacity) ? opacity : 1);
+          const gain = brightnessOf(s.filter);
+          const mix = (c) => Math.max(0, Math.min(255, (c * alpha + 255 * (1 - alpha)) * gain));
+          return { r: mix(base.r), g: mix(base.g), b: mix(base.b) };
+        };
 
-          // Check for CSS animations that might cause flashing
-          const animationName = computedStyle.animationName;
-          const animationDuration = parseFloat(computedStyle.animationDuration) || 0;
-          const animationIterationCount = computedStyle.animationIterationCount;
+        const relativeLuminance = (c) => {
+          const channel = (v) => {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+          };
+          return 0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b);
+        };
 
-          if (animationName !== 'none' && animationDuration > 0) {
-            const flashFrequency = 1 / animationDuration; // flashes per second
+        // WCAG saturated red: R / (R + G + B) >= 0.8 of the transition colours.
+        const isSaturatedRed = (c) => {
+          if (!c) return false;
+          const sum = c.r + c.g + c.b;
+          return sum > 0 && c.r / sum >= 0.8 && c.r >= 128;
+        };
 
-            // CRITICAL: Check for dangerous flash rates (>3 Hz is seizure risk)
-            if (flashFrequency > 3 || animationIterationCount === 'infinite') {
-              window.flashDetectionData.flashingElements.push({
-                element: element,
-                elementKey: elementKey,
-                animationName: animationName,
-                frequency: flashFrequency,
-                duration: animationDuration,
-                selector: safeSelector(element),
-                riskLevel: flashFrequency > 3 ? 'HIGH' : 'MEDIUM',
-              });
+        const visibleArea = (el) => {
+          const r = el.getBoundingClientRect();
+          const w = Math.max(0, Math.min(r.right, window.innerWidth) - Math.max(r.left, 0));
+          const h = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+          return w * h;
+        };
+
+        const candidates = [];
+        const seen = new Set();
+        const addCandidate = (el, area) => {
+          if (!el || seen.has(el)) return;
+          seen.add(el);
+          candidates.push({ el: el, area: area, selector: selectorOf(el) });
+        };
+
+        // The document background is repainted by script on many flashing
+        // pages, so it is sampled whether or not it carries a CSS animation.
+        addCandidate(document.documentElement, window.innerWidth * window.innerHeight);
+        if (document.body) addCandidate(document.body, window.innerWidth * window.innerHeight);
+
+        for (const el of document.querySelectorAll('body *')) {
+          const s = window.getComputedStyle(el);
+          const duration = parseFloat(s.animationDuration) || 0;
+          if (s.animationName === 'none' || duration <= 0) continue;
+          if (!__isRendered(el)) continue;
+          addCandidate(el, visibleArea(el));
+        }
+
+        // Sampling every candidate once per frame is the cost of this scanner;
+        // the largest boxes are the ones the area threshold can ever admit.
+        candidates.sort((a, b) => b.area - a.area);
+        const sampled = candidates.slice(0, 100);
+        const series = sampled.map(() => []);
+        const colors = sampled.map(() => []);
+
+        const start = performance.now();
+        await new Promise((resolve) => {
+          const step = () => {
+            for (let i = 0; i < sampled.length; i++) {
+              const c = paintedColor(sampled[i].el);
+              if (!c) continue;
+              series[i].push(relativeLuminance(c));
+              colors[i].push(c);
             }
-          }
-
-          // Monitor for class changes that might indicate flashing
-          if (safeClass(element).includes('flash') || safeClass(element).includes('blink')) {
-            window.flashDetectionData.flashingElements.push({
-              element: element,
-              elementKey: elementKey,
-              type: 'css-class',
-              className: safeClass(element),
-              selector: safeSelector(element),
-              riskLevel: 'HIGH', // Assume high risk for explicit flashing classes
-            });
-          }
-
-          element.flashMonitor = true;
+            if (performance.now() - start >= windowMs) {
+              resolve();
+              return;
+            }
+            requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
         });
-      };
+        const elapsedSeconds = Math.max((performance.now() - start) / 1000, 0.001);
 
-      // Initial scan
-      observeFlashing();
+        // Small safe area: a flash smaller than a quarter of the 10-degree
+        // visual field (341 x 256 px at the reference resolution) is exempt.
+        const fieldArea = Math.min(341 * 256, window.innerWidth * window.innerHeight);
+        const areaThreshold = 0.25 * fieldArea;
 
-      // Monitor for new elements
-      const observer = new MutationObserver(observeFlashing);
-      observer.observe(document.body, { childList: true, subtree: true });
+        const issues = [];
+        for (let i = 0; i < sampled.length; i++) {
+          const values = series[i];
+          if (values.length < 6) continue;
+          let transitions = 0;
+          let direction = 0;
+          let reference = values[0];
+          let referenceIndex = 0;
+          let sawRed = false;
+          for (let k = 1; k < values.length; k++) {
+            const delta = values[k] - reference;
+            if (Math.abs(delta) < 0.1) continue;
+            if (Math.min(values[k], reference) >= 0.8) {
+              reference = values[k];
+              referenceIndex = k;
+              continue;
+            }
+            const nextDirection = delta > 0 ? 1 : -1;
+            if (nextDirection !== direction) {
+              transitions++;
+              direction = nextDirection;
+              if (isSaturatedRed(colors[i][k]) || isSaturatedRed(colors[i][referenceIndex])) {
+                sawRed = true;
+              }
+            }
+            reference = values[k];
+            referenceIndex = k;
+          }
+          const pairs = Math.floor(transitions / 2);
+          const hz = pairs / elapsedSeconds;
+          if (hz <= 3) continue;
+          const area = Math.max(sampled[i].area, visibleArea(sampled[i].el));
+          if (area < areaThreshold) continue;
 
-      window.flashObserver = observer;
-    });
-
-    // Wait and observe for flashing content
-    log.debug(`Observing page for ${observationTime}ms to detect flashing...`);
-    await new Promise((resolve) => setTimeout(resolve, observationTime));
-
-    // Analyze detected flashing
-    const flashingAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let safe = true;
-      let riskLevel = 'LOW';
-
-      // Stop monitoring
-      if (window.flashObserver) {
-        window.flashObserver.disconnect();
-      }
-
-      const flashData = window.flashDetectionData;
-
-      flashData.flashingElements.forEach((flashElement) => {
-        // CRITICAL: Check for dangerous flash frequencies
-        if (flashElement.frequency && flashElement.frequency > 3) {
           issues.push({
-            type: 'dangerous-flash-frequency',
-            element: flashElement.selector,
-            frequency: flashElement.frequency,
-            animationName: flashElement.animationName,
-            description: `DANGER: Flashing at ${flashElement.frequency.toFixed(2)} Hz exceeds safe limit of 3 Hz`,
+            type: sawRed ? 'red-flashing-content' : 'dangerous-flash-frequency',
+            element: sampled[i].selector,
+            frequency: Math.round(hz * 100) / 100,
+            flashingArea: Math.round(area),
+            areaThreshold: Math.round(areaThreshold),
+            samples: values.length,
+            description: sawRed
+              ? `Saturated red flashing measured at ${hz.toFixed(1)} Hz over ${Math.round(area)} px2, above the 3 Hz red flash threshold`
+              : `Flashing measured at ${hz.toFixed(1)} Hz over ${Math.round(area)} px2, above the 3 Hz general flash threshold`,
             severity: 'critical',
-            riskLevel: 'HIGH',
           });
-          safe = false;
-          riskLevel = 'HIGH';
         }
 
-        // Check for CSS-based flashing
-        if (flashElement.type === 'css-class') {
-          issues.push({
-            type: 'css-flashing-class',
-            element: flashElement.selector,
-            className: typeof flashElement.className === 'string' ? flashElement.className : '',
-            description: 'Element uses CSS class indicating flashing/blinking behavior',
-            severity: 'error',
-            riskLevel: 'HIGH',
-          });
-          safe = false;
-          if (riskLevel !== 'HIGH') riskLevel = 'MEDIUM';
-        }
+        return { issues: issues, sampledElements: sampled.length };
+      },
+      renderedCode,
+      sampleMs
+    );
 
-        // Check for infinite animations that could be problematic
-        if (flashElement.animationIterationCount === 'infinite' && flashElement.frequency > 1) {
-          issues.push({
-            type: 'infinite-animation-risk',
-            element: flashElement.selector,
-            frequency: flashElement.frequency,
-            description: 'Infinite animation with potential seizure risk',
-            severity: 'warning',
-            riskLevel: 'MEDIUM',
-          });
-          if (riskLevel === 'LOW') riskLevel = 'MEDIUM';
-        }
-      });
-
-      // Check for red flashing specifically (highest seizure risk)
-      const redFlashElements = document.querySelectorAll(
-        '[style*="red"], [class*="red"], [class*="error"]'
-      );
-      redFlashElements.forEach((element) => {
-        const computedStyle = window.getComputedStyle(element);
-        const animationName = computedStyle.animationName;
-
-        if (animationName !== 'none') {
-          // className is an SVGAnimatedString on SVG/MathML elements.
-          const cls = typeof element.className === 'string' ? element.className : '';
-          const selector =
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (cls.trim() ? `.${cls.trim().split(/\s+/)[0]}` : '');
-
-          issues.push({
-            type: 'red-flashing-content',
-            element: selector,
-            description: 'CRITICAL: Red flashing content detected - highest seizure risk',
-            severity: 'critical',
-            riskLevel: 'HIGH',
-          });
-          safe = false;
-          riskLevel = 'HIGH';
-        }
-      });
-
-      return { issues, safe, riskLevel, totalFlashingElements: flashData.flashingElements.length };
-    });
-
-    // Create violations for flashing content - CRITICAL PRIORITY
-    flashingAnalysis.issues.forEach((issue) => {
+    for (const issue of analysis.issues) {
       violations.push({
         criterion: '9.2.3.1',
         element: issue.element,
@@ -308,303 +325,192 @@ class SeizurePreventionScanner extends BaseScanner {
         description: issue.description,
         frequency: issue.frequency,
         severity: issue.severity,
-        riskLevel: issue.riskLevel,
+        riskLevel: 'HIGH',
+        details: {
+          measuredHz: issue.frequency,
+          flashingAreaPx: issue.flashingArea,
+          areaThresholdPx: issue.areaThreshold,
+          luminanceSamples: issue.samples,
+        },
         suggestion: this.getFlashingSuggestion(issue.type),
-        safetyWarning:
-          issue.severity === 'critical' ? 'Immediate action required: seizure risk' : null,
+        safetyWarning: 'Immediate action required: seizure risk',
       });
-    });
+    }
 
     log.debug(
-      `Flashing analysis complete: ${flashingAnalysis.issues.length} issues, Risk: ${flashingAnalysis.riskLevel}`
+      `Flash measurement complete: ${analysis.issues.length} issues over ${analysis.sampledElements} sampled elements`
     );
 
     return {
-      safe: flashingAnalysis.safe,
-      riskLevel: flashingAnalysis.riskLevel,
+      safe: analysis.issues.length === 0,
+      riskLevel: analysis.issues.length > 0 ? 'HIGH' : 'LOW',
+      sampledElements: analysis.sampledElements,
     };
   }
 
   /**
-   * Analyze animation from interactions (WCAG 2.3.3)
-   */
-  async analyzeAnimationFromInteractions(page, violations) {
-    log.debug('Analyzing animation from interactions...');
-
-    const animationAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let controlled = true;
-
-      // Check for prefers-reduced-motion support
-
-      // Look for elements that trigger animations on interaction
-      const interactiveElements = document.querySelectorAll(
-        'button, [role="button"], a[href], input, [onclick], [onmouseover], [onfocus]'
-      );
-
-      interactiveElements.forEach((element) => {
-        // className is an SVGAnimatedString on SVG/MathML elements; an inline
-        // <svg> inside a <button> would otherwise throw and abort this sweep.
-        const cls = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (cls.trim() ? `.${cls.trim().split(/\s+/)[0]}` : ''),
-        };
-
-        // Check for hover/focus animations
-        const hasHoverAnimation =
-          element.style.transition !== '' || cls.includes('hover') || cls.includes('animate');
-
-        if (hasHoverAnimation) {
-          // Check if animation respects prefers-reduced-motion
-          const respectsMotionPreference =
-            element.style.transition.includes('prefers-reduced-motion') ||
-            document
-              .querySelector('style')
-              ?.textContent.includes('@media (prefers-reduced-motion: reduce)');
-
-          if (!respectsMotionPreference) {
-            issues.push({
-              type: 'animation-no-motion-preference',
-              element: elementInfo.selector,
-              description:
-                'Interactive animation does not respect prefers-reduced-motion preference',
-              severity: 'warning',
-            });
-          }
-        }
-
-        // Check for onclick animations that might be jarring
-        if (element.hasAttribute('onclick')) {
-          const onclickCode = element.getAttribute('onclick');
-          const hasAnimationTrigger =
-            onclickCode.includes('animate') ||
-            onclickCode.includes('transition') ||
-            onclickCode.includes('transform');
-
-          if (hasAnimationTrigger) {
-            // Look for animation controls or motion preference handling
-            const hasMotionControls =
-              document.querySelector('[type="checkbox"][id*="motion"]') ||
-              document.querySelector('[type="checkbox"][id*="animation"]') ||
-              document.querySelector('button[aria-label*="motion"]');
-
-            if (!hasMotionControls) {
-              issues.push({
-                type: 'interaction-animation-no-controls',
-                element: elementInfo.selector,
-                description:
-                  'Interactive animation lacks user controls or motion preference support',
-                severity: 'warning',
-              });
-              controlled = false;
-            }
-          }
-        }
-      });
-
-      // Check for CSS animations triggered by :hover, :focus, :active
-      const styleSheets = Array.from(document.styleSheets);
-      let hasMotionSafeCSS = false;
-
-      try {
-        styleSheets.forEach((sheet) => {
-          try {
-            const rules = Array.from(sheet.cssRules || sheet.rules || []);
-            rules.forEach((rule) => {
-              if (rule.selectorText && rule.selectorText.includes('prefers-reduced-motion')) {
-                hasMotionSafeCSS = true;
-              }
-            });
-          } catch (e) {
-            // Cross-origin stylesheet, skip
-          }
-        });
-      } catch (e) {
-        // Error accessing stylesheets
-      }
-
-      // Check if page has interactive animations but no motion preferences
-      const hasInteractiveAnimations =
-        document.querySelectorAll('[class*="animate"], [style*="transition"], [style*="transform"]')
-          .length > 0;
-
-      if (hasInteractiveAnimations && !hasMotionSafeCSS) {
-        issues.push({
-          type: 'no-reduced-motion-support',
-          element: 'document',
-          description: 'Page has animations but does not support prefers-reduced-motion',
-          severity: 'warning',
-        });
-      }
-
-      return { issues, controlled };
-    });
-
-    // Create violations for animation interaction issues
-    animationAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.3.3',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getAnimationSuggestion(issue.type),
-      });
-    });
-
-    return { controlled: animationAnalysis.controlled };
-  }
-
-  /**
-   * Analyze motion sensitivity support
+   * Measure prefers-reduced-motion support (WCAG 2.3.3).
+   *
+   * Large motion is measured, not declared. Every running animation is seeked
+   * through one iteration with the Web Animations API and the box of its target
+   * is read at each step, so the travel a keyframe set produces is known
+   * whatever its duration: a parallax layer that drifts 100px over eight
+   * seconds counts, a colour pulse, a hover lift and a 1.05 scale do not. The
+   * preference is then emulated and the same measurement is repeated, so a page
+   * whose motion stops is silent whether it implements the query in a
+   * cross-origin stylesheet or in script.
    */
   async analyzeMotionSensitivity(page, violations) {
-    log.debug('Analyzing motion sensitivity support...');
+    log.debug('Measuring prefers-reduced-motion support');
 
-    const motionAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let supported = true;
+    const measure = () =>
+      page.evaluate(
+        async (renderedSrc, travelPx, steps) => {
+          eval(renderedSrc);
 
-      // Check for vestibular disorder considerations
-      const motionKeywords = ['scroll', 'parallax', 'zoom', 'spin', 'rotate', 'tilt'];
-      const pageText = document.body.textContent.toLowerCase();
+          // One entry per animated element, with the animations driving it.
+          const byTarget = new Map();
+          for (const animation of document.getAnimations()) {
+            const effect = animation.effect;
+            const target = effect && effect.target;
+            if (!target || target.nodeType !== 1) continue;
+            if (animation.playState === 'idle' || animation.playState === 'finished') continue;
+            const duration = effect.getComputedTiming().duration;
+            if (typeof duration !== 'number' || !Number.isFinite(duration) || duration <= 0) {
+              continue;
+            }
+            if (!__isRendered(target)) continue;
+            if (!byTarget.has(target)) byTarget.set(target, []);
+            byTarget.get(target).push({ animation, duration });
+            if (byTarget.size >= 60) break;
+          }
 
-      const hasMotionEffects = motionKeywords.some(
-        (keyword) =>
-          pageText.includes(keyword) ||
-          document.querySelector(`[class*="${keyword}"]`) ||
-          document.querySelector(`[id*="${keyword}"]`)
+          const moving = [];
+          for (const [target, entries] of byTarget) {
+            const saved = entries.map((e) => ({
+              animation: e.animation,
+              time: e.animation.currentTime,
+              wasRunning: e.animation.playState === 'running',
+            }));
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+            let minW = Infinity;
+            let maxW = -Infinity;
+            let minH = Infinity;
+            let maxH = -Infinity;
+
+            try {
+              for (let step = 0; step <= steps; step++) {
+                for (const e of entries) {
+                  e.animation.pause();
+                  e.animation.currentTime = (e.duration * step) / steps;
+                }
+                const r = target.getBoundingClientRect();
+                const cx = r.left + r.width / 2;
+                const cy = r.top + r.height / 2;
+                minX = Math.min(minX, cx);
+                maxX = Math.max(maxX, cx);
+                minY = Math.min(minY, cy);
+                maxY = Math.max(maxY, cy);
+                minW = Math.min(minW, r.width);
+                maxW = Math.max(maxW, r.width);
+                minH = Math.min(minH, r.height);
+                maxH = Math.max(maxH, r.height);
+              }
+            } finally {
+              for (const s of saved) {
+                s.animation.currentTime = s.time;
+                if (s.wasRunning) s.animation.play();
+              }
+            }
+
+            if (
+              maxX - minX >= travelPx ||
+              maxY - minY >= travelPx ||
+              maxW - minW >= travelPx ||
+              maxH - minH >= travelPx
+            ) {
+              const cls =
+                typeof target.className === 'string' ? target.className.trim().split(/\s+/)[0] : '';
+              moving.push(
+                `${target.tagName.toLowerCase()}${target.id ? `#${target.id}` : ''}${cls ? `.${cls}` : ''}`
+              );
+            }
+          }
+
+          const smoothScroll =
+            window.getComputedStyle(document.documentElement).scrollBehavior === 'smooth';
+          return { moving, smoothScroll };
+        },
+        renderedCode,
+        MOTION_TRAVEL_PX,
+        MOTION_SAMPLE_STEPS
       );
 
-      if (hasMotionEffects) {
-        // Look for motion reduction controls
-        const motionControls = document.querySelectorAll(
-          'input[type="checkbox"], button, [role="switch"]'
-        );
-        let hasMotionToggle = false;
-
-        motionControls.forEach((control) => {
-          const controlText =
-            control.textContent.toLowerCase() +
-            (control.getAttribute('aria-label') || '').toLowerCase();
-
-          if (
-            controlText.includes('motion') ||
-            controlText.includes('animation') ||
-            controlText.includes('parallax') ||
-            controlText.includes('scroll')
-          ) {
-            hasMotionToggle = true;
-          }
-        });
-
-        if (!hasMotionToggle) {
-          issues.push({
-            type: 'motion-effects-no-toggle',
-            element: 'document',
-            description: 'Motion effects detected without user controls to disable them',
-            severity: 'warning',
-          });
-          supported = false;
-        }
-
-        // Check for CSS prefers-reduced-motion support
-        const reducedMotionSupport = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (!reducedMotionSupport) {
-          // Check if CSS actually implements reduced motion
-          const styleSheets = Array.from(document.styleSheets);
-          let implementsReducedMotion = false;
-
-          try {
-            styleSheets.forEach((sheet) => {
-              try {
-                const rules = Array.from(sheet.cssRules || []);
-                rules.forEach((rule) => {
-                  if (rule.media && rule.media.mediaText.includes('prefers-reduced-motion')) {
-                    implementsReducedMotion = true;
-                  }
-                });
-              } catch (e) {
-                // Cross-origin or restricted stylesheet
-              }
-            });
-          } catch (e) {
-            // Error accessing stylesheets
-          }
-
-          if (!implementsReducedMotion) {
-            issues.push({
-              type: 'no-reduced-motion-css',
-              element: 'document',
-              description:
-                'Motion effects present but prefers-reduced-motion not implemented in CSS',
-              severity: 'warning',
-            });
-          }
-        }
+    let before;
+    let after;
+    try {
+      before = await measure();
+      if (before.moving.length === 0 && !before.smoothScroll) {
+        return { supported: true };
       }
-
-      return { issues, supported };
-    });
-
-    // Create violations for motion sensitivity issues
-    motionAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.3.3',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getMotionSensitivitySuggestion(issue.type),
+      await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+      after = await measure();
+    } catch (error) {
+      log.warn(`Reduced-motion measurement failed: ${error.message}`);
+      return { supported: true };
+    } finally {
+      await page.emulateMediaFeatures([]).catch(() => {
+        /* emulation already reset */
       });
+    }
+
+    const stillMoving = after.moving.filter((entry) => before.moving.includes(entry));
+    const unchanged =
+      stillMoving.length === before.moving.length && after.smoothScroll === before.smoothScroll;
+
+    if (!unchanged) return { supported: true };
+
+    const evidence = [];
+    if (before.moving.length) {
+      evidence.push(
+        `${before.moving.length} element(s) keep moving by at least ${MOTION_TRAVEL_PX}px`
+      );
+    }
+    if (before.smoothScroll) evidence.push('scroll-behavior stays smooth');
+
+    violations.push({
+      criterion: '9.2.3.3',
+      element: 'document',
+      issue: 'no-reduced-motion-support',
+      description: `With prefers-reduced-motion: reduce emulated, ${evidence.join(' and ')}: the page does not respond to the preference`,
+      severity: 'warning',
+      details: {
+        animationsBefore: before.moving.length,
+        animationsAfterEmulation: stillMoving.length,
+        smoothScroll: before.smoothScroll,
+        examples: before.moving.slice(0, 5),
+      },
+      suggestion:
+        'Disable or shorten the animations inside @media (prefers-reduced-motion: reduce), or honour the preference in script',
     });
 
-    return { supported: motionAnalysis.supported };
+    return { supported: false };
   }
 
   /**
-   * Get suggestion for flashing violations - CRITICAL
+   * Get suggestion for flashing violations.
    */
   getFlashingSuggestion(violationType) {
     const suggestions = {
-      'dangerous-flash-frequency': 'Critical: remove or reduce flashing to under 3 Hz',
-      'css-flashing-class':
-        'Remove CSS flashing or blinking classes and replace them with static alternatives',
-      'infinite-animation-risk':
-        'Limit animation duration or provide pause controls for infinite animations',
-      'red-flashing-content': 'Critical: remove red flashing content, the highest seizure risk',
+      'dangerous-flash-frequency':
+        'Critical: keep flashing below 3 Hz, or reduce the flashing area below a quarter of the 10-degree visual field',
+      'red-flashing-content':
+        'Critical: remove the saturated red transitions, which carry the highest seizure risk',
     };
     return suggestions[violationType] || 'Review flashing content for seizure safety';
-  }
-
-  /**
-   * Get suggestion for animation violations
-   */
-  getAnimationSuggestion(violationType) {
-    const suggestions = {
-      'animation-no-motion-preference':
-        'Implement @media (prefers-reduced-motion: reduce) to disable animations',
-      'interaction-animation-no-controls': 'Add user controls to disable interactive animations',
-      'no-reduced-motion-support': 'Implement CSS prefers-reduced-motion media query support',
-    };
-    return suggestions[violationType] || 'Provide user controls for motion-triggered animations';
-  }
-
-  /**
-   * Get suggestion for motion sensitivity violations
-   */
-  getMotionSensitivitySuggestion(violationType) {
-    const suggestions = {
-      'motion-effects-no-toggle':
-        'Add user controls to disable motion effects for vestibular disorder support',
-      'no-reduced-motion-css':
-        'Implement @media (prefers-reduced-motion: reduce) CSS rules to disable motion',
-    };
-    return suggestions[violationType] || 'Provide motion sensitivity controls for accessibility';
   }
 }
 

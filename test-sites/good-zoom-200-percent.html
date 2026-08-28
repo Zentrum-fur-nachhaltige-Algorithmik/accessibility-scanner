@@ -1,0 +1,165 @@
+<!-- WCAG-TEST
+criterion: 1.4.4
+level: AA
+title: Resize Text
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: text-resize
+description: Fine print in px, a small avatar with a max-width, a page width inside a wide media query, a wide table in a scrolling wrapper and a carousel whose off-frame slides are clipped at every zoom level
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content that survives 200 percent zoom</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        color: #1a1a1a;
+        background: #ffffff;
+        line-height: 1.6;
+      }
+      .page {
+        max-width: 100%;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+      @media (min-width: 1400px) {
+        .page {
+          width: 1200px;
+          margin: 0 auto;
+        }
+      }
+
+      /* The standard circular avatar: small, clipped by design, no text. */
+      .avatar {
+        width: 48px;
+        height: 48px;
+        max-width: 48px;
+        overflow: hidden;
+        border-radius: 50%;
+        background: #1a5490;
+      }
+      .logo {
+        max-width: 180px;
+      }
+
+      /* Fine print. Browser zoom scales px text like rem text. */
+      .legal,
+      .footnote {
+        font-size: 11px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+      .table-wrap table {
+        min-width: 720px;
+        border-collapse: collapse;
+      }
+      .table-wrap th,
+      .table-wrap td {
+        border: 1px solid #767676;
+        padding: 8px;
+      }
+
+      /* A carousel frame. Slides two and three are parked to the right at
+         every width and at every zoom level; the buttons bring them in. */
+      .carousel {
+        position: relative;
+        max-width: 100%;
+      }
+      .slides {
+        overflow: hidden;
+        height: 120px;
+        position: relative;
+      }
+      .slide {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        background: #eef2f5;
+      }
+      .slide:nth-child(1) {
+        left: 0;
+      }
+      .slide:nth-child(2) {
+        left: 100%;
+      }
+      .slide:nth-child(3) {
+        left: 200%;
+      }
+      button {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 8px 16px;
+        background: #1a5490;
+        color: #ffffff;
+        border: 1px solid #10314f;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>Content that survives 200 percent zoom</h1>
+
+      <div class="avatar"></div>
+      <p>
+        <img
+          class="logo"
+          src="data:image/gif;base64,R0lGODlhAQABAIAAAMzMzP///yH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+          alt="Example company"
+        />
+      </p>
+
+      <p>
+        Every paragraph on this page wraps and every container grows with its content, so nothing
+        is lost when the text is enlarged to twice its size.
+      </p>
+
+      <div class="carousel">
+        <h2>Featured</h2>
+        <div class="slides">
+          <div class="slide">Slide one is in the frame and fully readable.</div>
+          <div class="slide">Slide two waits to the right of the frame.</div>
+          <div class="slide">Slide three waits further to the right.</div>
+        </div>
+        <button type="button">Previous slide</button>
+        <button type="button">Next slide</button>
+      </div>
+
+      <h2>Opening hours</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Morning</th>
+              <th scope="col">Afternoon</th>
+              <th scope="col">Evening</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Monday</th>
+              <td>09:00 to 12:00</td>
+              <td>13:00 to 17:00</td>
+              <td>closed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="legal">
+        Prices include value added tax. The fine print is set in eleven pixels and grows with the
+        browser zoom like the rest of the page.
+      </p>
+      <p class="footnote">Last updated in March.</p>
+    </div>
+  </body>
+</html>

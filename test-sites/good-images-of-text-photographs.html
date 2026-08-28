@@ -1,0 +1,63 @@
+<!-- WCAG-TEST
+criterion: 1.4.5
+level: AA
+title: Images of Text
+test_type: good
+expected_violations: 0
+testable_by: regex
+scanners: images-of-text
+description: Photographs with descriptive alt text, a wide banner image, an image inside a button, an icon SVG and a logo SVG that does carry text but links to the site root
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field report</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
+        .banner { width: 600px; height: 120px; }
+        .thumb-title { width: 160px; height: 100px; }
+        .hero { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='200'%3E%3Crect width='600' height='200' fill='%232d4a2b'/%3E%3Ccircle cx='120' cy='60' r='40' fill='%23e8c35a'/%3E%3C/svg%3E"); background-size: cover; color: #ffffff; padding: 2rem; }
+        button { font: inherit; padding: 0.5rem 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='40'%3E%3Ctext x='0' y='28' font-family='Georgia' font-size='24' fill='%2312324f'%3ENordwind%3C/text%3E%3C/svg%3E" alt="Nordwind" width="140" height="40">
+        </a>
+    </header>
+
+    <main>
+        <h1>Field report from the dunes</h1>
+
+        <!-- A wide photograph with descriptive alt text -->
+        <img class="banner" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='120'%3E%3Crect width='600' height='120' fill='%23c9b18a'/%3E%3Cpath d='M0 90 Q150 40 300 90 T600 90 V120 H0 Z' fill='%2385704a'/%3E%3C/svg%3E" alt="Sand dunes under a low afternoon sun, with marram grass in the foreground">
+
+        <p>The dunes shift by up to four metres a year.</p>
+
+        <!-- An image whose class name mentions a title, inside a link -->
+        <a href="/reports/2026-spring">
+            <img class="thumb-title" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='100'%3E%3Crect width='160' height='100' fill='%233b5a72'/%3E%3C/svg%3E" alt="Spring survey report">
+        </a>
+
+        <!-- An image inside a button -->
+        <button type="button">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M4 12h16M12 4v16' stroke='%23333' stroke-width='2'/%3E%3C/svg%3E" alt="" width="24" height="24">
+            Add a sighting
+        </button>
+
+        <!-- Real HTML text over a background photograph -->
+        <div class="hero">
+            <h2>Volunteer with us</h2>
+            <p>Counts run every second Saturday.</p>
+        </div>
+
+        <!-- Inline SVG text is real, selectable, resizable text -->
+        <svg width="200" height="40" role="img" aria-label="Ten years of counts">
+            <text x="0" y="28" font-size="20" fill="#1a1a1a">Ten years of counts</text>
+        </svg>
+    </main>
+</body>
+</html>

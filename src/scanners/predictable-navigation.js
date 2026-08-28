@@ -542,15 +542,37 @@ class PredictableNavigationScanner extends BaseScanner {
         for (const block of document.querySelectorAll('div, ul, ol, section, header, footer, nav')) {
           const controls = Array.from(block.querySelectorAll(CONTROL_SELECTOR)).filter(__isRendered);
           if (controls.length < MIN_CONTROLS) continue;
-          const signature = controls
-            .map((el) => `${el.tagName.toLowerCase()}:${el.getAttribute('role') || ''}`)
-            .join(',');
+          // The same mechanism is rendered from the same component, so the
+          // block itself has to match too: two menus that happen to list the
+          // same links each carry their own toggle and are not one mechanism.
+          const blockClass =
+            typeof block.className === 'string' ? block.className.split(' ')[0] : '';
+          const signature = [
+            block.tagName.toLowerCase(),
+            blockClass,
+            ...controls.map((el) => `${el.tagName.toLowerCase()}:${el.getAttribute('role') || ''}`),
+          ].join(',');
           if (!blocks.has(signature)) blocks.set(signature, []);
           blocks.get(signature).push({
+            node: block,
             selector: selectorFor(block),
             names: controls.map((el) => (__accessibleName(el) || '').trim().toLowerCase()),
           });
         }
+
+        // A wrapper around a block holds the same controls in the same order,
+        // so it carries the same signature; comparing the two compares the
+        // same markup against itself.
+        for (const [signature, copies] of blocks) {
+          blocks.set(
+            signature,
+            copies.filter((copy) => !copies.some((o) => o !== copy && o.node.contains(copy.node)))
+          );
+        }
+
+        // A block and the wrapper around it report the same divergence, so the
+        // evidence is reported once.
+        const reportedDivergences = new Set();
 
         for (const copies of blocks.values()) {
           if (copies.length < 2 || found.length >= MAX_REPORTED_BLOCKS) continue;
@@ -562,6 +584,9 @@ class PredictableNavigationScanner extends BaseScanner {
               .map((name, i) => ({ name, otherName: other.names[i], i }))
               .filter((pair) => pair.name !== pair.otherName);
             if (!differing.length) continue;
+            const divergence = differing.map((pair) => `${pair.name}|${pair.otherName}`).join(',');
+            if (reportedDivergences.has(divergence)) continue;
+            reportedDivergences.add(divergence);
             found.push({
               type: 'inconsistent-component-identification',
               element: `${first.selector} vs ${other.selector}`,

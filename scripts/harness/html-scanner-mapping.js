@@ -246,7 +246,7 @@ const HTML_SCANNER_MAPPING = {
     expectedScanners: ['input-modalities'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
-    wcagCriteria: ['2.5.1', '2.5.2', '2.5.3', '2.5.4'],
+    wcagCriteria: ['2.5.1', '2.5.2', '2.5.4'],
     description: 'Pointer gestures without alternatives, missing pointer cancellation',
   },
 

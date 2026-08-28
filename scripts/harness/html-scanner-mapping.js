@@ -791,28 +791,59 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['4.1.2'],
     description:
-      'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference: valid per WAI-ARIA 1.2, tab-missing-controls must not fire',
+      'role=tab without aria-controls but with role=tabpanel[aria-labelledby] back-reference: valid per WAI-ARIA 1.2 and no advanced-aria finding',
+  },
+
+  'good-composite-aria-widgets.html': {
+    expectedScanners: [],
+    excludedScanners: ['advanced-aria', 'screen-reader'],
+    testType: 'good',
+    wcagCriteria: ['4.1.2'],
+    description:
+      'Roving tabindex, a disclosure accordion, a non-modal dialog, a collapsed combobox, tabs marked with aria-current, a grid named by aria-labelledby and a menubar named by title: no advanced-aria finding',
+  },
+
+  'good-media-icons-and-background-video.html': {
+    expectedScanners: [],
+    excludedScanners: ['media-accessibility'],
+    testType: 'good',
+    wcagCriteria: ['1.1.1', '1.2.1', '1.2.2'],
+    description:
+      'Inline SVG icons, a photograph with long alt, a 24px chart icon, an object and an image map with names, a decorative canvas and a muted looping background video: no media-accessibility finding',
+  },
+
+  'good-touch-and-pointer-alternatives.html': {
+    expectedScanners: [],
+    excludedScanners: ['concurrent-input'],
+    testType: 'good',
+    wcagCriteria: ['2.5.6'],
+    description:
+      'Swipe gestures beside buttons and arrow keys, a passive touch listener, pointer-events:none on an icon inside its button and on a decorative overlay, and one set of pointer handlers behind a touch probe: no 2.5.6 finding',
+  },
+
+  'good-contact-page-no-statement.html': {
+    expectedScanners: ['accessibility-statement'],
+    excludedScanners: [],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1'],
+    description:
+      'Contact page with e-mail, phone and a form on a site with no accessibility statement: missing-accessibility-statement is the only finding',
   },
 
   'good-accessibility-marketing-page.html': {
     expectedScanners: ['accessibility-statement'],
-    excludedScanners: ['eaa-procedure', 'contact-mechanism', 'compliance-monitoring'],
+    excludedScanners: [],
     testType: 'good',
-    wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+    wcagCriteria: ['EN 301 549 12.1'],
     description:
-      'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit": one missing-accessibility-statement is correct, the follow-up rules (no-audit-schedule, no-issue-tracking, no-feedback-process, ...) must stay silent',
+      'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit": one missing-accessibility-statement is the whole EAA verdict for this page',
   },
 
   'good-accessibility-statement-complete.html': {
     expectedScanners: [],
-    excludedScanners: [
-      'accessibility-statement',
-      'eaa-procedure',
-      'contact-mechanism',
-      'compliance-monitoring',
-    ],
+    excludedScanners: ['accessibility-statement'],
     testType: 'good',
-    wcagCriteria: ['EN 301 549 12.1', 'EN 301 549 12.2', 'EN 301 549 12.4'],
+    wcagCriteria: ['EN 301 549 12.1'],
     description:
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
@@ -1021,12 +1052,9 @@ const AVAILABLE_SCANNERS = [
   'seizure-prevention',
   'predictable-navigation',
   'error-handling',
-  'eaa-procedure',
   'focus-management',
   'page-structure',
   'accessibility-statement',
-  'contact-mechanism',
-  'compliance-monitoring',
   'responsive-design',
   'advanced-aria',
   'screen-reader',

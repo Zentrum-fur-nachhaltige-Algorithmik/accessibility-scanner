@@ -22,9 +22,6 @@ const LabelInNameScanner = require('../scanners/label-in-name');
 const StatusMessagesScanner = require('../scanners/status-messages');
 const AdvancedAriaScanner = require('../scanners/advanced-aria');
 const AccessibilityStatementScanner = require('../scanners/accessibility-statement');
-const ContactMechanismScanner = require('../scanners/contact-mechanism');
-const ComplianceMonitoringScanner = require('../scanners/compliance-monitoring');
-const EAAProcedureScanner = require('../scanners/eaa-procedure');
 const KeyboardNavigationScanner = require('../scanners/keyboard-navigation');
 const FocusManagementScanner = require('../scanners/focus-management');
 const InputModalitiesScanner = require('../scanners/input-modalities');
@@ -115,9 +112,6 @@ function createAllScanners({ llmClient } = {}) {
     new ConcurrentInputScanner(),
     new DynamicSPAScanner(),
     new AccessibilityStatementScanner(),
-    new ContactMechanismScanner(),
-    new ComplianceMonitoringScanner(),
-    new EAAProcedureScanner(),
   ];
 
   const llmScanners = createLLMScanners({ llmClient });
@@ -191,9 +185,6 @@ const PROFILES = {
     'concurrent-input',
     'dynamic-spa',
     'accessibility-statement',
-    'contact-mechanism',
-    'compliance-monitoring',
-    'eaa-procedure',
     'multiple-ways',
     'llm-sensory-characteristics',
     // The axe `incomplete` adjudicator belongs in `standard`: it turns

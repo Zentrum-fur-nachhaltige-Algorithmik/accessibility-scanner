@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 213,
+  "fixtureCount": 212,
   "scanners": [
     {
       "id": "axe-core",
@@ -12,12 +12,13 @@
     {
       "id": "color-contrast",
       "criteria": [
+        "1.4.3",
         "1.4.6"
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trust": "experimental",
+      "trustReason": "concurrent harness FAIL: false positive on good-contrast-hidden-and-arbitrary-classes.html (1.4.3)"
     },
     {
       "id": "use-of-color",
@@ -26,8 +27,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trust": "experimental",
+      "trustReason": "concurrent harness FAIL: missed bad-use-of-color.html (1.4.1)"
     },
     {
       "id": "images-of-text",
@@ -39,6 +40,17 @@
       "exclusive": false,
       "trust": "experimental",
       "trustReason": "concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)"
+    },
+    {
+      "id": "advanced-contrast",
+      "criteria": [
+        "1.4.11",
+        "1.4.13"
+      ],
+      "kind": "deterministic",
+      "exclusive": false,
+      "trust": "experimental",
+      "trustReason": "concurrent harness FAIL: missed bad-hover-focus-content.html (1.4.13) | concurrent harness FAIL: missed bad-title-only-name.html (1.4.13)"
     },
     {
       "id": "nontext-contrast",
@@ -140,7 +152,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)"
+      "trustReason": "concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2) | concurrent harness FAIL: false positive on good-error-tokens-not-error-messages.html (3.3.1,3.3.3)"
     },
     {
       "id": "page-structure",
@@ -163,7 +175,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3) | concurrent harness FAIL: false positive on good-label-in-name.html (2.5.3)"
+      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3)"
     },
     {
       "id": "status-messages",
@@ -178,13 +190,12 @@
     {
       "id": "advanced-aria",
       "criteria": [
-        "4.1.2",
-        "1.3.1"
+        "4.1.2"
       ],
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | concurrent harness FAIL: missed bad-icon-accessibility.html (4.1.2) | (+4 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2) | concurrent harness FAIL: missed bad-beeproduced-real-issues.html (4.1.2) | concurrent harness FAIL: missed bad-icon-accessibility.html (4.1.2)"
     },
     {
       "id": "seizure-prevention",
@@ -206,8 +217,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: false positive on good-timing-controls.html (2.2.1,2.2.2)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "multiple-ways",
@@ -255,8 +266,8 @@
       ],
       "kind": "deterministic",
       "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
+      "trust": "experimental",
+      "trustReason": "exclusive harness FAIL: missed bad-keyboard-native-override.html (2.5.1) | exclusive harness FAIL: missed bad-motion-vestibular.html (2.5.4)"
     },
     {
       "id": "responsive-design",
@@ -313,30 +324,6 @@
     },
     {
       "id": "accessibility-statement",
-      "criteria": [],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "contact-mechanism",
-      "criteria": [],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "compliance-monitoring",
-      "criteria": [],
-      "kind": "deterministic",
-      "exclusive": true,
-      "trust": "proven",
-      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
-    },
-    {
-      "id": "eaa-procedure",
       "criteria": [],
       "kind": "deterministic",
       "exclusive": true,
@@ -507,7 +494,8 @@
           "good-accessibility.html",
           "good-css-background-accessible.html",
           "good-descriptive-photo-alt.html",
-          "good-image-alt-complex.html"
+          "good-image-alt-complex.html",
+          "good-media-icons-and-background-video.html"
         ],
         "bad": [
           "bad-beeproduced-real-issues.html",
@@ -541,7 +529,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-media-alternatives.html"
+          "good-media-alternatives.html",
+          "good-media-icons-and-background-video.html"
         ],
         "bad": [
           "bad-media-alternatives.html"
@@ -554,7 +543,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -578,7 +567,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-media-alternatives.html"
+          "good-media-alternatives.html",
+          "good-media-icons-and-background-video.html"
         ],
         "bad": [
           "bad-media-alternatives.html"
@@ -591,7 +581,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -807,8 +797,7 @@
       "mechanism": "axe-core",
       "supporting": [
         "screen-reader (experimental)",
-        "page-structure (experimental)",
-        "advanced-aria (experimental)"
+        "page-structure (experimental)"
       ],
       "justification": "",
       "isManual": false,
@@ -829,8 +818,7 @@
       ],
       "deterministic": [
         "screen-reader",
-        "page-structure",
-        "advanced-aria"
+        "page-structure"
       ],
       "llm": [],
       "fixtures": {
@@ -860,8 +848,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 42,
+        "fpClean": true,
+        "runs": 30,
         "from": [
           "concurrent"
         ]
@@ -1026,8 +1014,10 @@
       "sc": "1.4.1",
       "level": "A",
       "title": "Use of Color",
-      "mechanism": "hybrid:axe-core+use-of-color",
-      "supporting": [],
+      "mechanism": "axe-core",
+      "supporting": [
+        "use-of-color (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1040,9 +1030,7 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-color-coded-indicators.html",
-          "good-css-background-accessible.html",
-          "good-links-distinguished-in-text.html"
+          "good-css-background-accessible.html"
         ],
         "bad": [
           "bad-css-background-info.html",
@@ -1056,7 +1044,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1094,18 +1082,21 @@
       "level": "AA",
       "title": "Contrast (Minimum)",
       "mechanism": "axe-core",
-      "supporting": [],
+      "supporting": [
+        "color-contrast (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [
         "color-contrast"
       ],
-      "deterministic": [],
+      "deterministic": [
+        "color-contrast"
+      ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-aa-text-not-enhanced.html",
           "good-bootstrap-patterns.html",
           "good-color-contrast.html",
           "good-contrast-hidden-and-arbitrary-classes.html"
@@ -1116,9 +1107,17 @@
         ]
       },
       "harness": [
-        "axe-e2e"
+        "axe-e2e",
+        "concurrent"
       ],
-      "outcome": null
+      "outcome": {
+        "tp": true,
+        "fpClean": false,
+        "runs": 5,
+        "from": [
+          "concurrent"
+        ]
+      }
     },
     {
       "sc": "1.4.4",
@@ -1200,8 +1199,10 @@
       "sc": "1.4.6",
       "level": "AAA",
       "title": "Contrast (Enhanced)",
-      "mechanism": "hybrid:axe-core+color-contrast",
-      "supporting": [],
+      "mechanism": "axe-core",
+      "supporting": [
+        "color-contrast (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1214,6 +1215,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-bootstrap-patterns.html",
           "good-contrast-enhanced.html"
         ],
         "bad": [
@@ -1227,7 +1229,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1373,26 +1375,28 @@
       "level": "AA",
       "title": "Non-text Contrast",
       "mechanism": "deterministic:nontext-contrast",
-      "supporting": [],
+      "supporting": [
+        "advanced-contrast (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
+        "advanced-contrast",
         "nontext-contrast"
       ],
       "llm": [],
       "fixtures": {
         "good": [
-          "good-graphic-parts-contrast.html",
-          "good-nontext-contrast.html",
-          "good-state-styles-unused.html"
+          "good-nontext-contrast.html"
         ],
         "bad": [
           "bad-nontext-contrast.html"
         ]
       },
       "harness": [
+        "concurrent",
         "exclusive",
         "golden"
       ],
@@ -1449,12 +1453,15 @@
       "level": "AA",
       "title": "Content on Hover or Focus",
       "mechanism": "deterministic:hover-focus-content",
-      "supporting": [],
+      "supporting": [
+        "advanced-contrast (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
+        "advanced-contrast",
         "hover-focus-content"
       ],
       "llm": [],
@@ -1469,14 +1476,16 @@
         ]
       },
       "harness": [
+        "concurrent",
         "exclusive",
         "golden"
       ],
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 8,
         "from": [
+          "concurrent",
           "exclusive"
         ]
       }
@@ -1632,10 +1641,8 @@
       "sc": "2.2.1",
       "level": "A",
       "title": "Timing Adjustable",
-      "mechanism": "axe-core",
-      "supporting": [
-        "timing-controls (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+timing-controls",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1660,7 +1667,7 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
+        "fpClean": true,
         "runs": 2,
         "from": [
           "concurrent"
@@ -1671,10 +1678,8 @@
       "sc": "2.2.2",
       "level": "A",
       "title": "Pause, Stop, Hide",
-      "mechanism": "axe-core",
-      "supporting": [
-        "timing-controls (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+timing-controls",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1701,8 +1706,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 2,
+        "fpClean": true,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1850,7 +1855,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1946,7 +1951,7 @@
       "outcome": {
         "tp": false,
         "fpClean": true,
-        "runs": 5,
+        "runs": 8,
         "from": [
           "concurrent"
         ]
@@ -2131,7 +2136,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -2355,11 +2360,11 @@
       "sc": "2.5.1",
       "level": "A",
       "title": "Pointer Gestures",
-      "mechanism": "deterministic:input-modalities",
+      "mechanism": "experimental:input-modalities",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: input-modalities: exclusive harness FAIL: missed bad-keyboard-native-override.html (2.5.1) | exclusive harness FAIL: missed bad-motion-vestibular.html (2.5.4)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [
         "input-modalities"
@@ -2381,7 +2386,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2391,11 +2396,11 @@
       "sc": "2.5.2",
       "level": "A",
       "title": "Pointer Cancellation",
-      "mechanism": "deterministic:input-modalities",
+      "mechanism": "experimental:input-modalities",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: input-modalities: exclusive harness FAIL: missed bad-keyboard-native-override.html (2.5.1) | exclusive harness FAIL: missed bad-motion-vestibular.html (2.5.4)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [
         "input-modalities"
@@ -2417,7 +2422,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2427,9 +2432,10 @@
       "sc": "2.5.3",
       "level": "A",
       "title": "Label in Name",
-      "mechanism": "hybrid:axe-core+input-modalities",
+      "mechanism": "axe-core",
       "supporting": [
-        "label-in-name (experimental)"
+        "label-in-name (experimental)",
+        "input-modalities (experimental)"
       ],
       "justification": "",
       "isManual": false,
@@ -2460,8 +2466,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 7,
+        "fpClean": true,
+        "runs": 8,
         "from": [
           "concurrent",
           "exclusive"
@@ -2472,11 +2478,11 @@
       "sc": "2.5.4",
       "level": "A",
       "title": "Motion Actuation",
-      "mechanism": "deterministic:input-modalities",
+      "mechanism": "experimental:input-modalities",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: input-modalities: exclusive harness FAIL: missed bad-keyboard-native-override.html (2.5.1) | exclusive harness FAIL: missed bad-motion-vestibular.html (2.5.4)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [
         "input-modalities"
@@ -2498,7 +2504,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2543,7 +2549,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-concurrent-input.html"
+          "good-concurrent-input.html",
+          "good-touch-and-pointer-alternatives.html"
         ],
         "bad": [
           "bad-concurrent-input.html"
@@ -2555,7 +2562,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2565,11 +2572,11 @@
       "sc": "2.5.7",
       "level": "AA",
       "title": "Dragging Movements",
-      "mechanism": "deterministic:input-modalities",
+      "mechanism": "experimental:input-modalities",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: input-modalities: exclusive harness FAIL: missed bad-keyboard-native-override.html (2.5.1) | exclusive harness FAIL: missed bad-motion-vestibular.html (2.5.4)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [
         "input-modalities"
@@ -2590,7 +2597,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2600,8 +2607,10 @@
       "sc": "2.5.8",
       "level": "AA",
       "title": "Target Size (Minimum)",
-      "mechanism": "hybrid:axe-core+input-modalities",
-      "supporting": [],
+      "mechanism": "axe-core",
+      "supporting": [
+        "input-modalities (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -2629,7 +2638,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -2860,7 +2869,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -2966,7 +2975,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -3037,7 +3046,7 @@
       "title": "Error Identification",
       "mechanism": "experimental:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
+      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2) | concurrent harness FAIL: false positive on good-error-tokens-not-error-messages.html (3.3.1,3.3.3)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
@@ -3060,8 +3069,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": true,
-        "runs": 3,
+        "fpClean": false,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -3106,7 +3115,7 @@
       "outcome": {
         "tp": true,
         "fpClean": false,
-        "runs": 7,
+        "runs": 8,
         "from": [
           "concurrent"
         ]
@@ -3118,7 +3127,7 @@
       "title": "Error Suggestion",
       "mechanism": "experimental:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
+      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2) | concurrent harness FAIL: false positive on good-error-tokens-not-error-messages.html (3.3.1,3.3.3)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
@@ -3141,8 +3150,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": true,
-        "runs": 2,
+        "fpClean": false,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -3154,7 +3163,7 @@
       "title": "Error Prevention (Legal, Financial, Data)",
       "mechanism": "experimental:error-handling",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2)",
+      "justification": "Only experimental scanners cover this criterion: error-handling: concurrent harness FAIL: false positive on good-cognitive-accessibility.html (3.3.2) | concurrent harness FAIL: false positive on good-error-tokens-not-error-messages.html (3.3.1,3.3.3)",
       "isManual": false,
       "isExperimentalOnly": true,
       "axeRules": [],
@@ -3395,6 +3404,7 @@
           "good-aria-role-override.html",
           "good-aria-state-updates.html",
           "good-bootstrap-patterns.html",
+          "good-composite-aria-widgets.html",
           "good-hidden-modal.html",
           "good-icon-button-and-honeypot.html",
           "good-js-validation.html",
@@ -3417,7 +3427,7 @@
       "outcome": {
         "tp": true,
         "fpClean": false,
-        "runs": 24,
+        "runs": 32,
         "from": [
           "concurrent"
         ]
@@ -3458,7 +3468,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 8,
+        "runs": 10,
         "from": [
           "concurrent",
           "exclusive"

@@ -498,6 +498,15 @@ const HTML_SCANNER_MAPPING = {
     description: 'Voice control compatible interface',
   },
 
+  'good-label-in-name-placeholders.html': {
+    expectedScanners: [],
+    excludedScanners: ['label-in-name'],
+    testType: 'good',
+    wcagCriteria: ['2.5.3'],
+    description:
+      'A placeholder that differs from the accessible name, an image button whose alt and aria-label differ, an icon plus text link and a display:none control: label-in-name must stay silent',
+  },
+
   'good-complex-data-tables.html': {
     expectedScanners: [],
     excludedScanners: ['page-structure'],

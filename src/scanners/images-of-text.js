@@ -46,7 +46,9 @@ class ImagesOfTextScanner extends BaseScanner {
           if (!/image\/svg\+xml/i.test(head)) return null;
           const body = url.slice(url.indexOf(',') + 1);
           try {
-            return /;base64/i.test(head) ? atob(body.replace(/\s+/g, '')) : decodeURIComponent(body);
+            return /;base64/i.test(head)
+              ? atob(body.replace(/\s+/g, ''))
+              : decodeURIComponent(body);
           } catch (e) {
             return null; // truncated or invalid encoding: nothing is proven
           }

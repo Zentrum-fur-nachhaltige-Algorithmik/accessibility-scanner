@@ -52,10 +52,10 @@ const EXCLUSIVE_SCANNERS = {
     criteria: ['1.4.4', '1.4.10', '1.4.12'],
     scanOpts: { heuristicOnly: true }, // use heuristic mode for speed
   },
+  // Drives the pointer onto the content a hover reveals, so it needs its own tab.
   'hover-focus-content': {
     module: '../../src/scanners/hover-focus-content',
     criteria: ['1.4.13'],
-    scanOpts: { heuristicOnly: true },
   },
   'seizure-prevention': {
     module: '../../src/scanners/seizure-prevention',

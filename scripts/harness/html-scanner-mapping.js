@@ -523,6 +523,15 @@ const HTML_SCANNER_MAPPING = {
     description: 'Properly implemented hover/focus content',
   },
 
+  'good-hover-focus-measured.html': {
+    expectedScanners: [],
+    excludedScanners: ['hover-focus-content'],
+    testType: 'good',
+    wcagCriteria: ['1.4.13'],
+    description:
+      'A tooltip opened on focus by script rather than a :focus rule, a pointer-events:none layer over its own trigger, a mouseover handler paired with a focus handler and a toast hidden by setTimeout: hover-focus-content must stay silent',
+  },
+
   'good-pointer-cancellation.html': {
     expectedScanners: [],
     excludedScanners: ['input-modalities'],

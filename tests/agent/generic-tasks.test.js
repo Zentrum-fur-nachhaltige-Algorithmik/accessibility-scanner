@@ -140,8 +140,20 @@ describe('agent/generic-tasks', () => {
     }
   });
 
-  it('pathPattern keeps path + query and escapes regex characters', () => {
-    expect(pathPattern('http://127.0.0.1:8080/a/b.html?q=1')).toBe('/a/b\\.html\\?q=1');
+  it('pathPattern keeps path + query, escapes regex characters and tolerates the trailing slash', () => {
+    const p = pathPattern('http://127.0.0.1:8080/a/b.html?q=1');
+    expect(new RegExp(p, 'i').test('http://127.0.0.1:8080/a/b.html?q=1')).toBe(true);
+    expect(new RegExp(p, 'i').test('http://127.0.0.1:8080/a/bxhtml?q=1')).toBe(false);
+    const slash = new RegExp(pathPattern('http://localhost:8804/leistungen/'), 'i');
+    expect(slash.test('http://localhost:8804/leistungen')).toBe(true);
+    expect(slash.test('http://localhost:8804/leistungen/')).toBe(true);
+    expect(slash.test('http://localhost:8804/leistungen/#top')).toBe(true);
+    expect(slash.test('http://localhost:8804/leistungen-alt/')).toBe(false);
+    expect(slash.test('http://localhost:8804/leistungen/detail')).toBe(false);
+    const root = new RegExp(pathPattern('http://localhost:8804/'), 'i');
+    expect(root.test('http://localhost:8804/')).toBe(true);
+    expect(root.test('http://localhost:8804')).toBe(true);
+    expect(root.test('http://localhost:8804/leistungen')).toBe(false);
     expect(pathPattern('not a url')).toBe('not a url');
   });
 });

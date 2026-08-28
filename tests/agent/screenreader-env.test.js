@@ -346,6 +346,20 @@ describe('ScreenReaderEnv', () => {
       });
     }, 60000);
 
+    it('announces the document title after activating a link to another page', async () => {
+      await withEnv('nav-source.html', {}, async (env) => {
+        await env.step({ type: 'links' });
+        await env.step({ type: 'jumpTo', arg: 0 });
+        const nav = await env.step({ type: 'activate' });
+
+        expect(nav.urlChanged).toBe(true);
+        expect(nav.announcements[0]).toBe('page loaded: Target page');
+        // The announcement rides on the same observation and costs no extra step.
+        expect(nav.step).toBe(3);
+        expect(env.stepCount).toBe(3);
+      });
+    }, 60000);
+
     it('reports live-region announcements after submitting an accessible form', async () => {
       await withEnv('good-status-form.html', {}, async (env) => {
         await env.step({ type: 'formFields' });
@@ -519,6 +533,47 @@ describe('ScreenReaderEnv', () => {
       expect(ruleIds(good)).not.toContain('unnamed-control-used');
     }, 120000);
 
+    it('activation-no-effect: the dead button is flagged, the live one is not', async () => {
+      const dead = await withEnv('activation-no-effect.html', {}, async (env) => {
+        await env.step({ type: 'tab' }); // focus lands on the dead button
+        const act = await env.step({ type: 'activate' });
+        expect(act.urlChanged).toBe(false);
+        expect(act.announcements).toEqual([]);
+        expect(act.newPage).toBeUndefined();
+        return env.deriveFindings();
+      });
+      const f = dead.find((x) => x.ruleId === 'activation-no-effect');
+      expect(f).toBeTruthy();
+      expect(f.nodes[0].selector).toBe('#dead-button');
+      expect(f.type).toBe('activation-no-effect');
+      expect(f.wcagCriteria).toEqual(['4.1.2', '3.2.2']);
+      expect(f.description).toMatch(/no perceivable result/);
+
+      const live = await withEnv('activation-no-effect.html', {}, async (env) => {
+        await runAll(env, [{ type: 'tab' }, { type: 'tab' }, { type: 'tab' }]);
+        await env.step({ type: 'activate' }); // the button that fills in the phone number
+        return env.deriveFindings();
+      });
+      expect(ruleIds(live)).not.toContain('activation-no-effect');
+    }, 120000);
+
+    it('announces a link that opens a new window and does not call that a dead control', async () => {
+      await withEnv('activation-no-effect.html', {}, async (env, page) => {
+        await env.step({ type: 'links' });
+        await env.step({ type: 'jumpTo', arg: 0 });
+        const act = await env.step({ type: 'activate' });
+
+        expect(act.newPage).toBeTruthy();
+        expect(act.newPage.url).toContain('generic-thanks.html');
+        expect(act.announcements.some((a) => /^opens in new window: /.test(a))).toBe(true);
+        // The measurement stays on the original page and the popup is closed again.
+        expect(act.urlChanged).toBe(false);
+        expect(page.url()).toContain('activation-no-effect.html');
+        expect(env.trace.at(-1).obsAfter.newPage.url).toContain('generic-thanks.html');
+        expect(ruleIds(env.deriveFindings())).not.toContain('activation-no-effect');
+      });
+    }, 120000);
+
     it('produces findings shaped like scanner violations', async () => {
       const findings = await withEnv('bad-icon-buttons.html', {}, async (env) => {
         await runAll(env, [{ type: 'tab' }, { type: 'activate' }]);
@@ -547,5 +602,126 @@ describe('ScreenReaderEnv', () => {
         expect(severityWeight(f)).toBeGreaterThan(0);
       }
     }, 60000);
+  });
+
+  describe('reading fragmentation', () => {
+    it('flags a single line of text that is spoken as several phrases', async () => {
+      const report = await withEnv('reading-fragmentation.html', {}, async (env) =>
+        env.checkReadingFragmentation()
+      );
+      const byId = new Map(report.elements.map((e) => [e.selector, e]));
+      const heading = byId.get('#fragmented-heading');
+      expect(heading.count).toBe(5);
+      expect(heading.flagged).toBe(true);
+      expect(heading.phrases).toEqual([
+        'Information gem.',
+        '§ 5',
+        'ECG undOffenlegung gem.',
+        '§ 25',
+        'MedienG',
+      ]);
+      expect(byId.get('#fragmented-paragraph').flagged).toBe(true);
+    }, 60000);
+
+    it('leaves clean blocks and a heading that merely contains a link alone', async () => {
+      const report = await withEnv('reading-fragmentation.html', {}, async (env) =>
+        env.checkReadingFragmentation()
+      );
+      const flagged = report.elements.filter((e) => e.flagged).map((e) => e.selector);
+      expect(flagged).toEqual(['#fragmented-heading', '#fragmented-paragraph']);
+      // The clean paragraph is one phrase; the link inside <h3> is a node by design.
+      const byId = new Map(report.elements.map((e) => [e.selector, e]));
+      expect(byId.get('#clean-paragraph').count).toBe(1);
+      expect(byId.has('#heading-with-link')).toBe(true);
+      expect(byId.get('#heading-with-link').count).toBe(1);
+      // Boundary phrases ("paragraph", "end of heading, ...") never count.
+      expect(report.elements.every((e) => !e.phrases.some((p) => /^end of/.test(p)))).toBe(true);
+    }, 60000);
+
+    it('reports it as a finding with the fragmented phrases as the example', async () => {
+      const findings = await withEnv('reading-fragmentation.html', {}, async (env) => {
+        await env.checkReadingFragmentation();
+        return env.deriveFindings();
+      });
+      const frag = findings.filter((f) => f.ruleId === 'reading-fragmentation');
+      expect(frag.length).toBe(2);
+      expect(frag[0].wcagCriteria).toEqual(['1.3.1', '1.3.2']);
+      expect(frag[0].severity).toBe('moderate');
+      expect(frag[0].scannerId).toBe('sr-agent-env');
+      expect(frag[0].type).toBe('reading-fragmentation');
+      expect(frag[0].description).toContain('"Information gem." / "§ 5"');
+      expect(frag[0].nodes[0].selector).toBe('#fragmented-heading');
+      expect(frag[0].meta.fragments).toBe(5);
+    }, 60000);
+
+    it('reports nothing on a page whose text is spoken as whole blocks', async () => {
+      const findings = await withEnv('generic-contact.html', {}, async (env) => {
+        await env.checkReadingFragmentation();
+        return env.deriveFindings();
+      });
+      expect(findings.filter((f) => f.ruleId === 'reading-fragmentation')).toEqual([]);
+    }, 60000);
+
+    it('caches the analysis per URL', async () => {
+      await withEnv('reading-fragmentation.html', {}, async (env, page) => {
+        const a = await env.checkReadingFragmentation();
+        const spy = [];
+        const original = page.evaluate.bind(page);
+        page.evaluate = (...args) => {
+          spy.push(1);
+          return original(...args);
+        };
+        const b = await env.checkReadingFragmentation();
+        expect(b).toBe(a);
+        expect(spy.length).toBe(0);
+      });
+    }, 60000);
+  });
+
+  describe('fragmentationFindings (page level)', () => {
+    const { fragmentationFindings } = require('../../src/agent/screenreader-env');
+
+    it('adds a page-level finding when the whole page averages >= 2.5 phrases', () => {
+      const findings = fragmentationFindings({
+        url: 'http://x/',
+        elementCount: 12,
+        fragmentCount: 36,
+        ratio: 3,
+        pageFlagged: true,
+        elements: [
+          { selector: '#a', tag: 'p', count: 4, phrases: ['a', 'b', 'c', 'd'], flagged: false },
+          { selector: '#b', tag: 'p', count: 3, phrases: ['e', 'f', 'g'], flagged: false },
+        ],
+      });
+      expect(findings.length).toBe(1);
+      expect(findings[0].meta.scope).toBe('page');
+      expect(findings[0].description).toContain('3.0 per element');
+      expect(findings[0].nodes.map((n) => n.selector)).toEqual(['#a', '#b']);
+    });
+
+    it('reports at most five elements of one page', () => {
+      const elements = Array.from({ length: 9 }, (_, i) => ({
+        selector: `#e${i}`,
+        tag: 'p',
+        count: 3,
+        phrases: ['a', 'b', 'c'],
+        flagged: true,
+      }));
+      const findings = fragmentationFindings({
+        url: 'http://x/',
+        elementCount: 9,
+        fragmentCount: 27,
+        ratio: 3,
+        pageFlagged: false,
+        elements,
+      });
+      expect(findings.length).toBe(5);
+    });
+
+    it('returns nothing for a clean page', () => {
+      expect(
+        fragmentationFindings({ url: 'http://x/', elements: [], pageFlagged: false, ratio: 0 })
+      ).toEqual([]);
+    });
   });
 });

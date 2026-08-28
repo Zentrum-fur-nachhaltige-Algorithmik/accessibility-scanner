@@ -4,19 +4,46 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
-const { computeOptimalPath, chooseReach } = require('../../src/agent/optimal-path');
+const {
+  computeOptimalPath,
+  chooseReach,
+  analyzeInPage,
+  EVIDENCE_NOT_IN_READING_ORDER,
+} = require('../../src/agent/optimal-path');
 
 const HOME = '/agent/generic-home.html';
 const LANDMARK = '/agent/optimal-landmark.html';
 const MODAL = '/agent/good-modal.html';
 const EQUIV = '/agent/optimal-equivalence.html';
+const READ = '/agent/optimal-read.html';
 
 const CONTACT_LINK = 'nav ul li:nth-of-type(3) a';
 
-async function optimal(fixture, sightedPath) {
+/**
+ * Like `optimal`, but on a page whose `evaluate` counts how often the in-page
+ * analysis really ran, and reporting the url the page ended on (the proof that
+ * the steps were executed even when the analysis came from the cache).
+ */
+async function optimalCounted(fixture, sightedPath, options) {
+  const page = await getPage(`${getBaseUrl()}${fixture}`);
+  const evaluate = page.evaluate.bind(page);
+  let analyses = 0;
+  page.evaluate = (fn, ...args) => {
+    if (fn === analyzeInPage) analyses += 1;
+    return evaluate(fn, ...args);
+  };
+  try {
+    const res = await computeOptimalPath(page, { id: 't', sightedPath }, {}, options);
+    return { res, analyses, url: page.url() };
+  } finally {
+    await page.close();
+  }
+}
+
+async function optimal(fixture, sightedPath, task = {}) {
   const page = await getPage(`${getBaseUrl()}${fixture}`);
   try {
-    return await computeOptimalPath(page, { id: 't', sightedPath });
+    return await computeOptimalPath(page, { id: 't', sightedPath, ...task });
   } finally {
     await page.close();
   }
@@ -259,6 +286,33 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     expect(res.steps[0].equivalenceClassSize).toBeGreaterThan(1);
   }, 60000);
 
+  it('serves a shared analysisCache across pages without skipping the steps', async () => {
+    const analysisCache = new Map();
+    const sightedPath = [{ action: 'click', selector: CONTACT_LINK }];
+
+    const first = await optimalCounted(HOME, sightedPath, { analysisCache });
+    expect(first.res.error).toBeUndefined();
+    expect(first.analyses).toBe(1);
+    expect(first.res.steps[0].analysis.cacheHit).toBe(false);
+    expect(analysisCache.size).toBe(1);
+
+    // A second, unrelated page in the same state: same (url, fingerprint), so
+    // the reading-order walk is not repeated ...
+    const second = await optimalCounted(HOME, sightedPath, { analysisCache });
+    expect(second.analyses).toBe(0);
+    expect(second.res.nOpt).toBe(first.res.nOpt);
+    expect(second.res.steps[0].reach).toEqual(first.res.steps[0].reach);
+    expect(second.res.steps[0].analysis.cacheHit).toBe(true);
+    // ... but the step itself still ran for real.
+    expect(second.url).toContain('generic-contact.html');
+    expect(first.url).toContain('generic-contact.html');
+
+    // Without the cache the analysis runs again, with the same result.
+    const third = await optimalCounted(HOME, sightedPath, {});
+    expect(third.analyses).toBe(1);
+    expect(third.res.nOpt).toBe(first.res.nOpt);
+  }, 60000);
+
   it('reports an error (and nOpt null) when a step cannot be executed', async () => {
     const page = await getPage(`${getBaseUrl()}${HOME}`);
     try {
@@ -273,6 +327,105 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     } finally {
       await page.close();
     }
+  }, 60000);
+
+  it('appends a read step for an information task: nOpt = navigation + read', async () => {
+    // The answer sits on the contact page, three commands into its reading
+    // order. Costing only the `goto` would price "find the phone number" at 1.
+    const res = await optimal(
+      HOME,
+      [{ action: 'goto', url: `${getBaseUrl()}/agent/generic-contact.html` }],
+      { kind: 'information', evidence: 'Phone +49 30 1234567' }
+    );
+    expect(res.error).toBeUndefined();
+    expect(res.optimalPathError).toBeUndefined();
+    expect(res.steps).toHaveLength(2);
+
+    const read = res.steps[1];
+    expect(read).toMatchObject({
+      index: 1,
+      action: 'read',
+      evidence: 'Phone +49 30 1234567',
+      // Hearing the phrase IS the goal, so there is no action to pay for.
+      actionCost: 0,
+      selector: expect.stringContaining('p'),
+    });
+    // The phrase really carries the evidence.
+    expect(read.phrase.toLowerCase()).toContain('phone +49 30 1234567');
+    // Reached with the ordinary strategies: nextHeading, then next x k.
+    expect(read.reach).toMatchObject({ strategy: 'step+next', cost: 3 });
+    expect(read.reach.via).toMatchObject({ kind: 'headings', command: 'nextHeading', k: 2 });
+    // ... which is cheaper than walking there with `next` alone.
+    expect(read.analysis.next).toBeGreaterThanOrEqual(read.reach.cost);
+
+    expect(res.readDistance).toBe(3);
+    // goto (1 + 0) + read (3 + 0)
+    expect(res.nOpt).toBe(4);
+  }, 60000);
+
+  it('costs the cheapest matching phrase and reports the read step from document start', async () => {
+    const res = await optimal(READ, [], { kind: 'information', evidence: 'Phone 555 0100' });
+    expect(res.error).toBeUndefined();
+    expect(res.steps).toHaveLength(1);
+    expect(res.steps[0].action).toBe('read');
+    expect(res.steps[0].analysis.cursorIndex).toBe(res.steps[0].analysis.docStartIndex);
+    expect(res.nOpt).toBe(res.readDistance);
+    expect(res.readDistance).toBeGreaterThan(0);
+  }, 60000);
+
+  it('matches the evidence case-insensitively and across whitespace runs', async () => {
+    const res = await optimal(READ, [], {
+      kind: 'information',
+      evidence: '  phone   555\n0100  ',
+    });
+    expect(res.optimalPathError).toBeUndefined();
+    expect(res.steps[0].action).toBe('read');
+  }, 60000);
+
+  it('reads an answer that is split over two adjacent nodes, one `next` more', async () => {
+    // "Mobile 555 0111<br>Mon to Fri" is one visual line but two spoken
+    // phrases. Hearing it means reaching the first and reading on.
+    const split = await optimal(READ, [], {
+      kind: 'information',
+      evidence: 'Mobile 555 0111 Mon to Fri',
+    });
+    expect(split.optimalPathError).toBeUndefined();
+    expect(split.steps).toHaveLength(1);
+    const read = split.steps[0];
+    expect(read.action).toBe('read');
+    expect(read.spanPhrases).toBe(2);
+    expect(read.reach.via.spanPhrases).toBe(2);
+    expect(read.phrase.toLowerCase()).toContain('mobile 555 0111');
+    expect(read.phrase.toLowerCase()).toContain('mon to fri');
+
+    // Exactly one command more than reaching the first of the two phrases.
+    const first = await optimal(READ, [], { kind: 'information', evidence: 'Mobile 555 0111' });
+    expect(first.steps[0].spanPhrases).toBe(1);
+    expect(read.reach.cost).toBe(first.steps[0].reach.cost + 1);
+    expect(split.readDistance).toBe(first.readDistance + 1);
+  }, 60000);
+
+  it('reports evidence-not-in-reading-order when the text is never spoken', async () => {
+    // "Fax 555 0199" is CSS-generated content: a sighted user reads it, the
+    // screen reader never says it.
+    const res = await optimal(READ, [], { kind: 'information', evidence: 'Fax 555 0199' });
+    expect(res.error).toBeUndefined();
+    expect(res.optimalPathError).toBe(EVIDENCE_NOT_IN_READING_ORDER);
+    expect(res.nOptPartial).toBe(true);
+    expect(res.readDistance).toBeNull();
+    // The navigation part survives, so the task is still measurable.
+    expect(res.nOpt).toBe(0);
+    expect(res.steps.every((s) => s.action !== 'read')).toBe(true);
+  }, 60000);
+
+  it('leaves action tasks untouched (no read step, no readDistance)', async () => {
+    const res = await optimal(HOME, [{ action: 'click', selector: CONTACT_LINK }], {
+      kind: 'action',
+      evidence: 'Phone +49 30 1234567',
+    });
+    expect(res.steps).toHaveLength(1);
+    expect(res.readDistance).toBeUndefined();
+    expect(res.nOpt).toBe(2);
   }, 60000);
 
   it('rejects an unsupported action', async () => {

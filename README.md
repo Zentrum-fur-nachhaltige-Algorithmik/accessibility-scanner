@@ -199,7 +199,19 @@ cannot be replayed is excluded, never scored.
 Findings are read off the trace without an LLM and use the same shape as the
 scanners' violations: `focus-lost` (2.4.3), `dialog-not-trapped` (2.4.3),
 `escape-does-not-close` (2.1.2), `unannounced-change` (4.1.3),
-`unnamed-control-used` (4.1.2), `agent-claimed-done-prematurely`.
+`unnamed-control-used` (4.1.2), `reading-fragmentation` (1.3.1/1.3.2: one
+visual line of text spoken as three or more separate phrases, as visual site
+builders produce), `agent-claimed-done-prematurely` (4.1.3, only when the page
+reacted to nothing the agent did) and `agent-stopped-early` (an agent finding
+that stays out of the site score).
+
+A task that asks for information ("what is the phone number?") carries both the
+verbatim page text (`evidence`) and the answer itself (`answer` plus
+`answerType`: phone, email, address, hours or text). It counts as solved when
+the screen reader spoke the evidence OR when what the user heard carries the
+same answer in another spelling or on another page - decided deterministically
+per answer type, and only if that fails and the agent gave up, by one cheap LLM
+judge call. Every run reports how it was solved (`successBy`).
 
 A run on gov.uk with generated tasks:
 

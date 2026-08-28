@@ -547,6 +547,105 @@ function srenvRuntime() {
     };
   }
 
+  /* ---------------------------------------------------------------- */
+  /* Reading fragmentation                                             */
+  /* ---------------------------------------------------------------- */
+
+  // Boundary phrases the VSR speaks for containers. Kept in sync with
+  // `isStructuralPhrase` in src/agent/answer-match.js. They are punctuation,
+  // not content, and must not count as fragments.
+  const STRUCTURAL_PHRASE_RE =
+    /^(end of\b.*|document|paragraph|list|listitem|list item|table|row|cell|columnheader|rowheader|figure|blockquote|region|banner|navigation|main|contentinfo|complementary|form|search|article|section|group|separator|generic|heading)$/i;
+
+  const FRAGMENT_BLOCK_SELECTOR = 'h1,h2,h3,h4,h5,h6,p,li';
+  const INTERACTIVE_SELECTOR = 'a,button,input,select,textarea,[role="link"],[role="button"]';
+  /** A single visual line of text is at most this many line-heights tall. */
+  const SINGLE_LINE_FACTOR = 2;
+  /** Fragments in one single-line block from which it counts as fragmented. */
+  const FRAGMENT_MIN = 3;
+  /** Page-level: average fragments per element from which the page counts. */
+  const PAGE_FRAGMENT_RATIO = 2.5;
+  const PAGE_MIN_ELEMENTS = 10;
+
+  function lineHeightOf(el) {
+    const cs = getComputedStyle(el);
+    const lh = parseFloat(cs.lineHeight);
+    if (Number.isFinite(lh) && lh > 0) return lh;
+    const fs = parseFloat(cs.fontSize);
+    return Number.isFinite(fs) && fs > 0 ? fs * 1.2 : 16 * 1.2;
+  }
+
+  /**
+   * How many separate text nodes the screen reader speaks per heading /
+   * paragraph / list item. A builder that wraps every word in its own inline
+   * element turns one sentence into a stutter of phrases ("Information gem." /
+   * "§ 5" / "ECG und Offenlegung gem." / ...): the visual line is one line, the
+   * spoken output is five. Interactive descendants (links, buttons) are their
+   * own spoken node by design and are not counted.
+   */
+  async function readingFragmentation() {
+    const order = await readingOrder();
+    const perBlock = new Map();
+    for (const entry of order) {
+      const phrase = String(entry.phrase == null ? '' : entry.phrase).trim();
+      if (!phrase || STRUCTURAL_PHRASE_RE.test(phrase)) continue;
+      const el = elementOf(entry.node);
+      if (!el || !el.closest) continue;
+      const block = el.closest(FRAGMENT_BLOCK_SELECTOR);
+      if (!block || !isVisible(block)) continue;
+      // The block's own announcement ("heading, ..., level 2") is not a fragment,
+      // but it proves the block exists: a heading spoken as ONE phrase has no
+      // text node of its own and would otherwise be missing from the page ratio.
+      if (entry.node === block) {
+        if (!perBlock.has(block)) perBlock.set(block, []);
+        continue;
+      }
+      // Links and buttons inside the text are separate nodes on purpose.
+      const interactive = el.closest(INTERACTIVE_SELECTOR);
+      if (interactive && block.contains(interactive)) continue;
+      if (!perBlock.has(block)) perBlock.set(block, []);
+      const list = perBlock.get(block);
+      if (list.length < 12) list.push(phrase);
+      else list.push(null);
+    }
+
+    const elements = [];
+    let totalFragments = 0;
+    for (const [block, phrases] of perBlock) {
+      const count = Math.max(phrases.length, 1);
+      totalFragments += count;
+      const lineHeight = lineHeightOf(block);
+      const height = block.getBoundingClientRect().height;
+      const singleLine = height > 0 && height <= SINGLE_LINE_FACTOR * lineHeight;
+      elements.push({
+        selector: selectorFor(block),
+        tag: block.tagName.toLowerCase(),
+        count,
+        phrases: phrases.filter((p) => p !== null),
+        singleLine,
+        height: Math.round(height),
+        lineHeight: Math.round(lineHeight),
+        flagged: count >= FRAGMENT_MIN && singleLine,
+      });
+    }
+    const ratio = elements.length ? totalFragments / elements.length : 0;
+    return {
+      url: location.href,
+      title: document.title,
+      elementCount: elements.length,
+      fragmentCount: totalFragments,
+      ratio,
+      pageFlagged: elements.length >= PAGE_MIN_ELEMENTS && ratio >= PAGE_FRAGMENT_RATIO,
+      thresholds: {
+        fragmentMin: FRAGMENT_MIN,
+        pageRatio: PAGE_FRAGMENT_RATIO,
+        pageMinElements: PAGE_MIN_ELEMENTS,
+      },
+      // Worst first: the page-level finding shows the head of this list.
+      elements: elements.sort((a, b) => b.count - a.count),
+    };
+  }
+
   window.__SRENV = {
     ready: false,
     /**
@@ -555,6 +654,7 @@ function srenvRuntime() {
      */
     internals: {
       readingOrder,
+      readingFragmentation,
       buildRotor,
       selectorFor,
       elementOf,
@@ -655,7 +755,38 @@ const FINDING_DEFS = {
     impact: 'critical',
     help: 'https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html',
   },
+  'activation-no-effect': {
+    wcag: ['4.1.2', '3.2.2'],
+    severity: 'serious',
+    impact: 'serious',
+    help: 'https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html',
+  },
+  'reading-fragmentation': {
+    wcag: ['1.3.1', '1.3.2'],
+    severity: 'moderate',
+    impact: 'moderate',
+    help: 'https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html',
+  },
 };
+
+/** Roles whose activation must do something perceivable. */
+const ACTIONABLE_ROLE_RE = /^(button|link|menuitem|menuitemcheckbox|menuitemradio|tab|switch)$/i;
+
+/** The role a VSR phrase starts with ("link, Impressum" -> "link"). */
+function phraseRole(phrase) {
+  return String(phrase || '')
+    .split(',')[0]
+    .trim();
+}
+
+/** `page.url()` without throwing on a target that is already gone. */
+function safeUrl(target) {
+  try {
+    return typeof target.url === 'function' ? target.url() : null;
+  } catch (_) {
+    return null;
+  }
+}
 
 /** Phrases VSR speaks for an element that has a role but no accessible name. */
 const ROLE_ONLY_RE =
@@ -686,10 +817,106 @@ class ScreenReaderEnv {
     this._injected = false;
     this._lastUrl = null;
 
+    // Pages opened by the last command (window.open / target="_blank"). A blind
+    // user is told a new window appeared, so the env announces it; the popup
+    // itself is closed again so the measurement stays on one page.
+    this._pendingPopups = [];
+    this._popupWork = [];
+
+    // Reading-fragmentation results, one per URL visited (see
+    // `checkReadingFragmentation`); merged into `deriveFindings()`.
+    this._fragmentation = new Map();
+
     this._onFrameNavigated = (frame) => {
       if (frame === this.page.mainFrame()) this._injected = false;
     };
     this.page.on('framenavigated', this._onFrameNavigated);
+
+    this._onPopup = (popup) => this._capturePopup(popup);
+    this.page.on('popup', this._onPopup);
+
+    // Not every driver routes window.open through the page's `popup` event, so
+    // the browser-level target event is watched as well (deduplicated by page).
+    this._browser = typeof this.page.browser === 'function' ? this.page.browser() : null;
+    if (this._browser && typeof this._browser.on === 'function') {
+      this._onTargetCreated = async (target) => {
+        try {
+          if (typeof target.type === 'function' && target.type() !== 'page') return;
+          // Only a window THIS page opened; every other tab in the browser
+          // (another measurement, another test) is none of this env's business.
+          const opener = typeof target.opener === 'function' ? target.opener() : null;
+          if (!opener || opener !== this.page.target()) return;
+          const popup = await target.page();
+          if (popup && popup !== this.page) this._capturePopup(popup);
+        } catch (_) {
+          /* the target vanished before it could be inspected */
+        }
+      };
+      this._browser.on('targetcreated', this._onTargetCreated);
+    }
+  }
+
+  /**
+   * Record a newly opened page and close it again. The record is filled in
+   * asynchronously; `step()` awaits `_popupWork` before it reads the list, so a
+   * popup is never reported one command too late.
+   */
+  _capturePopup(popup) {
+    if (!popup || popup === this.page || this._seenPopups().has(popup)) return;
+    this._popupPages = this._popupPages || new WeakSet();
+    this._popupPages.add(popup);
+    const record = { url: safeUrl(popup), title: null };
+    this._pendingPopups.push(record);
+    this._popupWork.push(
+      (async () => {
+        try {
+          if (!record.url || record.url === 'about:blank') {
+            await popup
+              .waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 1000 })
+              .catch(() => {});
+            record.url = safeUrl(popup) || record.url;
+          }
+          record.title = await popup.title().catch(() => null);
+        } finally {
+          await popup.close().catch(() => {});
+        }
+      })()
+    );
+  }
+
+  _seenPopups() {
+    this._popupPages = this._popupPages || new WeakSet();
+    return this._popupPages;
+  }
+
+  /**
+   * The name a real screen reader speaks when a new document finishes loading:
+   * the document title, or the first h1, or the path when the page has neither.
+   */
+  async _documentName() {
+    try {
+      return await this.page.evaluate(() => {
+        const clean = (s) =>
+          String(s == null ? '' : s)
+            .replace(/\s+/g, ' ')
+            .trim();
+        const title = clean(document.title);
+        if (title) return title;
+        const h1 = document.querySelector('h1');
+        const heading = h1 ? clean(h1.textContent) : '';
+        if (heading) return heading;
+        return clean(location.pathname) || clean(location.href);
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /** Drain the popups opened since the last command. */
+  async _drainPopups() {
+    const work = this._popupWork.splice(0);
+    if (work.length) await Promise.all(work).catch(() => {});
+    return this._pendingPopups.splice(0);
   }
 
   static get COMMAND_TYPES() {
@@ -830,6 +1057,7 @@ class ScreenReaderEnv {
     }
 
     await this._settle();
+    const popups = await this._drainPopups();
 
     let reinjected = false;
     if (navigated || this.page.url() !== urlBefore || !this._injected) {
@@ -887,6 +1115,22 @@ class ScreenReaderEnv {
       urlChanged,
       budgetLeft: this.budgetLeft,
     };
+    if (reinjected) {
+      // A new document was loaded: NVDA, VoiceOver and JAWS all speak the page
+      // title at that moment, and it is the only thing that tells the user where
+      // they landed. It is part of the same observation, so it costs no step.
+      const name = await this._documentName();
+      if (name) obs.announcements = [`page loaded: ${name}`].concat(obs.announcements);
+    }
+    if (popups.length) {
+      // A new window is the only thing a screen reader has to go on here; the
+      // agent hears it exactly as a real one announces a window switch.
+      obs.announcements = obs.announcements.concat(
+        popups.map((p) => `opens in new window: ${p.title || p.url || 'unknown page'}`)
+      );
+      obs.newPage = { url: popups[0].url || null };
+      if (popups.length > 1) obs.newPage.count = popups.length;
+    }
     if (result.error) obs.error = result.error;
 
     this.phrases.push(obs.phrase);
@@ -1040,6 +1284,34 @@ class ScreenReaderEnv {
         }
       }
 
+      // activation-no-effect: a button/link was activated and NOTHING happened:
+      // no navigation, no DOM change, no announcement, no new window and no focus
+      // move away from the control itself. For a sighted user such a control may
+      // well work (a print dialog, a video that starts); for a screen-reader user
+      // the page simply goes silent, so the control is indistinguishable from dead.
+      if (cmd === 'activate' && !entry.obsAfter.error) {
+        const cursorSelector = entry.obsBefore.focusSelector || before.cursorSelector || null;
+        // Focus landing on the activated control itself is not "something happened".
+        const focusMovedAway =
+          focusChanged && (!focusAfter || focusAfter.selector !== cursorSelector);
+        const role = phraseRole(entry.obsBefore.phrase);
+        if (
+          ACTIONABLE_ROLE_RE.test(role) &&
+          !entry.domChanged &&
+          !entry.obsAfter.urlChanged &&
+          !entry.obsAfter.newPage &&
+          (entry.obsAfter.announcements || []).length === 0 &&
+          !focusMovedAway
+        ) {
+          push(
+            'activation-no-effect',
+            `Activating the ${role.toLowerCase()} "${entry.obsBefore.phrase}" produced no perceivable result: the page did not change, nothing was announced, focus did not move and no new window opened. For a screen-reader user the control appears to do nothing.`,
+            { selector: cursorSelector, phrase: entry.obsBefore.phrase },
+            entry
+          );
+        }
+      }
+
       // unnamed-control-used: activated a control whose phrase is role-only
       if (cmd === 'activate') {
         const phrase = (entry.obsBefore.phrase || '').trim();
@@ -1058,11 +1330,47 @@ class ScreenReaderEnv {
       }
     }
 
+    // Page-level barriers collected while walking the site (one report per URL).
+    for (const report of this._fragmentation.values()) {
+      for (const f of fragmentationFindings(report)) {
+        const key = `${f.ruleId}::${(f.nodes[0] && f.nodes[0].selector) || f.meta.url}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        findings.push(f);
+      }
+    }
+
     return findings;
+  }
+
+  /**
+   * Analyse the CURRENT page for reading fragmentation and remember the result
+   * for `deriveFindings()`. Per page, not per step: the harness calls it once
+   * per URL the agent visits. Returns the raw report (or null).
+   */
+  async checkReadingFragmentation() {
+    if (!this.page) return null;
+    if (typeof this.page.isClosed === 'function' && this.page.isClosed()) return null;
+    const url = this.page.url();
+    if (this._fragmentation.has(url)) return this._fragmentation.get(url);
+    let report = null;
+    try {
+      await this._ensureInjected();
+      report = await this.page.evaluate(() => window.__SRENV.internals.readingFragmentation());
+    } catch (_) {
+      return null;
+    }
+    if (report) this._fragmentation.set(url, report);
+    return report;
   }
 
   async stop() {
     this.page.off('framenavigated', this._onFrameNavigated);
+    if (this._onPopup) this.page.off('popup', this._onPopup);
+    if (this._browser && this._onTargetCreated && typeof this._browser.off === 'function') {
+      this._browser.off('targetcreated', this._onTargetCreated);
+    }
+    await this._drainPopups().catch(() => {});
     this.started = false;
     try {
       await this.page.evaluate(() => window.__SRENV && window.__SRENV.stop());
@@ -1081,6 +1389,79 @@ class ScreenReaderEnv {
  * @param {{force?: boolean}} [options] force = inject even if a runtime is present
  * @returns {Promise<boolean>} true when it (re-)injected
  */
+/** How many fragmented elements of one page are reported individually. */
+const MAX_FRAGMENTATION_EXAMPLES = 5;
+
+/**
+ * Findings from one `readingFragmentation()` report.
+ *
+ * A page builder that wraps every few words in its own inline element makes the
+ * screen reader stutter: one visual line of a heading comes out as five
+ * separate phrases ("Information gem." / "§ 5" / "ECG undOffenlegung gem." /
+ * "§ 25" / "MedienG"). Sighted users see one sentence; screen-reader users hear
+ * shrapnel and cannot tell what belongs together, which is exactly what
+ * "information and relationships" and "meaningful sequence" are about.
+ * Reported per element for a single line broken into >= 3 spoken pieces, and
+ * once for the page when the whole page averages >= 2.5 pieces per element.
+ */
+function fragmentationFindings(report) {
+  if (!report) return [];
+  const def = FINDING_DEFS['reading-fragmentation'];
+  const base = {
+    scannerId: 'sr-agent-env',
+    ruleId: 'reading-fragmentation',
+    type: 'reading-fragmentation',
+    impact: def.impact,
+    severity: def.severity,
+    helpUrl: def.help,
+    wcagCriteria: def.wcag,
+  };
+  const out = [];
+  const flagged = (report.elements || []).filter((e) => e.flagged);
+  for (const el of flagged.slice(0, MAX_FRAGMENTATION_EXAMPLES)) {
+    out.push({
+      ...base,
+      description:
+        `The <${el.tag}> is rendered as one line of text but the screen reader speaks it as ` +
+        `${el.count} separate phrases: ${el.phrases.map((p) => `"${p}"`).join(' / ')}. ` +
+        'The text is split across inline elements, so a screen-reader user hears fragments ' +
+        'instead of one sentence and has to reassemble them.',
+      nodes: [{ selector: el.selector, phrase: el.phrases.join(' / ') }],
+      meta: {
+        url: report.url,
+        fragments: el.count,
+        phrases: el.phrases,
+        height: el.height,
+        lineHeight: el.lineHeight,
+      },
+    });
+  }
+  if (report.pageFlagged) {
+    const examples = (report.elements || []).slice(0, MAX_FRAGMENTATION_EXAMPLES);
+    out.push({
+      ...base,
+      description:
+        `Across this page the screen reader speaks ${report.fragmentCount} separate phrases for ` +
+        `${report.elementCount} headings, paragraphs and list items (${report.ratio.toFixed(1)} per ` +
+        'element). The text of nearly every block is split into several spoken pieces, so the ' +
+        'whole page is heard as fragments rather than as sentences. Example: ' +
+        examples
+          .slice(0, 2)
+          .map((e) => `<${e.tag}> "${e.phrases.join(' / ')}"`)
+          .join('; '),
+      nodes: examples.map((e) => ({ selector: e.selector, phrase: e.phrases.join(' / ') })),
+      meta: {
+        url: report.url,
+        scope: 'page',
+        ratio: report.ratio,
+        elementCount: report.elementCount,
+        fragmentCount: report.fragmentCount,
+      },
+    });
+  }
+  return out;
+}
+
 async function injectScreenReader(page, options = {}) {
   if (!options.force) {
     const alive = await page
@@ -1094,9 +1475,30 @@ async function injectScreenReader(page, options = {}) {
   return true;
 }
 
+/**
+ * Every phrase the screen reader speaks on this page, in reading order.
+ *
+ * The one place that answers "would a screen-reader user ever HEAR this text?".
+ * Injects the VSR if it is not there yet and walks the reading order once, so
+ * the generator verifies evidence against the same phrases the harness and
+ * `optimal-path.js` later match against.
+ *
+ * @param {import('puppeteer').Page} page
+ * @returns {Promise<string[]>} spoken phrases, empty when nothing could be read
+ */
+async function collectSpokenPhrases(page) {
+  await injectScreenReader(page);
+  const phrases = await page.evaluate(async () => {
+    const order = await window.__SRENV.internals.readingOrder();
+    return order.map((entry) => String(entry.phrase == null ? '' : entry.phrase));
+  });
+  return (phrases || []).filter((p) => p.trim() !== '');
+}
+
 module.exports = ScreenReaderEnv;
 module.exports.ScreenReaderEnv = ScreenReaderEnv;
 module.exports.injectScreenReader = injectScreenReader;
+module.exports.collectSpokenPhrases = collectSpokenPhrases;
 module.exports.srenvRuntime = srenvRuntime;
 module.exports.vsrSource = vsrSource;
 module.exports.COMMAND_TYPES = COMMAND_TYPES;
@@ -1105,3 +1507,5 @@ module.exports.ROTOR_STEP_COMMANDS = ROTOR_STEP_COMMANDS;
 module.exports.ROTOR_STEP_TYPES = ROTOR_STEP_TYPES;
 module.exports.FREE_COMMANDS = FREE_COMMANDS;
 module.exports.FINDING_DEFS = FINDING_DEFS;
+module.exports.fragmentationFindings = fragmentationFindings;
+module.exports.phraseRole = phraseRole;

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Booking - Mini Practice</title>
+</head>
+<body>
+  <main>
+    <h1>Booking</h1>
+
+    <!-- Dead control: it looks and sounds like a button but nothing is wired to it. -->
+    <p><button id="dead-button" type="button">Book an appointment</button></p>
+
+    <!-- Opens a second window; nothing on this page changes. -->
+    <p><a id="new-window-link" href="generic-thanks.html" target="_blank">Online booking</a></p>
+
+    <!-- Control group: this one really does something. -->
+    <p><button id="live-button" type="button">Show the phone number</button></p>
+    <p id="phone-slot"></p>
+  </main>
+
+<script>
+  document.getElementById('live-button').addEventListener('click', function () {
+    document.getElementById('phone-slot').textContent = 'Phone +43 1 2345678';
+  });
+</script>
+</body>
+</html>

@@ -11,6 +11,7 @@ const puppeteer = require('puppeteer');
 
 const { AgentLLMClient: LLMClient } = require('./llm-chat');
 const { runSite } = require('./harness');
+const { DEFAULT_CONCURRENCY, normaliseConcurrency } = require('./concurrency');
 
 const DEFAULT_MODEL = 'google/gemini-3.7-flash';
 
@@ -27,6 +28,7 @@ function parseArgs(argv) {
     allowSubmit: false,
     maxTasks: 8,
     explore: 4,
+    concurrency: DEFAULT_CONCURRENCY,
   };
   const rest = [];
   for (let i = 0; i < argv.length; i++) {
@@ -41,6 +43,8 @@ function parseArgs(argv) {
     else if (a === '--allow-submit') args.allowSubmit = true;
     else if (a === '--max-tasks') args.maxTasks = parseInt(argv[++i], 10) || 8;
     else if (a === '--explore') args.explore = parseInt(argv[++i], 10) || 0;
+    else if (a === '--concurrency')
+      args.concurrency = normaliseConcurrency(argv[++i], DEFAULT_CONCURRENCY);
     else if (a === '--only')
       args.only = argv[++i]
         .split(',')
@@ -59,7 +63,7 @@ function parseArgs(argv) {
 }
 
 const USAGE = `Usage: node src/agent/run.js <url> [--tasks tasks.json] [--generate] [--k 1] [--model ${DEFAULT_MODEL}]
-       [--out result.json] [--headless true] [--only id,id] [--exclude id,id]
+       [--out result.json] [--headless true] [--only id,id] [--exclude id,id] [--concurrency 3]
        generator options (with --generate): [--max-tasks 8] [--explore 4] [--vision] [--allow-submit]`;
 
 function pad(s, n) {
@@ -72,8 +76,13 @@ function printSummary(result) {
     [38, 'task'],
     [8, 'nSighted'],
     [6, 'nOpt'],
+    // Of nOpt, the part spent reaching the phrase that speaks the answer
+    // (information tasks only; blank for action tasks).
+    [6, 'read'],
     [6, 'nSr'],
     [6, 'R'],
+    // How success was established: oracle | evidence | answer-normalised | answer-llm
+    [18, 'by'],
     [10, 'stoppedBy'],
   ];
   console.log('');
@@ -85,15 +94,20 @@ function printSummary(result) {
         [
           pad(t.task.id || t.task.description, 38),
           pad(t.nSighted, 8),
-          pad(t.nOpt == null ? '-' : t.nOpt, 6),
+          pad(t.nOpt == null ? '-' : `${t.nOpt}${t.nOptPartial ? '*' : ''}`, 6),
+          pad(t.readDistance == null ? '' : t.readDistance, 6),
           pad(run.nSr, 6),
           pad(run.R.toFixed(2), 6),
+          pad(run.successBy || '-', 18),
           pad(run.stoppedBy || '-', 10),
         ].join(' ')
       );
     }
   }
   console.log('');
+  if (result.tasks.some((t) => t.nOptPartial)) {
+    console.log('* nOpt covers navigation only: the evidence is never spoken (see findings).');
+  }
   console.log(
     `siteScore: ${result.siteScore == null ? 'n/a (no valid tasks)' : result.siteScore.toFixed(3)}`
   );
@@ -103,6 +117,16 @@ function printSummary(result) {
   }
   const findings = result.tasks.flatMap((t) => t.findings || []);
   console.log(`findings: ${findings.length}`);
+  // Env findings carry `type`, harness findings carry `ruleId`; both are set on
+  // every finding now, so one of them always names the barrier.
+  const byType = new Map();
+  for (const f of findings) {
+    const key = f.type || f.ruleId || 'unknown';
+    byType.set(key, (byType.get(key) || 0) + 1);
+  }
+  for (const [type, count] of Array.from(byType).sort((a, b) => b[1] - a[1])) {
+    console.log(`  - ${type}: ${count}`);
+  }
   if (result.usage) {
     const u = result.usage;
     const cost = u.costKnown ? `$${u.cost.toFixed(4)}` : `unknown (partial: $${u.cost.toFixed(4)})`;
@@ -147,6 +171,7 @@ async function main() {
           explore: args.explore,
           vision: args.vision,
           allowSubmit: args.allowSubmit,
+          concurrency: args.concurrency,
         },
       });
       printGenSummary(generated);
@@ -177,6 +202,7 @@ async function main() {
       llm,
       k: args.k,
       model: args.model,
+      concurrency: args.concurrency,
     });
     if (generated)
       result.generator = {

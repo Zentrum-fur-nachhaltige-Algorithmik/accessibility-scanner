@@ -14,6 +14,7 @@ const DEFAULTS = {
   navigationTimeout: 2000, // how long to wait for a navigation a step may trigger
   settleMs: 150, // small settle delay after a non-navigating interaction
   gotoTimeout: 30000,
+  oracleSettleMs: 3000, // how long a false oracle is re-checked after the last step
 };
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -79,6 +80,22 @@ async function executeStep(page, step, label, options = {}) {
   if (!navigated) await delay(opts.settleMs);
 }
 
+/**
+ * Evaluate an oracle, re-checking a false result for up to `settleMs`. A
+ * client-side router finishes its route change after the click has returned
+ * (payload fetch, then pushState), and on a loaded machine that outlasts the
+ * navigation watcher of the step.
+ */
+async function evaluateSettled(spec, page, ctx, settleMs) {
+  const deadline = Date.now() + (settleMs || 0);
+  let verdict = await evaluate(spec, page, ctx);
+  while (verdict !== true && Date.now() < deadline) {
+    await delay(250);
+    verdict = await evaluate(spec, page, ctx);
+  }
+  return verdict;
+}
+
 /** Run a list of steps in order. Throws on the first failing step. */
 async function runSteps(page, steps, kind, options) {
   for (let i = 0; i < steps.length; i += 1) {
@@ -111,9 +128,14 @@ async function runPreconditions(page, task, options = {}) {
  * @param {object} task
  * @param {object} [ctx] oracle context, e.g. `{ recorder }` for `requestSent`
  * @param {object} [options] timeout overrides (see DEFAULTS)
+ * @param {(page, task, options) => Promise<void>} [runner] executes the path;
+ *        defaults to running the steps in order. `validateTask` swaps in the
+ *        optimal-path walk, which executes the very same steps while also
+ *        costing them, so one page does both jobs. It must throw on failure.
  * @returns {Promise<{ok, nSighted, oracleBefore, oracleAfter, error?}>}
  */
-async function replaySightedPath(page, task, ctx = {}, options = {}) {
+async function replaySightedPath(page, task, ctx = {}, options = {}, runner = null) {
+  const opts = { ...DEFAULTS, ...options };
   const steps = task.sightedPath || [];
   const nSighted = steps.length;
   const result = { ok: false, nSighted, oracleBefore: null, oracleAfter: null };
@@ -126,7 +148,8 @@ async function replaySightedPath(page, task, ctx = {}, options = {}) {
   }
 
   try {
-    await runSteps(page, steps, 'sightedPath', options);
+    if (runner) await runner(page, task, options);
+    else await runSteps(page, steps, 'sightedPath', options);
   } catch (err) {
     result.error = err.message;
     // Still report the oracle state so callers can see how far the replay got.
@@ -135,7 +158,7 @@ async function replaySightedPath(page, task, ctx = {}, options = {}) {
   }
 
   try {
-    result.oracleAfter = await evaluate(task.oracle, page, ctx);
+    result.oracleAfter = await evaluateSettled(task.oracle, page, ctx, opts.oracleSettleMs);
   } catch (err) {
     result.error = `oracle evaluation failed after replay: ${err.message}`;
     return result;
@@ -153,29 +176,61 @@ async function replaySightedPath(page, task, ctx = {}, options = {}) {
  * excluded from scoring: it says nothing about the accessibility of the page.
  *
  * A valid task additionally gets its `nOpt`, the length of the shortest
- * ScreenReaderEnv command sequence for the same path (see optimal-path.js),
- * measured on one extra isolated-context page. `nSighted` is in clicks, not
- * screen-reader commands, and serves validation and the step budget only.
+ * ScreenReaderEnv command sequence for the same path (see optimal-path.js).
+ * `nSighted` is in clicks, not screen-reader commands, and serves validation
+ * and the step budget only.
+ *
+ * The `nOpt` walk needs exactly the state a validation repeat starts from
+ * (fresh context + goto + preconditions) and executes exactly the steps a
+ * repeat executes, so it rides along on the LAST repeat instead of paying for
+ * another context and another page load. Should that fused attempt fail, the
+ * repeat is redone cleanly and `nOpt` is measured on its own page as before, so
+ * the outcome never depends on the fusion.
+ *
+ * `options.analysisCache` (a Map created once per site) is forwarded to
+ * `computeOptimalPath`; see there.
+ *
+ * For an information task `nOpt` additionally covers the final `read` step:
+ * reaching the reading-order position whose spoken phrase carries the task's
+ * `evidence` (action cost 0 - hearing it IS the goal). `readDistance` reports
+ * that step's reach cost. When no spoken phrase contains the evidence,
+ * `optimalPathError` is `'evidence-not-in-reading-order'`, `nOptPartial` is
+ * true and `nOpt` covers the navigation only.
  *
  * @returns {Promise<{ valid, reasons: string[], nSighted, nOpt: number|null,
- *                     optimalPath: object[]|null, optimalPathError?: string }>}
+ *                     optimalPath: object[]|null, optimalPathError?: string,
+ *                     readDistance: number|null, nOptPartial?: boolean,
+ *                     timings: { validateMs: number, nOptMs: number } }>}
  */
 async function validateTask(
   browser,
   url,
   task,
-  { repeats = 2, options = {}, computeOptimal = true } = {}
+  { repeats = 2, options = {}, computeOptimal = true, analysisCache = null } = {}
 ) {
+  const startedAt = Date.now();
   const reasons = [];
+  let nOptMs = 0;
   let normalized;
   try {
     normalized = validateTaskShape(task);
   } catch (err) {
-    return { valid: false, reasons: [err.message], nSighted: 0, nOpt: null, optimalPath: null };
+    return {
+      valid: false,
+      reasons: [err.message],
+      nSighted: 0,
+      nOpt: null,
+      optimalPath: null,
+      readDistance: null,
+      timings: { validateMs: Date.now() - startedAt, nOptMs: 0 },
+    };
   }
   const nSighted = normalized.sightedPath.length;
+  const { computeOptimalPath } = require('./optimal-path');
 
-  for (let attempt = 1; attempt <= repeats; attempt += 1) {
+  /** One repeat on its own isolated context. Returns the reasons it collected. */
+  const runRepeat = async (attempt, runner) => {
+    const found = [];
     // Isolated context per repeat: cookies/storage from one repeat must not
     // leak into the next (a cookie banner dismissed in repeat 1 would make the
     // oracle "already true at state 0" in repeat 2).
@@ -187,8 +242,8 @@ async function validateTask(
 
       const pre = await runPreconditions(page, normalized, options);
       if (!pre.ok) {
-        reasons.push(`repeat ${attempt}: precondition failed: ${pre.error}`);
-        continue;
+        found.push(`repeat ${attempt}: precondition failed: ${pre.error}`);
+        return found;
       }
 
       // Recorder starts at state 0 so the initial navigation and the
@@ -196,34 +251,90 @@ async function validateTask(
       const recorder = createRequestRecorder(page);
       const ctx = { recorder };
       try {
-        const res = await replaySightedPath(page, normalized, ctx, options);
-        if (res.oracleBefore !== false) {
-          reasons.push(
+        const res = await replaySightedPath(page, normalized, ctx, options, runner);
+        // An information task asks the user to FIND OUT something. The text that
+        // holds the answer is usually already on the page at state 0, so "false
+        // before" cannot be required; what makes such a task non-trivial is that
+        // the screen reader has to actually speak it, which the harness checks.
+        if (res.oracleBefore !== false && normalized.kind !== 'information') {
+          found.push(
             `repeat ${attempt}: oracle is already true at state 0 (task is trivially solved)`
           );
         }
         if (!res.ok) {
-          reasons.push(`repeat ${attempt}: ${res.error || 'oracle false after replay'}`);
+          found.push(`repeat ${attempt}: ${res.error || 'oracle false after replay'}`);
         }
       } finally {
         recorder.stop();
       }
     } catch (err) {
-      reasons.push(`repeat ${attempt}: ${err.message}`);
+      found.push(`repeat ${attempt}: ${err.message}`);
     } finally {
       await page.close().catch(() => {});
       await context.close().catch(() => {});
     }
+    return found;
+  };
+
+  let fused = null;
+  for (let attempt = 1; attempt <= repeats; attempt += 1) {
+    // The last repeat doubles as the nOpt measurement.
+    const fuse = computeOptimal && attempt === repeats;
+    let runner = null;
+    if (fuse) {
+      runner = async (page, t, opts) => {
+        const t0 = Date.now();
+        try {
+          fused = await computeOptimalPath(page, t, {}, { ...opts, analysisCache });
+        } finally {
+          nOptMs += Date.now() - t0;
+        }
+        if (fused.error) throw new Error(fused.error);
+      };
+    }
+
+    let found = await runRepeat(attempt, runner);
+    if (fuse && fused && fused.error) {
+      // The fused walk failed, so this repeat says nothing about the task:
+      // redo it as a plain replay and fall back to a standalone measurement.
+      fused = null;
+      found = await runRepeat(attempt, null);
+    }
+    reasons.push(...found);
   }
 
-  const result = { valid: reasons.length === 0, reasons, nSighted, nOpt: null, optimalPath: null };
-  if (!result.valid || !computeOptimal) return result;
+  const result = {
+    valid: reasons.length === 0,
+    reasons,
+    nSighted,
+    nOpt: null,
+    optimalPath: null,
+    readDistance: null,
+    timings: { validateMs: 0, nOptMs: 0 },
+  };
+  const finish = () => {
+    result.timings = { validateMs: Math.max(0, Date.now() - startedAt - nOptMs), nOptMs };
+    return result;
+  };
+  if (!result.valid || !computeOptimal) return finish();
 
-  const opt = await measureOptimalPath(browser, url, normalized, options);
+  let opt = fused;
+  if (!opt) {
+    const t0 = Date.now();
+    opt = await measureOptimalPath(browser, url, normalized, options, analysisCache);
+    nOptMs += Date.now() - t0;
+  }
   result.nOpt = opt.nOpt;
   result.optimalPath = opt.steps || null;
+  // Information tasks carry a final `read` step: the cost of actually HEARING
+  // the evidence. `readDistance` is its reach cost; `nOptPartial` says nOpt
+  // covers only the navigation because the read step could not be costed
+  // (`optimalPathError`, e.g. `evidence-not-in-reading-order`).
+  if (opt.readDistance !== undefined) result.readDistance = opt.readDistance;
+  if (opt.nOptPartial) result.nOptPartial = true;
+  if (opt.optimalPathError) result.optimalPathError = opt.optimalPathError;
   if (opt.error) result.optimalPathError = opt.error;
-  return result;
+  return finish();
 }
 
 /**
@@ -231,7 +342,7 @@ async function validateTask(
  * (state 0, exactly what the SR agent sees) and walk the sighted path with the
  * screen-reader cost model.
  */
-async function measureOptimalPath(browser, url, task, options = {}) {
+async function measureOptimalPath(browser, url, task, options = {}, analysisCache = null) {
   const { computeOptimalPath } = require('./optimal-path');
   const context = await createIsolatedContext(browser);
   const page = await context.newPage();
@@ -240,7 +351,7 @@ async function measureOptimalPath(browser, url, task, options = {}) {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: DEFAULTS.gotoTimeout });
     const pre = await runPreconditions(page, task, options);
     if (!pre.ok) return { nOpt: null, steps: null, error: `precondition failed: ${pre.error}` };
-    return await computeOptimalPath(page, task, {}, options);
+    return await computeOptimalPath(page, task, {}, { ...options, analysisCache });
   } catch (err) {
     return { nOpt: null, steps: null, error: err.message };
   } finally {

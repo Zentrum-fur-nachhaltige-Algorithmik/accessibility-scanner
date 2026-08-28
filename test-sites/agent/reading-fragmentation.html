@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Reading fragmentation</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.4;
+        max-width: 60em;
+      }
+      /* Like the output of visual site builders: every run of words is its own
+         inline element, so the screen reader speaks each one separately even
+         though the browser renders a single line. */
+      .split > span {
+        display: inline;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Fragmentation fixture</h1>
+
+      <!-- Fragmented: one visual line, five spoken text nodes. -->
+      <h2 class="split" id="fragmented-heading">
+        <span>Information gem.</span> <span>&sect; 5</span>
+        <span>ECG undOffenlegung gem.</span> <span>&sect; 25</span> <span>MedienG</span>
+      </h2>
+
+      <!-- Clean: one visual line, one spoken text node. -->
+      <h2 id="clean-heading">Ordinationszeiten und Kontakt</h2>
+
+      <!-- Fragmented paragraph on a single line. -->
+      <p class="split" id="fragmented-paragraph">
+        <span>Telefon:</span> <span>+43 1</span> <span>203 93 33</span>
+      </p>
+
+      <!-- Clean paragraph. -->
+      <p id="clean-paragraph">Donaustadtstrasse 1, 1220 Wien</p>
+
+      <!-- A link inside a heading is a spoken node by design, not fragmentation. -->
+      <h3 id="heading-with-link">Mehr dazu im <a href="#clean-heading">Impressum</a></h3>
+    </main>
+  </body>
+</html>

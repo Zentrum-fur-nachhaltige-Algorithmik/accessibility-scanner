@@ -128,6 +128,37 @@ describe('runSrAgent tool schema', () => {
       expect(SYSTEM_PROMPT).toContain(name);
     }
   });
+
+  it('makes hearing the answer the completion rule of an information task', () => {
+    expect(SYSTEM_PROMPT).toContain('TASK TYPE: information');
+    expect(SYSTEM_PROMPT).toMatch(/reaching the right page is not enough/i);
+  });
+});
+
+describe('the task the agent is given', () => {
+  it('marks an information task so the agent knows the page alone is not the goal', async () => {
+    const env = fakeEnv({ maxSteps: 2 });
+    const llm = fakeLlm([call('done')]);
+    await runSrAgent({
+      env,
+      task: { id: 't2', description: 'Find out when the practice is open.', kind: 'information' },
+      llm,
+    });
+    const first = llm.seen[0].messages.at(-1).content;
+    expect(first).toContain('TASK: Find out when the practice is open.');
+    expect(first).toContain('TASK TYPE: information');
+  });
+
+  it('leaves an action task unmarked', async () => {
+    const env = fakeEnv({ maxSteps: 2 });
+    const llm = fakeLlm([call('done')]);
+    await runSrAgent({
+      env,
+      task: { id: 't3', description: 'Open the imprint.', kind: 'action' },
+      llm,
+    });
+    expect(llm.seen[0].messages.at(-1).content).not.toContain('TASK TYPE');
+  });
 });
 
 describe('runSrAgent stop conditions', () => {

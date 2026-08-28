@@ -10,11 +10,13 @@ const puppeteer = require('puppeteer');
 const { AgentLLMClient } = require('./llm-chat');
 const { generateTasks } = require('./task-generator');
 const { saveTasks } = require('./task');
+const { DEFAULT_CONCURRENCY, normaliseConcurrency } = require('./concurrency');
 
 const DEFAULT_MODEL = 'google/gemini-3.7-flash';
 
 const USAGE = `Usage: node src/agent/generate-tasks.js <url> [--out tasks.json] [--model ${DEFAULT_MODEL}]
-       [--max-tasks 8] [--explore 4] [--vision] [--allow-submit] [--no-generic] [--headless true] [--quiet]`;
+       [--max-tasks 8] [--explore 4] [--concurrency 3] [--vision] [--allow-submit] [--no-generic]
+       [--headless true] [--quiet]`;
 
 function parseArgs(argv) {
   const args = {
@@ -23,6 +25,7 @@ function parseArgs(argv) {
     model: DEFAULT_MODEL,
     maxTasks: 8,
     explore: 4,
+    concurrency: DEFAULT_CONCURRENCY,
     vision: false,
     allowSubmit: false,
     generic: true,
@@ -36,6 +39,8 @@ function parseArgs(argv) {
     else if (a === '--model') args.model = argv[++i];
     else if (a === '--max-tasks') args.maxTasks = parseInt(argv[++i], 10) || 8;
     else if (a === '--explore') args.explore = parseInt(argv[++i], 10) || 0;
+    else if (a === '--concurrency')
+      args.concurrency = normaliseConcurrency(argv[++i], DEFAULT_CONCURRENCY);
     else if (a === '--vision') args.vision = true;
     else if (a === '--allow-submit') args.allowSubmit = true;
     else if (a === '--no-generic') args.generic = false;
@@ -61,6 +66,9 @@ function printSummary(result) {
     [10, 'pathLength'],
     [10, 'agentSteps'],
     [16, 'oracle'],
+    [12, 'kind'],
+    [10, 'answer'],
+    [14, 'corroborated'],
     [10, 'status'],
   ];
   console.log('');
@@ -81,11 +89,22 @@ function printSummary(result) {
         pad(g.pathLength ?? t.sightedPath.length, 10),
         pad(g.sightedAgentSteps ?? '-', 10),
         pad(t.oracle.type, 16),
+        pad(t.kind || 'action', 12),
+        pad(t.answerType || '-', 10),
+        pad(g.corroboration || '-', 14),
         pad(t.ambiguous ? 'ambiguous' : 'ok', 10),
       ].join(' ')
     );
   }
   console.log('');
+  // The ground truth an information task is scored against, in full.
+  for (const t of result.tasks) {
+    if (t.kind === 'information') {
+      console.log(
+        `  ${t.id}: evidence "${t.evidence}" | answer (${t.answerType || '-'}) "${t.answer || '-'}"`
+      );
+    }
+  }
   console.log(`generated: ${result.tasks.length} task(s)`);
   if (result.dropped && result.dropped.length) {
     console.log(`dropped: ${result.dropped.length}`);
@@ -126,6 +145,7 @@ async function main() {
         vision: args.vision,
         allowSubmit: args.allowSubmit,
         generic: args.generic,
+        concurrency: args.concurrency,
       },
     });
     printSummary(result);

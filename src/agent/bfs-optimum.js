@@ -788,11 +788,22 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
 async function compareOptima(browser, url, task, options = {}) {
   const startedAt = Date.now();
   const guided = await measureOptimalPath(browser, url, task, options);
-  const nOptGuided = typeof guided.nOpt === 'number' ? guided.nOpt : null;
+  // The BFS goal-tests the task's oracle on the page, so it prices the
+  // NAVIGATION only. An information task's guided nOpt additionally contains
+  // the final `read` step (reaching the phrase that speaks the evidence), which
+  // the BFS never searches for. Comparing the two would report a phantom gap,
+  // so the read distance is taken back out before the comparison and reported
+  // on its own.
+  const readDistance = typeof guided.readDistance === 'number' ? guided.readDistance : null;
+  const nOptGuided =
+    typeof guided.nOpt === 'number'
+      ? guided.nOpt - (readDistance === null ? 0 : readDistance)
+      : null;
   const bfs = await computeBfsOptimum(browser, url, task, { ...options, nOptGuided });
   return {
     taskId: task && task.id,
     nOptGuided,
+    readDistance,
     nOptBfs: bfs.nOptBfs,
     delta: nOptGuided === null || bfs.nOptBfs === null ? null : nOptGuided - bfs.nOptBfs,
     bfsPath: bfs.path,

@@ -282,6 +282,78 @@ async function runSightedAgent({
   };
 }
 
+// Trajectory hygiene
+
+/** Path + query of a URL, without a trailing slash. Used to compare locations. */
+function locationOf(href) {
+  try {
+    const u = new URL(href);
+    return `${u.origin}${u.pathname.replace(/\/$/, '')}${u.search}`;
+  } catch (_) {
+    return String(href == null ? '' : href);
+  }
+}
+
+/**
+ * Remove the wandering from a recorded trajectory before it becomes a sightedPath.
+ *
+ * An LLM that explores costs the task its meaning: the recorded path then ends
+ * wherever the agent gave up, and an oracle derived from that end state measures
+ * the detour rather than the goal. Three rules, applied in order per entry:
+ *
+ * 1. A `goto`/`back` that lands on the URL it started from is a no-op and is dropped.
+ * 2. A `goto`/`back` that lands back on the START url means "I am starting over":
+ *    everything before it (and the entry itself) is dropped.
+ * 3. Any other entry that navigates to a URL that was already visited closes a
+ *    cycle: everything between the first visit and this entry is dropped, and the
+ *    state rewinds to that first visit.
+ *
+ * Entries that do not change the URL (opening a menu, filling a field) never
+ * close a cycle; they are kept as they are.
+ *
+ * @param {object[]} trajectory  entries from `runSightedAgent`
+ * @param {string} startUrl      the URL the run started on
+ * @returns {{trajectory: object[], prunedSteps: number}}
+ */
+function pruneTrajectory(trajectory, startUrl) {
+  const start = locationOf(startUrl);
+  let kept = [];
+  // location -> how many kept entries had run when the agent was last there.
+  let seen = new Map([[start, 0]]);
+  let prunedSteps = 0;
+
+  const rewindTo = (at) => {
+    prunedSteps += kept.length - at;
+    kept = kept.slice(0, at);
+    for (const [loc, index] of Array.from(seen)) if (index > at) seen.delete(loc);
+  };
+
+  for (const t of trajectory || []) {
+    const from = locationOf(t.urlBefore);
+    const to = locationOf(t.urlAfter);
+    const navigation = to !== from;
+    const isJump = t.action === 'goto' || t.action === 'back';
+
+    if (isJump && !navigation) {
+      prunedSteps += 1; // rule 1: a jump to where we already are
+      continue;
+    }
+    if (isJump && to === start) {
+      rewindTo(0); // rule 2: restart from the start page
+      prunedSteps += 1;
+      continue;
+    }
+
+    kept.push(t);
+    if (!navigation) continue;
+    if (seen.has(to))
+      rewindTo(seen.get(to)); // rule 3: close the cycle
+    else seen.set(to, kept.length);
+  }
+
+  return { trajectory: kept, prunedSteps };
+}
+
 // Trajectory to sightedPath
 
 /**
@@ -292,12 +364,24 @@ async function runSightedAgent({
  * they did not change the page and would only make the replay brittle.
  * Consecutive navigations to the same URL are collapsed.
  *
+ * With `options.startUrl` the trajectory is first run through `pruneTrajectory`,
+ * which is what the task generator does; the pruned count is reported on the
+ * returned array as a non-enumerable `prunedSteps` property.
+ *
  * @param {object[]} trajectory
+ * @param {{startUrl?: string}} [options]
  * @returns {object[]} sightedPath steps
  */
-function toSightedPath(trajectory) {
+function toSightedPath(trajectory, options = {}) {
+  let source = trajectory || [];
+  let prunedSteps = 0;
+  if (options && typeof options.startUrl === 'string') {
+    const pruned = pruneTrajectory(source, options.startUrl);
+    source = pruned.trajectory;
+    prunedSteps = pruned.prunedSteps;
+  }
   const path = [];
-  for (const t of trajectory || []) {
+  for (const t of source) {
     if (t.error) continue;
     let step;
     if (t.action === 'back') {
@@ -320,6 +404,7 @@ function toSightedPath(trajectory) {
     if (step.action === 'goto' && prev && prev.action === 'goto' && prev.url === step.url) continue;
     path.push(step);
   }
+  Object.defineProperty(path, 'prunedSteps', { value: prunedSteps, enumerable: false });
   return path;
 }
 
@@ -459,6 +544,8 @@ function buildMessages({ goal, history, memoryTurns, pending, view }) {
 module.exports = {
   runSightedAgent,
   toSightedPath,
+  pruneTrajectory,
+  locationOf,
   SIGHTED_TOOLS,
   SYSTEM_PROMPT,
   isLocalOrigin,

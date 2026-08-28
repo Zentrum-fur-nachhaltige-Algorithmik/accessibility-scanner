@@ -113,6 +113,9 @@ const SYSTEM_PROMPT = [
   '- Call `done` as soon as you believe the task is complete.',
   '- You will NEVER be told whether you succeeded. Nobody confirms or corrects your progress.',
   '  Judge completion yourself from what you heard (announcements, changed URL, new phrases).',
+  '- On a task marked TASK TYPE: information, reaching the right page is not enough: you are done',
+  '  only once the information the task asks for has been SPOKEN to you. After you arrive, read',
+  '  (nextHeading, next) until you have heard it, and only then call `done`.',
   '- Your step budget is limited and is shown to you each turn. When it runs out the session ends.',
 ].join('\n');
 
@@ -147,7 +150,12 @@ async function runSrAgent({
   if (!llm || typeof llm.chat !== 'function')
     throw new Error('runSrAgent: llm with chat() is required');
 
-  const description = task.description;
+  // The kind is part of what the agent is told: on an information task, hearing
+  // the answer is what completes it (see SYSTEM_PROMPT).
+  const description =
+    task.kind === 'information'
+      ? `${task.description}\nTASK TYPE: information (you must have HEARD the answer, not just reached the page)`
+      : task.description;
   let budgetLeft = numberOr(maxSteps, numberOr(env.maxSteps, 30));
 
   const usage = { promptTokens: 0, completionTokens: 0, calls: 0, cost: 0, costKnown: true };

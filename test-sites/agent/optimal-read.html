@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Read Fixture - Mini Site</title>
+<style>
+  /* Text a sighted user reads but that is in no text node, so it never reaches
+     the accessibility tree and is never spoken. */
+  #generated::before { content: "Fax 555 0199"; }
+</style>
+</head>
+<body>
+  <header><a href="generic-home.html">Mini Site</a></header>
+  <main>
+    <h1>Read Fixture</h1>
+    <h2>Contact</h2>
+    <p>Phone 555 0100 during office hours.</p>
+    <!-- One visual line, two spoken phrases: the <br> splits the answer over
+         two reading-order nodes ("Mobile 555 0111" / "Mon to Fri"). -->
+    <p>Mobile 555 0111<br>Mon to Fri</p>
+    <p id="generated"></p>
+  </main>
+</body></html>

@@ -9,8 +9,18 @@
 const fs = require('fs');
 const path = require('path');
 const { validateSpec } = require('./oracle');
+const { ANSWER_TYPES } = require('./answer-match');
 
 const STEP_ACTIONS = ['click', 'type', 'press', 'goto'];
+
+/**
+ * What kind of goal the task states.
+ * - `action`:      the user changes something; the oracle observes the new state.
+ * - `information`: the user wants to KNOW something; the oracle observes the text
+ *   that holds the answer, and the harness additionally requires the screen
+ *   reader to have spoken it (`evidence`). See src/agent/harness.js.
+ */
+const TASK_KINDS = ['action', 'information'];
 
 /**
  * Validate a single sightedPath/precondition step. Throws with a clear message.
@@ -66,7 +76,10 @@ const SELECTORY =
  * Returns a new task object with defaults applied (does not mutate the input).
  * Fields: id, description (plain user language, no selectors), weight = 1, oracle
  * (see oracle.js), sightedPath (>= 1 step), preconditions? (run before both agents),
- * template? (generic-task template id), meta? (free-form provenance).
+ * kind = 'action', evidence? (required for kind 'information': the verbatim page
+ * text the screen reader must have spoken), answer?/answerType? (the ground-truth
+ * value and its kind, matched fuzzily by the harness), template? (generic-task template id),
+ * meta? (free-form provenance).
  */
 function validateTaskShape(task) {
   if (!task || typeof task !== 'object' || Array.isArray(task)) {
@@ -89,6 +102,36 @@ function validateTaskShape(task) {
   if (!task.oracle) throw new Error(`Task ${task.id}: "oracle" is required`);
   validateSpec(task.oracle, `Task ${task.id}.oracle`);
 
+  if (task.kind !== undefined && !TASK_KINDS.includes(task.kind)) {
+    throw new Error(`Task ${task.id}: "kind" must be one of ${TASK_KINDS.join('|')}`);
+  }
+  if (task.kind === 'information') {
+    if (typeof task.evidence !== 'string' || task.evidence.trim() === '') {
+      throw new Error(
+        `Task ${task.id}: "evidence" (the page text the screen reader must speak) is required for kind "information"`
+      );
+    }
+    // The ground-truth answer is what the task really asks for; `evidence` is
+    // only the wording one particular page uses for it. The harness accepts any
+    // spelling of the answer, anywhere on the site (see answer-match.js).
+    if (
+      task.answer !== undefined &&
+      (typeof task.answer !== 'string' || task.answer.trim() === '')
+    ) {
+      throw new Error(`Task ${task.id}: "answer" must be a non-empty string`);
+    }
+    if (task.answerType !== undefined && !ANSWER_TYPES.includes(task.answerType)) {
+      throw new Error(
+        `Task ${task.id}: "answerType" must be one of ${ANSWER_TYPES.join('|')} (got "${task.answerType}")`
+      );
+    }
+    if (task.answer !== undefined && task.answerType === undefined) {
+      throw new Error(`Task ${task.id}: "answerType" is required when "answer" is given`);
+    }
+  } else if (task.answer !== undefined || task.answerType !== undefined) {
+    throw new Error(`Task ${task.id}: "answer"/"answerType" only apply to kind "information"`);
+  }
+
   if (!Array.isArray(task.sightedPath) || task.sightedPath.length === 0) {
     throw new Error(`Task ${task.id}: "sightedPath" must be a non-empty array of steps`);
   }
@@ -108,6 +151,7 @@ function validateTaskShape(task) {
 function applyDefaults(task) {
   const out = { ...task };
   if (out.weight === undefined) out.weight = 1;
+  if (out.kind === undefined) out.kind = 'action';
   if (out.preconditions === undefined) out.preconditions = [];
   return out;
 }
@@ -168,6 +212,8 @@ function saveTasks(filePath, tasks, url = null) {
 
 module.exports = {
   STEP_ACTIONS,
+  TASK_KINDS,
+  ANSWER_TYPES,
   validateStep,
   validateTaskShape,
   isValidTaskShape,

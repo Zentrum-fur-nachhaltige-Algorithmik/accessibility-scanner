@@ -7,6 +7,7 @@ const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-poo
 const {
   runSightedAgent,
   toSightedPath,
+  pruneTrajectory,
   SIGHTED_TOOLS,
   isLocalOrigin,
   submitRefusal,
@@ -413,5 +414,100 @@ describe('agent/sighted-agent: toSightedPath', () => {
   it('is empty for an empty trajectory', () => {
     expect(toSightedPath([])).toEqual([]);
     expect(toSightedPath(null)).toEqual([]);
+  });
+});
+
+describe('agent/sighted-agent: pruneTrajectory', () => {
+  const nav = (action, from, to, extra = {}) => ({
+    action,
+    urlBefore: from,
+    urlAfter: to,
+    ...extra,
+  });
+  const START = 'http://s/';
+
+  it('leaves a straight path untouched', () => {
+    const t = [
+      nav('click', START, 'http://s/a', { selector: '#a' }),
+      nav('click', 'http://s/a', 'http://s/b', { selector: '#b' }),
+    ];
+    const pruned = pruneTrajectory(t, START);
+    expect(pruned.trajectory).toEqual(t);
+    expect(pruned.prunedSteps).toBe(0);
+  });
+
+  it('cuts everything between the first visit of a url and the revisit', () => {
+    const pruned = pruneTrajectory(
+      [
+        nav('click', START, 'http://s/a', { selector: '#a' }),
+        nav('click', 'http://s/a', 'http://s/detour', { selector: '#d' }),
+        nav('click', 'http://s/detour', 'http://s/deeper', { selector: '#e' }),
+        nav('goto', 'http://s/deeper', 'http://s/a', { url: 'http://s/a' }),
+        nav('click', 'http://s/a', 'http://s/b', { selector: '#b' }),
+      ],
+      START
+    );
+    expect(pruned.trajectory.map((t) => t.selector)).toEqual(['#a', '#b']);
+    expect(pruned.prunedSteps).toBe(3);
+  });
+
+  it('treats a return to the start page as "starting over"', () => {
+    const pruned = pruneTrajectory(
+      [
+        nav('click', START, 'http://s/a', { selector: '#a' }),
+        nav('click', 'http://s/a', 'http://s/b', { selector: '#b' }),
+        nav('back', 'http://s/b', START),
+        nav('click', START, 'http://s/c', { selector: '#c' }),
+      ],
+      START
+    );
+    expect(pruned.trajectory.map((t) => t.selector)).toEqual(['#c']);
+    expect(pruned.prunedSteps).toBe(3);
+  });
+
+  it('drops a goto that lands where the agent already is', () => {
+    const pruned = pruneTrajectory(
+      [nav('goto', 'http://s/a', 'http://s/a', { url: 'http://s/a' })],
+      START
+    );
+    expect(pruned.trajectory).toEqual([]);
+    expect(pruned.prunedSteps).toBe(1);
+  });
+
+  it('keeps in-page interactions that do not navigate', () => {
+    const pruned = pruneTrajectory(
+      [
+        nav('click', START, START, { selector: '#menu' }),
+        nav('click', START, 'http://s/a', { selector: '#a' }),
+      ],
+      START
+    );
+    expect(pruned.trajectory.map((t) => t.selector)).toEqual(['#menu', '#a']);
+    expect(pruned.prunedSteps).toBe(0);
+  });
+
+  it('reduces the real wandering run to the one step that mattered', () => {
+    // The shape of the urologiefischer "find the opening hours" trajectory:
+    // reach the imprint, poke around, go back home, navigate to the imprint again.
+    const IMPRINT = 'https://p.at/page10/page10.html';
+    const path = toSightedPath(
+      [
+        nav('click', 'https://p.at/', IMPRINT, { selector: '#imprint' }),
+        nav('click', IMPRINT, IMPRINT, { selector: '#toggle' }),
+        nav('goto', IMPRINT, 'https://p.at/page1/page1.html', {
+          url: 'https://p.at/page1/page1.html',
+        }),
+        nav('goto', 'https://p.at/page1/page1.html', 'https://p.at/', { url: 'https://p.at/' }),
+        nav('goto', 'https://p.at/', IMPRINT, { url: IMPRINT }),
+      ],
+      { startUrl: 'https://p.at/' }
+    );
+    expect(path).toEqual([{ action: 'goto', url: IMPRINT }]);
+    expect(path.prunedSteps).toBe(4);
+  });
+
+  it('normalises trailing slashes when it compares locations', () => {
+    const pruned = pruneTrajectory([nav('back', 'http://s/a', 'http://s')], 'http://s/');
+    expect(pruned.trajectory).toEqual([]);
   });
 });

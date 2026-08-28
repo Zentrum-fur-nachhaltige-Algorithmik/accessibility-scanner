@@ -7,7 +7,12 @@ import fs from 'fs';
 const require = createRequire(import.meta.url);
 const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helpers/fixture-server');
 const { launchBrowser, closeBrowser, getPage, getBrowser } = require('../helpers/browser-pool');
-const { replaySightedPath, runPreconditions, validateTask } = require('../../src/agent/replay');
+const {
+  replaySightedPath,
+  runPreconditions,
+  validateTask,
+  measureOptimalPath,
+} = require('../../src/agent/replay');
 const { createRequestRecorder } = require('../../src/agent/oracle');
 const {
   validateTaskShape,
@@ -19,6 +24,7 @@ const {
 
 const HOME = '/agent/generic-home.html';
 const BASIC = '/agent/oracle-basic.html';
+const READ = '/agent/optimal-read.html';
 
 // Task schema (no browser needed)
 
@@ -267,8 +273,8 @@ describe('agent/replay', () => {
       const res = await validateTask(getBrowser(), `${getBaseUrl()}${HOME}`, task, { repeats: 2 });
       expect(res).toMatchObject({ valid: true, nSighted: 1 });
       expect(res.reasons).toEqual([]);
-      // ... and it measures nOpt on one extra isolated page: "Contact" is the
-      // last link, so one prevLink step plus activate.
+      // ... and it measures nOpt while replaying: "Contact" is the last link,
+      // so one prevLink step plus activate.
       expect(res.nOpt).toBe(2);
       expect(res.optimalPath).toHaveLength(1);
       expect(res.optimalPath[0]).toMatchObject({
@@ -280,6 +286,103 @@ describe('agent/replay', () => {
       expect(res.optimalPath[0].reach.via.kind).toBe('links');
       expect(res.optimalPath[0].reach.via.command).toBe('prevLink');
       expect(res.optimalPathError).toBeUndefined();
+    }, 120000);
+
+    it('adds the read step of an information task to nOpt and reports readDistance', async () => {
+      const task = {
+        id: 'phone',
+        description: 'Find out which phone number the office can be reached on.',
+        kind: 'information',
+        evidence: 'Phone 555 0100',
+        oracle: { type: 'elementWithText', text: 'Phone\\s+555\\s+0100' },
+        sightedPath: [{ action: 'goto', url: `${getBaseUrl()}${READ}` }],
+      };
+      const res = await validateTask(getBrowser(), `${getBaseUrl()}${READ}`, task, { repeats: 2 });
+      expect(res.valid).toBe(true);
+      expect(res.optimalPathError).toBeUndefined();
+      expect(res.nOptPartial).toBeUndefined();
+      // The navigation part is empty here, so nOpt IS the reading distance.
+      expect(res.readDistance).toBeGreaterThan(0);
+      expect(res.nOpt).toBe(1 + res.readDistance); // goto + read
+      const read = res.optimalPath[res.optimalPath.length - 1];
+      expect(read).toMatchObject({ action: 'read', actionCost: 0, evidence: 'Phone 555 0100' });
+    }, 120000);
+
+    it('keeps nOpt partial when the evidence is on the page but never spoken', async () => {
+      // "Fax 555 0199" only exists as CSS-generated content.
+      const task = {
+        id: 'fax',
+        description: 'Find out which fax number the office can be reached on.',
+        kind: 'information',
+        evidence: 'Fax 555 0199',
+        // The oracle looks at the visual text, which the sighted user reads.
+        oracle: { type: 'titleMatches', pattern: 'Read Fixture' },
+        sightedPath: [{ action: 'goto', url: `${getBaseUrl()}${READ}` }],
+      };
+      const res = await validateTask(getBrowser(), `${getBaseUrl()}${READ}`, task, { repeats: 2 });
+      // The task stays valid: this is a barrier, not a broken task.
+      expect(res.valid).toBe(true);
+      expect(res.optimalPathError).toBe('evidence-not-in-reading-order');
+      expect(res.nOptPartial).toBe(true);
+      expect(res.readDistance).toBeNull();
+      expect(res.nOpt).toBe(1); // the goto only
+      expect(res.optimalPath.some((s) => s.action === 'read')).toBe(false);
+    }, 120000);
+
+    it('measures the same nOpt fused into the last repeat as on a page of its own', async () => {
+      const task = {
+        id: 'contact-nopt-equal',
+        description: 'Find the page with the contact details of this company.',
+        oracle: { type: 'urlMatches', pattern: 'generic-contact\\.html' },
+        sightedPath: [{ action: 'click', selector: 'nav ul li:nth-of-type(3) a' }],
+      };
+      const url = `${getBaseUrl()}${HOME}`;
+      // The default path: the nOpt walk rides along on the last repeat.
+      const fused = await validateTask(getBrowser(), url, task, { repeats: 2 });
+      // The standalone measurement on its own fresh context (what the fused
+      // walk replaces): identical state 0, so it must produce identical numbers.
+      const standalone = await measureOptimalPath(
+        getBrowser(),
+        url,
+        validateTaskShape(task),
+        {},
+        null
+      );
+
+      expect(fused.valid).toBe(true);
+      expect(fused.nOpt).toBe(standalone.nOpt);
+      expect(fused.nOpt).not.toBeNull();
+      expect(fused.optimalPath).toHaveLength(standalone.steps.length);
+      expect(fused.optimalPath.map((s) => [s.action, s.reach.strategy, s.reach.cost])).toEqual(
+        standalone.steps.map((s) => [s.action, s.reach.strategy, s.reach.cost])
+      );
+      expect(fused.optimalPathError).toBeUndefined();
+      expect(fused.timings.nOptMs).toBeGreaterThanOrEqual(0);
+      expect(fused.timings.validateMs).toBeGreaterThanOrEqual(0);
+    }, 120000);
+
+    it('falls back to a clean repeat when the fused nOpt walk fails', async () => {
+      const optimalPath = require('../../src/agent/optimal-path');
+      const original = optimalPath.computeOptimalPath;
+      optimalPath.computeOptimalPath = async () => ({ nOpt: null, steps: [], error: 'boom' });
+      const task = {
+        id: 'contact-nopt-fallback',
+        description: 'Find the page with the contact details of this company.',
+        oracle: { type: 'urlMatches', pattern: 'generic-contact\\.html' },
+        sightedPath: [{ action: 'click', selector: 'nav ul li:nth-of-type(3) a' }],
+      };
+      let res;
+      try {
+        res = await validateTask(getBrowser(), `${getBaseUrl()}${HOME}`, task, { repeats: 2 });
+      } finally {
+        optimalPath.computeOptimalPath = original;
+      }
+      // A failed nOpt walk never invalidates the task: the repeat is redone as
+      // a plain replay, exactly as before the two were fused.
+      expect(res.valid).toBe(true);
+      expect(res.reasons).toEqual([]);
+      expect(res.nOpt).toBeNull();
+      expect(res.optimalPathError).toBe('boom');
     }, 120000);
 
     it('skips the nOpt measurement when computeOptimal is false', async () => {

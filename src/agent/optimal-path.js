@@ -36,13 +36,45 @@ const STRATEGY_ORDER = [
   'prev',
 ];
 
-/** Action cost of one sighted-path step, once the target has been reached. */
-const ACTION_COST = { click: 1, type: 1, press: 1, goto: 1 };
+/**
+ * Action cost of one sighted-path step, once the target has been reached.
+ * `read` costs 0: for an information task, hearing the phrase IS the goal, so
+ * the cursor arriving on it already completes the task - there is no further
+ * keystroke to pay for.
+ */
+const ACTION_COST = { click: 1, type: 1, press: 1, goto: 1, read: 0 };
+
+/** Whitespace-normalised, case-insensitive comparison form (Node + in-page). */
+const squashText = (s) =>
+  String(s == null ? '' : s)
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
+/** Reported as `optimalPathError` when no spoken phrase contains the evidence. */
+const EVIDENCE_NOT_IN_READING_ORDER = 'evidence-not-in-reading-order';
+
+/** Cap on how many matching reading-order phrases are costed. */
+const MAX_READ_CANDIDATES = 50;
+
+/**
+ * How many consecutive spoken phrases may be joined before the evidence counts
+ * as heard. The screen reader speaks NODES, not sentences, so an answer can be
+ * split over neighbouring nodes ("Ordinationszeiten" / "Mo: 12h30 - 18h30").
+ * A single phrase stays the primary match; a run of up to this many phrases
+ * costs the extra `next` presses it takes to hear them all.
+ */
+const MAX_EVIDENCE_PHRASE_SPAN = 3;
 
 /**
  * In-page analysis. Runs in the browser; uses window.__SRENV.internals.
  *
- * Costs the target of one sighted step against an effect-equivalence class and
+ * Two modes. `mode: 'act'` (the default) costs the target of one sighted step
+ * against an effect-equivalence class; `mode: 'read'` ignores `targetSelector`
+ * and instead costs every reading-order position whose spoken phrase contains
+ * `options.evidence` - what an information task really asks for.
+ *
+ * In act mode it costs the target of one sighted step against an effect-equivalence class and
  * returns every member as a candidate: links resolving to the same URL, the
  * other submit controls of the same form plus Enter in an already filled text
  * field of it, and buttons with the same accessible name in the same form or
@@ -51,6 +83,8 @@ const ACTION_COST = { click: 1, type: 1, press: 1, goto: 1 };
  *
  * The reading-order walk, rotor lists and tab order are cached in the page
  * under `window.__OPT_ANALYSIS_CACHE`, keyed by (run id, url, DOM fingerprint).
+ * The finished analysis is additionally cacheable across pages and contexts by
+ * the caller (`options.analysisCache`, see `computeOptimalPath`).
  */
 /* istanbul ignore next -- runs in the browser */
 async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
@@ -60,9 +94,18 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
   const typedSelectors = options.typedSelectors || [];
   const action = options.action || 'click';
   const key = options.key || null;
+  const mode = options.mode === 'read' ? 'read' : 'act';
+  const squash = (s) =>
+    String(s == null ? '' : s)
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  const needle = squash(options.evidence);
+  const maxReadCandidates = options.maxReadCandidates || 50;
+  const maxSpan = options.maxEvidenceSpan || 1;
 
-  const target = document.querySelector(targetSelector);
-  if (!target) return { error: 'target not found: ' + targetSelector };
+  const target = targetSelector ? document.querySelector(targetSelector) : null;
+  if (!target && mode !== 'read') return { error: 'target not found: ' + targetSelector };
 
   const mod = (a, n) => ((a % n) + n) % n;
 
@@ -85,7 +128,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     return location.href + '#' + h.toString(16) + '#' + material.length;
   };
 
-  const cacheKey = fingerprint();
+  const cacheKey = options.fingerprint || fingerprint();
   const holder = window.__OPT_ANALYSIS_CACHE;
   let page =
     holder && holder.runId === options.runId && holder.key === cacheKey ? holder.data : null;
@@ -152,7 +195,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     window.__OPT_ANALYSIS_CACHE = { runId: options.runId, key: cacheKey, data: page };
   }
 
-  const { order, N, idxOf, docStart, rotors, tabOrder } = page;
+  const { order, els, N, idxOf, docStart, rotors, tabOrder } = page;
 
   const cursorEl = cursorSelector ? document.querySelector(cursorSelector) : null;
   const cursorIdxs = (cursorEl && idxOf.get(cursorEl)) || [];
@@ -214,10 +257,10 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     stepCostByKind[kind] = { positions, costs };
   }
 
-  // cost analysis of one element
-  const analyzeElement = (el) => {
-    const list = idxOf.get(el) || [];
-
+  // Cost analysis of a set of reading-order positions belonging to `el`.
+  // `analyzeElement` passes every position of the element; the read analysis
+  // passes the single position whose phrase carries the evidence.
+  const analyzeIndices = (el, list) => {
     let next = null;
     let prev = null;
     for (const i of list) {
@@ -291,7 +334,7 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
 
     // tab order
     let tab = null;
-    const tIdxTab = tabOrder.indexOf(el);
+    const tIdxTab = el ? tabOrder.indexOf(el) : -1;
     if (tIdxTab !== -1) {
       tab =
         tIdxTab >= cursorPos
@@ -309,6 +352,56 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       phrase: list.length ? order[list[0]].phrase : null,
     };
   };
+
+  const analyzeElement = (el) => analyzeIndices(el, idxOf.get(el) || []);
+
+  // Read mode: every reading-order position whose spoken phrase contains the
+  // evidence is a candidate; the caller picks the cheapest to reach. Only if no
+  // single phrase carries it, a run of up to `maxSpan` consecutive phrases is
+  // tried as well (`spanPhrases` > 1, costed with the extra `next` presses). An
+  // empty list means the text is on the page but is never spoken.
+  if (mode === 'read') {
+    const readCandidates = [];
+    const addCandidate = (i, span, phrase) => {
+      const el = els[i];
+      readCandidates.push({
+        readingOrderIndex: i,
+        selector: el ? I.selectorFor(el) : null,
+        phrase,
+        spanPhrases: span,
+        analysis: analyzeIndices(el, [i]),
+      });
+    };
+    for (let i = 0; i < N && readCandidates.length < maxReadCandidates; i += 1) {
+      if (!needle || !squash(order[i].phrase).includes(needle)) continue;
+      addCandidate(i, 1, order[i].phrase);
+    }
+    // Only when no single phrase carries the answer: allow a tolerable split
+    // over up to `maxSpan` phrases spoken one after the other. The extra
+    // `next` presses are costed by the caller.
+    if (needle && readCandidates.length === 0 && maxSpan > 1) {
+      for (let i = 0; i < N && readCandidates.length < maxReadCandidates; i += 1) {
+        let joined = squash(order[i].phrase);
+        let raw = String(order[i].phrase == null ? '' : order[i].phrase);
+        for (let w = 2; w <= maxSpan && i + w <= N; w += 1) {
+          const nextPhrase = order[i + w - 1].phrase;
+          joined = `${joined} ${squash(nextPhrase)}`;
+          raw = `${raw} ${nextPhrase == null ? '' : nextPhrase}`;
+          if (joined.includes(needle)) {
+            addCandidate(i, w, raw);
+            break;
+          }
+        }
+      }
+    }
+    return {
+      readingOrderLength: N,
+      cursorIndex: cIdx,
+      docStartIndex: docStart,
+      cacheHit,
+      readCandidates,
+    };
+  }
 
   // the equivalence class of the step's target
   const SUBMITTABLE = 'button, input[type="submit"], input[type="image"]';
@@ -424,6 +517,33 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
   };
 }
 
+/**
+ * The same cheap page fingerprint `analyzeInPage` uses, as a standalone in-page
+ * function: url + hash of the body markup + all form-control values. Two pages
+ * with the same fingerprint produce the same analysis for the same (target,
+ * cursor, action) triple, which is what makes the analysis cacheable across
+ * browser contexts. No reading-order walk, so it is cheap enough to run before
+ * every step.
+ */
+/* istanbul ignore next -- runs in the browser */
+function pageFingerprint() {
+  const values = Array.prototype.map
+    .call(document.querySelectorAll('input, select, textarea'), (el) => {
+      if (el.type === 'checkbox' || el.type === 'radio') return el.checked ? '1' : '0';
+      return typeof el.value === 'string' ? el.value : '';
+    })
+    .join('');
+  const SEP = String.fromCharCode(1);
+  const material =
+    location.href + SEP + (document.body ? document.body.innerHTML : '') + SEP + values;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < material.length; i += 1) {
+    h ^= material.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return location.href + '#' + h.toString(16) + '#' + material.length;
+}
+
 // Node side
 
 /**
@@ -519,8 +639,15 @@ function chooseReach(analysis) {
  *
  * @param {import('puppeteer').Page} page
  * @param {object} task
+ * `options.analysisCache` is an optional `Map` the caller creates once per site
+ * and passes to every call: it caches the finished in-page analysis across
+ * pages and contexts, keyed by (url + DOM fingerprint, target, cursor, action).
+ * Only the analysis is cached; every step is still executed for real.
+ *
+ * @param {import('puppeteer').Page} page
+ * @param {object} task
  * @param {object} [ctx]      reserved (oracle context), unused
- * @param {object} [options]  replay timeout overrides
+ * @param {object} [options]  replay timeout overrides, plus `analysisCache`
  * @returns {Promise<{nOpt: number|null, steps: object[], error?: string}>}
  */
 async function computeOptimalPath(page, task, ctx = {}, options = {}) {
@@ -532,6 +659,8 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   // Scopes the in-page reading-order cache to this call.
   const runId = `opt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const typedSelectors = [];
+  // Cross-context cache of finished analyses, supplied by the caller.
+  const shared = options.analysisCache instanceof Map ? options.analysisCache : null;
 
   for (let i = 0; i < path.length; i += 1) {
     const step = path[i];
@@ -551,17 +680,48 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     // `goto` is a navigation, not something the cursor has to reach.
     if (step.action !== 'goto' && step.selector) {
       await injectScreenReader(page);
-      let analysis;
-      try {
-        analysis = await page.evaluate(analyzeInPage, step.selector, cursorSelector, ROTOR_KINDS, {
-          runId,
-          action: step.action,
-          key: step.key || null,
-          typedSelectors,
-          stepCommands: STEP_COMMAND_BY_KIND,
-        });
-      } catch (err) {
-        return { nOpt: null, steps, error: `optimalPath[${i}]: analysis failed: ${err.message}` };
+
+      // The fingerprint is only needed for the shared cache, and it is taken
+      // after injection so both users of the key see the same DOM.
+      let sharedKey = null;
+      if (shared) {
+        try {
+          const fingerprint = await page.evaluate(pageFingerprint);
+          sharedKey = JSON.stringify([
+            fingerprint,
+            step.selector,
+            cursorSelector,
+            step.action,
+            step.key || null,
+            typedSelectors,
+          ]);
+        } catch (_) {
+          sharedKey = null; // cache miss; the analysis below runs as usual
+        }
+      }
+
+      let analysis = sharedKey && shared.has(sharedKey) ? shared.get(sharedKey) : null;
+      if (analysis) {
+        analysis = { ...analysis, cacheHit: true };
+      } else {
+        try {
+          analysis = await page.evaluate(
+            analyzeInPage,
+            step.selector,
+            cursorSelector,
+            ROTOR_KINDS,
+            {
+              runId,
+              action: step.action,
+              key: step.key || null,
+              typedSelectors,
+              stepCommands: STEP_COMMAND_BY_KIND,
+            }
+          );
+        } catch (err) {
+          return { nOpt: null, steps, error: `optimalPath[${i}]: analysis failed: ${err.message}` };
+        }
+        if (sharedKey && analysis && !analysis.error) shared.set(sharedKey, analysis);
       }
       if (analysis.error)
         return { nOpt: null, steps, error: `optimalPath[${i}]: ${analysis.error}` };
@@ -639,15 +799,131 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     }
   }
 
+  // An information task does not end when the page holding the answer is
+  // reached - it ends when the screen reader has SPOKEN the answer. Costing
+  // only the navigation would price "find the phone number" at one `goto`
+  // while the number itself sits 90 `next` presses down the home page, and the
+  // step budget derived from nOpt would run out before the agent could ever
+  // hear it. So the reading is appended as a final `read` step.
+  if (task && task.kind === 'information' && task.evidence) {
+    const read = await costReadStep(page, task.evidence, cursorSelector, runId);
+    if (read.error) {
+      // A hard failure of the read analysis: keep the navigation part rather
+      // than losing the whole measurement.
+      return { nOpt, steps, readDistance: null, nOptPartial: true, optimalPathError: read.error };
+    }
+    if (!read.entry) {
+      // The evidence exists visually but no spoken phrase contains it: a
+      // finding in its own right (harness turns it into `evidence-not-readable`).
+      return {
+        nOpt,
+        steps,
+        readDistance: null,
+        nOptPartial: true,
+        optimalPathError: EVIDENCE_NOT_IN_READING_ORDER,
+      };
+    }
+    read.entry.index = steps.length;
+    steps.push(read.entry);
+    nOpt += read.entry.reach.cost + read.entry.actionCost;
+    return { nOpt, steps, readDistance: read.entry.reach.cost };
+  }
+
   return { nOpt, steps };
+}
+
+/**
+ * Cost the cheapest way to HEAR `evidence` from the current cursor position,
+ * using exactly the reach strategies a sighted-path step uses. Action cost 0.
+ *
+ * @returns {Promise<{entry?: object, error?: string}>} `entry` absent (without
+ *          an error) means no spoken phrase contains the evidence.
+ */
+async function costReadStep(page, evidence, cursorSelector, runId) {
+  try {
+    await injectScreenReader(page);
+  } catch (err) {
+    return { error: `read step: screen reader injection failed: ${err.message}` };
+  }
+
+  let analysis;
+  try {
+    analysis = await page.evaluate(analyzeInPage, null, cursorSelector, ROTOR_KINDS, {
+      runId,
+      mode: 'read',
+      evidence,
+      maxReadCandidates: MAX_READ_CANDIDATES,
+      maxEvidenceSpan: MAX_EVIDENCE_PHRASE_SPAN,
+      stepCommands: STEP_COMMAND_BY_KIND,
+    });
+  } catch (err) {
+    return { error: `read step: analysis failed: ${err.message}` };
+  }
+  if (analysis.error) return { error: `read step: ${analysis.error}` };
+
+  let best = null;
+  for (const cand of analysis.readCandidates || []) {
+    const reached = chooseReach(cand.analysis);
+    if (!reached) continue;
+    // Hearing a split answer means reading on: one `next` per extra phrase.
+    const span = cand.spanPhrases || 1;
+    const reach =
+      span > 1
+        ? {
+            ...reached,
+            cost: reached.cost + (span - 1),
+            via: { ...(reached.via || {}), spanPhrases: span },
+          }
+        : reached;
+    // Cheapest wins; at equal cost the tighter span, so the read step starts
+    // where the answer starts.
+    const better =
+      !best ||
+      reach.cost < best.reach.cost ||
+      (reach.cost === best.reach.cost && span < (best.cand.spanPhrases || 1));
+    if (better) best = { cand, reach };
+  }
+  if (!best) return {};
+
+  return {
+    entry: {
+      index: -1, // set by the caller
+      action: 'read',
+      selector: best.cand.selector,
+      evidence,
+      phrase: best.cand.phrase,
+      spanPhrases: best.cand.spanPhrases || 1,
+      reach: best.reach,
+      actionCost: ACTION_COST.read,
+      candidateCount: (analysis.readCandidates || []).length,
+      analysis: {
+        cursorIndex: analysis.cursorIndex,
+        docStartIndex: analysis.docStartIndex,
+        readingOrderLength: analysis.readingOrderLength,
+        cacheHit: analysis.cacheHit,
+        readingOrderIndex: best.cand.readingOrderIndex,
+        next: best.cand.analysis.next,
+        prev: best.cand.analysis.prev,
+        tab: best.cand.analysis.tab,
+        rotor: best.cand.analysis.rotor,
+        step: best.cand.analysis.step,
+      },
+    },
+  };
 }
 
 module.exports = {
   computeOptimalPath,
+  costReadStep,
   chooseReach,
   reachCommands,
   analyzeInPage,
+  pageFingerprint,
   ACTION_COST,
+  EVIDENCE_NOT_IN_READING_ORDER,
+  MAX_READ_CANDIDATES,
+  MAX_EVIDENCE_PHRASE_SPAN,
+  squashText,
   ROTOR_KINDS,
   STRATEGY_ORDER,
   STEP_COMMAND_BY_KIND,

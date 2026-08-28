@@ -181,12 +181,17 @@ async function collectCandidates(page, words) {
 
 /** Path + query of a URL, used to build url oracles that survive host/port changes. */
 function pathPattern(href) {
+  let u;
   try {
-    const u = new URL(href);
-    return escapeRegExp(`${u.pathname}${u.search}`);
+    u = new URL(href);
   } catch (_) {
     return escapeRegExp(String(href));
   }
+  // Client-side routers normalise the trailing slash away (or add one), so the
+  // pattern accepts both and stops at the end of the path.
+  const path = u.pathname.replace(/\/+$/, '');
+  if (!path) return `^[a-z]+://[^/?#]+/?${escapeRegExp(u.search)}(?:[?#]|$)`;
+  return `${escapeRegExp(path)}/?${escapeRegExp(u.search)}(?:[?#]|$)`;
 }
 
 /** Plausible value for a form field, based on its type/name. */

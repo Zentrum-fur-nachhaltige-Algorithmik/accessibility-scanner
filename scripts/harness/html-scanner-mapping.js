@@ -335,9 +335,8 @@ const HTML_SCANNER_MAPPING = {
   },
 
   // Technical Implementation
-  // bad-html-validation.html has no entry: SC 4.1.1 was removed from WCAG 2.2
-  // and the scanner that owned the file is gone. axe-core still reports the
-  // ARIA and naming defects in it.
+  // bad-html-validation.html has no entry: SC 4.1.1 was removed from WCAG 2.2.
+  // axe-core reports the ARIA and naming defects in it.
 
   'bad-css-background-info.html': {
     expectedScanners: ['page-structure', 'use-of-color'],

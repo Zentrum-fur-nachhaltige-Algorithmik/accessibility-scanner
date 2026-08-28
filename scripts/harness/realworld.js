@@ -969,10 +969,8 @@ const FIXTURES = [
         // are the consent library's `__tcfapiLocator` and `__gppLocator`
         // frames, both `style="display: none"`, so they are not in the
         // accessibility tree and a name would never be announced. The two that
-        // are exposed both carry a title. This spot-truth was recorded as
-        // "three iframes have no title" from html-validation, whose frame-title
-        // rule demanded a literal title attribute on every frame including the
-        // hidden ones; axe-core frame-title exempts them, which is correct.
+        // are exposed both carry a title, and axe-core frame-title exempts the
+        // hidden ones.
         check: ({ violations }) => {
           const hits = violations.filter((v) =>
             /frame-title|frame or iframe lacks a title/i.test(

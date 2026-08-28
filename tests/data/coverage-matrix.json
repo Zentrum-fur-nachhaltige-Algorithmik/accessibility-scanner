@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 211,
+  "fixtureCount": 216,
   "scanners": [
     {
       "id": "axe-core",
@@ -38,8 +38,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "advanced-contrast",
@@ -81,7 +81,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-aria-state-updates.html (4.1.2,4.1.3) | concurrent harness FAIL: missed bad-beeproduced-real-issues.html (4.1.2,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (4.1.2,1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+4 more)"
+      "trustReason": "concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | concurrent harness FAIL: missed bad-landmarks.html (1.3.1,2.4.1)"
     },
     {
       "id": "media-accessibility",
@@ -150,8 +150,8 @@
       ],
       "kind": "deterministic",
       "exclusive": false,
-      "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-beeproduced-real-issues.html (2.4.1,1.3.1) | concurrent harness FAIL: missed bad-cognitive-accessibility.html (1.3.1) | concurrent harness FAIL: missed bad-complex-aria.html (1.3.1) | concurrent harness FAIL: missed bad-complex-data-tables.html (1.3.1) | concurrent harness FAIL: missed bad-form-grouping.html (1.3.1) | concurrent harness FAIL: missed bad-form-labels.html (1.3.1) | (+2 more)"
+      "trust": "proven",
+      "trustReason": "Clean record: every deterministic-harness assertion on its own criteria passed, no crashes across the five real-world fixtures, not a top noise source."
     },
     {
       "id": "label-in-name",
@@ -161,7 +161,7 @@
       "kind": "deterministic",
       "exclusive": false,
       "trust": "experimental",
-      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3) | concurrent harness FAIL: false positive on good-label-in-name.html (2.5.3)"
+      "trustReason": "concurrent harness FAIL: missed bad-input-modalities.html (2.5.3)"
     },
     {
       "id": "status-messages",
@@ -857,7 +857,7 @@
       "outcome": {
         "tp": true,
         "fpClean": false,
-        "runs": 42,
+        "runs": 29,
         "from": [
           "concurrent"
         ]
@@ -949,7 +949,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -973,7 +973,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-autocomplete.html"
+          "good-autocomplete.html",
+          "good-input-purpose-not-user-data.html"
         ],
         "bad": [
           "bad-autocomplete.html"
@@ -986,7 +987,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1172,11 +1173,11 @@
       "sc": "1.4.5",
       "level": "AA",
       "title": "Images of Text",
-      "mechanism": "experimental:images-of-text",
+      "mechanism": "deterministic:images-of-text",
       "supporting": [],
-      "justification": "Only experimental scanners cover this criterion: images-of-text: concurrent harness FAIL: missed bad-images-of-text.html (1.4.5,1.4.9)",
+      "justification": "",
       "isManual": false,
-      "isExperimentalOnly": true,
+      "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [
         "images-of-text"
@@ -1195,9 +1196,9 @@
         "concurrent"
       ],
       "outcome": {
-        "tp": false,
+        "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1301,10 +1302,8 @@
       "sc": "1.4.9",
       "level": "AAA",
       "title": "Images of Text (No Exception)",
-      "mechanism": "llm:llm-visual-presentation",
-      "supporting": [
-        "images-of-text (experimental)"
-      ],
+      "mechanism": "hybrid:images-of-text+llm-visual-presentation",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1474,6 +1473,7 @@
       "fixtures": {
         "good": [
           "good-hover-focus-content.html",
+          "good-hover-focus-measured.html",
           "good-title-supplementing-name.html"
         ],
         "bad": [
@@ -1489,7 +1489,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -1958,9 +1958,9 @@
         "concurrent"
       ],
       "outcome": {
-        "tp": false,
+        "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 8,
         "from": [
           "concurrent"
         ]
@@ -1999,9 +1999,8 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 2,
         "from": [
-          "concurrent",
           "exclusive"
         ]
       }
@@ -2054,10 +2053,8 @@
       "sc": "2.4.4",
       "level": "A",
       "title": "Link Purpose (In Context)",
-      "mechanism": "axe-core",
-      "supporting": [
-        "page-structure (experimental)"
-      ],
+      "mechanism": "hybrid:axe-core+page-structure",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -2082,7 +2079,14 @@
         "axe-e2e",
         "concurrent"
       ],
-      "outcome": null
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 3,
+        "from": [
+          "concurrent"
+        ]
+      }
     },
     {
       "sc": "2.4.5",
@@ -2100,6 +2104,8 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-multiple-ways-process-step.html",
+          "good-multiple-ways-standalone.html",
           "good-multiple-ways.html"
         ],
         "bad": [
@@ -2112,7 +2118,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2140,14 +2146,7 @@
         ]
       },
       "harness": [],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 2,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "2.4.7",
@@ -2214,9 +2213,9 @@
       "sc": "2.4.9",
       "level": "AAA",
       "title": "Link Purpose (Link Only)",
-      "mechanism": "hybrid:axe-core+llm-semantic-text",
+      "mechanism": "hybrid:axe-core+page-structure",
       "supporting": [
-        "page-structure (experimental)"
+        "llm-semantic-text"
       ],
       "justification": "",
       "isManual": false,
@@ -2248,7 +2247,14 @@
         "concurrent",
         "llm"
       ],
-      "outcome": null
+      "outcome": {
+        "tp": true,
+        "fpClean": true,
+        "runs": 7,
+        "from": [
+          "concurrent"
+        ]
+      }
     },
     {
       "sc": "2.4.10",
@@ -2463,6 +2469,7 @@
       "fixtures": {
         "good": [
           "good-icon-button-and-honeypot.html",
+          "good-label-in-name-placeholders.html",
           "good-label-in-name.html"
         ],
         "bad": [
@@ -2478,8 +2485,8 @@
       ],
       "outcome": {
         "tp": true,
-        "fpClean": false,
-        "runs": 7,
+        "fpClean": true,
+        "runs": 10,
         "from": [
           "concurrent",
           "exclusive"
@@ -2681,14 +2688,7 @@
       "harness": [
         "axe-e2e"
       ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 3,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.1.2",
@@ -2717,14 +2717,7 @@
       "harness": [
         "axe-e2e"
       ],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 4,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.1.3",
@@ -3423,7 +3416,7 @@
       "outcome": {
         "tp": true,
         "fpClean": false,
-        "runs": 24,
+        "runs": 12,
         "from": [
           "concurrent"
         ]
@@ -3460,9 +3453,8 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 8,
+        "runs": 5,
         "from": [
-          "concurrent",
           "exclusive"
         ]
       }

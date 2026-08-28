@@ -1,0 +1,197 @@
+{
+  "url": "https://urologiefischer.at/",
+  "tasks": [
+    {
+      "id": "ordinationszeiten-pruefen",
+      "description": "Die regulären Ordinationszeiten und Öffnungszeiten der Praxis in Erfahrung bringen.",
+      "keywords": [
+        "ORDINATIONSZEITEN",
+        "Uhr",
+        "Impressum",
+        "Kassen"
+      ],
+      "weight": 3,
+      "kind": "information",
+      "evidence": "Fr nach Vereinbarung",
+      "answer": "MO: 12h30 - 18h30, DIE: 9-14 Uhr, MI: 7-13 und 14-19 Uhr, DO: 8-14 h, Fr nach Vereinbarung",
+      "answerType": "hours",
+      "oracle": {
+        "type": "all",
+        "of": [
+          {
+            "type": "urlMatches",
+            "pattern": "/page10/page10\\.html"
+          },
+          {
+            "type": "elementWithText",
+            "text": "Fr\\s+nach\\s+Vereinbarung"
+          }
+        ]
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a"
+        },
+        {
+          "action": "click",
+          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(7) > div > div > div:nth-of-type(1) > div > div"
+        },
+        {
+          "action": "goto",
+          "url": "https://urologiefischer.at/page1/page1.html"
+        },
+        {
+          "action": "goto",
+          "url": "https://urologiefischer.at/page10/page10.html"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "evidence",
+        "expectedOutcome": "Die wöchentlichen Ordinationszeiten von Montag bis Freitag werden angezeigt.",
+        "sightedSummary": "Die wöchentlichen Ordinationszeiten von Montag bis Freitag (MO: 12:30-18:30, DI: 9-14, MI: 7-13 und 14-19, DO: 8-14, FR: nach Vereinbarung) werden auf der Seite angezeigt."
+      },
+      "generator": {
+        "sightedAgentSteps": 5,
+        "pathLength": 4,
+        "agentPathLength": 4,
+        "shortened": false,
+        "ratio": 1.25,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 1,
+        "retries": 1,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 26092,
+        "oracleMs": 5683,
+        "validateMs": 14114,
+        "nOptMs": 122169
+      }
+    },
+    {
+      "id": "kontaktdaten-finden",
+      "description": "Die Telefonnummer und die Anschrift der Praxis im Donauzentrum finden, um Kontakt aufzunehmen oder die Anreise zu planen.",
+      "keywords": [
+        "ÄRZTEZENTRUM",
+        "DONAUZENTRUM",
+        "Donaustadtstraße",
+        "TEL",
+        "Mail"
+      ],
+      "weight": 2,
+      "kind": "information",
+      "evidence": "1220 WIEN DONAUSTADTSTRASSE 1",
+      "answer": "Donaustadtstraße 1, 1220 Wien",
+      "answerType": "address",
+      "oracle": {
+        "type": "elementWithText",
+        "text": "1220\\s+WIEN\\s+DONAUSTADTSTRASSE\\s+1"
+      },
+      "sightedPath": [
+        {
+          "action": "goto",
+          "url": "https://urologiefischer.at/"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "evidence",
+        "expectedOutcome": "Die Kontaktdaten mit Adresse in 1220 Wien und Telefonnummer der Ordination sind sichtbar.",
+        "sightedSummary": "Die Kontaktdaten der Praxis im Donauzentrum (Donaustadtstraße 1, 1220 Wien) und die Telefonnummer (01 2039333) sind direkt im oberen Bereich der Startseite sichtbar."
+      },
+      "generator": {
+        "sightedAgentSteps": 1,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 1,
+        "prunedSteps": 0,
+        "corroboration": "llm",
+        "corroborationScore": 4,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 7254,
+        "oracleMs": 8032,
+        "validateMs": 676,
+        "nOptMs": 17253
+      }
+    },
+    {
+      "id": "impressum-aufrufen",
+      "description": "Das Impressum und die rechtlichen Informationen gemäß Mediengesetz und E-Commerce-Gesetz der Ordination einsehen.",
+      "keywords": [
+        "Impressum",
+        "Information gem. § 5 ECG",
+        "Offenlegung",
+        "Diensteanbieter"
+      ],
+      "weight": 1,
+      "kind": "information",
+      "evidence": "Information gem. § 5 ECG",
+      "answer": "Information gem. § 5 ECG undOffenlegung gem. § 25 MedienG: Diensteanbieter: Dr. Mons Fischer, F.E.B.U.",
+      "answerType": "text",
+      "oracle": {
+        "type": "all",
+        "of": [
+          {
+            "type": "urlMatches",
+            "pattern": "/page10/page10\\.html"
+          },
+          {
+            "type": "elementWithText",
+            "text": "Information\\s+gem\\.\\s+§\\s+5\\s+ECG"
+          }
+        ]
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a"
+        },
+        {
+          "action": "click",
+          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a"
+        },
+        {
+          "action": "goto",
+          "url": "https://urologiefischer.at/page10/page10.html"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "evidence",
+        "expectedOutcome": "Die Impressumsseite mit den Pflichtangaben zu Medieninhaber und Aufsichtsbehörde wird angezeigt.",
+        "sightedSummary": "Die Impressumsseite wurde aufgerufen und zeigt alle gesetzlichen Pflichtangaben gemäß § 5 ECG und § 25 MedienG (inklusive Diensteanbieter, Medieninhaber und rechtliche Hinweise)."
+      },
+      "generator": {
+        "sightedAgentSteps": 4,
+        "pathLength": 3,
+        "agentPathLength": 3,
+        "shortened": false,
+        "ratio": 1.3333333333333333,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 4,
+        "retries": 1,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 20171,
+        "oracleMs": 4992,
+        "validateMs": 14093,
+        "nOptMs": 122672
+      }
+    }
+  ]
+}

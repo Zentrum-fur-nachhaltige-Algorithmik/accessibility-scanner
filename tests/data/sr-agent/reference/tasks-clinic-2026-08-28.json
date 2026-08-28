@@ -1,0 +1,258 @@
+{
+  "url": "http://localhost:8802/",
+  "tasks": [
+    {
+      "id": "generic-main-navigation",
+      "template": "main-navigation",
+      "description": "Öffnen Sie die Seite \"Leistungen\" über das Hauptmenü dieser Website.",
+      "keywords": [
+        "Leistungen"
+      ],
+      "oracle": {
+        "type": "urlMatches",
+        "pattern": "/leistungen/?(?:[?#]|$)"
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a"
+        }
+      ],
+      "weight": 1,
+      "meta": {
+        "source": "generic-tasks",
+        "url": "http://localhost:8802/"
+      },
+      "preconditions": [],
+      "generator": {
+        "sightedAgentSteps": null,
+        "pathLength": 1,
+        "ratio": null,
+        "prunedSteps": 0,
+        "corroboration": "none",
+        "corroborationScore": 0,
+        "retries": 0,
+        "source": "generic"
+      },
+      "timings": {
+        "solveMs": 0,
+        "oracleMs": 0,
+        "validateMs": 1112,
+        "nOptMs": 18347
+      },
+      "kind": "action"
+    },
+    {
+      "id": "generic-contact-page",
+      "template": "contact-page",
+      "description": "Finden Sie die Seite, auf der Sie sehen, wie man dieses Unternehmen erreicht.",
+      "keywords": [
+        "Kontakt",
+        "Telefon",
+        "E-Mail",
+        "Adresse"
+      ],
+      "oracle": {
+        "type": "any",
+        "of": [
+          {
+            "type": "urlMatches",
+            "pattern": "/kontakt/?(?:[?#]|$)"
+          },
+          {
+            "type": "titleMatches",
+            "pattern": "contact|kontakt"
+          }
+        ]
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(4) > a"
+        }
+      ],
+      "weight": 1,
+      "meta": {
+        "source": "generic-tasks",
+        "url": "http://localhost:8802/"
+      },
+      "preconditions": [],
+      "generator": {
+        "sightedAgentSteps": null,
+        "pathLength": 1,
+        "ratio": null,
+        "prunedSteps": 0,
+        "corroboration": "none",
+        "corroborationScore": 0,
+        "retries": 0,
+        "source": "generic"
+      },
+      "timings": {
+        "solveMs": 0,
+        "oracleMs": 0,
+        "validateMs": 1159,
+        "nOptMs": 18398
+      },
+      "kind": "action"
+    },
+    {
+      "id": "leistungen-einsehen",
+      "description": "Informieren Sie sich über die angebotenen diagnostischen Untersuchungen und Vorsorgeleistungen der Praxis.",
+      "keywords": [
+        "Leistungen",
+        "Diagnostik",
+        "Vorsorge",
+        "Untersuchungen",
+        "Echokardiographie",
+        "Belastungs-EKG"
+      ],
+      "weight": 3,
+      "kind": "information",
+      "evidence": "Diagnostik & Vorsorge",
+      "answer": "Diagnostik & Vorsorge",
+      "answerType": "text",
+      "oracle": {
+        "type": "all",
+        "of": [
+          {
+            "type": "urlMatches",
+            "pattern": "/leistungen"
+          },
+          {
+            "type": "elementWithText",
+            "text": "Diagnostik\\s+&\\s+Vorsorge"
+          }
+        ]
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "evidence",
+        "expectedOutcome": "Die Leistungsübersicht mit Details zu Echokardiographie, Belastungs-EKG und Vorsorgeuntersuchungen wird angezeigt.",
+        "sightedSummary": "Die Leistungsübersicht mit Details zu Echokardiographie, Belastungs-EKG und kardiologischer Vorsorge wird auf der Leistungsseite angezeigt."
+      },
+      "generator": {
+        "sightedAgentSteps": 2,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 2,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 3,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 6697,
+        "oracleMs": 3099,
+        "validateMs": 787,
+        "nOptMs": 25535
+      }
+    },
+    {
+      "id": "aerztin-werdegang",
+      "description": "Erfahren Sie mehr über die berufliche Ausbildung, Erfahrung und Schwerpunkte von Dr. Elena Brandt.",
+      "keywords": [
+        "Team",
+        "Wer Sie betreut",
+        "Ihre Ärztin",
+        "Elena Brandt",
+        "Fachärztin"
+      ],
+      "weight": 2,
+      "kind": "action",
+      "oracle": {
+        "type": "urlMatches",
+        "pattern": "/team"
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(3) > a"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "deterministic",
+        "expectedOutcome": "Die Team-Seite mit Informationen zum Werdegang, der Facharztausbildung und den Spezialisierungen der Ärztin wird aufgerufen.",
+        "sightedSummary": "Die Team-Seite wurde aufgerufen und zeigt den Werdegang, die Facharztausbildung sowie die Schwerpunkte von Dr. Elena Brandt."
+      },
+      "generator": {
+        "sightedAgentSteps": 2,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 2,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 7,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 6218,
+        "oracleMs": 3657,
+        "validateMs": 732,
+        "nOptMs": 18383
+      }
+    },
+    {
+      "id": "impressum-aufrufen",
+      "description": "Rufen Sie das Impressum der Praxis auf, um die rechtlichen Angaben und die Berufsbezeichnung einzusehen.",
+      "keywords": [
+        "Impressum",
+        "Angaben",
+        "ECG",
+        "Graz"
+      ],
+      "weight": 1,
+      "kind": "action",
+      "oracle": {
+        "type": "urlMatches",
+        "pattern": "/impressum"
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > footer > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li:nth-of-type(1) > a"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "deterministic",
+        "expectedOutcome": "Das Impressum mit den gesetzlichen Angaben gemäß § 5 ECG und Anschrift der Praxis wird angezeigt.",
+        "sightedSummary": "Das Impressum mit den gesetzlichen Angaben gemäß § 5 ECG und der Anschrift der Praxis wurde erfolgreich aufgerufen."
+      },
+      "generator": {
+        "sightedAgentSteps": 2,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 2,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 4,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 7391,
+        "oracleMs": 2947,
+        "validateMs": 860,
+        "nOptMs": 18205
+      }
+    }
+  ]
+}

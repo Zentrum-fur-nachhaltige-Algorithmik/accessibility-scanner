@@ -1,0 +1,250 @@
+{
+  "url": "http://localhost:8804/",
+  "tasks": [
+    {
+      "id": "generic-main-navigation",
+      "template": "main-navigation",
+      "description": "Öffnen Sie die Seite \"Leistungen\" über das Hauptmenü dieser Website.",
+      "keywords": [
+        "Leistungen"
+      ],
+      "oracle": {
+        "type": "urlMatches",
+        "pattern": "/leistungen/?(?:[?#]|$)"
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)"
+        }
+      ],
+      "weight": 1,
+      "meta": {
+        "source": "generic-tasks",
+        "url": "http://localhost:8804/"
+      },
+      "preconditions": [],
+      "generator": {
+        "sightedAgentSteps": null,
+        "pathLength": 1,
+        "ratio": null,
+        "prunedSteps": 0,
+        "corroboration": "none",
+        "corroborationScore": 0,
+        "retries": 0,
+        "source": "generic"
+      },
+      "timings": {
+        "solveMs": 0,
+        "oracleMs": 0,
+        "validateMs": 1117,
+        "nOptMs": 20184
+      },
+      "kind": "action"
+    },
+    {
+      "id": "generic-contact-page",
+      "template": "contact-page",
+      "description": "Finden Sie die Seite, auf der Sie sehen, wie man dieses Unternehmen erreicht.",
+      "keywords": [
+        "Kontakt",
+        "Telefon",
+        "E-Mail",
+        "Adresse"
+      ],
+      "oracle": {
+        "type": "any",
+        "of": [
+          {
+            "type": "urlMatches",
+            "pattern": "/kontakt/?(?:[?#]|$)"
+          },
+          {
+            "type": "titleMatches",
+            "pattern": "contact|kontakt"
+          }
+        ]
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(4)"
+        }
+      ],
+      "weight": 1,
+      "meta": {
+        "source": "generic-tasks",
+        "url": "http://localhost:8804/"
+      },
+      "preconditions": [],
+      "generator": {
+        "sightedAgentSteps": null,
+        "pathLength": 1,
+        "ratio": null,
+        "prunedSteps": 0,
+        "corroboration": "none",
+        "corroborationScore": 0,
+        "retries": 0,
+        "source": "generic"
+      },
+      "timings": {
+        "solveMs": 0,
+        "oracleMs": 0,
+        "validateMs": 1169,
+        "nOptMs": 20220
+      },
+      "kind": "action"
+    },
+    {
+      "id": "kardiologische-leistungen-ansehen",
+      "description": "Informieren Sie sich über die kardiologischen Untersuchungen und diagnostischen Leistungen, die in der Ordination angeboten werden.",
+      "keywords": [
+        "Leistungen",
+        "Diagnostik",
+        "Untersuchungen",
+        "Echokardiographie",
+        "Belastungs-EKG",
+        "Vorsorge"
+      ],
+      "weight": 3,
+      "kind": "action",
+      "oracle": {
+        "type": "urlMatches",
+        "pattern": "/leistungen"
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "deterministic",
+        "expectedOutcome": "Die Seite mit der Übersicht über die diagnostischen Untersuchungen wie Echokardiographie, Belastungs-EKG und kardiologische Vorsorge wird angezeigt.",
+        "sightedSummary": "Die Seite 'Leistungen' mit der Übersicht über die diagnostischen Untersuchungen (Echokardiographie, Belastungs-EKG, kardiologische Vorsorge) wird angezeigt."
+      },
+      "generator": {
+        "sightedAgentSteps": 2,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 2,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 9,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 7331,
+        "oracleMs": 2127,
+        "validateMs": 1004,
+        "nOptMs": 19972
+      }
+    },
+    {
+      "id": "profil-der-aerztin",
+      "description": "Erfahren Sie mehr über die berufliche Ausbildung, Erfahrung und Spezialisierung von Dr. Elena Brandt.",
+      "keywords": [
+        "Team",
+        "Ihre Ärztin",
+        "Dr. Elena Brandt",
+        "Fachärztin",
+        "Wer Sie betreut"
+      ],
+      "weight": 2,
+      "kind": "action",
+      "oracle": {
+        "type": "urlMatches",
+        "pattern": "/team"
+      },
+      "sightedPath": [
+        {
+          "action": "click",
+          "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(3)"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "deterministic",
+        "expectedOutcome": "Die Team-Seite mit dem Werdegang der Fachärztin und ihren diagnostischen Schwerpunkten wird aufgerufen.",
+        "sightedSummary": "Die Team-Seite wurde aufgerufen, auf der der Werdegang von Dr. Elena Brandt sowie ihre diagnostischen Schwerpunkte (u.a. Nicht-invasive Herzdiagnostik, Herzinsuffizienz, Vorsorge) dargestellt sind."
+      },
+      "generator": {
+        "sightedAgentSteps": 2,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 2,
+        "prunedSteps": 0,
+        "corroboration": "keyword",
+        "corroborationScore": 6,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 7775,
+        "oracleMs": 3814,
+        "validateMs": 1008,
+        "nOptMs": 19966
+      }
+    },
+    {
+      "id": "ablauf-ersttermin-nachlesen",
+      "description": "Lesen Sie nach, welche Schritte Sie bei einem ersten Besuch in der Ordination erwarten.",
+      "keywords": [
+        "erster Termin",
+        "Erstgespräch",
+        "Untersuchung",
+        "Befund",
+        "Therapieplan"
+      ],
+      "weight": 2,
+      "kind": "information",
+      "evidence": "Erstgespräch & Untersuchung",
+      "answer": "Termin vereinbaren, Erstgespräch & Untersuchung, Befund & Therapieplan",
+      "answerType": "text",
+      "oracle": {
+        "type": "elementWithText",
+        "text": "Erstgespräch\\s+&\\s+Untersuchung"
+      },
+      "sightedPath": [
+        {
+          "action": "goto",
+          "url": "http://localhost:8804/"
+        }
+      ],
+      "preconditions": [],
+      "meta": {
+        "source": "task-generator",
+        "oracleOrigin": "evidence",
+        "expectedOutcome": "Die Schritte des Ersttermins von der Vereinbarung über das Erstgespräch bis zum Befund und Therapieplan werden auf der Startseite angezeigt.",
+        "sightedSummary": "Die Schritte des Ersttermins (Termin vereinbaren, Erstgespräch & Untersuchung, Befund & Therapieplan) werden auf der Startseite im Abschnitt 'So läuft Ihr erster Termin ab' aufgeführt."
+      },
+      "generator": {
+        "sightedAgentSteps": 1,
+        "pathLength": 1,
+        "agentPathLength": 1,
+        "shortened": false,
+        "ratio": 1,
+        "prunedSteps": 0,
+        "corroboration": "llm",
+        "corroborationScore": 8,
+        "retries": 0,
+        "source": "llm",
+        "ambiguityRatio": 3
+      },
+      "timings": {
+        "solveMs": 7595,
+        "oracleMs": 5248,
+        "validateMs": 803,
+        "nOptMs": 19943
+      }
+    }
+  ]
+}

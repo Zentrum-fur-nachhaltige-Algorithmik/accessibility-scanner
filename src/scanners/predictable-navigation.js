@@ -645,8 +645,14 @@ class PredictableNavigationScanner extends BaseScanner {
           }
 
           for (const pseudo of ['::after', '::before']) {
-            const content = window.getComputedStyle(link, pseudo).content;
-            if (content && content !== 'none' && content !== 'normal') return true;
+            const style = window.getComputedStyle(link, pseudo);
+            const content = (style.content || '').trim();
+            if (!content || content === 'none' || content === 'normal') continue;
+            // A marker the reader sees: generated text, or an image standing in
+            // for it. `content: ""` paints nothing on its own.
+            const text = content.replace(/^["']|["']$/g, '').trim();
+            if (text) return true;
+            if (style.backgroundImage && style.backgroundImage !== 'none') return true;
           }
           return false;
         }

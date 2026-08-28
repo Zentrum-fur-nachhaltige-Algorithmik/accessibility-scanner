@@ -20,25 +20,39 @@ describe('ColorContrastScanner', () => {
     await stopFixtureServer();
   });
 
-  it('detects violations in bad-color-contrast.html', async () => {
+  it('detects enhanced-contrast violations in bad-color-contrast.html', async () => {
     const url = `${getBaseUrl()}/bad-color-contrast.html`;
     const page = await getPage(url);
     try {
-      const result = await scanner.scan(page);
+      const result = await scanner.scan(page, { wcagLevel: 'AAA' });
 
       expect(result).toBeDefined();
       expect(result.passed).toBe(false);
       expect(result.violations.length).toBeGreaterThan(0);
+      expect(result.violations.every((v) => v.wcagCriteria === '1.4.6')).toBe(true);
     } finally {
       await page.close();
     }
   });
 
-  it('finds no color-contrast violations in good-accessibility.html', async () => {
-    const url = `${getBaseUrl()}/good-accessibility.html`;
+  it('reports nothing for a scan that does not ask for AAA', async () => {
+    const url = `${getBaseUrl()}/bad-color-contrast.html`;
     const page = await getPage(url);
     try {
       const result = await scanner.scan(page);
+
+      expect(result.violations).toEqual([]);
+      expect(result.summary.evaluated).toBe(false);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it('finds no enhanced-contrast violations in good-contrast-enhanced.html', async () => {
+    const url = `${getBaseUrl()}/good-contrast-enhanced.html`;
+    const page = await getPage(url);
+    try {
+      const result = await scanner.scan(page, { wcagLevel: 'AAA' });
 
       expect(result).toBeDefined();
       expect(result.violations).toEqual([]);

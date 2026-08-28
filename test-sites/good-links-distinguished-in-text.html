@@ -1,0 +1,38 @@
+<!-- WCAG-TEST
+criterion: 1.4.1
+level: A
+title: Use of Color, links distinguished by something other than colour
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: use-of-color
+description: Links inside body text that are underlined, bold, carry an icon, or are colour-only with a declared underline on hover and focus (G183), plus a colour-only navigation bar that is not inside a text block. link-color-only must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Links distinguished without colour</title>
+<style>
+  body { font-family: sans-serif; color: #222222; background: #ffffff; max-width: 40rem; margin: 2rem auto; }
+  .underlined a { color: #0b4fa2; text-decoration: underline; }
+  .bold a { color: #0b4fa2; text-decoration: none; font-weight: 700; }
+  .iconised a { color: #0b4fa2; text-decoration: none; }
+  .iconised a::after { content: " \2197"; }
+  /* G183: 3.33:1 against the surrounding text, plus an underline on hover and on focus */
+  .g183 { color: #707070; }
+  .g183 a { color: #1f1f1f; text-decoration: none; }
+  .g183 a:hover { text-decoration: underline; }
+  .g183 a:focus-visible { text-decoration: underline; outline: 2px solid #1f1f1f; }
+  nav a { color: #0b4fa2; text-decoration: none; margin-right: 1rem; }
+</style>
+</head>
+<body>
+<nav aria-label="Main"><a href="/products">Products</a><a href="/pricing">Pricing</a><a href="/support">Support</a></nav>
+<h1>Links distinguished without colour</h1>
+<p class="underlined">The classic pattern keeps <a href="/a">an underline on the link</a> so the difference survives greyscale printing.</p>
+<p class="bold">A heavier weight also works: <a href="/b">this link is bold</a> and stays recognisable without colour.</p>
+<p class="iconised">An appended glyph is a non-colour cue too, as in <a href="/c">this external link</a> inside a sentence.</p>
+<p class="g183">Colour alone is allowed when the link colour reaches 3:1 against the surrounding text and the page adds a non-colour cue on hover and on focus, as <a href="/d">this link</a> does.</p>
+</body>
+</html>

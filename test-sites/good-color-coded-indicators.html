@@ -1,0 +1,56 @@
+<!-- WCAG-TEST
+criterion: 1.4.1
+level: A
+title: Use of Color, coloured indicators that carry a text equivalent
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: use-of-color
+description: Status dots labelled by a visually hidden span, dots carrying a title, a row of identical decorative dots, and a colour picker of named buttons. color-coded-indicator must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Coloured indicators with a text equivalent</title>
+<style>
+  body { font-family: sans-serif; background: #ffffff; color: #1a1a1a; margin: 2rem; }
+  .dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; margin-right: 0.5rem; }
+  .online { background: #14652f; }
+  .away { background: #8a5b00; }
+  .offline { background: #6b6b6b; }
+  .bullet { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #1a1a1a; margin-right: 0.5rem; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .swatch { width: 24px; height: 24px; border: 1px solid #1a1a1a; }
+  .swatch-red { background: #b02020; }
+  .swatch-blue { background: #1f4e79; }
+  ul { list-style: none; padding: 0; }
+</style>
+</head>
+<body>
+<h1>Coloured indicators with a text equivalent</h1>
+
+<h2>Presence, named by a visually hidden span</h2>
+<ul>
+  <li><span class="dot online"></span><span class="visually-hidden">Online</span> Mia Sorensen</li>
+  <li><span class="dot away"></span><span class="visually-hidden">Away</span> Jonas Weber</li>
+  <li><span class="dot offline"></span><span class="visually-hidden">Offline</span> Aisha Khan</li>
+</ul>
+
+<h2>Legend, named by the title attribute</h2>
+<p><span class="dot online" title="Delivered"></span><span class="dot away" title="Delayed"></span><span class="dot offline" title="Cancelled"></span></p>
+
+<h2>Decoration, one appearance</h2>
+<ul>
+  <li><span class="bullet"></span>Same colour for every item, so the bullet carries no information</li>
+  <li><span class="bullet"></span>Second item</li>
+  <li><span class="bullet"></span>Third item</li>
+</ul>
+
+<h2>Colour picker, named controls</h2>
+<p>
+  <button type="button" class="swatch swatch-red" aria-label="Red"></button>
+  <button type="button" class="swatch swatch-blue" aria-label="Blue"></button>
+</p>
+</body>
+</html>

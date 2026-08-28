@@ -8,7 +8,6 @@
 const ColorContrastScanner = require('../scanners/color-contrast');
 const UseOfColorScanner = require('../scanners/use-of-color');
 const ImagesOfTextScanner = require('../scanners/images-of-text');
-const AdvancedContrastScanner = require('../scanners/advanced-contrast');
 const NonTextContrastScanner = require('../scanners/nontext-contrast');
 const TextResizeScanner = require('../scanners/text-resize');
 const ScreenReaderScanner = require('../scanners/screen-reader');
@@ -92,7 +91,6 @@ function createAllScanners({ llmClient } = {}) {
     new ColorContrastScanner(),
     new UseOfColorScanner(),
     new ImagesOfTextScanner(),
-    new AdvancedContrastScanner(),
     new NonTextContrastScanner(),
     new TextResizeScanner(),
     new ScreenReaderScanner(),
@@ -145,7 +143,6 @@ const PROFILES = {
     'color-contrast',
     'use-of-color',
     'images-of-text',
-    'advanced-contrast',
     'nontext-contrast',
     'screen-reader',
     'media-accessibility',
@@ -172,7 +169,6 @@ const PROFILES = {
     'color-contrast',
     'use-of-color',
     'images-of-text',
-    'advanced-contrast',
     'nontext-contrast',
     'screen-reader',
     'media-accessibility',

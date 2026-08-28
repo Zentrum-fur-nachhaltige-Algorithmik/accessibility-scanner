@@ -1,19 +1,20 @@
 /**
  * Blind Mode optimal path: the keystrokes and phrases of the shortest route.
  * Expands the cost breakdown from optimal-path.js into a ScreenReaderEnv command
- * list of length nOpt and replays it in a fresh context to collect the phrases.
+ * list costing nOpt and replays it in a fresh context to collect the phrases.
  */
 
 'use strict';
 
 const ScreenReaderEnv = require('../../screenreader-env');
+const { commandCost } = ScreenReaderEnv;
 const { computeOptimalPath, reachCommands } = require('../../optimal-path');
 const { createIsolatedContext, runPreconditions } = require('../../replay');
 
 /**
  * Expand `computeOptimalPath().steps` into the command list a player would type.
- * `commands.length === nOpt` by construction: each reach strategy emits exactly
- * `reach.cost` commands and each action exactly `actionCost` (= 1).
+ * The commands add up to `nOpt` when each is charged with `commandCost`
+ * (one per command, two for `find`).
  */
 function commandsFromOptimalSteps(optSteps, sightedPath) {
   const commands = [];
@@ -76,7 +77,8 @@ async function computeSpokenOptimalPath(browser, task) {
     const pre = await runPreconditions(page, task);
     if (!pre.ok)
       return { nOpt: computed.nOpt, path: [], error: `precondition failed: ${pre.error}` };
-    const env = new ScreenReaderEnv(page, { maxSteps: commands.length + 5 });
+    const budget = commands.reduce((n, cmd) => n + commandCost(cmd.type), 0) + 5;
+    const env = new ScreenReaderEnv(page, { maxSteps: budget });
     await env.start();
     for (const cmd of commands) {
       const obs = await env.step(cmd);

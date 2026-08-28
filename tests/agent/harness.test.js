@@ -745,7 +745,7 @@ describe('runSite', () => {
       expect(warnings.join(' ')).not.toMatch(/falling back to nSighted/);
     });
 
-    it('hears the answer in an announcement or a rotor list too', () => {
+    it('hears the answer in an announcement, but a rotor list is an index, not something heard', () => {
       const env = {
         trace: [
           { obsAfter: { phrase: 'banner', announcements: [] } },
@@ -760,8 +760,9 @@ describe('runSite', () => {
         ],
       };
       expect(tracePhrases(env)).toContain('status, 3 results found');
+      expect(tracePhrases(env)).not.toContain('heading, Opening hours');
       expect(heardEvidence(env, '3 results found')).toBe(true);
-      expect(heardEvidence(env, 'opening   HOURS')).toBe(true);
+      expect(heardEvidence(env, 'opening   HOURS')).toBe(false);
       expect(heardEvidence(env, 'closing hours')).toBe(false);
       expect(heardEvidence(env, '')).toBe(false);
     });

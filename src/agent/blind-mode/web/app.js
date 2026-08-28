@@ -17,6 +17,9 @@
     landmarks: 'List landmarks',
     links: 'List links',
     formFields: 'List fields',
+    buttons: 'List buttons',
+    more: 'Next page of the list',
+    rotorLetter: 'Letter in the list',
     jumpTo: 'Pick from the list',
     nextHeading: 'H',
     prevHeading: 'Shift+H',
@@ -26,6 +29,10 @@
     prevFormField: 'Shift+F',
     nextLandmark: 'D',
     prevLandmark: 'Shift+D',
+    nextButton: 'B',
+    prevButton: 'Shift+B',
+    find: 'Ctrl+F',
+    findNext: 'F3',
     activate: 'Enter',
     type: 'Type',
     escape: 'Esc',
@@ -40,6 +47,9 @@
     'L: next link, Shift L back.',
     'F: next form field, Shift F back.',
     'D: next landmark, Shift D back.',
+    'B: next button, Shift B back.',
+    'One to six: next heading of that level, with Shift back.',
+    'Control F or slash: search for a word. F3: search again.',
     'Enter: activate. In a text field: input mode.',
     'Esc: cancel. R: repeat the last announcement.',
     'Question mark: this list. Esc Esc: leave the game.',
@@ -79,6 +89,7 @@
     lastPhrase: '',
     warned: false,
     inputMode: false,
+    inputTarget: 'field',
     inputBuffer: '',
     inputField: '',
     escTimer: null,
@@ -390,6 +401,7 @@
     l: ['nextLink', 'prevLink'],
     f: ['nextFormField', 'prevFormField'],
     d: ['nextLandmark', 'prevLandmark'],
+    b: ['nextButton', 'prevButton'],
   };
 
   capture.addEventListener('keydown', function (event) {
@@ -428,7 +440,28 @@
       speech.speak(KEY_HELP, { lang: 'en' });
       return;
     }
+    if (key === 'F3') {
+      event.preventDefault();
+      sendCmd({ type: 'findNext' });
+      return;
+    }
+    // The digit keys of NVDA and JAWS: heading of that level, Shift for back.
+    var digit = /^Digit([1-6])$/.exec(event.code || '');
+    if (digit) {
+      event.preventDefault();
+      sendCmd({
+        type: event.shiftKey ? 'prevHeading' : 'nextHeading',
+        arg: Number(digit[1]),
+      });
+      return;
+    }
     var lower = typeof key === 'string' ? key.toLowerCase() : '';
+    if (key === '/' || (event.ctrlKey && lower === 'f')) {
+      event.preventDefault();
+      enterInputMode('find');
+      return;
+    }
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
     if (lower === 'r') {
       event.preventDefault();
       sendCmd({ type: 'repeat' });
@@ -483,16 +516,25 @@
     return (parts[1] || parts[0] || 'field').trim();
   }
 
-  function enterInputMode() {
+  /**
+   * One text prompt for two purposes: typing into the field at the cursor
+   * (`target` omitted) and typing a search word (`target` = 'find').
+   */
+  function enterInputMode(target) {
     state.inputMode = true;
+    state.inputTarget = target === 'find' ? 'find' : 'field';
     state.inputBuffer = '';
-    state.inputField = fieldNameOf(state.lastPhrase);
+    state.inputField = target === 'find' ? 'search' : fieldNameOf(state.lastPhrase);
     earcon.inputMode();
-    speech.speak('Input mode, ' + state.inputField, { lang: 'en' });
+    speech.speak(
+      state.inputTarget === 'find' ? 'Search for' : 'Input mode, ' + state.inputField,
+      { lang: 'en' }
+    );
   }
 
   function leaveInputMode() {
     state.inputMode = false;
+    state.inputTarget = 'field';
     state.inputBuffer = '';
   }
 
@@ -509,7 +551,13 @@
       event.preventDefault();
       var text = state.inputBuffer;
       var field = state.inputField;
+      var target = state.inputTarget;
       leaveInputMode();
+      if (target === 'find') {
+        sendCmd({ type: 'find', arg: text });
+        speech.speak('Searching for ' + text, { lang: 'en' });
+        return;
+      }
       sendCmd({ type: 'type', arg: text });
       speech.speak(field + ', ' + text);
       return;
@@ -532,6 +580,12 @@
     if (!cmd) return '?';
     var label = KEY_LABEL[cmd.type] || cmd.type;
     if (cmd.type === 'type') return 'Type "' + cmd.arg + '"';
+    if (cmd.type === 'find') return 'Search "' + cmd.arg + '"';
+    if (cmd.type === 'rotorLetter') return 'Letter ' + String(cmd.arg).toUpperCase();
+    // A heading step with a level is the digit key, not H.
+    if ((cmd.type === 'nextHeading' || cmd.type === 'prevHeading') && cmd.arg) {
+      return (cmd.type === 'prevHeading' ? 'Shift+' : '') + cmd.arg;
+    }
     if (cmd.type === 'jumpTo') return label;
     return label;
   }

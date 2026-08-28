@@ -168,7 +168,8 @@ task ------------------------------+
 +-----------------+   phrase,    +-----------+   command    +------------------+
 | ScreenReaderEnv | ---------->  | LLM agent | ---------->  | ScreenReaderEnv  |
 | virtual screen  |  rotor lists |           |  next, tab,  | in the page      |
-| reader in page  |  live regions|           |  H, L, F, D, |                  |
+| reader in page  |  live regions|           |  H 1-6, L, F,|                  |
+|                 |              |           |  D, B, find, |                  |
 +-----------------+              +-----------+  activate    +------------------+
         ^                                                          |
         |                  oracle checked after every step         |
@@ -177,8 +178,14 @@ task ------------------------------+
 
 The agent never sees HTML, an accessibility tree, a screenshot or a selector.
 Each turn it receives the phrase at the cursor, the announcements since the
-last step and, on request, a rotor list (headings, landmarks, links, form
-fields). Every command counts as one step, including failed ones.
+last step and, on request, one PAGE of a rotor list (headings, landmarks, links,
+form fields, buttons; eight entries, `more` for the next eight, a first-letter
+jump to skip ahead). The command set is the browse mode of NVDA and JAWS: the
+quick-navigation keys of each kind, heading levels 1 to 6, and a search over the
+spoken text (`find`, `findNext`). Every command counts as one step, including
+failed ones; only `find` counts as two, for the word and the Enter. A container
+and its first line of text are one reading stop ("paragraph, We build small
+things"), the closing boundaries are none.
 
 Scoring per task:
 

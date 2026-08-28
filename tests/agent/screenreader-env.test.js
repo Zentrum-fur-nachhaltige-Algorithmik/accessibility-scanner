@@ -223,6 +223,111 @@ describe('ScreenReaderEnv', () => {
       });
     }, 60000);
 
+    it('shows the rotor list one page at a time and reveals more on request', async () => {
+      await withEnv('quick-keys.html', {}, async (env) => {
+        const first = await env.step({ type: 'buttons' });
+        // Eight buttons, eight per page: the first page is the whole list here.
+        expect(first.rotor).toMatchObject({ from: 0, total: 8, hasMore: false });
+        expect(first.rotor.items).toHaveLength(8);
+
+        const links = await env.step({ type: 'links' });
+        expect(links.rotor.total).toBe(2);
+        const noMore = await env.step({ type: 'more' });
+        expect(noMore.error).toBe('no more entries in the list');
+
+        // An entry the list has not shown cannot be jumped to.
+        const headings = await env.step({ type: 'headings' });
+        expect(headings.rotor.items).toHaveLength(6);
+        expect(await env.step({ type: 'jumpTo', arg: 4 }).then((o) => o.error)).toBeUndefined();
+      });
+    }, 60000);
+
+    it('refuses jumpTo for an entry that is still hidden and reveals it by letter', async () => {
+      // Ten links, "One" to "Ten": more than one page.
+      await withEnv('optimal-landmark.html', {}, async (env) => {
+        const page1 = await env.step({ type: 'links' });
+        expect(page1.rotor.items).toHaveLength(8);
+        expect(page1.rotor).toMatchObject({ from: 0, total: 10, hasMore: true });
+
+        const refused = await env.step({ type: 'jumpTo', arg: 9 });
+        expect(refused.error).toMatch(/has not been shown yet/);
+
+        const page2 = await env.step({ type: 'more' });
+        expect(page2.rotor.from).toBe(8);
+        expect(page2.rotor.items.map((i) => i.index)).toEqual([8, 9]);
+        expect(page2.rotor.hasMore).toBe(false);
+        // Now it is on screen, so the cursor may go there.
+        const jumped = await env.step({ type: 'jumpTo', arg: 9 });
+        expect(jumped.error).toBeUndefined();
+        expect(jumped.phrase).toBe(page2.rotor.items[1].phrase);
+      });
+    }, 60000);
+
+    it('jumps to the next entry with a letter, the way the elements list does', async () => {
+      await withEnv('optimal-landmark.html', {}, async (env) => {
+        await env.step({ type: 'links' });
+        // "Nine" is the only entry starting with n and sits on the second page.
+        const byLetter = await env.step({ type: 'rotorLetter', arg: 'N' });
+        expect(byLetter.error).toBeUndefined();
+        expect(byLetter.rotor.from).toBe(8);
+        expect(byLetter.rotor.items[0].phrase).toContain('Nine');
+        expect(await env.step({ type: 'jumpTo', arg: 8 }).then((o) => o.error)).toBeUndefined();
+
+        const none = await env.step({ type: 'rotorLetter', arg: 'z' });
+        expect(none.error).toBe('no entry starting with z');
+      });
+    }, 60000);
+
+    it('lists the buttons and steps through them with nextButton / prevButton', async () => {
+      await withEnv('quick-keys.html', {}, async (env) => {
+        const rotor = await env.step({ type: 'buttons' });
+        expect(rotor.rotor.kind).toBe('buttons');
+        // Native buttons, a submit input and a summary, in reading order.
+        expect(rotor.rotor.items.map((i) => i.selector)).toEqual([
+          '#menu',
+          '#b1',
+          '#b2',
+          '#send',
+          'html > body > main > details > summary',
+          '#call',
+          '#b3',
+          '#b4',
+        ]);
+
+        const first = await env.step({ type: 'nextButton' });
+        expect(first.phrase).toBe('button, Open the menu');
+        expect(await env.step({ type: 'nextButton' }).then((o) => o.phrase)).toBe('button, First');
+        // Backwards from the first button wraps to the last one.
+        const jumped = await env.step({ type: 'jumpTo', arg: 0 });
+        expect(jumped.phrase).toBe('button, Open the menu');
+        expect(await env.step({ type: 'prevButton' }).then((o) => o.phrase)).toBe('button, Fourth');
+      });
+    }, 60000);
+
+    it('stops only at headings of the requested level', async () => {
+      await withEnv('quick-keys.html', {}, async (env) => {
+        // One h1, four h3 and a single h2: the level skips all four h3.
+        const h2 = await env.step({ type: 'nextHeading', arg: 2 });
+        expect(h2.error).toBeUndefined();
+        expect(h2.phrase).toBe('heading, Contact, level 2');
+        // Only one heading of that level, so stepping on wraps back onto it.
+        expect(await env.step({ type: 'nextHeading', arg: 2 }).then((o) => o.phrase)).toBe(
+          h2.phrase
+        );
+        const h1 = await env.step({ type: 'prevHeading', arg: 1 });
+        expect(h1.phrase).toBe('heading, Quick key playground, level 1');
+        // Without a level the very next heading is the first h3.
+        expect(await env.step({ type: 'nextHeading' }).then((o) => o.phrase)).toBe(
+          'heading, Waiting room, level 3'
+        );
+
+        const none = await env.step({ type: 'nextHeading', arg: 5 });
+        expect(none.error).toBe('no heading at level 5');
+        const bad = await env.step({ type: 'nextHeading', arg: 9 });
+        expect(bad.error).toMatch(/level must be between 1 and 6/);
+      });
+    }, 60000);
+
     it('reports "no <kind>" when the document has none, and still costs a step', async () => {
       await withEnv('good-status-form.html', {}, async (env) => {
         const noLink = await env.step({ type: 'nextLink' });
@@ -246,6 +351,52 @@ describe('ScreenReaderEnv', () => {
         const failed = await env.step({ type: 'nextLink' });
         expect(failed.error).toBe('no link');
         expect(failed.phrase).toBe(before.phrase);
+      });
+    }, 60000);
+
+    it('finds the next phrase containing the search text and costs two steps', async () => {
+      await withEnv('quick-keys.html', {}, async (env) => {
+        const hit = await env.step({ type: 'find', arg: 'ORDINATION' });
+        expect(hit.error).toBeUndefined();
+        expect(hit.phrase).toBe('paragraph, Ordination hours: Monday 08:00 to 12:00');
+        // Typing the word and pressing Enter: two steps for one command.
+        expect(env.stepCount).toBe(2);
+        expect(hit.budgetLeft).toBe(env.maxSteps - 2);
+
+        // Nothing after the cursor matches any more and the search does not
+        // wrap, so the cursor stays where it is.
+        const again = await env.step({ type: 'findNext' });
+        expect(again.error).toBe('not found');
+        expect(again.phrase).toBe(hit.phrase);
+        expect(env.stepCount).toBe(3);
+      });
+    }, 60000);
+
+    it('repeats the last search with findNext and refuses an empty or unstarted one', async () => {
+      await withEnv('quick-keys.html', {}, async (env) => {
+        const noSearch = await env.step({ type: 'findNext' });
+        expect(noSearch.error).toMatch(/preceding find/);
+        const empty = await env.step({ type: 'find', arg: '   ' });
+        expect(empty.error).toMatch(/requires a text/);
+
+        const first = await env.step({ type: 'find', arg: 'parking' });
+        expect(first.phrase).toBe('heading, Parking, level 3');
+        const second = await env.step({ type: 'findNext' });
+        expect(second.error).toBeUndefined();
+        expect(second.phrase).toBe('paragraph, Two parking spaces are reserved for patients.');
+      });
+    }, 60000);
+
+    it('matches diacritics and reports nothing found without moving the cursor', async () => {
+      await withEnv('quick-keys.html', {}, async (env) => {
+        const before = await env.step({ type: 'nextHeading' });
+        const miss = await env.step({ type: 'find', arg: 'radiology' });
+        expect(miss.error).toBe('not found');
+        expect(miss.phrase).toBe(before.phrase);
+        // "Step-free" is found by an accent-free query and vice versa.
+        const hit = await env.step({ type: 'find', arg: 'stép-frée' });
+        expect(hit.error).toBeUndefined();
+        expect(hit.phrase).toBe('heading, Step-free access, level 3');
       });
     }, 60000);
 
@@ -434,6 +585,49 @@ describe('ScreenReaderEnv', () => {
         expect(entry.obsAfter.phrase).toBe('textbox, Nickname');
         expect(entry.domChanged).toBe(true);
         expect(typeof entry.durationMs).toBe('number');
+      });
+    }, 60000);
+
+    it('records the caller note next to the command in the trace', async () => {
+      await withEnv('generic-home.html', {}, async (env) => {
+        await env.step({ type: 'next', note: 'Starting at the top of the page.' });
+        await env.step({ type: 'repeat', note: 'Say that again.' });
+        await env.step({ type: 'next' });
+        expect(env.trace[0].note).toBe('Starting at the top of the page.');
+        expect(env.trace[1]).toMatchObject({ free: true, note: 'Say that again.' });
+        expect(env.trace[2].note).toBeUndefined();
+        // The note travels with the command, it does not become an observation.
+        expect(env.trace[0].obsAfter.note).toBeUndefined();
+      });
+    }, 60000);
+
+    it('records the mark, the word count and a derived backtrack', async () => {
+      await withEnv('optimal-landmark.html', {}, async (env) => {
+        const links = await env.step({ type: 'links' });
+        await env.step({ type: 'jumpTo', arg: 0 });
+        await env.step({ type: 'next' });
+        await env.step({ type: 'next' });
+        // Back to the entry the cursor already visited, three stops ago.
+        const back = await env.step({ type: 'jumpTo', arg: 0 });
+        expect(back.phrase).toBe(links.rotor.items[0].phrase);
+
+        const marked = await env.step({
+          type: 'mark',
+          arg: { kind: 'dead_end', reason: 'The first link leads nowhere.' },
+        });
+        expect(marked.free).toBe(true);
+        expect(marked.mark).toEqual({ kind: 'dead_end', reason: 'The first link leads nowhere.' });
+        expect(env.stepCount).toBe(5); // the mark is free
+
+        const entries = env.trace;
+        expect(entries[4].derivedMark).toBe('backtrack');
+        expect(entries[1].derivedMark).toBeUndefined(); // the first visit is not one
+        expect(entries[entries.length - 1].mark.kind).toBe('dead_end');
+        // Listening time is words; the score stays in commands.
+        expect(entries[2].words).toBe(entries[2].obsAfter.phrase.trim().split(/\s+/).length);
+
+        const bad = await env.step({ type: 'mark', arg: { kind: 'whatever' } });
+        expect(bad.error).toMatch(/mark requires a kind/);
       });
     }, 60000);
 

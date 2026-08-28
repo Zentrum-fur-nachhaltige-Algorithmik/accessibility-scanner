@@ -22,7 +22,7 @@ function vsrSource() {
   return vsrBundleSource;
 }
 
-const ROTOR_KINDS = ['headings', 'landmarks', 'links', 'formFields'];
+const ROTOR_KINDS = ['headings', 'landmarks', 'links', 'formFields', 'buttons'];
 
 /**
  * Rotor stepping commands (NVDA quick-nav keys) -> rotor kind + direction.
@@ -37,31 +37,75 @@ const ROTOR_STEP_COMMANDS = {
   prevFormField: { kind: 'formFields', dir: 'prev', label: 'form field' },
   nextLandmark: { kind: 'landmarks', dir: 'next', label: 'landmark' },
   prevLandmark: { kind: 'landmarks', dir: 'prev', label: 'landmark' },
+  nextButton: { kind: 'buttons', dir: 'next', label: 'button' },
+  prevButton: { kind: 'buttons', dir: 'prev', label: 'button' },
 };
 const ROTOR_STEP_TYPES = Object.keys(ROTOR_STEP_COMMANDS);
 
+/** Step commands that accept a heading level (1..6) as their argument. */
+const LEVELLED_STEP_COMMANDS = new Set(['nextHeading', 'prevHeading']);
+
+/**
+ * Entries one rotor page shows. A screen-reader user reads a list page by page,
+ * so revealing every entry of a 200-link page for one command would hand the
+ * agent an overview no blind user has.
+ */
+const ROTOR_PAGE_SIZE = 8; // mirror of PAGE_SIZE in the in-page runtime
+
+/** Marks the agent may record on its own trace (free, see `mark`). */
+const MARK_KINDS = ['dead_end', 'backtrack', 'confirmed'];
+
+/** Cursor-jump commands that can land back where the cursor already was. */
+const JUMP_COMMANDS = new Set(['jumpTo', 'find', 'findNext', ...ROTOR_STEP_TYPES]);
+
+/** Stops between two visits of one element from which it counts as a backtrack. */
+const BACKTRACK_MIN_GAP = 2;
+
 /** Commands that do not cost a step. */
-const FREE_COMMANDS = new Set(['repeat']);
+const FREE_COMMANDS = new Set(['repeat', 'mark']);
+
+/**
+ * Commands costing more than one step. `find` is a typed word plus Enter, which
+ * is what NVDA's Ctrl+NVDA+F and JAWS' Ctrl+F cost their user; `findNext` (F3)
+ * repeats it with a single key.
+ */
+const COMMAND_COSTS = { find: 2 };
+
+/** Steps one command consumes from the budget. */
+function commandCost(type) {
+  if (FREE_COMMANDS.has(type)) return 0;
+  return COMMAND_COSTS[type] || 1;
+}
 
 const COMMAND_TYPES = [
   'next',
   'prev',
   'tab',
   'shiftTab',
-  'headings',
-  'landmarks',
-  'links',
-  'formFields',
+  ...ROTOR_KINDS,
   'jumpTo',
+  'more',
+  'rotorLetter',
   ...ROTOR_STEP_TYPES,
+  'find',
+  'findNext',
   'activate',
   'type',
   'escape',
   'done',
   'repeat',
+  'mark',
 ];
 /** Commands whose implementation walks the whole reading order internally. */
-const WALKING_COMMANDS = new Set([...ROTOR_KINDS, 'jumpTo', ...ROTOR_STEP_TYPES]);
+const WALKING_COMMANDS = new Set([
+  ...ROTOR_KINDS,
+  'jumpTo',
+  'more',
+  'rotorLetter',
+  ...ROTOR_STEP_TYPES,
+  'find',
+  'findNext',
+]);
 
 // In-page runtime. Serialised with Function.prototype.toString() and evaluated
 // in the page after the VSR bundle; everything inside runs in the browser.
@@ -83,7 +127,30 @@ function srenvRuntime() {
     prevFormField: { kind: 'formFields', dir: 'prev', label: 'form field' },
     nextLandmark: { kind: 'landmarks', dir: 'next', label: 'landmark' },
     prevLandmark: { kind: 'landmarks', dir: 'prev', label: 'landmark' },
+    nextButton: { kind: 'buttons', dir: 'next', label: 'button' },
+    prevButton: { kind: 'buttons', dir: 'prev', label: 'button' },
   };
+  const ROTOR_KIND_LIST = ['headings', 'landmarks', 'links', 'formFields', 'buttons'];
+  const PAGE_SIZE = 8;
+
+  /**
+   * Container announcements merged with their first text node into ONE stop:
+   * the screen reader says "paragraph, Der Herzultraschall ..." instead of
+   * stopping on "paragraph" and on the text separately.
+   */
+  const MERGE_CONTAINER_SELECTOR = 'p, li, blockquote, figure, dd, dt';
+
+  /**
+   * "end of ..." stops that are dropped: they are punctuation, not content.
+   * The boundaries that carry information a user needs (a list and its item
+   * count, a table, the landmark boundaries, the document) keep their stop.
+   */
+  const DROPPED_END_RE =
+    /^end of (paragraph|listitem|list item|heading|group|figure|blockquote|term|definition|generic)\b/i;
+
+  /** Role word a phrase starts with ("link, Contact" -> "link"). */
+  const ROLE_PREFIX_RE =
+    /^(link|button|heading|listitem|list item|paragraph|textbox|searchbox|combobox|checkbox|radio|switch|spinbutton|slider|option|tab|menuitem|image|img|banner|navigation|main|contentinfo|complementary|region|form|search|article|group|list|table|row|cell|figure|blockquote|document|dialog|alertdialog|status|alert)\b[,:]?\s*/i;
 
   const LIVE_SELECTOR = '[aria-live], [role="status"], [role="alert"], [role="log"], output';
   const LANDMARK_SELECTOR =
@@ -96,17 +163,44 @@ function srenvRuntime() {
     '[role="textbox"], [role="searchbox"], [role="combobox"], [role="checkbox"],' +
     '[role="radio"], [role="spinbutton"], [role="slider"], [role="switch"]';
   const HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6, [role="heading"]';
+  const BUTTON_SELECTOR =
+    'button, input[type="button"], input[type="submit"], input[type="reset"],' +
+    ' input[type="image"], [role="button"], summary';
 
   const state = {
     ready: false,
     announcements: [],
     lastRotor: null,
+    lastFind: null,
     mutations: { added: 0, removed: 0, changed: 0 },
     liveSeen: new Map(),
   };
 
   function textOf(el) {
     return (el.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  /**
+   * Comparison form for `find`: case-insensitive and diacritic-insensitive, so
+   * "Öffnungszeiten" is found by typing "offnungszeiten" and "Café" by "cafe".
+   */
+  function foldText(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  /** The heading level of an element, `null` when it is not a heading. */
+  function headingLevelOf(el) {
+    if (!el || el.nodeType !== 1) return null;
+    const aria = el.getAttribute('aria-level');
+    if (aria && Number(aria) >= 1 && Number(aria) <= 6) return Number(aria);
+    const m = /^H([1-6])$/.exec(el.tagName);
+    if (m) return Number(m[1]);
+    return el.getAttribute('role') === 'heading' ? 2 : null;
   }
 
   function isVisible(el) {
@@ -311,18 +405,99 @@ function srenvRuntime() {
     }
   }
 
+  /* ---------------------------------------------------------------- */
+  /* Reading stops                                                      */
+  /* ---------------------------------------------------------------- */
+
   /**
-   * Walks the VSR reading order once and returns [{ node, phrase }].
-   * Walking a full cycle leaves the cursor exactly where it started.
+   * A "stop" is one position of the reading cursor. It is NOT one VSR position:
+   * a container announcement and its first text node are one stop
+   * ("paragraph, We build small things"), and the closing "end of paragraph" /
+   * "end of listitem" boundaries are no stop at all. That is how a screen
+   * reader reads running text; counting the punctuation as separate stops made
+   * every paragraph cost three commands to pass.
+   */
+  function isDroppedEnd(phrase) {
+    return DROPPED_END_RE.test(String(phrase == null ? '' : phrase).trim());
+  }
+
+  /** A container whose announcement merges with its first text node. */
+  function isContainerAnnouncement(node, phrase) {
+    if (!node || node.nodeType !== 1 || !node.matches) return false;
+    if (!node.matches(MERGE_CONTAINER_SELECTOR)) return false;
+    // The element's own announcement, not one of its descendants' phrases.
+    return !!phrase;
+  }
+
+  async function rawMove(dir) {
+    if (dir === 'prev') await virtual.previous();
+    else await virtual.next();
+  }
+
+  /**
+   * Moves off the VSR positions that are not stops of their own: dropped "end
+   * of ..." boundaries and container announcements that merge with the text
+   * node behind them.
+   */
+  async function normalizeStop(dir) {
+    for (let i = 0; i < 200; i += 1) {
+      const node = virtual.activeNode;
+      const phrase = await virtual.lastSpokenPhrase();
+      if (isDroppedEnd(phrase)) {
+        await rawMove(dir);
+        continue;
+      }
+      if (isContainerAnnouncement(node, phrase)) {
+        await virtual.next();
+        const after = virtual.activeNode;
+        const merges = after && after.nodeType !== 1 && node.contains(after);
+        // Going forward the merged stop IS the text node: stay on it.
+        if (merges && dir !== 'prev') return;
+        await virtual.previous();
+        if (merges) {
+          // Going backwards the announcement is behind the merged stop already.
+          await virtual.previous();
+          continue;
+        }
+        return; // a container without text of its own is a stop (e.g. a list item holding a link)
+      }
+      return;
+    }
+  }
+
+  /** The phrase of the current stop, with a merged container announcement. */
+  async function phraseHere() {
+    const node = virtual.activeNode;
+    const phrase = await virtual.lastSpokenPhrase();
+    if (!node || node.nodeType === 1) return phrase;
+    const container = node.parentElement && node.parentElement.closest(MERGE_CONTAINER_SELECTOR);
+    if (!container) return phrase;
+    await virtual.previous();
+    const before = virtual.activeNode;
+    const beforePhrase = await virtual.lastSpokenPhrase();
+    await virtual.next();
+    if (before !== container) return phrase;
+    return beforePhrase + ', ' + phrase;
+  }
+
+  /** One stop forward / backward, boundaries and merges applied. */
+  async function moveStop(dir) {
+    await rawMove(dir);
+    await normalizeStop(dir);
+  }
+
+  /**
+   * Walks the reading order once and returns [{ node, phrase }], one entry per
+   * stop. Walking a full cycle leaves the cursor exactly where it started.
    */
   async function readingOrder() {
     const firstNode = virtual.activeNode;
-    const firstPhrase = await virtual.lastSpokenPhrase();
+    const firstPhrase = await phraseHere();
     const entries = [{ node: firstNode, phrase: firstPhrase }];
     for (let i = 0; i < MAX_WALK; i++) {
-      await virtual.next();
+      await moveStop('next');
       const node = virtual.activeNode;
-      const phrase = await virtual.lastSpokenPhrase();
+      const phrase = await phraseHere();
       if (node === firstNode && phrase === firstPhrase) return entries;
       entries.push({ node, phrase });
     }
@@ -340,7 +515,34 @@ function srenvRuntime() {
     if (kind === 'landmarks') return el.matches(LANDMARK_SELECTOR);
     if (kind === 'links') return el.matches(LINK_SELECTOR);
     if (kind === 'formFields') return el.matches(FIELD_SELECTOR);
+    if (kind === 'buttons') return el.matches(BUTTON_SELECTOR);
     return false;
+  }
+
+  /** The entry text a first-letter jump looks at ("link, Contact" -> "Contact"). */
+  function rotorLabel(phrase) {
+    return String(phrase == null ? '' : phrase)
+      .replace(ROLE_PREFIX_RE, '')
+      .trim();
+  }
+
+  /** The page of `state.lastRotor` starting at `from`, and it is now revealed. */
+  function rotorPage(from) {
+    const rotor = state.lastRotor;
+    const start = Math.max(0, Math.min(from, rotor.items.length));
+    const page = [];
+    for (let i = start; i < rotor.items.length && page.length < PAGE_SIZE; i += 1) {
+      rotor.shown.add(i);
+      page.push(Object.assign({}, rotor.items[i]));
+    }
+    rotor.from = start;
+    return {
+      kind: rotor.kind,
+      items: page,
+      from: start,
+      total: rotor.items.length,
+      hasMore: start + page.length < rotor.items.length,
+    };
   }
 
   async function buildRotor(kind) {
@@ -355,17 +557,17 @@ function srenvRuntime() {
       if (!isVisible(el)) continue;
       seen.add(el);
       nodes.push(el);
-      items.push({
+      const item = {
         index: items.length,
         phrase: entry.phrase,
         selector: selectorFor(el),
-      });
+      };
+      // The level is what the digit keys navigate by, so the headings list says it.
+      if (kind === 'headings') item.level = headingLevelOf(el);
+      items.push(item);
     }
-    state.lastRotor = { kind, items, nodes };
-    return {
-      kind,
-      items: items.map((i) => ({ index: i.index, phrase: i.phrase, selector: i.selector })),
-    };
+    state.lastRotor = { kind, items, nodes, shown: new Set(), from: 0 };
+    return rotorPage(0);
   }
 
   /**
@@ -384,9 +586,12 @@ function srenvRuntime() {
    * "end of main"); the closing boundary is skipped so stepping always lands on
    * the landmark itself, the way NVDA's D key does.
    *
+   * With a `level` (1..6) only headings of that level are stopped at, the way
+   * the digit keys of NVDA and JAWS work.
+   *
    * @returns {Promise<boolean>} false when the document has no element of `kind`
    */
-  async function stepToKind(kind, dir) {
+  async function stepToKind(kind, dir, level) {
     const startNode = virtual.activeNode;
     const startPhrase = await virtual.lastSpokenPhrase();
     for (let i = 0; i < MAX_WALK; i += 1) {
@@ -398,6 +603,7 @@ function srenvRuntime() {
       if (
         el &&
         matchesKind(el, kind) &&
+        (!level || headingLevelOf(el) === level) &&
         isVisible(el) &&
         !/^end of\b/i.test(String(phrase || '').trim())
       ) {
@@ -410,11 +616,40 @@ function srenvRuntime() {
     return false;
   }
 
+  /**
+   * Browse-mode search (NVDA Ctrl+NVDA+F, JAWS Ctrl+F): move the cursor to the
+   * next element AFTER it whose spoken phrase contains `needle` (already
+   * folded). The search does NOT wrap: everything from the cursor to the end of
+   * the document is searched and nothing before it, so a miss leaves the cursor
+   * exactly where it was.
+   *
+   * @returns {Promise<boolean>} false when nothing after the cursor matches
+   */
+  async function findForward(needle) {
+    const order = await readingOrder();
+    // The reading order is cyclic and starts at the cursor, so the position of
+    // document start marks the end of the document for the forward search.
+    let stop = order.length;
+    for (let i = 1; i < order.length; i += 1) {
+      const node = order[i].node;
+      if (node === document || node === document.body || node === document.documentElement) {
+        stop = i;
+        break;
+      }
+    }
+    for (let i = 1; i < stop; i += 1) {
+      if (!foldText(order[i].phrase).includes(needle)) continue;
+      for (let j = 0; j < i; j += 1) await moveStop('next');
+      return true;
+    }
+    return false;
+  }
+
   /** Moves the VSR cursor forward (wrapping) until it lands on `target`. */
   async function moveCursorTo(target) {
     if (elementOf(virtual.activeNode) === target) return true;
     for (let i = 0; i < MAX_WALK; i++) {
-      await virtual.next();
+      await moveStop('next');
       if (elementOf(virtual.activeNode) === target) return true;
     }
     return false;
@@ -440,10 +675,10 @@ function srenvRuntime() {
     try {
       switch (type) {
         case 'next':
-          await virtual.next();
+          await moveStop('next');
           break;
         case 'prev':
-          await virtual.previous();
+          await moveStop('prev');
           break;
         case 'tab':
           await virtual.press('Tab');
@@ -455,8 +690,68 @@ function srenvRuntime() {
         case 'landmarks':
         case 'links':
         case 'formFields':
+        case 'buttons':
           rotor = await buildRotor(type);
           break;
+        case 'find': {
+          const needle = foldText(cmd.arg);
+          if (!needle) {
+            error = 'find requires a text to search for';
+            break;
+          }
+          state.lastFind = needle;
+          if (!(await findForward(needle))) error = 'not found';
+          break;
+        }
+        case 'findNext': {
+          if (!state.lastFind) {
+            error = 'findNext requires a preceding find';
+            break;
+          }
+          if (!(await findForward(state.lastFind))) error = 'not found';
+          break;
+        }
+        case 'more': {
+          if (!state.lastRotor) {
+            error = 'more requires a preceding rotor command';
+            break;
+          }
+          const next = state.lastRotor.from + PAGE_SIZE;
+          if (next >= state.lastRotor.items.length) {
+            error = 'no more entries in the list';
+            break;
+          }
+          rotor = rotorPage(next);
+          break;
+        }
+        case 'rotorLetter': {
+          if (!state.lastRotor) {
+            error = 'rotorLetter requires a preceding rotor command';
+            break;
+          }
+          const letter = foldText(cmd.arg).slice(0, 1);
+          if (!letter) {
+            error = 'rotorLetter requires a letter';
+            break;
+          }
+          const items = state.lastRotor.items;
+          let found = -1;
+          // The NEXT entry with that letter, wrapping once, like the first-letter
+          // navigation of the NVDA elements list.
+          for (let n = 1; n <= items.length; n += 1) {
+            const i = (state.lastRotor.from + n) % items.length;
+            if (foldText(rotorLabel(items[i].phrase)).startsWith(letter)) {
+              found = i;
+              break;
+            }
+          }
+          if (found === -1) {
+            error = 'no entry starting with ' + letter;
+            break;
+          }
+          rotor = rotorPage(found);
+          break;
+        }
         case 'jumpTo': {
           const idx = Number(cmd.arg);
           if (!state.lastRotor) {
@@ -470,6 +765,11 @@ function srenvRuntime() {
               ' is out of range (0..' +
               (state.lastRotor.nodes.length - 1) +
               ')';
+            break;
+          }
+          if (!state.lastRotor.shown.has(idx)) {
+            error =
+              'entry ' + idx + ' has not been shown yet; use more or rotorLetter to see it first';
             break;
           }
           const target = state.lastRotor.nodes[idx];
@@ -516,7 +816,8 @@ function srenvRuntime() {
         case 'done':
           break;
         case 'repeat':
-          // Nothing to do: `snapshot()` re-reads lastSpokenPhrase. Free command.
+        case 'mark':
+          // Nothing happens on the page; both are free and only recorded.
           break;
         default: {
           const step = STEP_COMMANDS[type];
@@ -524,8 +825,15 @@ function srenvRuntime() {
             error = 'unknown command: ' + JSON.stringify(type);
             break;
           }
-          const found = await stepToKind(step.kind, step.dir);
-          if (!found) error = 'no ' + step.label;
+          // Heading steps take an optional level (the digit keys of NVDA/JAWS).
+          const level =
+            step.kind === 'headings' && cmd.arg != null ? Math.trunc(Number(cmd.arg)) : 0;
+          if (level && !(level >= 1 && level <= 6)) {
+            error = 'heading level must be between 1 and 6';
+            break;
+          }
+          const found = await stepToKind(step.kind, step.dir, level);
+          if (!found) error = 'no ' + step.label + (level ? ' at level ' + level : '');
           break;
         }
       }
@@ -538,7 +846,7 @@ function srenvRuntime() {
 
   async function snapshot() {
     return {
-      phrase: await virtual.lastSpokenPhrase(),
+      phrase: await phraseHere(),
       focus: focusInfo(),
       dialogs: openDialogs(),
       dom: domSignature(),
@@ -660,6 +968,11 @@ function srenvRuntime() {
       elementOf,
       matchesKind,
       isVisible,
+      headingLevelOf,
+      foldText,
+      rotorLabel,
+      rotorPageSize: PAGE_SIZE,
+      rotorKinds: ROTOR_KIND_LIST,
       getLastRotorNodes() {
         return state.lastRotor ? state.lastRotor.nodes : [];
       },
@@ -779,6 +1092,24 @@ function phraseRole(phrase) {
     .trim();
 }
 
+/**
+ * A `mark` argument the agent supplies: `{ kind, reason }` with a known kind.
+ * Returns null for anything else, which the env reports as an error.
+ */
+function normalizeMark(arg) {
+  const value = arg && typeof arg === 'object' ? arg : { kind: arg };
+  const kind = String(value.kind || '').trim();
+  if (MARK_KINDS.indexOf(kind) === -1) return null;
+  const reason = value.reason == null ? '' : String(value.reason).trim();
+  return reason ? { kind, reason } : { kind };
+}
+
+/** Words in one spoken phrase, so listening time can be computed from a trace. */
+function wordCount(phrase) {
+  const text = String(phrase == null ? '' : phrase).trim();
+  return text ? text.split(/\s+/).length : 0;
+}
+
 /** `page.url()` without throwing on a target that is already gone. */
 function safeUrl(target) {
   try {
@@ -813,6 +1144,8 @@ class ScreenReaderEnv {
     this.stepCount = 0;
     this.trace = [];
     this.phrases = [];
+    /** Cursor selector after every counted command, for derived backtracks. */
+    this._cursorHistory = [];
     this.started = false;
     this._injected = false;
     this._lastUrl = null;
@@ -912,6 +1245,23 @@ class ScreenReaderEnv {
     }
   }
 
+  /**
+   * A jump that lands on an element the cursor has already visited, with at
+   * least `BACKTRACK_MIN_GAP` other stops in between, is a backtrack: the agent
+   * went somewhere, found nothing and came back. Derived from the trace so the
+   * report does not depend on the agent marking it itself.
+   *
+   * @returns {'backtrack'|null}
+   */
+  _deriveBacktrack(type, cursorSelector) {
+    if (!cursorSelector || !JUMP_COMMANDS.has(type)) return null;
+    const last = this._cursorHistory.lastIndexOf(cursorSelector);
+    if (last === -1) return null;
+    const between = new Set(this._cursorHistory.slice(last + 1).filter(Boolean));
+    between.delete(cursorSelector);
+    return between.size >= BACKTRACK_MIN_GAP ? 'backtrack' : null;
+  }
+
   /** Drain the popups opened since the last command. */
   async _drainPopups() {
     const work = this._popupWork.splice(0);
@@ -965,12 +1315,22 @@ class ScreenReaderEnv {
    * budget is already exhausted (nothing is executed then). `repeat` is free.
    *
    * Commands: next, prev, tab, shiftTab (cursor); headings, landmarks, links,
-   * formFields (rotor list into obs.rotor), jumpTo arg:index (entry of the last
-   * rotor list); nextHeading/prevHeading, nextLink/prevLink, nextFormField/
-   * prevFormField, nextLandmark/prevLandmark (quick navigation, wraps around; an
-   * empty kind leaves the cursor put and sets `error: 'no <kind>'`); activate,
-   * type arg:text, escape; done (recorded only); repeat (re-emits the last phrase,
-   * trace entry and observation flagged `free: true`).
+   * formFields, buttons (first page of the rotor list into obs.rotor), more
+   * (next page), rotorLetter arg:letter (page starting at the next entry with
+   * that letter), jumpTo arg:index (an entry the list has SHOWN);
+   * nextHeading/prevHeading (arg: optional level 1..6),
+   * nextLink/prevLink, nextFormField/prevFormField, nextLandmark/prevLandmark,
+   * nextButton/prevButton (quick navigation, wraps around; an empty kind leaves
+   * the cursor put and sets `error: 'no <kind>'`); find arg:text (browse-mode
+   * search forward from the cursor, no wrap, `error: 'not found'`, costs TWO
+   * steps) and findNext (repeats the last search, one step); activate, type
+   * arg:text, escape; done (recorded only); repeat (re-emits the last phrase)
+   * and mark arg:{kind, reason} (records what the caller noticed), both free:
+   * trace entry and observation flagged `free: true`.
+   *
+   * One step of the cursor is one STOP, not one VSR position: a container and
+   * its first text node are read as one ("paragraph, We build small things"),
+   * and the "end of paragraph" style boundaries are no stop at all.
    */
   async step(cmd) {
     if (!this.started) throw new Error('ScreenReaderEnv.step() called before start()');
@@ -997,10 +1357,11 @@ class ScreenReaderEnv {
     const before = await this.page.evaluate(() => window.__SRENV.snapshot());
     const urlBefore = before.url;
 
-    // Free commands (`repeat`) change no state, so they neither consume budget
-    // nor advance `stepCount`. They are still recorded in the trace (flagged
-    // `free: true`) because they are part of what the user did.
+    // Free commands (`repeat`, `mark`) change no state, so they neither consume
+    // budget nor advance `stepCount`. They are still recorded in the trace
+    // (flagged `free: true`) because they are part of what the user did.
     if (FREE_COMMANDS.has(command.type)) {
+      const mark = command.type === 'mark' ? normalizeMark(command.arg) : null;
       const obs = {
         step: this.stepCount,
         phrase: before.phrase || '',
@@ -1011,10 +1372,16 @@ class ScreenReaderEnv {
         urlChanged: false,
         budgetLeft: this.budgetLeft,
         free: true,
+        ...(mark ? { mark } : {}),
+        ...(command.type === 'mark' && !mark
+          ? { error: `mark requires a kind out of ${MARK_KINDS.join(', ')}` }
+          : {}),
       };
       this.trace.push({
         step: this.stepCount,
         cmd: { type: command.type, arg: command.arg },
+        ...(command.note ? { note: command.note } : {}),
+        ...(mark ? { mark } : {}),
         free: true,
         obsBefore: {
           phrase: before.phrase,
@@ -1038,7 +1405,9 @@ class ScreenReaderEnv {
       return obs;
     }
 
-    this.stepCount += 1;
+    // `find` costs two steps (typing the word and pressing Enter), every other
+    // counted command one.
+    this.stepCount += commandCost(command.type);
 
     let result;
     let navigated = false;
@@ -1136,9 +1505,18 @@ class ScreenReaderEnv {
     this.phrases.push(obs.phrase);
     this._lastUrl = url;
 
+    const cursorSelector = (result.meta && result.meta.cursorSelector) || null;
+    const derived = this._deriveBacktrack(command.type, cursorSelector);
+    this._cursorHistory.push(cursorSelector);
+
     this.trace.push({
       step: this.stepCount,
       cmd: { type: command.type, arg: command.arg },
+      // The caller's own one-line reasoning, recorded for the trace report.
+      ...(command.note ? { note: command.note } : {}),
+      // Listening time is words, not commands; the score stays in commands.
+      words: wordCount(obs.phrase),
+      ...(derived ? { derivedMark: derived } : {}),
       obsBefore: {
         phrase: before.phrase,
         focusSelector: before.focus ? before.focus.selector : null,
@@ -1502,6 +1880,13 @@ module.exports.collectSpokenPhrases = collectSpokenPhrases;
 module.exports.srenvRuntime = srenvRuntime;
 module.exports.vsrSource = vsrSource;
 module.exports.COMMAND_TYPES = COMMAND_TYPES;
+module.exports.COMMAND_COSTS = COMMAND_COSTS;
+module.exports.commandCost = commandCost;
+module.exports.LEVELLED_STEP_COMMANDS = LEVELLED_STEP_COMMANDS;
+module.exports.ROTOR_PAGE_SIZE = ROTOR_PAGE_SIZE;
+module.exports.MARK_KINDS = MARK_KINDS;
+module.exports.wordCount = wordCount;
+module.exports.normalizeMark = normalizeMark;
 module.exports.ROTOR_KINDS = ROTOR_KINDS;
 module.exports.ROTOR_STEP_COMMANDS = ROTOR_STEP_COMMANDS;
 module.exports.ROTOR_STEP_TYPES = ROTOR_STEP_TYPES;

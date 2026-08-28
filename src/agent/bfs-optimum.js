@@ -7,8 +7,14 @@
 
 'use strict';
 
-const { injectScreenReader } = require('./screenreader-env');
-const { chooseReach, reachCommands, ROTOR_KINDS, STEP_COMMAND_BY_KIND } = require('./optimal-path');
+const { injectScreenReader, COMMAND_COSTS } = require('./screenreader-env');
+const {
+  chooseReach,
+  reachCommands,
+  findWordsFor,
+  ROTOR_KINDS,
+  STEP_COMMAND_BY_KIND,
+} = require('./optimal-path');
 const { evaluate, createRequestRecorder } = require('./oracle');
 const {
   createIsolatedContext,
@@ -92,26 +98,57 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
 
   const mod = (a, n) => ((a % n) + n) % n;
 
-  // rotor starts, and the nearest one preceding every index
+  // Rotor starts. A list shows one page of `pageSize` entries, so reaching entry
+  // r costs 1 (open) + the commands that reveal it (`more` per page, or one
+  // `rotorLetter` when r is the first entry with its letter) + 1 (`jumpTo`).
+  const pageSize = I.rotorPageSize || 8;
   const rotorAt = new Array(N).fill(null);
   const rotorNodesByKind = {};
   for (const kind of kinds) {
-    await I.buildRotor(kind);
+    const rotor = await I.buildRotor(kind);
     const nodes = I.getLastRotorNodes().slice();
     rotorNodesByKind[kind] = nodes;
+    const items = rotor.items || [];
+    const seenLetter = new Set();
     for (let r = 0; r < nodes.length; r += 1) {
+      const phrase = (items[r] && items[r].phrase) || '';
+      const letter = I.foldText(I.rotorLabel(phrase)).slice(0, 1);
+      const firstOfLetter = !!letter && !seenLetter.has(letter);
+      if (letter) seenLetter.add(letter);
+      const pages = Math.floor(r / pageSize);
+      const reveal = firstOfLetter && pages > 1 ? 1 : pages;
       const list = idxOf.get(nodes[r]);
       if (!list) continue;
-      for (const i of list) if (!rotorAt[i]) rotorAt[i] = { kind, index: r };
+      for (const i of list) {
+        if (!rotorAt[i] || 2 + reveal < rotorAt[i].cost) {
+          rotorAt[i] = {
+            kind,
+            index: r,
+            cost: 2 + reveal,
+            pages: firstOfLetter && pages > 1 ? 0 : pages,
+            letter: firstOfLetter && pages > 1 ? letter : null,
+          };
+        }
+      }
     }
   }
-  // Cyclic sweep: nearest[i] = index of the closest rotor entry at or before i.
-  const nearest = new Array(N).fill(-1);
-  let last = -1;
-  for (let pass = 0; pass < 2; pass += 1) {
-    for (let i = 0; i < N; i += 1) {
-      if (rotorAt[i]) last = i;
-      nearest[i] = last;
+  // Cyclic min-plus sweep: rotorCost[i] = cheapest rotor route to i, which is
+  // the cheapest entry at or before i plus one `next` per position in between.
+  const rotorCost = new Array(N).fill(Infinity);
+  const rotorFrom = new Array(N).fill(-1);
+  {
+    let cur = Infinity;
+    let from = -1;
+    for (let pass = 0; pass < 2; pass += 1) {
+      for (let i = 0; i < N; i += 1) {
+        cur = cur === Infinity ? Infinity : cur + 1;
+        if (rotorAt[i] && rotorAt[i].cost <= cur) {
+          cur = rotorAt[i].cost;
+          from = i;
+        }
+        rotorCost[i] = cur;
+        rotorFrom[i] = from;
+      }
     }
   }
 
@@ -123,13 +160,9 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
   // passes for the wrap) computes for every `i` in O(N): the same minimum
   // `optimal-path.js` takes directly over the (single) target's indices.
   const INF = Infinity;
-  const stepBest = {}; // kind -> { cost: number[], dir: string[], steps: number[], from: number[] }
-  for (const kind of kinds) {
-    const positions = [];
-    for (const el of rotorNodesByKind[kind]) {
-      const list = idxOf.get(el);
-      if (list && list.length) positions.push({ el, i: list[0] });
-    }
+  // kind (or heading level) -> { cost: number[], dir: string[], steps: number[], from: number[] }
+  const stepBest = {};
+  const sweepPositions = (positions) => {
     const costs = new Map();
     const put = (el, steps, dir) => {
       const cur = costs.get(el);
@@ -185,7 +218,71 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
         from[i] = curFrom;
       }
     }
-    stepBest[kind] = { cost, dir, steps, from };
+    return { cost, dir, steps, from };
+  };
+
+  const positionsOf = (nodes) => {
+    const positions = [];
+    for (const el of nodes) {
+      const list = idxOf.get(el);
+      if (list && list.length) positions.push({ el, i: list[0] });
+    }
+    return positions;
+  };
+
+  for (const kind of kinds) stepBest[kind] = sweepPositions(positionsOf(rotorNodesByKind[kind]));
+
+  // Heading levels: the same sweep over the headings of one level, which is
+  // what `nextHeading`/`prevHeading` with a level stop at (NVDA/JAWS digits).
+  const levelBest = {};
+  for (let level = 1; level <= 6; level += 1) {
+    const nodes = (rotorNodesByKind.headings || []).filter(
+      (el) => I.headingLevelOf(el) === level
+    );
+    if (!nodes.length) continue;
+    levelBest[level] = sweepPositions(positionsOf(nodes));
+  }
+
+  // find: browse-mode search, forward from the cursor, no wrap. One sweep per
+  // searchable word gives the cheapest `find` + j x `findNext` + k x `next` for
+  // every reading-order index.
+  const findWords = cfg.findWords || [];
+  const findCost = cfg.findCost || 2;
+  const findBest = {
+    cost: new Array(N).fill(INF),
+    word: new Array(N).fill(null),
+    k: new Array(N).fill(0),
+    findNexts: new Array(N).fill(0),
+  };
+  if (findWords.length) {
+    const folded = order.map((e) => I.foldText(e.phrase));
+    const limit = cIdx === docStart ? N : mod(docStart - cIdx, N);
+    for (const word of findWords) {
+      const w = I.foldText(word);
+      if (!w) continue;
+      let cur = INF;
+      let curD = 0;
+      let curJ = 0;
+      let j = 0;
+      for (let d = 1; d < limit; d += 1) {
+        cur = cur === INF ? INF : cur + 1;
+        const i = mod(cIdx + d, N);
+        if (folded[i].includes(w)) {
+          if (findCost + j <= cur) {
+            cur = findCost + j;
+            curD = d;
+            curJ = j;
+          }
+          j += 1;
+        }
+        if (cur < findBest.cost[i]) {
+          findBest.cost[i] = cur;
+          findBest.word[i] = word;
+          findBest.k[i] = d - curD;
+          findBest.findNexts[i] = curJ;
+        }
+      }
+    }
   }
 
   // tab order
@@ -295,17 +392,25 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
     let prev = null;
     let rotor = null;
     let step = null;
+    let stepLevel = null;
+    let find = null;
     for (const i of list) {
       const f = mod(i - cIdx, N);
       const b = mod(cIdx - i, N);
       if (next === null || f < next) next = f;
       if (prev === null || b < prev) prev = b;
-      const s = nearest[i];
-      if (s !== -1) {
+      const s = rotorFrom[i];
+      if (s !== -1 && rotorCost[i] !== Infinity) {
         const k = mod(i - s, N);
-        const cost = 2 + k;
-        if (!rotor || cost < rotor.cost) {
-          rotor = { kind: rotorAt[s].kind, index: rotorAt[s].index, k, cost };
+        if (!rotor || rotorCost[i] < rotor.cost) {
+          rotor = {
+            kind: rotorAt[s].kind,
+            index: rotorAt[s].index,
+            pages: rotorAt[s].pages,
+            letter: rotorAt[s].letter,
+            k,
+            cost: rotorCost[i],
+          };
         }
       }
       for (const kind of kinds) {
@@ -326,6 +431,34 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
           };
         }
       }
+      for (const level of Object.keys(levelBest)) {
+        const lb = levelBest[level];
+        if (lb.cost[i] === Infinity) continue;
+        const command =
+          (cfg.stepCommands && cfg.stepCommands.headings
+            ? cfg.stepCommands.headings[lb.dir[i]]
+            : null) || null;
+        if (!command) continue;
+        if (!stepLevel || lb.cost[i] < stepLevel.cost) {
+          stepLevel = {
+            kind: 'headings',
+            level: Number(level),
+            dir: lb.dir[i],
+            command,
+            steps: lb.steps[i],
+            k: mod(i - lb.from[i], N),
+            cost: lb.cost[i],
+          };
+        }
+      }
+      if (findBest.cost[i] !== Infinity && (!find || findBest.cost[i] < find.cost)) {
+        find = {
+          word: findBest.word[i],
+          findNexts: findBest.findNexts[i],
+          k: findBest.k[i],
+          cost: findBest.cost[i],
+        };
+      }
     }
     let tab = null;
     const tIdxTab = tabOrder.indexOf(el);
@@ -343,7 +476,7 @@ async function analyzeStateInPage(cursorSelector, kinds, cfg) {
       textField,
       enterAllowed: textField && !unsafeEnter,
       isSubmitControl: actionable && isSubmitControl(el),
-      analysis: { inReadingOrder: list.length > 0, next, prev, tab, rotor, step },
+      analysis: { inReadingOrder: list.length > 0, next, prev, tab, rotor, step, stepLevel, find },
     });
   }
 
@@ -516,6 +649,10 @@ async function computeBfsOptimum(browser, url, task, options = {}) {
     sameOriginOnly: opts.sameOriginOnly,
     allowSubmit: safeOrigin,
     stepCommands: STEP_COMMAND_BY_KIND,
+    // The search is restricted to the task's own words, exactly as in
+    // `optimal-path.js`: the optimum must not know the page.
+    findWords: findWordsFor(normalized),
+    findCost: COMMAND_COSTS.find,
   };
 
   const context = await createIsolatedContext(browser);

@@ -13,6 +13,7 @@ const {
   typeTextsOf,
   isLocalOrigin,
 } = require('../../src/agent/bfs-optimum');
+const { findWordsFor } = require('../../src/agent/optimal-path');
 
 const CONTACT_ORACLE = { type: 'urlMatches', pattern: 'bfs-contact\\.html' };
 
@@ -80,6 +81,71 @@ describe('agent/bfs-optimum: cost model (pure)', () => {
       { type: 'shiftTab' },
     ]);
     expect(reachCommands({ strategy: 'prev', cost: 5 }).every((c) => c.type === 'prev')).toBe(true);
+  });
+
+  it('pays for the pages a rotor entry needs before jumpTo can take it', () => {
+    // Entry 20 sits on the third page: open, more, more, jumpTo.
+    expect(
+      reachCommands({
+        strategy: 'rotor',
+        cost: 4,
+        via: { kind: 'links', index: 20, k: 0, pages: 2, letter: null },
+      })
+    ).toEqual([
+      { type: 'links' },
+      { type: 'more' },
+      { type: 'more' },
+      { type: 'jumpTo', arg: 20 },
+    ]);
+    // ... unless it is the first entry with its letter: open, letter, jumpTo.
+    expect(
+      reachCommands({
+        strategy: 'rotor',
+        cost: 3,
+        via: { kind: 'links', index: 20, k: 0, pages: 0, letter: 'k' },
+      })
+    ).toEqual([
+      { type: 'links' },
+      { type: 'rotorLetter', arg: 'k' },
+      { type: 'jumpTo', arg: 20 },
+    ]);
+  });
+
+  it('expands the levelled heading step and the search into their commands', () => {
+    expect(
+      reachCommands({
+        strategy: 'stepLevel',
+        cost: 2,
+        via: { kind: 'headings', level: 3, dir: 'next', command: 'nextHeading', steps: 2, k: 0 },
+      })
+    ).toEqual([
+      { type: 'nextHeading', arg: 3 },
+      { type: 'nextHeading', arg: 3 },
+    ]);
+    // find costs 2 (the word and Enter), findNext and next one each.
+    expect(
+      reachCommands({
+        strategy: 'find+next',
+        cost: 5,
+        via: { word: 'kontakt', findNexts: 1, k: 2 },
+      })
+    ).toEqual([
+      { type: 'find', arg: 'kontakt' },
+      { type: 'findNext' },
+      { type: 'next' },
+      { type: 'next' },
+    ]);
+  });
+
+  it('restricts the BFS search words to the task description', () => {
+    expect(findWordsFor({ description: 'Find the ordination hours on Monday' })).toEqual([
+      'ordination',
+      'hours',
+      'monday',
+    ]);
+    // Too short, a stopword, and a task without a description.
+    expect(findWordsFor({ description: 'Open the page and view it' })).toEqual([]);
+    expect(findWordsFor({})).toEqual([]);
   });
 
   it('collects the distinct texts the task types', () => {

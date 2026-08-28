@@ -246,7 +246,12 @@ async function runSite({
   return { url, tasks: results, siteScore, invalidTasks, usage, wallClockMs };
 }
 
-/** Everything a screen-reader user heard so far: cursor phrases, announcements, rotor lists. */
+/**
+ * Everything a screen-reader user heard so far: cursor phrases and announcements.
+ * Rotor lists are deliberately left out: a list of headings or links is an index
+ * the user scans to jump somewhere, not content that was read. Counting its
+ * entries as heard let an agent "read" a whole page in one command.
+ */
 function tracePhrases(env) {
   const out = [];
   for (const entry of (env && env.trace) || []) {
@@ -254,9 +259,6 @@ function tracePhrases(env) {
     if (!obs) continue;
     if (typeof obs.phrase === 'string') out.push(obs.phrase);
     for (const a of obs.announcements || []) out.push(a);
-    if (obs.rotor && Array.isArray(obs.rotor.items)) {
-      for (const item of obs.rotor.items) out.push(item.phrase);
-    }
   }
   return out.filter((p) => typeof p === 'string' && p !== '');
 }

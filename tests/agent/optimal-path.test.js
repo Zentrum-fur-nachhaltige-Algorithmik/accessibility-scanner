@@ -16,6 +16,7 @@ const LANDMARK = '/agent/optimal-landmark.html';
 const MODAL = '/agent/good-modal.html';
 const EQUIV = '/agent/optimal-equivalence.html';
 const READ = '/agent/optimal-read.html';
+const KEYS = '/agent/quick-keys.html';
 
 const CONTACT_LINK = 'nav ul li:nth-of-type(3) a';
 
@@ -128,20 +129,14 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     expect(res.steps[0].analysis.rotor).toMatchObject({ kind: 'links', k: 0, cost: 2 });
   }, 60000);
 
-  it('reaches a button inside a region by stepping to the landmark, then next × k', async () => {
+  it('reaches the only button of a page with one nextButton: nOpt = 2', async () => {
     const res = await optimal(LANDMARK, [{ action: 'click', selector: '#accept' }]);
-    expect(res.nOpt).toBe(3);
+    expect(res.nOpt).toBe(2);
     const step = res.steps[0];
-    expect(step.reach.strategy).toBe('step+next');
-    expect(step.reach.cost).toBe(2); // Shift+D (wraps to the last landmark) + next × 1
-    expect(step.reach.via).toMatchObject({
-      kind: 'landmarks',
-      command: 'prevLandmark',
-      steps: 1,
-      k: 1,
-    });
-    // The rotor route is still costed, it is simply one command dearer.
-    expect(step.analysis.rotor).toMatchObject({ kind: 'landmarks', k: 1, cost: 3 });
+    expect(step.reach).toMatchObject({ strategy: 'step', cost: 1 });
+    expect(step.reach.via).toMatchObject({ kind: 'buttons', command: 'nextButton', steps: 1, k: 0 });
+    // The rotor route to the same element is one command dearer, ...
+    expect(step.analysis.rotor.cost).toBe(2);
     // ... and both beat tabbing there, which costs 11.
     expect(step.analysis.tab.cost).toBe(11);
     expect(step.analysis.next).toBeGreaterThan(step.reach.cost);
@@ -165,9 +160,12 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     expect(res.steps[0].equivalenceClassSize).toBe(1);
   }, 60000);
 
-  it('uses tab when it is cheaper than any rotor (first control on the page)', async () => {
+  it('reaches the first control of the page in one command (button step, tab as dear)', async () => {
     const res = await optimal(HOME, [{ action: 'click', selector: '#cookie-accept' }]);
-    expect(res.steps[0].reach).toEqual({ strategy: 'tab', cost: 1 });
+    // One Tab and one B both land on it; on a tie the quick-nav key wins.
+    expect(res.steps[0].analysis.tab).toEqual({ dir: 'tab', cost: 1 });
+    expect(res.steps[0].reach).toMatchObject({ strategy: 'step', cost: 1 });
+    expect(res.steps[0].reach.via).toMatchObject({ kind: 'buttons', command: 'nextButton' });
     expect(res.nOpt).toBe(2);
   }, 60000);
 
@@ -219,7 +217,7 @@ describe('agent/optimal-path: computeOptimalPath', () => {
       { action: 'click', selector: '#save' },
     ]);
     expect(res.error).toBeUndefined();
-    expect(res.steps[0].reach).toEqual({ strategy: 'tab', cost: 1 });
+    expect(res.steps[0].reach).toMatchObject({ strategy: 'step', cost: 1 });
     // The dialog is open now, so the reading order the second step is costed
     // against is the dialog's, not the page's.
     expect(res.steps[1].analysis.readingOrderLength).toBeLessThan(
@@ -270,13 +268,88 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     expect(res.nOpt).toBe(3);
   }, 60000);
 
-  it('reaches the 2nd heading with nextHeading × 2: nOpt = 3', async () => {
+  it('reaches the 2nd heading with one levelled heading step: nOpt = 2', async () => {
     const res = await optimal(EQUIV, [{ action: 'click', selector: '#section-two' }]);
     expect(res.error).toBeUndefined();
-    expect(res.steps[0].reach).toMatchObject({ strategy: 'step', cost: 2 });
-    expect(res.steps[0].reach.via).toMatchObject({ kind: 'headings', steps: 2, k: 0 });
-    expect(res.steps[0].reach.via.command).toMatch(/^(next|prev)Heading$/);
-    expect(res.nOpt).toBe(3);
+    // It is the only level-2 heading, so the digit key reaches it in one press,
+    // while plain nextHeading has to pass the h1 first.
+    expect(res.steps[0].reach).toMatchObject({ strategy: 'stepLevel', cost: 1 });
+    expect(res.steps[0].reach.via).toMatchObject({
+      kind: 'headings',
+      level: 2,
+      command: 'nextHeading',
+      steps: 1,
+      k: 0,
+    });
+    expect(res.steps[0].analysis.step).toMatchObject({ kind: 'headings', steps: 2, cost: 2 });
+    expect(res.nOpt).toBe(2);
+  }, 60000);
+
+  it('reaches the last button with one prevButton, past seven other buttons', async () => {
+    const res = await optimal(KEYS, [{ action: 'click', selector: '#b4' }], {
+      description: 'Press the fourth button',
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.steps[0].reach).toMatchObject({ strategy: 'step', cost: 1 });
+    expect(res.steps[0].reach.via).toMatchObject({
+      kind: 'buttons',
+      dir: 'prev',
+      command: 'prevButton',
+      steps: 1,
+      k: 0,
+    });
+    expect(res.nOpt).toBe(2);
+  }, 60000);
+
+  it('picks the level of the target heading over the plain heading step', async () => {
+    // Four h3 sit between the h1 and the only h2, so nextHeading needs five
+    // presses (or prevHeading two); the digit key 2 needs one.
+    const res = await optimal(KEYS, [{ action: 'click', selector: '#contact' }], {
+      description: 'Open the contact section',
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.steps[0].reach).toMatchObject({ strategy: 'stepLevel', cost: 1 });
+    expect(res.steps[0].reach.via).toMatchObject({
+      kind: 'headings',
+      level: 2,
+      command: 'nextHeading',
+      steps: 1,
+      k: 0,
+    });
+    expect(res.steps[0].analysis.step.cost).toBeGreaterThan(1);
+    expect(res.nOpt).toBe(2);
+  }, 60000);
+
+  it('searches with a word of the task description when that is the cheapest route', async () => {
+    const res = await optimal(KEYS, [], {
+      description: 'What are the ordination hours?',
+      kind: 'information',
+      evidence: 'Monday 08:00 to 12:00',
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.optimalPathError).toBeUndefined();
+    const read = res.steps[0];
+    expect(read.action).toBe('read');
+    expect(read.reach).toMatchObject({ strategy: 'find', cost: 2 });
+    expect(read.reach.via).toMatchObject({ word: 'ordination', findNexts: 0, k: 0 });
+    // find (2) + hearing it (0), against 5 for the cheapest keystroke route.
+    expect(res.nOpt).toBe(2);
+    expect(res.readDistance).toBe(2);
+    expect(read.analysis.stepLevel.cost).toBeGreaterThan(2);
+  }, 60000);
+
+  it('never searches with a word the task description does not contain', async () => {
+    // Same page, same answer: only the wording of the task changed, so
+    // "ordination" is knowledge the user does not have and `find` is out.
+    const res = await optimal(KEYS, [], {
+      description: 'Give me the winter timetable',
+      kind: 'information',
+      evidence: 'Monday 08:00 to 12:00',
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.steps[0].analysis.find).toBeNull();
+    expect(res.steps[0].reach.strategy).not.toMatch(/^find/);
+    expect(res.nOpt).toBe(5);
   }, 60000);
 
   it('reuses the cached page analysis for the members of one equivalence class', async () => {
@@ -350,17 +423,18 @@ describe('agent/optimal-path: computeOptimalPath', () => {
       actionCost: 0,
       selector: expect.stringContaining('p'),
     });
-    // The phrase really carries the evidence.
+    // The phrase really carries the evidence, container and text in one stop.
     expect(read.phrase.toLowerCase()).toContain('phone +49 30 1234567');
+    expect(read.phrase).toMatch(/^paragraph, /);
     // Reached with the ordinary strategies: nextHeading, then next x k.
-    expect(read.reach).toMatchObject({ strategy: 'step+next', cost: 3 });
-    expect(read.reach.via).toMatchObject({ kind: 'headings', command: 'nextHeading', k: 2 });
-    // ... which is cheaper than walking there with `next` alone.
+    expect(read.reach).toMatchObject({ strategy: 'step+next', cost: 2 });
+    expect(read.reach.via).toMatchObject({ kind: 'headings', command: 'nextHeading', k: 1 });
+    // ... which is at most as dear as walking there with `next` alone.
     expect(read.analysis.next).toBeGreaterThanOrEqual(read.reach.cost);
 
-    expect(res.readDistance).toBe(3);
-    // goto (1 + 0) + read (3 + 0)
-    expect(res.nOpt).toBe(4);
+    expect(res.readDistance).toBe(2);
+    // goto (1 + 0) + read (2 + 0)
+    expect(res.nOpt).toBe(3);
   }, 60000);
 
   it('costs the cheapest matching phrase and reports the read step from document start', async () => {

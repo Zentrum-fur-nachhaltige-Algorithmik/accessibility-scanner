@@ -9,13 +9,35 @@ function fakeEnv({ maxSteps = 10, phraseFor } = {}) {
     trace: [],
     findings: [],
     async step(cmd) {
+      if (cmd.type === 'mark') {
+        const obs = {
+          step: env.stepCount,
+          phrase: '',
+          announcements: [],
+          rotor: null,
+          focus: null,
+          url: 'http://x/',
+          urlChanged: false,
+          budgetLeft: maxSteps - env.stepCount,
+          free: true,
+          mark: cmd.arg,
+        };
+        env.trace.push({ step: env.stepCount, cmd, free: true, mark: cmd.arg, obsAfter: obs });
+        return obs;
+      }
       env.stepCount += 1;
       const obs = {
         step: env.stepCount,
         phrase: phraseFor ? phraseFor(cmd, env.stepCount) : `phrase-${env.stepCount}`,
         announcements: [],
-        rotor: ['headings', 'landmarks', 'links', 'formFields'].includes(cmd.type)
-          ? { kind: cmd.type, items: [{ index: 0, phrase: 'Contact, heading level 2' }] }
+        rotor: ['headings', 'landmarks', 'links', 'formFields', 'buttons'].includes(cmd.type)
+          ? {
+              kind: cmd.type,
+              items: [{ index: 0, phrase: 'Contact, heading level 2' }],
+              from: 0,
+              total: 12,
+              hasMore: true,
+            }
           : null,
         focus: { role: 'link', name: `el-${env.stepCount}`, selector: '#a' },
         url: 'http://x/',
@@ -74,6 +96,9 @@ describe('runSrAgent tool schema', () => {
       'landmarks',
       'links',
       'formFields',
+      'buttons',
+      'more',
+      'rotorLetter',
       'jumpTo',
       'nextHeading',
       'prevHeading',
@@ -83,10 +108,15 @@ describe('runSrAgent tool schema', () => {
       'prevFormField',
       'nextLandmark',
       'prevLandmark',
+      'nextButton',
+      'prevButton',
+      'find',
+      'findNext',
       'activate',
       'type',
       'escape',
       'done',
+      'mark',
     ]);
     for (const t of SR_TOOLS) {
       expect(t.type).toBe('function');
@@ -102,21 +132,34 @@ describe('runSrAgent tool schema', () => {
 
   it('offers the rotor stepping commands with a step-cost hint and no arguments', () => {
     const stepping = [
-      'nextHeading',
-      'prevHeading',
       'nextLink',
       'prevLink',
       'nextFormField',
       'prevFormField',
       'nextLandmark',
       'prevLandmark',
+      'nextButton',
+      'prevButton',
     ];
     for (const name of stepping) {
       const tool = SR_TOOLS.find((t) => t.function.name === name);
       expect(tool, name).toBeDefined();
       expect(tool.function.description).toMatch(/Costs 1 step\./);
-      expect(tool.function.parameters.properties).toEqual({});
+      // Only the note every tool carries; the step itself takes no argument.
+      expect(Object.keys(tool.function.parameters.properties)).toEqual(['note']);
     }
+  });
+
+  it('takes an optional heading level on the heading steps and a text on find', () => {
+    for (const name of ['nextHeading', 'prevHeading']) {
+      const level = SR_TOOLS.find((t) => t.function.name === name).function.parameters;
+      expect(level.properties.level).toMatchObject({ type: 'integer', minimum: 1, maximum: 6 });
+      expect(level.required).toBeUndefined(); // the level is optional
+    }
+    const find = SR_TOOLS.find((t) => t.function.name === 'find').function;
+    expect(find.parameters.properties.text.type).toBe('string');
+    expect(find.parameters.required).toEqual(['text']);
+    expect(find.description).toMatch(/Costs 2 steps\./);
   });
 
   it('does not offer `repeat` as a tool: it is free and not part of the cost measure', () => {
@@ -124,9 +167,15 @@ describe('runSrAgent tool schema', () => {
   });
 
   it('documents the stepping commands in the system prompt', () => {
-    for (const name of ['nextHeading', 'prevLink', 'nextFormField', 'prevLandmark']) {
+    for (const name of ['nextHeading', 'prevLink', 'nextFormField', 'prevLandmark', 'nextButton']) {
       expect(SYSTEM_PROMPT).toContain(name);
     }
+  });
+
+  it('documents the levelled heading step and the search in the system prompt', () => {
+    expect(SYSTEM_PROMPT).toMatch(/nextHeading\(level\)/);
+    expect(SYSTEM_PROMPT).toMatch(/find\(text\)/);
+    expect(SYSTEM_PROMPT).toContain('findNext');
   });
 
   it('makes hearing the answer the completion rule of an information task', () => {
@@ -182,6 +231,108 @@ describe('runSrAgent stop conditions', () => {
     expect(res.success).toBeNull();
     expect(res.trace).toBe(env.trace);
     expect(onStep).toHaveBeenCalledTimes(3);
+  });
+
+  it('offers `note` on every tool and never makes it required', () => {
+    for (const t of SR_TOOLS) {
+      expect(t.function.parameters.properties.note, t.function.name).toMatchObject({
+        type: 'string',
+      });
+      expect(t.function.parameters.required || []).not.toContain('note');
+    }
+    expect(SYSTEM_PROMPT).toMatch(/Always fill `note`/);
+  });
+
+  it('records the note in the trace and keeps it out of the next prompt', async () => {
+    const env = fakeEnv();
+    const cmds = [];
+    const step = env.step;
+    env.step = async (cmd) => {
+      cmds.push(cmd);
+      return step(cmd);
+    };
+    const llm = fakeLlm([
+      [
+        {
+          name: 'nextHeading',
+          arguments: { level: 2, note: 'The intro is done, jump to sections.' },
+        },
+      ],
+      call('done'),
+    ]);
+    await runSrAgent({ env, task, llm });
+    expect(cmds[0]).toEqual({
+      type: 'nextHeading',
+      arg: 2,
+      note: 'The intro is done, jump to sections.',
+    });
+    expect(env.trace[0].cmd.note).toBe('The intro is done, jump to sections.');
+    // The note is the agent's own reasoning, not an observation: it is never
+    // rendered back into the prompt.
+    const secondPrompt = JSON.stringify(llm.seen[1].messages);
+    expect(secondPrompt).not.toContain('jump to sections');
+  });
+
+  it('requires a signal before `done` instead of a guess', () => {
+    expect(SYSTEM_PROMPT).toMatch(/`done` needs a signal/);
+    expect(SYSTEM_PROMPT).toMatch(/page loaded/);
+  });
+
+  it('passes the search text and the heading level through as the command argument', async () => {
+    const env = fakeEnv();
+    const cmds = [];
+    const step = env.step;
+    env.step = async (cmd) => {
+      cmds.push(cmd);
+      return step(cmd);
+    };
+    const llm = fakeLlm([
+      [{ name: 'find', arguments: { text: 'Ordination' } }],
+      [{ name: 'nextHeading', arguments: { level: 2 } }],
+      [{ name: 'nextHeading', arguments: {} }],
+      call('done'),
+    ]);
+    await runSrAgent({ env, task, llm });
+    expect(cmds.slice(0, 3)).toEqual([
+      { type: 'find', arg: 'Ordination' },
+      { type: 'nextHeading', arg: 2 },
+      { type: 'nextHeading' },
+    ]);
+  });
+
+  it('does not charge a step for the free `mark` and records it', async () => {
+    const env = fakeEnv();
+    const llm = fakeLlm([
+      [{ name: 'mark', arguments: { kind: 'dead_end', reason: 'That menu leads nowhere.' } }],
+      call('next'),
+      call('done'),
+    ]);
+    const res = await runSrAgent({ env, task, llm });
+    // Three turns, two commands: the mark is free.
+    expect(res.nSr).toBe(2);
+    expect(env.trace[0]).toMatchObject({ free: true, mark: { kind: 'dead_end' } });
+  });
+
+  it('charges a step once free commands come in a row', async () => {
+    const env = fakeEnv();
+    const llm = fakeLlm([
+      [{ name: 'mark', arguments: { kind: 'confirmed' } }],
+      [{ name: 'mark', arguments: { kind: 'confirmed' } }],
+      [{ name: 'mark', arguments: { kind: 'confirmed' } }],
+      call('done'),
+    ]);
+    const res = await runSrAgent({ env, task, llm });
+    // Two free marks, the third is charged, then done.
+    expect(res.nSr).toBe(2);
+  });
+
+  it('shows a rotor page with its position in the whole list', async () => {
+    const env = fakeEnv();
+    const llm = fakeLlm([call('links'), call('done')]);
+    await runSrAgent({ env, task, llm });
+    const shown = llm.seen[1].messages.at(-1).content;
+    expect(shown).toContain('entries 1 to 1 of 12');
+    expect(shown).toMatch(/`more` for the next 8/);
   });
 
   it('stops on `done` and records it as an env step', async () => {
@@ -275,6 +426,22 @@ describe('runSrAgent malformed turns', () => {
     expect(env.stepCount).toBe(1);
     expect(llm.seen[1].messages.at(-1).content).toMatch(/Unknown command "readWholePage"/);
     expect(llm.seen[2].messages.at(-1).content).toMatch(/jumpTo requires an integer/);
+  });
+
+  it('rejects an empty find text and a heading level outside 1 to 6', async () => {
+    const env = fakeEnv();
+    const llm = fakeLlm([
+      [{ name: 'find', arguments: { text: '   ' } }],
+      [{ name: 'nextHeading', arguments: { level: 9 } }],
+      call('done'),
+    ]);
+    const res = await runSrAgent({ env, task, llm });
+    expect(res.nSr).toBe(3);
+    expect(env.stepCount).toBe(1);
+    expect(llm.seen[1].messages.at(-1).content).toMatch(/find requires a non-empty/);
+    expect(llm.seen[2].messages.at(-1).content).toMatch(
+      /level" must be an integer between 1 and 6/
+    );
   });
 
   it('a malformed turn on the last budget step still ends with stoppedBy=budget', async () => {

@@ -5,7 +5,36 @@
  * never DOM, tree, selectors or screenshots. Every turn costs one step, including malformed ones.
  */
 
+const { MARK_KINDS } = require('./screenreader-env');
+
 const DEFAULT_MEMORY_TURNS = 8;
+/** Free commands accepted back to back before one is charged as a step. */
+const MAX_FREE_IN_A_ROW = 2;
+
+/**
+ * Every tool carries the same optional `note`: one sentence of the agent's own
+ * reasoning, recorded in the trace next to the command. It is never echoed back
+ * into the next prompt, so the prompt stays cacheable.
+ */
+const NOTE_PARAM = {
+  type: 'string',
+  description:
+    'One short sentence: what you just heard, what you conclude from it, why this command.',
+};
+
+/** Shared schema of the optional heading level of `nextHeading` / `prevHeading`. */
+const LEVEL_PARAMS = {
+  type: 'object',
+  properties: {
+    level: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 6,
+      description: 'Optional heading level 1 to 6; omit to stop at any heading.',
+    },
+  },
+  additionalProperties: false,
+};
 
 /** Function tools mirroring the env command set (JSON schema, OpenAI shape). */
 const SR_TOOLS = [
@@ -20,9 +49,27 @@ const SR_TOOLS = [
   fn('landmarks', 'Open the rotor and list all landmarks/regions on the page. Costs 1 step.'),
   fn('links', 'Open the rotor and list all links on the page. Costs 1 step.'),
   fn('formFields', 'Open the rotor and list all form fields on the page. Costs 1 step.'),
+  fn('buttons', 'Open the rotor and list all buttons on the page. Costs 1 step.'),
+  fn(
+    'more',
+    'Show the next page of the rotor list you retrieved last (8 entries per page). Costs 1 step.'
+  ),
+  fn(
+    'rotorLetter',
+    'Show the page of the current rotor list that starts at the next entry beginning with this' +
+      ' letter. Costs 1 step.',
+    {
+      type: 'object',
+      properties: {
+        letter: { type: 'string', description: 'A single letter, e.g. "k" for "Kontakt".' },
+      },
+      required: ['letter'],
+      additionalProperties: false,
+    }
+  ),
   fn(
     'jumpTo',
-    'Move the cursor directly to an entry of the rotor list you retrieved last. Costs 1 step.',
+    'Move the cursor directly to an entry that the rotor list has SHOWN you. Costs 1 step.',
     {
       type: 'object',
       properties: {
@@ -37,9 +84,16 @@ const SR_TOOLS = [
   ),
   fn(
     'nextHeading',
-    'Jump the cursor to the next heading (wraps around at the end of the page). Costs 1 step.'
+    'Jump the cursor to the next heading (wraps around at the end of the page). With "level" only' +
+      ' headings of that level are stopped at. Costs 1 step.',
+    LEVEL_PARAMS
   ),
-  fn('prevHeading', 'Jump the cursor to the previous heading (wraps around). Costs 1 step.'),
+  fn(
+    'prevHeading',
+    'Jump the cursor to the previous heading (wraps around). With "level" only headings of that' +
+      ' level are stopped at. Costs 1 step.',
+    LEVEL_PARAMS
+  ),
   fn(
     'nextLink',
     'Jump the cursor to the next link (wraps around at the end of the page). Costs 1 step.'
@@ -58,6 +112,25 @@ const SR_TOOLS = [
     'prevLandmark',
     'Jump the cursor to the previous landmark/region (wraps around). Costs 1 step.'
   ),
+  fn(
+    'nextButton',
+    'Jump the cursor to the next button (wraps around at the end of the page). Costs 1 step.'
+  ),
+  fn('prevButton', 'Jump the cursor to the previous button (wraps around). Costs 1 step.'),
+  fn(
+    'find',
+    'Search the page from the cursor downwards and put the cursor on the next element whose spoken' +
+      ' text contains your search text. Does not wrap around. Costs 2 steps.',
+    {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'The text to search for (case-insensitive).' },
+      },
+      required: ['text'],
+      additionalProperties: false,
+    }
+  ),
+  fn('findNext', 'Repeat the last search from the cursor downwards. Costs 1 step.'),
   fn('activate', 'Activate the element at the cursor (press Enter / click it). Costs 1 step.'),
   fn('type', 'Type text into the form field at the cursor. Costs 1 step.', {
     type: 'object',
@@ -69,15 +142,31 @@ const SR_TOOLS = [
   }),
   fn('escape', 'Press Escape, e.g. to close a dialog or a menu. Costs 1 step.'),
   fn('done', 'Declare that you believe the task is complete. Ends the session. Costs 1 step.'),
+  fn(
+    'mark',
+    'Record what you just realised: a dead end, a backtrack, or a confirmed step towards the goal.' +
+      ' Free, costs no step.',
+    {
+      type: 'object',
+      properties: {
+        kind: { type: 'string', enum: ['dead_end', 'backtrack', 'confirmed'] },
+        reason: { type: 'string', description: 'One short sentence: what made you mark this.' },
+      },
+      required: ['kind'],
+      additionalProperties: false,
+    }
+  ),
 ];
 
+
 function fn(name, description, parameters) {
+  const base = parameters || { type: 'object', properties: {}, additionalProperties: false };
   return {
     type: 'function',
     function: {
       name,
       description,
-      parameters: parameters || { type: 'object', properties: {}, additionalProperties: false },
+      parameters: { ...base, properties: { ...base.properties, note: NOTE_PARAM } },
     },
   };
 }
@@ -90,16 +179,24 @@ const SYSTEM_PROMPT = [
   'Available commands (each is a tool; every command costs exactly one step):',
   '- next / prev: move the reading cursor one element forward or backward and hear it.',
   '- tab / shiftTab: jump to the next / previous keyboard-focusable element.',
-  '- headings / landmarks / links / formFields: retrieve the rotor list of that kind.',
-  '- jumpTo(index): move the cursor straight to an entry from the rotor list you retrieved last.',
+  '- headings / landmarks / links / formFields / buttons: retrieve the rotor list of that kind.',
+  '  A list shows 8 entries at a time: `more` shows the next 8, rotorLetter(letter) jumps to the',
+  '  next entry starting with that letter. You can only jumpTo an entry that has been shown.',
+  '- jumpTo(index): move the cursor straight to an entry the rotor list has shown you.',
   '- nextHeading / prevHeading, nextLink / prevLink, nextFormField / prevFormField,',
-  '  nextLandmark / prevLandmark: step directly to the next / previous element of that kind',
-  '  (these are the quick-navigation keys of a real screen reader; they wrap around at the end',
-  '  of the page and cost one step each, without retrieving a list first).',
+  '  nextLandmark / prevLandmark, nextButton / prevButton: step directly to the next / previous',
+  '  element of that kind (these are the quick-navigation keys of a real screen reader; they wrap',
+  '  around at the end of the page and cost one step each, without retrieving a list first).',
+  '- nextHeading(level) / prevHeading(level): step only through headings of that level (1 to 6),',
+  '  which skips the sub-headings in between.',
+  '- find(text): search downwards from the cursor and land on the next element whose spoken text',
+  '  contains it (no wrap-around, costs 2 steps); findNext repeats that search for 1 step.',
   '- activate: press Enter on / click the element at the cursor.',
   '- type(text): type text into the form field at the cursor.',
   '- escape: press Escape (e.g. to close a dialog).',
   '- done: declare the task complete.',
+  '- mark(kind, reason): note a dead end, a backtrack or a confirmed step. It is free, so mark a',
+  '  dead end or a backtrack whenever you notice one.',
   '',
   'Strategy: reading the page element by element with `next` is slow and expensive. The rotor lists',
   '(headings, landmarks, links, formFields) plus jumpTo are the efficient way to navigate: one list',
@@ -110,9 +207,14 @@ const SYSTEM_PROMPT = [
   '',
   'Rules:',
   '- Call exactly one tool per turn. Never call zero tools, never call two, never answer with prose only.',
-  '- Call `done` as soon as you believe the task is complete.',
+  '- Always fill `note`: one sentence saying what you heard, what you conclude and why this command.',
+  '- `done` needs a signal, never a guess: on an action task a `page loaded` announcement or a',
+  '  changed URL, on an information task the answer itself spoken to you. Without one, keep looking;',
+  '  when the budget is nearly used up, keep searching rather than declaring the task done.',
   '- You will NEVER be told whether you succeeded. Nobody confirms or corrects your progress.',
   '  Judge completion yourself from what you heard (announcements, changed URL, new phrases).',
+  '- A rotor list is an index to jump from, not reading: hearing an entry in a list does NOT count',
+  '  as having read it. On an information task, jump to the element and read it with next.',
   '- On a task marked TASK TYPE: information, reaching the right page is not enough: you are done',
   '  only once the information the task asks for has been SPOKEN to you. After you arrive, read',
   '  (nextHeading, next) until you have heard it, and only then call `done`.',
@@ -164,6 +266,7 @@ async function runSrAgent({
   const history = [];
 
   let steps = 0;
+  let freeInARow = 0;
   let stoppedBy = null;
   let error;
   // First turn: no observation yet, only the task itself.
@@ -223,8 +326,15 @@ async function runSrAgent({
 
     const cmd = toCommand(toolCalls[0]);
     const obs = await env.step(cmd);
-    steps += 1;
-    budgetLeft = Math.min(budgetLeft - 1, numberOr(obs && obs.budgetLeft, Infinity));
+    // `mark` is free: it records what the agent noticed and changes nothing on
+    // the page, so it costs no step. A run of them in a row would still burn
+    // turns without progress, so only MAX_FREE_IN_A_ROW stay free.
+    const free = !!(obs && obs.free) && freeInARow < MAX_FREE_IN_A_ROW;
+    freeInARow = free ? freeInARow + 1 : 0;
+    if (!free) {
+      steps += 1;
+      budgetLeft = Math.min(budgetLeft - 1, numberOr(obs && obs.budgetLeft, Infinity));
+    }
     if (obs && typeof obs.phrase === 'string' && obs.phrase !== '') phrases.push(obs.phrase);
 
     let stopSignal;
@@ -286,13 +396,38 @@ function describeInvalid(toolCalls) {
   if (tc.name === 'type' && typeof tc.arguments.text !== 'string') {
     return 'type requires a string "text".';
   }
+  if (tc.name === 'rotorLetter' && !String(tc.arguments.letter || '').trim()) {
+    return 'rotorLetter requires a single letter.';
+  }
+  if (tc.name === 'mark' && !MARK_KINDS.includes(tc.arguments.kind)) {
+    return `mark requires a "kind" out of ${MARK_KINDS.join(', ')}.`;
+  }
+  if (tc.name === 'find' && !String(tc.arguments.text || '').trim()) {
+    return 'find requires a non-empty string "text" to search for.';
+  }
+  if (
+    (tc.name === 'nextHeading' || tc.name === 'prevHeading') &&
+    tc.arguments.level != null &&
+    !(Number.isInteger(tc.arguments.level) && tc.arguments.level >= 1 && tc.arguments.level <= 6)
+  ) {
+    return 'the heading "level" must be an integer between 1 and 6, or omitted.';
+  }
   return null;
 }
 
 function toCommand(tc) {
-  if (tc.name === 'jumpTo') return { type: 'jumpTo', arg: tc.arguments.index };
-  if (tc.name === 'type') return { type: 'type', arg: tc.arguments.text };
-  return { type: tc.name };
+  const note = typeof tc.arguments.note === 'string' ? tc.arguments.note.trim() : '';
+  const cmd = { type: tc.name };
+  if (tc.name === 'jumpTo') cmd.arg = tc.arguments.index;
+  else if (tc.name === 'type' || tc.name === 'find') cmd.arg = tc.arguments.text;
+  else if (tc.name === 'rotorLetter') cmd.arg = tc.arguments.letter;
+  else if (tc.name === 'mark') cmd.arg = { kind: tc.arguments.kind, reason: tc.arguments.reason };
+  else if ((tc.name === 'nextHeading' || tc.name === 'prevHeading') && tc.arguments.level != null) {
+    cmd.arg = tc.arguments.level;
+  }
+  // Recorded in the env trace, never rendered back to the model.
+  if (note) cmd.note = note;
+  return cmd;
 }
 
 function renderCommand(cmd) {
@@ -324,9 +459,17 @@ function renderObservation({ description, obs, phrases, phraseWindow, step, budg
   }
 
   if (o.rotor && Array.isArray(o.rotor.items)) {
-    lines.push(`ROTOR LIST (${o.rotor.kind}), ${o.rotor.items.length} entries:`);
+    const total = typeof o.rotor.total === 'number' ? o.rotor.total : o.rotor.items.length;
+    const from = typeof o.rotor.from === 'number' ? o.rotor.from : 0;
+    lines.push(
+      `ROTOR LIST (${o.rotor.kind}), entries ${from + 1} to ${from + o.rotor.items.length} of ${total}:`
+    );
     for (const item of o.rotor.items) lines.push(`  [${item.index}] ${item.phrase}`);
-    lines.push('  Use jumpTo(index) to go to one of these.');
+    lines.push(
+      o.rotor.hasMore
+        ? '  Use jumpTo(index) for one of these, `more` for the next 8, rotorLetter(letter) to skip ahead.'
+        : '  Use jumpTo(index) to go to one of these.'
+    );
   }
 
   if (o.focus) {

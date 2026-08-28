@@ -7,9 +7,12 @@
 
 'use strict';
 
-const { injectScreenReader, ROTOR_STEP_COMMANDS } = require('./screenreader-env');
-
-const ROTOR_KINDS = ['headings', 'landmarks', 'links', 'formFields'];
+const {
+  injectScreenReader,
+  ROTOR_STEP_COMMANDS,
+  ROTOR_KINDS,
+  COMMAND_COSTS,
+} = require('./screenreader-env');
 
 /** `{ headings: { next: 'nextHeading', prev: 'prevHeading' }, … }` */
 const STEP_COMMAND_BY_KIND = Object.entries(ROTOR_STEP_COMMANDS).reduce((acc, [cmd, def]) => {
@@ -27,14 +30,29 @@ const STEP_COMMAND_BY_KIND = Object.entries(ROTOR_STEP_COMMANDS).reduce((acc, [c
 const STRATEGY_ORDER = [
   'none',
   'step',
+  'stepLevel',
   'rotor',
   'step+next',
+  'stepLevel+next',
   'rotor+next',
   'tab',
   'shiftTab',
+  'find',
+  'find+next',
   'next',
   'prev',
 ];
+
+/**
+ * Words the OPTIMUM may search for: whole words of at least this many letters
+ * taken from the TASK DESCRIPTION, minus the generator's stopwords. The optimum
+ * must not use knowledge the user does not have, and the description is
+ * everything the user was told; a real user searching for a word they read in
+ * their task is exactly what this models.
+ */
+const MIN_FIND_WORD = 4;
+/** Cap on the searchable words, so the analysis stays linear in practice. */
+const MAX_FIND_WORDS = 12;
 
 /**
  * Action cost of one sighted-path step, once the target has been reached.
@@ -101,6 +119,9 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       .trim()
       .toLowerCase();
   const needle = squash(options.evidence);
+  const findWords = options.findWords || [];
+  // `find` is a typed word plus Enter (see screenreader-env COMMAND_COSTS).
+  const findCost = options.findCost || 2;
   const maxReadCandidates = options.maxReadCandidates || 50;
   const maxSpan = options.maxEvidenceSpan || 1;
 
@@ -163,11 +184,25 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     }
 
     // Rotor lists come from the env's own `buildRotor`, so the rotor indices
-    // here are exactly the indices `jumpTo` expects.
+    // here are exactly the indices `jumpTo` expects. A list shows one PAGE at a
+    // time, so an entry further down has to be revealed first: `more` per page,
+    // or one `rotorLetter` when the entry is the first one with its letter.
     const rotors = {};
+    const pageSize = I.rotorPageSize || 8;
     for (const kind of kinds) {
       const rotor = await I.buildRotor(kind);
-      rotors[kind] = { items: rotor.items, nodes: I.getLastRotorNodes().slice() };
+      const items = rotor.items.slice();
+      const nodes = I.getLastRotorNodes().slice();
+      const seenLetter = new Set();
+      const reveal = items.map((item, r) => {
+        const letter = I.foldText(I.rotorLabel(item.phrase)).slice(0, 1);
+        const firstOfLetter = !!letter && !seenLetter.has(letter);
+        if (letter) seenLetter.add(letter);
+        const pages = Math.floor(r / pageSize);
+        if (firstOfLetter && pages > 1) return { cost: 1, letter, pages: 0 };
+        return { cost: pages, pages };
+      });
+      rotors[kind] = { items, nodes, reveal };
     }
 
     // tab order
@@ -257,6 +292,59 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     stepCostByKind[kind] = { positions, costs };
   }
 
+  // Heading levels: `nextHeading`/`prevHeading` with a level stop only at
+  // headings of that level (the digit keys of NVDA and JAWS), which is a
+  // different, usually much shorter, sequence of presses. Costed exactly like a
+  // kind, over the subset of the headings rotor that has the level.
+  const levelCost = {};
+  const headingNodes = (rotors.headings && rotors.headings.nodes) || [];
+  for (let level = 1; level <= 6; level += 1) {
+    const positions = [];
+    for (const el of headingNodes) {
+      if (I.headingLevelOf(el) !== level) continue;
+      const list = idxOf.get(el);
+      if (list && list.length) positions.push({ el, i: list[0] });
+    }
+    if (!positions.length) continue;
+    const costs = new Map();
+    const put = (el, steps, dir) => {
+      const cur = costs.get(el);
+      if (!cur || steps < cur.steps) costs.set(el, { steps, dir });
+    };
+    const fwd = positions
+      .map((p) => ({ p, d: mod(p.i - cIdx, N) }))
+      .filter((x) => x.d > 0)
+      .sort((a, b) => a.d - b.d);
+    const bwd = positions
+      .map((p) => ({ p, d: mod(cIdx - p.i, N) }))
+      .filter((x) => x.d > 0)
+      .sort((a, b) => a.d - b.d);
+    fwd.forEach((x, r) => put(x.p.el, r + 1, 'next'));
+    bwd.forEach((x, r) => put(x.p.el, r + 1, 'prev'));
+    for (const p of positions) if (mod(p.i - cIdx, N) === 0) put(p.el, positions.length, 'next');
+    levelCost[level] = { positions, costs };
+  }
+
+  // `find` (browse-mode search) does NOT wrap, so only the stretch from the
+  // cursor to the end of the document can be searched. `limit` is that stretch
+  // in reading-order distance.
+  const limit = cIdx === docStart ? N : mod(docStart - cIdx, N);
+  // Per searchable word, the distances of the phrases it matches, in the order
+  // the search visits them: the j-th entry is reached with `find` + j x `findNext`.
+  const findMatches = [];
+  if (findWords.length) {
+    const folded = order.map((e) => I.foldText(e.phrase));
+    for (const word of findWords) {
+      const w = I.foldText(word);
+      if (!w) continue;
+      const ds = [];
+      for (let d = 1; d < limit; d += 1) {
+        if (folded[mod(cIdx + d, N)].includes(w)) ds.push(d);
+      }
+      if (ds.length) findMatches.push({ word, ds });
+    }
+  }
+
   // Cost analysis of a set of reading-order positions belonging to `el`.
   // `analyzeElement` passes every position of the element; the read analysis
   // passes the single position whose phrase carries the evidence.
@@ -284,7 +372,8 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
             if (k === null || d < k) k = d;
           }
           if (k === null) continue;
-          const cost = 2 + k;
+          const reveal = rotors[kind].reveal[r] || { cost: 0, pages: 0 };
+          const cost = 2 + reveal.cost + k;
           if (!rotor || cost < rotor.cost) {
             const item = rotors[kind].items[r] || {};
             rotor = {
@@ -292,6 +381,8 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
               index: r,
               k,
               cost,
+              pages: reveal.pages || 0,
+              letter: reveal.letter || null,
               phrase: item.phrase || null,
               selector: item.selector || null,
             };
@@ -332,6 +423,53 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     }
     if (step && !step.command) step = null;
 
+    // levelled heading step (+ next x k)
+    let stepLevel = null;
+    for (const level of Object.keys(levelCost)) {
+      const { positions, costs } = levelCost[level];
+      for (const p of positions) {
+        let k = null;
+        for (const t of list) {
+          const d = mod(t - p.i, N);
+          if (k === null || d < k) k = d;
+        }
+        if (k === null) continue;
+        const c = costs.get(p.el);
+        if (!c) continue;
+        const cost = c.steps + k;
+        if (!stepLevel || cost < stepLevel.cost || (cost === stepLevel.cost && k < stepLevel.k)) {
+          stepLevel = {
+            kind: 'headings',
+            level: Number(level),
+            dir: c.dir,
+            command: (stepCommands.headings || {})[c.dir] || null,
+            steps: c.steps,
+            k,
+            cost,
+          };
+        }
+      }
+    }
+    if (stepLevel && !stepLevel.command) stepLevel = null;
+
+    // find (+ findNext x j, + next x k). Only positions after the cursor and
+    // before the end of the document are searchable: the search does not wrap.
+    let find = null;
+    for (const entry of findMatches) {
+      for (const t of list) {
+        const dt = mod(t - cIdx, N);
+        if (dt <= 0 || dt >= limit) continue;
+        for (let j = 0; j < entry.ds.length; j += 1) {
+          if (entry.ds[j] > dt) break;
+          const k = dt - entry.ds[j];
+          const cost = findCost + j + k;
+          if (!find || cost < find.cost || (cost === find.cost && k < find.k)) {
+            find = { word: entry.word, findNexts: j, k, cost };
+          }
+        }
+      }
+    }
+
     // tab order
     let tab = null;
     const tIdxTab = el ? tabOrder.indexOf(el) : -1;
@@ -349,6 +487,8 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
       tab,
       rotor,
       step,
+      stepLevel,
+      find,
       phrase: list.length ? order[list[0]].phrase : null,
     };
   };
@@ -547,8 +687,34 @@ function pageFingerprint() {
 // Node side
 
 /**
+ * The words the optimum is allowed to search for: the content words of the task
+ * DESCRIPTION (at least `MIN_FIND_WORD` letters, no stopwords), folded like the
+ * env's `find`. The agent may search for anything it likes; the optimum may
+ * only use what the user was told, so it never buys a shortcut with knowledge
+ * of the page.
+ */
+function findWordsFor(task) {
+  // Lazily required: task-generator pulls in replay, which pulls in this module.
+  const { STOPWORDS } = require('./task-generator');
+  const source = String((task && task.description) || '');
+  const words = [];
+  const seen = new Set();
+  for (const raw of source.toLowerCase().split(/[^\p{L}\p{N}]+/u)) {
+    if (raw.length < MIN_FIND_WORD) continue;
+    if (!/\p{L}/u.test(raw)) continue;
+    if (STOPWORDS.has(raw)) continue;
+    if (seen.has(raw)) continue;
+    seen.add(raw);
+    words.push(raw);
+    if (words.length >= MAX_FIND_WORDS) break;
+  }
+  return words;
+}
+
+/**
  * Expand a chosen reach strategy into the literal env commands it costs.
- * `reachCommands(reach).length === reach.cost` for every strategy; that
+ * The commands add up to `reach.cost` when each is charged with
+ * `screenreader-env.commandCost` (one per command, two for `find`); that
  * identity lets `nOpt` be reported as a keystroke list (Blind Mode's optimal
  * route) and keeps the BFS edge weights honest.
  */
@@ -558,17 +724,37 @@ function reachCommands(reach) {
     case 'none':
       return [];
     case 'rotor':
-      return [{ type: reach.via.kind }, { type: 'jumpTo', arg: reach.via.index }];
     case 'rotor+next':
       return [
         { type: reach.via.kind },
+        // The entry has to be on screen before `jumpTo` can take it: one page
+        // at a time, or one first-letter jump.
+        ...(reach.via.letter
+          ? [{ type: 'rotorLetter', arg: reach.via.letter }]
+          : Array.from({ length: reach.via.pages || 0 }, () => ({ type: 'more' }))),
         { type: 'jumpTo', arg: reach.via.index },
-        ...repeat('next', reach.via.k),
+        ...repeat('next', reach.via.k || 0),
       ];
     case 'step':
       return repeat(reach.via.command, reach.via.steps);
     case 'step+next':
       return [...repeat(reach.via.command, reach.via.steps), ...repeat('next', reach.via.k)];
+    case 'stepLevel':
+    case 'stepLevel+next':
+      return [
+        ...Array.from({ length: reach.via.steps }, () => ({
+          type: reach.via.command,
+          arg: reach.via.level,
+        })),
+        ...repeat('next', reach.via.k),
+      ];
+    case 'find':
+    case 'find+next':
+      return [
+        { type: 'find', arg: reach.via.word },
+        ...repeat('findNext', reach.via.findNexts),
+        ...repeat('next', reach.via.k),
+      ];
     case 'tab':
       return repeat('tab', reach.cost);
     case 'shiftTab':
@@ -584,11 +770,16 @@ function reachCommands(reach) {
 }
 
 /**
- * Picks the cheapest reach strategy from the in-page analysis. One command = 1:
- * `none` 0; `rotor` (list + `jumpTo`) 2; `rotor+next` 2 + k; `step` s presses of
- * a rotor step command in the shorter direction, wrapping like
- * `ScreenReaderEnv.stepToKind`; `step+next` s + k (how buttons, which are in no
- * rotor list, are reached); `tab`/`shiftTab` tab-order distance; `next`/`prev`
+ * Picks the cheapest reach strategy from the in-page analysis. One command = 1
+ * (`find` = 2): `none` 0; `rotor` (list + `jumpTo`) 2; `rotor+next` 2 + k;
+ * `rotor` is 1 (open the list) + the commands that reveal the entry (`more` per
+ * page of 8, or one `rotorLetter` when the entry is the first with its letter)
+ * + 1 (`jumpTo`);
+ * `step` s presses of a rotor step command in the shorter direction, wrapping
+ * like `ScreenReaderEnv.stepToKind`; `step+next` s + k; `stepLevel`(`+next`) the
+ * same with a heading level, which skips every heading of another level;
+ * `tab`/`shiftTab` tab-order distance; `find`(`+next`) 2 + j presses of
+ * `findNext` + k, searching only words of the task description; `next`/`prev`
  * reading-order distance.
  */
 function chooseReach(analysis) {
@@ -601,7 +792,15 @@ function chooseReach(analysis) {
       candidates.push({
         strategy: r.k === 0 ? 'rotor' : 'rotor+next',
         cost: r.cost,
-        via: { kind: r.kind, index: r.index, k: r.k, phrase: r.phrase, selector: r.selector },
+        via: {
+          kind: r.kind,
+          index: r.index,
+          k: r.k,
+          pages: r.pages || 0,
+          letter: r.letter || null,
+          phrase: r.phrase,
+          selector: r.selector,
+        },
       });
     }
     if (analysis.step) {
@@ -610,6 +809,29 @@ function chooseReach(analysis) {
         strategy: s.k === 0 ? 'step' : 'step+next',
         cost: s.cost,
         via: { kind: s.kind, dir: s.dir, command: s.command, steps: s.steps, k: s.k },
+      });
+    }
+    if (analysis.stepLevel) {
+      const s = analysis.stepLevel;
+      candidates.push({
+        strategy: s.k === 0 ? 'stepLevel' : 'stepLevel+next',
+        cost: s.cost,
+        via: {
+          kind: s.kind,
+          level: s.level,
+          dir: s.dir,
+          command: s.command,
+          steps: s.steps,
+          k: s.k,
+        },
+      });
+    }
+    if (analysis.find) {
+      const f = analysis.find;
+      candidates.push({
+        strategy: f.k === 0 ? 'find' : 'find+next',
+        cost: f.cost,
+        via: { word: f.word, findNexts: f.findNexts, k: f.k },
       });
     }
     if (analysis.tab) {
@@ -659,6 +881,7 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   // Scopes the in-page reading-order cache to this call.
   const runId = `opt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const typedSelectors = [];
+  const findWords = findWordsFor(task);
   // Cross-context cache of finished analyses, supplied by the caller.
   const shared = options.analysisCache instanceof Map ? options.analysisCache : null;
 
@@ -694,6 +917,7 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
             step.action,
             step.key || null,
             typedSelectors,
+            findWords,
           ]);
         } catch (_) {
           sharedKey = null; // cache miss; the analysis below runs as usual
@@ -716,6 +940,8 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
               key: step.key || null,
               typedSelectors,
               stepCommands: STEP_COMMAND_BY_KIND,
+              findWords,
+              findCost: COMMAND_COSTS.find,
             }
           );
         } catch (err) {
@@ -769,6 +995,8 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
         tab: best.cand.analysis.tab,
         rotor: best.cand.analysis.rotor,
         step: best.cand.analysis.step,
+        stepLevel: best.cand.analysis.stepLevel,
+        find: best.cand.analysis.find,
       };
     }
 
@@ -806,7 +1034,7 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   // step budget derived from nOpt would run out before the agent could ever
   // hear it. So the reading is appended as a final `read` step.
   if (task && task.kind === 'information' && task.evidence) {
-    const read = await costReadStep(page, task.evidence, cursorSelector, runId);
+    const read = await costReadStep(page, task.evidence, cursorSelector, runId, findWords);
     if (read.error) {
       // A hard failure of the read analysis: keep the navigation part rather
       // than losing the whole measurement.
@@ -839,7 +1067,7 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
  * @returns {Promise<{entry?: object, error?: string}>} `entry` absent (without
  *          an error) means no spoken phrase contains the evidence.
  */
-async function costReadStep(page, evidence, cursorSelector, runId) {
+async function costReadStep(page, evidence, cursorSelector, runId, findWords = []) {
   try {
     await injectScreenReader(page);
   } catch (err) {
@@ -855,6 +1083,8 @@ async function costReadStep(page, evidence, cursorSelector, runId) {
       maxReadCandidates: MAX_READ_CANDIDATES,
       maxEvidenceSpan: MAX_EVIDENCE_PHRASE_SPAN,
       stepCommands: STEP_COMMAND_BY_KIND,
+      findWords,
+      findCost: COMMAND_COSTS.find,
     });
   } catch (err) {
     return { error: `read step: analysis failed: ${err.message}` };
@@ -907,6 +1137,8 @@ async function costReadStep(page, evidence, cursorSelector, runId) {
         tab: best.cand.analysis.tab,
         rotor: best.cand.analysis.rotor,
         step: best.cand.analysis.step,
+        stepLevel: best.cand.analysis.stepLevel,
+        find: best.cand.analysis.find,
       },
     },
   };
@@ -915,6 +1147,7 @@ async function costReadStep(page, evidence, cursorSelector, runId) {
 module.exports = {
   computeOptimalPath,
   costReadStep,
+  findWordsFor,
   chooseReach,
   reachCommands,
   analyzeInPage,
@@ -923,6 +1156,8 @@ module.exports = {
   EVIDENCE_NOT_IN_READING_ORDER,
   MAX_READ_CANDIDATES,
   MAX_EVIDENCE_PHRASE_SPAN,
+  MIN_FIND_WORD,
+  MAX_FIND_WORDS,
   squashText,
   ROTOR_KINDS,
   STRATEGY_ORDER,

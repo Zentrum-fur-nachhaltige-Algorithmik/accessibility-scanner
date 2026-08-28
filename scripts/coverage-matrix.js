@@ -66,6 +66,13 @@ const MANUAL_OVERRIDES = {
       'Location (AAA): whether a user can determine their position requires the ' +
       'surrounding set of pages and its information architecture, not one page.',
   },
+  '3.3.4': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Error Prevention (Legal, Financial, Data): the criterion applies only to pages that ' +
+      'commit the user legally or financially, and is met by reversibility, checking or ' +
+      'confirmation, all of which are server-side behaviour a static page does not expose.',
+  },
   '3.3.6': {
     mechanism: MECHANISM.MANUAL,
     justification:

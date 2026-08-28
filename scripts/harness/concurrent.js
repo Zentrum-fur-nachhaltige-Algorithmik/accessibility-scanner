@@ -51,7 +51,6 @@ const CONCURRENT_SCANNERS = {
   orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
   'language-detection': { module: '../../src/scanners/language-detection' },
-  'predictable-navigation': { module: '../../src/scanners/predictable-navigation' },
   'error-handling': { module: '../../src/scanners/error-handling' },
   'page-structure': { module: '../../src/scanners/page-structure' },
   'label-in-name': { module: '../../src/scanners/label-in-name' },

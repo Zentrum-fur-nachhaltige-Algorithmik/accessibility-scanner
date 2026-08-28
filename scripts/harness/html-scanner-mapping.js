@@ -278,16 +278,17 @@ const HTML_SCANNER_MAPPING = {
     expectedScanners: ['error-handling', 'page-structure'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
-    wcagCriteria: ['3.3.1', '3.3.3', '3.3.4'],
-    description: 'Poor error identification, suggestions, and prevention',
+    wcagCriteria: ['3.3.1', '3.3.3'],
+    description: 'Poor error identification and no format suggestion on pattern fields',
   },
 
   'bad-error-prevention.html': {
-    expectedScanners: ['error-handling'],
+    expectedScanners: [],
     excludedScanners: ['color-contrast', 'use-of-color', 'keyboard-navigation'],
     testType: 'bad',
     wcagCriteria: ['3.3.4', '3.3.6'],
-    description: 'Missing safeguards for critical actions and data submission',
+    description:
+      'Missing safeguards for critical actions and data submission: 3.3.4 and 3.3.6 are manual review items',
   },
 
   // Complex UI Patterns
@@ -921,6 +922,42 @@ const HTML_SCANNER_MAPPING = {
     wcagCriteria: ['2.4.11'],
     description:
       'A transparent full viewport fixed layer that takes the hit test above a form: focus-obscured-by-fixed-element must stay silent',
+  },
+
+  'good-predictable-controls.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.1', '3.2.2'],
+    description:
+      'Autofocus inside a dialog, a positive tabindex and controls whose change only rewrites text: no context change to report',
+  },
+
+  'good-repeated-cards-and-buttons.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.4'],
+    description:
+      'Cards that name every link differently, and Cancel/Close/Save buttons: neither is an inconsistent identification',
+  },
+
+  'good-form-fields-without-hints.html': {
+    expectedScanners: [],
+    excludedScanners: ['error-handling'],
+    testType: 'good',
+    wcagCriteria: ['3.3.1', '3.3.2', '3.3.3'],
+    description:
+      'A login password, an e-mail and a date field with no format hint, aria-invalid="false" and groups named without a legend',
+  },
+
+  'good-static-decorations.html': {
+    expectedScanners: [],
+    excludedScanners: ['timing-controls'],
+    testType: 'good',
+    wcagCriteria: ['2.2.1', '2.2.2'],
+    description:
+      'Decorations named blink, scroll and moving that stay in place, and a counter that counts up and can be paused',
   },
 };
 

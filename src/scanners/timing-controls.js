@@ -1,14 +1,33 @@
 /**
  * Timing Controls Scanner.
- * WCAG 2.2.1, 2.2.2 (EN 301 549 9.2.2.1, 9.2.2.2, 9.2.2.6).
- * Observes the page for timeouts, auto-playing media and moving content and
- * checks whether the user can pause, stop or extend them.
+ * WCAG 2.2.1, 2.2.2 (EN 301 549 9.2.2.1, 9.2.2.2).
+ * Watches the page for a ticking countdown, for media that plays by itself and
+ * for content that moves or rewrites itself, and reports the ones the user
+ * cannot extend, pause or stop.
  */
 const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
+const { injectableCode: renderedCode } = require('../utils/rendered');
+const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('timing-controls');
+
+/**
+ * Every rule here decides from a before/after comparison, so the window has to
+ * be long enough for a second of page time to pass. Callers that ask for a
+ * shorter one (the harnesses pass `observationTime: 0`) get this instead.
+ */
+const MIN_OBSERVATION_MS = 1500;
+
+/** Updates below this count are a page settling in, not auto-updating content. */
+const MIN_AUTO_UPDATES = 3;
+
+/** Movement and playback shorter than this are outside 2.2.2. */
+const LONG_ENOUGH_SECONDS = 5;
+
+/** Below this the painted box only jitters, as a rotating indicator does. */
+const MIN_SHIFT_PX = 8;
 
 class TimingControlsScanner extends BaseScanner {
   constructor() {
@@ -25,33 +44,28 @@ class TimingControlsScanner extends BaseScanner {
    * @returns {Promise<Object>} ScanResult
    */
   async scan(page, options = {}) {
-    const defaultOptions = {
-      testTimeouts: true,
-      testAutoPlay: true,
-      testMovingContent: true,
+    const scanOptions = {
       observationTime: 5000,
       timeout: TIMEOUTS.scanner,
+      ...options,
     };
+    const windowMs = Math.max(Number(scanOptions.observationTime) || 0, MIN_OBSERVATION_MS);
 
-    const scanOptions = { ...defaultOptions, ...options };
-
-    // Create timestamped scan directory
     const timestamp = Date.now();
     const scanDir = path.join(this.screenshotDir, `scan-${timestamp}`);
     await fs.ensureDir(scanDir);
 
-    const timingResults = await this.performTimingControlsAnalysis(page, scanDir, scanOptions);
+    const timingResults = await this.performTimingControlsAnalysis(page, scanDir, windowMs);
 
     return {
       scannerId: this.id,
-      criteria: ['9.2.2.1', '9.2.2.2', '9.2.2.6'],
+      criteria: ['9.2.2.1', '9.2.2.2'],
       passed: timingResults.violations.length === 0,
       violations: timingResults.violations,
       summary: {
         timeoutsAdjustable: timingResults.timeoutsAdjustable,
         autoPlayControlled: timingResults.autoPlayControlled,
         movingContentControllable: timingResults.movingContentControllable,
-        dataPreservedOnTimeout: timingResults.dataPreservedOnTimeout,
       },
       screenshotPath: scanDir,
       visualEvidence: timingResults.visualEvidence,
@@ -59,706 +73,311 @@ class TimingControlsScanner extends BaseScanner {
   }
 
   /**
-   * Perform comprehensive timing controls analysis
+   * Install the probes, let the page run untouched for the observation window,
+   * then read what changed and turn the readings into violations.
    */
-  async performTimingControlsAnalysis(page, scanDir, options) {
+  async performTimingControlsAnalysis(page, scanDir, windowMs) {
     const violations = [];
-    const visualEvidence = [];
-    let timeoutsAdjustable = true;
-    let autoPlayControlled = true;
-    let movingContentControllable = true;
-    let dataPreservedOnTimeout = true;
 
     log.debug('Starting timing controls analysis...');
 
-    // Take initial screenshot
     const initialScreenshot = path.join(scanDir, 'timing-controls-analysis.png');
     await page.screenshot({ path: initialScreenshot, fullPage: true });
 
-    // 1. Test auto-playing content (WCAG 2.2.2). It owns the observation
-    //    window, and what it sees updating on its own is also the evidence
-    //    that the page runs a time limit at all.
-    let countdownObserved = false;
-    if (options.testAutoPlay) {
-      const autoPlayResults = await this.analyzeAutoPlayingContent(
-        page,
-        violations,
-        options.observationTime
-      );
-      autoPlayControlled = autoPlayResults.controlled;
-      countdownObserved = autoPlayResults.countdownObserved;
+    await this.installProbes(page);
+    await new Promise((resolve) => setTimeout(resolve, windowMs));
+    const observed = await this.readProbes(page, windowMs);
+
+    for (const issue of observed.countdowns) {
+      violations.push({
+        criterion: '9.2.2.1',
+        element: issue.element,
+        issue: 'timeout-no-extend-option',
+        description: issue.description,
+        severity: 'error',
+        evidence: issue.evidence,
+        suggestion: this.getTimeoutSuggestion('timeout-no-extend-option'),
+      });
     }
 
-    // 2. Test timeout adjustability (WCAG 2.2.1)
-    if (options.testTimeouts) {
-      const timeoutResults = await this.analyzeTimeoutAdjustability(
-        page,
-        violations,
-        countdownObserved
-      );
-      timeoutsAdjustable = timeoutResults.adjustable;
-      dataPreservedOnTimeout = timeoutResults.dataPreserved;
+    for (const issue of [...observed.media, ...observed.moving, ...observed.updates]) {
+      violations.push({
+        criterion: '9.2.2.2',
+        element: issue.element,
+        issue: issue.type,
+        description: issue.description,
+        severity: issue.severity,
+        evidence: issue.evidence,
+        suggestion: this.getPauseStopHideSuggestion(issue.type),
+      });
     }
-
-    // 3. Test moving/updating content (WCAG 2.2.2)
-    if (options.testMovingContent) {
-      const movingContentResults = await this.analyzeMovingContent(
-        page,
-        violations,
-        options.observationTime
-      );
-      movingContentControllable = movingContentResults.controllable;
-    }
-
-    // 4. Test timeout warnings (WCAG 2.2.6)
-    await this.analyzeTimeoutWarnings(page, violations, countdownObserved);
-
-    // Generate visual evidence
-    visualEvidence.push({
-      type: 'timing-controls',
-      screenshot: path.basename(initialScreenshot),
-      timeoutsAdjustable: timeoutsAdjustable,
-      autoPlayControlled: autoPlayControlled,
-      movingContentControllable: movingContentControllable,
-      dataPreserved: dataPreservedOnTimeout,
-    });
 
     log.debug(`Timing controls analysis complete: ${violations.length} violations found`);
 
     return {
       violations,
-      visualEvidence,
-      timeoutsAdjustable,
-      autoPlayControlled,
-      movingContentControllable,
-      dataPreservedOnTimeout,
+      timeoutsAdjustable: observed.countdowns.length === 0,
+      autoPlayControlled: observed.media.length === 0,
+      movingContentControllable: observed.moving.length === 0 && observed.updates.length === 0,
+      visualEvidence: [
+        {
+          type: 'timing-controls',
+          screenshot: path.basename(initialScreenshot),
+          observationMs: windowMs,
+          countdowns: observed.countdowns.length,
+          autoPlayingMedia: observed.media.length,
+          movingElements: observed.moving.length,
+          autoUpdatingElements: observed.updates.length,
+        },
+      ],
     };
   }
 
   /**
-   * Analyze timeout adjustability (WCAG 2.2.1)
+   * Record the starting state: mutation counts, the text of every short leaf
+   * that could be a counter, the playback position of every media element and
+   * the painted rectangle of every element running a long or endless animation.
    */
-  async analyzeTimeoutAdjustability(page, violations, countdownObserved) {
-    log.debug('Analyzing timeout adjustability...');
+  async installProbes(page) {
+    await page.evaluate(
+      (renderedHelpers, longEnough) => {
+        eval(renderedHelpers);
 
-    const timeoutAnalysis = await page.evaluate((countdownObserved) => {
-      const issues = [];
-      let adjustable = true;
-      let dataPreserved = true;
-
-      // Look for JavaScript timeouts and intervals
-      const originalSetTimeout = window.setTimeout;
-
-      const detectedTimeouts = [];
-
-      // Override setTimeout to detect timeouts
-      window.setTimeout = function (callback, delay, ...args) {
-        if (delay && delay < 20 * 60 * 1000) {
-          // Less than 20 minutes
-          detectedTimeouts.push({
-            type: 'timeout',
-            delay: delay,
-            callback: callback.toString().substring(0, 100),
-          });
-        }
-        return originalSetTimeout.call(this, callback, delay, ...args);
-      };
-
-      // Look for timeout-related content
-      const timeoutKeywords = [
-        'timeout',
-        'session expires',
-        'expires in',
-        'time remaining',
-        'will expire',
-      ];
-      // innerText (rendered text only): textContent would include inline
-      // <script> source, where "setTimeout" matched the "timeout" keyword.
-      const pageText = (document.body.innerText || '').toLowerCase();
-      const mentionsTimeout = timeoutKeywords.some((keyword) => pageText.includes(keyword));
-
-      // Wording alone is not a time limit: a checklist item titled "allow
-      // extending session timeouts" is a page about timeouts, not a page with
-      // one. A meta refresh or a counter that ticked down while the page sat
-      // idle is the evidence that one exists.
-      const metaRefresh = document.querySelector('meta[http-equiv="refresh" i]');
-      const refreshDelay = metaRefresh
-        ? parseInt(metaRefresh.getAttribute('content') || '', 10)
-        : NaN;
-      const hasTimeoutContent =
-        mentionsTimeout &&
-        (countdownObserved || (Number.isFinite(refreshDelay) && refreshDelay > 0));
-
-      if (hasTimeoutContent) {
-        // Look for timeout adjustment controls
-        const adjustmentControls = document.querySelectorAll(
-          'button, [role="button"], input[type="button"], a[href]'
-        );
-        let hasExtendOption = false;
-        let hasWarningMechanism = false;
-
-        adjustmentControls.forEach((control) => {
-          const controlText =
-            control.textContent.toLowerCase() +
-            (control.getAttribute('aria-label') || '').toLowerCase();
-
-          if (
-            controlText.includes('extend') ||
-            controlText.includes('more time') ||
-            controlText.includes('continue') ||
-            controlText.includes('keep session')
-          ) {
-            hasExtendOption = true;
+        const counts = new Map();
+        const observer = new MutationObserver((records) => {
+          for (const rec of records) {
+            const node = rec.type === 'characterData' ? rec.target.parentElement : rec.target;
+            if (!node || node.nodeType !== 1) continue;
+            if (node.closest('script, style, head')) continue;
+            counts.set(node, (counts.get(node) || 0) + 1);
           }
         });
+        observer.observe(document.body, { childList: true, characterData: true, subtree: true });
 
-        // Look for timeout warnings
-        const warningElements = document.querySelectorAll(
-          '[role="alert"], [aria-live], .warning, .timeout, .expires'
-        );
-        if (warningElements.length > 0) {
-          hasWarningMechanism = true;
+        // Leaves whose whole rendered text is short enough to be a counter.
+        const counters = new Map();
+        for (const el of document.body.querySelectorAll('*')) {
+          if (el.children.length) continue;
+          const text = (el.textContent || '').trim();
+          if (!text || text.length > 24) continue;
+          counters.set(el, text);
         }
 
-        if (!hasExtendOption) {
-          issues.push({
-            type: 'timeout-no-extend-option',
-            element: 'document',
-            description: 'Timeout detected without user control to extend time limit',
+        const media = new Map();
+        for (const el of document.querySelectorAll('video, audio')) {
+          media.set(el, el.currentTime);
+        }
+
+        // An animation that either never ends or runs longer than the 2.2.2
+        // threshold. Everything shorter stops on its own before it matters.
+        const animated = new Map();
+        for (const el of document.body.querySelectorAll('*')) {
+          const style = getComputedStyle(el);
+          if (style.animationName === 'none') continue;
+          const seconds = parseFloat(style.animationDuration) || 0;
+          if (style.animationIterationCount !== 'infinite' && seconds <= longEnough) continue;
+          if (!__isRendered(el)) continue;
+          const rect = el.getBoundingClientRect();
+          animated.set(el, { x: rect.x, y: rect.y, width: rect.width, height: rect.height });
+        }
+
+        window.__a11yTiming = { counts, observer, counters, media, animated };
+      },
+      renderedCode,
+      LONG_ENOUGH_SECONDS
+    );
+  }
+
+  /**
+   * Compare the page against the recorded starting state.
+   */
+  async readProbes(page, windowMs) {
+    return page.evaluate(
+      (renderedHelpers, accnameHelpers, config) => {
+        eval(renderedHelpers);
+        eval(accnameHelpers);
+        const { minUpdates, longEnough } = config;
+
+        const probe = window.__a11yTiming;
+        if (!probe) return { countdowns: [], media: [], moving: [], updates: [] };
+        probe.observer.disconnect();
+
+        function selectorFor(el) {
+          const className = typeof el.className === 'string' ? el.className : '';
+          return (
+            el.tagName.toLowerCase() +
+            (el.id ? `#${el.id}` : '') +
+            (className ? `.${className.split(' ')[0]}` : '')
+          );
+        }
+
+        /**
+         * A control the user can reach that could act on this element: a button
+         * inside it, in its parent or in its grandparent, or one that
+         * names it in aria-controls. Pause buttons commonly sit in a sibling
+         * toolbar rather than in the moving block itself.
+         */
+        const CONTROL_SELECTOR = 'button, [role="button"], input[type="button"]';
+        function hasControl(el) {
+          if (el.id && document.querySelector(`[aria-controls~="${el.id}"]`)) return true;
+          let scope = el;
+          for (let level = 0; level < 3 && scope; level++) {
+            if (scope.querySelector(CONTROL_SELECTOR)) return true;
+            scope = scope.parentElement;
+          }
+          return false;
+        }
+
+        /** 2.2.2 is about moving content, so the element has to carry content. */
+        function carriesContent(el) {
+          if ((el.textContent || '').trim()) return true;
+          return Boolean(el.querySelector('img, svg, video, canvas, picture'));
+        }
+
+        /**
+         * A "12:34", "90" or "90 sec" reading as seconds, with a note whether
+         * it was written as a clock, else null.
+         */
+        function readClock(text) {
+          const value = String(text || '').trim();
+          const clock = value.match(/^(\d+):(\d{2})(?::(\d{2}))?$/);
+          if (clock) {
+            const parts = clock.slice(1).filter(Boolean).map(Number);
+            return { seconds: parts.reduce((total, part) => total * 60 + part, 0), isClock: true };
+          }
+          const plain = value.match(/^(\d+)\s*[\p{L}.]{0,12}$/u);
+          return plain ? { seconds: Number(plain[1]), isClock: false } : null;
+        }
+
+        // ---- 2.2.1: a counter that ticked downwards ------------------------
+        // A bare number counts only when it fell at about one unit per second,
+        // which is what a clock does; any other falling number (a price, a
+        // stock quantity, a slide index) is not a time limit.
+        const perSecondTolerance = Math.ceil(config.windowMs / 1000) + 1;
+        const countdowns = [];
+        for (const [el, before] of probe.counters) {
+          if (!el.isConnected) continue;
+          const from = readClock(before);
+          const to = readClock((el.textContent || '').trim());
+          if (!from || !to || to.seconds >= from.seconds) continue;
+          if (!from.isClock && from.seconds - to.seconds > perSecondTolerance) continue;
+          if (!__isRendered(el)) continue;
+          countdowns.push({ el, from: before, to: (el.textContent || '').trim() });
+        }
+
+        // 2.2.1 is met when the user can turn the limit off, adjust it or ask
+        // for more time. A control that offers more time is that mechanism.
+        let hasExtendControl = false;
+        const offersTime = /\b(extend|more time|keep me|stay signed|continue session)\b|verläng|mehr zeit/i;
+        for (const control of document.querySelectorAll(
+          'button, [role="button"], input[type="button"], input[type="submit"], a[href]'
+        )) {
+          if (!__isRendered(control)) continue;
+          if (offersTime.test(__accessibleName(control) || '')) {
+            hasExtendControl = true;
+            break;
+          }
+        }
+
+        const countdownIssues = hasExtendControl
+          ? []
+          : countdowns.map(({ el, from, to }) => ({
+              element: selectorFor(el),
+              description: 'A running countdown offers no way to extend or turn off the time limit',
+              evidence: `counted down from "${from}" to "${to}" in ${config.windowMs} ms`,
+            }));
+
+        // ---- 2.2.2: media that played by itself ---------------------------
+        const media = [];
+        for (const [el, startedAt] of probe.media) {
+          if (!el.isConnected || el.currentTime <= startedAt) continue;
+          const duration = Number.isFinite(el.duration) ? el.duration : Infinity;
+          if (!el.loop && duration <= longEnough) continue;
+          if (el.hasAttribute('controls') || hasControl(el)) continue;
+          media.push({
+            type: 'autoplay-no-controls',
+            element: selectorFor(el),
+            description: 'Media started playing on its own and offers no pause or stop control',
             severity: 'error',
+            evidence: `playback advanced to ${el.currentTime.toFixed(1)}s, ${
+              el.loop ? 'looping' : `duration ${duration.toFixed(1)}s`
+            }`,
           });
-          adjustable = false;
         }
 
-        if (!hasWarningMechanism) {
-          issues.push({
-            type: 'timeout-no-warning',
-            element: 'document',
-            description: 'Timeout detected without advance warning mechanism',
+        // ---- 2.2.2: content that changed its painted position -------------
+        const moving = [];
+        for (const [el, before] of probe.animated) {
+          if (!el.isConnected) continue;
+          const rect = el.getBoundingClientRect();
+          // A rotating or pulsing indicator shifts its box by a pixel or two;
+          // content that travels across the page shifts it much further.
+          const shifted =
+            Math.abs(rect.x - before.x) >= config.minShiftPx ||
+            Math.abs(rect.y - before.y) >= config.minShiftPx ||
+            Math.abs(rect.width - before.width) >= config.minShiftPx ||
+            Math.abs(rect.height - before.height) >= config.minShiftPx;
+          if (!shifted || !carriesContent(el) || hasControl(el)) continue;
+          moving.push({
+            type: 'moving-content-no-controls',
+            element: selectorFor(el),
+            description:
+              'Content keeps moving on its own and offers no pause, stop or hide control',
             severity: 'error',
+            evidence: `moved from (${Math.round(before.x)}, ${Math.round(before.y)}) to (${Math.round(rect.x)}, ${Math.round(rect.y)})`,
           });
         }
 
-        // Check for data preservation
-        const formElements = document.querySelectorAll('input, textarea, select');
-        let hasAutoSave = false;
-
-        formElements.forEach((element) => {
-          if (element.hasAttribute('oninput') || element.hasAttribute('onchange')) {
-            const eventHandler =
-              element.getAttribute('oninput') || element.getAttribute('onchange');
-            if (eventHandler.includes('save') || eventHandler.includes('store')) {
-              hasAutoSave = true;
-            }
-          }
-        });
-
-        // Look for auto-save indicators
-        const autoSaveIndicators = document.querySelectorAll('*');
-        autoSaveIndicators.forEach((element) => {
-          const text = element.textContent.toLowerCase();
-          if (
-            text.includes('auto save') ||
-            text.includes('automatically saved') ||
-            text.includes('draft saved')
-          ) {
-            hasAutoSave = true;
-          }
-        });
-
-        if (formElements.length > 0 && !hasAutoSave) {
-          issues.push({
-            type: 'timeout-no-data-preservation',
-            element: 'document',
-            description: 'Forms present but no data preservation mechanism detected for timeouts',
+        // ---- 2.2.2: content that rewrote itself ---------------------------
+        const updates = [];
+        const reported = new Set(moving.map((issue) => issue.element));
+        for (const [el, count] of probe.counts) {
+          if (count < minUpdates || !el.isConnected) continue;
+          if (!__isRendered(el) || hasControl(el)) continue;
+          const selector = selectorFor(el);
+          if (reported.has(selector)) continue;
+          reported.add(selector);
+          updates.push({
+            type: 'auto-update-no-controls',
+            element: selector,
+            description: `Content updated ${count} times on its own and lacks pause or stop controls`,
             severity: 'warning',
+            evidence: `${count} updates in ${config.windowMs} ms`,
           });
-          dataPreserved = false;
         }
+
+        delete window.__a11yTiming;
+        return { countdowns: countdownIssues, media, moving, updates };
+      },
+      renderedCode,
+      accnameCode,
+      {
+        minUpdates: MIN_AUTO_UPDATES,
+        longEnough: LONG_ENOUGH_SECONDS,
+        minShiftPx: MIN_SHIFT_PX,
+        windowMs,
       }
-
-      // Restore original functions
-      window.setTimeout = originalSetTimeout;
-
-      return { issues, adjustable, dataPreserved, detectedTimeouts };
-    }, countdownObserved);
-
-    // Create violations for timeout issues
-    timeoutAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.2.1',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getTimeoutSuggestion(issue.type),
-      });
-    });
-
-    return {
-      adjustable: timeoutAnalysis.adjustable,
-      dataPreserved: timeoutAnalysis.dataPreserved,
-    };
+    );
   }
 
-  /**
-   * Analyze auto-playing content (WCAG 2.2.2)
-   */
-  async analyzeAutoPlayingContent(page, violations, observationTime) {
-    log.debug('Analyzing auto-playing content...');
-
-    // First, check for auto-playing media elements
-    const mediaAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let controlled = true;
-
-      // Check video and audio elements
-      const mediaElements = document.querySelectorAll('video, audio');
-
-      mediaElements.forEach((element) => {
-        const elementInfo = {
-          tagName: element.tagName.toLowerCase(),
-          id: element.id,
-          className: element.className,
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (element.className && typeof element.className === 'string'
-              ? `.${element.className.split(' ')[0]}`
-              : ''),
-        };
-
-        // Check for autoplay attribute
-        if (element.hasAttribute('autoplay') && !element.hasAttribute('muted')) {
-          // Look for user controls
-          const hasControls =
-            element.hasAttribute('controls') ||
-            (element.parentElement && element.parentElement.querySelector('button')) ||
-            document.querySelector(`button[aria-controls="${element.id}"]`);
-
-          if (!hasControls) {
-            issues.push({
-              type: 'autoplay-no-controls',
-              element: elementInfo.selector,
-              description: 'Auto-playing media lacks user controls for pause/stop',
-              severity: 'error',
-            });
-            controlled = false;
-          }
-
-          // Check duration (auto-play longer than 5 seconds needs controls)
-          if (element.duration > 5 && !hasControls) {
-            issues.push({
-              type: 'autoplay-long-duration-no-controls',
-              element: elementInfo.selector,
-              description: 'Auto-playing media longer than 5 seconds lacks pause/stop controls',
-              severity: 'error',
-            });
-            controlled = false;
-          }
-        }
-      });
-
-      return { issues, controlled };
-    });
-
-    // Record which elements actually rewrite their own text while nobody is
-    // interacting with the page. This is what "auto-updating content" means in
-    // 2.2.2; the words a page happens to contain say nothing about it.
-    await page.evaluate(() => {
-      const counts = new Map();
-      const observer = new MutationObserver((records) => {
-        for (const rec of records) {
-          const node = rec.type === 'characterData' ? rec.target.parentElement : rec.target;
-          if (!node || node.nodeType !== 1) continue;
-          if (node.closest('script, style, head')) continue;
-          counts.set(node, (counts.get(node) || 0) + 1);
-        }
-      });
-      observer.observe(document.body, {
-        childList: true,
-        characterData: true,
-        subtree: true,
-      });
-      window.__a11yAutoUpdate = { counts, observer };
-    });
-
-    // Observe page for auto-starting content
-    await new Promise((resolve) => setTimeout(resolve, observationTime));
-
-    const dynamicContentAnalysis = await page.evaluate(() => {
-      const issues = [];
-      let controlled = true;
-      let countdownObserved = false;
-
-      // Look for elements with animations or auto-updating content
-      const animatedElements = document.querySelectorAll(
-        '[class*="animate"], [class*="moving"], [style*="animation"], [style*="transition"]'
-      );
-
-      animatedElements.forEach((element) => {
-        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-        const className = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (className ? `.${className.split(' ')[0]}` : ''),
-        };
-
-        const computedStyle = window.getComputedStyle(element);
-        const hasInfiniteAnimation =
-          computedStyle.animationIterationCount === 'infinite' ||
-          computedStyle.animationDuration !== '0s';
-
-        if (hasInfiniteAnimation) {
-          // Look for pause controls
-          const hasPauseControl =
-            element.querySelector('button') ||
-            (element.parentElement && element.parentElement.querySelector('button')) ||
-            document.querySelector(`button[aria-controls="${element.id}"]`) ||
-            element.hasAttribute('onclick');
-
-          if (!hasPauseControl) {
-            // Check if it's likely distracting (moving or flashing)
-            const isDistracting =
-              className.includes('flash') ||
-              className.includes('blink') ||
-              className.includes('scroll') ||
-              computedStyle.animationName.includes('flash') ||
-              computedStyle.animationName.includes('blink');
-
-            if (isDistracting) {
-              issues.push({
-                type: 'auto-animation-no-pause',
-                element: elementInfo.selector,
-                description: 'Auto-playing animation lacks pause or stop controls',
-                severity: 'error',
-              });
-              controlled = false;
-            }
-          }
-        }
-      });
-
-      // Auto-updating content: elements that rewrote themselves repeatedly
-      // during the observation window without any input from the user.
-      // A single update is a page settling in (lazy image, hydration); 2.2.2
-      // is about content that keeps updating.
-      const MIN_AUTO_UPDATES = 3;
-      const recorded = window.__a11yAutoUpdate;
-      if (recorded) {
-        recorded.observer.disconnect();
-        for (const [element, count] of recorded.counts) {
-          if (count < MIN_AUTO_UPDATES) continue;
-          if (!element.isConnected) continue;
-          // A number that keeps being rewritten while nobody touches the page
-          // is a running clock: the evidence a time limit exists.
-          if (/\d/.test(element.textContent || '')) countdownObserved = true;
-          // SVG/MathML elements expose className as an SVGAnimatedString
-          const className = typeof element.className === 'string' ? element.className : '';
-          const elementInfo = {
-            selector:
-              element.tagName.toLowerCase() +
-              (element.id ? `#${element.id}` : '') +
-              (className ? `.${className.split(' ')[0]}` : ''),
-          };
-
-          // Look for pause/stop controls
-          const hasUpdateControls =
-            element.querySelector('button') ||
-            (element.parentElement && element.parentElement.querySelector('button')) ||
-            (element.id && document.querySelector(`button[aria-controls="${element.id}"]`));
-
-          if (!hasUpdateControls) {
-            issues.push({
-              type: 'auto-update-no-controls',
-              element: elementInfo.selector,
-              description: `Content updated ${count} times on its own and lacks pause or stop controls`,
-              severity: 'warning',
-            });
-          }
-        }
-        delete window.__a11yAutoUpdate;
-      }
-
-      return { issues, controlled, countdownObserved };
-    });
-
-    // Combine results
-    const allIssues = [...mediaAnalysis.issues, ...dynamicContentAnalysis.issues];
-    const overallControlled = mediaAnalysis.controlled && dynamicContentAnalysis.controlled;
-
-    // Create violations for auto-play issues
-    allIssues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.2.2',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getAutoPlaySuggestion(issue.type),
-      });
-    });
-
-    return {
-      controlled: overallControlled,
-      countdownObserved: dynamicContentAnalysis.countdownObserved,
-    };
-  }
-
-  /**
-   * Analyze moving content (WCAG 2.2.2)
-   */
-  async analyzeMovingContent(page, violations, observationTime) {
-    log.debug('Analyzing moving content...');
-
-    const movingContentAnalysis = await page.evaluate((observationTime) => {
-      const issues = [];
-      let controllable = true;
-
-      // Find elements with CSS animations, transforms, or movement
-      const potentiallyMovingElements = document.querySelectorAll('*');
-      const movingElements = [];
-
-      potentiallyMovingElements.forEach((element) => {
-        // SVG/MathML elements expose className as an SVGAnimatedString, not a string
-        const className = typeof element.className === 'string' ? element.className : '';
-        const computedStyle = window.getComputedStyle(element);
-        const hasMovement =
-          computedStyle.animationName !== 'none' ||
-          computedStyle.transform !== 'none' ||
-          className.includes('move') ||
-          className.includes('slide') ||
-          className.includes('scroll') ||
-          className.includes('rotate');
-
-        if (hasMovement) {
-          movingElements.push(element);
-        }
-      });
-
-      movingElements.forEach((element) => {
-        const className = typeof element.className === 'string' ? element.className : '';
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (className ? `.${className.split(' ')[0]}` : ''),
-        };
-
-        const computedStyle = window.getComputedStyle(element);
-
-        // Check if movement lasts longer than 5 seconds
-        const animationDuration = parseFloat(computedStyle.animationDuration) || 0;
-        const isInfinite = computedStyle.animationIterationCount === 'infinite';
-        const isLongDuration = animationDuration > 5 || isInfinite;
-
-        if (isLongDuration) {
-          // Look for pause, stop, or hide controls
-          const hasControls =
-            element.querySelector('button') ||
-            (element.parentElement && element.parentElement.querySelector('button')) ||
-            document.querySelector(`button[aria-controls="${element.id}"]`) ||
-            element.hasAttribute('onclick') ||
-            element.closest('[role="dialog"]'); // Modals often have close buttons
-
-          if (!hasControls) {
-            // Check if the movement is essential (like progress indicators)
-            const isEssential =
-              className.includes('progress') ||
-              className.includes('loading') ||
-              element.getAttribute('role') === 'progressbar' ||
-              element.tagName.toLowerCase() === 'progress';
-
-            if (!isEssential) {
-              issues.push({
-                type: 'moving-content-no-controls',
-                element: elementInfo.selector,
-                description:
-                  'Moving content lasting longer than 5 seconds lacks pause, stop, or hide controls',
-                severity: 'error',
-              });
-              controllable = false;
-            }
-          }
-        }
-
-        // Check for blinking/flashing content
-        const isBlinking =
-          className.includes('blink') ||
-          className.includes('flash') ||
-          computedStyle.animationName.includes('blink') ||
-          computedStyle.animationName.includes('flash');
-
-        if (isBlinking) {
-          issues.push({
-            type: 'blinking-content',
-            element: elementInfo.selector,
-            description: 'Blinking or flashing content detected - potential seizure risk',
-            severity: 'error',
-          });
-          controllable = false;
-        }
-      });
-
-      return { issues, controllable };
-    }, observationTime);
-
-    // Create violations for moving content issues
-    movingContentAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.2.2',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getMovingContentSuggestion(issue.type),
-      });
-    });
-
-    return { controllable: movingContentAnalysis.controllable };
-  }
-
-  /**
-   * Analyze timeout warnings (WCAG 2.2.6)
-   */
-  async analyzeTimeoutWarnings(page, violations, countdownObserved) {
-    log.debug('Analyzing timeout warnings...');
-
-    const warningAnalysis = await page.evaluate((countdownObserved) => {
-      const issues = [];
-
-      // A page that only writes about timeouts has no timeout warning to make
-      // accessible, so the same evidence gates this check.
-      const metaRefresh = document.querySelector('meta[http-equiv="refresh" i]');
-      const refreshDelay = metaRefresh
-        ? parseInt(metaRefresh.getAttribute('content') || '', 10)
-        : NaN;
-      if (!countdownObserved && !(Number.isFinite(refreshDelay) && refreshDelay > 0)) {
-        return { issues };
-      }
-
-      // Look for timeout-related elements
-      const timeoutElements = document.querySelectorAll(
-        '[class*="timeout"], [class*="expire"], [id*="timeout"], [id*="expire"]'
-      );
-
-      timeoutElements.forEach((element) => {
-        const elementInfo = {
-          selector:
-            element.tagName.toLowerCase() +
-            (element.id ? `#${element.id}` : '') +
-            (element.className && typeof element.className === 'string'
-              ? `.${element.className.split(' ')[0]}`
-              : ''),
-        };
-
-        // Check if timeout warning is accessible
-        const hasAriaLive = element.hasAttribute('aria-live');
-        const hasRole =
-          element.getAttribute('role') === 'alert' || element.getAttribute('role') === 'status';
-        const isVisuallyHidden =
-          element.style.display === 'none' ||
-          element.style.visibility === 'hidden' ||
-          element.getAttribute('aria-hidden') === 'true';
-
-        if (!hasAriaLive && !hasRole && !isVisuallyHidden) {
-          issues.push({
-            type: 'timeout-warning-not-accessible',
-            element: elementInfo.selector,
-            description: 'Timeout warning lacks proper ARIA live region or alert role',
-            severity: 'warning',
-          });
-        }
-
-        // Check for timeout duration information
-        const hasTimeRemaining =
-          element.textContent.includes(':') ||
-          element.textContent.includes('minute') ||
-          element.textContent.includes('second');
-
-        if (!hasTimeRemaining && element.textContent.toLowerCase().includes('timeout')) {
-          issues.push({
-            type: 'timeout-warning-no-duration',
-            element: elementInfo.selector,
-            description: 'Timeout warning does not specify remaining time',
-            severity: 'warning',
-          });
-        }
-      });
-
-      return { issues };
-    }, countdownObserved);
-
-    // Create violations for timeout warning issues
-    warningAnalysis.issues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.2.6',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: this.getTimeoutWarningSuggestion(issue.type),
-      });
-    });
-
-    return warningAnalysis;
-  }
-
-  /**
-   * Get suggestion for timeout violations
-   */
   getTimeoutSuggestion(violationType) {
     const suggestions = {
       'timeout-no-extend-option':
-        'Provide user controls to extend time limits (extend, continue session buttons)',
-      'timeout-no-warning':
-        'Implement advance warning system (20 seconds before expiry) with ARIA live regions',
-      'timeout-no-data-preservation':
-        'Add auto-save functionality or session storage to preserve user data',
+        'Let the user turn the time limit off, adjust it, or extend it before it runs out',
     };
     return (
       suggestions[violationType] || 'Ensure timeout mechanisms are user-controllable and accessible'
     );
   }
 
-  /**
-   * Get suggestion for auto-play violations
-   */
-  getAutoPlaySuggestion(violationType) {
+  getPauseStopHideSuggestion(violationType) {
     const suggestions = {
-      'autoplay-no-controls': 'Add pause, stop, and volume controls for auto-playing media',
-      'autoplay-long-duration-no-controls':
-        'Provide pause/stop controls for media longer than 5 seconds',
-      'auto-animation-no-pause': 'Add pause or stop controls for auto-playing animations',
+      'autoplay-no-controls': 'Add pause and stop controls for media that starts on its own',
+      'moving-content-no-controls':
+        'Add pause, stop or hide controls for content that moves for more than five seconds',
       'auto-update-no-controls': 'Provide pause controls for auto-updating content like news feeds',
     };
     return suggestions[violationType] || 'Provide user controls for auto-playing content';
-  }
-
-  /**
-   * Get suggestion for moving content violations
-   */
-  getMovingContentSuggestion(violationType) {
-    const suggestions = {
-      'moving-content-no-controls':
-        'Add pause, stop, or hide controls for moving content lasting over 5 seconds',
-      'blinking-content': 'Remove blinking/flashing content or provide controls to stop it',
-    };
-    return suggestions[violationType] || 'Ensure moving content can be paused or hidden by users';
-  }
-
-  /**
-   * Get suggestion for timeout warning violations
-   */
-  getTimeoutWarningSuggestion(violationType) {
-    const suggestions = {
-      'timeout-warning-not-accessible':
-        'Add role="alert" or aria-live="assertive" to timeout warnings',
-      'timeout-warning-no-duration': 'Include specific time remaining in timeout warnings',
-    };
-    return suggestions[violationType] || 'Make timeout warnings accessible with proper ARIA markup';
   }
 }
 

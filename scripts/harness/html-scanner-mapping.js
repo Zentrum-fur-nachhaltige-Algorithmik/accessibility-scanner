@@ -865,6 +865,15 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-target-size-lazy-banner.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'Banner links holding only a lazy image that has not loaded: 2.5.8 measures the box the width and height attributes reserve, not the collapsed anchor',
+  },
+
   'good-title-as-the-name-of-a-control.html': {
     expectedScanners: [],
     excludedScanners: ['hover-focus-content'],

@@ -607,6 +607,39 @@ class InputModalitiesScanner extends BaseScanner {
         return rect.width <= 16 && rect.height <= 16;
       }
 
+      /**
+       * The box a target occupies once its images have painted.
+       *
+       * A link that holds nothing but an <img loading="lazy" width="384"
+       * height="100"> collapses to the line box while that image is still
+       * unloaded, which is what the page looks like below the fold and in an
+       * offline snapshot, and never what the user clicks. The width and height
+       * attributes are the box the browser reserves for it, so they are what
+       * 2.5.8 measures. An image that declares no such box reserves none and
+       * the painted rectangle stands.
+       */
+      function reservedRect(el, rect) {
+        let width = rect.width;
+        let height = rect.height;
+        for (const img of el.querySelectorAll('img')) {
+          if (img.complete && img.naturalWidth > 0) continue;
+          const w = parseFloat(img.getAttribute('width'));
+          const h = parseFloat(img.getAttribute('height'));
+          if (!(w > 0) || !(h > 0)) continue;
+          width = Math.max(width, w);
+          height = Math.max(height, h);
+        }
+        if (width === rect.width && height === rect.height) return rect;
+        return {
+          left: rect.left,
+          top: rect.top,
+          right: rect.left + width,
+          bottom: rect.top + height,
+          width: width,
+          height: height,
+        };
+      }
+
       // Collect every rendered pointer target ONCE (each element, not each selector match)
       const candidates = new Set();
       document
@@ -630,8 +663,9 @@ class InputModalitiesScanner extends BaseScanner {
           p = p.parentElement;
         }
         if (nested) continue;
-        const rect = el.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) continue;
+        const painted = el.getBoundingClientRect();
+        if (painted.width === 0 || painted.height === 0) continue;
+        const rect = reservedRect(el, painted);
         targets.push({ el, rect, selector: selectorOf(el), style: window.getComputedStyle(el) });
       }
 

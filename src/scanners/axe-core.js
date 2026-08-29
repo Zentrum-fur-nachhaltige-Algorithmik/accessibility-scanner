@@ -10,6 +10,7 @@ const { AxePuppeteer } = require('@axe-core/puppeteer');
 const { isHardViolation } = require('../core/severity');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
 const { injectableCode: paintedBackgroundUtils } = require('../utils/painted-background');
+const { injectableCode: mediaAudioUtils } = require('../utils/media-audio');
 const log = require('../utils/logger').createLogger('axe-core');
 
 /**
@@ -171,6 +172,59 @@ class AxeCoreAdapter extends BaseScanner {
     return new Map(decisions);
   }
 
+  /**
+   * Whether the media elements axe leaves `incomplete` under `video-caption`
+   * or `no-autoplay-audio` carry audio at all.
+   *
+   * Both rules name criteria about audio: 1.2.2 asks for captions of the audio
+   * of synchronized media, 1.4.2 for a control over audio that starts by
+   * itself. A looping background decoration with no audio track is outside
+   * both, and axe cannot read the track, which is why it stops.
+   *
+   * @returns {Promise<Map<string, object>>} target selector -> { decorative, audio }
+   */
+  async _decideMedia(page, incompleteRules) {
+    const MEDIA_RULES = new Set(['video-caption', 'no-autoplay-audio']);
+    const targets = [];
+    for (const rule of incompleteRules || []) {
+      if (!MEDIA_RULES.has(rule.id)) continue;
+      for (const node of rule.nodes) {
+        if (!Array.isArray(node.target) || node.target.length !== 1) continue;
+        if (typeof node.target[0] !== 'string') continue;
+        targets.push(node.target[0]);
+      }
+    }
+    if (targets.length === 0) return new Map();
+
+    const states = await page.evaluate(
+      (selectors, mediaCode) => {
+        eval(mediaCode);
+        const out = [];
+        for (const selector of selectors) {
+          let element = null;
+          try {
+            element = document.querySelector(selector);
+          } catch (e) {
+            element = null;
+          }
+          if (!element) continue;
+          out.push([
+            selector,
+            {
+              decorative: element.tagName === 'VIDEO' && __isDecorativeBackgroundVideo(element),
+              audio: __mediaAudioState(element),
+            },
+          ]);
+        }
+        return out;
+      },
+      targets,
+      mediaAudioUtils
+    );
+
+    return new Map(states);
+  }
+
   async scan(page, options = {}) {
     await this._ensurePageReady(page);
 
@@ -182,6 +236,11 @@ class AxeCoreAdapter extends BaseScanner {
 
     const contrastDecisions = await this._decideContrast(page, axeResults.incomplete).catch((e) => {
       log.warn(`[axe-core] contrast resolution failed: ${e.message}`);
+      return new Map();
+    });
+
+    const mediaStates = await this._decideMedia(page, axeResults.incomplete).catch((e) => {
+      log.warn(`[axe-core] media audio resolution failed: ${e.message}`);
       return new Map();
     });
 
@@ -206,6 +265,21 @@ class AxeCoreAdapter extends BaseScanner {
     for (const rule of axeResults.incomplete || []) {
       const bucket = isBestPracticeOnly(rule.tags) ? bestPractices : violations;
       for (const node of rule.nodes) {
+        if (rule.id === 'video-caption' || rule.id === 'no-autoplay-audio') {
+          const target =
+            Array.isArray(node.target) && node.target.length === 1 ? node.target[0] : null;
+          const state = target ? mediaStates.get(target) : null;
+          if (
+            state &&
+            (state.audio === 'silent' || (state.decorative && state.audio !== 'audio'))
+          ) {
+            log.debug(
+              `[axe-core] ${rule.id} ${target}: no audio track (${state.audio}), criterion does not apply`
+            );
+            continue;
+          }
+        }
+
         if (rule.id === 'color-contrast') {
           const target =
             Array.isArray(node.target) && node.target.length === 1 ? node.target[0] : null;

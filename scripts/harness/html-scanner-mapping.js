@@ -865,6 +865,15 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-video-silent-background-loop.html': {
+    expectedScanners: [],
+    excludedScanners: ['media-accessibility'],
+    testType: 'good',
+    wcagCriteria: ['1.2.2', '1.2.3', '1.2.5'],
+    description:
+      'Two identical autoplay/loop/no-controls motion graphics, only one of which the page script mutes: the markup decides what the pattern is, not the muted property',
+  },
+
   'good-carousel-role-less-wrapper.html': {
     expectedScanners: [],
     excludedScanners: ['advanced-aria'],

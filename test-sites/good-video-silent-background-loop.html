@@ -1,0 +1,45 @@
+<!-- WCAG-TEST
+criterion: 1.2.2, 1.2.3, 1.2.5
+level: AA
+title: A looping motion graphic with no audio track is not synchronized media
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: media-accessibility
+description: Two identical widget videos declare autoplay, loop and playsinline and offer no controls. Neither carries a muted attribute: the page script sets the property on the second one and not on the first, so a rule that reads video.muted exempts one and reports three findings on the other. 1.2.2, 1.2.3 and 1.2.5 all govern synchronized media, which is audio synchronized with video, and a looping decoration behind a headline has no audio to caption or describe.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widget</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  .widget { position: relative; border: 1px solid #595959; padding: 1rem; margin-bottom: 1rem; }
+  .widget video { width: 100%; height: 8rem; object-fit: cover; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The card index</h1>
+
+  <div class="widget">
+    <h2>Search the index</h2>
+    <video class="rounded" autoplay loop playsinline src="motion-graphic.mp4"></video>
+  </div>
+
+  <div class="widget">
+    <h2>Search the index again</h2>
+    <video class="rounded" id="second-widget" autoplay loop playsinline src="motion-graphic.mp4"></video>
+  </div>
+
+  <script>
+    // The page's own script mutes only the second widget, which is why the
+    // markup and not the property has to decide what this pattern is.
+    document.getElementById('second-widget').muted = true;
+  </script>
+</main>
+</body>
+</html>

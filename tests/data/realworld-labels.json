@@ -4008,216 +4008,6 @@
    "reason": "the page links Impressum and Datenschutz but no accessibility statement, and no statement-shaped link exists anywhere in the markup (EN 301 549 12.2.2); whether the EAA binds this microenterprise is a legal question the markup cannot answer"
   },
   {
-   "snapshot": "muenchen-portal.html",
-   "rule": "image-alt",
-   "selector": ".m-teaser-list--three-cols.paragraph--type--teaser-row-component.m-teaser-list:nth-child(3) > .container > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(3) > .m-teaser-vertical.m-teaser-vertical-article > .m-teaser-vertical__image > div > picture > img[height=\"213\"][loading=\"eager\"]",
-   "verdict": "true",
-   "reason": "the img inside the teaser picture carries width, height, loading and src but no alt attribute at all, while every other teaser image on the page has one, so the image has no text alternative and its file name is announced (SC 1.1.1)"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "image-alt",
-   "selector": ".m-teaser-list--three-cols.paragraph--type--teaser-row-component.m-teaser-list:nth-child(3) > .container > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(4) > .m-teaser-vertical.m-teaser-vertical-article > .m-teaser-vertical__image > div > picture > img[height=\"213\"][loading=\"eager\"]",
-   "verdict": "true",
-   "reason": "the img inside the teaser picture carries width, height, loading and src but no alt attribute at all, while every other teaser image on the page has one, so the image has no text alternative and its file name is announced (SC 1.1.1)"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "link-name-identifies-nothing",
-   "selector": "a.m-sector-link",
-   "verdict": "false",
-   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "missing-carousel-label",
-   "selector": "div.m-intro",
-   "verdict": "false",
-   "reason": "the flagged div.m-intro.m-intro-carousel carries no role, and the carousel inside it is section.m-slider with aria-label='Karussell mit Inhalten' wrapping div.splide[role=region][aria-roledescription=carousel]; SC 4.1.2 asks for a name on the component that has the role, and that component has one, so the outer wrapper needs none"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "missing-autocomplete",
-   "selector": "input#subscribeEmail",
-   "verdict": "true",
-   "reason": "input#subscribeEmail is type=email name=email in the newsletter form and collects the user's own e-mail address, which is one of the input purposes of WCAG section 7, but carries no autocomplete attribute (SC 1.3.5)"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "target-too-small",
-   "selector": "a.dropdown-item",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: a.dropdown-item \"Zum Rathaus\" is an item of ul.dropdown-menu in the header service menu, which is display: none on the live page until the toggle is clicked; the snapshot renders it open at 96x17 with button#languageButton inside its 24px spacing circle. An open menu item of that size does fail SC 2.5.8, but the state is one the live page does not expose without user action, and the three live target-too-small findings are 4x24 links elsewhere"
-  },
-  {
-   "snapshot": "muenchen-portal.html",
-   "rule": "reflow-failure",
-   "selector": "",
-   "verdict": "false",
-   "reason": "the sideways overflow comes from teaser images whose src 404s in the offline snapshot, so they lay out at their width attribute (702px and 384px) instead of the size the CSS gives them; the live page reports no reflow failure at 320px (SC 1.4.10)"
-  },
-  {
    "snapshot": "spiegel-news.html",
    "rule": "aria-required-parent",
    "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(43) > .sm\\:-mt-16.md\\:w-full.lg\\:w-4\\/12 > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
@@ -5868,6 +5658,468 @@
    "selector": "main",
    "verdict": "review",
    "reason": "same live statement page and same question: whether it names a preparation or review date is a human reading, not a fact of the snapshot (EN 301 549 12.2.2)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(1) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__list > .grande.m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(1) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(2) > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(6) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__list > .grande.m-teaser-list__list-item > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(9) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__list > .grande.m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(9) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(2) > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(11) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__list > .grande.m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(11) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(2) > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "image-alt",
+   "selector": ".m-teaser-list--three-cols.paragraph--type--teaser-row-component.m-teaser-list:nth-child(3) > .container > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(3) > .m-teaser-vertical.m-teaser-vertical-article > .m-teaser-vertical__image > div > picture > img[height=\"213\"][loading=\"eager\"]",
+   "verdict": "true",
+   "reason": "the img inside the teaser picture carries width, height, loading and src but no alt attribute at all, while every other teaser image on the page has one, so the image has no text alternative and its file name is announced (SC 1.1.1)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "image-alt",
+   "selector": ".m-teaser-list--three-cols.paragraph--type--teaser-row-component.m-teaser-list:nth-child(3) > .container > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(4) > .m-teaser-vertical.m-teaser-vertical-article > .m-teaser-vertical__image > div > picture > img[height=\"213\"][loading=\"eager\"]",
+   "verdict": "true",
+   "reason": "the img inside the teaser picture carries width, height, loading and src but no alt attribute at all, while every other teaser image on the page has one, so the image has no text alternative and its file name is announced (SC 1.1.1)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#navSearchContent > .bb-banner[href$=\"branchenbuch\"]",
+   "verdict": "false",
+   "reason": "the advert label #613207 sits on the banner's own linear-gradient(#FFD873, #FFA22C): 7.79:1 against the lighter stop and 5.31:1 against the darker one at 14px bold, above the 4.5:1 of SC 1.4.3. axe reports incomplete because the background is a gradient, and the ratio the walk falls back to belongs to the blue bar behind it"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide01 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__image > .m-intro-carousel-element__indicator[aria-hidden=\"true\"]",
+   "verdict": "review",
+   "reason": "the same teaser overlay on a carousel slide that splide fades to opacity 0.5 as an inactive preview: text and background fade together to 2.17:1 in the snapshot, and behind them sits a photo the snapshot does not have. Both the fade state and the photo are for a human to judge (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide02 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__image > .m-intro-carousel-element__indicator[aria-hidden=\"true\"]",
+   "verdict": "false",
+   "reason": "the slide counter is #FFFFFF on the chip rgba(0, 0, 0, 0.6) over #F2F6FA, which composites to #616264: 6.11:1 at 16px, above the 4.5:1 of SC 1.4.3; axe reports incomplete because the chip is translucent"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide02 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__body > .m-intro-carousel-element__body__inner > .m-intro-carousel-element__tagline",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide02 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__body > .m-intro-carousel-element__body__inner > .m-intro-carousel-element__headline > a[target=\"_self\"]",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide02 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__body > .m-intro-carousel-element__body__inner > .m-intro-carousel-element__teaser",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide03 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__body > .m-intro-carousel-element__body__inner > .m-intro-carousel-element__tagline",
+   "verdict": "review",
+   "reason": "the same teaser overlay on a carousel slide that splide fades to opacity 0.5 as an inactive preview: text and background fade together to 2.17:1 in the snapshot, and behind them sits a photo the snapshot does not have. Both the fade state and the photo are for a human to judge (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide03 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__body > .m-intro-carousel-element__body__inner > .m-intro-carousel-element__headline > a[target=\"_self\"]",
+   "verdict": "review",
+   "reason": "the same teaser overlay on a carousel slide that splide fades to opacity 0.5 as an inactive preview: text and background fade together to 2.17:1 in the snapshot, and behind them sits a photo the snapshot does not have. Both the fade state and the photo are for a human to judge (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "#splide01-slide03 > .m-intro-carousel-element > .m-intro-carousel-element__inner > .m-intro-carousel-element__body > .m-intro-carousel-element__body__inner > .m-intro-carousel-element__teaser",
+   "verdict": "review",
+   "reason": "the same teaser overlay on a carousel slide that splide fades to opacity 0.5 as an inactive preview: text and background fade together to 2.17:1 in the snapshot, and behind them sits a photo the snapshot does not have. Both the fade state and the photo are for a human to judge (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(1) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__head > .m-teaser-list__headline",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(1) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__list > .grande.m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__headline > a",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list__headline > a[target=\"_blank\"]",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-contained-article__headline > a[target=\"_blank\"]",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list__headline > a[href$=\"sehenswuerdigkeiten\"]",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(6) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__list > .grande.m-teaser-list__list-item > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__headline > a",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-pillar-content__list-item:nth-child(8) > a[target=\"_blank\"]",
+   "verdict": "false",
+   "reason": "text rgb(0, 106, 222) on rgb(244, 244, 244) is 4.64:1 at 16px normal, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list__headline > a[href$=\"veranstaltungen\"]",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"events\"]",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list__headline > a[href$=\"freizeit\"]",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(9) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(2) > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(1) > .m-teaser-contained-article > .m-teaser-contained-article__body > .m-teaser-contained-article__headline > a",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(11) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(1) > .m-teaser-list__head > .m-teaser-list__headline",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-contained-article__headline > a[href$=\"leben\"]",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".m-teaser-list--compilation-two-cols.paragraph--type--teaser-compilation-component.m-teaser-list:nth-child(11) > .container > .m-teaser-list__row > .m-teaser-list__column:nth-child(2) > .m-teaser-list__head > .m-teaser-list__headline",
+   "verdict": "false",
+   "reason": "text rgb(58, 83, 104) on rgb(255, 255, 255) is 8.02:1 at 28px bold, at or above the threshold SC 1.4.3 sets for this size; axe reports it as incomplete, not as a failure"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"gesundheit\"]",
+   "verdict": "review",
+   "reason": "white text over the teaser overlay linear-gradient(rgba(0, 0, 0, 0) 2rem, rgba(0, 0, 0, 0.54)) on the teaser photo: the overlay alone gives 4.61:1 at its darkest point and 1:1 where it is transparent, so the outcome depends entirely on the photo, which 404s in the snapshot. Whether the headline keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "color-contrast",
+   "selector": ".footer-navigation__block.footer-navigation__block--fill:nth-child(2) > .bb-banner[target=\"_blank\"]",
+   "verdict": "false",
+   "reason": "the advert label #613207 sits on the banner's own linear-gradient(#FFD873, #FFA22C): 7.79:1 against the lighter stop and 5.31:1 against the darker one at 14px bold, above the 4.5:1 of SC 1.4.3. axe reports incomplete because the background is a gradient, and the ratio the walk falls back to belongs to the blue bar behind it"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph \"Branchen A-Z\"; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "missing-carousel-label",
+   "selector": "div.m-intro",
+   "verdict": "false",
+   "reason": "the flagged div.m-intro.m-intro-carousel carries no role, and the carousel inside it is section.m-slider with aria-label=\"Karussell mit Inhalten\" wrapping div.splide[role=region][aria-roledescription=carousel]; SC 4.1.2 asks for a name on the component that has the role, and that component has one, so the outer wrapper needs none"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "missing-autocomplete",
+   "selector": "input#subscribeEmail",
+   "verdict": "true",
+   "reason": "input#subscribeEmail is type=email name=email in the newsletter form and collects the user's own e-mail address, which is one of the input purposes of WCAG section 7, but carries no autocomplete attribute (SC 1.3.5)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "insufficient-form-border-contrast",
+   "selector": "input#sitesearch-input",
+   "verdict": "false",
+   "reason": "input#sitesearch-input is a white field on the blue header bar #1B98D5: its fill differs from what surrounds it by 3.23:1, which is the boundary SC 1.4.11 asks about, so the control is identifiable. The rule looks only at the 1px #BDD4EA border and never compares the fill with the background the control sits on"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "insufficient-form-border-contrast",
+   "selector": "input#subscribeEmail",
+   "verdict": "true",
+   "reason": "input#subscribeEmail is a #F2F6FA field with a 1px #BDD4EA border on a white parent: the border reaches 1.53:1 against the page and 1.40:1 against the fill, and the fill itself only 1.09:1 against the page, so nothing that marks the field's boundary reaches the 3:1 of SC 1.4.11, and the field has no shadow or outline either"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "focus-obscured-by-fixed-element",
+   "selector": "div.m-teaser-contained-article > div.m-teaser-contained-article__body:nth-of-type(2) > h3.m-teaser-contained-article__headline > a",
+   "verdict": "true",
+   "reason": "header.m-page-header is position: fixed, 1280x116 at the top with z-index 100, and neither html nor body sets scroll-padding-top, so a focused element the browser scrolls to the top of the viewport lands inside the header: scrolling this link to the top puts it at y 0 to 66 and elementFromPoint at its centre returns the header. SC 2.4.11 asks that a focused component is not entirely hidden by author-created content. The live scan walks a different tab order behind the consent overlay and does not reach this element"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "false",
+   "reason": "the target is one of the three partner banner links of div.m-banner-box, each wrapping only <img loading=\"lazy\" width=\"384\" height=\"100\">. The image has not loaded when the scan measures, in the snapshot because it 404s and on the live page because it is far below the fold, so the link collapses to 4x24 and its neighbours land inside the spacing circle. The painted target on a real visit is the 384x100 banner, which SC 2.5.8 is satisfied by"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "false",
+   "reason": "the target is one of the three partner banner links of div.m-banner-box, each wrapping only <img loading=\"lazy\" width=\"384\" height=\"100\">. The image has not loaded when the scan measures, in the snapshot because it 404s and on the live page because it is far below the fold, so the link collapses to 4x24 and its neighbours land inside the spacing circle. The painted target on a real visit is the 384x100 banner, which SC 2.5.8 is satisfied by"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "false",
+   "reason": "the target is one of the three partner banner links of div.m-banner-box, each wrapping only <img loading=\"lazy\" width=\"384\" height=\"100\">. The image has not loaded when the scan measures, in the snapshot because it 404s and on the live page because it is far below the fold, so the link collapses to 4x24 and its neighbours land inside the spacing circle. The painted target on a real visit is the 384x100 banner, which SC 2.5.8 is satisfied by"
   }
  ]
 }

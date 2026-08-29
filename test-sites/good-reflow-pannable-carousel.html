@@ -1,0 +1,51 @@
+<!-- WCAG-TEST
+criterion: 1.4.10, 1.4.12
+level: AA
+title: A topic strip that pans loses nothing at the 320px reflow viewport
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: responsive-design
+description: The topic strip clips at overflow hidden and its track is 1600px wide inside a 320px box, so the later slides sit outside the visible rectangle at the reflow viewport and after the 1.4.12 spacing values are injected. The track is a direct child of the container whose slides lie side by side and span its whole scrollable width, and the container scrolls, so the prev/next controls bring every slide into view: no content and no functionality is lost. The paragraph below reflows normally.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topics</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  .strip { position: relative; overflow: hidden; }
+  .strip__track { display: flex; flex-wrap: nowrap; align-items: center; }
+  .strip__slide { flex: 0 0 200px; padding: .75rem; white-space: nowrap; border: 1px solid #595959; }
+  .strip__prev, .strip__next { position: absolute; top: 0; bottom: 0; background: #0b4f9e; color: #ffffff; border: none; padding: 0 .5rem; }
+  .strip__prev { left: 0; }
+  .strip__next { right: 0; }
+  p { max-width: 100%; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Topics</h1>
+
+  <div class="strip">
+    <div class="strip__track">
+      <a class="strip__slide" href="#politics">Politics of the week</a>
+      <a class="strip__slide" href="#economy">Economy of the week</a>
+      <a class="strip__slide" href="#science">Science of the week</a>
+      <a class="strip__slide" href="#culture">Culture of the week</a>
+      <a class="strip__slide" href="#sport">Sport of the week</a>
+      <a class="strip__slide" href="#travel">Travel of the week</a>
+      <a class="strip__slide" href="#food">Food of the week</a>
+      <a class="strip__slide" href="#books">Books of the week</a>
+    </div>
+    <button class="strip__prev" type="button">Previous topics</button>
+    <button class="strip__next" type="button">Next topics</button>
+  </div>
+
+  <p>The strip above pans sideways. This paragraph reflows to the viewport width and is never cut off.</p>
+</main>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-08-28T17:29:49.808Z",
+  "recordedAt": "2026-08-29T18:56:18.163Z",
   "profile": "standard",
   "labelsRecordedAt": "2026-08-28",
   "snapshots": [
@@ -33,7 +33,7 @@
     },
     {
       "file": "govuk-design-system.html",
-      "findings": 18
+      "error": "Navigation timeout of 45000 ms exceeded"
     },
     {
       "file": "a11y-project-checklist.html",
@@ -46,56 +46,76 @@
     {
       "file": "wiki-accessibility-en.html",
       "findings": 19
+    },
+    {
+      "file": "maler-staepke.html",
+      "findings": 21
+    },
+    {
+      "file": "muenchen-portal.html",
+      "findings": 66
+    },
+    {
+      "file": "spiegel-news.html",
+      "findings": 205
+    },
+    {
+      "file": "oesterreich-gv.html",
+      "findings": 16
+    },
+    {
+      "file": "hilfsgemeinschaft.html",
+      "findings": 15
     }
   ],
   "rules": [
-    {
-      "rule": "target-too-small",
-      "scanners": [
-        "input-modalities"
-      ],
-      "reported": 313,
-      "true": 296,
-      "false": 0,
-      "review": 0,
-      "unlabelled": 17,
-      "precision": 1
-    },
     {
       "rule": "color-contrast",
       "scanners": [
         "axe-core"
       ],
-      "reported": 117,
-      "true": 1,
-      "false": 0,
-      "review": 116,
+      "reported": 361,
+      "true": 17,
+      "false": 181,
+      "review": 163,
       "unlabelled": 0,
-      "precision": 1
+      "precision": 0.08585858585858586
     },
     {
-      "rule": "no-selected-tab",
+      "rule": "target-too-small",
       "scanners": [
-        "advanced-aria"
+        "input-modalities"
       ],
-      "reported": 16,
-      "true": 0,
-      "false": 0,
-      "review": 16,
+      "reported": 318,
+      "true": 298,
+      "false": 3,
+      "review": 0,
+      "unlabelled": 17,
+      "precision": 0.9900332225913622
+    },
+    {
+      "rule": "link-name-identifies-nothing",
+      "scanners": [
+        "page-structure"
+      ],
+      "reported": 33,
+      "true": 9,
+      "false": 24,
+      "review": 0,
       "unlabelled": 0,
-      "precision": null
+      "precision": 0.2727272727272727
     },
     {
       "rule": "image-alt",
       "scanners": [
         "axe-core"
       ],
-      "reported": 12,
-      "true": 12,
-      "false": 0,
+      "reported": 15,
+      "true": 14,
+      "false": 1,
       "review": 0,
       "unlabelled": 0,
-      "precision": 1
+      "precision": 0.9333333333333333
     },
     {
       "rule": "link-name",
@@ -110,21 +130,33 @@
       "precision": 1
     },
     {
-      "rule": "link-name-identifies-nothing",
+      "rule": "missing-accessibility-statement",
       "scanners": [
-        "page-structure"
+        "accessibility-statement"
       ],
-      "reported": 9,
-      "true": 9,
+      "reported": 7,
+      "true": 7,
       "false": 0,
       "review": 0,
       "unlabelled": 0,
       "precision": 1
     },
     {
-      "rule": "missing-accessibility-statement",
+      "rule": "aria-required-parent",
       "scanners": [
-        "accessibility-statement"
+        "axe-core"
+      ],
+      "reported": 6,
+      "true": 6,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "fixed-width-element",
+      "scanners": [
+        "responsive-design"
       ],
       "reported": 6,
       "true": 6,
@@ -146,6 +178,54 @@
       "precision": 1
     },
     {
+      "rule": "missing-autocomplete",
+      "scanners": [
+        "input-purpose"
+      ],
+      "reported": 5,
+      "true": 5,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "outdated-statement",
+      "scanners": [
+        "accessibility-statement"
+      ],
+      "reported": 5,
+      "true": 0,
+      "false": 0,
+      "review": 5,
+      "unlabelled": 0,
+      "precision": null
+    },
+    {
+      "rule": "text-spacing-failure",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 5,
+      "true": 4,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0.8
+    },
+    {
+      "rule": "insufficient-form-border-contrast",
+      "scanners": [
+        "nontext-contrast"
+      ],
+      "reported": 4,
+      "true": 3,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0.75
+    },
+    {
       "rule": "label-not-in-name",
       "scanners": [
         "label-in-name"
@@ -158,26 +238,50 @@
       "precision": 1
     },
     {
-      "rule": "missing-autocomplete",
+      "rule": "link-purpose-needs-context",
       "scanners": [
-        "input-purpose"
+        "page-structure"
       ],
       "reported": 4,
-      "true": 4,
+      "true": 0,
       "false": 0,
-      "review": 0,
+      "review": 4,
       "unlabelled": 0,
-      "precision": 1
+      "precision": null
     },
     {
-      "rule": "text-spacing-failure",
+      "rule": "missing-carousel-label",
+      "scanners": [
+        "advanced-aria"
+      ],
+      "reported": 4,
+      "true": 0,
+      "false": 4,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
+    },
+    {
+      "rule": "reflow-content-clipped",
       "scanners": [
         "responsive-design"
       ],
       "reported": 4,
-      "true": 4,
+      "true": 1,
+      "false": 2,
+      "review": 1,
+      "unlabelled": 0,
+      "precision": 0.3333333333333333
+    },
+    {
+      "rule": "reflow-failure",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 4,
+      "true": 2,
       "false": 0,
-      "review": 0,
+      "review": 2,
       "unlabelled": 0,
       "precision": 1
     },
@@ -194,7 +298,7 @@
       "precision": 1
     },
     {
-      "rule": "outdated-statement",
+      "rule": "incomplete-content",
       "scanners": [
         "accessibility-statement"
       ],
@@ -206,16 +310,17 @@
       "precision": null
     },
     {
-      "rule": "reflow-failure",
+      "rule": "video-caption",
       "scanners": [
-        "responsive-design"
+        "axe-core",
+        "media-accessibility"
       ],
       "reported": 3,
-      "true": 1,
-      "false": 0,
-      "review": 2,
+      "true": 0,
+      "false": 3,
+      "review": 0,
       "unlabelled": 0,
-      "precision": 1
+      "precision": 0
     },
     {
       "rule": "aria-valid-attr-value",
@@ -230,9 +335,9 @@
       "precision": null
     },
     {
-      "rule": "fixed-width-element",
+      "rule": "focus-obscured-by-fixed-element",
       "scanners": [
-        "responsive-design"
+        "focus-management"
       ],
       "reported": 2,
       "true": 2,
@@ -242,38 +347,50 @@
       "precision": 1
     },
     {
-      "rule": "incomplete-content",
+      "rule": "insufficient-background-contrast",
       "scanners": [
-        "accessibility-statement"
-      ],
-      "reported": 2,
-      "true": 0,
-      "false": 0,
-      "review": 2,
-      "unlabelled": 0,
-      "precision": null
-    },
-    {
-      "rule": "link-purpose-needs-context",
-      "scanners": [
-        "page-structure"
-      ],
-      "reported": 2,
-      "true": 0,
-      "false": 0,
-      "review": 2,
-      "unlabelled": 0,
-      "precision": null
-    },
-    {
-      "rule": "reflow-content-clipped",
-      "scanners": [
-        "responsive-design"
+        "nontext-contrast"
       ],
       "reported": 2,
       "true": 1,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0.5
+    },
+    {
+      "rule": "no-autoplay-audio",
+      "scanners": [
+        "axe-core"
+      ],
+      "reported": 2,
+      "true": 0,
+      "false": 2,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
+    },
+    {
+      "rule": "title-attribute-as-content",
+      "scanners": [
+        "hover-focus-content"
+      ],
+      "reported": 2,
+      "true": 0,
+      "false": 2,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
+    },
+    {
+      "rule": "2.4.5",
+      "scanners": [
+        "multiple-ways"
+      ],
+      "reported": 1,
+      "true": 1,
       "false": 0,
-      "review": 1,
+      "review": 0,
       "unlabelled": 0,
       "precision": 1
     },
@@ -314,9 +431,33 @@
       "precision": 1
     },
     {
-      "rule": "insufficient-background-contrast",
+      "rule": "bypass",
       "scanners": [
-        "nontext-contrast"
+        "axe-core"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "horizontal-scroll",
+      "scanners": [
+        "responsive-design"
+      ],
+      "reported": 1,
+      "true": 0,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
+    },
+    {
+      "rule": "html-has-lang",
+      "scanners": [
+        "axe-core"
       ],
       "reported": 1,
       "true": 1,
@@ -338,18 +479,6 @@
       "precision": 1
     },
     {
-      "rule": "insufficient-form-border-contrast",
-      "scanners": [
-        "nontext-contrast"
-      ],
-      "reported": 1,
-      "true": 1,
-      "false": 0,
-      "review": 0,
-      "unlabelled": 0,
-      "precision": 1
-    },
-    {
       "rule": "link-in-text-block",
       "scanners": [
         "axe-core"
@@ -360,9 +489,55 @@
       "review": 0,
       "unlabelled": 0,
       "precision": 1
+    },
+    {
+      "rule": "no-visible-focus",
+      "scanners": [
+        "focus-management"
+      ],
+      "reported": 1,
+      "true": 1,
+      "false": 0,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 1
+    },
+    {
+      "rule": "video-audio-description",
+      "scanners": [
+        "media-accessibility"
+      ],
+      "reported": 1,
+      "true": 0,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
+    },
+    {
+      "rule": "video-description",
+      "scanners": [
+        "media-accessibility"
+      ],
+      "reported": 1,
+      "true": 0,
+      "false": 1,
+      "review": 0,
+      "unlabelled": 0,
+      "precision": 0
     }
   ],
   "missingTrue": [],
-  "failures": [],
-  "passed": true
+  "failures": [
+    "color-contrast (axe-core): precision 0.09 (181 of 198 judged findings are false)",
+    "target-too-small (input-modalities): precision 0.99 (3 of 301 judged findings are false)",
+    "link-name-identifies-nothing (page-structure): precision 0.27 (24 of 33 judged findings are false)",
+    "image-alt (axe-core): precision 0.93 (1 of 15 judged findings are false)",
+    "text-spacing-failure (responsive-design): precision 0.80 (1 of 5 judged findings are false)",
+    "insufficient-form-border-contrast (nontext-contrast): precision 0.75 (1 of 4 judged findings are false)",
+    "missing-carousel-label (advanced-aria): precision 0.00 (4 of 4 judged findings are false)",
+    "reflow-content-clipped (responsive-design): precision 0.33 (2 of 3 judged findings are false)",
+    "video-caption (axe-core, media-accessibility): precision 0.00 (3 of 3 judged findings are false)"
+  ],
+  "passed": false
 }

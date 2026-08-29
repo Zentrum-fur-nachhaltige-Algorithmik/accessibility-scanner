@@ -865,6 +865,15 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-reflow-pannable-carousel.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10', '1.4.12'],
+    description:
+      "A topic strip whose track spans the container's whole scrollable width and pans: the slides outside the clip box are reachable, so neither 1.4.10 nor 1.4.12 loses anything",
+  },
+
   'good-video-silent-background-loop.html': {
     expectedScanners: [],
     excludedScanners: ['media-accessibility'],

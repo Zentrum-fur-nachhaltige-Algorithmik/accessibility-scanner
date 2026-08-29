@@ -865,6 +865,42 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-contrast-composited-backgrounds.html': {
+    expectedScanners: [],
+    excludedScanners: ['color-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.3'],
+    description:
+      'Translucent panel over a photo, single-colour and multi-stop gradient fills, a translucent chip and a background image that does not load: every backdrop axe-core leaves incomplete composites at or above the threshold',
+  },
+
+  'bad-contrast-composited-backgrounds.html': {
+    expectedScanners: ['color-contrast'],
+    excludedScanners: ['use-of-color', 'images-of-text'],
+    testType: 'bad',
+    wcagCriteria: ['1.4.3'],
+    description:
+      'The same backdrops failing: a chip composited to light grey, an orange label inside a zero-line-height wrapper and a gradient whose every stop is too close to the text',
+  },
+
+  'good-link-index-letters.html': {
+    expectedScanners: [],
+    excludedScanners: ['page-structure'],
+    testType: 'good',
+    wcagCriteria: ['2.4.4'],
+    description:
+      'An A to Y trade directory index and a 1 to 6 pagination: sibling links whose names are single characters in ascending order identify each other as an index',
+  },
+
+  'bad-link-single-character-navbox.html': {
+    expectedScanners: ['page-structure'],
+    excludedScanners: ['color-contrast'],
+    testType: 'bad',
+    wcagCriteria: ['2.4.4'],
+    description:
+      'Navigation box links named "v", "t" and "e": single characters that are neither a run nor accompanied by a word, so nothing identifies where they go',
+  },
+
   'good-contrast-hidden-and-arbitrary-classes.html': {
     expectedScanners: [],
     excludedScanners: ['color-contrast'],

@@ -89,6 +89,31 @@ class PageStructureScanner extends BaseScanner {
         return __visibleLabelNormalize(clone.textContent || '');
       }
 
+      // An alphabetical or numeric index: a run of sibling links inside one
+      // list or row whose names are single characters in ascending order with
+      // few gaps ("A B C ... Y", "1 2 3 4"). Each entry is identified by the
+      // sibling characters, which the WCAG definition of programmatically
+      // determined link context counts as text in the same list. Three
+      // characters that are not a run ("v", "t", "e" in a navigation box) are
+      // not an index.
+      function isIndexEntry(link) {
+        const item = link.closest('li, td, th') || link.parentElement;
+        const container = item && item.parentElement;
+        if (!container) return false;
+        const peers = Array.from(container.querySelectorAll('a[href]')).filter(__isRendered);
+        if (!peers.includes(link)) return false;
+        const points = [];
+        for (const peer of peers) {
+          const peerName = __visibleLabelNormalize(__accessibleNameInfo(peer).name || '');
+          if ([...peerName].length !== 1) continue;
+          points.push(peerName.codePointAt(0));
+        }
+        if (points.length < 3) return false;
+        for (let i = 1; i < points.length; i++) if (points[i] <= points[i - 1]) return false;
+        const span = points[points.length - 1] - points[0] + 1;
+        return span <= points.length * 2;
+      }
+
       function getSelector(link, index) {
         if (link.id) return `a#${link.id}`;
         if (typeof link.className === 'string' && link.className.trim()) {
@@ -126,6 +151,7 @@ class PageStructureScanner extends BaseScanner {
           /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u.test(name);
         if (!authored && !ideographic && normalized.length < 2) {
           if (contextWords(link).length > 0) return;
+          if (isIndexEntry(link)) return;
           violations.push({
             criterion: '9.2.4.4',
             wcagCriteria: ['2.4.4', '2.4.9'],

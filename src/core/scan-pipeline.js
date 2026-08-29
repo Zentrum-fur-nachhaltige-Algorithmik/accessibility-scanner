@@ -210,15 +210,17 @@ class ScanPipeline {
             v.experimental = true;
             v.confidence = 'low';
           }
-          // Conformance level. A finding whose every criterion is AAA is
-          // advisory for an AA audit: it is kept, but as 'info' so it neither
-          // drives the score nor sits among the AA failures in the report.
+          // Conformance level. A finding whose every criterion is AAA is not a
+          // failure of the AA conformance this profile audits, so it is
+          // reported beside the findings instead of among them.
           const level = levelOfViolation(v);
           if (level) v.wcagLevel = level;
-          if (level === 'AAA' && v.severity !== 'info') {
+          if (level === 'AAA') {
             v.originalSeverity = v.severity ?? null;
             v.severity = 'info';
             v.aaa = true;
+            needsReview.push(v);
+            continue;
           }
           allViolations.push(v);
         }

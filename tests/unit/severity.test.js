@@ -25,7 +25,7 @@ describe('severity', () => {
       p.computeViolationWeightedScore([{ severity: 'info' }, { severity: 'best-practice' }])
     ).toBe(100);
   });
-  it('an AAA-only finding is downgraded to info and weighs 0', () => {
+  it('an AAA-only finding is reported beside the findings and weighs 0', () => {
     const p = new ScanPipeline();
     const result = p.assembleResult('http://x', [
       {
@@ -37,7 +37,9 @@ describe('severity', () => {
         ],
       },
     ]);
-    const [aaa, aa] = result.violations;
+    const [aaa] = result.needsReview;
+    const [aa] = result.violations;
+    expect(result.violations).toHaveLength(1);
     expect(aaa.wcagLevel).toBe('AAA');
     expect(aaa.severity).toBe('info');
     expect(aaa.aaa).toBe(true);

@@ -394,9 +394,23 @@ class AdvancedAriaScanner extends BaseScanner {
         return hasPrevNextControl(el) || hasSlideIndicators(el) || hasAutoRotation(el);
       }
 
-      const confirmed = candidates.filter(
-        (el) => hasDeclaredCarouselEvidence(el) || (countSlides(el) >= 2 && hasCarouselControls(el))
-      );
+      // SC 4.1.2 asks for a name on a user interface COMPONENT, which is an
+      // element that carries a role. A div whose only carousel evidence is a
+      // class name exposes no role and nothing to name, so the criterion has
+      // nothing to say about it; naming it is APG advice.
+      function carriesRole(el) {
+        const role = el.getAttribute('role');
+        if (role === 'region' || role === 'group') return true;
+        const rd = (el.getAttribute('aria-roledescription') || '').toLowerCase();
+        return /carousel|karussell|slideshow|diashow/.test(rd) && !!role;
+      }
+
+      const confirmed = candidates
+        .filter(carriesRole)
+        .filter(
+          (el) =>
+            hasDeclaredCarouselEvidence(el) || (countSlides(el) >= 2 && hasCarouselControls(el))
+        );
 
       // Outermost wins: a track/viewport nested inside a confirmed
       // carousel is part of it, not a second carousel.
@@ -431,20 +445,8 @@ class AdvancedAriaScanner extends BaseScanner {
           const cap = fig.querySelector('figcaption');
           if (cap && cap.textContent.trim()) return cap.textContent.trim();
         }
-        // A wrapping section/region/group that itself carries a name
-        // makes the carousel identifiable in the region tree.
-        let wrapper = el.parentElement
-          ? el.parentElement.closest('section, aside, [role="region"], [role="group"]')
-          : null;
-        while (wrapper) {
-          const wl =
-            (wrapper.getAttribute('aria-label') || '').trim() ||
-            textOfIds(wrapper.getAttribute('aria-labelledby'));
-          if (wl) return wl;
-          wrapper = wrapper.parentElement
-            ? wrapper.parentElement.closest('section, aside, [role="region"], [role="group"]')
-            : null;
-        }
+        // The name of a wrapping region is that region's name, not this
+        // component's: an element with its own role needs its own.
         return '';
       }
 

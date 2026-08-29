@@ -865,6 +865,24 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-carousel-role-less-wrapper.html': {
+    expectedScanners: [],
+    excludedScanners: ['advanced-aria'],
+    testType: 'good',
+    wcagCriteria: ['4.1.2'],
+    description:
+      'A swiper wrapper with slides and prev/next controls but no role beside a named role="region" carousel: only the element that carries a role needs a name',
+  },
+
+  'bad-carousel-unnamed-region.html': {
+    expectedScanners: ['advanced-aria'],
+    excludedScanners: ['color-contrast'],
+    testType: 'bad',
+    wcagCriteria: ['4.1.2'],
+    description:
+      'role="region" aria-roledescription="carousel" with no name of its own inside a named section: the wrapping name is the section\'s, not the component\'s',
+  },
+
   'good-contrast-composited-backgrounds.html': {
     expectedScanners: [],
     excludedScanners: ['color-contrast'],

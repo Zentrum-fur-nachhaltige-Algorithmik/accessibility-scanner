@@ -8,6 +8,8 @@
 const BaseScanner = require('../core/base-scanner');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
 const { isHardViolation } = require('../core/severity');
+const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
+const { injectableCode: paintedBackgroundUtils } = require('../utils/painted-background');
 const log = require('../utils/logger').createLogger('axe-core');
 
 /**
@@ -110,6 +112,65 @@ class AxeCoreAdapter extends BaseScanner {
     }
   }
 
+  /**
+   * Decide SC 1.4.3 for the nodes axe leaves `incomplete` under `color-contrast`.
+   *
+   * axe stops as soon as the backdrop is not a plain colour it can read from
+   * the CSSOM: a translucent fill, a gradient, a background image, an element
+   * whose box paints at zero height. None of that says the text fails. The
+   * decision is taken in the page: the background stack is composited (alpha
+   * and opacity applied, gradient stops resolved, background images that never
+   * loaded skipped and same-origin ones sampled under the text) and the ratio
+   * is measured against the threshold the font size and weight ask for.
+   *
+   * @returns {Promise<Map<string, object>>} target selector -> decision
+   */
+  async _decideContrast(page, incompleteRules) {
+    const targets = [];
+    for (const rule of incompleteRules || []) {
+      if (rule.id !== 'color-contrast') continue;
+      for (const node of rule.nodes) {
+        // A target of more than one selector points into a frame, whose
+        // document this page cannot reach.
+        if (!Array.isArray(node.target) || node.target.length !== 1) continue;
+        if (typeof node.target[0] !== 'string') continue;
+        targets.push(node.target[0]);
+      }
+    }
+    if (targets.length === 0) return new Map();
+
+    const decisions = await page.evaluate(
+      async (selectors, contrastCode, paintedCode) => {
+        eval(contrastCode);
+        eval(paintedCode);
+        const out = [];
+        for (const selector of selectors) {
+          let element = null;
+          try {
+            element = document.querySelector(selector);
+          } catch (e) {
+            element = null;
+          }
+          if (!element) {
+            out.push([selector, { decision: 'review', reason: 'element not found' }]);
+            continue;
+          }
+          try {
+            out.push([selector, await __decideTextContrast(element)]);
+          } catch (e) {
+            out.push([selector, { decision: 'review', reason: String(e && e.message) }]);
+          }
+        }
+        return out;
+      },
+      targets,
+      contrastUtils,
+      paintedBackgroundUtils
+    );
+
+    return new Map(decisions);
+  }
+
   async scan(page, options = {}) {
     await this._ensurePageReady(page);
 
@@ -119,10 +180,19 @@ class AxeCoreAdapter extends BaseScanner {
 
     const axeResults = await axeBuilder.analyze();
 
+    const contrastDecisions = await this._decideContrast(page, axeResults.incomplete).catch((e) => {
+      log.warn(`[axe-core] contrast resolution failed: ${e.message}`);
+      return new Map();
+    });
+
     const violations = [];
     // Deque best practices are advice about a criterion nothing fails, so they
     // are reported beside the findings instead of among them.
     const bestPractices = [];
+    // Nodes whose criterion could not be decided from the page. Reported
+    // separately so an unknown is never counted as a failure.
+    const needsReview = [];
+    let contrastPassed = 0;
 
     // Convert definitive violations
     for (const rule of axeResults.violations) {
@@ -136,6 +206,25 @@ class AxeCoreAdapter extends BaseScanner {
     for (const rule of axeResults.incomplete || []) {
       const bucket = isBestPracticeOnly(rule.tags) ? bestPractices : violations;
       for (const node of rule.nodes) {
+        if (rule.id === 'color-contrast') {
+          const target =
+            Array.isArray(node.target) && node.target.length === 1 ? node.target[0] : null;
+          const decision = target ? contrastDecisions.get(target) : null;
+          if (decision && decision.decision === 'pass') {
+            contrastPassed++;
+            log.debug(
+              `[axe-core] color-contrast ${target}: ${decision.minRatio}:1 against ${decision.background}, ` +
+                `threshold ${decision.threshold}:1, not reported`
+            );
+            continue;
+          }
+          if (decision && decision.decision === 'fail') {
+            violations.push(this._convertContrastFailure(rule, node, decision));
+            continue;
+          }
+          needsReview.push(this._convertNode(rule, node, 'incomplete', decision));
+          continue;
+        }
         bucket.push(this._convertNode(rule, node, 'incomplete'));
       }
     }
@@ -147,6 +236,7 @@ class AxeCoreAdapter extends BaseScanner {
       passed: violations.filter(isHardViolation).length === 0,
       violations,
       bestPractices,
+      needsReview,
       summary: {
         engine: 'axe-core',
         version: axeResults.testEngine?.version || 'unknown',
@@ -159,6 +249,8 @@ class AxeCoreAdapter extends BaseScanner {
         incompleteRules: axeResults.incomplete?.length || 0,
         totalNodes: violations.length,
         bestPracticeNodes: bestPractices.length,
+        needsReviewNodes: needsReview.length,
+        contrastResolvedAsPassing: contrastPassed,
       },
     };
   }
@@ -166,11 +258,12 @@ class AxeCoreAdapter extends BaseScanner {
   /**
    * Convert a single axe-core node result into the unified violation format.
    */
-  _convertNode(rule, node, resultType) {
+  _convertNode(rule, node, resultType, measured = null) {
     const wcagCriteria = extractWcagCriteria(rule.tags);
     const isIncomplete = resultType === 'incomplete';
 
     return {
+      measured,
       // Core fields
       scannerId: this.id,
       ruleId: rule.id,
@@ -203,6 +296,25 @@ class AxeCoreAdapter extends BaseScanner {
       source: 'axe-core',
       confidence: isIncomplete ? 'low' : 'high',
     };
+  }
+
+  /**
+   * An `incomplete` color-contrast node whose ratio the page measurement put
+   * below the threshold: a 1.4.3 failure with the measured evidence on it.
+   */
+  _convertContrastFailure(rule, node, measured) {
+    const violation = this._convertNode(rule, node, 'violation', measured);
+    violation.impact = 'serious';
+    violation.severity = 'serious';
+    violation.confidence = 'high';
+    violation.description =
+      `${rule.help} (measured ${measured.maxRatio}:1 against the composited background ` +
+      `${measured.background}, ${measured.fontSize} ${measured.fontWeight}, ` +
+      `threshold ${measured.threshold}:1)`;
+    violation.recommendation =
+      `Text ${measured.foreground} on ${measured.background} reaches ${measured.maxRatio}:1 ` +
+      `where SC 1.4.3 asks for ${measured.threshold}:1.`;
+    return violation;
   }
 }
 

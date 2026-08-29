@@ -1,0 +1,56 @@
+<!-- WCAG-TEST
+criterion: 1.4.3
+level: AA
+title: Text on translucent and gradient backgrounds that composites below 4.5:1
+test_type: bad
+expected_violations: 3
+testable_by: dom
+scanners: color-contrast
+description: The same backdrops axe-core leaves as `incomplete`, this time failing: white text on a chip that composites to a light grey, an orange label on white at 4.04:1 inside a zero-line-height wrapper that paints a zero-height box, and body text on a gradient whose every stop is too close to it. Each one has to be reported under SC 1.4.3 once the background is composited.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composited backgrounds that fail</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.5rem; }
+
+  /* rgba(0, 0, 0, 0.15) over white composites to #d9d9d9: white text on it
+     is 1.4:1. */
+  .chip {
+    background-color: rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    padding: 0.25rem 0.75rem;
+    display: inline-block;
+  }
+
+  /* The wrapper sets line-height: 0, so the span's own box is zero pixels
+     high and axe cannot decide it. The text is still painted, at 4.04:1. */
+  .tight { line-height: 0; }
+  .tight span { color: #e64415; font-weight: 700; font-size: 0.875rem; }
+
+  /* Both stops sit within 3:1 of the text. */
+  .banner {
+    background-image: linear-gradient(90deg, #6a7f95 0%, #8fa3b8 100%);
+    color: #4a5a6a;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Composited backgrounds that fail</h1>
+
+  <p><span class="chip">3 of 12</span></p>
+
+  <p class="tight"><span>39 Min</span></p>
+
+  <p class="banner">Body text whose gradient backdrop never leaves it 4.5:1.</p>
+</main>
+</body>
+</html>

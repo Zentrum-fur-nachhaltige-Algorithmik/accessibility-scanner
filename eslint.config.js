@@ -18,6 +18,8 @@ const pageGlobals = Object.fromEntries(
     '__hasCompliantBorder',
     '__getRenderedBorder',
     '__isLargeText',
+    '__paintedBackdrops',
+    '__decideTextContrast',
     '__isRendered',
     '__accessibleNameInfo',
     '__visibleLabelNormalize',

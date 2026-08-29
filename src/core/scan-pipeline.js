@@ -186,6 +186,10 @@ class ScanPipeline {
     // Advice a scanner offers about criteria nothing fails (the Deque best
     // practice rules). Reported, never counted and never scored.
     const bestPractices = [];
+    // Nodes whose criterion the scanner could not decide from the page.
+    // Reported, never counted and never scored, so an unknown is never a
+    // failure and never disappears either.
+    const needsReview = [];
     const scannerSummaries = {};
 
     const { trustTier, trustReason } = require('./scanner-trust');
@@ -231,6 +235,13 @@ class ScanPipeline {
         }
       }
 
+      if (Array.isArray(result.needsReview)) {
+        for (const v of result.needsReview) {
+          if (!v.scannerId) v.scannerId = result.scannerId;
+          needsReview.push(v);
+        }
+      }
+
       scannerSummaries[result.scannerId] = {
         passed: result.passed,
         violationCount: result.violations?.length || 0,
@@ -253,6 +264,7 @@ class ScanPipeline {
       totalViolations: violations.length,
       violations,
       bestPractices,
+      needsReview,
       scanners: scannerSummaries,
       categories,
     };

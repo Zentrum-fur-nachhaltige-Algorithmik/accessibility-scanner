@@ -994,6 +994,208 @@ const FIXTURES = [
       },
     ],
   },
+  {
+    file: 'maler-staepke.html',
+    source: 'https://www.maler-staepke.de/de.html',
+    // recorded: 13 total ensemble violations (profile=standard, --no-llm).
+    band: [6, 26],
+    spotTruths: [
+      {
+        name: 'REAL: the document declares no language',
+        kind: 'must-detect',
+        // <html xmlns="http://www.w3.org/1999/xhtml"> carries no lang attribute
+        // anywhere in the file, so the page language is not programmatically
+        // determined. WCAG 3.1.1, axe rule `html-has-lang`.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['html-has-lang', '3.1.1'] });
+          return hits.length ? null : 'no 3.1.1 finding for an html element without lang';
+        },
+      },
+      {
+        name: 'REGRESSION: menu text over a background image that does not load',
+        kind: 'must-not-flag',
+        // The inline CSS paints images/mainrightcontainertop.gif behind the six
+        // main menu links, and that GIF is not part of the snapshot. An image
+        // that does not load paints nothing, so the text sits on the declared
+        // background-color #E9E8DB and #AA141D bold on it is 6.02:1.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: 'color-contrast',
+            selector: 'leistungen.html',
+          });
+          return hits.length
+            ? `${hits.length} contrast finding(s) on the menu links at 6.02:1`
+            : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'muenchen-portal.html',
+    source: 'https://www.muenchen.de/',
+    // recorded: 25 total ensemble violations (profile=standard, --no-llm).
+    band: [12, 50],
+    spotTruths: [
+      {
+        name: 'REAL: two teaser images carry no alt attribute',
+        kind: 'must-detect',
+        // In the third teaser row the third and fourth
+        //   <picture><img height="213" loading="eager" src="..."> elements
+        // carry width, height, loading and src but no alt, while every other
+        // teaser image on the page has one. WCAG 1.1.1, axe rule `image-alt`.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['image-alt', '1.1.1'] });
+          return hits.length >= 2 ? null : `${hits.length} image-alt findings, expected 2`;
+        },
+      },
+      {
+        name: 'REGRESSION: the A to Z index links are not unnamed links',
+        kind: 'must-not-flag',
+        // ul.m-sectors-list holds 24 a.m-sector-link items whose names are the
+        // single letters A, B, C ... pointing at
+        // /service/branchenbuch/<letter>.html. The sibling letters are text in
+        // the same list, which WCAG counts as programmatically determined link
+        // context, and together they are the alphabetical index.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: 'link-name-identifies-nothing',
+            selector: 'm-sector-link',
+          });
+          return hits.length ? `${hits.length} of the 24 A to Z index links reported` : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'spiegel-news.html',
+    source: 'https://www.spiegel.de/',
+    // recorded: 47 total ensemble violations (profile=standard, --no-llm).
+    band: [23, 94],
+    spotTruths: [
+      {
+        name: 'REAL: role=listitem elements whose parent has no list role',
+        kind: 'must-detect',
+        // In the "topreads" blocks the teasers declare
+        //   <div class="md:py-12 sm:py-8" role="listitem">
+        // inside plain <div> wrappers that carry no role at all, so the list
+        // relationship the role announces does not exist. WCAG 1.3.1, axe rule
+        // `aria-required-parent`.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: 'aria-required-parent' });
+          return hits.length >= 6
+            ? null
+            : `${hits.length} aria-required-parent findings, expected 6`;
+        },
+      },
+      {
+        name: 'REGRESSION: a silent looping motion graphic needs no captions',
+        kind: 'must-not-flag',
+        // The two widget videos are
+        //   <video class="rounded" autoplay loop playsinline webkit-playsinline
+        //     src=".../2026_NSDAPAKte_Aufmacher0_SS.aep.mp4">
+        // with no controls attribute. Autoplay without a muted attribute is
+        // only ever granted to media a browser can play silently, and the file
+        // carries a vide/avc1 track and no soun or mp4a track, so it is not
+        // synchronized media and 1.2.2, 1.2.3, 1.2.5 and 1.4.2 do not apply.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: [
+              'video-caption',
+              'video-description',
+              'video-audio-description',
+              'no-autoplay-audio',
+            ],
+          });
+          return hits.length
+            ? `${hits.length} caption/description finding(s) on a silent video`
+            : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'oesterreich-gv.html',
+    source: 'https://www.oesterreich.gv.at/',
+    // Calibration site: built under the Austrian accessibility law, every
+    // finding on it is treated as false until the markup proves otherwise.
+    // recorded: 3 total ensemble violations (profile=standard, --no-llm).
+    band: [1, 6],
+    spotTruths: [
+      {
+        name: 'REGRESSION: card text over a single-colour gradient fill',
+        kind: 'must-not-flag',
+        // The service cards paint linear-gradient(#fff, #fff) over a gradient
+        // border, which axe cannot resolve. The gradient has one colour, so the
+        // fill is white and the card title #1E4EA6 at 18px bold is 7.79:1 and
+        // the body text #030D20 is 19.4:1.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: 'color-contrast',
+            selector: 'group-data-',
+          });
+          return hits.length ? `${hits.length} contrast finding(s) on the service cards` : null;
+        },
+      },
+      {
+        name: 'REGRESSION: an icon inside an aria-labelled button is not a missing alternative',
+        kind: 'must-not-flag',
+        // <button id="ida-chatbot" aria-label="Chatbot IDA öffnen"> holds a
+        // 32x32 data-URI SVG icon as its only content. The button is named by
+        // its author-supplied label and the icon is never announced on its own,
+        // so nothing is missing a text alternative under 1.1.1.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: 'image-alt', selector: 'ida-chatbot' });
+          return hits.length
+            ? 'the icon of the labelled chatbot button reported under 1.1.1'
+            : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'hilfsgemeinschaft.html',
+    source: 'https://www.hilfsgemeinschaft.at/',
+    // Calibration site: the association of blind and visually impaired people
+    // in Austria, every finding on it is treated as false until the markup
+    // proves otherwise.
+    // recorded: 4 total ensemble violations (profile=standard, --no-llm).
+    band: [2, 8],
+    spotTruths: [
+      {
+        name: 'REAL: the search field is bounded only by a 2.85:1 border',
+        kind: 'must-detect',
+        // <input type="text" id="search" class="form-control"> is a white field
+        // on a white panel whose only boundary is a 1px solid #999999 border:
+        // 2.85:1, below the 3:1 that SC 1.4.11 asks of the visual information
+        // that identifies a user interface component.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: ['insufficient-form-border-contrast', '1.4.11'],
+            selector: '#search',
+          });
+          return hits.length ? null : 'no 1.4.11 finding for the 2.85:1 search field border';
+        },
+      },
+      {
+        name: 'REGRESSION: a slider track that pans is not a reflow failure',
+        kind: 'must-not-flag',
+        // The tiny-slider track lays its eight slides out side by side and pans
+        // horizontally, which overflows the document by 25px at a 1920px
+        // viewport. SC 1.4.10 is measured at 320 CSS px, where this page
+        // reflows, and no criterion governs overflow at a desktop width.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: 'horizontal-scroll' });
+          return hits.length
+            ? `${hits.length} horizontal-scroll finding(s) at a desktop viewport`
+            : null;
+        },
+      },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1391,4 +1593,12 @@ if (require.main === module) {
   });
 }
 
-module.exports = { FIXTURES, FIXTURE_DIR, PROFILE, startServer, scanFile, findViolations, mentions };
+module.exports = {
+  FIXTURES,
+  FIXTURE_DIR,
+  PROFILE,
+  startServer,
+  scanFile,
+  findViolations,
+  mentions,
+};

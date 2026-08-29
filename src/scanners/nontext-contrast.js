@@ -267,7 +267,7 @@ class NonTextContrastScanner extends BaseScanner {
           evaluateComponent(buttons[i], i, {
             borderType: 'insufficient-border-contrast',
             borderDescription:
-              'No boundary of the button reaches 3:1: not its border against the page, not its border against its own fill, and not its fill against the page',
+              'No boundary of the button reaches the 3:1 contrast SC 1.4.11 asks for: not its border against the page, not its border against its own fill, and not its fill against the page',
             borderImpact: 'Button boundaries are not clearly visible',
             checkFill: true,
           });
@@ -281,7 +281,7 @@ class NonTextContrastScanner extends BaseScanner {
           evaluateComponent(formControls[i], i, {
             borderType: 'insufficient-form-border-contrast',
             borderDescription:
-              'No boundary of the form control reaches 3:1: not its border against the page, not its border against its own fill, and not its fill against the page',
+              'No boundary of the form control reaches the 3:1 contrast SC 1.4.11 asks for: not its border against the page, not its border against its own fill, and not its fill against the page',
             borderImpact: 'Form control boundaries are not clearly visible',
             checkFill: false,
           });

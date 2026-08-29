@@ -809,7 +809,7 @@ const FIXTURES = [
         // 1.4.11 asks of the visual boundary of a control.
         check: ({ violations }) => {
           const hits = mentions(violations, 'waveurl').filter((v) =>
-            /contrast/i.test(`${v.issue || ''} ${v.description || ''}`)
+            /contrast/i.test(`${v.issue || ''} ${v.type || ''} ${v.description || ''}`)
           );
           if (hits.length > 0) return null;
           return 'no 1.4.11 finding for the #cccccc border of input#waveurl on #e5e6eb';

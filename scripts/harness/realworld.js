@@ -122,6 +122,9 @@ function mentions(violations, needle) {
 const FIXTURES = [
   {
     file: 'own-audit-ui.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries no CSS, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
     // recorded: 3 total ensemble violations (profile=standard, --no-llm).
     band: [1, 6],
@@ -180,6 +183,9 @@ const FIXTURES = [
 
   {
     file: 'med-theme.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries no CSS, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://dr-mauermann-urologe.vercel.app',
     // recorded: 14 total ensemble violations (profile=standard, --no-llm).
     band: [7, 28],
@@ -251,6 +257,9 @@ const FIXTURES = [
 
   {
     file: 'beeproduced.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries only part of them, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://beeproduced.com',
     // recorded: 14 total ensemble violations (profile=standard, --no-llm).
     band: [7, 28],
@@ -346,6 +355,9 @@ const FIXTURES = [
 
   {
     file: 'wiki-medical-de.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries only part of them, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
     // recorded: 304 total ensemble violations (profile=standard, --no-llm),
     // 281.5s wall clock.
@@ -488,6 +500,9 @@ const FIXTURES = [
 
   {
     file: 'modern-commercial.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries no CSS, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://www.mozilla.org/de/',
     // recorded: 47 total ensemble violations (profile=standard, --no-llm).
     band: [23, 94],

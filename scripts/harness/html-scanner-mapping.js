@@ -865,6 +865,15 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-title-as-the-name-of-a-control.html': {
+    expectedScanners: [],
+    excludedScanners: ['hover-focus-content'],
+    testType: 'good',
+    wcagCriteria: ['1.4.13'],
+    description:
+      'A teaser link named only by its title and a button carrying both a title and its text: a browser tooltip is user agent content, and a control with no name is 4.1.2',
+  },
+
   'good-reflow-pannable-carousel.html': {
     expectedScanners: [],
     excludedScanners: ['responsive-design'],

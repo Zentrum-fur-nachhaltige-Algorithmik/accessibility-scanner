@@ -261,8 +261,8 @@ const FIXTURES = [
     // carries only part of them, so what it paints is not what the site serves.
     unstyledCapture: true,
     source: 'https://beeproduced.com',
-    // recorded: 14 total ensemble violations (profile=standard, --no-llm).
-    band: [7, 28],
+    // recorded: 6 total ensemble violations (profile=standard, --no-llm).
+    band: [3, 12],
     spotTruths: [
       {
         name: 'REGRESSION: axe-core survives the dead <iframe> and still reports',
@@ -275,14 +275,25 @@ const FIXTURES = [
         // parent document can sit at readyState 'interactive'. Unhandled, that
         // makes AxePuppeteer throw "Page/Frame is not ready" and report zero
         // violations for an otherwise scannable page. Assert both that it did
-        // not error and that it produced findings (a crash that degrades to an
-        // empty array would otherwise pass unnoticed).
+        // not error and that its rules ran and produced results in some bucket
+        // (a crash that degrades to an empty array would otherwise pass
+        // unnoticed). The bucket is not the point: every finding this page
+        // produces is a best practice or a contrast node that composites above
+        // the threshold.
         check: ({ scanners }) => {
           const s = scanners['axe-core'];
           if (!s) return 'axe-core missing from results entirely';
           if (s.error) return `axe-core returned error: ${s.error}`;
-          if (!s.violationCount)
-            return 'axe-core reported 0 violations: suspicious silent zero on a dead-iframe page';
+          const summary = s.summary || {};
+          if (!summary.rulesRun)
+            return 'axe-core ran no rule at all: suspicious silent zero on a dead-iframe page';
+          const produced =
+            (s.violationCount || 0) +
+            (summary.bestPracticeNodes || 0) +
+            (summary.needsReviewNodes || 0) +
+            (summary.contrastResolvedAsPassing || 0);
+          if (!produced)
+            return 'axe-core produced no node in any bucket on a page of 500 KB of markup';
           return null;
         },
       },
@@ -359,9 +370,9 @@ const FIXTURES = [
     // carries only part of them, so what it paints is not what the site serves.
     unstyledCapture: true,
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
-    // recorded: 304 total ensemble violations (profile=standard, --no-llm),
-    // 281.5s wall clock.
-    band: [152, 608],
+    // recorded: 217 total ensemble violations (profile=standard, --no-llm),
+    // 263.9s wall clock.
+    band: [108, 434],
     spotTruths: [
       {
         name: 'REAL: images with no alt attribute at all',
@@ -504,8 +515,8 @@ const FIXTURES = [
     // carries no CSS, so what it paints is not what the site serves.
     unstyledCapture: true,
     source: 'https://www.mozilla.org/de/',
-    // recorded: 47 total ensemble violations (profile=standard, --no-llm).
-    band: [23, 94],
+    // recorded: 46 total ensemble violations (profile=standard, --no-llm).
+    band: [23, 92],
     spotTruths: [
       {
         name: 'REAL: a literal <blink> element in the navigation',
@@ -740,8 +751,8 @@ const FIXTURES = [
   {
     file: 'webaim-article.html',
     source: 'https://webaim.org/techniques/skipnav/',
-    // recorded: 34 total ensemble violations (profile=standard, --no-llm).
-    band: [17, 68],
+    // recorded: 15 total ensemble violations (profile=standard, --no-llm).
+    band: [7, 30],
     spotTruths: [
       {
         name: 'REGRESSION: article links are not skip links',
@@ -810,10 +821,10 @@ const FIXTURES = [
   {
     file: 'govuk-design-system.html',
     source: 'https://design-system.service.gov.uk/components/text-input/',
-    // recorded: 18 total ensemble violations (profile=standard, --no-llm) on
-    // two runs of this file alone; in both, two exclusive scanners lost the 45s
-    // reload on this 811KB page and contributed nothing.
-    band: [9, 36],
+    // recorded: 16 total ensemble violations (profile=standard, --no-llm); on
+    // some runs two exclusive scanners lose the 45s reload on this 811KB page
+    // and contribute nothing.
+    band: [8, 32],
     spotTruths: [
       {
         name: 'REGRESSION: iframes are not reported as missing a focus indicator',
@@ -922,8 +933,8 @@ const FIXTURES = [
   {
     file: 'broadcaster-news.html',
     source: 'https://www.bbc.com/news',
-    // recorded: 68 total ensemble violations (profile=standard, --no-llm).
-    band: [34, 136],
+    // recorded: 67 total ensemble violations (profile=standard, --no-llm).
+    band: [33, 134],
     spotTruths: [
       {
         name: 'REGRESSION: a described photograph is not a defect',
@@ -1049,8 +1060,8 @@ const FIXTURES = [
   {
     file: 'muenchen-portal.html',
     source: 'https://www.muenchen.de/',
-    // recorded: 25 total ensemble violations (profile=standard, --no-llm).
-    band: [12, 50],
+    // recorded: 13 total ensemble violations (profile=standard, --no-llm).
+    band: [6, 26],
     spotTruths: [
       {
         name: 'REAL: two teaser images carry no alt attribute',
@@ -1086,8 +1097,8 @@ const FIXTURES = [
   {
     file: 'spiegel-news.html',
     source: 'https://www.spiegel.de/',
-    // recorded: 47 total ensemble violations (profile=standard, --no-llm).
-    band: [23, 94],
+    // recorded: 26 total ensemble violations (profile=standard, --no-llm).
+    band: [13, 52],
     spotTruths: [
       {
         name: 'REAL: role=listitem elements whose parent has no list role',
@@ -1136,8 +1147,11 @@ const FIXTURES = [
     source: 'https://www.oesterreich.gv.at/',
     // Calibration site: built under the Austrian accessibility law, every
     // finding on it is treated as false until the markup proves otherwise.
-    // recorded: 3 total ensemble violations (profile=standard, --no-llm).
-    band: [1, 6],
+    // recorded: 0 total ensemble violations (profile=standard, --no-llm): a
+    // calibration site whose total is the floor of the corpus, so the band is
+    // the recipe's [floor(0 * 0.5), ceil(0 * 2)] and every new finding is a
+    // regression signal.
+    band: [0, 0],
     spotTruths: [
       {
         name: 'REGRESSION: card text over a single-colour gradient fill',

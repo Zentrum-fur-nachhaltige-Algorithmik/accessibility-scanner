@@ -3859,6 +3859,1798 @@
    "selector": "span",
    "verdict": "true",
    "reason": "text newly clipped after the 1.4.12 values were injected"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "html-has-lang",
+   "selector": "html",
+   "verdict": "true",
+   "reason": "the html element carries xmlns but no lang attribute, so the page language is not programmatically determined (SC 3.1.1)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "bypass",
+   "selector": "html",
+   "verdict": "true",
+   "reason": "the page has no skip link, no landmark element, no heading of any level and no frame title, and repeats the six-link main menu and the left sub-menu on every page, so no mechanism bypasses the repeated block (SC 2.4.1)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": ".unternavilinkactive",
+   "verdict": "true",
+   "reason": "text #B0A1A2 on the page background #E9E8DB is 2.01:1 at 12.8px normal, below the 4.5:1 of SC 1.4.3; the only background image on the element is untermenuarrowactive.gif, a 7x14 arrow inside the 20px left padding, so no image lies under the text"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "a[href=\"/de/index-partner.html\"]",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px bold over mainleftcontainer.gif, a uniform #E9E8DB at the menu row: 6.02:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": ".mainmenulinkarrowactive > .mainmenulink",
+   "verdict": "true",
+   "reason": "text #B0A1A2 at 12.8px normal over mainrightcontainertop.gif, which is a uniform #E9E8DB across the menu row: 2.01:1, below the 4.5:1 of SC 1.4.3"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"leistungen.html\"]",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px bold over mainrightcontainertop.gif, a uniform #E9E8DB across the menu row: 6.02:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": ".mainmenulink > a[href$=\"referenzen.html\"]",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px bold over mainrightcontainertop.gif, a uniform #E9E8DB across the menu row: 6.02:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"kontakt.html\"]",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px bold over mainrightcontainertop.gif, a uniform #E9E8DB across the menu row: 6.02:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"impressum.html\"]",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px bold over mainrightcontainertop.gif, a uniform #E9E8DB across the menu row: 6.02:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"datenschutz.html\"]",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px bold over mainrightcontainertop.gif, a uniform #E9E8DB across the menu row: 6.02:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "p",
+   "verdict": "false",
+   "reason": "text #AA141D at 12.8px normal over mainrightcontainer.gif, which is white across the whole text area: 7.43:1, above the 4.5:1 of SC 1.4.3; axe reports incomplete only because a background image is declared"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "color-contrast",
+   "selector": "p > a",
+   "verdict": "false",
+   "reason": "link text #AA141D at 12.8px normal over the same white area of mainrightcontainer.gif: 7.43:1, above the 4.5:1 of SC 1.4.3"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "2.4.5",
+   "selector": "",
+   "verdict": "true",
+   "reason": "the page offers the main menu and the left sub-menu, no search field, no site map and no breadcrumb, so only one navigation mechanism locates a page of the site (SC 2.4.5); the count of 0 in the description is wrong, the menus are plain divs with no nav element or role"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "true",
+   "reason": "the two language links in div.langs are 72x17 and 57x17 in the snapshot and 23x16 and 24x16 live (langde.gif, langpl.gif), so the target is under 24px high either way, and the sibling language link sits inside the 24px spacing circle; no inline, essential or user agent exception applies (SC 2.5.8)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "target-too-small",
+   "selector": "a",
+   "verdict": "true",
+   "reason": "the two language links in div.langs are 72x17 and 57x17 in the snapshot and 23x16 and 24x16 live (langde.gif, langpl.gif), so the target is under 24px high either way, and the sibling language link sits inside the 24px spacing circle; no inline, essential or user agent exception applies (SC 2.5.8)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "reflow-failure",
+   "selector": "",
+   "verdict": "true",
+   "reason": "div.maincontainer declares width: 970px with no media query anywhere in the page CSS, so at a 320px viewport the document is 970px wide and has to be scrolled sideways (SC 1.4.10)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "fixed-width-element",
+   "selector": "div.maincontainer",
+   "verdict": "true",
+   "reason": "the element declares width: 970px in the page CSS and renders at that width at the 320px reflow viewport, where it is one of the boxes that force the sideways scroll (SC 1.4.10)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "fixed-width-element",
+   "selector": "div#headerright",
+   "verdict": "true",
+   "reason": "the element declares width: 741px in the page CSS and renders at that width at the 320px reflow viewport, where it is one of the boxes that force the sideways scroll (SC 1.4.10)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "fixed-width-element",
+   "selector": "div.mainrightcontainer",
+   "verdict": "true",
+   "reason": "the element declares width: 700px in the page CSS and renders at that width at the 320px reflow viewport, where it is one of the boxes that force the sideways scroll (SC 1.4.10)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "fixed-width-element",
+   "selector": "div.mainrightcontainertop",
+   "verdict": "true",
+   "reason": "the element declares width: 700px in the page CSS and renders at that width at the 320px reflow viewport, where it is one of the boxes that force the sideways scroll (SC 1.4.10)"
+  },
+  {
+   "snapshot": "maler-staepke.html",
+   "rule": "missing-accessibility-statement",
+   "selector": "website",
+   "verdict": "true",
+   "reason": "the page links Impressum and Datenschutz but no accessibility statement, and no statement-shaped link exists anywhere in the markup (EN 301 549 12.2.2); whether the EAA binds this microenterprise is a legal question the markup cannot answer"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "image-alt",
+   "selector": ".m-teaser-list--three-cols.paragraph--type--teaser-row-component.m-teaser-list:nth-child(3) > .container > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(3) > .m-teaser-vertical.m-teaser-vertical-article > .m-teaser-vertical__image > div > picture > img[height=\"213\"][loading=\"eager\"]",
+   "verdict": "true",
+   "reason": "the img inside the teaser picture carries width, height, loading and src but no alt attribute at all, while every other teaser image on the page has one, so the image has no text alternative and its file name is announced (SC 1.1.1)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "image-alt",
+   "selector": ".m-teaser-list--three-cols.paragraph--type--teaser-row-component.m-teaser-list:nth-child(3) > .container > .m-teaser-list__list > .m-teaser-list__list-item:nth-child(4) > .m-teaser-vertical.m-teaser-vertical-article > .m-teaser-vertical__image > div > picture > img[height=\"213\"][loading=\"eager\"]",
+   "verdict": "true",
+   "reason": "the img inside the teaser picture carries width, height, loading and src but no alt attribute at all, while every other teaser image on the page has one, so the image has no text alternative and its file name is announced (SC 1.1.1)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "link-name-identifies-nothing",
+   "selector": "a.m-sector-link",
+   "verdict": "false",
+   "reason": "the link is one item of ul.m-sectors-list, a run of 24 sibling links A to Z pointing at /service/branchenbuch/<letter>.html under the paragraph 'Branchen A-Z'; WCAG counts text in the same list as programmatically determined link context, and the sibling letters identify the link as the alphabetical index entry, so SC 2.4.4 is met; the rule reads only the link's own list item, cell or paragraph"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "missing-carousel-label",
+   "selector": "div.m-intro",
+   "verdict": "false",
+   "reason": "the flagged div.m-intro.m-intro-carousel carries no role, and the carousel inside it is section.m-slider with aria-label='Karussell mit Inhalten' wrapping div.splide[role=region][aria-roledescription=carousel]; SC 4.1.2 asks for a name on the component that has the role, and that component has one, so the outer wrapper needs none"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "missing-autocomplete",
+   "selector": "input#subscribeEmail",
+   "verdict": "true",
+   "reason": "input#subscribeEmail is type=email name=email in the newsletter form and collects the user's own e-mail address, which is one of the input purposes of WCAG section 7, but carries no autocomplete attribute (SC 1.3.5)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "target-too-small",
+   "selector": "a.dropdown-item",
+   "verdict": "true",
+   "reason": "a.dropdown-item 'Zum Rathaus' is an inline link of 96x17 in the rendered header dropdown, under the 24px minimum in height, and button#languageButton sits inside its 24px spacing circle; no inline, essential or user agent exception applies (SC 2.5.8)"
+  },
+  {
+   "snapshot": "muenchen-portal.html",
+   "rule": "reflow-failure",
+   "selector": "",
+   "verdict": "false",
+   "reason": "the sideways overflow comes from teaser images whose src 404s in the offline snapshot, so they lay out at their width attribute (702px and 384px) instead of the size the CSS gives them; the live page reports no reflow failure at 320px (SC 1.4.10)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "aria-required-parent",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(43) > .sm\\:-mt-16.md\\:w-full.lg\\:w-4\\/12 > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
+   "verdict": "true",
+   "reason": "the element declares role=listitem and its parent div carries no role at all, so the list relationship the role announces does not exist and the item is exposed outside any list (SC 1.3.1)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "aria-required-parent",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(43) > .md\\:w-full.lg\\:w-4\\/12.sm\\:w-full:nth-child(4) > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
+   "verdict": "true",
+   "reason": "the element declares role=listitem and its parent div carries no role at all, so the list relationship the role announces does not exist and the item is exposed outside any list (SC 1.3.1)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "aria-required-parent",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(43) > .md\\:w-full.lg\\:w-4\\/12.sm\\:w-full:nth-child(5) > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
+   "verdict": "true",
+   "reason": "the element declares role=listitem and its parent div carries no role at all, so the list relationship the role announces does not exist and the item is exposed outside any list (SC 1.3.1)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "aria-required-parent",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(45) > .sm\\:-mt-16.md\\:w-full.lg\\:w-4\\/12 > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
+   "verdict": "true",
+   "reason": "the element declares role=listitem and its parent div carries no role at all, so the list relationship the role announces does not exist and the item is exposed outside any list (SC 1.3.1)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "aria-required-parent",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(45) > .md\\:w-full.lg\\:w-4\\/12.sm\\:w-full:nth-child(4) > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
+   "verdict": "true",
+   "reason": "the element declares role=listitem and its parent div carries no role at all, so the list relationship the role announces does not exist and the item is exposed outside any list (SC 1.3.1)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "aria-required-parent",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(45) > .md\\:w-full.lg\\:w-4\\/12.sm\\:w-full:nth-child(5) > .md\\:py-12.sm\\:py-8[role=\"listitem\"]",
+   "verdict": "true",
+   "reason": "the element declares role=listitem and its parent div carries no role at all, so the list relationship the role announces does not exist and the item is exposed outside any list (SC 1.3.1)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Abonnement\"] > .border-b",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".dark\\:text-primary-base > .leading-18.text-s[data-label=\"\"]",
+   "verdict": "true",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".mb-16.leading-tight.lg\\:mx-24",
+   "verdict": "true",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 16px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Jetzt registrieren\"] > .leading-18.text-s[data-label=\"\"]",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".hover\\:border-shade-light.border-transparent[title=\"Panorama\"] > .border-inherit.md\\:text-s.lg\\:text-s",
+   "verdict": "false",
+   "reason": "text #000000 on #FFFFFF is 21.00:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"1:1\"] > .md\\:p-24[data-target-teaser=\"xl-news\"][data-video-el=\"mouseTarget\"] > .lg\\:gap-x-24.lg\\:flex-row-reverse.md\\:flex-col > .lg\\:rounded.flex-none.z-40 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"extra\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"2:2\"] > article > .block[target=\"_self\"] > .justify-between.flex > .flex-col > .pr-px.font-serifUI.leading-loose",
+   "verdict": "false",
+   "reason": "text #000000 on #FFFFFF is 21.00:1 at 16px bold, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"2:2\"] > article > .block[target=\"_self\"] > .justify-between.flex > .flex-col > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"2:3\"] > article > .block[target=\"_self\"] > .justify-between.flex > .flex-col > .pr-px.font-serifUI.leading-loose",
+   "verdict": "false",
+   "reason": "text #000000 on #FFFFFF is 21.00:1 at 16px bold, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"2:3\"] > article > .block[target=\"_self\"] > .justify-between.flex > .flex-col > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"2:4\"] > article > .block[target=\"_self\"] > .justify-between.flex > .flex-col > .pr-px.font-serifUI.leading-loose",
+   "verdict": "false",
+   "reason": "text #000000 on #FFFFFF is 21.00:1 at 16px bold, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"2:4\"] > article > .block[target=\"_self\"] > .justify-between.flex > .flex-col > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".gsa.svelte-lzyc1f[data-type=\"graphics-svelte-app\"]:nth-child(1) > .duv-content.svelte-1mjx20i > .widget-outer.svelte-1x5iokp > .widget-container.svelte-1x5iokp > .widget-content.svelte-1x5iokp > div > .duv-section-search.mt-section.svelte-1x5iokp > .duv-search.svelte-1okeovd > .duv-search-inputs.svelte-1okeovd > svelte-css-wrapper > .svelte-sr8nnf > .svelte-sr8nnf",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".gsa.svelte-lzyc1f[data-type=\"graphics-svelte-app\"]:nth-child(2) > .duv-content.svelte-1mjx20i > .widget-outer.svelte-1x5iokp > .widget-container.svelte-1x5iokp > .widget-content.svelte-1x5iokp > div > .duv-section-search.mt-section.svelte-1x5iokp > .duv-search.svelte-1okeovd > .duv-search-inputs.svelte-1okeovd > svelte-css-wrapper > .svelte-sr8nnf > .svelte-sr8nnf",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".text-white.flex-wrap[data-contains-auxiliary-icons=\"Video\"] > .h-20.leading-none[data-icon-auxiliary=\"Video\"] > span:nth-child(2)",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"5:2\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide-compact\"] > .lg\\:w-10\\/12:nth-child(2) > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"6:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"7:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"8:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide-compact\"] > .lg\\:w-10\\/12:nth-child(2) > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"9:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Video\"] > .h-20.leading-none[data-icon-auxiliary=\"Video\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Grelle Rebellen\"][data-target-teaser=\"xl-news\"][data-video-el=\"mouseTarget\"] > .lg\\:gap-x-24.lg\\:flex-row-reverse.md\\:flex-col > .lg\\:rounded.flex-none.z-40 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".mt-12.sm\\:px-16.lg\\:px-24 > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[data-target-teaser=\"m-news-compact\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"13:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"13:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"13:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"16:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"16:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"16:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"16:4\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"16:5\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"16:6\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"22:1\"] > .md\\:p-24.lg\\:p-24[data-target-teaser=\"xl-news\"] > .lg\\:gap-x-24.lg\\:flex-row-reverse.md\\:flex-col > .lg\\:rounded.flex-none.z-40 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"23:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"24:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".lg\\:p-24[data-target-teaser=\"xxl-news\"][data-video-el=\"mouseTarget\"] > .md\\:mx-24.mt-12.sm\\:mx-16 > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Party auf Ruinen\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"28:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"29:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"30:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"l-news-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"33:1\"] > .lg\\:p-24.sm\\:py-16[data-target-teaser=\"xxl-news\"] > .md\\:mx-24.mt-12.sm\\:mx-16 > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"33:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"33:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"»Slow Sex verändert alles«\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"36:1\"] > .md\\:p-24.lg\\:p-24[data-target-teaser=\"xl-news\"] > .lg\\:gap-x-24.lg\\:flex-row-reverse.md\\:flex-col > .lg\\:rounded.flex-none.z-40 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "span[data-icon-auxiliary=\"Gallery\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"36:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Podcasts\"][href$=\"audio/\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "button[title=\"39 Min\"] > .ml-6.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "button[title=\"41 Min\"] > .ml-6.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "button[title=\"23 Min\"] > .ml-6.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "button[title=\"34 Min\"] > .ml-6.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Mossad\"] > .gap-16.mt-12.items-center > span[\\@audio-omny-loaded=\"if (isPlayPending) play();\"] > .dark\\:focus\\:text-shade-lighter.px-12[title=\"38 Min\"] > .ml-6.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Games & Quiz\"][href$=\"games/\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(43) > .sm\\:sticky[data-block-el=\"title\"][data-headerbar-height=\"\"] > .lg\\:pt-24.md\\:pt-24[data-area=\"title-cluster\"] > .lg\\:w-full.md\\:mr-24.md\\:w-full > .flex > .lg\\:justify-start.md\\:justify-start.sm\\:justify-between > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".lg\\:shadow.md\\:bg-white[data-area=\"block>topreads\"]:nth-child(45) > .sm\\:sticky[data-block-el=\"title\"][data-headerbar-height=\"\"] > .lg\\:pt-24.md\\:pt-24[data-area=\"title-cluster\"] > .lg\\:w-full.md\\:mr-24.md\\:w-full > .flex > .lg\\:justify-start.md\\:justify-start.sm\\:justify-between > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".justify-between[title=\"Videoreportagen und Talks\"][href$=\"video/\"] > .lg\\:text-2xl.md\\:text-2xl.sm\\:text-xl > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 24px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:mb-6",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".text-3xl",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 3.0:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".pt-64 > .mr-16.mb-16.right-0 > .min-h-32.focus\\:bg-primary-darker.hover\\:bg-primary-dark > .ml-8.pr-8.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(1) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .lg\\:text-l.text-shadow-sm.focus\\:text-shade-lighter",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(1) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .text-shade-light.mt-2.flex-wrap > span[data-auxiliary=\"\"]:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#BBB9B7) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(1) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .text-shade-light.mt-2.flex-wrap > span[data-auxiliary=\"\"]:nth-child(3)",
+   "verdict": "review",
+   "reason": "white or light text (#BBB9B7) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(2) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .lg\\:text-l.text-shadow-sm.focus\\:text-shade-lighter",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(2) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .text-shade-light.mt-2.flex-wrap > span[data-auxiliary=\"\"]:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#BBB9B7) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(2) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .text-shade-light.mt-2.flex-wrap > span[data-auxiliary=\"\"]:nth-child(3)",
+   "verdict": "review",
+   "reason": "white or light text (#BBB9B7) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(3) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .lg\\:text-l.text-shadow-sm.focus\\:text-shade-lighter",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(3) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .text-shade-light.mt-2.flex-wrap > span[data-auxiliary=\"\"]:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#BBB9B7) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:px-8.md\\:px-12[data-area=\"article_teaser>news_m\"]:nth-child(3) > .sm\\:max-w-280.md\\:max-w-270.lg\\:max-w-370 > .pr-64.pt-32.pl-16 > a > .text-base.font-normal.block > .text-shade-light.mt-2.flex-wrap > span[data-auxiliary=\"\"]:nth-child(3)",
+   "verdict": "review",
+   "reason": "white or light text (#BBB9B7) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"SPIEGEL TV\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.hover\\:text-shade-lighter:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 3.0:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"SPIEGEL TV\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.mt-2",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Spitzengespräch\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.hover\\:text-shade-lighter:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 3.0:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Spitzengespräch\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.mt-2",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".md\\:max-w-208.sm\\:max-w-180[title=\"Im Verhör\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.hover\\:text-shade-lighter:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 3.0:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".md\\:max-w-208.sm\\:max-w-180[title=\"Im Verhör\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.mt-2",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Die USA unter Trump\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.hover\\:text-shade-lighter:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 3.0:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Die USA unter Trump\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.mt-2",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Krieg in der Ukraine\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.hover\\:text-shade-lighter:nth-child(1)",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 3.0:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Krieg in der Ukraine\"] > .lg\\:pt-64.md\\:pt-64.sm\\:pt-40 > .text-shadow-sm.focus\\:text-shade-lighter.mt-2",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Kommentare und Kolumnen\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".z-40.lg\\:pr-24.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"45:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-opinion\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .block[target=\"_self\"] > .justify-between.items-center.flex > .flex-col.w-full.flex > .text-l.serifmode\\:font-serifUI.font-bold > .hover\\:opacity-moderate.focus\\:opacity-moderate > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"45:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-opinion\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"45:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-opinion\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .block[target=\"_self\"] > .justify-between.items-center.flex > .flex-col.w-full.flex > .text-l.serifmode\\:font-serifUI.font-bold > .hover\\:opacity-moderate.focus\\:opacity-moderate > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"45:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-opinion\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Vergesst die Bayern!\"] > .justify-between.items-center.flex > .flex-col.w-full.flex > .text-l.serifmode\\:font-serifUI.font-bold > .hover\\:opacity-moderate.focus\\:opacity-moderate > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Vergesst die Bayern!\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Zwetschgendatschi\"] > .mt-16.justify-between.flex > .flex-wrap.text-shade-darker[data-contains-auxiliary-icons=\"Briefing\"] > .h-20.leading-none[data-icon-auxiliary=\"Briefing\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFEFED is 6.15:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"47:2\"] > .bg-effilee.dark\\:bg-dm-effilee.pt-8 > .mt-16.justify-between.flex > .flex-wrap.text-shade-darker[data-contains-auxiliary-icons=\"Briefing\"] > .h-20.leading-none[data-icon-auxiliary=\"Briefing\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFEFED is 6.15:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Panzanella (Brotsalat)\"] > .mt-16.justify-between.flex > .flex-wrap.text-shade-darker[data-contains-auxiliary-icons=\"Briefing\"] > .h-20.leading-none[data-icon-auxiliary=\"Briefing\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFEFED is 6.15:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"47:4\"] > .bg-effilee.dark\\:bg-dm-effilee.pt-8 > .mt-16.justify-between.flex > .flex-wrap.text-shade-darker[data-contains-auxiliary-icons=\"Briefing\"] > .h-20.leading-none[data-icon-auxiliary=\"Briefing\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFEFED is 6.15:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".justify-between[title=\"Leben\"][target=\"_self\"] > .lg\\:text-2xl.md\\:text-2xl.sm\\:text-xl > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 24px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".md\\:text-3xl.lg\\:text-4xl.sm\\:text-2xl > .align-middle:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #000000 on #FFFFFF is 21.00:1 at 32px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".md\\:w-10\\/12.lg\\:mx-auto.md\\:mx-auto > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"48:2\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"classic-highlight\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"48:3\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"classic-highlight\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"48:4\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"classic-highlight\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"48:5\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"classic-highlight\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".sm\\:mr-16.md\\:mr-16.lg\\:mr-24:nth-child(1) > .group[data-sara-click-el=\"product_slider\"][target=\"_blank\"] > .sm\\:w-292.md\\:w-292.lg\\:w-340 > .mt-16.flex-col.flex > .mt-8.group-hover\\:opacity-moderate.group-focus\\:opacity-moderate",
+   "verdict": "false",
+   "reason": "text #000000 on #FFFFFF is 21.00:1 at 16px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Politik\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:1:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:1:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-opinion-group\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:1:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-opinion-group\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Ausland\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:2:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Video\"] > .h-20.leading-none[data-icon-auxiliary=\"Video\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Panorama\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:3:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:3:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:3:3\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Wissenschaft\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:4:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:4:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Raus aus den Kartoffeln!\"] > .sm\\:mr-20.sm\\:ml-16.lg\\:grow > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Wirtschaft\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:5:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:5:2\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > h2 > .block[target=\"_self\"] > .text-l.serifmode\\:font-serifUI.font-bold > .hover\\:opacity-moderate.focus\\:opacity-moderate > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:5:2\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:5:3\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:6:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:6:2\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:6:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"sport/\"][title=\"Sport\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Drei Spiele, 22 Tore\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:7:2\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:7:3\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:8:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:8:3\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Netzwelt\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:9:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:9:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:9:3\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"kultur/\"][title=\"Kultur\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:10:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:10:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:10:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Job & Karriere\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:11:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:11:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:11:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > h2 > .block[target=\"_self\"] > .text-l.serifmode\\:font-serifUI.font-bold > .hover\\:opacity-moderate.focus\\:opacity-moderate > .inline-block.dark\\:text-shade-light[data-target-teaser-el=\"meta\"]",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:11:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[href$=\"start/\"][title=\"Start\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".lg\\:mx-24.md\\:mx-24.sm\\:mx-16:nth-child(2) > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:12:2\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:12:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Geschichte\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:13:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:13:2\"] > .py-16.sm\\:px-16[data-target-teaser=\"s-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:13:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Tests\"][href$=\"tests/\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:14:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".py-16[data-target-teaser=\"s-news\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Mobilität\"][target=\"_self\"] > .hover\\:text-primary-dark.focus\\:text-primary-darker.lg\\:justify-start > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 20px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:15:1\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news-group\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:15:2\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"50:15:3\"] > .py-16[data-target-teaser=\"s-news-group\"][data-has-linked-author=\"\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"52:1\"] > .lg\\:p-24.sm\\:py-16[data-target-teaser=\"xxl-news\"] > .md\\:mx-24.mt-12.sm\\:mx-16 > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"52:2\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"52:4\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Wer kurbelt, kann hören\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Darauf einen Toast!\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"52:7\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"52:8\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"m-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Dieses E-Bike schreit Diebe an\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[aria-label=\"Klare Sicht voraus!\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "article[data-target-teaser=\"l-opinion-wide\"] > .md\\:flex-col.lg\\:flex-row-reverse.sm\\:flex-col > .lg\\:pr-24.lg\\:flex-col.lg\\:w-6\\/12 > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".mt-8.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"53:3\"] > .lg\\:py-24.sm\\:py-16[data-target-teaser=\"s-news\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "span[x-text=\"label\"]",
+   "verdict": "false",
+   "reason": "text #FFFFFF on #1A3A4A is 12.01:1 at 14px bold, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".my-px",
+   "verdict": "false",
+   "reason": "text #1A3A4A on #E9F1F5 is 10.51:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".justify-between[title=\"DEIN SPIEGEL\"][target=\"_self\"] > .lg\\:text-2xl.md\\:text-2xl.sm\\:text-xl > span[data-title=\"\"]",
+   "verdict": "false",
+   "reason": "text #E64415 on #FFFFFF is 4.04:1 at 24px bold, at or above the 3.0:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"56:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"classic-highlight\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"56:2\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"classic-highlight\"] > .mt-12.justify-between.items-center > .flex-wrap.dark\\:text-shade-light[data-contains-auxiliary-icons=\"Text\"] > .h-20.leading-none[data-icon-auxiliary=\"Text\"] > span:nth-child(2)",
+   "verdict": "false",
+   "reason": "text #5C5A58 on #FFFFFF is 6.87:1 at 14px normal, at or above the 4.5:1 the criterion asks for; axe reports it as incomplete, not as a failure (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "p[data-forward-id=\"wvuqXoZur09W\"]",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\"Cartoon des Tages\"][target=\"_self\"] > header > h2 > .text-l.text-white.serifmode\\:font-serifUI",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".min-h-32.focus\\:bg-primary-darker[title=\"Cartoon des Tages\"] > .ml-8.pr-8.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "p[data-forward-id=\"4xoxhmp5yfsn\"]",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": ".mb-6",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"59:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"gallery-highlight\"] > .overflow-hidden.relative > .items-end.pt-40.flex-row > a[target=\"_self\"] > header > h2 > .text-l.text-white.serifmode\\:font-serifUI",
+   "verdict": "review",
+   "reason": "white or light text (#FFFFFF) sits on a teaser photo under a black-to-transparent gradient overlay; the photo is not in the snapshot and the gradient is partly transparent, so whether the text keeps 4.5:1 over every part of the image is a judgement only a human looking at the rendered teaser can make (SC 1.4.3)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "color-contrast",
+   "selector": "div[data-pos=\"59:1\"] > .sm\\:p-16.md\\:p-24[data-target-teaser=\"gallery-highlight\"] > .overflow-hidden.relative > .items-end.pt-40.flex-row > .pointer-events-none.mr-16.mb-16 > .min-h-32.focus\\:bg-primary-darker.hover\\:bg-primary-dark > .ml-8.pr-8.font-bold",
+   "verdict": "true",
+   "reason": "text #FFFFFF on #E64415 is 4.04:1 at 14px bold, below the 4.5:1 of SC 1.4.3 (SPIEGEL orange #E64415 against white)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "video-caption",
+   "selector": ".gsa.svelte-lzyc1f[data-type=\"graphics-svelte-app\"]:nth-child(1) > .duv-content.svelte-1mjx20i > .widget-outer.svelte-1x5iokp > .widget-container.svelte-1x5iokp > .widget-media.svelte-1x5iokp > .svelte-1x5iokp > .svelte-1x5iokp.block[target=\"_self\"] > .svelte-1x5iokp[autoplay=\"\"][webkit-playsinline=\"\"]",
+   "verdict": "false",
+   "reason": "the video is the silent looping motion graphic 2026_NSDAPAKte_Aufmacher0_SS.aep.mp4; its moov box holds a vide/avc1 track and no soun or mp4a track, so it carries no audio and SC 1.2.2 (captions for prerecorded synchronized media) does not apply"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "video-caption",
+   "selector": ".gsa.svelte-lzyc1f[data-type=\"graphics-svelte-app\"]:nth-child(2) > .duv-content.svelte-1mjx20i > .widget-outer.svelte-1x5iokp > .widget-container.svelte-1x5iokp > .widget-media.svelte-1x5iokp > .svelte-1x5iokp > .svelte-1x5iokp.block[target=\"_self\"] > .svelte-1x5iokp[autoplay=\"\"][webkit-playsinline=\"\"]",
+   "verdict": "false",
+   "reason": "the video is the silent looping motion graphic 2026_NSDAPAKte_Aufmacher0_SS.aep.mp4; its moov box holds a vide/avc1 track and no soun or mp4a track, so it carries no audio and SC 1.2.2 (captions for prerecorded synchronized media) does not apply"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "no-autoplay-audio",
+   "selector": ".gsa.svelte-lzyc1f[data-type=\"graphics-svelte-app\"]:nth-child(1) > .duv-content.svelte-1mjx20i > .widget-outer.svelte-1x5iokp > .widget-container.svelte-1x5iokp > .widget-media.svelte-1x5iokp > .svelte-1x5iokp > .svelte-1x5iokp.block[target=\"_self\"] > .svelte-1x5iokp[autoplay=\"\"][webkit-playsinline=\"\"]",
+   "verdict": "false",
+   "reason": "the same autoplay video file has no audio track (moov holds vide/avc1, no soun or mp4a), so nothing plays automatically that would need a stop or volume control (SC 1.4.2)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "no-autoplay-audio",
+   "selector": ".gsa.svelte-lzyc1f[data-type=\"graphics-svelte-app\"]:nth-child(2) > .duv-content.svelte-1mjx20i > .widget-outer.svelte-1x5iokp > .widget-container.svelte-1x5iokp > .widget-media.svelte-1x5iokp > .svelte-1x5iokp > .svelte-1x5iokp.block[target=\"_self\"] > .svelte-1x5iokp[autoplay=\"\"][webkit-playsinline=\"\"]",
+   "verdict": "false",
+   "reason": "the same autoplay video file has no audio track (moov holds vide/avc1, no soun or mp4a), so nothing plays automatically that would need a stop or volume control (SC 1.4.2)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "video-caption",
+   "selector": "video.rounded",
+   "verdict": "false",
+   "reason": "video.rounded is an autoplay loop playsinline motion graphic whose file carries no audio track (moov holds vide/avc1, no soun or mp4a); SC 1.2.2 governs captions for the audio of synchronized media, and there is no audio; the second, identical widget on the page is exempted by the rule only because its script had already set video.muted"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "video-description",
+   "selector": "video.rounded",
+   "verdict": "false",
+   "reason": "same element: SC 1.2.3 asks for an audio description or media alternative for prerecorded synchronized media, and this file has no audio track, so it is not synchronized media; it is a decorative looping animation behind the widget headline"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "video-audio-description",
+   "selector": "video.rounded",
+   "verdict": "false",
+   "reason": "same element: SC 1.2.5 asks for audio description for prerecorded synchronized media, and this file has no audio track; a third finding on the one video after video-caption and video-description"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "missing-carousel-label",
+   "selector": "div.polygon-swiper",
+   "verdict": "false",
+   "reason": "div.polygon-swiper carries no role, no aria-roledescription and no ARIA state; SC 4.1.2 asks for a name on a user interface component that has a role, and a plain div with a swiper class is not one, so an aria-label on it is APG advice rather than a criterion"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "missing-carousel-label",
+   "selector": "div.polygon-swiper",
+   "verdict": "false",
+   "reason": "div.polygon-swiper carries no role, no aria-roledescription and no ARIA state; SC 4.1.2 asks for a name on a user interface component that has a role, and a plain div with a swiper class is not one, so an aria-label on it is APG advice rather than a criterion"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "missing-carousel-label",
+   "selector": "div.polygon-swiper",
+   "verdict": "false",
+   "reason": "div.polygon-swiper carries no role, no aria-roledescription and no ARIA state; SC 4.1.2 asks for a name on a user interface component that has a role, and a plain div with a swiper class is not one, so an aria-label on it is APG advice rather than a criterion"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "no-visible-focus",
+   "selector": "div.bg-white.dark\\:bg-dm-shade-darkest > div.lg\\:max-w-lg.mx-auto > div.h-full.sm\\:hidden:nth-of-type(1) > button.flex.items-center",
+   "verdict": "true",
+   "reason": "the Menue button matches :focus-visible after a real Tab, and its computed outline, box-shadow, border, background, colour, decoration, filter and transform are identical before and after; the page CSS ends with .outline-focus:focus-visible{outline:initial}, which resets the ring the preceding .outline-focus:focus rule sets, so a keyboard user sees no indicator (SC 2.4.7)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "text-spacing-failure",
+   "selector": "span.sm:text-base.md:text-s",
+   "verdict": "false",
+   "reason": "the span sits in the same initialized polygon-swiper topic strip; after the 1.4.12 spacing values the label runs past the strip's visible box, but the strip pans horizontally and the slide stays reachable, so no content or functionality is lost (SC 1.4.12)"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "reflow-content-clipped",
+   "selector": "nav.polygon-swiper",
+   "verdict": "false",
+   "reason": "at 320px the document is exactly 320px wide and the clipped text is inside an initialized polygon-swiper (scrollWidth 2485px against clientWidth 320px, 27 slides, prev/next controls) that pans horizontally; SC 1.4.10 is about the page needing scrolling in two dimensions and about content being lost, and the swiper's slides stay reachable"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "reflow-content-clipped",
+   "selector": "div.polygon-swiper",
+   "verdict": "false",
+   "reason": "at 320px the document is exactly 320px wide and the clipped text is inside an initialized polygon-swiper (scrollWidth 2485px against clientWidth 320px, 27 slides, prev/next controls) that pans horizontally; SC 1.4.10 is about the page needing scrolling in two dimensions and about content being lost, and the swiper's slides stay reachable"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "title-attribute-as-content",
+   "selector": "a",
+   "verdict": "false",
+   "reason": "the link wraps a teaser video and takes its accessible name from title, which assistive technology exposes as the name; SC 1.4.13 governs additional content the author shows on hover or focus, and a browser tooltip drawn from title is user agent content the author cannot make hoverable or dismissible, which the rule's own comment states"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "title-attribute-as-content",
+   "selector": "button.flex",
+   "verdict": "false",
+   "reason": "the bookmark button's accessible name comes from the title and from its own text content 'Zur Merkliste hinzufuegen'; no author-controlled content appears on hover or focus, so SC 1.4.13 has nothing to govern"
+  },
+  {
+   "snapshot": "spiegel-news.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "the rule judges the statement page it fetched over the live network, not anything in the snapshot; whether that page names a preparation or review date, and whether EN 301 549 12.2.2 binds it, is for a human to read, as with the BBC pair in the existing corpus"
   }
  ]
 }

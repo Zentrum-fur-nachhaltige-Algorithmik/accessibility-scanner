@@ -5653,965 +5653,6 @@
    "reason": "the rule judges the statement page it fetched over the live network, not anything in the snapshot; whether that page names a preparation or review date, and whether EN 301 549 12.2.2 binds it, is for a human to read, as with the BBC pair in the existing corpus"
   },
   {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "aria-prohibited-attr",
-   "selector": ".tns-nav",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: div.tns-nav carries aria-label=\"Carousel Pagination\" with no role, and is display: none at this width on the live page, where axe never evaluates it. The attribute is inert rather than wrong: a name on a generic div is ignored by assistive technology, the six dots inside carry their own aria-labels, and no criterion asks for a name here"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "aria-valid-attr-value",
-   "selector": "#menubutton",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: button#menubutton is the mobile hamburger inside div.mobile-nav, which is display: none at 1280px on the live page. Its aria-controls=\"sidebarmenu\" resolves to an existing element in both runs, so the attribute value is valid; axe reports it as incomplete because the button is collapsed (aria-expanded=\"false\")"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": ".frame-inner > .lookapp-scope > h2",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "#c103 > .frame-container.box-white-transparent > .frame-inner > .lookapp-scope > p:nth-child(2)",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": ".frame-inner > .lookapp-scope > p:nth-child(3)",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "p:nth-child(3) > strong:nth-child(1)",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "p:nth-child(3) > strong:nth-child(2)",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "strong:nth-child(3)",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "strong:nth-child(4)",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "a[title=\"Online-Antrag ausfüllen\"] > .text",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "a[title=\"Infos zur Freiwilligenarbeit\"] > .text",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "color-contrast",
-   "selector": "a[title=\"Jetzt spenden\"] > .text",
-   "verdict": "false",
-   "reason": "black or link-blue text on the white .box-white-transparent panel: #000000 on #FFFFFF is 21:1 and #0000EE on #FFFFFF is 9.4:1 at 16 to 24px, far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because div.frame behind the panel carries the header photo, and the panel's own rgba(255, 255, 255, 0.7) fill keeps the text over white in either case"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "label-not-in-name",
-   "selector": "button[5]",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the visible text the rule read, \"Menue aus-/einklappen\", is the button's <span class=\"sr-only\">, which the site CSS clips to rect(0px, 0px, 0px, 0px) on the live page. Without the stylesheet the span paints at 131x15, so the control looks as if it had a visible label that its accessible name \"Hauptmenue\" does not contain; live the button shows the hamburger icon only and the rule reports nothing (SC 2.5.3)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "focusable-element",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the element is one of the five inactive pagination dots of div.tns-nav, which carry tabindex=\"-1\" as the roving tabindex of the tiny-slider widget while the active dot stays in the tab order. div.tns-nav is display: none at this width on the live page and the slider script that binds the arrow keys is not in the snapshot, so the rule sees a lost tab stop where the live page has none (SC 2.1.1)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "focusable-element",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the element is one of the five inactive pagination dots of div.tns-nav, which carry tabindex=\"-1\" as the roving tabindex of the tiny-slider widget while the active dot stays in the tab order. div.tns-nav is display: none at this width on the live page and the slider script that binds the arrow keys is not in the snapshot, so the rule sees a lost tab stop where the live page has none (SC 2.1.1)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "focusable-element",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the element is one of the five inactive pagination dots of div.tns-nav, which carry tabindex=\"-1\" as the roving tabindex of the tiny-slider widget while the active dot stays in the tab order. div.tns-nav is display: none at this width on the live page and the slider script that binds the arrow keys is not in the snapshot, so the rule sees a lost tab stop where the live page has none (SC 2.1.1)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "focusable-element",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the element is one of the five inactive pagination dots of div.tns-nav, which carry tabindex=\"-1\" as the roving tabindex of the tiny-slider widget while the active dot stays in the tab order. div.tns-nav is display: none at this width on the live page and the slider script that binds the arrow keys is not in the snapshot, so the rule sees a lost tab stop where the live page has none (SC 2.1.1)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "focusable-element",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the element is one of the five inactive pagination dots of div.tns-nav, which carry tabindex=\"-1\" as the roving tabindex of the tiny-slider widget while the active dot stays in the tab order. div.tns-nav is display: none at this width on the live page and the slider script that binds the arrow keys is not in the snapshot, so the rule sees a lost tab stop where the live page has none (SC 2.1.1)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Hauptinhalt\" is inside nav#skiplinks-menu, the skip-link list that the site CSS moves off screen (40x0 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 76x17px at (48, 108) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Hauptmenü\" is inside nav#skiplinks-menu, the skip-link list that the site CSS moves off screen (40x0 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 75x17px at (48, 126) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Suche\" is inside nav#skiplinks-menu, the skip-link list that the site CSS moves off screen (40x0 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 39x17px at (48, 144) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Kontaktdaten\" is inside nav#skiplinks-menu, the skip-link list that the site CSS moves off screen (40x0 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 86x17px at (48, 162) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Impressumsseite\" is inside nav#skiplinks-menu, the skip-link list that the site CSS moves off screen (40x0 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 107x17px at (48, 180) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button#menubutton.hamburger",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Menü aus-/einklappen\" is inside div.mobile-nav, which is display: none at this width live (the hamburger is the mobile control) and whose sr-only span the site CSS clips. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 147x21px at (8, 368) with a.link-home inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Schwarz auf Weiss\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 197x17px at (48, 613) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Weiss auf Schwarz\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 197x17px at (48, 631) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Gelb auf Blau\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 165x17px at (48, 649) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Blau auf Gelb\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 165x17px at (48, 667) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Grün auf Schwarz\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 192x17px at (48, 685) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Rot auf Blau\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 157x17px at (48, 703) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Normal\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 124x17px at (48, 721) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a.active",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Deutsch DE\" is inside ul.language-menu in the topbar, which the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 78x17px at (48, 943) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Leichte Sprache LL\" is inside ul.language-menu in the topbar, which the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 127x17px at (48, 961) with a.active inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"English EN\" is inside ul.language-menu in the topbar, which the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 74x17px at (48, 979) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a#dropdown0.nav-link",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Die Hilfsgemeinschaft\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 144x17px at (48, 1327) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Ziele des Vereins\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 110x17px at (88, 1347) with a#dropdown0.nav-link inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Tätigkeitsbericht\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 108x17px at (88, 1365) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Netzwerke & Partner\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 136x17px at (88, 1383) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Geschichte\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 71x17px at (88, 1401) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Team\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 35x17px at (88, 1437) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Jobs\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 28x17px at (88, 1455) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"AUGust - das Maskottchen\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 175x17px at (88, 1473) with button.btn inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Beratungstermin vereinbaren\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 186x17px at (88, 1650) with button.btn inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Sozialrechtliche Beratung\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 166x17px at (88, 1668) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Pflegegeld\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 68x17px at (128, 1686) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Behindertenpass\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 106x17px at (128, 1704) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Vergünstigungen\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 108x17px at (128, 1722) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Beratung Hilfsmittel\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 132x17px at (128, 1740) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Low Vision Beratung\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 137x17px at (88, 1758) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Psychologische Beratung\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 162x17px at (88, 1776) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Online-Beratung\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 108x17px at (88, 1794) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a#dropdown2.nav-link",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Mitgliederservice\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 113x17px at (48, 1951) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Kostenlos Mitglied werden\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 174x17px at (88, 1971) with button.btn inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Besuchs- und Begleitdienst\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 175x17px at (88, 1989) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Orientierungs- und Mobilitätstraining\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 241x17px at (88, 2007) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Hilfsmittel\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 69x17px at (88, 2025) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Blindenführhunde\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 116x17px at (128, 2043) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Kennzeichnende Hilfsmittel\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 180x17px at (128, 2061) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Uhren\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 40x17px at (128, 2079) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Hilfsmittel für den Haushalt\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 180x17px at (128, 2097) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Hilfsmittel für die Gesundheit\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 192x17px at (128, 2115) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Lupen und Lesehilfen\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (128, 2133) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Spiele\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 40x17px at (128, 2151) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Freizeitangebot\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 100x17px at (88, 2169) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Kinder und Jugendliche\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 153x17px at (128, 2187) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Kunst und Kultur\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 112x17px at (128, 2205) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Kurse und Lernen\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 116x17px at (128, 2223) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Sport und Geselliges\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 133x17px at (128, 2241) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Bezirksgruppen\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 101x17px at (88, 2259) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a#dropdown3.nav-link",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Augengesundheit\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 112x17px at (48, 2416) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Das Auge\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 63x17px at (88, 2436) with a#dropdown3.nav-link inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Augenerkrankungen\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 131x17px at (88, 2454) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Trockenes Auge\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 104x17px at (128, 2472) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Retinopathia pigmentosa\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 160x17px at (128, 2490) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Retinaler Venenverschluss\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 169x17px at (128, 2508) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Netzhautablösung\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 116x17px at (128, 2526) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Grüner Star\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 75x17px at (128, 2544) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Grauer Star\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 74x17px at (128, 2562) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Diabetische Retinopathie\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 161x17px at (128, 2580) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Bindehautentzündung\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (128, 2598) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Altersbedingte Makuladegeneration (AMD)\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 282x17px at (128, 2616) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Augentipps von AUGust\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 158x17px at (88, 2634) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Medizin informiert\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 122x17px at (88, 2652) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Augenambulanzen\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 120x17px at (88, 2670) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Infomaterial bestellen\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (88, 2688) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Blog\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 31x17px at (88, 2865) with a#dropdown4.nav-link inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Veranstaltungskalender\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 149x17px at (88, 2883) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Magazin sichtweisen\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 135x17px at (88, 2901) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Newsletter\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 69x17px at (88, 2919) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Presse\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 41x17px at (88, 2937) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a#dropdown5.nav-link",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Helfen und Spenden\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 131x17px at (48, 3112) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Online spenden\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 100x17px at (88, 3132) with a#dropdown5.nav-link inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"So hilft Ihre Spende\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 128x17px at (88, 3150) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Testamentsspenden\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 124x17px at (88, 3168) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Infomaterial Testament\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 148x17px at (128, 3186) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Testamentsspender im Porträt\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 190x17px at (128, 3204) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Ethische Richtlinien\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 130x17px at (128, 3222) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Fragen und Antworten\" is inside ul.subsubmenu inside div#sidebarmenu, a third-level menu the site CSS collapses (ul.submenu is visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 144x17px at (128, 3240) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Unternehmensspenden\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 146x17px at (88, 3258) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Sachspenden\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 84x17px at (88, 3276) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Freiwilliges Engagement\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 160x17px at (88, 3294) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Fördernde Mitgliedschaft\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 163x17px at (88, 3312) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Spendenabsetzbarkeit\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (88, 3330) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Spendengütesiegel\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 120x17px at (88, 3348) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a#dropdown6.nav-link",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Lotterie Augenstern\" is inside ul#menu-list.navbar-nav inside div#sidebarmenu, whose links the site CSS renders as blocks with padding 8px 16px (204x43 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 128x17px at (48, 3366) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a#dropdown7.nav-link",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Barrierefrei werden\" is inside ul#menu-list.navbar-nav inside div#sidebarmenu, whose links the site CSS renders as blocks with padding 8px 16px (204x43 live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 126x17px at (48, 3384) with a#dropdown6.nav-link inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Standorte\" is inside ul.submenu inside nav#mainmenu of div#sidebarmenu, which the site CSS collapses (visibility: hidden live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 61x17px at (88, 3561) with button.btn inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Schwarz auf Weiss\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 197x17px at (48, 3647) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Weiss auf Schwarz\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 197x17px at (48, 3665) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Gelb auf Blau\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 165x17px at (48, 3683) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Blau auf Gelb\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 165x17px at (48, 3701) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Grün auf Schwarz\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 192x17px at (48, 3719) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Rot auf Blau\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 157x17px at (48, 3737) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"a Kontrast: Normal\" is inside ul.ally-nav, the contrast and font-size toolbar the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 124x17px at (48, 3755) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a.active",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Deutsch DE\" is inside ul.language-menu in the topbar, which the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 78x17px at (48, 3977) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Leichte Sprache LL\" is inside ul.language-menu in the topbar, which the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 127x17px at (48, 3995) with a.active inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"English EN\" is inside ul.language-menu in the topbar, which the site CSS lays out as padded buttons. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 74x17px at (48, 4013) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button.tns-nav-active",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the button.tns-nav-active is inside div.tns-nav, the slider pagination the site CSS hides at this width (display: none live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 16x6px at (8, 11078) with button inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the button is inside div.tns-nav, the slider pagination the site CSS hides at this width (display: none live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 16x6px at (24, 11078) with button.tns-nav-active inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the button is inside div.tns-nav, the slider pagination the site CSS hides at this width (display: none live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 16x6px at (40, 11078) with button inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the button is inside div.tns-nav, the slider pagination the site CSS hides at this width (display: none live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 16x6px at (56, 11078) with button inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the button is inside div.tns-nav, the slider pagination the site CSS hides at this width (display: none live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 16x6px at (72, 11078) with button inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the button is inside div.tns-nav, the slider pagination the site CSS hides at this width (display: none live). the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 16x6px at (88, 11078) with button inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"01 330 35 45–0\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 100x17px at (8, 12761) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"info@hilfsgemeinschaft.at\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 170x17px at (8, 12779) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Jägerstraße 36, 1200 Wien\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 170x17px at (8, 12797) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Impressum\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 71x17px at (48, 15162) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Datenschutzerklärung\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (48, 15180) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Barrierefreiheitserklärung\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 166x17px at (48, 15198) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Newsletter abonnieren\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 144x17px at (48, 15216) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Infomaterial bestellen\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (48, 15234) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Access Austria\" is inside the footer contact paragraphs, whose links the site CSS lays out with padding. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 96x17px at (48, 15252) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "button.btn",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Präferenzen speichern\" is inside the cookie consent panel, which the site CSS lays out as a styled dialog. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 150x21px at (8, 15602) with a inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "target-too-small",
-   "selector": "a",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: the link \"Datenschutzerklärung\" is inside the cookie consent panel, which the site CSS lays out as a styled dialog. the merged TYPO3 stylesheet /typo3temp/assets/compressed/merged-bdc9992978a691f6638ebcccde979c0d-c5f4e52e05585e473db168e3e6d1ce61.css is linked by absolute path and 404s in the offline snapshot (0 rules loaded against 2947 live), so the page renders without the site CSS, so the link is an unstyled inline box of 140x17px at (8, 15623) with button.btn inside its 24px spacing circle. With the stylesheet the same control is at least 24x24: the live page has no interactive target under 24px at all and the live scan reports no target-too-small (SC 2.5.8)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "reflow-failure",
-   "selector": "",
-   "verdict": "artefact",
-   "reason": "snapshot artefact: without the site stylesheet the document is 1246px wide at the 320px viewport because every image lays out at its intrinsic width and no layout constrains it. The live page at 320px is 362px wide, a different 42px overflow that comes from the tiny-slider track and its off-screen slides (SC 1.4.10)"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "incomplete-content",
-   "selector": "main",
-   "verdict": "review",
-   "reason": "the rule judges the Erklaerung zur Barrierefreiheit it fetched over the live network, not anything in the snapshot; whether the statement names a compliance level in the wording EN 301 549 12.2.2 asks for is for a human to read, as with the BBC pair in the existing corpus"
-  },
-  {
-   "snapshot": "hilfsgemeinschaft.html",
-   "rule": "outdated-statement",
-   "selector": "main",
-   "verdict": "review",
-   "reason": "same live statement page and same question: whether it names a preparation or review date is a human reading, not a fact of the snapshot (EN 301 549 12.2.2)"
-  },
-  {
    "snapshot": "oesterreich-gv.html",
    "rule": "image-alt",
    "selector": "#ida-chatbot > img",
@@ -6722,6 +5763,111 @@
    "selector": "button#ida-chatbot",
    "verdict": "false",
    "reason": "button#ida-chatbot is an 80x80 round white button carrying a coloured 32x32 icon and box-shadow rgba(0, 0, 0, 0.1) 0px 6px 6px; SC 1.4.11 asks for 3:1 on the visual information needed to identify the control, which here is the icon, not the button's fill. The rule compares the fill with the page background and reports 1:1 because both are white"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "label[for=\"search\"]",
+   "verdict": "false",
+   "reason": "the search label #000000 on the white search panel is 21:1 at 17px bold (SC 1.4.3); axe reports incomplete because div.search carries the AUGust mascot as a background image, which is anchored at 100% bottom, no-repeat, 100px tall, so it sits at the right edge of the 301px box and not under the label text"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": ".frame-inner > .lookapp-scope > h2",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "#c103 > .frame-container.box-white-transparent > .frame-inner > .lookapp-scope > p:nth-child(2)",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": ".frame-inner > .lookapp-scope > p:nth-child(3)",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "p:nth-child(3) > strong:nth-child(1)",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "p:nth-child(3) > strong:nth-child(2)",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "strong:nth-child(3)",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "strong:nth-child(4)",
+   "verdict": "false",
+   "reason": "black text #000000 on the .box-white-transparent panel, an rgba(255, 255, 255, 0.7) fill over the header photo Haende_mit_gelbem_Herz.jpg: 21:1 against the composited white and 9.9:1 even if the photo under the panel were solid black, both far above the 4.5:1 of SC 1.4.3; axe reports incomplete only because of the photo"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "a[title=\": Heiteres Gedächtnistraining\"]",
+   "verdict": "false",
+   "reason": "the event link #000000 on #FFFFFF is 21:1 at 23.7px (SC 1.4.3); the element carries no background image of its own and axe stops at the tile behind it"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "color-contrast",
+   "selector": "#c10570 > .frame-container.box-white-transparent > .frame-inner > .lookapp-scope > p:nth-child(2)",
+   "verdict": "false",
+   "reason": "the donation footer block is #FFFFFF on #333333, 12.63:1 at 17px, far above the 4.5:1 of SC 1.4.3"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "insufficient-form-border-contrast",
+   "selector": "input#search",
+   "verdict": "true",
+   "reason": "input#search is a white field whose only boundary is a 1px solid #999999 border on all four sides, on a white parent: 2.85:1, below the 3:1 SC 1.4.11 asks for on the visual information that identifies a user interface component. The field carries no shadow, no outline and no fill difference that would identify it instead, and the live page reports the same finding"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "focus-obscured-by-fixed-element",
+   "selector": "div.frame-inner > div.lookapp-scope > p:nth-of-type(2) > a",
+   "verdict": "true",
+   "reason": "div.om-cookie-panel is position: fixed at z-index 9999, opaque white, 1920x188 at the bottom of the viewport, and carries no dialog role and no aria-modal, so keyboard focus walks into the page behind it: the link \"Standorte\" at y=1050 is entirely covered, elementFromPoint at its centre returns the panel. SC 2.4.11 asks that a focused component is not entirely hidden by author-created content, and the live page reports the same finding"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "horizontal-scroll",
+   "selector": "",
+   "verdict": "false",
+   "reason": "the rule reports a 25px overflow at a 1920px viewport, which no criterion forbids: SC 1.4.10 is about content reflowing at 320px, and the styled snapshot reports no reflow failure there. The overflow is the tiny-slider track, whose eight slides lay out beyond the viewport (the widest ends at 52942px) and which pans instead of scrolling the page"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "incomplete-content",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "the rule judges the Erklaerung zur Barrierefreiheit it fetched over the live network, not anything in the snapshot; whether the statement names a compliance level in the wording EN 301 549 12.2.2 asks for is for a human to read, as with the BBC pair in the existing corpus"
+  },
+  {
+   "snapshot": "hilfsgemeinschaft.html",
+   "rule": "outdated-statement",
+   "selector": "main",
+   "verdict": "review",
+   "reason": "same live statement page and same question: whether it names a preparation or review date is a human reading, not a fact of the snapshot (EN 301 549 12.2.2)"
   }
  ]
 }

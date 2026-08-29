@@ -314,6 +314,14 @@ const injectableCode = `
    */
   async function __decideTextContrast(element) {
     const styles = window.getComputedStyle(element);
+    // background-clip: text paints the element's background INTO the glyphs,
+    // so that background is the text colour and not the backdrop. What lies
+    // behind the glyphs is the layer below, and the foreground is a gradient
+    // with no single colour to measure.
+    const clip = styles.backgroundClip || styles.webkitBackgroundClip;
+    if (clip === 'text') {
+      return { decision: 'review', reason: 'text painted with the element background' };
+    }
     const fg = __parseRgb(styles.color);
     if (!fg) return { decision: 'review', reason: 'no computed text colour' };
     const { candidates, unresolved, unresolvedSource } = await __paintedBackdrops(element);

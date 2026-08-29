@@ -16,6 +16,7 @@ const pageGlobals = Object.fromEntries(
     '__isInactive',
     '__resolveBackground',
     '__hasCompliantBorder',
+    '__strongestBoundary',
     '__getRenderedBorder',
     '__isLargeText',
     '__mediaAudioState',

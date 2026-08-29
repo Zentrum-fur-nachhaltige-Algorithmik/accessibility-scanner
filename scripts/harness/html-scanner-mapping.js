@@ -865,6 +865,24 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-nontext-boundary-fill-and-icon.html': {
+    expectedScanners: [],
+    excludedScanners: ['nontext-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.11'],
+    description:
+      'A white field on a blue header bar bounded by its own fill at 3.23:1 and a white round button identified by its icon: 1.4.11 asks for 3:1 on what identifies the component, not on every edge',
+  },
+
+  'good-image-alt-icon-in-named-button.html': {
+    expectedScanners: [],
+    excludedScanners: ['media-accessibility', 'screen-reader'],
+    testType: 'good',
+    wcagCriteria: ['1.1.1'],
+    description:
+      'An icon with no alt attribute as the sole content of a button carrying aria-label: the control is named by its author and the icon is never announced on its own',
+  },
+
   'good-target-size-lazy-banner.html': {
     expectedScanners: [],
     excludedScanners: ['input-modalities'],

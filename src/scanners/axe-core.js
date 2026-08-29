@@ -225,6 +225,63 @@ class AxeCoreAdapter extends BaseScanner {
     return new Map(states);
   }
 
+  /**
+   * Whether an image axe reports under `image-alt` is the sole content of a
+   * control its author named.
+   *
+   * SC 1.1.1 asks that non-text content have a text alternative that serves an
+   * equivalent purpose. Where an icon is the only content of a button carrying
+   * aria-label or aria-labelledby, the control is named by the author, the
+   * icon is never announced on its own and nothing is missing; what the markup
+   * lacks is alt="" on a decorative image, which axe cannot tell from a missing
+   * alternative.
+   *
+   * @returns {Promise<Set<string>>} target selectors of such images
+   */
+  async _iconsInsideNamedControls(page, violationRules) {
+    const targets = [];
+    for (const rule of violationRules || []) {
+      if (rule.id !== 'image-alt') continue;
+      for (const node of rule.nodes) {
+        if (!Array.isArray(node.target) || node.target.length !== 1) continue;
+        if (typeof node.target[0] !== 'string') continue;
+        targets.push(node.target[0]);
+      }
+    }
+    if (targets.length === 0) return new Set();
+
+    const decorative = await page.evaluate((selectors) => {
+      const out = [];
+      for (const selector of selectors) {
+        let img = null;
+        try {
+          img = document.querySelector(selector);
+        } catch (e) {
+          img = null;
+        }
+        if (!img) continue;
+        const control = img.closest(
+          'button, a[href], [role="button"], [role="link"], input, summary'
+        );
+        if (!control) continue;
+        const labelledby = (control.getAttribute('aria-labelledby') || '')
+          .split(/\s+/)
+          .filter(Boolean)
+          .some((id) => document.getElementById(id));
+        const named = (control.getAttribute('aria-label') || '').trim().length > 0 || labelledby;
+        if (!named) continue;
+        // The image must be all the control holds: an image beside a headline
+        // carries information of its own.
+        if ((control.textContent || '').trim().length > 0) continue;
+        if (control.querySelectorAll('img').length !== 1) continue;
+        out.push(selector);
+      }
+      return out;
+    }, targets);
+
+    return new Set(decorative);
+  }
+
   async scan(page, options = {}) {
     await this._ensurePageReady(page);
 
@@ -244,6 +301,13 @@ class AxeCoreAdapter extends BaseScanner {
       return new Map();
     });
 
+    const decorativeIcons = await this._iconsInsideNamedControls(page, axeResults.violations).catch(
+      (e) => {
+        log.warn(`[axe-core] image-alt resolution failed: ${e.message}`);
+        return new Set();
+      }
+    );
+
     const violations = [];
     // Deque best practices are advice about a criterion nothing fails, so they
     // are reported beside the findings instead of among them.
@@ -257,6 +321,14 @@ class AxeCoreAdapter extends BaseScanner {
     for (const rule of axeResults.violations) {
       const bucket = isBestPracticeOnly(rule.tags) ? bestPractices : violations;
       for (const node of rule.nodes) {
+        if (rule.id === 'image-alt') {
+          const target =
+            Array.isArray(node.target) && node.target.length === 1 ? node.target[0] : null;
+          if (target && decorativeIcons.has(target)) {
+            log.debug(`[axe-core] image-alt ${target}: sole icon of a control its author named`);
+            continue;
+          }
+        }
         bucket.push(this._convertNode(rule, node, 'violation'));
       }
     }

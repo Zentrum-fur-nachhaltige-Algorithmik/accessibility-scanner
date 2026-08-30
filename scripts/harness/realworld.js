@@ -37,6 +37,15 @@ const PROFILE = 'standard';
 const PER_FILE_TIMEOUT_MS = 600000;
 const SLOW_FILE_MS = 240000;
 /**
+ * Snapshots scanned at once share the CPU, so the wall clock of one grows with
+ * the others: wiki-accessibility-en.html takes 395 s alone and 590 s beside two
+ * more. Each extra worker buys a file this much more before it counts as a hang.
+ */
+const PER_WORKER_TIMEOUT_MS = 150000;
+function perFileTimeoutMs(parallel) {
+  return PER_FILE_TIMEOUT_MS + PER_WORKER_TIMEOUT_MS * Math.max(0, parallel - 1);
+}
+/**
  * Snapshots scanned at once. Each gets its own pipeline and browser, so they
  * only share the CPU: at 3 the sequential 40 minutes over sixteen snapshots
  * become about 15, and elapsedMs grows a little under the shared load, which is
@@ -1299,7 +1308,7 @@ function parseArgs(argv) {
   return out;
 }
 
-async function scanFile(url, scannerIds, scanOptions) {
+async function scanFile(url, scannerIds, scanOptions, timeoutMs = PER_FILE_TIMEOUT_MS) {
   // Fresh pipeline (and therefore a fresh browser) per file: a hang in one
   // fixture must not poison the next, and it makes timeout recovery trivial.
   const pipeline = new ScanPipeline();
@@ -1315,11 +1324,9 @@ async function scanFile(url, scannerIds, scanOptions) {
     timer = setTimeout(
       () =>
         rej(
-          new Error(
-            `WALL-CLOCK TIMEOUT after ${PER_FILE_TIMEOUT_MS}ms: treated as a hang, not a soft skip`
-          )
+          new Error(`WALL-CLOCK TIMEOUT after ${timeoutMs}ms: treated as a hang, not a soft skip`)
         ),
-      PER_FILE_TIMEOUT_MS
+      timeoutMs
     );
   });
 
@@ -1381,7 +1388,7 @@ async function main() {
     startedAt: new Date().toISOString(),
     profile: PROFILE,
     llmEnabled,
-    perFileTimeoutMs: PER_FILE_TIMEOUT_MS,
+    perFileTimeoutMs: perFileTimeoutMs(args.parallel),
     parallel: args.parallel,
     files: [],
   };
@@ -1404,7 +1411,12 @@ async function main() {
 
     const noiseFrom = noise.length;
     const t0 = Date.now();
-    const outcome = await scanFile(url, scannerIds, profileOptions);
+    const outcome = await scanFile(
+      url,
+      scannerIds,
+      profileOptions,
+      perFileTimeoutMs(args.parallel)
+    );
     const elapsedMs = Date.now() - t0;
 
     const entry = {
@@ -1677,6 +1689,7 @@ module.exports = {
   FIXTURE_DIR,
   PROFILE,
   DEFAULT_PARALLEL,
+  perFileTimeoutMs,
   startServer,
   scanFile,
   findViolations,

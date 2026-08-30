@@ -23,6 +23,7 @@ const {
   FIXTURE_DIR,
   PROFILE,
   DEFAULT_PARALLEL,
+  perFileTimeoutMs,
   startServer,
   scanFile,
 } = require('./harness/realworld');
@@ -153,7 +154,12 @@ async function main() {
   const worker = async () => {
     while (nextIndex < fixtures.length) {
       const i = nextIndex++;
-      scans[i] = await scanFile(`http://localhost:${port}/${fixtures[i].file}`, scannerIds, {});
+      scans[i] = await scanFile(
+        `http://localhost:${port}/${fixtures[i].file}`,
+        scannerIds,
+        {},
+        perFileTimeoutMs(args.parallel)
+      );
     }
   };
   console.log = () => {};

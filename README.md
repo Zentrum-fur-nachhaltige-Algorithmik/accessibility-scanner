@@ -61,6 +61,38 @@ viewport, send input or navigate, so the pipeline runs them one at a time and
 reloads the URL in between. LLM scanners register only when
 `OPENROUTER_API_KEY` is set.
 
+### Verdicts: violation or needs review
+
+Scanners measure. What a scanner can prove is a `violation`; what it can only
+suspect is a `needs-review` finding, and every finding carries its verdict.
+
+A needs-review finding stays out of `violations`, out of the score and out of
+the category counts. It lands in `needsReview` on the result with an evidence
+dossier a reviewer decides on:
+
+```
+dossier: {
+  question,                                  // the one decision to make
+  element: { selector, html, role, name },
+  measurements,                              // flat map of measured values
+  context                                    // short surrounding facts
+}
+```
+
+Report and UI show them in their own "Needs review" section, never among the
+findings. When a reviewer clears one (today only `llm-incomplete-reviewer`),
+it leaves `needsReview` and is recorded in the result's `reviewLog` as
+`{ ruleId, selector, verdict: 'pass', reason, by }`.
+
+### Consent pre-step
+
+Before any scanner looks at the page, the pipeline detects a cookie/consent
+overlay, clicks its accept control and waits for it to go, on the shared page
+and on every exclusive tab. A scan of a covered page would otherwise measure
+the dialog. What was seen is recorded as `consent` on the result; the field is
+absent when no overlay was found. The pre-step only dismisses: scanning the
+overlay as a page state of its own comes with the state-scans work.
+
 ## Quick start
 
 Docker:

@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-08-29T19:51:28.067Z",
+  "recordedAt": "2026-08-30T11:56:12.404Z",
   "profile": "standard",
   "labelsRecordedAt": "2026-08-28",
   "snapshots": [
@@ -433,14 +433,13 @@
         "focus-management"
       ],
       "reported": 2,
-      "true": 2,
+      "true": 1,
       "false": 0,
       "review": 0,
       "artefact": 0,
       "unstyled": 0,
-      "unlabelled": 0,
+      "unlabelled": 1,
       "precisionFrom": [
-        "hilfsgemeinschaft.html",
         "muenchen-portal.html"
       ],
       "precision": 1
@@ -644,7 +643,13 @@
       "precision": 1
     }
   ],
-  "missingTrue": [],
+  "missingTrue": [
+    {
+      "snapshot": "hilfsgemeinschaft.html",
+      "rule": "focus-obscured-by-fixed-element",
+      "selector": "div.frame-inner > div.lookapp-scope > p:nth-of-type(2) > a"
+    }
+  ],
   "failures": [],
   "passed": true
 }

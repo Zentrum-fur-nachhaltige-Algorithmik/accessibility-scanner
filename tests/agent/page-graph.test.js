@@ -154,6 +154,30 @@ describe('agent/page-graph: shortest paths over the command graph', () => {
     expect(strategyCosts(later, 5, [2]).rotor).toMatchObject({ kind: 'links', index: 2, cost: 2 });
   });
 
+  it('opens the rotor list later when fewer entries have to be revealed', () => {
+    // Twenty links, then a landmark with the target as its third link: from the
+    // start the links list needs two `more` presses (2 + 2), after one
+    // nextLandmark press the same list starts at the landmark (1 + 2).
+    const stops = [{ phrase: 'document' }];
+    for (let i = 1; i <= 20; i += 1) stops.push({ phrase: `link, Menu ${i}`, kind: 'links' });
+    stops.push({ phrase: 'main', kind: 'landmarks' });
+    stops.push({ phrase: 'link, Menu Alpha', kind: 'links' });
+    stops.push({ phrase: 'link, Menu Beta', kind: 'links' });
+    stops.push({ phrase: 'link, Menu Gamma', kind: 'links', selector: '#gamma' });
+    // More links behind the target, so wrapping backwards is no shortcut.
+    for (let i = 1; i <= 6; i += 1) stops.push({ phrase: `link, Footer ${i}`, kind: 'links' });
+    const graph = buildPageGraph(makeDesc(stops), { cursor: 0 });
+    const sp = shortestPaths(graph, 0);
+    const found = reachGoals(sp, [24]);
+    expect(strategyCosts(graph, 0, [24]).rotor.cost).toBe(4);
+    expect(found.reach.cost).toBe(3);
+    expect(found.reach.commands.map((c) => c.type)).toEqual([
+      'nextLandmark',
+      'links',
+      'jumpTo',
+    ]);
+  });
+
   it('pays for revealing a rotor entry: one `more` per page, or a letter jump', () => {
     const many = [{ phrase: 'document' }];
     for (let i = 1; i <= 24; i += 1) {

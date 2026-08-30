@@ -183,6 +183,9 @@ function buildPageGraph(desc, options = {}) {
 
   const rotors = {};
   for (const kind of kinds) rotors[kind] = rotorEntriesFrom(desc, kind, cursor, n, pageSize);
+  // The same lists as opened from any other stop, built when Dijkstra first
+  // settles that stop (see `rotorsAt`).
+  const rotorsByNode = new Map([[cursor, rotors]]);
 
   // Tab stops the reading order never visits still deserve a node: an element
   // outside the reading order is reachable by Tab and by nothing else.
@@ -219,11 +222,25 @@ function buildPageGraph(desc, options = {}) {
     kindStops,
     levelStops,
     rotors,
+    rotorsByNode,
+    pageSize,
     tabNode,
     tabPosOfNode,
     findHits,
     extraSelectors,
   };
+}
+
+/** The rotor lists as the env opens them with the cursor on `node`. */
+function rotorsAt(graph, node) {
+  let rotors = graph.rotorsByNode.get(node);
+  if (!rotors) {
+    rotors = {};
+    for (const kind of graph.kinds)
+      rotors[kind] = rotorEntriesFrom(graph.desc, kind, node, graph.n, graph.pageSize);
+    graph.rotorsByNode.set(node, rotors);
+  }
+  return rotors;
 }
 
 /** The selector of a node, for reporting. */
@@ -258,10 +275,9 @@ function stepTarget(stops, i, n, dir) {
 /**
  * Outgoing edges of `node`. They are emitted in preference order (quick-nav
  * key, rotor list, Tab, search, reading order), which is what breaks a tie
- * between two equally expensive routes. Rotor edges are emitted from the
- * start node only: their cost does not depend on where the cursor is, so a
- * route that opens a rotor list half way is never cheaper than one that opens it
- * straight away.
+ * between two equally expensive routes. The rotor lists are opened at the
+ * cursor, so a list opened after a quick-nav press can be cheaper than one
+ * opened at the start (fewer entries to reveal); every stop gets its own.
  */
 function* neighbours(graph, node, source) {
   const n = graph.n;
@@ -294,9 +310,12 @@ function* neighbours(graph, node, source) {
     }
   }
 
-  if (node === source) {
+  if (node < n || node === source) {
+    // A start outside the reading order (a focused element only Tab reaches)
+    // opens the lists as described from the cursor.
+    const rotors = node < n ? rotorsAt(graph, node) : graph.rotors;
     for (const kind of graph.kinds) {
-      for (const entry of graph.rotors[kind]) {
+      for (const entry of rotors[kind]) {
         if (entry.stop === node) continue;
         yield {
           type: 'rotor',

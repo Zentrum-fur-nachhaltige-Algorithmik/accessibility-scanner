@@ -170,8 +170,8 @@ async function runSite({
         ? Number(validation.nOpt)
         : nSighted;
     const optimalPath = validation.optimalPath || null;
-    // 'dag' means nOpt was priced along a route that skipped a link that led straight to the
-    // target, not along the (possibly wandering) sighted path.
+    // 'dag' means nOpt skipped sighted waypoints: an earlier page already had a
+    // link to the target, so the (possibly wandering) sighted path was not charged.
     const optimalRoute = validation.route || null;
     const readDistance = Number.isFinite(validation.readDistance) ? validation.readDistance : null;
     const nOptPartial = !!validation.nOptPartial;

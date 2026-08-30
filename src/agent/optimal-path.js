@@ -434,6 +434,8 @@ function urlPatternsOf(spec, out = []) {
   return out;
 }
 
+const sameUrl = (a, b) => normaliseUrl(a) === normaliseUrl(b);
+
 /** Origin + path + query, lowercased, without a trailing slash or a fragment. */
 function normaliseUrl(href) {
   try {
@@ -716,7 +718,11 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
 
   for (let j = 0; j < path.length; j += 1) {
     const step = path[j];
-    const actionCost = ACTION_COST[step.action];
+    // A `goto` to the page the walk already stands on is nothing to do.
+    const actionCost =
+      step.action === 'goto' && step.url && sameUrl(step.url, page.url())
+        ? 0
+        : ACTION_COST[step.action];
     if (actionCost === undefined) {
       return {
         nOpt: null,
@@ -794,42 +800,6 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     relax(j + 1, dist[j] + cost, { from: j, entry });
     chain[j + 1] = chain[j] + cost;
 
-    // The same waypoint, reached from an earlier page: a link with the target's
-    // href was already there, so the walk through the menu is not what a
-    // screen-reader user would have to pay for.
-    const href = state && state.resolved ? state.resolved.targetHref : null;
-    const activates = step.action === 'click' || (step.action === 'press' && step.key === 'Enter');
-    if (href && activates) {
-      for (let i = j - 1; i >= 0 && pureNav[i]; i -= 1) {
-        const from = states[i];
-        if (!from || !from.graph || dist[i] === undefined) continue;
-        const goals = nodesForHref(from.graph, href);
-        const found = goals.length ? reachGoals(from.sp, goals) : null;
-        if (!found) continue;
-        const selector = from.desc.selectors[found.node];
-        const skipEntry = {
-          index: j,
-          action: step.action,
-          selector,
-          equivalentSelector: selector,
-          reach: {
-            ...found.reach,
-            via: {
-              ...(found.reach.via || {}),
-              equivalentOf: selector,
-              equivalence: 'same-href-earlier-page',
-              sightedSelector: step.selector,
-            },
-          },
-          actionCost,
-          skipped: Array.from({ length: j - i }, (_, k) => i + k),
-          analysis: analysisOf(from, goals),
-          navigated: true,
-        };
-        relax(j + 1, dist[i] + found.reach.cost + actionCost, { from: i, entry: skipEntry });
-      }
-    }
-
     if (step.action === 'type' && step.selector) typedSelectors.push(step.selector);
 
     // Execute the step for real so the next step is costed against real DOM.
@@ -852,7 +822,70 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
       // optimally-playing user's cursor would be.
       cursorSelector = entry.equivalentSelector || step.selector || cursorSelector;
     }
-    pureNav[j] = !!(entry.navigated && href && activates);
+    // Where the waypoint meant to go: the link's href, or the URL of a `goto`.
+    const href =
+      step.action === 'goto'
+        ? step.url || null
+        : state && state.resolved
+          ? state.resolved.targetHref
+          : null;
+    const activates =
+      step.action === 'goto' ||
+      step.action === 'click' ||
+      (step.action === 'press' && step.key === 'Enter');
+    // A click that did not navigate is still nothing but navigation when a
+    // later waypoint goes to the same URL: the sighted agent clicked twice, or
+    // the replay's click was swallowed and the generator appended a `goto`.
+    const retried =
+      !entry.navigated &&
+      !!href &&
+      activates &&
+      path
+        .slice(j + 1)
+        .some(
+          (later) =>
+            (later.action === 'goto' && later.url && sameUrl(later.url, href)) ||
+            (later.action === 'click' && later.selector && later.selector === step.selector)
+        );
+    pureNav[j] = !!((entry.navigated || retried) && href && activates);
+
+    // The same waypoint, reached from an earlier page: a link with the target's
+    // href was already there, so the walk through the menu is not what a
+    // screen-reader user would have to pay for. Only once the sighted step has
+    // really navigated: a link the page intercepts leads somewhere else.
+    if (entry.navigated && href && activates) {
+      for (let i = j - 1; i >= 0 && pureNav[i]; i -= 1) {
+        const from = states[i];
+        if (!from || !from.graph || dist[i] === undefined) continue;
+        const goals = nodesForHref(from.graph, href);
+        const found = goals.length ? reachGoals(from.sp, goals) : null;
+        if (!found) continue;
+        const selector = from.desc.selectors[found.node];
+        const skipEntry = {
+          index: j,
+          action: 'click',
+          selector,
+          equivalentSelector: selector,
+          reach: {
+            ...found.reach,
+            via: {
+              ...(found.reach.via || {}),
+              equivalentOf: selector,
+              equivalence: 'same-href-earlier-page',
+              sightedSelector: step.selector,
+            },
+          },
+          actionCost: ACTION_COST.click,
+          skipped: Array.from({ length: j - i }, (_, k) => i + k),
+          analysis: analysisOf(from, goals),
+          navigated: true,
+        };
+        relax(j + 1, dist[i] + found.reach.cost + ACTION_COST.click, {
+          from: i,
+          entry: skipEntry,
+        });
+      }
+    }
   }
 
   const last = path.length;

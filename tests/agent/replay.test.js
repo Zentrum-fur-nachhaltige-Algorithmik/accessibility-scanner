@@ -327,7 +327,7 @@ describe('agent/replay', () => {
       expect(res.optimalPathError).toBe('evidence-not-in-reading-order');
       expect(res.nOptPartial).toBe(true);
       expect(res.readDistance).toBeNull();
-      expect(res.nOpt).toBe(1); // the goto only
+      expect(res.nOpt).toBe(0); // a goto to the page the walk stands on costs nothing
       expect(res.optimalPath.some((s) => s.action === 'read')).toBe(false);
     }, 120000);
 

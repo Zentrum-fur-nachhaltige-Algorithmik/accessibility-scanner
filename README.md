@@ -204,9 +204,11 @@ things"), the closing boundaries are none.
 Scoring per task:
 
 ```
-nOpt  shortest command sequence that solves the task, computed
-      deterministically along the sighted reference path, or along a link
-      that leads straight to the target when the page has one (optimal-path.js)
+nOpt  shortest command sequence that solves the task: Dijkstra over the
+      page's command graph (page-graph.js), guided from waypoint to waypoint
+      of the sighted reference path, skipping waypoints an earlier page
+      already linked past; for information tasks the answer counts where it
+      is first spoken, the start page included (optimal-path.js)
 nSr   commands the agent used
 R     = min(1, nOpt / nSr), 0 when the task was not solved
 ```
@@ -288,7 +290,7 @@ npm run sr-agent -- https://example.com --tasks tasks.json --k 3
 npm run sr-agent -- https://example.com --tasks tasks.json --agent greedy   # no LLM
 npm run sr-agent -- https://example.com --tasks tasks.json --k 3 --observation privileged --out priv.json
 npm run sr-agent:barrier -- result.json priv.json
-node src/agent/validate-nopt.js https://example.com --tasks tasks.json
+node src/agent/validate-nopt.js --remote      # re-measure nOpt of every recorded reference run
 ```
 
 ### Blind Mode (live demo)

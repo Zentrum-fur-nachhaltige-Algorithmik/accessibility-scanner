@@ -205,9 +205,9 @@ class ScanPipeline {
     // Advice a scanner offers about criteria nothing fails (the Deque best
     // practice rules). Reported, never counted and never scored.
     const bestPractices = [];
-    // Nodes whose criterion the scanner could not decide from the page.
-    // Reported, never counted and never scored, so an unknown is never a
-    // failure and never disappears either.
+    // Findings the scanner could not decide from the page (verdict
+    // 'needs-review'). Reported with their evidence dossier, never counted and
+    // never scored, so an unknown is never a failure and never disappears.
     const needsReview = [];
     const scannerSummaries = {};
 
@@ -238,9 +238,16 @@ class ScanPipeline {
             v.originalSeverity = v.severity ?? null;
             v.severity = 'info';
             v.aaa = true;
+            v.verdict = 'needs-review';
             needsReview.push(v);
             continue;
           }
+          // A scanner that could only suspect this finding says so itself.
+          if (v.verdict === 'needs-review') {
+            needsReview.push(v);
+            continue;
+          }
+          v.verdict = 'violation';
           allViolations.push(v);
         }
       }
@@ -252,6 +259,10 @@ class ScanPipeline {
             v.experimental = true;
             v.confidence = 'low';
           }
+          if (v.verdict === 'needs-review') {
+            needsReview.push(v);
+            continue;
+          }
           bestPractices.push(v);
         }
       }
@@ -259,6 +270,7 @@ class ScanPipeline {
       if (Array.isArray(result.needsReview)) {
         for (const v of result.needsReview) {
           if (!v.scannerId) v.scannerId = result.scannerId;
+          v.verdict = 'needs-review';
           needsReview.push(v);
         }
       }
@@ -273,50 +285,69 @@ class ScanPipeline {
       };
     }
 
-    const violations = this.dedupeProcedureFindings(
-      this.reconcileIncompleteReviews(allViolations, scannerResults)
-    );
+    const violations = this.dedupeProcedureFindings(allViolations);
+    const { kept, reviewLog } = this.reconcileIncompleteReviews(needsReview, scannerResults);
     const categories = this.categorizeViolations(violations);
 
-    return {
+    const result = {
       url,
       timestamp: new Date().toISOString(),
       accessibilityScore: this.computeViolationWeightedScore(violations),
       totalViolations: violations.length,
       violations,
       bestPractices,
-      needsReview,
+      needsReview: kept,
       scanners: scannerSummaries,
       categories,
     };
+    if (reviewLog.length > 0) result.reviewLog = reviewLog;
+    return result;
   }
 
   /**
-   * Drop the axe-core `incomplete` placeholders that the LLM incomplete
-   * reviewer has since decided are compliant.
+   * Take the needs-review items a reviewer has since decided are compliant out
+   * of the reader's list and into the review log.
    *
-   * `AxeCoreAdapter` forwards every `incomplete` node as a `severity: 'info'`
-   * "Manual review required" line. `llm-incomplete-reviewer` re-examines those
-   * nodes with measured evidence and records the ones it cleared in
-   * `summary.suppressed`. Without this reconciliation the reader sees both the
-   * adjudicated verdict AND the original to-do item for the same element.
+   * A needs-review finding is an open question. `llm-incomplete-reviewer`
+   * answers some of them with measured evidence and records the ones it
+   * cleared in `summary.suppressed`. Without this reconciliation the reader
+   * sees both the answer AND the original question for the same element.
    *
-   * Only axe's own informational entries are ever removed. A real axe
-   * violation, or any finding from another scanner, is untouched.
+   * Identity is (ruleId|selector), so any scanner's needs-review item can be
+   * decided, not only axe's. Cleared items are kept in `reviewLog` for
+   * precision measurement; the report does not render them.
+   *
+   * @returns {{kept: Object[], reviewLog: Object[]}}
    */
-  reconcileIncompleteReviews(violations, scannerResults) {
+  reconcileIncompleteReviews(needsReview, scannerResults) {
     const reviewer = scannerResults.find((r) => r.scannerId === 'llm-incomplete-reviewer');
     const suppressed = reviewer?.summary?.suppressed;
-    if (!Array.isArray(suppressed) || suppressed.length === 0) return violations;
+    if (!Array.isArray(suppressed) || suppressed.length === 0) {
+      return { kept: needsReview, reviewLog: [] };
+    }
 
-    const keys = new Set(suppressed.map((s) => `${s.axeRuleId}|${s.selector}`));
+    const reasons = new Map(
+      suppressed.map((s) => [`${s.axeRuleId}|${s.selector}`, s.reason || null])
+    );
 
-    return violations.filter((v) => {
-      if (v.source !== 'axe-core') return true;
-      if ((v.severity || '') !== 'info') return true;
-      const selector = v.nodes?.[0]?.selector || '';
-      return !keys.has(`${v.ruleId}|${selector}`);
-    });
+    const kept = [];
+    const reviewLog = [];
+    for (const v of needsReview) {
+      const selector = v.nodes?.[0]?.selector || v.element || '';
+      const key = `${v.ruleId || v.axeRuleId || ''}|${selector}`;
+      if (!reasons.has(key)) {
+        kept.push(v);
+        continue;
+      }
+      reviewLog.push({
+        ruleId: v.ruleId || v.axeRuleId || null,
+        selector,
+        verdict: 'pass',
+        reason: reasons.get(key),
+        by: 'llm-incomplete-reviewer',
+      });
+    }
+    return { kept, reviewLog };
   }
 
   /**

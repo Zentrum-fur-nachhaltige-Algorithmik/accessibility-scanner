@@ -4,7 +4,9 @@
  * Re-measures every task of the recorded reference runs with today's
  * optimal-path.js and prints the recorded nOpt beside the new one, plus the
  * route that explains a difference (a waypoint skipped, the evidence heard on an
- * earlier page). Nothing is written back: the reviewer decides what to re-record.
+ * earlier page). Without --write nothing is written back: the reviewer decides
+ * what to re-record; --write folds the measured values into the reference files
+ * (nOpt, route, R per run and task, siteScore).
  */
 
 'use strict';
@@ -19,12 +21,15 @@ const REFERENCE_DIR = path.join(__dirname, '..', '..', 'tests', 'data', 'sr-agen
 
 const USAGE = `Usage: node src/agent/validate-nopt.js [reference.json ...]
        [--dir ${path.relative(process.cwd(), REFERENCE_DIR)}] [--url http://127.0.0.1:8804/]
-       [--only id,id] [--remote] [--headless false] [--out report.json]
+       [--only id,id] [--remote] [--headless false] [--out report.json] [--write]
 
 Without files every *.json of the reference directory that carries recorded
 nOpt values is measured again. Tasks on a remote origin are skipped unless
 --remote is given (they fetch the live site); --url replaces the recorded
 origin, which is how a locally served copy of a recorded site is measured.
+--write rewrites the reference files onto the new values (nOpt, route, R per
+run and task, siteScore); a file is only written when every recorded task of
+it was measured, so a partial run never mixes old and new prices in one score.
 
 Exit code 0 = every task was measured, 2 = at least one measurement failed,
 1 = usage / IO error.`;
@@ -38,6 +43,7 @@ function parseArgs(argv) {
     remote: false,
     headless: true,
     out: null,
+    write: false,
     help: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
@@ -47,6 +53,7 @@ function parseArgs(argv) {
     else if (a === '--remote') args.remote = true;
     else if (a === '--headless') args.headless = String(argv[++i]) !== 'false';
     else if (a === '--out') args.out = argv[++i];
+    else if (a === '--write') args.write = true;
     else if (a === '--only')
       args.only = argv[++i]
         .split(',')
@@ -154,6 +161,8 @@ async function validateNopt({ browser, tasks, options = {}, logger = console, me
       route: (res && res.route) || null,
       skipped: (res && res.skipped) || null,
       readDistance: res && Number.isFinite(res.readDistance) ? res.readDistance : null,
+      steps: (res && res.steps) || null,
+      nOptPartial: !!(res && res.nOptPartial),
       note: describeRoute(res),
       error: (res && res.error) || null,
       ms: Date.now() - startedAt,
@@ -164,6 +173,74 @@ async function validateNopt({ browser, tasks, options = {}, logger = console, me
     }
   }
   return rows;
+}
+
+/**
+ * Fold the measured rows of ONE reference document back into it: nOpt and the
+ * route fields per task, R per run (scoreTask over the new nOpt) and per task,
+ * then the weighted siteScore. Failed rows leave their task untouched. Returns
+ * how many tasks were updated.
+ */
+function applyRows(doc, rows) {
+  const { scoreTask } = require('./harness');
+  const byId = new Map(rows.filter((r) => r.after !== null).map((r) => [r.id, r]));
+  let updated = 0;
+  for (const entry of (doc && doc.tasks) || []) {
+    const task = entry.task || entry;
+    const row = task && byId.get(task.id);
+    if (!row || !Number.isFinite(entry.nOpt)) continue;
+    entry.nOpt = row.after;
+    entry.readDistance = row.readDistance;
+    entry.optimalRoute = row.route;
+    if (row.steps) entry.optimalPath = row.steps;
+    // The pre-Dijkstra field name; today's harness records optimalSkipped.
+    delete entry.optimalShortcut;
+    if (row.skipped && row.skipped.length) entry.optimalSkipped = row.skipped;
+    else delete entry.optimalSkipped;
+    if (row.nOptPartial) entry.nOptPartial = true;
+    else delete entry.nOptPartial;
+    for (const run of entry.runs || []) run.R = scoreTask(entry.nOpt, run.nSr, run.success);
+    if (entry.runs && entry.runs.length)
+      entry.R = entry.runs.reduce((a, r) => a + r.R, 0) / entry.runs.length;
+    updated += 1;
+  }
+  const valid = ((doc && doc.tasks) || []).filter((t) => t.runs && t.runs.length > 0);
+  const weightSum = valid.reduce((a, t) => a + (Number(t.task && t.task.weight) || 1), 0);
+  if (weightSum > 0)
+    doc.siteScore =
+      valid.reduce((a, t) => a + t.R * (Number(t.task && t.task.weight) || 1), 0) / weightSum;
+  return updated;
+}
+
+/**
+ * Rewrite the reference files onto the re-measured values. A file is only
+ * written when every task that carries a recorded nOpt was measured and none
+ * failed: a partial run must not mix old and new prices in one score.
+ */
+function writeBack(rows, filePaths, logger = console) {
+  const byFile = new Map();
+  for (const r of rows) {
+    if (!byFile.has(r.file)) byFile.set(r.file, []);
+    byFile.get(r.file).push(r);
+  }
+  for (const [name, fileRows] of byFile) {
+    const file = filePaths.get(name);
+    if (!file) continue;
+    const doc = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const recorded = tasksOf(doc, file).length;
+    const failed = fileRows.filter((r) => r.after === null).length;
+    if (failed || fileRows.length < recorded) {
+      logger.log(`  not written (${failed ? `${failed} failed` : 'partially measured'}): ${name}`);
+      continue;
+    }
+    const updated = applyRows(doc, fileRows);
+    fs.writeFileSync(file, `${JSON.stringify(doc, null, 2)}\n`);
+    logger.log(
+      `  written back: ${name} (${updated} task(s), siteScore ${
+        doc.siteScore == null ? 'n/a' : doc.siteScore.toFixed(3)
+      })`
+    );
+  }
 }
 
 const pad = (s, n) => {
@@ -246,8 +323,11 @@ async function main() {
 
   const failed = printTable(rows);
   for (const t of skipped) console.log(`  skipped (remote, use --remote): ${t.id} ${t.url}`);
+  if (args.write) writeBack(rows, new Map(files.map((f) => [path.basename(f), f])));
   if (args.out) {
-    fs.writeFileSync(path.resolve(args.out), JSON.stringify({ rows }, null, 2));
+    // The report keeps the verdicts, not the full step objects.
+    const lean = rows.map(({ steps, ...r }) => r);
+    fs.writeFileSync(path.resolve(args.out), JSON.stringify({ rows: lean }, null, 2));
     console.log(`written: ${args.out}`);
   }
   process.exit(failed ? 2 : 0);
@@ -267,6 +347,8 @@ module.exports = {
   rebase,
   describeRoute,
   validateNopt,
+  applyRows,
+  writeBack,
   printTable,
   REFERENCE_DIR,
   USAGE,

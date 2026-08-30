@@ -9,9 +9,14 @@ const {
   describeRoute,
   referenceFiles,
   validateNopt,
+  applyRows,
+  writeBack,
   printTable,
   REFERENCE_DIR,
 } = require('../../src/agent/validate-nopt');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 describe('agent/validate-nopt: CLI arguments', () => {
   it('measures the whole reference directory by default', () => {
@@ -118,5 +123,88 @@ describe('agent/validate-nopt: the regression table', () => {
     expect(text).toMatch(/3 task\(s\): 2 measured, 1 changed, 1 failed/);
     expect(text).toMatch(/shorter: 5 -> 2 via skipped waypoint 0/);
     expect(text).toMatch(/FAILED broken: target not found/);
+  });
+});
+
+describe('agent/validate-nopt: writing back', () => {
+  const doc = () => ({
+    url: 'http://x/',
+    siteScore: 0.5,
+    tasks: [
+      {
+        task: { id: 'a', weight: 1 },
+        nSighted: 1,
+        nOpt: 3,
+        readDistance: null,
+        optimalPath: [{ action: 'click' }],
+        optimalRoute: 'guided',
+        optimalShortcut: true,
+        runs: [
+          { nSr: 4, success: true, R: 0.75 },
+          { nSr: 0, success: false, R: 0 },
+        ],
+        R: 0.375,
+      },
+      { task: { id: 'b', weight: 1 }, nOpt: 2, runs: [{ nSr: 2, success: true, R: 1 }], R: 1 },
+    ],
+  });
+
+  it('rewrites nOpt, the route fields, R per run and task, and the siteScore', () => {
+    const d = doc();
+    const updated = applyRows(d, [
+      {
+        id: 'a',
+        after: 2,
+        route: 'dag',
+        skipped: [0],
+        readDistance: 1,
+        steps: [{ action: 'read' }],
+        nOptPartial: false,
+      },
+    ]);
+    expect(updated).toBe(1);
+    const a = d.tasks[0];
+    expect(a.nOpt).toBe(2);
+    expect(a.optimalRoute).toBe('dag');
+    expect(a.optimalSkipped).toEqual([0]);
+    expect(a.optimalShortcut).toBeUndefined();
+    expect(a.optimalPath).toEqual([{ action: 'read' }]);
+    expect(a.readDistance).toBe(1);
+    expect(a.runs.map((r) => r.R)).toEqual([0.5, 0]);
+    expect(a.R).toBe(0.25);
+    expect(d.siteScore).toBeCloseTo((0.25 + 1) / 2, 10);
+  });
+
+  it('leaves a failed row and its task untouched', () => {
+    const d = doc();
+    expect(applyRows(d, [{ id: 'a', after: null }])).toBe(0);
+    expect(d.tasks[0].nOpt).toBe(3);
+    expect(d.tasks[0].runs[0].R).toBe(0.75);
+  });
+
+  it('writes only files whose every recorded task was measured', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'validate-nopt-'));
+    const whole = path.join(dir, 'whole.json');
+    const partial = path.join(dir, 'partial.json');
+    fs.writeFileSync(whole, JSON.stringify(doc()));
+    fs.writeFileSync(partial, JSON.stringify(doc()));
+    const lines = [];
+    writeBack(
+      [
+        { file: 'whole.json', id: 'a', after: 2, route: 'dag', steps: [] },
+        { file: 'whole.json', id: 'b', after: 2, route: 'guided', steps: [] },
+        { file: 'partial.json', id: 'a', after: 2, route: 'dag', steps: [] },
+      ],
+      new Map([
+        ['whole.json', whole],
+        ['partial.json', partial],
+      ]),
+      { log: (l) => lines.push(String(l)) }
+    );
+    expect(JSON.parse(fs.readFileSync(whole, 'utf8')).tasks[0].nOpt).toBe(2);
+    expect(JSON.parse(fs.readFileSync(partial, 'utf8')).tasks[0].nOpt).toBe(3);
+    expect(lines.join('\n')).toMatch(/written back: whole.json \(2 task\(s\)/);
+    expect(lines.join('\n')).toMatch(/not written \(partially measured\): partial.json/);
+    fs.rmSync(dir, { recursive: true, force: true });
   });
 });

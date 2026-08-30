@@ -7,7 +7,7 @@ const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-poo
 const {
   computeOptimalPath,
   chooseReach,
-  analyzeInPage,
+  describePageInPage,
   targetMatcherFor,
   urlPatternsOf,
   EVIDENCE_NOT_IN_READING_ORDER,
@@ -32,7 +32,7 @@ async function optimalCounted(fixture, sightedPath, options) {
   const evaluate = page.evaluate.bind(page);
   let analyses = 0;
   page.evaluate = (fn, ...args) => {
-    if (fn === analyzeInPage) analyses += 1;
+    if (fn === describePageInPage) analyses += 1;
     return evaluate(fn, ...args);
   };
   try {
@@ -356,7 +356,14 @@ describe('agent/optimal-path: computeOptimalPath', () => {
     expect(res.error).toBeUndefined();
     expect(res.steps[0].analysis.find).toBeNull();
     expect(res.steps[0].reach.strategy).not.toMatch(/^find/);
-    expect(res.nOpt).toBe(5);
+    // The shortest keystroke route mixes two quick-nav keys with one `prev`,
+    // which no single strategy could have priced.
+    expect(res.nOpt).toBe(3);
+    expect(res.steps[0].reach.commands.map((c) => c.type)).toEqual([
+      'prevHeading',
+      'prevButton',
+      'prev',
+    ]);
   }, 60000);
 
   it('reuses the cached page analysis for the members of one equivalence class', async () => {

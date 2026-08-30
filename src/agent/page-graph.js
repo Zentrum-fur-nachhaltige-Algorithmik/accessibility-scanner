@@ -40,6 +40,34 @@ const mod = (a, n) => ((a % n) + n) % n;
  */
 const MAX_FIND_NEXTS = 8;
 
+/**
+ * Tie-break between two equally expensive routes, summed over their edges and
+ * minimised after the cost: a quick-nav key beats the rotor list (both cost two
+ * keystrokes, but stepping is what screen-reader users reach for and it needs no
+ * list), the rotor beats tabbing, and everything beats walking the reading
+ * order. Same intent as the old STRATEGY_ORDER.
+ */
+const EDGE_PENALTY = {
+  step: 0,
+  stepLevel: 1,
+  rotor: 2,
+  tab: 3,
+  shiftTab: 3,
+  find: 4,
+  next: 5,
+  prev: 6,
+};
+
+/**
+ * Extra tie-break on top of EDGE_PENALTY: changing the key you press costs a
+ * little, so two presses of one quick-nav key are reported over one press of
+ * each of two, which is what a screen-reader user would really do.
+ */
+const SWITCH_PENALTY = 1;
+
+/** The command family of an edge: the same family is the same keystroke. */
+const familyOf = (edge) => `${edge.type}:${edge.command || edge.kind || edge.word || ''}`;
+
 /** Binary min-heap over (node, cost); ties keep insertion order. */
 class MinHeap {
   constructor() {
@@ -327,24 +355,31 @@ function* neighbours(graph, node, source) {
 function shortestPaths(graph, source) {
   const size = graph.nodeCount;
   const dist = new Array(size).fill(Infinity);
+  const pen = new Array(size).fill(Infinity);
   const via = new Array(size).fill(null);
   const done = new Array(size).fill(false);
+  // One key orders the queue lexicographically by (cost, preference).
+  const key = (cost, penalty) => cost * 1e6 + penalty;
   dist[source] = 0;
+  pen[source] = 0;
   const heap = new MinHeap();
   heap.push(source, 0);
   while (heap.size) {
-    const { node: u, cost: d } = heap.pop();
+    const { node: u } = heap.pop();
     if (done[u]) continue;
     done[u] = true;
-    if (d > dist[u]) continue;
     for (const edge of neighbours(graph, u, source)) {
       const v = edge.to;
-      if (v < 0 || v >= size) continue;
-      const nd = d + edge.cost;
-      if (nd < dist[v]) {
+      if (v < 0 || v >= size || done[v]) continue;
+      const nd = dist[u] + edge.cost;
+      const previous = via[u] ? via[u].edge : null;
+      const switched = previous && familyOf(previous) !== familyOf(edge) ? SWITCH_PENALTY : 0;
+      const np = pen[u] + (EDGE_PENALTY[edge.type] || 0) + switched;
+      if (nd < dist[v] || (nd === dist[v] && np < pen[v])) {
         dist[v] = nd;
+        pen[v] = np;
         via[v] = { from: u, edge };
-        heap.push(v, nd);
+        heap.push(v, key(nd, np));
       }
     }
   }
@@ -511,7 +546,10 @@ function reachGoals(sp, goals) {
     const base = sp.dist[node];
     if (base === undefined || base === Infinity) continue;
     const cost = base + extra;
-    if (!best || cost < best.cost) best = { node, extra, cost, goal };
+    // Cheapest wins; at equal cost the tighter span, so a read starts where the
+    // answer starts.
+    if (!best || cost < best.cost || (cost === best.cost && extra < best.extra))
+      best = { node, extra, cost, goal };
   }
   if (!best) return null;
   const edges = pathTo(sp, best.node) || [];

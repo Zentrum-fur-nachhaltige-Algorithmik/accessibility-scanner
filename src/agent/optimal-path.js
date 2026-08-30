@@ -1,34 +1,26 @@
 /**
  * optimal-path: `n_opt`, the shortest screen-reader command sequence for a task.
- * Costs each sighted-path step in ScreenReaderEnv commands (reach the target, then act),
- * using the env's own in-page reading order and rotor lists, and additionally
- * prices the direct link to the target when one is on a page the walk visits.
- * Deterministic, no LLM.
+ * One in-page reading-order walk per page state builds the command graph of that
+ * page (see page-graph.js); Dijkstra over it prices the cheapest route to the
+ * target of each sighted-path step, and only the action edges are executed for
+ * real. Deterministic, no LLM.
  * Score: `R = n_opt / n_sr`, capped at 1.
  */
 
 'use strict';
 
+const { injectScreenReader, ROTOR_KINDS } = require('./screenreader-env');
 const {
-  injectScreenReader,
-  ROTOR_STEP_COMMANDS,
-  ROTOR_KINDS,
-  COMMAND_COSTS,
-} = require('./screenreader-env');
-const { ensureHelpers } = require('./dom-helpers');
-
-/** `{ headings: { next: 'nextHeading', prev: 'prevHeading' }, … }` */
-const STEP_COMMAND_BY_KIND = Object.entries(ROTOR_STEP_COMMANDS).reduce((acc, [cmd, def]) => {
-  acc[def.kind] = acc[def.kind] || {};
-  acc[def.kind][def.dir] = cmd;
-  return acc;
-}, {});
+  buildPageGraph,
+  shortestPaths,
+  reachGoals,
+  strategyCosts,
+  STEP_COMMAND_BY_KIND,
+} = require('./page-graph');
 
 /**
- * Reach strategies, in tie-break preference order (cheapest wins first; equal
- * cost is broken by this order). A rotor step command beats the equally
- * expensive rotor list + `jumpTo`: both are two keystrokes, but stepping is what
- * screen-reader users reach for, and it does not require reading a list first.
+ * Reach strategies, in tie-break preference order. Only `chooseReach` still uses
+ * it; the graph breaks ties by the order it emits its edges in.
  */
 const STRATEGY_ORDER = [
   'none',
@@ -75,13 +67,6 @@ const squashText = (s) =>
 /** Reported as `optimalPathError` when no spoken phrase contains the evidence. */
 const EVIDENCE_NOT_IN_READING_ORDER = 'evidence-not-in-reading-order';
 
-/**
- * How many distinct link destinations the direct-link shortcut prices per page.
- * Several links usually point at the same page; only distinct destinations are
- * worth a second analysis, and three of them cover any real navigation.
- */
-const MAX_SHORTCUT_LINKS = 3;
-
 /** Cap on how many matching reading-order phrases are costed. */
 const MAX_READ_CANDIDATES = 50;
 
@@ -95,59 +80,30 @@ const MAX_READ_CANDIDATES = 50;
 const MAX_EVIDENCE_PHRASE_SPAN = 3;
 
 /**
- * In-page analysis. Runs in the browser; uses window.__SRENV.internals.
+ * One in-page description of the current page: everything the command graph is
+ * built from. Runs in the browser; uses window.__SRENV.internals, so the reading
+ * order, the rotor lists and the quick-nav sets are the env's own.
  *
- * Two modes. `mode: 'act'` (the default) costs the target of one sighted step
- * against an effect-equivalence class; `mode: 'read'` ignores `targetSelector`
- * and instead costs every reading-order position whose spoken phrase contains
- * `options.evidence` - what an information task really asks for.
- *
- * In act mode it costs the target of one sighted step against an effect-equivalence class and
- * returns every member as a candidate: links resolving to the same URL, the
- * other submit controls of the same form plus Enter in an already filled text
- * field of it, and buttons with the same accessible name in the same form or
- * dialog container. Only the sighted step is ever executed; equivalents are
- * priced, never clicked.
- *
- * The reading-order walk, rotor lists and tab order are cached in the page
- * under `window.__OPT_ANALYSIS_CACHE`, keyed by (run id, url, DOM fingerprint).
- * The finished analysis is additionally cacheable across pages and contexts by
- * the caller (`options.analysisCache`, see `computeOptimalPath`).
+ * The reading order is CYCLIC and starts wherever the VSR cursor happens to be,
+ * so it is rotated to document start: index 0 is document start for every
+ * caller, which makes the description independent of the cursor and therefore
+ * cacheable (in the page under `window.__OPT_PAGE_DESC`, keyed by run id and
+ * DOM fingerprint, and across pages and contexts by the caller, see
+ * `options.analysisCache` of `computeOptimalPath`).
  */
 /* istanbul ignore next -- runs in the browser */
-async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
+async function describePageInPage(kinds, opts) {
   const I = window.__SRENV.internals;
   const options = opts || {};
-  const stepCommands = options.stepCommands || {};
-  const typedSelectors = options.typedSelectors || [];
-  const action = options.action || 'click';
-  const key = options.key || null;
-  const mode = options.mode === 'read' ? 'read' : 'act';
-  const squash = (s) =>
-    String(s == null ? '' : s)
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toLowerCase();
-  const needle = squash(options.evidence);
   const findWords = options.findWords || [];
-  // `find` is a typed word plus Enter (see screenreader-env COMMAND_COSTS).
-  const findCost = options.findCost || 2;
-  const maxReadCandidates = options.maxReadCandidates || 50;
-  const maxSpan = options.maxEvidenceSpan || 1;
 
-  const target = targetSelector ? document.querySelector(targetSelector) : null;
-  if (!target && mode !== 'read') return { error: 'target not found: ' + targetSelector };
-
-  const mod = (a, n) => ((a % n) + n) % n;
-
-  // page fingerprint (cheap; no reading-order walk)
-  const fingerprint = () => {
+  const fingerprintOf = () => {
     const values = Array.prototype.map
       .call(document.querySelectorAll('input, select, textarea'), (el) => {
         if (el.type === 'checkbox' || el.type === 'radio') return el.checked ? '1' : '0';
         return typeof el.value === 'string' ? el.value : '';
       })
-      .join('');
+      .join('');
     const SEP = String.fromCharCode(1);
     const material =
       location.href + SEP + (document.body ? document.body.innerHTML : '') + SEP + values;
@@ -159,401 +115,192 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     return location.href + '#' + h.toString(16) + '#' + material.length;
   };
 
-  const cacheKey = options.fingerprint || fingerprint();
-  const holder = window.__OPT_ANALYSIS_CACHE;
-  let page =
-    holder && holder.runId === options.runId && holder.key === cacheKey ? holder.data : null;
-  const cacheHit = !!page;
-
-  if (!page) {
-    // One walk of the VSR reading order. It is cyclic and starts at the current
-    // VSR cursor, which is always document start here (the runtime was just
-    // (re-)started), so indices are stable for the whole analysis.
-    const order = await I.readingOrder();
-    const els = order.map((e) => I.elementOf(e.node));
-    const N = els.length;
-
-    const idxOf = new Map();
-    for (let i = 0; i < N; i += 1) {
-      const el = els[i];
-      if (!el) continue;
-      const list = idxOf.get(el);
-      if (list) list.push(i);
-      else idxOf.set(el, [i]);
-    }
-
-    // The walk starts wherever the VSR cursor currently is, which is not
-    // necessarily document start, so locate document start explicitly.
-    let docStart = 0;
-    for (let i = 0; i < N; i += 1) {
-      const node = order[i].node;
-      if (node === document || node === document.body || node === document.documentElement) {
-        docStart = i;
-        break;
-      }
-    }
-
-    // Rotor lists come from the env's own `buildRotor`, so the rotor indices
-    // here are exactly the indices `jumpTo` expects. A list shows one PAGE at a
-    // time, so an entry further down has to be revealed first: `more` per page,
-    // or one `rotorLetter` when the entry is the first one with its letter.
-    const rotors = {};
-    const pageSize = I.rotorPageSize || 8;
-    for (const kind of kinds) {
-      const rotor = await I.buildRotor(kind);
-      const items = rotor.items.slice();
-      const nodes = I.getLastRotorNodes().slice();
-      const seenLetter = new Set();
-      const reveal = items.map((item, r) => {
-        const letter = I.foldText(I.rotorLabel(item.phrase)).slice(0, 1);
-        const firstOfLetter = !!letter && !seenLetter.has(letter);
-        if (letter) seenLetter.add(letter);
-        const pages = Math.floor(r / pageSize);
-        if (firstOfLetter && pages > 1) return { cost: 1, letter, pages: 0 };
-        return { cost: pages, pages };
-      });
-      rotors[kind] = { items, nodes, reveal };
-    }
-
-    // tab order
-    const FOCUSABLE =
-      'a[href], area[href], button, input, select, textarea, summary, iframe, object,' +
-      ' embed, audio[controls], video[controls], [contenteditable], [tabindex]';
-    const focusables = Array.prototype.filter.call(document.querySelectorAll(FOCUSABLE), (el) => {
-      if (el.disabled) return false;
-      if (el.tagName === 'INPUT' && el.type === 'hidden') return false;
-      const ti = el.getAttribute('tabindex');
-      if (ti !== null && Number(ti) < 0) return false;
-      if (!I.isVisible(el)) return false;
-      // A hidden ancestor takes the element out of the tab order, too.
-      if (!el.getClientRects().length) return false;
-      return true;
-    });
-    // Positive tabindex first (ascending, document order within a value), then
-    // everything else in document order: the browser's tab sequence.
-    const positive = focusables
-      .filter((el) => Number(el.getAttribute('tabindex')) > 0)
-      .sort((a, b) => Number(a.getAttribute('tabindex')) - Number(b.getAttribute('tabindex')));
-    const rest = focusables.filter((el) => !(Number(el.getAttribute('tabindex')) > 0));
-
-    page = { order, els, N, idxOf, docStart, rotors, tabOrder: positive.concat(rest) };
-    window.__OPT_ANALYSIS_CACHE = { runId: options.runId, key: cacheKey, data: page };
+  const cacheKey = options.fingerprint || fingerprintOf();
+  const holder = window.__OPT_PAGE_DESC;
+  if (holder && holder.runId === options.runId && holder.key === cacheKey) {
+    return Object.assign({}, holder.data, { cacheHit: true });
   }
 
-  const { order, els, N, idxOf, docStart, rotors, tabOrder } = page;
-
-  const cursorEl = cursorSelector ? document.querySelector(cursorSelector) : null;
-  const cursorIdxs = (cursorEl && idxOf.get(cursorEl)) || [];
-  // Cursor at document start, or on an element that left the reading order
-  // (e.g. a dismissed banner), maps to document start.
-  const cIdx = cursorIdxs.length ? cursorIdxs[0] : docStart;
-
-  // where the cursor sits in the tab sequence
-  let cursorPos;
-  const cursorTabIdx = cursorEl ? tabOrder.indexOf(cursorEl) : -1;
-  if (cursorTabIdx !== -1) {
-    cursorPos = cursorTabIdx;
-  } else {
-    // Not itself a tab stop: it sits between two stops, modelled as
-    // `index - 0.5`, so one Tab reaches the following stop and one Shift+Tab
-    // the preceding one.
-    let following = tabOrder.length;
-    for (let i = 0; i < tabOrder.length; i += 1) {
-      if (
-        !cursorEl ||
-        cursorEl.compareDocumentPosition(tabOrder[i]) &
-          (Node.DOCUMENT_POSITION_FOLLOWING | Node.DOCUMENT_POSITION_CONTAINED_BY)
-      ) {
-        following = i;
-        break;
-      }
+  // One walk of the VSR reading order, rotated so that index 0 is document start.
+  const order = await I.readingOrder();
+  const N = order.length;
+  const walked = order.map((e) => I.elementOf(e.node));
+  let start = 0;
+  for (let i = 0; i < N; i += 1) {
+    const node = order[i].node;
+    if (node === document || node === document.body || node === document.documentElement) {
+      start = i;
+      break;
     }
-    cursorPos = following - 0.5;
   }
 
-  // rotor step commands: cost of reaching each rotor entry
-  // `nextHeading` & co. wrap at the document boundary (see
-  // ScreenReaderEnv.stepToKind), so the cheaper of the two directions counts.
-  const stepCostByKind = {};
+  const els = [];
+  const phrases = [];
+  const selectors = [];
+  const hrefs = [];
+  for (let i = 0; i < N; i += 1) {
+    const j = (i + start) % N;
+    const el = walked[j];
+    els.push(el);
+    phrases.push(order[j].phrase);
+    selectors.push(el ? I.selectorFor(el) : null);
+    hrefs.push(el && el.matches && el.matches('a[href], area[href]') ? el.href : null);
+  }
+
+  const firstStop = new Map();
+  for (let i = 0; i < N; i += 1) {
+    const el = els[i];
+    if (el && !firstStop.has(el)) firstStop.set(el, i);
+  }
+  const stopOf = (el) => (firstStop.has(el) ? firstStop.get(el) : -1);
+
+  // Rotor lists come from the env's own `buildRotor`, so the entries here are
+  // exactly the ones `jumpTo` can reach. `buildRotor` only RETURNS the first
+  // page of its list, so the full list is rebuilt from its nodes.
+  const rotors = {};
   for (const kind of kinds) {
-    const positions = [];
-    for (const el of rotors[kind].nodes) {
-      const list = idxOf.get(el);
-      if (list && list.length) positions.push({ el, i: list[0] });
-    }
-    const costs = new Map();
-    const put = (el, steps, dir) => {
-      const cur = costs.get(el);
-      if (!cur || steps < cur.steps) costs.set(el, { steps, dir });
-    };
-    const fwd = positions
-      .map((p) => ({ p, d: mod(p.i - cIdx, N) }))
-      .filter((x) => x.d > 0)
-      .sort((a, b) => a.d - b.d);
-    const bwd = positions
-      .map((p) => ({ p, d: mod(cIdx - p.i, N) }))
-      .filter((x) => x.d > 0)
-      .sort((a, b) => a.d - b.d);
-    fwd.forEach((x, r) => put(x.p.el, r + 1, 'next'));
-    bwd.forEach((x, r) => put(x.p.el, r + 1, 'prev'));
-    // The element the cursor already sits on: one full lap re-speaks it (the
-    // env wraps), which costs as many presses as there are elements of the kind.
-    for (const p of positions) if (mod(p.i - cIdx, N) === 0) put(p.el, positions.length, 'next');
-    stepCostByKind[kind] = { positions, costs };
-  }
-
-  // Heading levels: `nextHeading`/`prevHeading` with a level stop only at
-  // headings of that level (the digit keys of NVDA and JAWS), which is a
-  // different, usually much shorter, sequence of presses. Costed exactly like a
-  // kind, over the subset of the headings rotor that has the level.
-  const levelCost = {};
-  const headingNodes = (rotors.headings && rotors.headings.nodes) || [];
-  for (let level = 1; level <= 6; level += 1) {
-    const positions = [];
-    for (const el of headingNodes) {
-      if (I.headingLevelOf(el) !== level) continue;
-      const list = idxOf.get(el);
-      if (list && list.length) positions.push({ el, i: list[0] });
-    }
-    if (!positions.length) continue;
-    const costs = new Map();
-    const put = (el, steps, dir) => {
-      const cur = costs.get(el);
-      if (!cur || steps < cur.steps) costs.set(el, { steps, dir });
-    };
-    const fwd = positions
-      .map((p) => ({ p, d: mod(p.i - cIdx, N) }))
-      .filter((x) => x.d > 0)
-      .sort((a, b) => a.d - b.d);
-    const bwd = positions
-      .map((p) => ({ p, d: mod(cIdx - p.i, N) }))
-      .filter((x) => x.d > 0)
-      .sort((a, b) => a.d - b.d);
-    fwd.forEach((x, r) => put(x.p.el, r + 1, 'next'));
-    bwd.forEach((x, r) => put(x.p.el, r + 1, 'prev'));
-    for (const p of positions) if (mod(p.i - cIdx, N) === 0) put(p.el, positions.length, 'next');
-    levelCost[level] = { positions, costs };
-  }
-
-  // `find` (browse-mode search) does NOT wrap, so only the stretch from the
-  // cursor to the end of the document can be searched. `limit` is that stretch
-  // in reading-order distance.
-  const limit = cIdx === docStart ? N : mod(docStart - cIdx, N);
-  // Per searchable word, the distances of the phrases it matches, in the order
-  // the search visits them: the j-th entry is reached with `find` + j x `findNext`.
-  const findMatches = [];
-  if (findWords.length) {
-    const folded = order.map((e) => I.foldText(e.phrase));
-    for (const word of findWords) {
-      const w = I.foldText(word);
-      if (!w) continue;
-      const ds = [];
-      for (let d = 1; d < limit; d += 1) {
-        if (folded[mod(cIdx + d, N)].includes(w)) ds.push(d);
-      }
-      if (ds.length) findMatches.push({ word, ds });
-    }
-  }
-
-  // Cost analysis of a set of reading-order positions belonging to `el`.
-  // `analyzeElement` passes every position of the element; the read analysis
-  // passes the single position whose phrase carries the evidence.
-  const analyzeIndices = (el, list) => {
-    let next = null;
-    let prev = null;
-    for (const i of list) {
-      const f = mod(i - cIdx, N);
-      const b = mod(cIdx - i, N);
-      if (next === null || f < next) next = f;
-      if (prev === null || b < prev) prev = b;
-    }
-
-    // rotor (+ next x k)
-    let rotor = null;
-    for (const kind of kinds) {
-      const nodes = rotors[kind].nodes;
-      for (let r = 0; r < nodes.length; r += 1) {
-        const startIdxs = idxOf.get(nodes[r]);
-        if (!startIdxs || !startIdxs.length) continue;
-        for (const s of startIdxs) {
-          let k = null;
-          for (const t of list) {
-            const d = mod(t - s, N);
-            if (k === null || d < k) k = d;
-          }
-          if (k === null) continue;
-          const reveal = rotors[kind].reveal[r] || { cost: 0, pages: 0 };
-          const cost = 2 + reveal.cost + k;
-          if (!rotor || cost < rotor.cost) {
-            const item = rotors[kind].items[r] || {};
-            rotor = {
-              kind,
-              index: r,
-              k,
-              cost,
-              pages: reveal.pages || 0,
-              letter: reveal.letter || null,
-              phrase: item.phrase || null,
-              selector: item.selector || null,
-            };
-          }
-        }
-      }
-    }
-
-    // rotor step command (+ next x k)
-    let step = null;
-    for (const kind of kinds) {
-      const { positions, costs } = stepCostByKind[kind];
-      // The nearest element of this kind at or before the target: going further
-      // back never pays (one step saved costs at least one extra `next`).
-      for (const p of positions) {
-        let k = null;
-        for (const t of list) {
-          const d = mod(t - p.i, N);
-          if (k === null || d < k) k = d;
-        }
-        if (k === null) continue;
-        const c = costs.get(p.el);
-        if (!c) continue;
-        const cost = c.steps + k;
-        // On a tie the shorter tail wins: a pure `step` (k = 0) beats stepping
-        // to an earlier element of the kind and walking forward.
-        if (!step || cost < step.cost || (cost === step.cost && k < step.k)) {
-          step = {
-            kind,
-            dir: c.dir,
-            command: (stepCommands[kind] || {})[c.dir] || null,
-            steps: c.steps,
-            k,
-            cost,
-          };
-        }
-      }
-    }
-    if (step && !step.command) step = null;
-
-    // levelled heading step (+ next x k)
-    let stepLevel = null;
-    for (const level of Object.keys(levelCost)) {
-      const { positions, costs } = levelCost[level];
-      for (const p of positions) {
-        let k = null;
-        for (const t of list) {
-          const d = mod(t - p.i, N);
-          if (k === null || d < k) k = d;
-        }
-        if (k === null) continue;
-        const c = costs.get(p.el);
-        if (!c) continue;
-        const cost = c.steps + k;
-        if (!stepLevel || cost < stepLevel.cost || (cost === stepLevel.cost && k < stepLevel.k)) {
-          stepLevel = {
-            kind: 'headings',
-            level: Number(level),
-            dir: c.dir,
-            command: (stepCommands.headings || {})[c.dir] || null,
-            steps: c.steps,
-            k,
-            cost,
-          };
-        }
-      }
-    }
-    if (stepLevel && !stepLevel.command) stepLevel = null;
-
-    // find (+ findNext x j, + next x k). Only positions after the cursor and
-    // before the end of the document are searchable: the search does not wrap.
-    let find = null;
-    for (const entry of findMatches) {
-      for (const t of list) {
-        const dt = mod(t - cIdx, N);
-        if (dt <= 0 || dt >= limit) continue;
-        for (let j = 0; j < entry.ds.length; j += 1) {
-          if (entry.ds[j] > dt) break;
-          const k = dt - entry.ds[j];
-          const cost = findCost + j + k;
-          if (!find || cost < find.cost || (cost === find.cost && k < find.k)) {
-            find = { word: entry.word, findNexts: j, k, cost };
-          }
-        }
-      }
-    }
-
-    // tab order
-    let tab = null;
-    const tIdxTab = el ? tabOrder.indexOf(el) : -1;
-    if (tIdxTab !== -1) {
-      tab =
-        tIdxTab >= cursorPos
-          ? { dir: 'tab', cost: Math.ceil(tIdxTab - cursorPos) }
-          : { dir: 'shiftTab', cost: Math.ceil(cursorPos - tIdxTab) };
-    }
-
-    return {
-      inReadingOrder: list.length > 0,
-      next,
-      prev,
-      tab,
-      rotor,
-      step,
-      stepLevel,
-      find,
-      phrase: list.length ? order[list[0]].phrase : null,
-    };
-  };
-
-  const analyzeElement = (el) => analyzeIndices(el, idxOf.get(el) || []);
-
-  // Read mode: every reading-order position whose spoken phrase contains the
-  // evidence is a candidate; the caller picks the cheapest to reach. Only if no
-  // single phrase carries it, a run of up to `maxSpan` consecutive phrases is
-  // tried as well (`spanPhrases` > 1, costed with the extra `next` presses). An
-  // empty list means the text is on the page but is never spoken.
-  if (mode === 'read') {
-    const readCandidates = [];
-    const addCandidate = (i, span, phrase) => {
-      const el = els[i];
-      readCandidates.push({
-        readingOrderIndex: i,
-        selector: el ? I.selectorFor(el) : null,
+    await I.buildRotor(kind);
+    const nodes = I.getLastRotorNodes().slice();
+    const items = [];
+    const stops = [];
+    for (const el of nodes) {
+      const stop = stopOf(el);
+      const phrase = stop >= 0 ? phrases[stop] : null;
+      items.push({
         phrase,
-        spanPhrases: span,
-        analysis: analyzeIndices(el, [i]),
+        selector: I.selectorFor(el),
+        level: kind === 'headings' ? I.headingLevelOf(el) : null,
+        letter: I.foldText(I.rotorLabel(phrase)).slice(0, 1),
       });
-    };
-    for (let i = 0; i < N && readCandidates.length < maxReadCandidates; i += 1) {
-      if (!needle || !squash(order[i].phrase).includes(needle)) continue;
-      addCandidate(i, 1, order[i].phrase);
+      stops.push(stop);
     }
-    // Only when no single phrase carries the answer: allow a tolerable split
-    // over up to `maxSpan` phrases spoken one after the other. The extra
-    // `next` presses are costed by the caller.
-    if (needle && readCandidates.length === 0 && maxSpan > 1) {
-      for (let i = 0; i < N && readCandidates.length < maxReadCandidates; i += 1) {
-        let joined = squash(order[i].phrase);
-        let raw = String(order[i].phrase == null ? '' : order[i].phrase);
-        for (let w = 2; w <= maxSpan && i + w <= N; w += 1) {
-          const nextPhrase = order[i + w - 1].phrase;
-          joined = `${joined} ${squash(nextPhrase)}`;
-          raw = `${raw} ${nextPhrase == null ? '' : nextPhrase}`;
-          if (joined.includes(needle)) {
-            addCandidate(i, w, raw);
-            break;
-          }
-        }
-      }
-    }
-    return {
-      readingOrderLength: N,
-      cursorIndex: cIdx,
-      docStartIndex: docStart,
-      cacheHit,
-      readCandidates,
-    };
+    rotors[kind] = { items, stops };
   }
 
-  // the equivalence class of the step's target
+  // tab order
+  const FOCUSABLE =
+    'a[href], area[href], button, input, select, textarea, summary, iframe, object,' +
+    ' embed, audio[controls], video[controls], [contenteditable], [tabindex]';
+  const focusables = Array.prototype.filter.call(document.querySelectorAll(FOCUSABLE), (el) => {
+    if (el.disabled) return false;
+    if (el.tagName === 'INPUT' && el.type === 'hidden') return false;
+    const ti = el.getAttribute('tabindex');
+    if (ti !== null && Number(ti) < 0) return false;
+    if (!I.isVisible(el)) return false;
+    // A hidden ancestor takes the element out of the tab order, too.
+    if (!el.getClientRects().length) return false;
+    return true;
+  });
+  // Positive tabindex first (ascending, document order within a value), then
+  // everything else in document order: the browser's tab sequence.
+  const positive = focusables
+    .filter((el) => Number(el.getAttribute('tabindex')) > 0)
+    .sort((a, b) => Number(a.getAttribute('tabindex')) - Number(b.getAttribute('tabindex')));
+  const rest = focusables.filter((el) => !(Number(el.getAttribute('tabindex')) > 0));
+  const tabOrder = positive.concat(rest);
+  const tabIndexOf = new Map();
+  tabOrder.forEach((el, t) => tabIndexOf.set(el, t));
+
+  // How many tab stops precede an element in document order. A stop that is not
+  // itself focusable sits BETWEEN two tab stops, which is modelled as
+  // `index - 0.5`: one Tab reaches the following stop, one Shift+Tab the
+  // preceding one.
+  const passed = new Map();
+  let seenTabStops = 0;
+  const allElements = document.querySelectorAll('*');
+  for (let i = 0; i < allElements.length; i += 1) {
+    const el = allElements[i];
+    passed.set(el, seenTabStops);
+    if (tabIndexOf.has(el)) seenTabStops += 1;
+  }
+
+  const tabPos = els.map((el) => {
+    if (!el) return null;
+    if (tabIndexOf.has(el)) return tabIndexOf.get(el);
+    return passed.has(el) ? passed.get(el) - 0.5 : null;
+  });
+
+  const folded = phrases.map((p) => I.foldText(p));
+  const findHits = {};
+  for (const word of findWords) {
+    const w = I.foldText(word);
+    if (!w) continue;
+    const hits = [];
+    for (let i = 0; i < N; i += 1) if (folded[i].includes(w)) hits.push(i);
+    if (hits.length) findHits[word] = hits;
+  }
+
+  const desc = {
+    n: N,
+    url: location.href,
+    fingerprint: cacheKey,
+    phrases,
+    selectors,
+    hrefs,
+    rotors,
+    rotorPageSize: I.rotorPageSize || 8,
+    tabStops: tabOrder.map((el) => stopOf(el)),
+    tabSelectors: tabOrder.map((el) => I.selectorFor(el)),
+    tabPos,
+    findHits,
+  };
+  window.__OPT_PAGE_DESC = { runId: options.runId, key: cacheKey, data: desc };
+  return Object.assign({}, desc, { cacheHit: false });
+}
+
+/**
+ * The same cheap page fingerprint `describePageInPage` uses, as a standalone
+ * in-page function: url + hash of the body markup + all form-control values. Two
+ * pages with the same fingerprint produce the same description, which is what
+ * makes it cacheable across browser contexts. No reading-order walk, so it is
+ * cheap enough to run before every step.
+ */
+/* istanbul ignore next -- runs in the browser */
+function pageFingerprint() {
+  const values = Array.prototype.map
+    .call(document.querySelectorAll('input, select, textarea'), (el) => {
+      if (el.type === 'checkbox' || el.type === 'radio') return el.checked ? '1' : '0';
+      return typeof el.value === 'string' ? el.value : '';
+    })
+    .join('');
+  const SEP = String.fromCharCode(1);
+  const material =
+    location.href + SEP + (document.body ? document.body.innerHTML : '') + SEP + values;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < material.length; i += 1) {
+    h ^= material.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return location.href + '#' + h.toString(16) + '#' + material.length;
+}
+
+/**
+ * The effect-equivalence class of one sighted step's target, and where the
+ * cursor stands, both as selectors the page description can be matched against.
+ * Links resolving to the same URL, the other submit controls of the same form
+ * plus Enter in an already filled text field of it, and buttons with the same
+ * accessible name in the same form or dialog container. Only the sighted step is
+ * ever executed; equivalents are priced, never clicked.
+ *
+ * No reading-order walk, so this runs per step even when the description is
+ * served from a cache.
+ */
+/* istanbul ignore next -- runs in the browser */
+function resolveTargetsInPage(opts) {
+  const I = window.__SRENV.internals;
+  const options = opts || {};
+  const targetSelector = options.targetSelector || null;
+  const typedSelectors = options.typedSelectors || [];
+  const action = options.action || 'click';
+  const key = options.key || null;
+
+  const cursorEl = options.cursorSelector ? document.querySelector(options.cursorSelector) : null;
+  const cursor = cursorEl ? I.selectorFor(cursorEl) : null;
+  if (!targetSelector) return { cursor, members: [] };
+
+  const target = document.querySelector(targetSelector);
+  if (!target) return { cursor, error: 'target not found: ' + targetSelector };
+
   const SUBMITTABLE = 'button, input[type="submit"], input[type="image"]';
   const TEXTFIELD =
     'input:not([type]), input[type="text"], input[type="search"], input[type="email"],' +
@@ -647,57 +394,24 @@ async function analyzeInPage(targetSelector, cursorSelector, kinds, opts) {
     }
   }
 
-  const candidates = members.map((m) => {
-    const a = analyzeElement(m.el);
-    return {
-      selector: m.el === target ? targetSelector : I.selectorFor(m.el),
-      via: m.via,
-      isTarget: m.el === target,
-      phrase: a.phrase,
-      analysis: a,
-    };
-  });
-
   return {
-    readingOrderLength: N,
-    cursorIndex: cIdx,
-    docStartIndex: docStart,
-    cacheHit,
-    candidates,
+    cursor,
+    targetHref: target.matches('a[href], area[href]') ? target.href : null,
+    members: members.map((m) => ({
+      selector: m.el === target ? I.selectorFor(target) : I.selectorFor(m.el),
+      sightedSelector: m.el === target ? targetSelector : null,
+      isTarget: m.el === target,
+      via: m.via,
+      href: m.el.matches && m.el.matches('a[href], area[href]') ? m.el.href : null,
+    })),
   };
 }
 
 /**
- * The same cheap page fingerprint `analyzeInPage` uses, as a standalone in-page
- * function: url + hash of the body markup + all form-control values. Two pages
- * with the same fingerprint produce the same analysis for the same (target,
- * cursor, action) triple, which is what makes the analysis cacheable across
- * browser contexts. No reading-order walk, so it is cheap enough to run before
- * every step.
- */
-/* istanbul ignore next -- runs in the browser */
-function pageFingerprint() {
-  const values = Array.prototype.map
-    .call(document.querySelectorAll('input, select, textarea'), (el) => {
-      if (el.type === 'checkbox' || el.type === 'radio') return el.checked ? '1' : '0';
-      return typeof el.value === 'string' ? el.value : '';
-    })
-    .join('');
-  const SEP = String.fromCharCode(1);
-  const material =
-    location.href + SEP + (document.body ? document.body.innerHTML : '') + SEP + values;
-  let h = 0x811c9dc5;
-  for (let i = 0; i < material.length; i += 1) {
-    h ^= material.charCodeAt(i);
-    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
-  }
-  return location.href + '#' + h.toString(16) + '#' + material.length;
-}
-
-/**
- * Rendered links of the current page with their resolved href, for the
- * direct-link shortcut. Uses the shared in-page helpers so the selectors are the
- * ones `replay.executeStep` can replay.
+ * Rendered links of the current page with their resolved href. Used by the task
+ * generator to shorten a sighted path; the optimum reads the links straight out
+ * of the page description. Uses the shared in-page helpers so the selectors are
+ * the ones `replay.executeStep` can replay.
  */
 /* istanbul ignore next -- runs in the browser */
 function collectLinksInPage() {
@@ -712,6 +426,22 @@ function collectLinksInPage() {
     out.push({ selector, href: el.href, name: H.accName(el) });
   }
   return out;
+}
+
+/**
+ * The rendered links of `page` whose resolved href satisfies `matches`, in
+ * document order, with a selector `replay.executeStep` can click.
+ */
+async function findDirectLinks(page, matches) {
+  const { ensureHelpers } = require('./dom-helpers');
+  await ensureHelpers(page);
+  let links;
+  try {
+    links = await page.evaluate(collectLinksInPage);
+  } catch (_) {
+    return [];
+  }
+  return (links || []).filter((l) => matches(l.href));
 }
 
 // Node side
@@ -762,79 +492,11 @@ function targetMatcherFor(task, options = {}) {
 }
 
 /**
- * The rendered links of `page` whose resolved href satisfies `matches`, in
- * document order, with a selector `replay.executeStep` can click.
- */
-async function findDirectLinks(page, matches) {
-  await ensureHelpers(page);
-  let links;
-  try {
-    links = await page.evaluate(collectLinksInPage);
-  } catch (_) {
-    return [];
-  }
-  return (links || []).filter((l) => matches(l.href));
-}
-
-/**
- * The cheapest "reach a link that already leads to the target, then activate it"
- * on the page as it is now, costed with exactly the strategies a sighted-path
- * step uses. Returns null when no rendered link leads there.
- */
-async function priceDirectLink(page, { matches, cursorSelector, findWords, runId }) {
-  const links = await findDirectLinks(page, matches);
-  const seen = new Set();
-  const targets = [];
-  for (const link of links) {
-    const key = normaliseUrl(link.href);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    targets.push(link);
-    if (targets.length >= MAX_SHORTCUT_LINKS) break;
-  }
-  if (!targets.length) return null;
-
-  let best = null;
-  for (const link of targets) {
-    let analysis;
-    try {
-      analysis = await page.evaluate(analyzeInPage, link.selector, cursorSelector, ROTOR_KINDS, {
-        runId,
-        action: 'click',
-        key: null,
-        typedSelectors: [],
-        stepCommands: STEP_COMMAND_BY_KIND,
-        findWords,
-        findCost: COMMAND_COSTS.find,
-      });
-    } catch (_) {
-      continue;
-    }
-    if (!analysis || analysis.error) continue;
-    for (const cand of analysis.candidates || []) {
-      const reach = chooseReach(cand.analysis);
-      if (!reach) continue;
-      const cost = reach.cost + ACTION_COST.click;
-      if (!best || cost < best.cost) {
-        best = {
-          cost,
-          reach,
-          selector: cand.selector || link.selector,
-          href: link.href,
-          name: link.name || null,
-        };
-      }
-    }
-  }
-  return best;
-}
-
-/**
  * The words the optimum is allowed to search for: the content words of the task
  * DESCRIPTION and of its `keywords` (at least `MIN_FIND_WORD` letters, no
- * stopwords), folded like the env's `find`. The agent may search for anything it likes; the optimum may
- * only use what the user was told, so it never buys a shortcut with knowledge
- * of the page.
+ * stopwords), folded like the env's `find`. The agent may search for anything it
+ * likes; the optimum may only use what the user was told, so it never buys a
+ * shortcut with knowledge of the page.
  */
 function findWordsFor(task) {
   // Lazily required: task-generator pulls in replay, which pulls in this module.
@@ -856,13 +518,17 @@ function findWordsFor(task) {
 }
 
 /**
- * Expand a chosen reach strategy into the literal env commands it costs.
+ * The literal env commands a chosen reach costs. The graph names every edge, so
+ * the commands come with the reach; the switch serves the callers that still
+ * build a reach from a per-strategy analysis (bfs-optimum.js).
+ *
  * The commands add up to `reach.cost` when each is charged with
  * `screenreader-env.commandCost` (one per command, two for `find`); that
  * identity lets `nOpt` be reported as a keystroke list (Blind Mode's optimal
- * route) and keeps the BFS edge weights honest.
+ * route).
  */
 function reachCommands(reach) {
+  if (reach && Array.isArray(reach.commands)) return reach.commands;
   const repeat = (type, n) => Array.from({ length: n }, () => ({ type }));
   switch (reach.strategy) {
     case 'none':
@@ -871,8 +537,6 @@ function reachCommands(reach) {
     case 'rotor+next':
       return [
         { type: reach.via.kind },
-        // The entry has to be on screen before `jumpTo` can take it: one page
-        // at a time, or one first-letter jump.
         ...(reach.via.letter
           ? [{ type: 'rotorLetter', arg: reach.via.letter }]
           : Array.from({ length: reach.via.pages || 0 }, () => ({ type: 'more' }))),
@@ -914,17 +578,8 @@ function reachCommands(reach) {
 }
 
 /**
- * Picks the cheapest reach strategy from the in-page analysis. One command = 1
- * (`find` = 2): `none` 0; `rotor` (list + `jumpTo`) 2; `rotor+next` 2 + k;
- * `rotor` is 1 (open the list) + the commands that reveal the entry (`more` per
- * page of 8, or one `rotorLetter` when the entry is the first with its letter)
- * + 1 (`jumpTo`);
- * `step` s presses of a rotor step command in the shorter direction, wrapping
- * like `ScreenReaderEnv.stepToKind`; `step+next` s + k; `stepLevel`(`+next`) the
- * same with a heading level, which skips every heading of another level;
- * `tab`/`shiftTab` tab-order distance; `find`(`+next`) 2 + j presses of
- * `findNext` + k, searching only words of the task description; `next`/`prev`
- * reading-order distance.
+ * Picks the cheapest of a per-strategy analysis. Only bfs-optimum.js still
+ * produces such an analysis; the guided optimum takes shortest paths instead.
  */
 function chooseReach(analysis) {
   const candidates = [];
@@ -995,37 +650,160 @@ function chooseReach(analysis) {
 }
 
 /**
+ * The nodes of the command graph that belong to `selector`: every reading-order
+ * stop of the element, plus its tab stop when the reading order never visits it
+ * (an element outside the reading order is reachable by Tab and nothing else).
+ */
+function nodesForSelector(graph, selector) {
+  if (!selector) return [];
+  const desc = graph.desc;
+  const nodes = [];
+  for (let i = 0; i < desc.n; i += 1) if (desc.selectors[i] === selector) nodes.push(i);
+  if (!nodes.length) {
+    (desc.tabSelectors || []).forEach((sel, t) => {
+      if (sel === selector) nodes.push(graph.tabNode[t]);
+    });
+  }
+  return nodes;
+}
+
+/** Every reading-order stop of a link whose resolved href matches `href`. */
+function nodesForHref(graph, href) {
+  const key = normaliseUrl(href);
+  const desc = graph.desc;
+  const nodes = [];
+  for (let i = 0; i < desc.n; i += 1) {
+    if (desc.hrefs[i] && normaliseUrl(desc.hrefs[i]) === key) nodes.push(i);
+  }
+  return nodes;
+}
+
+/**
+ * The reading-order stops whose spoken phrase carries `evidence`. Only when no
+ * single phrase does, a run of up to `maxSpan` phrases spoken one after the
+ * other counts as well, with the extra `next` presses as `extra`.
+ */
+function evidenceGoals(desc, evidence, maxSpan = MAX_EVIDENCE_PHRASE_SPAN) {
+  const needle = squashText(evidence);
+  if (!needle) return [];
+  const squashed = desc.phrases.map(squashText);
+  const goals = [];
+  for (let i = 0; i < desc.n && goals.length < MAX_READ_CANDIDATES; i += 1) {
+    if (!squashed[i].includes(needle)) continue;
+    goals.push({ node: i, extra: 0, spanPhrases: 1, phrase: desc.phrases[i] });
+  }
+  if (goals.length || maxSpan <= 1) return goals;
+  for (let i = 0; i < desc.n && goals.length < MAX_READ_CANDIDATES; i += 1) {
+    let joined = squashed[i];
+    let raw = String(desc.phrases[i] == null ? '' : desc.phrases[i]);
+    for (let w = 2; w <= maxSpan && i + w <= desc.n; w += 1) {
+      const next = desc.phrases[i + w - 1];
+      joined = `${joined} ${squashed[i + w - 1]}`;
+      raw = `${raw} ${next == null ? '' : next}`;
+      if (joined.includes(needle)) {
+        goals.push({ node: i, extra: w - 1, spanPhrases: w, phrase: raw });
+        break;
+      }
+    }
+  }
+  return goals;
+}
+
+/**
+ * Describe the page the browser is on and build its command graph as seen from
+ * the current cursor. One reading-order walk per page state; the description is
+ * served from `shared` (the caller's per-site cache) whenever the page has the
+ * same fingerprint, the graph and the Dijkstra run are pure Node.
+ */
+async function loadPageState(page, { runId, findWords, shared, cursorSelector, targets }) {
+  await injectScreenReader(page);
+
+  let resolved = { cursor: null, members: [] };
+  try {
+    resolved = await page.evaluate(resolveTargetsInPage, {
+      targetSelector: (targets && targets.selector) || null,
+      cursorSelector,
+      action: (targets && targets.action) || 'click',
+      key: (targets && targets.key) || null,
+      typedSelectors: (targets && targets.typedSelectors) || [],
+    });
+  } catch (err) {
+    return { error: `page analysis failed: ${err.message}` };
+  }
+  if (resolved.error) return { error: resolved.error };
+
+  let sharedKey = null;
+  if (shared) {
+    try {
+      const fingerprint = await page.evaluate(pageFingerprint);
+      sharedKey = JSON.stringify([fingerprint, findWords]);
+    } catch (_) {
+      sharedKey = null; // cache miss; the walk below runs as usual
+    }
+  }
+
+  let desc =
+    sharedKey && shared.has(sharedKey) ? { ...shared.get(sharedKey), cacheHit: true } : null;
+  if (!desc) {
+    try {
+      desc = await page.evaluate(describePageInPage, ROTOR_KINDS, { runId, findWords });
+    } catch (err) {
+      return { error: `page analysis failed: ${err.message}` };
+    }
+    if (sharedKey) shared.set(sharedKey, desc);
+  }
+
+  const cursorNodes = nodesForSelector({ desc, tabNode: [] }, resolved.cursor);
+  // A cursor on an element that left the reading order (a dismissed banner)
+  // maps to document start, which is index 0 of the rotated description.
+  const cursor = cursorNodes.length ? cursorNodes[0] : 0;
+  const graph = buildPageGraph(desc, { cursor, findWords });
+  return { desc, graph, cursor, sp: shortestPaths(graph, cursor), resolved, url: page.url() };
+}
+
+/** The diagnostics a step reports beside its reach: what one strategy alone costs. */
+function analysisOf(state, goals) {
+  return {
+    cursorIndex: state.cursor,
+    docStartIndex: 0,
+    readingOrderLength: state.desc.n,
+    cacheHit: !!state.desc.cacheHit,
+    ...strategyCosts(state.graph, state.cursor, goals),
+  };
+}
+
+/**
  * Compute the shortest screen-reader command sequence for a task's sighted path.
  *
  * The page must be freshly navigated to the task URL with the task's
  * preconditions already applied: the same state 0 the SR agent gets. Each step
  * costs reach + action (click/type/press/goto = 1; goto has no reach cost and
- * resets the cursor). Each step is executed for real (`replay.executeStep`)
- * after it has been costed, so the next step is costed against the real DOM.
+ * resets the cursor); the reach is the shortest path in the page's command
+ * graph to the cheapest member of the step's effect-equivalence class. Each step
+ * is executed for real (`replay.executeStep`) after it has been costed, so the
+ * next step is costed against the real DOM.
  *
- * @param {import('puppeteer').Page} page
- * @param {object} task
- * `options.analysisCache` is an optional `Map` the caller creates once per site
- * and passes to every call: it caches the finished in-page analysis across
- * pages and contexts, keyed by (url + DOM fingerprint, target, cursor, action).
- * Only the analysis is cached; every step is still executed for real.
- *
- * @param {import('puppeteer').Page} page
- * @param {object} task
  * A sighted agent that wandered through a menu makes the guided route longer
  * than the page really is. So every page the walk stands on is additionally
  * checked for a rendered link whose resolved href already satisfies the task's
- * URL target (`options.targetUrl`, the URL the sighted path ends on, recorded
- * during validation, or the oracle's `urlMatches`): "reach that link, activate
- * it" is priced with the same strategies, and `nOpt` is the cheaper of the two
- * routes. `route` says which one was taken and `shortcut` names the link. No
- * cross-page search happens - only links that are on a page the walk visits.
+ * URL target (`options.targetUrl`, the URL the sighted path ends on, or the
+ * oracle's `urlMatches`): "reach that link, activate it" is priced with the same
+ * graph, and `nOpt` is the cheaper of the two routes. `route` says which one was
+ * taken and `shortcut` names the link.
  *
+ * `options.analysisCache` is an optional `Map` the caller creates once per site
+ * and passes to every call: it caches the finished page description across pages
+ * and contexts, keyed by (url + DOM fingerprint, searchable words). Only the
+ * description is cached; every step is still executed for real.
+ *
+ * @param {import('puppeteer').Page} page
+ * @param {object} task
  * @param {object} [ctx]      reserved (oracle context), unused
  * @param {object} [options]  replay timeout overrides, plus `analysisCache`
  *                            and `targetUrl`
  * @returns {Promise<{nOpt: number|null, steps: object[], route?: 'guided'|'direct-link',
- *                    shortcut?: object, guidedNOpt?: number, error?: string}>}
+ *                    shortcut?: object, guidedNOpt?: number, readDistance?: number,
+ *                    nOptPartial?: boolean, optimalPathError?: string, error?: string}>}
  */
 async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   const { executeStep } = require('./replay');
@@ -1033,51 +811,17 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   const steps = [];
   let nOpt = 0;
   let cursorSelector = null; // null = document start
-  // Scopes the in-page reading-order cache to this call.
+  // Scopes the in-page description cache to this call.
   const runId = `opt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const typedSelectors = [];
   const findWords = findWordsFor(task);
-  // Cross-context cache of finished analyses, supplied by the caller.
   const shared = options.analysisCache instanceof Map ? options.analysisCache : null;
-  // The direct-link shortcut: the sighted agent may have taken a detour, and
-  // pricing only its route would charge the screen-reader user for it.
   const matchesTarget = targetMatcherFor(task, options);
+  const isInformation = !!(task && task.kind === 'information' && task.evidence);
   let shortcut = null;
 
   for (let i = 0; i < path.length; i += 1) {
     const step = path[i];
-
-    // Before the step is priced: does a link on THIS page already lead where the
-    // task wants to go? Then "get there and press Enter" is a route the guided
-    // walk never sees, and nOpt is the cheaper of the two. A remaining `type`
-    // step rules the shortcut out: what the user still has to fill in cannot be
-    // skipped by arriving at the right page.
-    const typeAhead = path.slice(i).some((s) => s.action === 'type');
-    if (
-      matchesTarget &&
-      !typeAhead &&
-      !matchesTarget(page.url()) &&
-      !(shortcut && shortcut.nOpt <= nOpt + 1)
-    ) {
-      await injectScreenReader(page);
-      const direct = await priceDirectLink(page, {
-        matches: matchesTarget,
-        cursorSelector,
-        findWords,
-        runId,
-      });
-      if (direct && (!shortcut || nOpt + direct.cost < shortcut.nOpt)) {
-        shortcut = {
-          ...direct,
-          index: i,
-          pageUrl: page.url(),
-          prefixCost: nOpt,
-          prefixSteps: steps.slice(),
-          nOpt: nOpt + direct.cost,
-        };
-      }
-    }
-
     const actionCost = ACTION_COST[step.action];
     if (actionCost === undefined) {
       return { nOpt: null, steps, error: `optimalPath[${i}]: unsupported action "${step.action}"` };
@@ -1092,69 +836,30 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     };
 
     // `goto` is a navigation, not something the cursor has to reach.
-    if (step.action !== 'goto' && step.selector) {
-      await injectScreenReader(page);
-
-      // The fingerprint is only needed for the shared cache, and it is taken
-      // after injection so both users of the key see the same DOM.
-      let sharedKey = null;
-      if (shared) {
-        try {
-          const fingerprint = await page.evaluate(pageFingerprint);
-          sharedKey = JSON.stringify([
-            fingerprint,
-            step.selector,
-            cursorSelector,
-            step.action,
-            step.key || null,
-            typedSelectors,
-            findWords,
-          ]);
-        } catch (_) {
-          sharedKey = null; // cache miss; the analysis below runs as usual
-        }
-      }
-
-      let analysis = sharedKey && shared.has(sharedKey) ? shared.get(sharedKey) : null;
-      if (analysis) {
-        analysis = { ...analysis, cacheHit: true };
-      } else {
-        try {
-          analysis = await page.evaluate(
-            analyzeInPage,
-            step.selector,
-            cursorSelector,
-            ROTOR_KINDS,
-            {
-              runId,
-              action: step.action,
-              key: step.key || null,
-              typedSelectors,
-              stepCommands: STEP_COMMAND_BY_KIND,
-              findWords,
-              findCost: COMMAND_COSTS.find,
-            }
-          );
-        } catch (err) {
-          return { nOpt: null, steps, error: `optimalPath[${i}]: analysis failed: ${err.message}` };
-        }
-        if (sharedKey && analysis && !analysis.error) shared.set(sharedKey, analysis);
-      }
-      if (analysis.error)
-        return { nOpt: null, steps, error: `optimalPath[${i}]: ${analysis.error}` };
+    const needsState = step.action !== 'goto' && step.selector;
+    if (needsState) {
+      const state = await loadPageState(page, {
+        runId,
+        findWords,
+        shared,
+        cursorSelector,
+        targets: { selector: step.selector, action: step.action, key: step.key, typedSelectors },
+      });
+      if (state.error) return { nOpt: null, steps, error: `optimalPath[${i}]: ${state.error}` };
 
       // Cheapest member of the effect-equivalence class; the sighted element
       // itself wins every tie.
       let best = null;
-      for (const cand of analysis.candidates) {
-        const reach = chooseReach(cand.analysis);
-        if (!reach) continue;
+      for (const member of state.resolved.members) {
+        const goals = nodesForSelector(state.graph, member.selector);
+        const found = reachGoals(state.sp, goals);
+        if (!found) continue;
         if (
           !best ||
-          reach.cost < best.reach.cost ||
-          (reach.cost === best.reach.cost && cand.isTarget && !best.cand.isTarget)
+          found.reach.cost < best.found.reach.cost ||
+          (found.reach.cost === best.found.reach.cost && member.isTarget && !best.member.isTarget)
         ) {
-          best = { cand, reach };
+          best = { member, found, goals };
         }
       }
       if (!best) {
@@ -1165,30 +870,38 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
         };
       }
 
-      entry.reach = best.reach;
-      entry.equivalenceClassSize = analysis.candidates.length;
-      if (!best.cand.isTarget) {
+      entry.reach = best.found.reach;
+      entry.equivalenceClassSize = state.resolved.members.length;
+      if (!best.member.isTarget) {
         entry.reach.via = {
           ...(entry.reach.via || {}),
-          equivalentOf: best.cand.selector,
-          equivalence: best.cand.via,
+          equivalentOf: best.member.selector,
+          equivalence: best.member.via,
           sightedSelector: step.selector,
         };
-        entry.equivalentSelector = best.cand.selector;
+        entry.equivalentSelector = best.member.selector;
       }
-      entry.analysis = {
-        cursorIndex: analysis.cursorIndex,
-        docStartIndex: analysis.docStartIndex,
-        readingOrderLength: analysis.readingOrderLength,
-        cacheHit: analysis.cacheHit,
-        next: best.cand.analysis.next,
-        prev: best.cand.analysis.prev,
-        tab: best.cand.analysis.tab,
-        rotor: best.cand.analysis.rotor,
-        step: best.cand.analysis.step,
-        stepLevel: best.cand.analysis.stepLevel,
-        find: best.cand.analysis.find,
-      };
+      entry.analysis = analysisOf(state, best.goals);
+
+      // Before the step is priced: does a link on THIS page already lead where
+      // the task wants to go? Then "get there and press Enter" is a route the
+      // guided walk never sees, and nOpt is the cheaper of the two. A remaining
+      // `type` step rules the shortcut out: what the user still has to fill in
+      // cannot be skipped by arriving at the right page.
+      const typeAhead = path.slice(i).some((s) => s.action === 'type');
+      if (matchesTarget && !typeAhead && !matchesTarget(state.url)) {
+        const direct = priceDirectLink(state, matchesTarget);
+        if (direct && (!shortcut || nOpt + direct.cost < shortcut.nOpt)) {
+          shortcut = {
+            ...direct,
+            index: i,
+            pageUrl: state.url,
+            prefixCost: nOpt,
+            prefixSteps: steps.slice(),
+            nOpt: nOpt + direct.cost,
+          };
+        }
+      }
     }
 
     nOpt += entry.reach.cost + entry.actionCost;
@@ -1218,24 +931,20 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     }
   }
 
-  // An information task does not end when the page holding the answer is
-  // reached - it ends when the screen reader has SPOKEN the answer. Costing
-  // only the navigation would price "find the phone number" at one `goto`
-  // while the number itself sits 90 `next` presses down the home page, and the
-  // step budget derived from nOpt would run out before the agent could ever
-  // hear it. So the reading is appended as a final `read` step.
   // The shortcut only replaces the guided route when that route really ended on
   // the target: otherwise the sighted path did something beyond arriving there.
   if (shortcut && !matchesTarget(page.url())) shortcut = null;
 
+  // An information task does not end when the page holding the answer is
+  // reached - it ends when the screen reader has SPOKEN the answer.
   let readEntry = null;
-  if (task && task.kind === 'information' && task.evidence) {
+  if (isInformation) {
     // Both routes end on the same page; the read may only be shared between
     // them when the guided walk arrives there with the cursor at document
     // start, which is where a navigation puts it.
     const readFromDocumentStart = cursorSelector === null;
-    const read = await costReadStep(page, task.evidence, cursorSelector, runId, findWords);
-    if (read.error) {
+    const state = await loadPageState(page, { runId, findWords, shared, cursorSelector });
+    if (state.error) {
       // A hard failure of the read analysis: keep the navigation part rather
       // than losing the whole measurement.
       return {
@@ -1243,11 +952,13 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
         steps,
         readDistance: null,
         nOptPartial: true,
-        optimalPathError: read.error,
+        optimalPathError: `read step: ${state.error}`,
         route: 'guided',
       };
     }
-    if (!read.entry) {
+    const goals = evidenceGoals(state.desc, task.evidence);
+    const found = goals.length ? reachGoals(state.sp, goals) : null;
+    if (!found) {
       // The evidence exists visually but no spoken phrase contains it: a
       // finding in its own right (harness turns it into `evidence-not-readable`).
       return {
@@ -1259,7 +970,18 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
         route: 'guided',
       };
     }
-    readEntry = read.entry;
+    readEntry = {
+      index: -1, // set below
+      action: 'read',
+      selector: state.desc.selectors[found.node],
+      evidence: task.evidence,
+      phrase: found.goal.phrase,
+      spanPhrases: found.goal.spanPhrases || 1,
+      reach: found.reach,
+      actionCost: ACTION_COST.read,
+      candidateCount: goals.length,
+      analysis: { ...analysisOf(state, [found.node]), readingOrderIndex: found.node },
+    };
     if (!readFromDocumentStart) shortcut = null;
   }
 
@@ -1302,6 +1024,31 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   };
 }
 
+/**
+ * The cheapest "reach a link that already leads to the target, then activate it"
+ * on the page the state describes. Returns null when no rendered link leads
+ * there.
+ */
+function priceDirectLink(state, matches) {
+  const desc = state.desc;
+  const goals = [];
+  const hrefOf = new Map();
+  for (let i = 0; i < desc.n; i += 1) {
+    if (!desc.hrefs[i] || !matches(desc.hrefs[i])) continue;
+    goals.push(i);
+    hrefOf.set(i, desc.hrefs[i]);
+  }
+  const found = goals.length ? reachGoals(state.sp, goals) : null;
+  if (!found) return null;
+  return {
+    cost: found.reach.cost + ACTION_COST.click,
+    reach: found.reach,
+    selector: desc.selectors[found.node],
+    href: hrefOf.get(found.node),
+    name: null,
+  };
+}
+
 /** The shortcut route as it is reported: which link, on which page, at what cost. */
 function describeShortcut(shortcut, readCost = 0) {
   return {
@@ -1317,103 +1064,22 @@ function describeShortcut(shortcut, readCost = 0) {
   };
 }
 
-/**
- * Cost the cheapest way to HEAR `evidence` from the current cursor position,
- * using exactly the reach strategies a sighted-path step uses. Action cost 0.
- *
- * @returns {Promise<{entry?: object, error?: string}>} `entry` absent (without
- *          an error) means no spoken phrase contains the evidence.
- */
-async function costReadStep(page, evidence, cursorSelector, runId, findWords = []) {
-  try {
-    await injectScreenReader(page);
-  } catch (err) {
-    return { error: `read step: screen reader injection failed: ${err.message}` };
-  }
-
-  let analysis;
-  try {
-    analysis = await page.evaluate(analyzeInPage, null, cursorSelector, ROTOR_KINDS, {
-      runId,
-      mode: 'read',
-      evidence,
-      maxReadCandidates: MAX_READ_CANDIDATES,
-      maxEvidenceSpan: MAX_EVIDENCE_PHRASE_SPAN,
-      stepCommands: STEP_COMMAND_BY_KIND,
-      findWords,
-      findCost: COMMAND_COSTS.find,
-    });
-  } catch (err) {
-    return { error: `read step: analysis failed: ${err.message}` };
-  }
-  if (analysis.error) return { error: `read step: ${analysis.error}` };
-
-  let best = null;
-  for (const cand of analysis.readCandidates || []) {
-    const reached = chooseReach(cand.analysis);
-    if (!reached) continue;
-    // Hearing a split answer means reading on: one `next` per extra phrase.
-    const span = cand.spanPhrases || 1;
-    const reach =
-      span > 1
-        ? {
-            ...reached,
-            cost: reached.cost + (span - 1),
-            via: { ...(reached.via || {}), spanPhrases: span },
-          }
-        : reached;
-    // Cheapest wins; at equal cost the tighter span, so the read step starts
-    // where the answer starts.
-    const better =
-      !best ||
-      reach.cost < best.reach.cost ||
-      (reach.cost === best.reach.cost && span < (best.cand.spanPhrases || 1));
-    if (better) best = { cand, reach };
-  }
-  if (!best) return {};
-
-  return {
-    entry: {
-      index: -1, // set by the caller
-      action: 'read',
-      selector: best.cand.selector,
-      evidence,
-      phrase: best.cand.phrase,
-      spanPhrases: best.cand.spanPhrases || 1,
-      reach: best.reach,
-      actionCost: ACTION_COST.read,
-      candidateCount: (analysis.readCandidates || []).length,
-      analysis: {
-        cursorIndex: analysis.cursorIndex,
-        docStartIndex: analysis.docStartIndex,
-        readingOrderLength: analysis.readingOrderLength,
-        cacheHit: analysis.cacheHit,
-        readingOrderIndex: best.cand.readingOrderIndex,
-        next: best.cand.analysis.next,
-        prev: best.cand.analysis.prev,
-        tab: best.cand.analysis.tab,
-        rotor: best.cand.analysis.rotor,
-        step: best.cand.analysis.step,
-        stepLevel: best.cand.analysis.stepLevel,
-        find: best.cand.analysis.find,
-      },
-    },
-  };
-}
-
 module.exports = {
   targetMatcherFor,
   findDirectLinks,
-  priceDirectLink,
   urlPatternsOf,
   normaliseUrl,
   computeOptimalPath,
-  costReadStep,
+  evidenceGoals,
   findWordsFor,
   chooseReach,
   reachCommands,
-  analyzeInPage,
+  nodesForSelector,
+  nodesForHref,
+  describePageInPage,
+  resolveTargetsInPage,
   pageFingerprint,
+  loadPageState,
   ACTION_COST,
   EVIDENCE_NOT_IN_READING_ORDER,
   MAX_READ_CANDIDATES,

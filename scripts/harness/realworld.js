@@ -37,6 +37,18 @@ const PROFILE = 'standard';
 const PER_FILE_TIMEOUT_MS = 600000;
 const SLOW_FILE_MS = 240000;
 
+/**
+ * Navigation budget one scanner gets for its own page load.
+ *
+ * Every exclusive scanner reloads the snapshot on its own tab.
+ * govuk-design-system.html, 811 KB, holds subresources that never let
+ * `networkidle0` settle, so on every run a different scanner runs out of budget
+ * there; raising it to 90 s changed which scanners, not whether. The timeout is
+ * the page's, which is why derive-scanner-trust.js does not read it as a crash
+ * of the scanner that happened to draw it.
+ */
+const SCANNER_NAV_TIMEOUT_MS = 45000;
+
 // ---------------------------------------------------------------------------
 // violation matching helpers
 //
@@ -1305,7 +1317,11 @@ async function scanFile(url, scannerIds, scanOptions) {
 
   try {
     const result = await Promise.race([
-      pipeline.scan(url, { scannerIds: expectedIds, timeout: 45000, ...scanOptions }),
+      pipeline.scan(url, {
+        scannerIds: expectedIds,
+        timeout: SCANNER_NAV_TIMEOUT_MS,
+        ...scanOptions,
+      }),
       timeoutPromise,
     ]);
     return { result, expectedIds, timedOut: false };

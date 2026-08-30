@@ -83,16 +83,21 @@ function derive() {
   }
 
   // ---- 2. real-world crashes -------------------------------------------
+  // A navigation timeout is the page's, not the scanner's: a snapshot whose
+  // subresources never let `networkidle0` settle runs a different scanner out
+  // of its load budget on every run, so reading it as a crash would move an
+  // arbitrary scanner out of the default profiles. The harness still reports
+  // it; it is not evidence about the scanner that happened to draw it.
+  const NOT_A_CRASH = /Navigation timeout of \d+ ms exceeded/i;
   const realworld = readJson('harness-realworld.json');
   if (realworld) {
     for (const f of realworld.files || realworld.results || []) {
       for (const err of f.scannerErrors || []) {
         const id = err.scanner || err.scannerId;
         if (!id) continue;
-        add(
-          id,
-          `realworld: crashed on ${f.file}: ${String(err.error || err.message || '').slice(0, 160)}`
-        );
+        const message = String(err.error || err.message || '');
+        if (NOT_A_CRASH.test(message)) continue;
+        add(id, `realworld: crashed on ${f.file}: ${message.slice(0, 160)}`);
       }
     }
   }

@@ -7,6 +7,7 @@
  */
 const puppeteer = require('puppeteer');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
+const { dismissConsent } = require('./consent');
 
 /**
  * Navigate and wait for the network to go quiet; when it never does inside
@@ -92,10 +93,15 @@ class ScanPipeline {
 
     const passedOptions = { ...scannerOptions, screenshotDir, timeout };
     const allResults = [];
+    let consent = null;
 
     try {
       // Navigate once for concurrent scanners
       await this.navigateWithCSPFallback(page, url, { timeout });
+
+      // Accept the consent overlay before anything measures the page: a
+      // scanner looking at a cookie dialog measures the dialog.
+      consent = await dismissConsent(page);
 
       // Run concurrent scanners in parallel. LLM scanners get a warm-up
       // stagger: they all send an identical shared page-context prefix, so
@@ -151,6 +157,8 @@ class ScanPipeline {
             await tab.setViewport({ width: 1920, height: 1080 });
             try {
               await gotoSettled(tab, url, timeout);
+              // Every tab is a fresh navigation, so the banner is back.
+              await dismissConsent(tab);
               return await scanner.scan(tab, passedOptions);
             } finally {
               await tab.close().catch(() => {});
@@ -178,7 +186,7 @@ class ScanPipeline {
       await this.recycleBrowserIfDue();
     }
 
-    return this.assembleResult(url, allResults);
+    return this.assembleResult(url, allResults, consent);
   }
 
   /**
@@ -200,7 +208,7 @@ class ScanPipeline {
   /**
    * Assemble individual scanner results into a unified pipeline result.
    */
-  assembleResult(url, scannerResults) {
+  assembleResult(url, scannerResults, consent = null) {
     const allViolations = [];
     // Advice a scanner offers about criteria nothing fails (the Deque best
     // practice rules). Reported, never counted and never scored.
@@ -301,6 +309,8 @@ class ScanPipeline {
       categories,
     };
     if (reviewLog.length > 0) result.reviewLog = reviewLog;
+    // Absent when no overlay was seen.
+    if (consent && consent.detected) result.consent = consent;
     return result;
   }
 

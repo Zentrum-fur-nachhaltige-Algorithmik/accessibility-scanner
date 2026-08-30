@@ -77,114 +77,108 @@
         }
       },
       "nSighted": 4,
-      "nOpt": 11,
-      "readDistance": 9,
+      "nOpt": 4,
+      "readDistance": 4,
       "optimalPath": [
         {
           "index": 0,
-          "action": "click",
-          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a",
-          "reach": {
-            "strategy": "step",
-            "cost": 1,
-            "via": {
-              "kind": "links",
-              "dir": "prev",
-              "command": "prevLink",
-              "steps": 1,
-              "k": 0
-            }
-          },
-          "actionCost": 1,
-          "shortcut": true,
-          "href": "https://urologiefischer.at/page10/page10.html",
-          "navigated": true
-        },
-        {
-          "index": 1,
           "action": "read",
-          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(8) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(8)",
+          "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(9) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(8)",
           "evidence": "Fr nach Vereinbarung",
           "phrase": "paragraph, Fr nach Vereinbarung",
           "spanPhrases": 1,
           "reach": {
-            "strategy": "find+next",
-            "cost": 9,
+            "strategy": "path",
+            "cost": 4,
             "via": {
-              "word": "ordinationszeiten",
-              "findNexts": 0,
-              "k": 7
-            }
+              "edges": [
+                {
+                  "type": "step",
+                  "command": "nextFormField",
+                  "to": 77
+                },
+                {
+                  "type": "prev",
+                  "command": null,
+                  "to": 76
+                },
+                {
+                  "type": "prev",
+                  "command": null,
+                  "to": 75
+                },
+                {
+                  "type": "prev",
+                  "command": null,
+                  "to": 74
+                }
+              ]
+            },
+            "commands": [
+              {
+                "type": "nextFormField"
+              },
+              {
+                "type": "prev"
+              },
+              {
+                "type": "prev"
+              },
+              {
+                "type": "prev"
+              }
+            ]
           },
           "actionCost": 0,
           "candidateCount": 1,
+          "pageUrl": "https://urologiefischer.at/",
           "analysis": {
             "cursorIndex": 0,
             "docStartIndex": 0,
-            "readingOrderLength": 73,
+            "readingOrderLength": 110,
             "cacheHit": false,
-            "readingOrderIndex": 23,
-            "next": 23,
-            "prev": 50,
+            "inReadingOrder": true,
+            "next": 74,
+            "prev": 36,
             "tab": null,
             "rotor": {
-              "kind": "links",
+              "kind": "headings",
               "index": 0,
-              "k": 20,
-              "cost": 22,
+              "k": 52,
+              "cost": 54,
               "pages": 0,
               "letter": null,
-              "phrase": "link",
-              "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(1) > a"
+              "phrase": "heading, Liebe Patientinnen und Patienten!, level 1",
+              "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(8) > h1"
             },
             "step": {
-              "kind": "links",
-              "dir": "next",
-              "command": "nextLink",
-              "steps": 1,
-              "k": 22,
-              "cost": 23
-            },
-            "stepLevel": {
               "kind": "headings",
-              "level": 2,
               "dir": "next",
               "command": "nextHeading",
               "steps": 1,
-              "k": 70,
-              "cost": 71
+              "k": 52,
+              "cost": 53
+            },
+            "stepLevel": {
+              "kind": "headings",
+              "level": 1,
+              "dir": "next",
+              "command": "nextHeading",
+              "steps": 1,
+              "k": 52,
+              "cost": 53
             },
             "find": {
               "word": "ordinationszeiten",
               "findNexts": 0,
               "k": 7,
               "cost": 9
-            }
+            },
+            "readingOrderIndex": 74
           }
         }
       ],
-      "optimalRoute": "direct-link",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://urologiefischer.at/",
-        "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a",
-        "href": "https://urologiefischer.at/page10/page10.html",
-        "name": "Impressum | © 2021",
-        "reach": {
-          "strategy": "step",
-          "cost": 1,
-          "via": {
-            "kind": "links",
-            "dir": "prev",
-            "command": "prevLink",
-            "steps": 1,
-            "k": 0
-          }
-        },
-        "cost": 2,
-        "prefixCost": 0,
-        "nOpt": 11
-      },
+      "optimalRoute": "guided",
       "runs": [
         {
           "nSr": 3,
@@ -970,21 +964,11 @@
         }
       },
       "nSighted": 1,
-      "nOpt": 3,
+      "nOpt": 2,
       "readDistance": 2,
       "optimalPath": [
         {
           "index": 0,
-          "action": "goto",
-          "selector": null,
-          "reach": {
-            "strategy": "none",
-            "cost": 0
-          },
-          "actionCost": 1
-        },
-        {
-          "index": 1,
           "action": "read",
           "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(6) > p",
           "evidence": "1220 WIEN DONAUSTADTSTRASSE 1",
@@ -997,24 +981,31 @@
               "word": "donauzentrum",
               "findNexts": 0,
               "k": 0
-            }
+            },
+            "commands": [
+              {
+                "type": "find",
+                "arg": "donauzentrum"
+              }
+            ]
           },
           "actionCost": 0,
           "candidateCount": 1,
+          "pageUrl": "https://urologiefischer.at/",
           "analysis": {
             "cursorIndex": 0,
             "docStartIndex": 0,
-            "readingOrderLength": 107,
+            "readingOrderLength": 110,
             "cacheHit": false,
-            "readingOrderIndex": 14,
+            "inReadingOrder": true,
             "next": 14,
-            "prev": 93,
+            "prev": 96,
             "tab": null,
             "rotor": {
               "kind": "links",
               "index": 0,
-              "k": 11,
-              "cost": 13,
+              "k": 13,
+              "cost": 15,
               "pages": 0,
               "letter": null,
               "phrase": "link",
@@ -1042,7 +1033,8 @@
               "findNexts": 0,
               "k": 0,
               "cost": 2
-            }
+            },
+            "readingOrderIndex": 14
           }
         }
       ],
@@ -1537,9 +1529,10 @@
       "readDistance": 1,
       "optimalPath": [
         {
-          "index": 0,
+          "index": 2,
           "action": "click",
           "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a",
+          "equivalentSelector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a",
           "reach": {
             "strategy": "step",
             "cost": 1,
@@ -1548,12 +1541,67 @@
               "dir": "prev",
               "command": "prevLink",
               "steps": 1,
-              "k": 0
-            }
+              "k": 0,
+              "equivalentOf": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a",
+              "equivalence": "same-href-earlier-page"
+            },
+            "commands": [
+              {
+                "type": "prevLink"
+              }
+            ]
           },
           "actionCost": 1,
-          "shortcut": true,
-          "href": "https://urologiefischer.at/page10/page10.html",
+          "skipped": [
+            0,
+            1
+          ],
+          "analysis": {
+            "cursorIndex": 0,
+            "docStartIndex": 0,
+            "readingOrderLength": 110,
+            "cacheHit": false,
+            "inReadingOrder": true,
+            "next": 106,
+            "prev": 2,
+            "tab": {
+              "dir": "tab",
+              "cost": 6
+            },
+            "rotor": {
+              "kind": "links",
+              "index": 3,
+              "k": 0,
+              "cost": 2,
+              "pages": 0,
+              "letter": null,
+              "phrase": "link, Impressum | © 2021",
+              "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a"
+            },
+            "step": {
+              "kind": "links",
+              "dir": "prev",
+              "command": "prevLink",
+              "steps": 1,
+              "k": 0,
+              "cost": 1
+            },
+            "stepLevel": {
+              "kind": "headings",
+              "level": 1,
+              "dir": "next",
+              "command": "nextHeading",
+              "steps": 1,
+              "k": 84,
+              "cost": 85
+            },
+            "find": {
+              "word": "impressum",
+              "findNexts": 0,
+              "k": 0,
+              "cost": 2
+            }
+          },
           "navigated": true
         },
         {
@@ -1572,16 +1620,22 @@
               "command": "nextHeading",
               "steps": 1,
               "k": 0
-            }
+            },
+            "commands": [
+              {
+                "type": "nextHeading"
+              }
+            ]
           },
           "actionCost": 0,
           "candidateCount": 1,
+          "pageUrl": "https://urologiefischer.at/page10/page10.html",
           "analysis": {
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 73,
             "cacheHit": false,
-            "readingOrderIndex": 26,
+            "inReadingOrder": true,
             "next": 26,
             "prev": 47,
             "tab": null,
@@ -1617,32 +1671,12 @@
               "findNexts": 0,
               "k": 0,
               "cost": 2
-            }
+            },
+            "readingOrderIndex": 26
           }
         }
       ],
-      "optimalRoute": "direct-link",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://urologiefischer.at/",
-        "selector": "#b > div:nth-of-type(1) > div > div > div:nth-of-type(12) > a",
-        "href": "https://urologiefischer.at/page10/page10.html",
-        "name": "Impressum | © 2021",
-        "reach": {
-          "strategy": "step",
-          "cost": 1,
-          "via": {
-            "kind": "links",
-            "dir": "prev",
-            "command": "prevLink",
-            "steps": 1,
-            "k": 0
-          }
-        },
-        "cost": 2,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
+      "optimalRoute": "dag",
       "runs": [
         {
           "nSr": 7,
@@ -3827,7 +3861,11 @@
         "validateMs": 8202,
         "nOptMs": 64887,
         "agentMs": 88670
-      }
+      },
+      "optimalSkipped": [
+        1,
+        0
+      ]
     }
   ],
   "siteScore": 0.9047619047619048,

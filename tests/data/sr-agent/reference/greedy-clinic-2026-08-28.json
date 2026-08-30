@@ -62,7 +62,16 @@
               "letter": null,
               "phrase": "link, Leistungen",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 4
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 6,
@@ -71,6 +80,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 172,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 19,
             "prev": 151,
             "tab": {
@@ -115,29 +125,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8802/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a",
-        "href": "http://localhost:8802/leistungen",
-        "name": "Leistungen",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 4,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Leistungen",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 3,
@@ -444,7 +431,16 @@
               "letter": null,
               "phrase": "link, Kontakt",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(4) > a"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 6
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 4,
@@ -452,7 +448,8 @@
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 172,
-            "cacheHit": true,
+            "cacheHit": false,
+            "inReadingOrder": true,
             "next": 27,
             "prev": 143,
             "tab": {
@@ -497,29 +494,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8802/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(4) > a",
-        "href": "http://localhost:8802/kontakt",
-        "name": "Kontakt",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 6,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Kontakt",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(4) > a"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 14,
@@ -1559,7 +1533,16 @@
               "letter": null,
               "phrase": "link, Leistungen",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 4
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 6,
@@ -1568,6 +1551,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 172,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 19,
             "prev": 151,
             "tab": {
@@ -1626,16 +1610,22 @@
               "command": "nextHeading",
               "steps": 1,
               "k": 0
-            }
+            },
+            "commands": [
+              {
+                "type": "nextHeading"
+              }
+            ]
           },
           "actionCost": 0,
           "candidateCount": 1,
+          "pageUrl": "http://localhost:8802/leistungen",
           "analysis": {
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 69,
-            "cacheHit": false,
-            "readingOrderIndex": 36,
+            "cacheHit": true,
+            "inReadingOrder": true,
             "next": 36,
             "prev": 33,
             "tab": null,
@@ -1671,34 +1661,12 @@
               "findNexts": 0,
               "k": 0,
               "cost": 2
-            }
+            },
+            "readingOrderIndex": 36
           }
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8802/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a",
-        "href": "http://localhost:8802/leistungen",
-        "name": "Leistungen",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 4,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Leistungen",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(2) > a"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 4
-      },
       "runs": [
         {
           "nSr": 5,
@@ -2155,7 +2123,16 @@
               "letter": null,
               "phrase": "link, Team",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(3) > a"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 5
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
@@ -2164,6 +2141,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 172,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 23,
             "prev": 147,
             "tab": {
@@ -2208,29 +2186,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8802/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(3) > a",
-        "href": "http://localhost:8802/team",
-        "name": "Team",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 5,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Team",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > ul > li:nth-of-type(3) > a"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 4,
@@ -2620,17 +2575,30 @@
           "action": "click",
           "selector": "body > div:nth-of-type(2) > footer > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li:nth-of-type(1) > a",
           "reach": {
-            "strategy": "rotor",
+            "strategy": "path",
             "cost": 2,
             "via": {
-              "kind": "links",
-              "index": 14,
-              "k": 0,
-              "pages": 0,
-              "letter": null,
-              "phrase": null,
-              "selector": null
-            }
+              "edges": [
+                {
+                  "type": "step",
+                  "command": "prevLandmark",
+                  "to": 149
+                },
+                {
+                  "type": "step",
+                  "command": "nextLink",
+                  "to": 155
+                }
+              ]
+            },
+            "commands": [
+              {
+                "type": "prevLandmark"
+              },
+              {
+                "type": "nextLink"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -2639,6 +2607,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 172,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 155,
             "prev": 17,
             "tab": {
@@ -2649,11 +2618,11 @@
               "kind": "links",
               "index": 14,
               "k": 0,
-              "cost": 2,
-              "pages": 0,
+              "cost": 3,
+              "pages": 1,
               "letter": null,
-              "phrase": null,
-              "selector": null
+              "phrase": "link, Impressum",
+              "selector": "html > body > div:nth-of-type(2) > footer > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li:nth-of-type(1) > a"
             },
             "step": {
               "kind": "headings",
@@ -2683,29 +2652,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8802/",
-        "selector": "body > div:nth-of-type(2) > footer > div > div:nth-of-type(1) > div:nth-of-type(2) > ul > li:nth-of-type(1) > a",
-        "href": "http://localhost:8802/impressum",
-        "name": "Impressum",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 14,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": null,
-            "selector": null
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 4,

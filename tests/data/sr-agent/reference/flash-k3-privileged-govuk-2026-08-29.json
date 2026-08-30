@@ -69,7 +69,12 @@
               "command": "nextButton",
               "steps": 1,
               "k": 0
-            }
+            },
+            "commands": [
+              {
+                "type": "nextButton"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -78,6 +83,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 283,
             "cacheHit": false,
+            "inReadingOrder": true,
             "next": 6,
             "prev": 277,
             "tab": {
@@ -586,7 +592,12 @@
               "command": "nextFormField",
               "steps": 1,
               "k": 0
-            }
+            },
+            "commands": [
+              {
+                "type": "nextFormField"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -595,6 +606,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 281,
             "cacheHit": false,
+            "inReadingOrder": true,
             "next": 32,
             "prev": 249,
             "tab": {
@@ -609,7 +621,7 @@
               "pages": 0,
               "letter": null,
               "phrase": "combobox, Search, When search suggestions are available use up and down arrows to review and enter to select. Touch device users, explore by touch or with swipe gestures., has popup listbox, not expanded, autocomplete in list, 1 control",
-              "selector": "#search-main-25123487"
+              "selector": "#search-main-1e181393"
             },
             "step": {
               "kind": "formFields",
@@ -643,20 +655,22 @@
           "reach": {
             "strategy": "none",
             "cost": 0,
+            "commands": [],
             "via": {
-              "equivalentOf": "#search-main-25123487",
+              "equivalentOf": "#search-main-1e181393",
               "equivalence": "enter-in-field",
               "sightedSelector": "#content > header > div > div:nth-of-type(2) > div > form > div > div > div > div:nth-of-type(2) > button"
             }
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
-          "equivalentSelector": "#search-main-25123487",
+          "equivalentSelector": "#search-main-1e181393",
           "analysis": {
-            "cursorIndex": 0,
-            "docStartIndex": 1,
+            "cursorIndex": 34,
+            "docStartIndex": 0,
             "readingOrderLength": 4001,
             "cacheHit": false,
+            "inReadingOrder": true,
             "next": 0,
             "prev": 0,
             "tab": {
@@ -671,7 +685,7 @@
               "pages": 0,
               "letter": null,
               "phrase": "combobox, Search, kontakt, has popup listbox, not expanded, autocomplete in list, 1 control",
-              "selector": "#search-main-25123487"
+              "selector": "#search-main-1e181393"
             },
             "step": {
               "kind": "formFields",
@@ -690,7 +704,12 @@
               "k": 8,
               "cost": 9
             },
-            "find": null
+            "find": {
+              "word": "kontakt",
+              "findNexts": 0,
+              "k": 0,
+              "cost": 2
+            }
           },
           "navigated": true
         }
@@ -2632,17 +2651,19 @@
           "action": "click",
           "selector": "body > footer > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(5) > a",
           "reach": {
-            "strategy": "rotor",
+            "strategy": "find",
             "cost": 2,
             "via": {
-              "kind": "links",
-              "index": 73,
-              "k": 0,
-              "pages": 0,
-              "letter": null,
-              "phrase": null,
-              "selector": null
-            }
+              "word": "contact",
+              "findNexts": 0,
+              "k": 0
+            },
+            "commands": [
+              {
+                "type": "find",
+                "arg": "contact"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -2650,7 +2671,8 @@
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 281,
-            "cacheHit": true,
+            "cacheHit": false,
+            "inReadingOrder": true,
             "next": 267,
             "prev": 14,
             "tab": {
@@ -2661,11 +2683,11 @@
               "kind": "links",
               "index": 73,
               "k": 0,
-              "cost": 2,
-              "pages": 0,
+              "cost": 11,
+              "pages": 9,
               "letter": null,
-              "phrase": null,
-              "selector": null
+              "phrase": "link, Contact",
+              "selector": "html > body > footer > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(5) > a"
             },
             "step": {
               "kind": "links",
@@ -2695,29 +2717,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://www.gov.uk/",
-        "selector": "body > footer > div > div:nth-of-type(2) > div:nth-of-type(1) > ul > li:nth-of-type(5) > a",
-        "href": "https://www.gov.uk/contact",
-        "name": "Contact",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 73,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": null,
-            "selector": null
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 2,
@@ -3315,17 +3314,30 @@
           "action": "click",
           "selector": "#content > section > div > div > div > ul > li:nth-of-type(1) > div > span:nth-of-type(2) > a",
           "reach": {
-            "strategy": "rotor",
+            "strategy": "path",
             "cost": 2,
             "via": {
-              "kind": "links",
-              "index": 3,
-              "k": 0,
-              "pages": 0,
-              "letter": null,
-              "phrase": "link, HMRC account: sign in or set up",
-              "selector": "#content > section > div > div > div > ul > li:nth-of-type(1) > div > span:nth-of-type(2) > a"
-            }
+              "edges": [
+                {
+                  "type": "step",
+                  "command": "nextHeading",
+                  "to": 16
+                },
+                {
+                  "type": "step",
+                  "command": "nextLink",
+                  "to": 38
+                }
+              ]
+            },
+            "commands": [
+              {
+                "type": "nextHeading"
+              },
+              {
+                "type": "nextLink"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
@@ -3333,7 +3345,8 @@
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 281,
-            "cacheHit": true,
+            "cacheHit": false,
+            "inReadingOrder": true,
             "next": 38,
             "prev": 243,
             "tab": {
@@ -3378,29 +3391,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://www.gov.uk/",
-        "selector": "#content > section > div > div > div > ul > li:nth-of-type(1) > div > span:nth-of-type(2) > a",
-        "href": "https://www.gov.uk/log-in-register-hmrc-online-services",
-        "name": "HMRC account: sign in or set up",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 3,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, HMRC account: sign in or set up",
-            "selector": "#content > section > div > div > div > ul > li:nth-of-type(1) > div > span:nth-of-type(2) > a"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 8,
@@ -5247,7 +5237,7 @@
         }
       },
       "nSighted": 1,
-      "nOpt": 3,
+      "nOpt": 4,
       "readDistance": null,
       "optimalPath": [
         {
@@ -5255,17 +5245,22 @@
           "action": "click",
           "selector": "#content > div > div:nth-of-type(2) > div > div:nth-of-type(2) > section > ul > li:nth-of-type(6) > a",
           "reach": {
-            "strategy": "rotor",
-            "cost": 2,
+            "strategy": "find",
+            "cost": 3,
             "via": {
-              "kind": "links",
-              "index": 40,
-              "k": 0,
-              "pages": 0,
-              "letter": null,
-              "phrase": null,
-              "selector": null
-            }
+              "word": "state",
+              "findNexts": 1,
+              "k": 0
+            },
+            "commands": [
+              {
+                "type": "find",
+                "arg": "state"
+              },
+              {
+                "type": "findNext"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -5273,7 +5268,8 @@
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 281,
-            "cacheHit": true,
+            "cacheHit": false,
+            "inReadingOrder": true,
             "next": 175,
             "prev": 106,
             "tab": {
@@ -5284,11 +5280,11 @@
               "kind": "links",
               "index": 40,
               "k": 0,
-              "cost": 2,
-              "pages": 0,
+              "cost": 7,
+              "pages": 5,
               "letter": null,
-              "phrase": null,
-              "selector": null
+              "phrase": "link, Check your State Pension age",
+              "selector": "#content > div > div:nth-of-type(2) > div > div:nth-of-type(2) > section > ul > li:nth-of-type(6) > a"
             },
             "step": {
               "kind": "headings",
@@ -5318,29 +5314,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://www.gov.uk/",
-        "selector": "#content > div > div:nth-of-type(2) > div > div:nth-of-type(2) > section > ul > li:nth-of-type(6) > a",
-        "href": "https://www.gov.uk/state-pension-age",
-        "name": "Check your State Pension age",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 40,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": null,
-            "selector": null
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 2,
@@ -6005,17 +5978,30 @@
           "action": "click",
           "selector": "#content > div > div:nth-of-type(2) > div > div:nth-of-type(2) > section > ul > li:nth-of-type(10) > a",
           "reach": {
-            "strategy": "rotor",
+            "strategy": "path",
             "cost": 2,
             "via": {
-              "kind": "links",
-              "index": 44,
-              "k": 0,
-              "pages": 0,
-              "letter": null,
-              "phrase": null,
-              "selector": null
-            }
+              "edges": [
+                {
+                  "type": "step",
+                  "command": "prevLandmark",
+                  "to": 200
+                },
+                {
+                  "type": "step",
+                  "command": "prevLink",
+                  "to": 183
+                }
+              ]
+            },
+            "commands": [
+              {
+                "type": "prevLandmark"
+              },
+              {
+                "type": "prevLink"
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -6023,7 +6009,8 @@
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 281,
-            "cacheHit": true,
+            "cacheHit": false,
+            "inReadingOrder": true,
             "next": 183,
             "prev": 98,
             "tab": {
@@ -6034,11 +6021,11 @@
               "kind": "links",
               "index": 44,
               "k": 0,
-              "cost": 2,
+              "cost": 3,
               "pages": 0,
-              "letter": null,
-              "phrase": null,
-              "selector": null
+              "letter": "a",
+              "phrase": "link, Apply for a passport",
+              "selector": "#content > div > div:nth-of-type(2) > div > div:nth-of-type(2) > section > ul > li:nth-of-type(10) > a"
             },
             "step": {
               "kind": "headings",
@@ -6068,29 +6055,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://www.gov.uk/",
-        "selector": "#content > div > div:nth-of-type(2) > div > div:nth-of-type(2) > section > ul > li:nth-of-type(10) > a",
-        "href": "https://www.gov.uk/apply-renew-passport",
-        "name": "Apply for a passport",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 44,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": null,
-            "selector": null
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 2,
@@ -6765,7 +6729,16 @@
               "letter": null,
               "phrase": "link, eVisas: access and use your online immigration status",
               "selector": "#content > section > div > div > div > ul > li:nth-of-type(2) > div > span:nth-of-type(2) > a"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 4
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 1,
@@ -6773,7 +6746,8 @@
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 281,
-            "cacheHit": true,
+            "cacheHit": false,
+            "inReadingOrder": true,
             "next": 40,
             "prev": 241,
             "tab": {
@@ -6818,29 +6792,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "https://www.gov.uk/",
-        "selector": "#content > section > div > div > div > ul > li:nth-of-type(2) > div > span:nth-of-type(2) > a",
-        "href": "https://www.gov.uk/evisa",
-        "name": "eVisas: access and use your online immigration status",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 4,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, eVisas: access and use your online immigration status",
-            "selector": "#content > section > div > div > div > ul > li:nth-of-type(2) > div > span:nth-of-type(2) > a"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 2,

@@ -62,7 +62,16 @@
               "letter": null,
               "phrase": "link, Leistungen",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 3
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
@@ -71,6 +80,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 174,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 10,
             "prev": 164,
             "tab": {
@@ -115,29 +125,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8804/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)",
-        "href": "http://localhost:8804/leistungen/",
-        "name": "Leistungen",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 3,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Leistungen",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 3,
@@ -444,7 +431,16 @@
               "letter": null,
               "phrase": "link, Kontakt",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(4)"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 5
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
@@ -453,6 +449,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 174,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 12,
             "prev": 162,
             "tab": {
@@ -497,29 +494,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8804/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(4)",
-        "href": "http://localhost:8804/kontakt/",
-        "name": "Kontakt",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 5,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Kontakt",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(4)"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 4,
@@ -922,7 +896,16 @@
               "letter": null,
               "phrase": "link, Leistungen",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 3
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
@@ -931,6 +914,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 174,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 10,
             "prev": 164,
             "tab": {
@@ -975,29 +959,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8804/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)",
-        "href": "http://localhost:8804/leistungen/",
-        "name": "Leistungen",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 3,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Leistungen",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(2)"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 3,
@@ -1300,7 +1261,16 @@
               "letter": null,
               "phrase": "link, Team",
               "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(3)"
-            }
+            },
+            "commands": [
+              {
+                "type": "links"
+              },
+              {
+                "type": "jumpTo",
+                "arg": 4
+              }
+            ]
           },
           "actionCost": 1,
           "equivalenceClassSize": 2,
@@ -1309,6 +1279,7 @@
             "docStartIndex": 0,
             "readingOrderLength": 174,
             "cacheHit": true,
+            "inReadingOrder": true,
             "next": 11,
             "prev": 163,
             "tab": {
@@ -1353,29 +1324,6 @@
         }
       ],
       "optimalRoute": "guided",
-      "optimalShortcut": {
-        "index": 0,
-        "pageUrl": "http://localhost:8804/",
-        "selector": "body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(3)",
-        "href": "http://localhost:8804/team/",
-        "name": "Team",
-        "reach": {
-          "strategy": "rotor",
-          "cost": 2,
-          "via": {
-            "kind": "links",
-            "index": 4,
-            "k": 0,
-            "pages": 0,
-            "letter": null,
-            "phrase": "link, Team",
-            "selector": "html > body > div:nth-of-type(2) > header > div > nav > a:nth-of-type(3)"
-          }
-        },
-        "cost": 3,
-        "prefixCost": 0,
-        "nOpt": 3
-      },
       "runs": [
         {
           "nSr": 4,
@@ -1749,46 +1697,52 @@
         }
       },
       "nSighted": 1,
-      "nOpt": 3,
+      "nOpt": 2,
       "readDistance": 2,
       "optimalPath": [
         {
           "index": 0,
-          "action": "goto",
-          "selector": null,
-          "reach": {
-            "strategy": "none",
-            "cost": 0
-          },
-          "actionCost": 1
-        },
-        {
-          "index": 1,
           "action": "read",
           "selector": "#ablauf > div > ol > li:nth-of-type(2) > div > h3",
           "evidence": "Erstgespräch & Untersuchung",
           "phrase": "heading, Erstgespräch & Untersuchung, level 3",
           "spanPhrases": 1,
           "reach": {
-            "strategy": "stepLevel",
+            "strategy": "path",
             "cost": 2,
             "via": {
-              "kind": "headings",
-              "level": 3,
-              "dir": "prev",
-              "command": "prevHeading",
-              "steps": 2,
-              "k": 0
-            }
+              "edges": [
+                {
+                  "type": "stepLevel",
+                  "command": "prevHeading",
+                  "to": 83
+                },
+                {
+                  "type": "step",
+                  "command": "prevHeading",
+                  "to": 80
+                }
+              ]
+            },
+            "commands": [
+              {
+                "type": "prevHeading",
+                "arg": 3
+              },
+              {
+                "type": "prevHeading"
+              }
+            ]
           },
           "actionCost": 0,
           "candidateCount": 1,
+          "pageUrl": "http://localhost:8804/",
           "analysis": {
             "cursorIndex": 0,
             "docStartIndex": 0,
             "readingOrderLength": 174,
-            "cacheHit": false,
-            "readingOrderIndex": 80,
+            "cacheHit": true,
+            "inReadingOrder": true,
             "next": 80,
             "prev": 94,
             "tab": null,
@@ -1796,11 +1750,11 @@
               "kind": "headings",
               "index": 8,
               "k": 0,
-              "cost": 2,
-              "pages": 0,
+              "cost": 3,
+              "pages": 1,
               "letter": null,
-              "phrase": null,
-              "selector": null
+              "phrase": "heading, Erstgespräch & Untersuchung, level 3",
+              "selector": "#ablauf > div > ol > li:nth-of-type(2) > div > h3"
             },
             "step": {
               "kind": "headings",
@@ -1824,7 +1778,8 @@
               "findNexts": 0,
               "k": 0,
               "cost": 2
-            }
+            },
+            "readingOrderIndex": 80
           }
         }
       ],

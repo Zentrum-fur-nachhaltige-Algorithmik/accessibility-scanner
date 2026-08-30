@@ -635,9 +635,11 @@ function kebab(s) {
 /**
  * Merge LLM proposals with the generic templates.
  *
- * Generic tasks already carry a verified oracle and sightedPath, so they are
- * kept and an LLM proposal with the same intent (cookie / search / contact /
- * login) is dropped as a duplicate.
+ * Generic tasks already carry a verified oracle and sightedPath and go first.
+ * A proposal with the same intent (cookie / search / contact / login) is
+ * kept next to them: "find out the opening hours" is not the same task as
+ * "reach the contact page", it has another oracle and another optimum. Real
+ * duplicates are caught later by their oracle (`duplicate-oracle`).
  *
  * Exception: the generic `login` template fires on any "Sign in" link, but on
  * many sites nobody's errand is "reach the login page", and a task nobody
@@ -665,22 +667,7 @@ function mergeCandidates({ proposed, genericTasks, maxTasks, dropped }) {
     });
     return false;
   });
-  const takenIntents = new Set(corroborated.map((g) => g.intent).filter(Boolean));
-
-  const kept = [];
-  for (const p of proposed) {
-    const intent = intentOf(p.description);
-    if (intent && takenIntents.has(intent)) {
-      dropped.push({
-        id: p.id,
-        description: p.description,
-        reason: `duplicate-intent (${intent}): covered by a generic template`,
-      });
-      continue;
-    }
-    if (intent) takenIntents.add(intent);
-    kept.push({ ...p, intent });
-  }
+  const kept = proposed.map((p) => ({ ...p, intent: intentOf(p.description) }));
 
   // Generics first: they are the cheap, certain part of the budget.
   const all = corroborated.concat(kept);

@@ -197,7 +197,7 @@ describe('agent/task-generator: merging and intent', () => {
     expect(intentOf('Find out what a passport costs.')).toBeNull();
   });
 
-  it('keeps the generic template and drops the duplicate proposal, with a reason', () => {
+  it('keeps a proposal next to the generic template of the same intent', () => {
     const dropped = [];
     const merged = mergeCandidates({
       proposed: [
@@ -215,10 +215,12 @@ describe('agent/task-generator: merging and intent', () => {
       maxTasks: 8,
       dropped,
     });
-    expect(merged.map((c) => c.id)).toEqual(['generic-cookie-banner-dismiss', 'passport-cost']);
-    expect(dropped).toHaveLength(1);
-    expect(dropped[0]).toMatchObject({ id: 'accept-cookies' });
-    expect(dropped[0].reason).toMatch(/duplicate-intent \(cookie\)/);
+    expect(merged.map((c) => c.id)).toEqual([
+      'generic-cookie-banner-dismiss',
+      'accept-cookies',
+      'passport-cost',
+    ]);
+    expect(dropped).toHaveLength(0);
   });
 
   it('drops the generic login task when the proposal does not corroborate it', () => {
@@ -258,10 +260,8 @@ describe('agent/task-generator: merging and intent', () => {
       maxTasks: 8,
       dropped,
     });
-    // The generic one survives; the proposal is deduplicated into it.
-    expect(merged.map((c) => c.id)).toEqual(['generic-login']);
-    expect(dropped).toHaveLength(1);
-    expect(dropped[0].reason).toMatch(/duplicate-intent \(login\)/);
+    expect(merged.map((c) => c.id)).toEqual(['generic-login', 'sign-in']);
+    expect(dropped).toHaveLength(0);
   });
 
   it('respects maxTasks and puts the generic (cheap, certain) tasks first', () => {

@@ -1,0 +1,94 @@
+<!-- WCAG-TEST
+criterion: 1.4.3
+level: AA
+title: Text on translucent, gradient and image backgrounds that composite above 4.5:1
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: color-contrast
+description: Every block here is a backdrop axe-core leaves as `incomplete` because it cannot read it from the CSSOM: a translucent panel over a photo, a single-colour linear-gradient fill, a multi-stop gradient whose stops all pass, a translucent chip over an opaque parent, and text over a background image whose file does not exist. Composited, each one is at or above the 4.5:1 (or 3:1 for large text) that SC 1.4.3 asks for, so none of them is a finding.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composited backgrounds</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.5rem; }
+
+  /* A photo behind a panel that lets 15 percent of it through. Whatever the
+     photo is, the text composites to at least 9.9:1. */
+  .hero {
+    background-image: linear-gradient(135deg, #101820 0%, #2b4a66 100%);
+    padding: 1rem;
+  }
+  .hero__panel {
+    background-color: rgba(255, 255, 255, 0.85);
+    color: #030d20;
+    padding: 1rem;
+  }
+
+  /* A fill declared as a gradient of one colour: white over the card's own
+     gradient border. */
+  .card {
+    background-image: linear-gradient(#ffffff, #ffffff);
+    border: 2px solid #1e4ea6;
+    color: #1e4ea6;
+    font-weight: 700;
+    font-size: 1.125rem;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  /* Every stop of this gradient carries the label at 5.3:1 or better. */
+  .advert {
+    background-image: linear-gradient(90deg, #f7d060 0%, #ffe9a8 100%);
+    color: #613207;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  /* A translucent chip over an opaque light parent: 6.1:1 composited. */
+  .slide { background-color: #f2f6fa; padding: 1rem; margin-top: 1rem; }
+  .slide__counter {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    padding: 0.25rem 0.75rem;
+    display: inline-block;
+  }
+
+  /* A background image that does not exist. It paints nothing, so the text
+     sits on the declared background-color. */
+  .menu {
+    background-color: #e9e8db;
+    background-image: url(images/does-not-exist.gif);
+    background-repeat: no-repeat;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  .menu a { color: #aa141d; font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Composited backgrounds</h1>
+
+  <div class="hero">
+    <div class="hero__panel">
+      <p>Text on a panel that lets the photograph behind it through at 15 percent.</p>
+    </div>
+  </div>
+
+  <div class="card">Service card title on a single-colour gradient fill</div>
+
+  <p class="advert">Advertisement label on a two-stop yellow gradient</p>
+
+  <div class="slide"><span class="slide__counter">3 of 12</span></div>
+
+  <div class="menu"><a href="#services">Services</a></div>
+</main>
+</body>
+</html>

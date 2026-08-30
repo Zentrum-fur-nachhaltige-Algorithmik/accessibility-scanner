@@ -1,0 +1,34 @@
+<!-- WCAG-TEST
+criterion: 2.5.8
+level: AA
+title: A link around an image that has not loaded is measured at the box the image reserves
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: Three partner banner links hold nothing but <img loading="lazy" width="384" height="100"> whose file does not exist, which is what the page looks like below the fold and in an offline snapshot. The painted anchor collapses to its line box and its neighbours fall inside the 24px spacing circle; the width and height attributes are the box the browser reserves, and 384x100 satisfies SC 2.5.8.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partners</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+  .banners { display: flex; flex-wrap: wrap; }
+  .banners a { display: block; padding: 0 .5rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Partners</h1>
+  <div class="banners">
+    <a href="/partner/one"><img loading="lazy" width="384" height="100" src="banner-one.png" alt="Partner one"></a>
+    <a href="/partner/two"><img loading="lazy" width="384" height="100" src="banner-two.png" alt="Partner two"></a>
+    <a href="/partner/three"><img loading="lazy" width="384" height="100" src="banner-three.png" alt="Partner three"></a>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!-- WCAG-TEST
+criterion: 2.4.4
+level: A
+title: An index of single-character links is identified by its own run of characters
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: page-structure
+description: Two runs of sibling links whose names are single characters in ascending order with few gaps: an A to Y trade directory index (Q, X and Z have no entries) and a 1 to 6 pagination. Each list item holds nothing but its link, so the enclosing item adds no word, but the sibling characters are text in the same list and they are what identifies each entry. Neither run is a 2.4.4 failure.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade directory</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  ul { display: flex; flex-wrap: wrap; gap: .25rem; list-style: none; padding: 0; }
+  li { border: 1px solid #595959; }
+  a { color: #0b4f9e; display: block; padding: .5rem .75rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Trade directory</h1>
+  <p>Businesses A to Z</p>
+  <ul class="index">
+    <li><a href="/directory/A.html">A</a></li>
+    <li><a href="/directory/B.html">B</a></li>
+    <li><a href="/directory/C.html">C</a></li>
+    <li><a href="/directory/D.html">D</a></li>
+    <li><a href="/directory/E.html">E</a></li>
+    <li><a href="/directory/F.html">F</a></li>
+    <li><a href="/directory/G.html">G</a></li>
+    <li><a href="/directory/H.html">H</a></li>
+    <li><a href="/directory/I.html">I</a></li>
+    <li><a href="/directory/J.html">J</a></li>
+    <li><a href="/directory/K.html">K</a></li>
+    <li><a href="/directory/L.html">L</a></li>
+    <li><a href="/directory/M.html">M</a></li>
+    <li><a href="/directory/N.html">N</a></li>
+    <li><a href="/directory/O.html">O</a></li>
+    <li><a href="/directory/P.html">P</a></li>
+    <li><a href="/directory/R.html">R</a></li>
+    <li><a href="/directory/S.html">S</a></li>
+    <li><a href="/directory/T.html">T</a></li>
+    <li><a href="/directory/U.html">U</a></li>
+    <li><a href="/directory/V.html">V</a></li>
+    <li><a href="/directory/W.html">W</a></li>
+    <li><a href="/directory/Y.html">Y</a></li>
+  </ul>
+
+  <h2>Results</h2>
+  <p>Page 1 of 6</p>
+  <ul class="pagination">
+    <li><a href="?page=1">1</a></li>
+    <li><a href="?page=2">2</a></li>
+    <li><a href="?page=3">3</a></li>
+    <li><a href="?page=4">4</a></li>
+    <li><a href="?page=5">5</a></li>
+    <li><a href="?page=6">6</a></li>
+  </ul>
+</main>
+</body>
+</html>

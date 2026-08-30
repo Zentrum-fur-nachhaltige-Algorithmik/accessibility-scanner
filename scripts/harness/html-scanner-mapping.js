@@ -865,6 +865,114 @@ const HTML_SCANNER_MAPPING = {
       'Complete German accessibility statement (conformance status, non-accessible content, dates, feedback contact, enforcement procedure): no EAA finding at all',
   },
 
+  'good-nontext-boundary-fill-and-icon.html': {
+    expectedScanners: [],
+    excludedScanners: ['nontext-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.11'],
+    description:
+      'A white field on a blue header bar bounded by its own fill at 3.23:1 and a white round button identified by its icon: 1.4.11 asks for 3:1 on what identifies the component, not on every edge',
+  },
+
+  'good-image-alt-icon-in-named-button.html': {
+    expectedScanners: [],
+    excludedScanners: ['media-accessibility', 'screen-reader'],
+    testType: 'good',
+    wcagCriteria: ['1.1.1'],
+    description:
+      'An icon with no alt attribute as the sole content of a button carrying aria-label: the control is named by its author and the icon is never announced on its own',
+  },
+
+  'good-target-size-lazy-banner.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'Banner links holding only a lazy image that has not loaded: 2.5.8 measures the box the width and height attributes reserve, not the collapsed anchor',
+  },
+
+  'good-title-as-the-name-of-a-control.html': {
+    expectedScanners: [],
+    excludedScanners: ['hover-focus-content'],
+    testType: 'good',
+    wcagCriteria: ['1.4.13'],
+    description:
+      'A teaser link named only by its title and a button carrying both a title and its text: a browser tooltip is user agent content, and a control with no name is 4.1.2',
+  },
+
+  'good-reflow-pannable-carousel.html': {
+    expectedScanners: [],
+    excludedScanners: ['responsive-design'],
+    testType: 'good',
+    wcagCriteria: ['1.4.10', '1.4.12'],
+    description:
+      "A topic strip whose track spans the container's whole scrollable width and pans: the slides outside the clip box are reachable, so neither 1.4.10 nor 1.4.12 loses anything",
+  },
+
+  'good-video-silent-background-loop.html': {
+    expectedScanners: [],
+    excludedScanners: ['media-accessibility'],
+    testType: 'good',
+    wcagCriteria: ['1.2.2', '1.2.3', '1.2.5'],
+    description:
+      'Two identical autoplay/loop/no-controls motion graphics, only one of which the page script mutes: the markup decides what the pattern is, not the muted property',
+  },
+
+  'good-carousel-role-less-wrapper.html': {
+    expectedScanners: [],
+    excludedScanners: ['advanced-aria'],
+    testType: 'good',
+    wcagCriteria: ['4.1.2'],
+    description:
+      'A swiper wrapper with slides and prev/next controls but no role beside a named role="region" carousel: only the element that carries a role needs a name',
+  },
+
+  'bad-carousel-unnamed-region.html': {
+    expectedScanners: ['advanced-aria'],
+    excludedScanners: ['color-contrast'],
+    testType: 'bad',
+    wcagCriteria: ['4.1.2'],
+    description:
+      'role="region" aria-roledescription="carousel" with no name of its own inside a named section: the wrapping name is the section\'s, not the component\'s',
+  },
+
+  'good-contrast-composited-backgrounds.html': {
+    expectedScanners: [],
+    excludedScanners: ['color-contrast'],
+    testType: 'good',
+    wcagCriteria: ['1.4.3'],
+    description:
+      'Translucent panel over a photo, single-colour and multi-stop gradient fills, a translucent chip and a background image that does not load: every backdrop axe-core leaves incomplete composites at or above the threshold',
+  },
+
+  'bad-contrast-composited-backgrounds.html': {
+    expectedScanners: ['color-contrast'],
+    excludedScanners: ['use-of-color', 'images-of-text'],
+    testType: 'bad',
+    wcagCriteria: ['1.4.3'],
+    description:
+      'The same backdrops failing: a chip composited to light grey, an orange label inside a zero-line-height wrapper and a gradient whose every stop is too close to the text',
+  },
+
+  'good-link-index-letters.html': {
+    expectedScanners: [],
+    excludedScanners: ['page-structure'],
+    testType: 'good',
+    wcagCriteria: ['2.4.4'],
+    description:
+      'An A to Y trade directory index and a 1 to 6 pagination: sibling links whose names are single characters in ascending order identify each other as an index',
+  },
+
+  'bad-link-single-character-navbox.html': {
+    expectedScanners: ['page-structure'],
+    excludedScanners: ['color-contrast'],
+    testType: 'bad',
+    wcagCriteria: ['2.4.4'],
+    description:
+      'Navigation box links named "v", "t" and "e": single characters that are neither a run nor accompanied by a word, so nothing identifies where they go',
+  },
+
   'good-contrast-hidden-and-arbitrary-classes.html': {
     expectedScanners: [],
     excludedScanners: ['color-contrast'],

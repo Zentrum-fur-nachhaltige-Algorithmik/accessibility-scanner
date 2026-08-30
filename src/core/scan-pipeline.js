@@ -8,6 +8,25 @@
 const puppeteer = require('puppeteer');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
+/**
+ * Navigate and wait for the network to go quiet; when it never does inside
+ * `timeout`, scan the page as it stands. A page whose subresources keep the
+ * network busy (analytics beacons, long polling, a slow third party) has still
+ * loaded, and giving up on it would drop the scan for a delay that is the
+ * page's, not the scanner's. Only a page that has not even reached
+ * `interactive` by then is a real navigation failure. Silent: the harness
+ * records the time, and the scan reports nothing about how it loaded.
+ */
+async function gotoSettled(page, url, timeout) {
+  try {
+    await page.goto(url, { waitUntil: 'networkidle0', timeout });
+  } catch (err) {
+    if (!/Navigation timeout/i.test(err.message)) throw err;
+    const readyState = await page.evaluate(() => document.readyState).catch(() => null);
+    if (readyState !== 'interactive' && readyState !== 'complete') throw err;
+  }
+}
+
 class ScanPipeline {
   /**
    * @param {Object} [options]
@@ -131,7 +150,7 @@ class ScanPipeline {
             this.autoDismissDialogs(tab);
             await tab.setViewport({ width: 1920, height: 1080 });
             try {
-              await tab.goto(url, { waitUntil: 'networkidle0', timeout });
+              await gotoSettled(tab, url, timeout);
               return await scanner.scan(tab, passedOptions);
             } finally {
               await tab.close().catch(() => {});
@@ -175,7 +194,7 @@ class ScanPipeline {
 
   async navigateWithCSPFallback(page, url, options = {}) {
     const timeout = options.timeout || 30000;
-    await page.goto(url, { waitUntil: 'networkidle0', timeout });
+    await gotoSettled(page, url, timeout);
   }
 
   /**
@@ -186,6 +205,10 @@ class ScanPipeline {
     // Advice a scanner offers about criteria nothing fails (the Deque best
     // practice rules). Reported, never counted and never scored.
     const bestPractices = [];
+    // Nodes whose criterion the scanner could not decide from the page.
+    // Reported, never counted and never scored, so an unknown is never a
+    // failure and never disappears either.
+    const needsReview = [];
     const scannerSummaries = {};
 
     const { trustTier, trustReason } = require('./scanner-trust');
@@ -206,15 +229,17 @@ class ScanPipeline {
             v.experimental = true;
             v.confidence = 'low';
           }
-          // Conformance level. A finding whose every criterion is AAA is
-          // advisory for an AA audit: it is kept, but as 'info' so it neither
-          // drives the score nor sits among the AA failures in the report.
+          // Conformance level. A finding whose every criterion is AAA is not a
+          // failure of the AA conformance this profile audits, so it is
+          // reported beside the findings instead of among them.
           const level = levelOfViolation(v);
           if (level) v.wcagLevel = level;
-          if (level === 'AAA' && v.severity !== 'info') {
+          if (level === 'AAA') {
             v.originalSeverity = v.severity ?? null;
             v.severity = 'info';
             v.aaa = true;
+            needsReview.push(v);
+            continue;
           }
           allViolations.push(v);
         }
@@ -228,6 +253,13 @@ class ScanPipeline {
             v.confidence = 'low';
           }
           bestPractices.push(v);
+        }
+      }
+
+      if (Array.isArray(result.needsReview)) {
+        for (const v of result.needsReview) {
+          if (!v.scannerId) v.scannerId = result.scannerId;
+          needsReview.push(v);
         }
       }
 
@@ -253,6 +285,7 @@ class ScanPipeline {
       totalViolations: violations.length,
       violations,
       bestPractices,
+      needsReview,
       scanners: scannerSummaries,
       categories,
     };

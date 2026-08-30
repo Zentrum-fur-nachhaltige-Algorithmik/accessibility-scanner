@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-28T17:44:16.300Z",
+  "generatedAt": "2026-08-29T20:09:12.416Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 102,
+    "passed": 105,
     "failed": 0
   },
   "results": [
@@ -529,6 +529,16 @@
       "status": "PASS"
     },
     {
+      "file": "good-target-size-lazy-banner.html",
+      "scanner": "input-modalities",
+      "expectViolations": false,
+      "criteria": [
+        "2.5.8"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
       "file": "good-target-size-minimum.html",
       "scanner": "input-modalities",
       "expectViolations": false,
@@ -687,16 +697,6 @@
       "criteria": [
         "1.4.13"
       ],
-      "matched": 1,
-      "status": "PASS"
-    },
-    {
-      "file": "bad-title-only-name.html",
-      "scanner": "hover-focus-content",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.13"
-      ],
       "matched": 2,
       "status": "PASS"
     },
@@ -712,6 +712,16 @@
     },
     {
       "file": "good-hover-focus-measured.html",
+      "scanner": "hover-focus-content",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.13"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-title-as-the-name-of-a-control.html",
       "scanner": "hover-focus-content",
       "expectViolations": false,
       "criteria": [
@@ -844,6 +854,16 @@
       "status": "PASS"
     },
     {
+      "file": "good-nontext-boundary-fill-and-icon.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
       "file": "good-nontext-contrast.html",
       "scanner": "nontext-contrast",
       "expectViolations": false,
@@ -910,6 +930,17 @@
       "expectViolations": false,
       "criteria": [
         "1.4.10"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-reflow-pannable-carousel.html",
+      "scanner": "responsive-design",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.10",
+        "1.4.12"
       ],
       "matched": 0,
       "status": "PASS"

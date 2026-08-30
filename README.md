@@ -136,14 +136,18 @@ the good-file corpus and never crashes on the real-world corpus; otherwise it
 is `experimental`, stays registered, is left out of the default profiles and
 its findings carry `confidence: "low"`. CI fails when the file is stale.
 
-`tests/data/realworld-labels.json` judges every finding the eleven real-world
+`tests/data/realworld-labels.json` judges every finding the sixteen real-world
 snapshots produced, one entry per (snapshot, rule id, node selector), as
-`true`, `false`, `review` or `unlabelled`, each with the reason. `npm run
-precision:check` runs the real-world pipeline again, matches what is reported
-against those labels and prints, per rule id, how many findings are real:
-precision = true / (true + false). It fails when a rule with at least three
-judged findings reports a false one, and lists reported findings that carry no
-label yet. Its result is recorded in `tests/data/harness/harness-precision.json`
+`true`, `false`, `review` or `artefact`, each with the reason; `artefact` is a
+finding the snapshot reports and the live page does not, because the replay
+keeps a state the page script would remove. `npm run precision:check` runs the
+real-world pipeline again, matches what is reported against those labels and
+prints, per rule id, how many findings are real: precision = true /
+(true + false). It fails when a rule with at least three judged findings
+reports a false one, and lists reported findings that carry no label yet.
+Artefacts never count, and neither does a rule that measures the rendering
+(contrast, reflow, target size, focus appearance) on one of the five snapshots
+captured before the stylesheets were inlined. Its result is recorded in `tests/data/harness/harness-precision.json`
 and is the third condition for a `proven` tier.
 
 ## WCAG 2.2 coverage
@@ -333,7 +337,7 @@ npm run test:self-scan      # builds the UI and scans it with the API
 npm run lint                # eslint, prettier, dash check
 ```
 
-`test-sites/` holds about 230 `good-*.html` / `bad-*.html` fixtures with
+`test-sites/` holds about 250 `good-*.html` / `bad-*.html` fixtures with
 a `WCAG-TEST` metadata block naming the criteria they exercise. The axe e2e
 test runs every fixture; the harnesses in `scripts/harness/` measure true and
 false positives per scanner and write the JSON that feeds the trust tiers:
@@ -342,8 +346,14 @@ false positives per scanner and write the JSON that feeds the trust tiers:
 npm run harness:exclusive   # one scanner at a time, fresh page each
 npm run harness:concurrent  # read-only scanners
 npm run harness:llm         # LLM scanners, needs OPENROUTER_API_KEY
-npm run harness:realworld   # captured real pages, no-crash invariant
+npm run harness:realworld -- --json tests/data/harness/harness-realworld.json   # captured real pages, no-crash invariant
 npm run precision:check     # captured real pages against the audit labels
+```
+
+The two real-world runs scan three snapshots at once (`--parallel 1` for a
+sequential run); `harness:realworld` records only with `--json`.
+
+```
 npm run trust:derive        # rewrite src/core/scanner-trust.json
 npm run coverage-matrix     # rewrite the coverage section above
 ```

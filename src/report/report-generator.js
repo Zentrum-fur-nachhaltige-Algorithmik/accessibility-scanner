@@ -813,6 +813,8 @@ class ReportGenerator {
       (v.description || v.type || v.issue || '').trim()
     );
     if (meaningfulOther.length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
+    if ((data.needsReview || []).length > 0)
+      sub += `<li><a href="#s-4-7">4.7 Needs review</a></li>\n`;
 
     return `
 <nav class="toc" aria-labelledby="toc-heading">
@@ -940,7 +942,12 @@ class ReportGenerator {
 
   generateFindingsSection(data) {
     if (!data.violations || data.violations.length === 0) {
-      return '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>';
+      const needsReview = this.generateNeedsReviewSection(data, 4);
+      this._tableCounter = needsReview ? 5 : 4;
+      return (
+        '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>' +
+        needsReview
+      );
     }
 
     const aaa = data.violations.filter((v) => v.wcagLevel === 'AAA');
@@ -988,8 +995,65 @@ class ReportGenerator {
       tableCounter++;
     }
 
+    const needsReview = this.generateNeedsReviewSection(data, tableCounter);
+    if (needsReview) {
+      html += needsReview;
+      tableCounter++;
+    }
+
     this._tableCounter = tableCounter;
     return html;
+  }
+
+  /**
+   * The findings the scanners could not decide from the page.
+   *
+   * Each carries the question a reviewer has to answer plus the values the
+   * scanner did measure. They are not violations: they appear in no count, no
+   * severity distribution and no per-principle table, only here.
+   */
+  generateNeedsReviewSection(data, tableCounter) {
+    const items = Array.isArray(data.needsReview) ? data.needsReview : [];
+    if (items.length === 0) return '';
+
+    let html = `<h3 id="s-4-7"><span class="sn">4.7</span> Needs review</h3>`;
+    html += `<p>${items.length} findings could not be decided automatically. They are not counted as violations and do not affect the score; a reviewer has to answer the question stated for each.</p>`;
+    html += this.renderNeedsReviewTable(items, tableCounter, 'Findings needing review');
+    return html;
+  }
+
+  renderNeedsReviewTable(items, tableNum, captionText) {
+    let html = `<div class="table-responsive" tabindex="0" role="region" aria-label="${this.esc(captionText)}">\n<table>\n`;
+    html += `<caption>Table ${this.esc(tableNum)}: ${this.esc(captionText)}</caption>\n`;
+    html += `<thead><tr><th scope="col" class="col-num">#</th><th scope="col" class="col-criterion">Criterion</th><th scope="col" class="col-source">Source</th><th scope="col">Question</th><th scope="col">Element</th><th scope="col">Measurements</th></tr></thead>\n<tbody>`;
+
+    items.forEach((item, i) => {
+      const dossier = item.dossier || {};
+      const criterion = item.criterion || item.wcagCriteria || item.clause || '';
+      const question = dossier.question || item.description || item.issue || '\u2014';
+      const selector = dossier.element?.selector || this.violationSelector(item);
+      const source = this._classifyViolationSource(item);
+      const sourceBadge = `<span class="source-badge source-${source.key}" title="${source.title}">${source.label}</span>`;
+      html += `<tr class="row-info"><th scope="row">${i + 1}</th><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${sourceBadge}</td><td>${this.esc(question)}</td><td>${selector ? `<code>${this.esc(selector)}</code>` : '\u2014'}</td><td>${this.renderMeasurements(dossier.measurements)}</td></tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  /** Flat "key: value" list of what a scanner measured, escaped. */
+  renderMeasurements(measurements) {
+    if (!measurements || typeof measurements !== 'object') return '\u2014';
+    const entries = Object.entries(measurements).filter(([, v]) => v !== null && v !== undefined);
+    if (entries.length === 0) return '\u2014';
+    return entries
+      .map(([key, value]) => `${this.esc(key)}: ${this.esc(String(value))}`)
+      .join('<br>');
+  }
+
+  /** First selector a finding names, whatever shape it came in. */
+  violationSelector(v) {
+    return v?.element || v?.selector || v?.nodes?.[0]?.selector || '';
   }
 
   renderViolationTable(violations, tableNum, captionText) {
@@ -1005,11 +1069,8 @@ class ReportGenerator {
       const descText = v.description || v.type || v.issue || '';
       const isIncomplete = sev === 'info';
       const desc = this.esc(descText) + (isIncomplete ? ' <em>(Manual review required)</em>' : '');
-      const el = v.element
-        ? `<code>${this.esc(v.element)}</code>`
-        : v.nodes && v.nodes[0] && v.nodes[0].selector
-          ? `<code>${this.esc(v.nodes[0].selector)}</code>`
-          : '\u2014';
+      const selector = this.violationSelector(v);
+      const el = selector ? `<code>${this.esc(selector)}</code>` : '\u2014';
       const rec = this.esc(v.recommendation || v.suggestion || v.axeHelp || '\u2014');
       const source = this._classifyViolationSource(v);
       const sourceBadge = `<span class="source-badge source-${source.key}" title="${source.title}">${source.label}</span>`;

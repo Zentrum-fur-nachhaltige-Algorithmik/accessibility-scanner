@@ -28,6 +28,8 @@ function parseArgs(argv) {
     // Which rung of the metric ladder runs: 'llm' = stage 3 (sr-agent.js),
     // 'greedy' = stage 2 (greedy-agent.js, word matching only).
     agent: 'llm',
+    // 'privileged' = control run for the barrier score (LLM agent only).
+    observation: 'blind',
     generate: false,
     vision: false,
     allowSubmit: false,
@@ -42,6 +44,7 @@ function parseArgs(argv) {
     else if (a === '--k') args.k = parseInt(argv[++i], 10) || 1;
     else if (a === '--model') args.model = argv[++i];
     else if (a === '--agent') args.agent = String(argv[++i] || '').trim();
+    else if (a === '--observation') args.observation = String(argv[++i] || '').trim();
     else if (a === '--out') args.out = argv[++i];
     else if (a === '--headless') args.headless = String(argv[++i]) !== 'false';
     else if (a === '--generate') args.generate = true;
@@ -69,7 +72,7 @@ function parseArgs(argv) {
 }
 
 const USAGE = `Usage: node src/agent/run.js <url> [--tasks tasks.json] [--generate] [--k 1] [--model ${DEFAULT_MODEL}]
-       [--agent llm|greedy] [--out result.json] [--headless true] [--only id,id] [--exclude id,id] [--concurrency 3]
+       [--agent llm|greedy] [--observation blind|privileged] [--out result.json] [--headless true] [--only id,id] [--exclude id,id] [--concurrency 3]
        generator options (with --generate): [--max-tasks 8] [--explore 4] [--vision] [--allow-submit]`;
 
 function pad(s, n) {
@@ -119,7 +122,8 @@ function printSummary(result) {
     console.log('* nOpt covers navigation only: the evidence is never spoken (see findings).');
   }
   console.log(
-    `siteScore: ${result.siteScore == null ? 'n/a (no valid tasks)' : result.siteScore.toFixed(3)}`
+    `siteScore: ${result.siteScore == null ? 'n/a (no valid tasks)' : result.siteScore.toFixed(3)}` +
+      (result.observation === 'privileged' ? ' (privileged control run)' : '')
   );
   if (result.invalidTasks.length) {
     console.log(`invalid tasks (${result.invalidTasks.length}):`);
@@ -155,6 +159,14 @@ async function main() {
 
   if (args.agent !== 'llm' && args.agent !== 'greedy') {
     console.error(`Unknown --agent "${args.agent}"; use "llm" or "greedy".`);
+    process.exit(1);
+  }
+  if (args.observation !== 'blind' && args.observation !== 'privileged') {
+    console.error(`Unknown --observation "${args.observation}"; use "blind" or "privileged".`);
+    process.exit(1);
+  }
+  if (args.observation === 'privileged' && args.agent !== 'llm') {
+    console.error('--observation privileged is a control run of the LLM agent; use --agent llm.');
     process.exit(1);
   }
 
@@ -230,6 +242,7 @@ async function main() {
       k: args.k,
       model: args.model,
       agent: args.agent,
+      observation: args.observation,
       concurrency: args.concurrency,
     });
     if (generated)

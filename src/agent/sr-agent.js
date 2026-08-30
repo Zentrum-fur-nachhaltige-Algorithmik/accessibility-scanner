@@ -3,6 +3,10 @@
  * The agent solves a task through a `ScreenReaderEnv` and only sees what a
  * screen-reader user hears (phrase, announcements, rotor lists, focus, URL);
  * never DOM, tree, selectors or screenshots. Every turn costs one step, including malformed ones.
+ *
+ * `observation: 'privileged'` is the control run of the barrier score: the same
+ * agent, prompt and commands, but every turn also carries the sighted page view
+ * (page-view.js). What it still needs blind beyond that is the barrier.
  */
 
 const { MARK_KINDS } = require('./screenreader-env');
@@ -158,7 +162,6 @@ const SR_TOOLS = [
   ),
 ];
 
-
 function fn(name, description, parameters) {
   const base = parameters || { type: 'object', properties: {}, additionalProperties: false };
   return {
@@ -222,6 +225,24 @@ const SYSTEM_PROMPT = [
 ].join('\n');
 
 /**
+ * Appended to the system prompt in the privileged control run. It changes only
+ * what the agent knows, never what it can do.
+ */
+const PRIVILEGED_PROMPT = [
+  '',
+  'PRIVILEGED MODE: in addition to what the screen reader speaks you receive, on every turn, the',
+  'complete structure of the current page as a sighted person sees it (PAGE VIEW: landmarks,',
+  'headings, every interactive element with its name and link target, the main text). Use it to',
+  'plan the shortest route: you know beforehand which heading, link or field you are looking for,',
+  'how many of its kind precede it and whether the page holds the answer at all.',
+  'The numbers in front of the PAGE VIEW entries are NOT commands: you still have to reach every',
+  'element with the screen-reader commands above, and every command still costs its step.',
+  'On an information task the answer still has to be SPOKEN to you before `done`.',
+].join('\n');
+
+const OBSERVATIONS = ['blind', 'privileged'];
+
+/**
  * Run the screen-reader agent against one task.
  *
  * @param {object} args
@@ -233,6 +254,9 @@ const SYSTEM_PROMPT = [
  * @param {number} [args.memoryTurns=8] - how many command/observation pairs stay in the history
  * @param {number} [args.maxSteps] - step budget; defaults to `env.maxSteps`
  * @param {(obs: object, cmd: object) => any} [args.onStep] - harness hook; may return `{ stop: true, reason }`
+ * @param {'blind'|'privileged'} [args.observation='blind'] - 'privileged' adds the sighted page view
+ * @param {() => Promise<string>} [args.privilegedView] - renders the current page view; required
+ *        with observation 'privileged', called at the start and after every step that changed the page
  * @returns {Promise<{success: null, nSr: number, steps: number, trace: any[], stoppedBy: string, usage: object, error?: string}>}
  */
 async function runSrAgent({
@@ -244,9 +268,16 @@ async function runSrAgent({
   memoryTurns = DEFAULT_MEMORY_TURNS,
   maxSteps,
   onStep,
+  observation = 'blind',
+  privilegedView,
 }) {
   if (!env || typeof env.step !== 'function')
     throw new Error('runSrAgent: env with step() is required');
+  if (!OBSERVATIONS.includes(observation))
+    throw new Error(`runSrAgent: unknown observation "${observation}"`);
+  const privileged = observation === 'privileged';
+  if (privileged && typeof privilegedView !== 'function')
+    throw new Error('runSrAgent: observation "privileged" needs a privilegedView function');
   if (!task || !task.description)
     throw new Error('runSrAgent: task with a description is required');
   if (!llm || typeof llm.chat !== 'function')
@@ -269,6 +300,11 @@ async function runSrAgent({
   let freeInARow = 0;
   let stoppedBy = null;
   let error;
+  const systemPrompt = privileged ? SYSTEM_PROMPT + PRIVILEGED_PROMPT : SYSTEM_PROMPT;
+  // The page view goes only into the current turn, never into the history:
+  // the newest one is the only one that is true, and the prompt stays small.
+  let view = privileged ? await renderView(privilegedView) : '';
+  const withView = (text) => (view ? `${text}\n\n${view}` : text);
   // First turn: no observation yet, only the task itself.
   let pending = `TASK: ${description}\n\nYou have just started. Budget left: ${budgetLeft} commands.\nDecide on your first command.`;
 
@@ -278,12 +314,17 @@ async function runSrAgent({
       break;
     }
 
-    const messages = buildMessages({ description, history, memoryTurns, pending });
+    const messages = buildMessages({
+      description,
+      history,
+      memoryTurns,
+      pending: withView(pending),
+    });
     const res = await llm.chat(messages, {
       tools: SR_TOOLS,
       toolChoice: 'required',
       temperature: 0,
-      systemPrompt: SYSTEM_PROMPT,
+      systemPrompt,
       model,
     });
 
@@ -339,6 +380,7 @@ async function runSrAgent({
 
     let stopSignal;
     if (typeof onStep === 'function') stopSignal = await onStep(obs, cmd);
+    if (privileged && !free && pageChanged(env, obs)) view = await renderView(privilegedView);
 
     const observationText = renderObservation({
       description,
@@ -373,6 +415,22 @@ async function runSrAgent({
 }
 
 // Internals
+
+async function renderView(privilegedView) {
+  try {
+    const text = await privilegedView();
+    return `PAGE VIEW (privileged; what a sighted person sees, not a command list):\n${text}`;
+  } catch (err) {
+    return `PAGE VIEW (privileged): unavailable (${err.message})`;
+  }
+}
+
+/** Did the last step change the page (navigation or DOM mutation), so the view is stale? */
+function pageChanged(env, obs) {
+  if (obs && obs.urlChanged) return true;
+  const last = env.trace && env.trace[env.trace.length - 1];
+  return !!(last && last.domChanged);
+}
 
 function numberOr(value, fallback) {
   return typeof value === 'number' && !Number.isNaN(value) ? value : fallback;
@@ -525,4 +583,4 @@ function buildMessages({ description, history, memoryTurns, pending }) {
   return messages;
 }
 
-module.exports = { runSrAgent, SR_TOOLS, SYSTEM_PROMPT };
+module.exports = { runSrAgent, SR_TOOLS, SYSTEM_PROMPT, PRIVILEGED_PROMPT, OBSERVATIONS };

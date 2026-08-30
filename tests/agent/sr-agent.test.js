@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { runSrAgent, SR_TOOLS, SYSTEM_PROMPT } from '../../src/agent/sr-agent.js';
+import {
+  runSrAgent,
+  SR_TOOLS,
+  SYSTEM_PROMPT,
+  PRIVILEGED_PROMPT,
+} from '../../src/agent/sr-agent.js';
 
 /** In-memory stand-in for ScreenReaderEnv: deterministic, no browser, no VSR. */
 function fakeEnv({ maxSteps = 10, phraseFor } = {}) {
@@ -565,5 +570,84 @@ describe('runSrAgent argument validation', () => {
     await expect(runSrAgent({ task, llm: fakeLlm([]) })).rejects.toThrow(/env/);
     await expect(runSrAgent({ env: fakeEnv(), llm: fakeLlm([]) })).rejects.toThrow(/task/);
     await expect(runSrAgent({ env: fakeEnv(), task })).rejects.toThrow(/llm/);
+  });
+});
+
+describe('runSrAgent privileged control run', () => {
+  const privilegedView = vi.fn(
+    async () => 'URL: http://x/\nHEADINGS:\n  h2 Contact\nELEMENTS:\n  [1] link "Contact"'
+  );
+
+  it('is blind by default and refuses an unknown observation', async () => {
+    const env = fakeEnv();
+    await expect(
+      runSrAgent({ env, task, llm: fakeLlm([call('done')]), observation: 'sighted' })
+    ).rejects.toThrow(/observation/);
+    await expect(
+      runSrAgent({ env, task, llm: fakeLlm([call('done')]), observation: 'privileged' })
+    ).rejects.toThrow(/privilegedView/);
+  });
+
+  it('adds the page view and the privileged prompt, same tools and costs', async () => {
+    privilegedView.mockClear();
+    const env = fakeEnv({ maxSteps: 6 });
+    const llm = fakeLlm([call('headings'), call('jumpTo', { index: 0 }), call('done')]);
+    const res = await runSrAgent({ env, task, llm, observation: 'privileged', privilegedView });
+    expect(res.nSr).toBe(3);
+    for (const { messages, options } of llm.seen) {
+      expect(options.tools).toBe(SR_TOOLS);
+      expect(options.systemPrompt).toBe(SYSTEM_PROMPT + PRIVILEGED_PROMPT);
+      const current = messages.at(-1).content;
+      expect(current).toContain('PAGE VIEW (privileged');
+      expect(current).toContain('[1] link "Contact"');
+    }
+    // The view goes only into the current turn: history stays screen-reader only.
+    const older = llm.seen[2].messages
+      .slice(1, -1)
+      .map((m) => m.content)
+      .join('\n');
+    expect(older).not.toContain('PAGE VIEW');
+    // Nothing changed the page, so the view was rendered once at the start.
+    expect(privilegedView).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-renders the view after a step that changed the page', async () => {
+    privilegedView.mockClear();
+    const env = fakeEnv({ maxSteps: 6 });
+    const step = env.step;
+    env.step = async (cmd) => {
+      const obs = await step(cmd);
+      if (cmd.type === 'activate') {
+        obs.urlChanged = true;
+        env.trace.at(-1).domChanged = true;
+      }
+      return obs;
+    };
+    const llm = fakeLlm([
+      call('next'),
+      call('activate'),
+      call('mark', { kind: 'confirmed' }),
+      call('done'),
+    ]);
+    await runSrAgent({ env, task, llm, observation: 'privileged', privilegedView });
+    // start + after activate; `next` and the free `mark` do not re-render.
+    expect(privilegedView).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps going when the view cannot be rendered', async () => {
+    const env = fakeEnv({ maxSteps: 3 });
+    const llm = fakeLlm([call('done')]);
+    const broken = async () => {
+      throw new Error('page gone');
+    };
+    const res = await runSrAgent({
+      env,
+      task,
+      llm,
+      observation: 'privileged',
+      privilegedView: broken,
+    });
+    expect(res.stoppedBy).toBe('done');
+    expect(llm.seen[0].messages.at(-1).content).toContain('unavailable (page gone)');
   });
 });

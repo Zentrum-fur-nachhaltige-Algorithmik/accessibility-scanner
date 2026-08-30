@@ -17,6 +17,13 @@ const secs = (ms) => `${(ms / 1000).toFixed(0)}s`;
  * env commands, so no smoothing constant is needed. A solved task that cost no
  * commands scores 1.
  */
+/**
+ * Bounds of the sighted page view handed to the privileged control run: wider
+ * than the sighted agent's defaults, because here the view has to remove the
+ * information barrier, not just size a prompt.
+ */
+const PRIVILEGED_VIEW = { maxElements: 120, maxTextChars: 3000, maxHeadings: 40 };
+
 function scoreTask(nOpt, nSr, success) {
   if (!success) return 0;
   const opt = Number(nOpt) || 0;
@@ -69,6 +76,9 @@ function resolveFn(name, required = true) {
  * @param {string} [args.model]
  * @param {'llm'|'greedy'} [args.agent='llm'] - stage 3 (the LLM agent) or stage 2
  *        (the deterministic word matcher of greedy-agent.js, which needs no LLM)
+ * @param {'blind'|'privileged'} [args.observation='blind'] - 'privileged' is the control
+ *        run of the barrier score: the LLM agent also gets the sighted page view
+ *        (page-view.js) every turn, commands and costs unchanged
  * @param {number} [args.concurrency=3] - tasks measured at the same time; the
  *        k runs of one task stay sequential (they share nothing but must not
  *        interleave in the trace).
@@ -84,6 +94,7 @@ async function runSite({
   k = 1,
   model,
   agent = 'llm',
+  observation = 'blind',
   concurrency = DEFAULT_CONCURRENCY,
   logger = console,
   deps,
@@ -202,6 +213,7 @@ async function runSite({
           ScreenReaderEnv,
           agentFn,
           runPreconditions,
+          observation,
         })
       );
     }
@@ -252,7 +264,7 @@ async function runSite({
       : null;
 
   const usage = aggregateUsage(results);
-  return { url, tasks: results, siteScore, invalidTasks, usage, wallClockMs };
+  return { url, agent, observation, tasks: results, siteScore, invalidTasks, usage, wallClockMs };
 }
 
 /**
@@ -431,6 +443,7 @@ async function runOnce({
   ScreenReaderEnv,
   agentFn,
   runPreconditions,
+  observation = 'blind',
 }) {
   let page;
   let env;
@@ -496,12 +509,24 @@ async function runOnce({
     };
     await checkFragmentation();
 
+    // The privileged control run reads the same page the env drives, so what it
+    // sees is exactly the state the screen reader is in.
+    const privilegedView =
+      observation === 'privileged'
+        ? async () => {
+            const { extractPageView, renderPageView } = require('./page-view');
+            return renderPageView(await extractPageView(page, PRIVILEGED_VIEW));
+          }
+        : undefined;
+
     const agent = await agentFn({
       env,
       task,
       llm,
       model,
       maxSteps,
+      observation,
+      privilegedView,
       onStep: async () => {
         const last = env.trace && env.trace[env.trace.length - 1];
         if (last && last.obsAfter && last.obsAfter.urlChanged) await checkFragmentation();

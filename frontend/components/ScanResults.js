@@ -8,8 +8,11 @@ import {
   countScannerErrors,
   formatDateTime,
   groupViolations,
+  needsReviewItems,
   normalizeSeverity,
   principleCounts,
+  reviewMeasurements,
+  reviewQuestion,
   scannerLabel,
   scoreBand,
   severityCounts,
@@ -164,6 +167,81 @@ function Group({ group, mode, number }) {
 }
 
 /**
+ * One finding the scanners could not decide: the question a reviewer has to
+ * answer, plus the values the scanner did measure. Neutral, never a severity:
+ * it is an open question, not a failure.
+ */
+function ReviewItem({ item, number }) {
+  const element = item?.dossier?.element?.selector || violationElement(item);
+  const measurements = reviewMeasurements(item);
+  const scanner = item?.scannerId ? scannerLabel(item.scannerId) : '';
+
+  return (
+    <li className="pb-finding">
+      <p className="pb-finding-head">
+        <span className="pb-finding-no" aria-hidden="true">
+          {number}
+        </span>
+        <span className="pb-sev pb-tone-neutral">Needs review</span>
+        <span className="pb-finding-text">{reviewQuestion(item)}</span>
+      </p>
+      <dl className="pb-finding-meta">
+        {element && (
+          <>
+            <dt>Element</dt>
+            <dd>
+              <code>{element}</code>
+            </dd>
+          </>
+        )}
+        {measurements.length > 0 && (
+          <>
+            <dt>Measured</dt>
+            <dd>
+              <ul className="pb-finding-details">
+                {measurements.map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+            </dd>
+          </>
+        )}
+        {scanner && (
+          <>
+            <dt>Scan module</dt>
+            <dd>{scanner}</dd>
+          </>
+        )}
+      </dl>
+    </li>
+  );
+}
+
+function NeedsReviewSection({ items }) {
+  if (items.length === 0) return null;
+
+  return (
+    <details className="pb-group-details">
+      <summary className="pb-group-summary">
+        <span className="pb-group-name">Needs review ({items.length})</span>
+        <span className="pb-group-count">not counted as findings</span>
+      </summary>
+      <div className="pb-group-body">
+        <p className="pb-note">
+          These checks could not be decided automatically. They do not count as findings and do not
+          affect the score; each states the question a reviewer has to answer.
+        </p>
+        <ol className="pb-finding-list">
+          {items.map((item, index) => (
+            <ReviewItem key={index} item={item} number={index + 1} />
+          ))}
+        </ol>
+      </div>
+    </details>
+  );
+}
+
+/**
  * Sections 2 to 4 of the report: assessment result, findings, scan modules.
  */
 export default function ScanResults({
@@ -178,6 +256,7 @@ export default function ScanResults({
   const [mode, setMode] = useState('criterion');
 
   const violations = Array.isArray(result?.violations) ? result.violations : [];
+  const review = needsReviewItems(result);
   const groups = groupViolations(violations, mode);
   const severities = severityCounts(violations);
   const principles = principleCounts(violations);
@@ -398,6 +477,8 @@ export default function ScanResults({
             </ul>
           </>
         )}
+
+        <NeedsReviewSection items={review} />
       </section>
 
       <section className="pb-section" aria-labelledby="modules-heading">

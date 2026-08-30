@@ -18,7 +18,14 @@
 const path = require('path');
 const fs = require('fs');
 
-const { FIXTURES, FIXTURE_DIR, PROFILE, startServer, scanFile } = require('./harness/realworld');
+const {
+  FIXTURES,
+  FIXTURE_DIR,
+  PROFILE,
+  DEFAULT_PARALLEL,
+  startServer,
+  scanFile,
+} = require('./harness/realworld');
 const { getProfile } = require('../src/core/scanner-registry');
 
 const LABELS_PATH = path.join(__dirname, '..', 'tests', 'data', 'realworld-labels.json');
@@ -81,12 +88,15 @@ function selectorOf(v) {
 }
 
 function parseArgs(argv) {
-  const out = { only: null, json: null };
+  const out = { only: null, json: null, parallel: DEFAULT_PARALLEL };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--only') out.only = argv[++i];
+    else if (argv[i] === '--parallel') out.parallel = Math.max(1, parseInt(argv[++i], 10) || 1);
     else if (argv[i] === '--json') out.json = argv[++i];
     else if (argv[i] === '--help' || argv[i] === '-h') {
-      console.log('Usage: node scripts/precision-check.js [--only <file>] [--json <path>]');
+      console.log(
+        'Usage: node scripts/precision-check.js [--only <file>] [--json <path>] [--parallel <n>]'
+      );
       process.exit(0);
     }
   }
@@ -135,15 +145,32 @@ async function main() {
   const realWarn = console.warn;
   const realErr = console.error;
 
-  for (const fx of fixtures) {
-    const url = `http://localhost:${port}/${fx.file}`;
-    console.log = () => {};
-    console.warn = () => {};
-    console.error = () => {};
-    const { result, error } = await scanFile(url, scannerIds, {});
+  // Scan first, several snapshots at once (see DEFAULT_PARALLEL); the labels
+  // are then judged in fixture order, so the report reads the same at any
+  // --parallel.
+  const scans = new Array(fixtures.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < fixtures.length) {
+      const i = nextIndex++;
+      scans[i] = await scanFile(`http://localhost:${port}/${fixtures[i].file}`, scannerIds, {});
+    }
+  };
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+  try {
+    await Promise.all(
+      Array.from({ length: Math.min(args.parallel, fixtures.length) }, () => worker())
+    );
+  } finally {
     console.log = realLog;
     console.warn = realWarn;
     console.error = realErr;
+  }
+
+  for (const [i, fx] of fixtures.entries()) {
+    const { result, error } = scans[i];
 
     if (!result) {
       console.log(`${fx.file.padEnd(30)} SCAN FAILED: ${error}`);

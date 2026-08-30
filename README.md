@@ -204,8 +204,14 @@ false positives per scanner and write the JSON that feeds the trust tiers:
 npm run harness:exclusive   # one scanner at a time, fresh page each
 npm run harness:concurrent  # read-only scanners
 npm run harness:llm         # LLM scanners, needs OPENROUTER_API_KEY
-npm run harness:realworld   # captured real pages, no-crash invariant
+npm run harness:realworld -- --json tests/data/harness/harness-realworld.json   # captured real pages, no-crash invariant
 npm run precision:check     # captured real pages against the audit labels
+```
+
+The two real-world runs scan three snapshots at once (`--parallel 1` for a
+sequential run); `harness:realworld` records only with `--json`.
+
+```
 npm run trust:derive        # rewrite src/core/scanner-trust.json
 npm run coverage-matrix     # rewrite the coverage section above
 ```

@@ -36,6 +36,13 @@ const PROFILE = 'standard';
  */
 const PER_FILE_TIMEOUT_MS = 600000;
 const SLOW_FILE_MS = 240000;
+/**
+ * Snapshots scanned at once. Each gets its own pipeline and browser, so they
+ * only share the CPU: at 3 the sequential 40 minutes over sixteen snapshots
+ * become about 15, and elapsedMs grows a little under the shared load, which is
+ * why SLOW is a performance finding and never a failure.
+ */
+const DEFAULT_PARALLEL = 3;
 
 /**
  * Navigation budget one scanner gets for its own page load.
@@ -1276,14 +1283,15 @@ function startServer(dir) {
 // ---------------------------------------------------------------------------
 
 function parseArgs(argv) {
-  const out = { json: null, only: null, noLlm: false };
+  const out = { json: null, only: null, noLlm: false, parallel: DEFAULT_PARALLEL };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--json') out.json = argv[++i];
+    else if (argv[i] === '--parallel') out.parallel = Math.max(1, parseInt(argv[++i], 10) || 1);
     else if (argv[i] === '--only') out.only = argv[++i];
     else if (argv[i] === '--no-llm') out.noLlm = true;
     else if (argv[i] === '--help' || argv[i] === '-h') {
       console.log(
-        'Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>]'
+        'Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>] [--parallel <n>]'
       );
       process.exit(0);
     }
@@ -1374,34 +1382,29 @@ async function main() {
     profile: PROFILE,
     llmEnabled,
     perFileTimeoutMs: PER_FILE_TIMEOUT_MS,
+    parallel: args.parallel,
     files: [],
   };
   const failures = [];
 
   // Scanners are noisy; capture their chatter instead of drowning the report.
+  // The console is swapped once around the whole pool, so the snapshots that
+  // run at the same time share one noise log.
   const realLog = console.log;
   const realWarn = console.warn;
   const realErr = console.error;
+  const noise = [];
+  const sink = (...a) => noise.push(a.map(String).join(' '));
+  const log = realLog;
 
-  for (const fx of fixtures) {
+  const runFixture = async (fx) => {
     const url = `http://localhost:${port}/${fx.file}`;
-    realLog(`--- ${fx.file}`);
+    log(`--- ${fx.file}`);
+    const failures = [];
 
-    const noise = [];
-    const sink = (...a) => noise.push(a.map(String).join(' '));
-    console.log = sink;
-    console.warn = sink;
-    console.error = sink;
-
+    const noiseFrom = noise.length;
     const t0 = Date.now();
-    let outcome;
-    try {
-      outcome = await scanFile(url, scannerIds, profileOptions);
-    } finally {
-      console.log = realLog;
-      console.warn = realWarn;
-      console.error = realErr;
-    }
+    const outcome = await scanFile(url, scannerIds, profileOptions);
     const elapsedMs = Date.now() - t0;
 
     const entry = {
@@ -1420,9 +1423,8 @@ async function main() {
     if (outcome.timedOut) {
       failures.push({ layer: 'no-crash', file: fx.file, detail: outcome.error });
       entry.error = outcome.error;
-      report.files.push(entry);
-      realLog(`  HANG/TIMEOUT after ${elapsedMs}ms: ${outcome.error}`);
-      continue;
+      log(`  ${fx.file}: HANG/TIMEOUT after ${elapsedMs}ms: ${outcome.error}`);
+      return { entry, failures };
     }
 
     const result = outcome.result;
@@ -1523,20 +1525,50 @@ async function main() {
     // Slowness is reported, never swallowed (see PER_FILE_TIMEOUT_MS).
     entry.slow = elapsedMs > SLOW_FILE_MS;
 
+    // Lines another snapshot's scanners wrote during this window are in here
+    // too: the console is shared, the attribution is by time.
     entry.noise = noise
+      .slice(noiseFrom)
       .filter((l) => /error|fail|cannot|undefined|not ready/i.test(l))
       .slice(0, 40);
-    report.files.push(entry);
 
     const stOk = entry.spotTruths.filter((s) => s.ok).length;
-    realLog(
-      `  ${violations.length} violations | ${entry.scannerCount}/${entry.expectedScannerCount} scanners | ` +
+    log(
+      `  ${fx.file}: ${violations.length} violations | ${entry.scannerCount}/${entry.expectedScannerCount} scanners | ` +
         `${entry.scannerErrors.length} errors | spot-truths ${stOk}/${entry.spotTruths.length} | ${(elapsedMs / 1000).toFixed(1)}s`
     );
-    for (const e of entry.scannerErrors) realLog(`    SCANNER ERROR  ${e.scanner}: ${e.error}`);
-    for (const m of entry.missingScanners) realLog(`    SCANNER MISSING ${m}`);
+    for (const e of entry.scannerErrors) log(`    SCANNER ERROR  ${e.scanner}: ${e.error}`);
+    for (const m of entry.missingScanners) log(`    SCANNER MISSING ${m}`);
     for (const s of entry.spotTruths.filter((x) => !x.ok))
-      realLog(`    SPOT-TRUTH FAIL ${s.name}: ${s.detail}`);
+      log(`    SPOT-TRUTH FAIL ${s.name}: ${s.detail}`);
+    return { entry, failures };
+  };
+
+  // Worker pool over the fixtures; results are kept in fixture order so the
+  // report reads the same at any --parallel.
+  const results = new Array(fixtures.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < fixtures.length) {
+      const i = nextIndex++;
+      results[i] = await runFixture(fixtures[i]);
+    }
+  };
+  console.log = sink;
+  console.warn = sink;
+  console.error = sink;
+  try {
+    await Promise.all(
+      Array.from({ length: Math.min(args.parallel, fixtures.length) }, () => worker())
+    );
+  } finally {
+    console.log = realLog;
+    console.warn = realWarn;
+    console.error = realErr;
+  }
+  for (const r of results) {
+    report.files.push(r.entry);
+    failures.push(...r.failures);
   }
 
   // ---- summary ----
@@ -1545,7 +1577,9 @@ async function main() {
   report.passed = failures.length === 0;
 
   console.log('\n=== SUMMARY ===');
-  console.log(`profile=${PROFILE}  llm=${llmEnabled ? 'on' : 'off'}  fixtures=${fixtures.length}`);
+  console.log(
+    `profile=${PROFILE}  llm=${llmEnabled ? 'on' : 'off'}  fixtures=${fixtures.length}  parallel=${args.parallel}`
+  );
   console.log('');
   console.log(
     'file'.padEnd(26) +
@@ -1642,6 +1676,7 @@ module.exports = {
   FIXTURES,
   FIXTURE_DIR,
   PROFILE,
+  DEFAULT_PARALLEL,
   startServer,
   scanFile,
   findViolations,

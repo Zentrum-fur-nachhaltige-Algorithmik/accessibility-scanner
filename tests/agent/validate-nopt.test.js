@@ -2,105 +2,121 @@ import { describe, it, expect } from 'vitest';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-const { parseArgs, printTable, validateNopt } = require('../../src/agent/validate-nopt');
-const { DEFAULTS } = require('../../src/agent/bfs-optimum');
+const {
+  parseArgs,
+  tasksOf,
+  rebase,
+  describeRoute,
+  referenceFiles,
+  validateNopt,
+  printTable,
+  REFERENCE_DIR,
+} = require('../../src/agent/validate-nopt');
 
 describe('agent/validate-nopt: CLI arguments', () => {
-  it('defaults to the within-page BFS budgets', () => {
-    const args = parseArgs(['https://example.com', '--tasks', 't.json']);
-    expect(args).toMatchObject({
-      url: 'https://example.com',
-      tasks: 't.json',
-      maxPages: DEFAULTS.maxPages,
-      maxEdges: DEFAULTS.maxEdges,
-      timeoutMs: DEFAULTS.timeoutMs,
-    });
-    expect(args.maxPages).toBe(1);
+  it('measures the whole reference directory by default', () => {
+    const args = parseArgs([]);
+    expect(args).toMatchObject({ dir: REFERENCE_DIR, files: [], remote: false, only: null });
   });
 
-  it('takes the exhaustive budgets when asked', () => {
+  it('takes files, an origin override and a task filter', () => {
     const args = parseArgs([
-      'https://example.com',
-      '--tasks',
-      't.json',
-      '--max-pages',
-      '40',
-      '--max-edges',
-      '600',
+      'a.json',
+      '--url',
+      'http://127.0.0.1:8804/',
       '--only',
-      'a, b',
+      'x, y',
+      '--remote',
     ]);
-    expect(args).toMatchObject({ maxPages: 40, maxEdges: 600, only: ['a', 'b'] });
+    expect(args).toMatchObject({
+      files: ['a.json'],
+      url: 'http://127.0.0.1:8804/',
+      only: ['x', 'y'],
+      remote: true,
+    });
+  });
+
+  it('moves a recorded url onto another origin, path and query kept', () => {
+    expect(rebase('http://localhost:8804/leistungen?a=1', 'http://127.0.0.1:9000')).toBe(
+      'http://127.0.0.1:9000/leistungen?a=1'
+    );
+    expect(rebase('http://localhost:8804/x', null)).toBe('http://localhost:8804/x');
   });
 });
 
-describe('agent/validate-nopt: verdicts', () => {
+describe('agent/validate-nopt: reading the recorded runs', () => {
+  it('takes every task that carries a recorded nOpt', () => {
+    const rows = tasksOf(
+      {
+        url: 'http://localhost:8804/',
+        tasks: [
+          { task: { id: 'a' }, nOpt: 3 },
+          { task: { id: 'b' } }, // never measured
+          { task: { id: 'c', meta: { url: 'http://localhost:8804/team' } }, nOpt: 7 },
+        ],
+      },
+      '/tmp/run.json'
+    );
+    expect(rows.map((r) => r.id)).toEqual(['a', 'c']);
+    expect(rows[0]).toMatchObject({ before: 3, url: 'http://localhost:8804/', file: 'run.json' });
+    expect(rows[1].url).toBe('http://localhost:8804/team');
+  });
+
+  it('finds the recorded runs of the repository', () => {
+    const files = referenceFiles(REFERENCE_DIR);
+    expect(files.length).toBeGreaterThan(0);
+    expect(files.every((f) => f.endsWith('.json'))).toBe(true);
+  });
+
+  it('explains a route by what it skipped and what it typed', () => {
+    const note = describeRoute({
+      nOpt: 2,
+      skipped: [0],
+      steps: [
+        { action: 'click', reach: { commands: [{ type: 'prevLink' }] } },
+        { action: 'read', reach: { commands: [{ type: 'find', arg: 'preise' }] } },
+      ],
+    });
+    expect(note).toBe('skipped waypoint 0 | prevLink activate find');
+  });
+});
+
+describe('agent/validate-nopt: the regression table', () => {
   const logger = () => {
     const lines = [];
     return { lines, log: (l) => lines.push(String(l)) };
   };
 
-  it('counts a conclusive bfs < guided as a gap', () => {
-    const out = logger();
-    const gaps = printTable(
-      [
-        { id: 'ok', nOptGuided: 3, nOptBfs: 3, delta: 0, gap: false, conclusive: true },
-        {
-          id: 'gappy',
-          nOptGuided: 5,
-          nOptBfs: 4,
-          delta: 1,
-          gap: true,
-          conclusive: true,
-          reason: 'optimal',
-          bfsPath: 'formFields jumpTo type activate',
-        },
-      ],
-      out
-    );
-    expect(gaps).toBe(1);
-    expect(out.lines.join('\n')).toMatch(/GAP gappy: bfs 4 < guided 5/);
+  const TASKS = [
+    { file: 'run.json', id: 'shorter', task: { id: 'shorter' }, before: 5, url: 'http://x/' },
+    { file: 'run.json', id: 'same', task: { id: 'same' }, before: 3, url: 'http://x/' },
+    { file: 'run.json', id: 'broken', task: { id: 'broken' }, before: 4, url: 'http://x/' },
+  ];
+
+  const measure = async (task) => {
+    if (task.id === 'shorter') return { nOpt: 2, route: 'dag', skipped: [0], steps: [] };
+    if (task.id === 'same') return { nOpt: 3, route: 'guided', steps: [] };
+    return { nOpt: null, error: 'target not found: #gone' };
+  };
+
+  it('puts the recorded value beside the new one', async () => {
+    const rows = await validateNopt({ tasks: TASKS, logger: null, measure });
+    expect(rows.map((r) => [r.before, r.after, r.delta])).toEqual([
+      [5, 2, -3],
+      [3, 3, 0],
+      [4, null, null],
+    ]);
+    expect(rows[0].route).toBe('dag');
+    expect(rows[2].error).toMatch(/target not found/);
   });
 
-  it('never fails on an inconclusive (truncated) row', () => {
+  it('counts the failures and names every changed value', async () => {
+    const rows = await validateNopt({ tasks: TASKS, logger: null, measure });
     const out = logger();
-    const gaps = printTable(
-      [
-        {
-          id: 'slow',
-          nOptGuided: 8,
-          nOptBfs: null,
-          delta: null,
-          gap: false,
-          conclusive: false,
-          reason: 'timeout',
-          bestFound: 4,
-        },
-      ],
-      out
-    );
-    expect(gaps).toBe(0);
-    expect(out.lines.join('\n')).toMatch(/1 inconclusive, 0 gap/);
-  });
-
-  it('marks the gap row from the comparison result', async () => {
-    const rows = await validateNopt({
-      browser: null,
-      url: 'https://example.com',
-      tasks: [{ id: 'fine' }, { id: 'gappy' }],
-      options: {},
-      logger: null,
-      compare: async (browser, url, task) => ({
-        taskId: task.id,
-        nOptGuided: 5,
-        nOptBfs: task.id === 'gappy' ? 4 : 5,
-        delta: task.id === 'gappy' ? 1 : 0,
-        bfsPath: [{ type: 'links' }, { type: 'activate' }],
-        explored: { reason: 'optimal', edges: 3 },
-        ms: 1,
-      }),
-    });
-    expect(rows.map((r) => r.gap)).toEqual([false, true]);
-    expect(rows[1].bfsPath).toBe('links activate');
+    expect(printTable(rows, out)).toBe(1);
+    const text = out.lines.join('\n');
+    expect(text).toMatch(/3 task\(s\): 2 measured, 1 changed, 1 failed/);
+    expect(text).toMatch(/shorter: 5 -> 2 via skipped waypoint 0/);
+    expect(text).toMatch(/FAILED broken: target not found/);
   });
 });

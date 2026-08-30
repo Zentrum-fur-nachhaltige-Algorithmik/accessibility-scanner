@@ -280,6 +280,7 @@ describe('blind-mode server', () => {
     });
 
     it('expands an optimal-path cost breakdown into exactly nOpt commands', () => {
+      // The reach of every step carries the literal commands the graph priced.
       const steps = [
         {
           index: 0,
@@ -287,20 +288,33 @@ describe('blind-mode server', () => {
           reach: {
             strategy: 'rotor+next',
             cost: 3,
-            via: { kind: 'formFields', index: 0, k: 1 },
+            commands: [{ type: 'formFields' }, { type: 'jumpTo', arg: 0 }, { type: 'next' }],
           },
           actionCost: 1,
         },
-        { index: 1, action: 'click', reach: { strategy: 'tab', cost: 2 }, actionCost: 1 },
+        {
+          index: 1,
+          action: 'click',
+          reach: { strategy: 'tab', cost: 2, commands: [{ type: 'tab' }, { type: 'tab' }] },
+          actionCost: 1,
+        },
         {
           index: 2,
           action: 'click',
           reach: {
             strategy: 'step+next',
             cost: 3,
-            via: { kind: 'headings', dir: 'next', command: 'nextHeading', steps: 2, k: 1 },
+            commands: [{ type: 'nextHeading' }, { type: 'nextHeading' }, { type: 'next' }],
           },
           actionCost: 1,
+        },
+        // A `read` step is the cursor arriving on the phrase: no keystroke of
+        // its own beyond the reach.
+        {
+          index: 3,
+          action: 'read',
+          reach: { strategy: 'find', cost: 2, commands: [{ type: 'find', arg: 'telefon' }] },
+          actionCost: 0,
         },
       ];
       const sighted = [
@@ -317,13 +331,13 @@ describe('blind-mode server', () => {
         'tab',
         'tab',
         'activate',
-        // the rotor step commands expand the same way
         'nextHeading',
         'nextHeading',
         'next',
         'activate',
+        'find',
       ]);
-      expect(cmds.length).toBe(3 + 1 + 2 + 1 + 3 + 1); // = nOpt
+      expect(cmds.length).toBe(3 + 1 + 2 + 1 + 3 + 1 + 1);
       expect(cmds[3].arg).toBe('hallo');
     });
   });

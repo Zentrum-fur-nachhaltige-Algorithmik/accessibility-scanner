@@ -19,26 +19,6 @@ const {
 } = require('./page-graph');
 
 /**
- * Reach strategies, in tie-break preference order. Only `chooseReach` still uses
- * it; the graph breaks ties by the order it emits its edges in.
- */
-const STRATEGY_ORDER = [
-  'none',
-  'step',
-  'stepLevel',
-  'rotor',
-  'step+next',
-  'stepLevel+next',
-  'rotor+next',
-  'tab',
-  'shiftTab',
-  'find',
-  'find+next',
-  'next',
-  'prev',
-];
-
-/**
  * Words the OPTIMUM may search for: whole words of at least this many letters
  * taken from the TASK DESCRIPTION and its `keywords`, minus the generator's
  * stopwords. The optimum must not use knowledge the user does not have, and
@@ -518,135 +498,14 @@ function findWordsFor(task) {
 }
 
 /**
- * The literal env commands a chosen reach costs. The graph names every edge, so
- * the commands come with the reach; the switch serves the callers that still
- * build a reach from a per-strategy analysis (bfs-optimum.js).
- *
- * The commands add up to `reach.cost` when each is charged with
- * `screenreader-env.commandCost` (one per command, two for `find`); that
+ * The literal env commands a reach costs. The graph names every edge, so the
+ * commands come with the reach; they add up to `reach.cost` when each is charged
+ * with `screenreader-env.commandCost` (one per command, two for `find`). That
  * identity lets `nOpt` be reported as a keystroke list (Blind Mode's optimal
  * route).
  */
 function reachCommands(reach) {
-  if (reach && Array.isArray(reach.commands)) return reach.commands;
-  const repeat = (type, n) => Array.from({ length: n }, () => ({ type }));
-  switch (reach.strategy) {
-    case 'none':
-      return [];
-    case 'rotor':
-    case 'rotor+next':
-      return [
-        { type: reach.via.kind },
-        ...(reach.via.letter
-          ? [{ type: 'rotorLetter', arg: reach.via.letter }]
-          : Array.from({ length: reach.via.pages || 0 }, () => ({ type: 'more' }))),
-        { type: 'jumpTo', arg: reach.via.index },
-        ...repeat('next', reach.via.k || 0),
-      ];
-    case 'step':
-      return repeat(reach.via.command, reach.via.steps);
-    case 'step+next':
-      return [...repeat(reach.via.command, reach.via.steps), ...repeat('next', reach.via.k)];
-    case 'stepLevel':
-    case 'stepLevel+next':
-      return [
-        ...Array.from({ length: reach.via.steps }, () => ({
-          type: reach.via.command,
-          arg: reach.via.level,
-        })),
-        ...repeat('next', reach.via.k),
-      ];
-    case 'find':
-    case 'find+next':
-      return [
-        { type: 'find', arg: reach.via.word },
-        ...repeat('findNext', reach.via.findNexts),
-        ...repeat('next', reach.via.k),
-      ];
-    case 'tab':
-      return repeat('tab', reach.cost);
-    case 'shiftTab':
-      return repeat('shiftTab', reach.cost);
-    case 'next':
-      return repeat('next', reach.cost);
-    case 'prev':
-      return repeat('prev', reach.cost);
-    /* istanbul ignore next -- chooseReach returns nothing else */
-    default:
-      return null;
-  }
-}
-
-/**
- * Picks the cheapest of a per-strategy analysis. Only bfs-optimum.js still
- * produces such an analysis; the guided optimum takes shortest paths instead.
- */
-function chooseReach(analysis) {
-  const candidates = [];
-  if (analysis.inReadingOrder && analysis.next === 0) {
-    candidates.push({ strategy: 'none', cost: 0 });
-  } else {
-    if (analysis.rotor) {
-      const r = analysis.rotor;
-      candidates.push({
-        strategy: r.k === 0 ? 'rotor' : 'rotor+next',
-        cost: r.cost,
-        via: {
-          kind: r.kind,
-          index: r.index,
-          k: r.k,
-          pages: r.pages || 0,
-          letter: r.letter || null,
-          phrase: r.phrase,
-          selector: r.selector,
-        },
-      });
-    }
-    if (analysis.step) {
-      const s = analysis.step;
-      candidates.push({
-        strategy: s.k === 0 ? 'step' : 'step+next',
-        cost: s.cost,
-        via: { kind: s.kind, dir: s.dir, command: s.command, steps: s.steps, k: s.k },
-      });
-    }
-    if (analysis.stepLevel) {
-      const s = analysis.stepLevel;
-      candidates.push({
-        strategy: s.k === 0 ? 'stepLevel' : 'stepLevel+next',
-        cost: s.cost,
-        via: {
-          kind: s.kind,
-          level: s.level,
-          dir: s.dir,
-          command: s.command,
-          steps: s.steps,
-          k: s.k,
-        },
-      });
-    }
-    if (analysis.find) {
-      const f = analysis.find;
-      candidates.push({
-        strategy: f.k === 0 ? 'find' : 'find+next',
-        cost: f.cost,
-        via: { word: f.word, findNexts: f.findNexts, k: f.k },
-      });
-    }
-    if (analysis.tab) {
-      candidates.push({ strategy: analysis.tab.dir, cost: analysis.tab.cost });
-    }
-    if (analysis.inReadingOrder) {
-      if (analysis.next !== null) candidates.push({ strategy: 'next', cost: analysis.next });
-      if (analysis.prev !== null) candidates.push({ strategy: 'prev', cost: analysis.prev });
-    }
-  }
-  if (!candidates.length) return null;
-  candidates.sort(
-    (a, b) =>
-      a.cost - b.cost || STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy)
-  );
-  return candidates[0];
+  return (reach && reach.commands) || [];
 }
 
 /**
@@ -1090,7 +949,6 @@ module.exports = {
   computeOptimalPath,
   evidenceGoals,
   findWordsFor,
-  chooseReach,
   reachCommands,
   nodesForSelector,
   nodesForHref,
@@ -1106,6 +964,5 @@ module.exports = {
   MAX_FIND_WORDS,
   squashText,
   ROTOR_KINDS,
-  STRATEGY_ORDER,
   STEP_COMMAND_BY_KIND,
 };

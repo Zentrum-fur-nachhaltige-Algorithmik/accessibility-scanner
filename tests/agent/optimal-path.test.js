@@ -6,7 +6,6 @@ const { startFixtureServer, stopFixtureServer, getBaseUrl } = require('../helper
 const { launchBrowser, closeBrowser, getPage } = require('../helpers/browser-pool');
 const {
   computeOptimalPath,
-  chooseReach,
   describePageInPage,
   targetMatcherFor,
   urlPatternsOf,
@@ -51,49 +50,6 @@ async function optimal(fixture, sightedPath, task = {}) {
     await page.close();
   }
 }
-
-describe('agent/optimal-path: chooseReach (pure)', () => {
-  it('takes the cheapest strategy and prefers the rotor on a tie', () => {
-    const analysis = {
-      inReadingOrder: true,
-      next: 2,
-      prev: 9,
-      tab: { dir: 'tab', cost: 2 },
-      rotor: { kind: 'links', index: 1, k: 0, cost: 2 },
-    };
-    expect(chooseReach(analysis)).toMatchObject({ strategy: 'rotor', cost: 2 });
-  });
-
-  it('falls back to tab when the target is not in the reading order', () => {
-    expect(
-      chooseReach({
-        inReadingOrder: false,
-        next: null,
-        prev: null,
-        tab: { dir: 'tab', cost: 3 },
-        rotor: null,
-      })
-    ).toEqual({ strategy: 'tab', cost: 3 });
-  });
-
-  it('costs nothing when the cursor is already on the target', () => {
-    expect(
-      chooseReach({
-        inReadingOrder: true,
-        next: 0,
-        prev: 0,
-        tab: { dir: 'tab', cost: 4 },
-        rotor: null,
-      })
-    ).toEqual({ strategy: 'none', cost: 0 });
-  });
-
-  it('returns null when there is no route at all', () => {
-    expect(
-      chooseReach({ inReadingOrder: false, next: null, prev: null, tab: null, rotor: null })
-    ).toBeNull();
-  });
-});
 
 describe('agent/optimal-path: computeOptimalPath', () => {
   beforeAll(async () => {

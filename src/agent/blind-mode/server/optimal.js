@@ -20,16 +20,17 @@ function commandsFromOptimalSteps(optSteps, sightedPath) {
   const commands = [];
   for (const entry of optSteps) {
     const step = sightedPath[entry.index] || {};
-    const reach = entry.reach || { strategy: 'none', cost: 0 };
+    const action = entry.action || step.action;
 
     // One shared expansion for every strategy (rotor, rotor step commands,
-    // tab, reading order), see `optimal-path.reachCommands`.
-    for (const cmd of reachCommands(reach) || []) commands.push(cmd);
+    // tab, reading order, and the mixed routes), see `optimal-path.reachCommands`.
+    for (const cmd of reachCommands(entry.reach) || []) commands.push(cmd);
 
-    if (step.action === 'type') commands.push({ type: 'type', arg: step.text });
-    else if (step.action === 'goto') {
+    if (action === 'type') commands.push({ type: 'type', arg: step.text });
+    else if (action === 'goto' || action === 'read') {
       // `goto` has no equivalent in the screen-reader command space (the player
-      // cannot type a URL). No demo task uses it; skipping keeps the list honest.
+      // cannot type a URL) and `read` is the cursor arriving on the phrase,
+      // which the reach already paid for. No demo task uses `goto`.
       continue;
     } else commands.push({ type: 'activate' });
   }

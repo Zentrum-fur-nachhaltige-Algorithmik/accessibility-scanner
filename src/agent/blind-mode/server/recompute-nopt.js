@@ -51,11 +51,11 @@ async function optimalFor(browser, task, url) {
     const commands = [];
     for (const entry of res.steps) {
       const step = task.sightedPath[entry.index] || {};
+      const action = entry.action || step.action;
       for (const cmd of reachCommands(entry.reach) || []) commands.push(cmd);
-      if (step.action === 'goto') continue;
-      commands.push(
-        step.action === 'type' ? { type: 'type', arg: step.text } : { type: 'activate' }
-      );
+      // `goto` cannot be typed and `read` is the cursor arriving on the phrase.
+      if (action === 'goto' || action === 'read') continue;
+      commands.push(action === 'type' ? { type: 'type', arg: step.text } : { type: 'activate' });
     }
     return { nOpt: res.nOpt, commands, steps: res.steps };
   } catch (err) {

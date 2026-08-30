@@ -8,6 +8,25 @@
 const puppeteer = require('puppeteer');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
 
+/**
+ * Navigate and wait for the network to go quiet; when it never does inside
+ * `timeout`, scan the page as it stands. A page whose subresources keep the
+ * network busy (analytics beacons, long polling, a slow third party) has still
+ * loaded, and giving up on it would drop the scan for a delay that is the
+ * page's, not the scanner's. Only a page that has not even reached
+ * `interactive` by then is a real navigation failure. Silent: the harness
+ * records the time, and the scan reports nothing about how it loaded.
+ */
+async function gotoSettled(page, url, timeout) {
+  try {
+    await page.goto(url, { waitUntil: 'networkidle0', timeout });
+  } catch (err) {
+    if (!/Navigation timeout/i.test(err.message)) throw err;
+    const readyState = await page.evaluate(() => document.readyState).catch(() => null);
+    if (readyState !== 'interactive' && readyState !== 'complete') throw err;
+  }
+}
+
 class ScanPipeline {
   /**
    * @param {Object} [options]
@@ -131,7 +150,7 @@ class ScanPipeline {
             this.autoDismissDialogs(tab);
             await tab.setViewport({ width: 1920, height: 1080 });
             try {
-              await tab.goto(url, { waitUntil: 'networkidle0', timeout });
+              await gotoSettled(tab, url, timeout);
               return await scanner.scan(tab, passedOptions);
             } finally {
               await tab.close().catch(() => {});
@@ -175,7 +194,7 @@ class ScanPipeline {
 
   async navigateWithCSPFallback(page, url, options = {}) {
     const timeout = options.timeout || 30000;
-    await page.goto(url, { waitUntil: 'networkidle0', timeout });
+    await gotoSettled(page, url, timeout);
   }
 
   /**

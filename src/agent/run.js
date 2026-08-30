@@ -107,7 +107,7 @@ function printSummary(result) {
           pad(t.task.id || t.task.description, 38),
           pad(t.nSighted, 8),
           pad(t.nOpt == null ? '-' : `${t.nOpt}${t.nOptPartial ? '*' : ''}`, 7),
-          pad(t.optimalRoute === 'direct-link' ? 'link' : t.optimalRoute || '-', 6),
+          pad(t.optimalRoute || '-', 6),
           pad(t.readDistance == null ? '' : t.readDistance, 6),
           pad(run.nSr, 6),
           pad(run.R.toFixed(2), 6),

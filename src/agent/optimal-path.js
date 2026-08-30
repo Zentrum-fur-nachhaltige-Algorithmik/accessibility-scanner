@@ -776,20 +776,30 @@ function analysisOf(state, goals) {
  * Compute the shortest screen-reader command sequence for a task's sighted path.
  *
  * The page must be freshly navigated to the task URL with the task's
- * preconditions already applied: the same state 0 the SR agent gets. Each step
- * costs reach + action (click/type/press/goto = 1; goto has no reach cost and
- * resets the cursor); the reach is the shortest path in the page's command
- * graph to the cheapest member of the step's effect-equivalence class. Each step
- * is executed for real (`replay.executeStep`) after it has been costed, so the
- * next step is costed against the real DOM.
+ * preconditions already applied: the same state 0 the SR agent gets. The steps
+ * of the sighted path are WAYPOINTS: each one is priced on the page state it was
+ * taken from as reach + action (click/type/press/goto = 1; goto has no reach
+ * cost and resets the cursor), where the reach is the shortest path in that
+ * page's command graph to the cheapest member of the step's effect-equivalence
+ * class. Every step is executed for real (`replay.executeStep`) after it has
+ * been costed, so the next one is costed against the real DOM.
  *
- * A sighted agent that wandered through a menu makes the guided route longer
- * than the page really is. So every page the walk stands on is additionally
- * checked for a rendered link whose resolved href already satisfies the task's
- * URL target (`options.targetUrl`, the URL the sighted path ends on, or the
- * oracle's `urlMatches`): "reach that link, activate it" is priced with the same
- * graph, and `nOpt` is the cheaper of the two routes. `route` says which one was
- * taken and `shortcut` names the link.
+ * The waypoints form a DAG, not a chain. A sighted agent that wandered through a
+ * menu makes the guided route longer than the page really is, so a waypoint may
+ * be reached from an EARLIER page whenever a link there leads to the same place
+ * (the same resolved href, which is the same effect-equivalence class) and every
+ * waypoint in between only followed a link to another page. `nOpt` is the
+ * shortest path through that DAG; `route` is 'dag' when it skipped a waypoint
+ * and 'guided' when it took them all, `skipped` lists the ones it left out and
+ * `guidedNOpt` is what the plain chain would have cost.
+ *
+ * For an information task the goal is not the last page but HEARING the answer:
+ * the goal set is every reading-order stop whose spoken phrase carries
+ * `task.evidence`, on every page along the route including the start page, and
+ * `nOpt` is the cheapest (reach the page) + (reach the phrase on it).
+ * `readDistance` is that second part. When no page speaks the evidence,
+ * `optimalPathError` is 'evidence-not-in-reading-order', `nOptPartial` is true
+ * and `nOpt` covers the navigation only.
  *
  * `options.analysisCache` is an optional `Map` the caller creates once per site
  * and passes to every call: it caches the finished page description across pages
@@ -800,53 +810,91 @@ function analysisOf(state, goals) {
  * @param {object} task
  * @param {object} [ctx]      reserved (oracle context), unused
  * @param {object} [options]  replay timeout overrides, plus `analysisCache`
- *                            and `targetUrl`
- * @returns {Promise<{nOpt: number|null, steps: object[], route?: 'guided'|'direct-link',
- *                    shortcut?: object, guidedNOpt?: number, readDistance?: number,
+ * @returns {Promise<{nOpt: number|null, steps: object[], route?: 'guided'|'dag',
+ *                    skipped?: number[], guidedNOpt?: number, readDistance?: number,
  *                    nOptPartial?: boolean, optimalPathError?: string, error?: string}>}
  */
 async function computeOptimalPath(page, task, ctx = {}, options = {}) {
   const { executeStep } = require('./replay');
   const path = (task && task.sightedPath) || [];
-  const steps = [];
-  let nOpt = 0;
-  let cursorSelector = null; // null = document start
-  // Scopes the in-page description cache to this call.
   const runId = `opt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  const typedSelectors = [];
   const findWords = findWordsFor(task);
   const shared = options.analysisCache instanceof Map ? options.analysisCache : null;
-  const matchesTarget = targetMatcherFor(task, options);
   const isInformation = !!(task && task.kind === 'information' && task.evidence);
-  let shortcut = null;
+  const typedSelectors = [];
+  let cursorSelector = null; // null = document start
 
-  for (let i = 0; i < path.length; i += 1) {
-    const step = path[i];
+  // One state per page the walk stands on: states[i] is the page before
+  // waypoint i, states[path.length] the page after the last one.
+  const states = [];
+  // pureNav[i]: waypoint i did nothing but follow a link to another page, so a
+  // route that never stood on that page loses nothing by skipping it.
+  const pureNav = [];
+  // Shortest route to each state, and the waypoint edge that got there.
+  const dist = [0];
+  const back = [null];
+  // The same walk with every waypoint taken, for `guidedNOpt`.
+  const chain = [0];
+
+  const relax = (to, cost, edge) => {
+    if (dist[to] === undefined || cost < dist[to]) {
+      dist[to] = cost;
+      back[to] = edge;
+    }
+  };
+  const rebuild = (to) => {
+    const out = [];
+    for (let cur = to; cur > 0; cur = back[cur].from) out.unshift(back[cur].entry);
+    return out;
+  };
+  const skippedOf = (to) => {
+    const out = [];
+    for (let cur = to; cur > 0; cur = back[cur].from) {
+      for (let k = back[cur].from; k < back[cur].entry.index; k += 1) out.unshift(k);
+    }
+    return out;
+  };
+
+  for (let j = 0; j < path.length; j += 1) {
+    const step = path[j];
     const actionCost = ACTION_COST[step.action];
     if (actionCost === undefined) {
-      return { nOpt: null, steps, error: `optimalPath[${i}]: unsupported action "${step.action}"` };
+      return {
+        nOpt: null,
+        steps: rebuild(j),
+        error: `optimalPath[${j}]: unsupported action "${step.action}"`,
+      };
     }
 
+    // `goto` is a navigation, not something the cursor has to reach; its page is
+    // still described when the answer of an information task may be spoken there.
+    const needsTarget = step.action !== 'goto' && !!step.selector;
+    let state = null;
+    if (needsTarget || isInformation) {
+      state = await loadPageState(page, {
+        runId,
+        findWords,
+        shared,
+        cursorSelector,
+        targets: needsTarget
+          ? { selector: step.selector, action: step.action, key: step.key, typedSelectors }
+          : null,
+      });
+      if (state.error) {
+        return { nOpt: null, steps: rebuild(j), error: `optimalPath[${j}]: ${state.error}` };
+      }
+    }
+    states[j] = state;
+
     const entry = {
-      index: i,
+      index: j,
       action: step.action,
       selector: step.selector || null,
       reach: { strategy: 'none', cost: 0 },
       actionCost,
     };
 
-    // `goto` is a navigation, not something the cursor has to reach.
-    const needsState = step.action !== 'goto' && step.selector;
-    if (needsState) {
-      const state = await loadPageState(page, {
-        runId,
-        findWords,
-        shared,
-        cursorSelector,
-        targets: { selector: step.selector, action: step.action, key: step.key, typedSelectors },
-      });
-      if (state.error) return { nOpt: null, steps, error: `optimalPath[${i}]: ${state.error}` };
-
+    if (needsTarget) {
       // Cheapest member of the effect-equivalence class; the sighted element
       // itself wins every tie.
       let best = null;
@@ -865,11 +913,10 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
       if (!best) {
         return {
           nOpt: null,
-          steps,
-          error: `optimalPath[${i}]: no screen-reader route to ${step.selector} (not reachable by rotor, tab or reading order)`,
+          steps: rebuild(j),
+          error: `optimalPath[${j}]: no screen-reader route to ${step.selector} (not reachable by rotor, tab or reading order)`,
         };
       }
-
       entry.reach = best.found.reach;
       entry.equivalenceClassSize = state.resolved.members.length;
       if (!best.member.isTarget) {
@@ -882,30 +929,47 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
         entry.equivalentSelector = best.member.selector;
       }
       entry.analysis = analysisOf(state, best.goals);
-
-      // Before the step is priced: does a link on THIS page already lead where
-      // the task wants to go? Then "get there and press Enter" is a route the
-      // guided walk never sees, and nOpt is the cheaper of the two. A remaining
-      // `type` step rules the shortcut out: what the user still has to fill in
-      // cannot be skipped by arriving at the right page.
-      const typeAhead = path.slice(i).some((s) => s.action === 'type');
-      if (matchesTarget && !typeAhead && !matchesTarget(state.url)) {
-        const direct = priceDirectLink(state, matchesTarget);
-        if (direct && (!shortcut || nOpt + direct.cost < shortcut.nOpt)) {
-          shortcut = {
-            ...direct,
-            index: i,
-            pageUrl: state.url,
-            prefixCost: nOpt,
-            prefixSteps: steps.slice(),
-            nOpt: nOpt + direct.cost,
-          };
-        }
-      }
     }
 
-    nOpt += entry.reach.cost + entry.actionCost;
-    steps.push(entry);
+    const cost = entry.reach.cost + entry.actionCost;
+    relax(j + 1, dist[j] + cost, { from: j, entry });
+    chain[j + 1] = chain[j] + cost;
+
+    // The same waypoint, reached from an earlier page: a link with the target's
+    // href was already there, so the walk through the menu is not what a
+    // screen-reader user would have to pay for.
+    const href = state && state.resolved ? state.resolved.targetHref : null;
+    const activates = step.action === 'click' || (step.action === 'press' && step.key === 'Enter');
+    if (href && activates) {
+      for (let i = j - 1; i >= 0 && pureNav[i]; i -= 1) {
+        const from = states[i];
+        if (!from || !from.graph || dist[i] === undefined) continue;
+        const goals = nodesForHref(from.graph, href);
+        const found = goals.length ? reachGoals(from.sp, goals) : null;
+        if (!found) continue;
+        const selector = from.desc.selectors[found.node];
+        const skipEntry = {
+          index: j,
+          action: step.action,
+          selector,
+          equivalentSelector: selector,
+          reach: {
+            ...found.reach,
+            via: {
+              ...(found.reach.via || {}),
+              equivalentOf: selector,
+              equivalence: 'same-href-earlier-page',
+              sightedSelector: step.selector,
+            },
+          },
+          actionCost,
+          skipped: Array.from({ length: j - i }, (_, k) => i + k),
+          analysis: analysisOf(from, goals),
+          navigated: true,
+        };
+        relax(j + 1, dist[i] + found.reach.cost + actionCost, { from: i, entry: skipEntry });
+      }
+    }
 
     if (step.action === 'type' && step.selector) typedSelectors.push(step.selector);
 
@@ -913,9 +977,9 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
     // Only the sighted step runs; an equivalent route is priced, never taken.
     const urlBefore = page.url();
     try {
-      await executeStep(page, step, `optimalPath[${i}] ${step.action}`, options);
+      await executeStep(page, step, `optimalPath[${j}] ${step.action}`, options);
     } catch (err) {
-      return { nOpt: null, steps, error: err.message };
+      return { nOpt: null, steps: rebuild(j), error: err.message };
     }
 
     if (page.url() !== urlBefore) {
@@ -929,138 +993,92 @@ async function computeOptimalPath(page, task, ctx = {}, options = {}) {
       // optimally-playing user's cursor would be.
       cursorSelector = entry.equivalentSelector || step.selector || cursorSelector;
     }
+    pureNav[j] = !!(entry.navigated && href && activates);
   }
 
-  // The shortcut only replaces the guided route when that route really ended on
-  // the target: otherwise the sighted path did something beyond arriving there.
-  if (shortcut && !matchesTarget(page.url())) shortcut = null;
+  const last = path.length;
+  const routeOf = (to) => (skippedOf(to).length ? 'dag' : 'guided');
+
+  if (!isInformation) {
+    const skipped = skippedOf(last);
+    return {
+      nOpt: dist[last],
+      steps: rebuild(last),
+      route: skipped.length ? 'dag' : 'guided',
+      ...(skipped.length ? { skipped, guidedNOpt: chain[last] } : {}),
+    };
+  }
 
   // An information task does not end when the page holding the answer is
-  // reached - it ends when the screen reader has SPOKEN the answer.
-  let readEntry = null;
-  if (isInformation) {
-    // Both routes end on the same page; the read may only be shared between
-    // them when the guided walk arrives there with the cursor at document
-    // start, which is where a navigation puts it.
-    const readFromDocumentStart = cursorSelector === null;
-    const state = await loadPageState(page, { runId, findWords, shared, cursorSelector });
-    if (state.error) {
-      // A hard failure of the read analysis: keep the navigation part rather
-      // than losing the whole measurement.
-      return {
-        nOpt,
-        steps,
-        readDistance: null,
-        nOptPartial: true,
-        optimalPathError: `read step: ${state.error}`,
-        route: 'guided',
-      };
-    }
+  // reached - it ends when the screen reader has SPOKEN the answer, and the
+  // answer may already be on the page the walk started from.
+  const endState = await loadPageState(page, { runId, findWords, shared, cursorSelector });
+  if (endState.error) {
+    // A hard failure of the read analysis: keep the navigation part rather than
+    // losing the whole measurement.
+    return {
+      nOpt: dist[last],
+      steps: rebuild(last),
+      readDistance: null,
+      nOptPartial: true,
+      optimalPathError: `read step: ${endState.error}`,
+      route: routeOf(last),
+    };
+  }
+  states[last] = endState;
+
+  let best = null;
+  let guidedRead = null;
+  for (let i = 0; i <= last; i += 1) {
+    const state = states[i];
+    if (!state || dist[i] === undefined) continue;
     const goals = evidenceGoals(state.desc, task.evidence);
     const found = goals.length ? reachGoals(state.sp, goals) : null;
-    if (!found) {
-      // The evidence exists visually but no spoken phrase contains it: a
-      // finding in its own right (harness turns it into `evidence-not-readable`).
-      return {
-        nOpt,
-        steps,
-        readDistance: null,
-        nOptPartial: true,
-        optimalPathError: EVIDENCE_NOT_IN_READING_ORDER,
-        route: 'guided',
-      };
-    }
-    readEntry = {
-      index: -1, // set below
-      action: 'read',
-      selector: state.desc.selectors[found.node],
-      evidence: task.evidence,
-      phrase: found.goal.phrase,
-      spanPhrases: found.goal.spanPhrases || 1,
-      reach: found.reach,
-      actionCost: ACTION_COST.read,
-      candidateCount: goals.length,
-      analysis: { ...analysisOf(state, [found.node]), readingOrderIndex: found.node },
-    };
-    if (!readFromDocumentStart) shortcut = null;
+    if (!found) continue;
+    if (i === last) guidedRead = found.reach.cost;
+    const total = dist[i] + found.reach.cost;
+    if (!best || total < best.total) best = { at: i, found, goals, total };
   }
 
-  const readCost = readEntry ? readEntry.reach.cost + readEntry.actionCost : 0;
-  const guidedNOpt = nOpt + readCost;
-  const withRead = (list) => {
-    if (!readEntry) return list;
-    readEntry.index = list.length;
-    return [...list, readEntry];
-  };
-  const readFields = readEntry ? { readDistance: readEntry.reach.cost } : {};
-
-  if (shortcut && shortcut.nOpt + readCost < guidedNOpt) {
-    const shortcutStep = {
-      index: shortcut.prefixSteps.length,
-      action: 'click',
-      selector: shortcut.selector,
-      reach: shortcut.reach,
-      actionCost: ACTION_COST.click,
-      shortcut: true,
-      href: shortcut.href,
-      navigated: true,
-    };
+  if (!best) {
+    // The evidence exists visually but no spoken phrase contains it: a finding
+    // in its own right (harness turns it into `evidence-not-readable`).
     return {
-      nOpt: shortcut.nOpt + readCost,
-      steps: withRead([...shortcut.prefixSteps, shortcutStep]),
-      route: 'direct-link',
-      guidedNOpt,
-      shortcut: describeShortcut(shortcut, readCost),
-      ...readFields,
+      nOpt: dist[last],
+      steps: rebuild(last),
+      readDistance: null,
+      nOptPartial: true,
+      optimalPathError: EVIDENCE_NOT_IN_READING_ORDER,
+      route: routeOf(last),
     };
   }
 
-  return {
-    nOpt: guidedNOpt,
-    steps: withRead(steps),
-    route: 'guided',
-    ...(shortcut ? { shortcut: describeShortcut(shortcut, readCost) } : {}),
-    ...readFields,
+  const state = states[best.at];
+  const steps = rebuild(best.at);
+  const readEntry = {
+    index: steps.length,
+    action: 'read',
+    selector: state.desc.selectors[best.found.node],
+    evidence: task.evidence,
+    phrase: best.found.goal.phrase,
+    spanPhrases: best.found.goal.spanPhrases || 1,
+    reach: best.found.reach,
+    actionCost: ACTION_COST.read,
+    candidateCount: best.goals.length,
+    pageUrl: state.url,
+    analysis: { ...analysisOf(state, [best.found.node]), readingOrderIndex: best.found.node },
   };
-}
-
-/**
- * The cheapest "reach a link that already leads to the target, then activate it"
- * on the page the state describes. Returns null when no rendered link leads
- * there.
- */
-function priceDirectLink(state, matches) {
-  const desc = state.desc;
-  const goals = [];
-  const hrefOf = new Map();
-  for (let i = 0; i < desc.n; i += 1) {
-    if (!desc.hrefs[i] || !matches(desc.hrefs[i])) continue;
-    goals.push(i);
-    hrefOf.set(i, desc.hrefs[i]);
-  }
-  const found = goals.length ? reachGoals(state.sp, goals) : null;
-  if (!found) return null;
+  const skipped = skippedOf(best.at);
+  const heardEarly = best.at < last;
+  const guidedNOpt = guidedRead === null ? null : chain[last] + guidedRead;
   return {
-    cost: found.reach.cost + ACTION_COST.click,
-    reach: found.reach,
-    selector: desc.selectors[found.node],
-    href: hrefOf.get(found.node),
-    name: null,
-  };
-}
-
-/** The shortcut route as it is reported: which link, on which page, at what cost. */
-function describeShortcut(shortcut, readCost = 0) {
-  return {
-    index: shortcut.index,
-    pageUrl: shortcut.pageUrl,
-    selector: shortcut.selector,
-    href: shortcut.href,
-    name: shortcut.name,
-    reach: shortcut.reach,
-    cost: shortcut.cost,
-    prefixCost: shortcut.prefixCost,
-    nOpt: shortcut.nOpt + readCost,
+    nOpt: best.total,
+    steps: [...steps, readEntry],
+    route: skipped.length ? 'dag' : 'guided',
+    readDistance: best.found.reach.cost,
+    ...(skipped.length ? { skipped } : {}),
+    ...(heardEarly ? { heardOnPage: best.at } : {}),
+    ...(guidedNOpt !== null && guidedNOpt !== best.total ? { guidedNOpt } : {}),
   };
 }
 

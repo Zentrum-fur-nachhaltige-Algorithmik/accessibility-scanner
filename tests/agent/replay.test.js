@@ -301,9 +301,11 @@ describe('agent/replay', () => {
       expect(res.valid).toBe(true);
       expect(res.optimalPathError).toBeUndefined();
       expect(res.nOptPartial).toBeUndefined();
-      // The navigation part is empty here, so nOpt IS the reading distance.
+      // The answer is spoken on the page the task starts on, so the `goto` of
+      // the sighted path is not part of the cheapest route: nOpt IS the reading
+      // distance.
       expect(res.readDistance).toBeGreaterThan(0);
-      expect(res.nOpt).toBe(1 + res.readDistance); // goto + read
+      expect(res.nOpt).toBe(res.readDistance);
       const read = res.optimalPath[res.optimalPath.length - 1];
       expect(read).toMatchObject({ action: 'read', actionCost: 0, evidence: 'Phone 555 0100' });
     }, 120000);

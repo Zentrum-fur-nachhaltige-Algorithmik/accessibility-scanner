@@ -178,8 +178,8 @@ describe('agent/optimal-path: computeOptimalPath', () => {
 
   it('resets the cursor to document start after a navigation', async () => {
     const res = await optimal(HOME, [
-      { action: 'click', selector: CONTACT_LINK },
-      { action: 'click', selector: 'a[href="generic-home.html"]' },
+      { action: 'click', selector: '#login-link' },
+      { action: 'type', selector: '#user', text: 'ada' },
     ]);
     expect(res.steps[0].navigated).toBe(true);
     const second = res.steps[1];
@@ -528,7 +528,7 @@ describe('agent/optimal-path: computeOptimalPath', () => {
   }, 60000);
 });
 
-describe('agent/optimal-path: the direct-link shortcut', () => {
+describe('agent/optimal-path: the waypoint DAG', () => {
   const SHORTCUT = '/agent/bfs-shortcut.html';
   // The sighted route: through the main navigation into Products, and from
   // there to the contact page. The footer of the start page links straight to it.
@@ -568,7 +568,7 @@ describe('agent/optimal-path: the direct-link shortcut', () => {
         ],
       })
     ).toEqual(['contact']);
-    // Nothing names a url: there is no shortcut to look for.
+    // Nothing names a url: the task generator has no end url to shorten towards.
     expect(targetMatcherFor({ oracle: { type: 'titleMatches', pattern: 'x' } }, {})).toBeNull();
   });
 
@@ -583,45 +583,44 @@ describe('agent/optimal-path: the direct-link shortcut', () => {
     const res = await optimalFor(SHORTCUT, DETOUR, {
       oracle: { type: 'urlMatches', pattern: 'bfs-contact' },
     });
-    expect(res.route).toBe('direct-link');
-    // One prevLink to the last link of the page, then activate.
+    expect(res.route).toBe('dag');
+    // The first waypoint is skipped: one prevLink to the last link of the start
+    // page, which has the second waypoint's href, then activate.
+    expect(res.skipped).toEqual([0]);
     expect(res.nOpt).toBe(2);
     expect(res.guidedNOpt).toBeGreaterThan(res.nOpt);
     expect(res.steps).toHaveLength(1);
-    expect(res.steps[0]).toMatchObject({ action: 'click', shortcut: true, actionCost: 1 });
+    expect(res.steps[0]).toMatchObject({ index: 1, action: 'click', actionCost: 1 });
     expect(res.steps[0].reach.cost).toBe(1);
-    expect(res.shortcut.href).toMatch(/bfs-contact\.html$/);
-    expect(res.shortcut.index).toBe(0);
-    expect(res.shortcut.nOpt).toBe(2);
+    expect(res.steps[0].reach.via).toMatchObject({
+      equivalence: 'same-href-earlier-page',
+      sightedSelector: 'main p a',
+    });
   }, 120000);
 
-  it('finds the same shortcut from the url the sighted path ends on alone', async () => {
-    const res = await optimalFor(
-      SHORTCUT,
-      DETOUR,
-      {},
-      { targetUrl: `${getBaseUrl()}/agent/bfs-contact.html` }
-    );
-    expect(res.route).toBe('direct-link');
-    expect(res.nOpt).toBe(2);
-  }, 120000);
-
-  it('stays on the guided route when no link leads to the target', async () => {
-    const res = await optimalFor(
-      HOME,
-      [{ action: 'click', selector: CONTACT_LINK }],
-      { oracle: { type: 'urlMatches', pattern: 'generic-thanks' } },
-      {}
-    );
-    expect(res.route).toBe('guided');
-    expect(res.shortcut).toBeUndefined();
-    expect(res.nOpt).toBe(res.steps.reduce((a, s) => a + s.reach.cost + s.actionCost, 0));
-  }, 120000);
-
-  it('never shortens a task that names no url target at all', async () => {
+  it('skips the detour whatever the oracle asks for: the DAG needs no url target', async () => {
     const res = await optimalFor(SHORTCUT, DETOUR, {
       oracle: { type: 'titleMatches', pattern: 'Contact' },
     });
+    expect(res.route).toBe('dag');
+    expect(res.nOpt).toBe(2);
+    expect(res.steps).toHaveLength(1);
+  }, 120000);
+
+  it('takes every waypoint when no earlier page holds the target link', async () => {
+    const res = await optimalFor(HOME, [{ action: 'click', selector: CONTACT_LINK }]);
+    expect(res.route).toBe('guided');
+    expect(res.skipped).toBeUndefined();
+    expect(res.nOpt).toBe(res.steps.reduce((a, s) => a + s.reach.cost + s.actionCost, 0));
+  }, 120000);
+
+  it('never skips a waypoint that typed something', async () => {
+    // The search page is reached through the menu, but the query still has to be
+    // typed on it, so neither waypoint may be skipped.
+    const res = await optimalFor('/agent/generic-home.html', [
+      { action: 'type', selector: '#q', text: 'kontakt' },
+      { action: 'click', selector: '#search-form button' },
+    ]);
     expect(res.route).toBe('guided');
     expect(res.steps).toHaveLength(2);
   }, 120000);

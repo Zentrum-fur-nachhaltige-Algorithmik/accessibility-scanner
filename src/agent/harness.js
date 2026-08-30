@@ -170,7 +170,7 @@ async function runSite({
         ? Number(validation.nOpt)
         : nSighted;
     const optimalPath = validation.optimalPath || null;
-    // 'direct-link' means nOpt was priced along a link that led straight to the
+    // 'dag' means nOpt was priced along a route that skipped a link that led straight to the
     // target, not along the (possibly wandering) sighted path.
     const optimalRoute = validation.route || null;
     const readDistance = Number.isFinite(validation.readDistance) ? validation.readDistance : null;
@@ -235,7 +235,7 @@ async function runSite({
         readDistance,
         optimalPath,
         optimalRoute,
-        ...(validation.shortcut ? { optimalShortcut: validation.shortcut } : {}),
+        ...(validation.skipped ? { optimalSkipped: validation.skipped } : {}),
         runs,
         R,
         findings,

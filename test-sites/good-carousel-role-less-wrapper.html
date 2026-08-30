@@ -1,0 +1,52 @@
+<!-- WCAG-TEST
+criterion: 4.1.2
+level: A
+title: A swiper wrapper without a role needs no accessible name
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: advanced-aria
+description: div.polygon-swiper wraps a slide track with prev/next controls but carries no role, no aria-roledescription and no ARIA state, so it exposes no user interface component for SC 4.1.2 to name. The component inside it, div[role="region"][aria-roledescription="carousel"], carries its own aria-label and is named.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topics</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  .polygon-swiper { overflow-x: auto; }
+  .swiper-track { display: flex; gap: .5rem; }
+  .swiper-slide { border: 1px solid #595959; padding: .5rem 1rem; white-space: nowrap; }
+  button { background: #0b4f9e; color: #ffffff; border: none; padding: .5rem 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Topics</h1>
+
+  <div class="polygon-swiper">
+    <div class="swiper-track">
+      <div class="swiper-slide">Politics</div>
+      <div class="swiper-slide">Economy</div>
+      <div class="swiper-slide">Science</div>
+      <div class="swiper-slide">Culture</div>
+    </div>
+    <button type="button">Previous topics</button>
+    <button type="button">Next topics</button>
+  </div>
+
+  <div class="splide" role="region" aria-roledescription="carousel" aria-label="Featured articles">
+    <div class="splide-track">
+      <div class="splide-slide">First article</div>
+      <div class="splide-slide">Second article</div>
+      <div class="splide-slide">Third article</div>
+    </div>
+    <button type="button">Previous article</button>
+    <button type="button">Next article</button>
+  </div>
+</main>
+</body>
+</html>

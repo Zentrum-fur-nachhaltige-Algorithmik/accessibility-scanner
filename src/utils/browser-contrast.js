@@ -179,13 +179,39 @@ const injectableCode = `
   // to contrast with the page. Standard accessible form styling (a white input
   // on a white page with a dark 2px border) depends on this.
   function __hasCompliantBorder(styles, backdrop, threshold) {
+    const strongest = __strongestBoundary(styles, backdrop);
+    if (!strongest || strongest.ratio < threshold) return null;
+    return { ratio: strongest.ratio, border: strongest.border, boundary: strongest.boundary };
+  }
+
+  /**
+   * The boundary that identifies a component, and how far it stands out.
+   *
+   * SC 1.4.11 asks for 3:1 on the visual information required to identify a
+   * user interface component, not on one particular edge. A white field on a
+   * blue header bar is bounded by its own fill even when its 1px border is
+   * faint, so all three candidates are measured and the strongest one answers:
+   * the border against the fill, the border against what the component sits
+   * on, and the fill against what it sits on.
+   */
+  function __strongestBoundary(styles, backdrop) {
+    const ownBg = __parseRgb(styles.backgroundColor);
+    const fill = ownBg && ownBg.a > 0 ? __blendOver(ownBg, backdrop) : backdrop;
+    let best = { ratio: __getContrastRatio(fill, backdrop), boundary: 'fill', border: null };
+
     const rendered = __getRenderedBorder(styles);
-    if (!rendered) return null;
-    const parsed = __parseRgb(rendered.color);
-    if (!parsed) return null;
-    const flattened = __blendOver(parsed, backdrop);
-    const ratio = __getContrastRatio(flattened, backdrop);
-    return ratio >= threshold ? { ratio: ratio, border: rendered } : null;
+    if (rendered) {
+      const parsed = __parseRgb(rendered.color);
+      if (parsed) {
+        const overBackdrop = __getContrastRatio(__blendOver(parsed, backdrop), backdrop);
+        if (overBackdrop > best.ratio)
+          best = { ratio: overBackdrop, boundary: 'border against the surround', border: rendered };
+        const overFill = __getContrastRatio(__blendOver(parsed, fill), fill);
+        if (overFill > best.ratio)
+          best = { ratio: overFill, boundary: 'border against the fill', border: rendered };
+      }
+    }
+    return best;
   }
 
   /**
@@ -230,6 +256,32 @@ const injectableCode = `
         }
       }
     }
+    // 3. An <img> icon: the pixels the author painted are what identifies the
+    // control. A cross-origin image taints the canvas and cannot be read.
+    for (const img of el.querySelectorAll('img')) {
+      if (!img.complete || !img.naturalWidth) continue;
+      try {
+        const w = Math.min(24, img.naturalWidth);
+        const h = Math.min(24, img.naturalHeight);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let best = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] === 0) continue;
+          const px = __blendOver({ r: data[i], g: data[i + 1], b: data[i + 2], a: data[i + 3] / 255 }, surface);
+          const ratio = __getContrastRatio(px, surface);
+          if (ratio > best) best = ratio;
+        }
+        if (best >= threshold) return { by: 'icon', ratio: best };
+      } catch (e) {
+        // Pixels unreadable: this image identifies nothing that can be measured.
+      }
+    }
+
     for (const pseudo of ['::before', '::after']) {
       const ps = window.getComputedStyle(el, pseudo);
       if (!ps.content || ps.content === 'none' || ps.content === 'normal' || ps.content === '""') continue;

@@ -18,7 +18,15 @@
 const path = require('path');
 const fs = require('fs');
 
-const { FIXTURES, FIXTURE_DIR, PROFILE, startServer, scanFile } = require('./harness/realworld');
+const {
+  FIXTURES,
+  FIXTURE_DIR,
+  PROFILE,
+  DEFAULT_PARALLEL,
+  perFileTimeoutMs,
+  startServer,
+  scanFile,
+} = require('./harness/realworld');
 const { getProfile } = require('../src/core/scanner-registry');
 
 const LABELS_PATH = path.join(__dirname, '..', 'tests', 'data', 'realworld-labels.json');
@@ -33,6 +41,35 @@ const EVIDENCE_PATH = path.join(
 
 /** A rule needs this many judged findings before its precision is a gate. */
 const MIN_LABELLED = 3;
+
+/**
+ * Rules whose verdict depends on the rendering.
+ *
+ * Five snapshots were captured before capture-realworld.js inlined
+ * stylesheets, so they replay with no CSS or with part of it. Their markup
+ * still judges every rule that reads the DOM, but a rule that measures a
+ * painted colour, a painted rectangle or a reflow is measuring a page the
+ * site never served. Those pairs are counted apart and left out of the rule's
+ * precision; the labels stay, and missingTrue still holds them.
+ */
+const STYLE_DEPENDENT_RULES = new Set([
+  'color-contrast',
+  'fixed-width-element',
+  'focus-obscured-by-fixed-element',
+  'focus-obscured-by-sticky-element',
+  'horizontal-scroll',
+  'indeterminate-component-background',
+  'insufficient-background-contrast',
+  'insufficient-border-contrast',
+  'insufficient-custom-control-contrast',
+  'insufficient-form-border-contrast',
+  'missing-focus-indicator',
+  'no-visible-focus',
+  'reflow-content-clipped',
+  'reflow-failure',
+  'target-too-small',
+  'text-spacing-failure',
+]);
 
 /** Rule id of a finding, whichever field the producing scanner uses. */
 function ruleOf(v) {
@@ -52,12 +89,15 @@ function selectorOf(v) {
 }
 
 function parseArgs(argv) {
-  const out = { only: null, json: null };
+  const out = { only: null, json: null, parallel: DEFAULT_PARALLEL };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--only') out.only = argv[++i];
+    else if (argv[i] === '--parallel') out.parallel = Math.max(1, parseInt(argv[++i], 10) || 1);
     else if (argv[i] === '--json') out.json = argv[++i];
     else if (argv[i] === '--help' || argv[i] === '-h') {
-      console.log('Usage: node scripts/precision-check.js [--only <file>] [--json <path>]');
+      console.log(
+        'Usage: node scripts/precision-check.js [--only <file>] [--json <path>] [--parallel <n>]'
+      );
       process.exit(0);
     }
   }
@@ -86,13 +126,16 @@ async function main() {
     process.exit(1);
   }
 
+  /** Snapshots captured before the stylesheets were inlined. */
+  const unstyled = new Set(FIXTURES.filter((f) => f.unstyledCapture).map((f) => f.file));
+
   const { server, port } = await startServer(FIXTURE_DIR);
   console.log(`Serving ${FIXTURE_DIR} on http://localhost:${port}`);
   console.log(
     `Labels: ${labelFile.labels.length} from ${path.relative(process.cwd(), LABELS_PATH)}\n`
   );
 
-  /** rule id -> { reported, true, false, review, unlabelled } */
+  /** rule id -> { reported, true, false, review, artefact, unstyled, unlabelled } */
   const perRule = new Map();
   const unlabelled = [];
   const perFile = [];
@@ -103,15 +146,37 @@ async function main() {
   const realWarn = console.warn;
   const realErr = console.error;
 
-  for (const fx of fixtures) {
-    const url = `http://localhost:${port}/${fx.file}`;
-    console.log = () => {};
-    console.warn = () => {};
-    console.error = () => {};
-    const { result, error } = await scanFile(url, scannerIds, {});
+  // Scan first, several snapshots at once (see DEFAULT_PARALLEL); the labels
+  // are then judged in fixture order, so the report reads the same at any
+  // --parallel.
+  const scans = new Array(fixtures.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < fixtures.length) {
+      const i = nextIndex++;
+      scans[i] = await scanFile(
+        `http://localhost:${port}/${fixtures[i].file}`,
+        scannerIds,
+        {},
+        perFileTimeoutMs(args.parallel)
+      );
+    }
+  };
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+  try {
+    await Promise.all(
+      Array.from({ length: Math.min(args.parallel, fixtures.length) }, () => worker())
+    );
+  } finally {
     console.log = realLog;
     console.warn = realWarn;
     console.error = realErr;
+  }
+
+  for (const [i, fx] of fixtures.entries()) {
+    const { result, error } = scans[i];
 
     if (!result) {
       console.log(`${fx.file.padEnd(30)} SCAN FAILED: ${error}`);
@@ -133,13 +198,25 @@ async function main() {
           true: 0,
           false: 0,
           review: 0,
+          artefact: 0,
+          unstyled: 0,
           unlabelled: 0,
           scanners: new Set(),
+          snapshots: new Set(),
         });
       const row = perRule.get(rule);
       if (v.scannerId) row.scanners.add(v.scannerId);
       row.reported++;
-      row[verdict]++;
+      // A finding a script would have removed from the live page describes a
+      // state of the replay medium, not a rule error and not a real failure.
+      // A style-dependent rule on an unstyled capture measures a rendering the
+      // site never served. Neither counts towards precision.
+      if (unstyled.has(fx.file) && STYLE_DEPENDENT_RULES.has(rule)) {
+        row.unstyled++;
+      } else {
+        row[verdict]++;
+        if (verdict === 'true' || verdict === 'false') row.snapshots.add(fx.file);
+      }
       if (!label) unlabelled.push({ snapshot: fx.file, rule, selector });
     }
     perFile.push({ file: fx.file, findings: violations.length });
@@ -155,6 +232,7 @@ async function main() {
         rule,
         ...r,
         scanners: [...r.scanners].sort(),
+        snapshots: [...r.snapshots].sort(),
         judged,
         precision: judged ? r.true / judged : null,
       };
@@ -162,12 +240,14 @@ async function main() {
     .sort((a, b) => b.reported - a.reported || a.rule.localeCompare(b.rule));
 
   console.log(
-    '\nrule id                                 reported  true false review unlab  precision'
+    '\nrule id                                 reported  true false review artef unsty unlab  precision'
   );
   for (const r of rows) {
     const p = r.precision === null ? '    -' : r.precision.toFixed(2).padStart(5);
     console.log(
-      `${r.rule.padEnd(38)} ${String(r.reported).padStart(8)} ${String(r.true).padStart(5)} ${String(r.false).padStart(5)} ${String(r.review).padStart(6)} ${String(r.unlabelled).padStart(5)} ${p}`
+      `${r.rule.padEnd(38)} ${String(r.reported).padStart(8)} ${String(r.true).padStart(5)} ` +
+        `${String(r.false).padStart(5)} ${String(r.review).padStart(6)} ${String(r.artefact).padStart(5)} ` +
+        `${String(r.unstyled).padStart(5)} ${String(r.unlabelled).padStart(5)} ${p}`
     );
   }
 
@@ -212,6 +292,8 @@ async function main() {
     profile: PROFILE,
     labelsRecordedAt: labelFile.recordedAt,
     snapshots: perFile,
+    unstyledCaptures: [...unstyled].sort(),
+    styleDependentRules: [...STYLE_DEPENDENT_RULES].sort(),
     rules: rows.map((r) => ({
       rule: r.rule,
       scanners: r.scanners,
@@ -219,7 +301,11 @@ async function main() {
       true: r.true,
       false: r.false,
       review: r.review,
+      artefact: r.artefact,
+      unstyled: r.unstyled,
       unlabelled: r.unlabelled,
+      // The snapshots the precision of this rule rests on.
+      precisionFrom: r.snapshots,
       precision: r.precision,
     })),
     missingTrue: missingTrue.map((l) => ({

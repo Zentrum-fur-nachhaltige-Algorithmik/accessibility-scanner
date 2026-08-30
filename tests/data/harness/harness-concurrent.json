@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-28T17:49:19.220Z",
+  "generatedAt": "2026-08-29T20:14:29.553Z",
   "harness": "concurrent",
   "totals": {
-    "passed": 79,
+    "passed": 84,
     "failed": 9,
     "errored": 0
   },
@@ -35,7 +35,8 @@
         ],
         "good": [
           "good-media-alternatives.html",
-          "good-media-icons-and-background-video.html"
+          "good-media-icons-and-background-video.html",
+          "good-video-silent-background-loop.html"
         ]
       }
     },
@@ -50,7 +51,8 @@
           "bad-media-alternatives.html"
         ],
         "good": [
-          "good-media-alternatives.html"
+          "good-media-alternatives.html",
+          "good-video-silent-background-loop.html"
         ]
       }
     },
@@ -65,7 +67,8 @@
           "bad-audio-description.html"
         ],
         "good": [
-          "good-audio-description.html"
+          "good-audio-description.html",
+          "good-video-silent-background-loop.html"
         ]
       }
     },
@@ -257,10 +260,12 @@
       "falsePositiveClean": true,
       "files": {
         "bad": [
-          "bad-link-purpose.html"
+          "bad-link-purpose.html",
+          "bad-link-single-character-navbox.html"
         ],
         "good": [
           "good-accessibility.html",
+          "good-link-index-letters.html",
           "good-link-purpose-in-context.html"
         ]
       }
@@ -371,6 +376,7 @@
           "bad-aria-role-override.html",
           "bad-aria-state-updates.html",
           "bad-beeproduced-real-issues.html",
+          "bad-carousel-unnamed-region.html",
           "bad-complex-aria.html",
           "bad-icon-accessibility.html"
         ],
@@ -379,6 +385,7 @@
           "good-aria-role-override.html",
           "good-aria-state-updates.html",
           "good-bootstrap-patterns.html",
+          "good-carousel-role-less-wrapper.html",
           "good-composite-aria-widgets.html",
           "good-hidden-modal.html",
           "good-icon-button-and-honeypot.html",
@@ -423,6 +430,17 @@
       "matched": 0,
       "status": "FAIL",
       "detail": "0 violations"
+    },
+    {
+      "file": "bad-carousel-unnamed-region.html",
+      "scanner": "advanced-aria",
+      "expectViolations": true,
+      "criteria": [
+        "4.1.2"
+      ],
+      "matched": 1,
+      "status": "PASS",
+      "detail": "1 violations"
     },
     {
       "file": "bad-complex-aria.html",
@@ -481,6 +499,17 @@
     },
     {
       "file": "good-bootstrap-patterns.html",
+      "scanner": "advanced-aria",
+      "expectViolations": false,
+      "criteria": [
+        "4.1.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-carousel-role-less-wrapper.html",
       "scanner": "advanced-aria",
       "expectViolations": false,
       "criteria": [
@@ -622,6 +651,19 @@
       "criteria": [
         "1.2.1",
         "1.2.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-video-silent-background-loop.html",
+      "scanner": "media-accessibility",
+      "expectViolations": false,
+      "criteria": [
+        "1.2.2",
+        "1.2.3",
+        "1.2.5"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1218,9 +1260,20 @@
         "2.4.4",
         "2.4.9"
       ],
-      "matched": 33,
+      "matched": 28,
       "status": "PASS",
-      "detail": "33 violations"
+      "detail": "28 violations"
+    },
+    {
+      "file": "bad-link-single-character-navbox.html",
+      "scanner": "page-structure",
+      "expectViolations": true,
+      "criteria": [
+        "2.4.4"
+      ],
+      "matched": 3,
+      "status": "PASS",
+      "detail": "3 violations"
     },
     {
       "file": "bad-navigation-aaa.html",
@@ -1246,6 +1299,17 @@
     },
     {
       "file": "good-accessibility.html",
+      "scanner": "page-structure",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.4"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-link-index-letters.html",
       "scanner": "page-structure",
       "expectViolations": false,
       "criteria": [

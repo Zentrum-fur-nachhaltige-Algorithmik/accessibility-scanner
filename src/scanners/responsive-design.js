@@ -178,15 +178,8 @@ class ResponsiveDesignScanner extends BaseScanner {
       await page.screenshot({ path: baselineScreenshot, fullPage: true });
 
       for (const zoomLevel of options.testZoomLevels) {
-        const zoomResults = await this.testZoomLevel(
-          page,
-          scanDir,
-          viewport,
-          zoomLevel,
-          violations
-        );
+        const zoomResults = await this.testZoomLevel(page, scanDir, viewport, zoomLevel);
         if (zoomResults.skipped) continue;
-        if (zoomResults.hasHorizontalScroll) reflowWorks = false;
         visualEvidence.push({
           viewport: viewport.name,
           zoomLevel: zoomLevel,
@@ -213,15 +206,7 @@ class ResponsiveDesignScanner extends BaseScanner {
     }
 
     const reflow = await this.measureReflow(page, { scanDir });
-    if (reflow.some((v) => v.issue === 'reflow-failure')) {
-      reflowWorks = false;
-      // The page-level overflow is one failure of 1.4.10. The 320px reference
-      // measurement owns it; the zoom steps of the viewport matrix see the
-      // same overflow and must not report it a second time.
-      for (let i = violations.length - 1; i >= 0; i--) {
-        if (violations[i].issue === 'horizontal-scroll') violations.splice(i, 1);
-      }
-    }
+    if (reflow.some((v) => v.issue === 'reflow-failure')) reflowWorks = false;
     violations.push(...reflow);
 
     log.debug(`Responsive analysis complete: ${violations.length} raw violations`);
@@ -230,15 +215,16 @@ class ResponsiveDesignScanner extends BaseScanner {
   }
 
   /**
-   * Test one zoom level for horizontal scrolling (WCAG 1.4.10).
+   * Screenshot and overflow record for one zoom level of the viewport matrix.
    *
    * Zoom is emulated by shrinking the CSS viewport (width / zoom), which is
    * what browser zoom does to layout; `body.style.zoom` would break
-   * position:fixed/sticky and vw units. WCAG 1.4.10 only requires reflow down
-   * to 320 CSS px, so a combination that emulates a narrower width is skipped,
-   * and so is the 320 px reference width itself, which `measureReflow` owns.
+   * position:fixed/sticky and vw units. SC 1.4.10 is defined at 320 CSS px
+   * (equivalently 400 percent zoom of a 1280px viewport), which `measureReflow`
+   * measures and owns; overflow at a wider viewport fails no criterion, so it
+   * is recorded as visual evidence and reported as nothing.
    */
-  async testZoomLevel(page, scanDir, viewport, zoomLevel, violations) {
+  async testZoomLevel(page, scanDir, viewport, zoomLevel) {
     const MIN_REFLOW_WIDTH = 320;
     const cssWidth = Math.round((viewport.width * 100) / zoomLevel);
     const cssHeight = Math.max(Math.round((viewport.height * 100) / zoomLevel), 256);
@@ -264,20 +250,6 @@ class ResponsiveDesignScanner extends BaseScanner {
       };
     }, OVERFLOW_CODE);
 
-    if (scrollAnalysis.hasHorizontalScroll) {
-      violations.push({
-        criterion: '9.1.4.10',
-        viewport: `${viewport.name} (${viewport.width}x${viewport.height})`,
-        zoomLevel: zoomLevel,
-        issue: 'horizontal-scroll',
-        severity: 'serious',
-        description: `Content is ${scrollAnalysis.scrollWidth}px wide in a ${scrollAnalysis.clientWidth}px viewport at ${zoomLevel}% zoom, so it has to be scrolled sideways`,
-        screenshot: screenshotName,
-        suggestion:
-          'Implement responsive design to eliminate horizontal scrolling at all zoom levels',
-      });
-    }
-
     return {
       screenshot: screenshotName,
       hasHorizontalScroll: scrollAnalysis.hasHorizontalScroll,
@@ -300,8 +272,9 @@ class ResponsiveDesignScanner extends BaseScanner {
    */
   async measureTextSpacing(page, options = {}) {
     const spacingResult = await page.evaluate(
-      (renderedSrc, css) => {
+      (renderedSrc, textClippingSrc, css) => {
         eval(renderedSrc);
+        eval(textClippingSrc);
 
         function selectorOf(el) {
           return (
@@ -428,6 +401,11 @@ class ResponsiveDesignScanner extends BaseScanner {
                 c.clipper.cy &&
                 verticallyClipped(c.el, c.clipper);
               if (newlyClipped || clippedAtSpec) {
+                // A container that pans on the clipped axis loses nothing:
+                // the text stays reachable, which is what 1.4.12 asks.
+                const axis =
+                  c.clipper.cy && verticallyClipped(c.el, c.clipper) ? 'vertical' : 'horizontal';
+                if (window.__isPannableContainer(c.clipper.el, axis)) continue;
                 issues.push({
                   element: selectorOf(c.el),
                   container: selectorOf(c.clipper.el),
@@ -442,6 +420,7 @@ class ResponsiveDesignScanner extends BaseScanner {
         });
       },
       renderedCode,
+      textClippingCode,
       SPACING_CSS
     );
 
@@ -607,8 +586,10 @@ class ResponsiveDesignScanner extends BaseScanner {
 
         const clipped = (window.__findClippedText({ minChars: 3 }) || []).filter(
           // Author-declared truncation (ellipsis, -webkit-line-clamp) looks the
-          // same at every width and keeps the full text in the DOM.
-          (c) => !c.truncationDeclared
+          // same at every width and keeps the full text in the DOM. A
+          // container that pans on the clipped axis loses nothing either: the
+          // slides stay reachable.
+          (c) => !c.truncationDeclared && !c.pannable
         );
 
         const overflow = window.__pageOverflow();

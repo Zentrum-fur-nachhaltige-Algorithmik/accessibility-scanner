@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 238,
+  "fixtureCount": 249,
   "scanners": [
     {
       "id": "axe-core",
@@ -456,6 +456,7 @@
           "good-css-background-accessible.html",
           "good-descriptive-photo-alt.html",
           "good-image-alt-complex.html",
+          "good-image-alt-icon-in-named-button.html",
           "good-media-icons-and-background-video.html"
         ],
         "bad": [
@@ -529,7 +530,8 @@
       "fixtures": {
         "good": [
           "good-media-alternatives.html",
-          "good-media-icons-and-background-video.html"
+          "good-media-icons-and-background-video.html",
+          "good-video-silent-background-loop.html"
         ],
         "bad": [
           "bad-media-alternatives.html"
@@ -542,7 +544,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "concurrent"
         ]
@@ -564,7 +566,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-media-alternatives.html"
+          "good-media-alternatives.html",
+          "good-video-silent-background-loop.html"
         ],
         "bad": [
           "bad-media-alternatives.html"
@@ -576,7 +579,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -621,7 +624,8 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-audio-description.html"
+          "good-audio-description.html",
+          "good-video-silent-background-loop.html"
         ],
         "bad": [
           "bad-audio-description.html"
@@ -633,7 +637,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "concurrent"
         ]
@@ -1058,10 +1062,12 @@
           "good-aa-text-not-enhanced.html",
           "good-bootstrap-patterns.html",
           "good-color-contrast.html",
+          "good-contrast-composited-backgrounds.html",
           "good-contrast-hidden-and-arbitrary-classes.html"
         ],
         "bad": [
           "bad-color-contrast.html",
+          "bad-contrast-composited-backgrounds.html",
           "bad-focus-visible.html"
         ]
       },
@@ -1295,6 +1301,7 @@
           "good-decorative-blur-blob.html",
           "good-fluid-container-and-truncation.html",
           "good-reflow-dead-image-and-skip-link.html",
+          "good-reflow-pannable-carousel.html",
           "good-reflow.html"
         ],
         "bad": [
@@ -1308,7 +1315,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 6,
         "from": [
           "exclusive"
         ]
@@ -1331,6 +1338,7 @@
       "fixtures": {
         "good": [
           "good-graphic-parts-contrast.html",
+          "good-nontext-boundary-fill-and-icon.html",
           "good-nontext-contrast.html",
           "good-state-styles-unused.html"
         ],
@@ -1345,7 +1353,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -1370,6 +1378,7 @@
       "fixtures": {
         "good": [
           "good-fluid-container-and-truncation.html",
+          "good-reflow-pannable-carousel.html",
           "good-text-spacing-grid-cards.html",
           "good-text-spacing.html"
         ],
@@ -1384,7 +1393,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -1408,11 +1417,11 @@
         "good": [
           "good-hover-focus-content.html",
           "good-hover-focus-measured.html",
+          "good-title-as-the-name-of-a-control.html",
           "good-title-supplementing-name.html"
         ],
         "bad": [
-          "bad-hover-focus-content.html",
-          "bad-title-only-name.html"
+          "bad-hover-focus-content.html"
         ]
       },
       "harness": [
@@ -2018,10 +2027,12 @@
       "fixtures": {
         "good": [
           "good-accessibility.html",
+          "good-link-index-letters.html",
           "good-link-purpose-in-context.html"
         ],
         "bad": [
-          "bad-link-purpose.html"
+          "bad-link-purpose.html",
+          "bad-link-single-character-navbox.html"
         ]
       },
       "harness": [
@@ -2031,7 +2042,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -2586,6 +2597,7 @@
         "good": [
           "good-inline-text-links.html",
           "good-pointer-labels-and-alternatives.html",
+          "good-target-size-lazy-banner.html",
           "good-target-size-minimum.html"
         ],
         "bad": [
@@ -2601,7 +2613,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 6,
         "from": [
           "exclusive"
         ]
@@ -3335,6 +3347,7 @@
           "good-aria-role-override.html",
           "good-aria-state-updates.html",
           "good-bootstrap-patterns.html",
+          "good-carousel-role-less-wrapper.html",
           "good-composite-aria-widgets.html",
           "good-hidden-modal.html",
           "good-icon-button-and-honeypot.html",
@@ -3347,6 +3360,7 @@
           "bad-aria-role-override.html",
           "bad-aria-state-updates.html",
           "bad-beeproduced-real-issues.html",
+          "bad-carousel-unnamed-region.html",
           "bad-complex-aria.html",
           "bad-icon-accessibility.html"
         ]
@@ -3358,7 +3372,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 16,
+        "runs": 18,
         "from": [
           "concurrent"
         ]

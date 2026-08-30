@@ -55,6 +55,66 @@ if (typeof window.__findClippedText !== 'function') {
   };
 
   /**
+   * A slide track: a direct child of the container whose own children lie side
+   * by side in one row that spans the container's whole scrollable width. That
+   * is the geometry of a carousel and the row is what a prev/next affordance
+   * moves. A block that merely overflows its box, three footer columns that do
+   * not wrap, has no such row of its own.
+   */
+  window.__hasSlideTrack = function (el) {
+    const box = el.getBoundingClientRect();
+    if (box.width < 1) return false;
+    for (let i = 0; i < el.children.length; i++) {
+      const track = el.children[i];
+      if (track.children.length < 3) continue;
+      const kids = [];
+      for (let k = 0; k < track.children.length; k++) {
+        const kr = track.children[k].getBoundingClientRect();
+        if (kr.width > 0 && kr.height > 0) kids.push(kr);
+      }
+      if (kids.length < 3) continue;
+      let inRow = true;
+      for (let k = 1; k < kids.length; k++) {
+        if (kids[k].left < kids[k - 1].right - 1) { inRow = false; break; }
+        if (Math.abs(kids[k].top - kids[0].top) > kids[0].height) { inRow = false; break; }
+      }
+      if (!inRow) continue;
+      const span = kids[kids.length - 1].right - kids[0].left;
+      if (span > box.width * 1.2 && span >= el.scrollWidth * 0.9) return true;
+    }
+    return false;
+  };
+
+  /**
+   * Can the user bring what the container clips on \`axis\` into view?
+   *
+   * SC 1.4.10 and 1.4.12 forbid loss of content and functionality, not the
+   * clip itself. A container loses nothing when it can be scrolled on the
+   * clipped axis and the user has a way to move it: the axis scrolls
+   * natively, or it holds a slide track, which is what a carousel's prev/next
+   * affordance pans. A fixed height box that swallows the end of a paragraph
+   * offers neither.
+   */
+  window.__isPannableContainer = function (el, axis) {
+    const horizontal = axis !== 'vertical';
+    const prop = horizontal ? 'scrollLeft' : 'scrollTop';
+    const extent = horizontal
+      ? el.scrollWidth - el.clientWidth
+      : el.scrollHeight - el.clientHeight;
+    if (extent <= 2) return false;
+    const before = el[prop];
+    el[prop] = before + 50;
+    const moved = el[prop] !== before;
+    el[prop] = before;
+    if (!moved) return false;
+
+    const s = window.getComputedStyle(el);
+    const overflow = horizontal ? s.overflowX : s.overflowY;
+    if (overflow === 'auto' || overflow === 'scroll') return true;
+    return horizontal && window.__hasSlideTrack(el);
+  };
+
+  /**
    * @param {Object} [opts]
    *   opts.root: subtree to scan (default document.body)
    *   opts.minChars: ignore clipped runs shorter than this (default 2)
@@ -144,11 +204,20 @@ if (typeof window.__findClippedText !== 'function') {
       const lineClamp = s.webkitLineClamp || s['-webkit-line-clamp'] || 'none';
       const truncationDeclared = (lineClamp && lineClamp !== 'none') || s.textOverflow === 'ellipsis';
 
+      const axis =
+        overshootX > TOL && overshootY > TOL ? 'both' : overshootX > TOL ? 'horizontal' : 'vertical';
+      const pannable =
+        axis === 'both'
+          ? window.__isPannableContainer(el, 'horizontal') &&
+            window.__isPannableContainer(el, 'vertical')
+          : window.__isPannableContainer(el, axis);
+
       out.push({
+        pannable: pannable,
         truncationDeclared: !!truncationDeclared,
         lineClamp: lineClamp,
         selector: selectorOf(el),
-        axis: overshootX > TOL && overshootY > TOL ? 'both' : (overshootX > TOL ? 'horizontal' : 'vertical'),
+        axis: axis,
         overshootX: Math.round(overshootX),
         overshootY: Math.round(overshootY),
         clippedChars: clippedChars,

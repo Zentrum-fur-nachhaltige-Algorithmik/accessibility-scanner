@@ -1,0 +1,37 @@
+<!-- WCAG-TEST
+criterion: 2.4.4
+level: A
+title: Single-character links that are not an index identify nothing
+test_type: bad
+expected_violations: 3
+testable_by: dom
+scanners: page-structure
+description: The three navigation-box controls are named "v", "t" and "e" (view, talk, edit). They sit in one list item that holds no other word, and their characters are neither ascending nor a run, so they are not an index either: nothing identifies where any of them goes. WCAG 2.4.4.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article with a navigation box</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  .navbox { border: 1px solid #595959; padding: .5rem; }
+  .navbox ul { display: flex; gap: .5rem; list-style: none; padding: 0; margin: 0; }
+  .navbox a { color: #0b4f9e; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Article with a navigation box</h1>
+  <div class="navbox">
+    <ul>
+      <li><a href="/template/accessibility">v</a></li>
+      <li><a href="/template_talk/accessibility">t</a></li>
+      <li><a href="/template/accessibility?action=edit">e</a></li>
+    </ul>
+  </div>
+</main>
+</body>
+</html>

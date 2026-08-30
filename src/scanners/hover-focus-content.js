@@ -6,7 +6,6 @@
  */
 const BaseScanner = require('../core/base-scanner');
 const { injectableCode: renderedCode } = require('../utils/rendered');
-const { injectableCode: accnameCode } = require('../utils/accessible-name');
 const log = require('../utils/logger').createLogger('hover-focus-content');
 
 /** Marks the trigger and the revealed content across page.evaluate calls. */
@@ -25,87 +24,19 @@ class HoverFocusContentScanner extends BaseScanner {
   }
 
   async scan(page, options = {}) {
+    // 1.4.13 governs content that appears when the pointer or the keyboard
+    // reaches a trigger. There is nothing to measure without driving them, so
+    // a run that may not do that measures nothing.
     if (options.heuristicOnly) {
-      return this.heuristicScan(page);
+      return {
+        scannerId: this.id,
+        criteria: ['9.1.4.13'],
+        passed: true,
+        violations: [],
+        summary: { heuristicOnly: true, violationCount: 0 },
+      };
     }
     return this.fullScan(page, options);
-  }
-
-  /**
-   * Concurrent-compatible pass: the one 1.4.13 defect that is visible in the
-   * DOM without driving the pointer.
-   */
-  async heuristicScan(page) {
-    const violations = await page.evaluate((injectedCode) => {
-      eval(injectedCode);
-      const found = [];
-
-      function getSelector(el) {
-        return (
-          el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (el.className && typeof el.className === 'string' ? `.${el.className.split(' ')[0]}` : '')
-        );
-      }
-
-      // Controls whose only name is a title attribute.
-      //
-      // The tooltip a browser draws from `title` is user agent content, which
-      // 1.4.13 does not govern, and a link that carries its page summary in a
-      // title (every link on a MediaWiki page) is supplementary. What does
-      // fail is a control with no other name: its name appears only in a
-      // tooltip that a touch user never sees and a keyboard user cannot
-      // dismiss or hover.
-      const withTitle = document.querySelectorAll(
-        'a[title], button[title], input[title], [role="button"][title], [tabindex][title]'
-      );
-      withTitle.forEach((el) => {
-        if (!__isRendered(el)) return;
-        const title = (el.getAttribute('title') || '').trim();
-        if (!title) return;
-        if ((__accessibleName(el) || '').trim() !== title) return;
-
-        // A wiki link is <a href="/wiki/X" title="X">X</a>: its name comes
-        // from its own text and merely happens to read like the title. The
-        // failure is a control with no other source of a name at all.
-        const labelledby = (el.getAttribute('aria-labelledby') || '')
-          .split(/\s+/)
-          .filter(Boolean)
-          .some((id) => document.getElementById(id));
-        const namedByImage = Array.from(el.querySelectorAll('img[alt], svg title')).some(
-          (child) => (child.getAttribute('alt') || child.textContent || '').trim().length > 0
-        );
-        const visible = __visibleLabelText(el);
-        const hasOtherName =
-          (visible && visible.full && visible.full.length > 0) ||
-          (el.getAttribute('aria-label') || '').trim().length > 0 ||
-          (el.getAttribute('value') || '').trim().length > 0 ||
-          labelledby ||
-          !!(el.labels && el.labels.length > 0) ||
-          namedByImage;
-        if (hasOtherName) return;
-
-        found.push({
-          criterion: '9.1.4.13',
-          element: getSelector(el),
-          issue: 'title-attribute-as-content',
-          description: `The only name of this control is title="${title.substring(0, 50)}", which is readable only as a browser tooltip that cannot be hovered or dismissed`,
-          severity: 'moderate',
-          suggestion:
-            'Give the control a visible label or an aria-label, and keep the title for supplementary information only.',
-        });
-      });
-
-      return found;
-    }, `${renderedCode}\n${accnameCode}`);
-
-    return {
-      scannerId: this.id,
-      criteria: ['9.1.4.13'],
-      passed: violations.length === 0,
-      violations,
-      summary: { heuristicOnly: true, violationCount: violations.length },
-    };
   }
 
   /**
@@ -113,8 +44,7 @@ class HoverFocusContentScanner extends BaseScanner {
    * what appears.
    */
   async fullScan(page, options = {}) {
-    const heuristicResult = await this.heuristicScan(page);
-    const violations = [...heuristicResult.violations];
+    const violations = [];
 
     const triggers = await this.collectTriggers(page);
     log.debug(`Hovering ${triggers.length} candidate trigger(s)`);

@@ -11,6 +11,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
+const { injectableCode: mediaAudioUtils } = require('../utils/media-audio');
 const log = require('../utils/logger').createLogger('media-accessibility');
 
 class MediaAccessibilityScanner extends BaseScanner {
@@ -77,7 +78,8 @@ class MediaAccessibilityScanner extends BaseScanner {
       screenshotPromise = page.screenshot({ path: initialScreenshot, fullPage: true });
     }
 
-    const mediaAnalysis = await page.evaluate(() => {
+    const mediaAnalysis = await page.evaluate((mediaAudioCode) => {
+      eval(mediaAudioCode);
       // Helper function for element selector generation (browser context)
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -147,15 +149,11 @@ class MediaAccessibilityScanner extends BaseScanner {
       }
 
       /**
-       * A muted video that starts by itself, loops and offers no player is
+       * A video that starts by itself, loops and offers no player is
        * decoration behind a headline. It carries no audio to caption and no
        * information the page does not also state in text.
        */
-      function isDecorativeBackgroundVideo(video) {
-        if (video.getAttribute('aria-hidden') === 'true') return true;
-        if (video.hasAttribute('controls')) return false;
-        return video.hasAttribute('autoplay') && video.hasAttribute('loop') && video.muted;
-      }
+      const isDecorativeBackgroundVideo = __isDecorativeBackgroundVideo;
 
       const allIssues = [];
       const mediaCounts = {
@@ -264,6 +262,10 @@ class MediaAccessibilityScanner extends BaseScanner {
 
         if (!isEvaluableMedia(video)) return;
         if (isDecorativeBackgroundVideo(video)) return;
+        // 1.2.2, 1.2.3 and 1.2.5 all govern synchronized media, which is
+        // audio synchronized with video. A file that decoded video and no
+        // audio carries none, so none of them applies to it.
+        if (__mediaAudioState(video) === 'silent') return;
 
         const tracks = video.querySelectorAll('track[kind="captions"], track[kind="subtitles"]');
         const hasCaptionTrack = tracks.length > 0;
@@ -391,7 +393,7 @@ class MediaAccessibilityScanner extends BaseScanner {
       });
 
       return { allIssues, mediaCounts };
-    });
+    }, mediaAudioUtils);
 
     // Wait for screenshot to complete
     await screenshotPromise;

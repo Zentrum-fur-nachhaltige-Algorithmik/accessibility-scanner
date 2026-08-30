@@ -36,6 +36,34 @@ const PROFILE = 'standard';
  */
 const PER_FILE_TIMEOUT_MS = 600000;
 const SLOW_FILE_MS = 240000;
+/**
+ * Snapshots scanned at once share the CPU, so the wall clock of one grows with
+ * the others: wiki-accessibility-en.html takes 395 s alone and 590 s beside two
+ * more. Each extra worker buys a file this much more before it counts as a hang.
+ */
+const PER_WORKER_TIMEOUT_MS = 150000;
+function perFileTimeoutMs(parallel) {
+  return PER_FILE_TIMEOUT_MS + PER_WORKER_TIMEOUT_MS * Math.max(0, parallel - 1);
+}
+/**
+ * Snapshots scanned at once. Each gets its own pipeline and browser, so they
+ * only share the CPU: at 3 the sequential 40 minutes over sixteen snapshots
+ * become about 15, and elapsedMs grows a little under the shared load, which is
+ * why SLOW is a performance finding and never a failure.
+ */
+const DEFAULT_PARALLEL = 3;
+
+/**
+ * Navigation budget one scanner gets for its own page load.
+ *
+ * Every exclusive scanner reloads the snapshot on its own tab.
+ * govuk-design-system.html, 811 KB, holds subresources that never let
+ * `networkidle0` settle, so on every run a different scanner runs out of budget
+ * there; raising it to 90 s changed which scanners, not whether. The timeout is
+ * the page's, which is why derive-scanner-trust.js does not read it as a crash
+ * of the scanner that happened to draw it.
+ */
+const SCANNER_NAV_TIMEOUT_MS = 45000;
 
 // ---------------------------------------------------------------------------
 // violation matching helpers
@@ -122,6 +150,9 @@ function mentions(violations, needle) {
 const FIXTURES = [
   {
     file: 'own-audit-ui.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries no CSS, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: "http://localhost:3111/audit (this repo's own Next.js frontend)",
     // recorded: 3 total ensemble violations (profile=standard, --no-llm).
     band: [1, 6],
@@ -180,6 +211,9 @@ const FIXTURES = [
 
   {
     file: 'med-theme.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries no CSS, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://dr-mauermann-urologe.vercel.app',
     // recorded: 14 total ensemble violations (profile=standard, --no-llm).
     band: [7, 28],
@@ -251,9 +285,12 @@ const FIXTURES = [
 
   {
     file: 'beeproduced.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries only part of them, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://beeproduced.com',
-    // recorded: 14 total ensemble violations (profile=standard, --no-llm).
-    band: [7, 28],
+    // recorded: 6 total ensemble violations (profile=standard, --no-llm).
+    band: [3, 12],
     spotTruths: [
       {
         name: 'REGRESSION: axe-core survives the dead <iframe> and still reports',
@@ -266,14 +303,25 @@ const FIXTURES = [
         // parent document can sit at readyState 'interactive'. Unhandled, that
         // makes AxePuppeteer throw "Page/Frame is not ready" and report zero
         // violations for an otherwise scannable page. Assert both that it did
-        // not error and that it produced findings (a crash that degrades to an
-        // empty array would otherwise pass unnoticed).
+        // not error and that its rules ran and produced results in some bucket
+        // (a crash that degrades to an empty array would otherwise pass
+        // unnoticed). The bucket is not the point: every finding this page
+        // produces is a best practice or a contrast node that composites above
+        // the threshold.
         check: ({ scanners }) => {
           const s = scanners['axe-core'];
           if (!s) return 'axe-core missing from results entirely';
           if (s.error) return `axe-core returned error: ${s.error}`;
-          if (!s.violationCount)
-            return 'axe-core reported 0 violations: suspicious silent zero on a dead-iframe page';
+          const summary = s.summary || {};
+          if (!summary.rulesRun)
+            return 'axe-core ran no rule at all: suspicious silent zero on a dead-iframe page';
+          const produced =
+            (s.violationCount || 0) +
+            (summary.bestPracticeNodes || 0) +
+            (summary.needsReviewNodes || 0) +
+            (summary.contrastResolvedAsPassing || 0);
+          if (!produced)
+            return 'axe-core produced no node in any bucket on a page of 500 KB of markup';
           return null;
         },
       },
@@ -346,10 +394,13 @@ const FIXTURES = [
 
   {
     file: 'wiki-medical-de.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries only part of them, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://de.wikipedia.org/wiki/Prostatakarzinom',
-    // recorded: 304 total ensemble violations (profile=standard, --no-llm),
-    // 281.5s wall clock.
-    band: [152, 608],
+    // recorded: 217 total ensemble violations (profile=standard, --no-llm),
+    // 263.9s wall clock.
+    band: [108, 434],
     spotTruths: [
       {
         name: 'REAL: images with no alt attribute at all',
@@ -488,9 +539,12 @@ const FIXTURES = [
 
   {
     file: 'modern-commercial.html',
+    // Captured before capture-realworld.js inlined stylesheets: this snapshot
+    // carries no CSS, so what it paints is not what the site serves.
+    unstyledCapture: true,
     source: 'https://www.mozilla.org/de/',
-    // recorded: 47 total ensemble violations (profile=standard, --no-llm).
-    band: [23, 94],
+    // recorded: 46 total ensemble violations (profile=standard, --no-llm).
+    band: [23, 92],
     spotTruths: [
       {
         name: 'REAL: a literal <blink> element in the navigation',
@@ -725,8 +779,8 @@ const FIXTURES = [
   {
     file: 'webaim-article.html',
     source: 'https://webaim.org/techniques/skipnav/',
-    // recorded: 34 total ensemble violations (profile=standard, --no-llm).
-    band: [17, 68],
+    // recorded: 15 total ensemble violations (profile=standard, --no-llm).
+    band: [7, 30],
     spotTruths: [
       {
         name: 'REGRESSION: article links are not skip links',
@@ -783,7 +837,7 @@ const FIXTURES = [
         // 1.4.11 asks of the visual boundary of a control.
         check: ({ violations }) => {
           const hits = mentions(violations, 'waveurl').filter((v) =>
-            /contrast/i.test(`${v.issue || ''} ${v.description || ''}`)
+            /contrast/i.test(`${v.issue || ''} ${v.type || ''} ${v.description || ''}`)
           );
           if (hits.length > 0) return null;
           return 'no 1.4.11 finding for the #cccccc border of input#waveurl on #e5e6eb';
@@ -795,10 +849,10 @@ const FIXTURES = [
   {
     file: 'govuk-design-system.html',
     source: 'https://design-system.service.gov.uk/components/text-input/',
-    // recorded: 18 total ensemble violations (profile=standard, --no-llm) on
-    // two runs of this file alone; in both, two exclusive scanners lost the 45s
-    // reload on this 811KB page and contributed nothing.
-    band: [9, 36],
+    // recorded: 16 total ensemble violations (profile=standard, --no-llm); on
+    // some runs two exclusive scanners lose the 45s reload on this 811KB page
+    // and contribute nothing.
+    band: [8, 32],
     spotTruths: [
       {
         name: 'REGRESSION: iframes are not reported as missing a focus indicator',
@@ -907,8 +961,8 @@ const FIXTURES = [
   {
     file: 'broadcaster-news.html',
     source: 'https://www.bbc.com/news',
-    // recorded: 68 total ensemble violations (profile=standard, --no-llm).
-    band: [34, 136],
+    // recorded: 67 total ensemble violations (profile=standard, --no-llm).
+    band: [33, 134],
     spotTruths: [
       {
         name: 'REGRESSION: a described photograph is not a defect',
@@ -994,6 +1048,211 @@ const FIXTURES = [
       },
     ],
   },
+  {
+    file: 'maler-staepke.html',
+    source: 'https://www.maler-staepke.de/de.html',
+    // recorded: 13 total ensemble violations (profile=standard, --no-llm).
+    band: [6, 26],
+    spotTruths: [
+      {
+        name: 'REAL: the document declares no language',
+        kind: 'must-detect',
+        // <html xmlns="http://www.w3.org/1999/xhtml"> carries no lang attribute
+        // anywhere in the file, so the page language is not programmatically
+        // determined. WCAG 3.1.1, axe rule `html-has-lang`.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['html-has-lang', '3.1.1'] });
+          return hits.length ? null : 'no 3.1.1 finding for an html element without lang';
+        },
+      },
+      {
+        name: 'REGRESSION: menu text over a background image that does not load',
+        kind: 'must-not-flag',
+        // The inline CSS paints images/mainrightcontainertop.gif behind the six
+        // main menu links, and that GIF is not part of the snapshot. An image
+        // that does not load paints nothing, so the text sits on the declared
+        // background-color #E9E8DB and #AA141D bold on it is 6.02:1.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: 'color-contrast',
+            selector: 'leistungen.html',
+          });
+          return hits.length
+            ? `${hits.length} contrast finding(s) on the menu links at 6.02:1`
+            : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'muenchen-portal.html',
+    source: 'https://www.muenchen.de/',
+    // recorded: 13 total ensemble violations (profile=standard, --no-llm).
+    band: [6, 26],
+    spotTruths: [
+      {
+        name: 'REAL: two teaser images carry no alt attribute',
+        kind: 'must-detect',
+        // In the third teaser row the third and fourth
+        //   <picture><img height="213" loading="eager" src="..."> elements
+        // carry width, height, loading and src but no alt, while every other
+        // teaser image on the page has one. WCAG 1.1.1, axe rule `image-alt`.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: ['image-alt', '1.1.1'] });
+          return hits.length >= 2 ? null : `${hits.length} image-alt findings, expected 2`;
+        },
+      },
+      {
+        name: 'REGRESSION: the A to Z index links are not unnamed links',
+        kind: 'must-not-flag',
+        // ul.m-sectors-list holds 24 a.m-sector-link items whose names are the
+        // single letters A, B, C ... pointing at
+        // /service/branchenbuch/<letter>.html. The sibling letters are text in
+        // the same list, which WCAG counts as programmatically determined link
+        // context, and together they are the alphabetical index.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: 'link-name-identifies-nothing',
+            selector: 'm-sector-link',
+          });
+          return hits.length ? `${hits.length} of the 24 A to Z index links reported` : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'spiegel-news.html',
+    source: 'https://www.spiegel.de/',
+    // recorded: 26 total ensemble violations (profile=standard, --no-llm).
+    band: [13, 52],
+    spotTruths: [
+      {
+        name: 'REAL: role=listitem elements whose parent has no list role',
+        kind: 'must-detect',
+        // In the "topreads" blocks the teasers declare
+        //   <div class="md:py-12 sm:py-8" role="listitem">
+        // inside plain <div> wrappers that carry no role at all, so the list
+        // relationship the role announces does not exist. WCAG 1.3.1, axe rule
+        // `aria-required-parent`.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: 'aria-required-parent' });
+          return hits.length >= 6
+            ? null
+            : `${hits.length} aria-required-parent findings, expected 6`;
+        },
+      },
+      {
+        name: 'REGRESSION: a silent looping motion graphic needs no captions',
+        kind: 'must-not-flag',
+        // The two widget videos are
+        //   <video class="rounded" autoplay loop playsinline webkit-playsinline
+        //     src=".../2026_NSDAPAKte_Aufmacher0_SS.aep.mp4">
+        // with no controls attribute. Autoplay without a muted attribute is
+        // only ever granted to media a browser can play silently, and the file
+        // carries a vide/avc1 track and no soun or mp4a track, so it is not
+        // synchronized media and 1.2.2, 1.2.3, 1.2.5 and 1.4.2 do not apply.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: [
+              'video-caption',
+              'video-description',
+              'video-audio-description',
+              'no-autoplay-audio',
+            ],
+          });
+          return hits.length
+            ? `${hits.length} caption/description finding(s) on a silent video`
+            : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'oesterreich-gv.html',
+    source: 'https://www.oesterreich.gv.at/',
+    // Calibration site: built under the Austrian accessibility law, every
+    // finding on it is treated as false until the markup proves otherwise.
+    // recorded: 0 total ensemble violations (profile=standard, --no-llm): a
+    // calibration site whose total is the floor of the corpus, so the band is
+    // the recipe's [floor(0 * 0.5), ceil(0 * 2)] and every new finding is a
+    // regression signal.
+    band: [0, 0],
+    spotTruths: [
+      {
+        name: 'REGRESSION: card text over a single-colour gradient fill',
+        kind: 'must-not-flag',
+        // The service cards paint linear-gradient(#fff, #fff) over a gradient
+        // border, which axe cannot resolve. The gradient has one colour, so the
+        // fill is white and the card title #1E4EA6 at 18px bold is 7.79:1 and
+        // the body text #030D20 is 19.4:1.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: 'color-contrast',
+            selector: 'group-data-',
+          });
+          return hits.length ? `${hits.length} contrast finding(s) on the service cards` : null;
+        },
+      },
+      {
+        name: 'REGRESSION: an icon inside an aria-labelled button is not a missing alternative',
+        kind: 'must-not-flag',
+        // <button id="ida-chatbot" aria-label="Chatbot IDA öffnen"> holds a
+        // 32x32 data-URI SVG icon as its only content. The button is named by
+        // its author-supplied label and the icon is never announced on its own,
+        // so nothing is missing a text alternative under 1.1.1.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: 'image-alt', selector: 'ida-chatbot' });
+          return hits.length
+            ? 'the icon of the labelled chatbot button reported under 1.1.1'
+            : null;
+        },
+      },
+    ],
+  },
+
+  {
+    file: 'hilfsgemeinschaft.html',
+    source: 'https://www.hilfsgemeinschaft.at/',
+    // Calibration site: the association of blind and visually impaired people
+    // in Austria, every finding on it is treated as false until the markup
+    // proves otherwise.
+    // recorded: 4 total ensemble violations (profile=standard, --no-llm).
+    band: [2, 8],
+    spotTruths: [
+      {
+        name: 'REAL: the search field is bounded only by a 2.85:1 border',
+        kind: 'must-detect',
+        // <input type="text" id="search" class="form-control"> is a white field
+        // on a white panel whose only boundary is a 1px solid #999999 border:
+        // 2.85:1, below the 3:1 that SC 1.4.11 asks of the visual information
+        // that identifies a user interface component.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, {
+            id: ['insufficient-form-border-contrast', '1.4.11'],
+            selector: '#search',
+          });
+          return hits.length ? null : 'no 1.4.11 finding for the 2.85:1 search field border';
+        },
+      },
+      {
+        name: 'REGRESSION: a slider track that pans is not a reflow failure',
+        kind: 'must-not-flag',
+        // The tiny-slider track lays its eight slides out side by side and pans
+        // horizontally, which overflows the document by 25px at a 1920px
+        // viewport. SC 1.4.10 is measured at 320 CSS px, where this page
+        // reflows, and no criterion governs overflow at a desktop width.
+        check: ({ violations }) => {
+          const hits = findViolations(violations, { id: 'horizontal-scroll' });
+          return hits.length
+            ? `${hits.length} horizontal-scroll finding(s) at a desktop viewport`
+            : null;
+        },
+      },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1033,14 +1292,15 @@ function startServer(dir) {
 // ---------------------------------------------------------------------------
 
 function parseArgs(argv) {
-  const out = { json: null, only: null, noLlm: false };
+  const out = { json: null, only: null, noLlm: false, parallel: DEFAULT_PARALLEL };
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--json') out.json = argv[++i];
+    else if (argv[i] === '--parallel') out.parallel = Math.max(1, parseInt(argv[++i], 10) || 1);
     else if (argv[i] === '--only') out.only = argv[++i];
     else if (argv[i] === '--no-llm') out.noLlm = true;
     else if (argv[i] === '--help' || argv[i] === '-h') {
       console.log(
-        'Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>]'
+        'Usage: node scripts/harness/realworld.js [--no-llm] [--only <file>] [--json <path>] [--parallel <n>]'
       );
       process.exit(0);
     }
@@ -1048,7 +1308,7 @@ function parseArgs(argv) {
   return out;
 }
 
-async function scanFile(url, scannerIds, scanOptions) {
+async function scanFile(url, scannerIds, scanOptions, timeoutMs = PER_FILE_TIMEOUT_MS) {
   // Fresh pipeline (and therefore a fresh browser) per file: a hang in one
   // fixture must not poison the next, and it makes timeout recovery trivial.
   const pipeline = new ScanPipeline();
@@ -1064,17 +1324,19 @@ async function scanFile(url, scannerIds, scanOptions) {
     timer = setTimeout(
       () =>
         rej(
-          new Error(
-            `WALL-CLOCK TIMEOUT after ${PER_FILE_TIMEOUT_MS}ms: treated as a hang, not a soft skip`
-          )
+          new Error(`WALL-CLOCK TIMEOUT after ${timeoutMs}ms: treated as a hang, not a soft skip`)
         ),
-      PER_FILE_TIMEOUT_MS
+      timeoutMs
     );
   });
 
   try {
     const result = await Promise.race([
-      pipeline.scan(url, { scannerIds: expectedIds, timeout: 45000, ...scanOptions }),
+      pipeline.scan(url, {
+        scannerIds: expectedIds,
+        timeout: SCANNER_NAV_TIMEOUT_MS,
+        ...scanOptions,
+      }),
       timeoutPromise,
     ]);
     return { result, expectedIds, timedOut: false };
@@ -1126,35 +1388,35 @@ async function main() {
     startedAt: new Date().toISOString(),
     profile: PROFILE,
     llmEnabled,
-    perFileTimeoutMs: PER_FILE_TIMEOUT_MS,
+    perFileTimeoutMs: perFileTimeoutMs(args.parallel),
+    parallel: args.parallel,
     files: [],
   };
   const failures = [];
 
   // Scanners are noisy; capture their chatter instead of drowning the report.
+  // The console is swapped once around the whole pool, so the snapshots that
+  // run at the same time share one noise log.
   const realLog = console.log;
   const realWarn = console.warn;
   const realErr = console.error;
+  const noise = [];
+  const sink = (...a) => noise.push(a.map(String).join(' '));
+  const log = realLog;
 
-  for (const fx of fixtures) {
+  const runFixture = async (fx) => {
     const url = `http://localhost:${port}/${fx.file}`;
-    realLog(`--- ${fx.file}`);
+    log(`--- ${fx.file}`);
+    const failures = [];
 
-    const noise = [];
-    const sink = (...a) => noise.push(a.map(String).join(' '));
-    console.log = sink;
-    console.warn = sink;
-    console.error = sink;
-
+    const noiseFrom = noise.length;
     const t0 = Date.now();
-    let outcome;
-    try {
-      outcome = await scanFile(url, scannerIds, profileOptions);
-    } finally {
-      console.log = realLog;
-      console.warn = realWarn;
-      console.error = realErr;
-    }
+    const outcome = await scanFile(
+      url,
+      scannerIds,
+      profileOptions,
+      perFileTimeoutMs(args.parallel)
+    );
     const elapsedMs = Date.now() - t0;
 
     const entry = {
@@ -1173,9 +1435,8 @@ async function main() {
     if (outcome.timedOut) {
       failures.push({ layer: 'no-crash', file: fx.file, detail: outcome.error });
       entry.error = outcome.error;
-      report.files.push(entry);
-      realLog(`  HANG/TIMEOUT after ${elapsedMs}ms: ${outcome.error}`);
-      continue;
+      log(`  ${fx.file}: HANG/TIMEOUT after ${elapsedMs}ms: ${outcome.error}`);
+      return { entry, failures };
     }
 
     const result = outcome.result;
@@ -1276,20 +1537,50 @@ async function main() {
     // Slowness is reported, never swallowed (see PER_FILE_TIMEOUT_MS).
     entry.slow = elapsedMs > SLOW_FILE_MS;
 
+    // Lines another snapshot's scanners wrote during this window are in here
+    // too: the console is shared, the attribution is by time.
     entry.noise = noise
+      .slice(noiseFrom)
       .filter((l) => /error|fail|cannot|undefined|not ready/i.test(l))
       .slice(0, 40);
-    report.files.push(entry);
 
     const stOk = entry.spotTruths.filter((s) => s.ok).length;
-    realLog(
-      `  ${violations.length} violations | ${entry.scannerCount}/${entry.expectedScannerCount} scanners | ` +
+    log(
+      `  ${fx.file}: ${violations.length} violations | ${entry.scannerCount}/${entry.expectedScannerCount} scanners | ` +
         `${entry.scannerErrors.length} errors | spot-truths ${stOk}/${entry.spotTruths.length} | ${(elapsedMs / 1000).toFixed(1)}s`
     );
-    for (const e of entry.scannerErrors) realLog(`    SCANNER ERROR  ${e.scanner}: ${e.error}`);
-    for (const m of entry.missingScanners) realLog(`    SCANNER MISSING ${m}`);
+    for (const e of entry.scannerErrors) log(`    SCANNER ERROR  ${e.scanner}: ${e.error}`);
+    for (const m of entry.missingScanners) log(`    SCANNER MISSING ${m}`);
     for (const s of entry.spotTruths.filter((x) => !x.ok))
-      realLog(`    SPOT-TRUTH FAIL ${s.name}: ${s.detail}`);
+      log(`    SPOT-TRUTH FAIL ${s.name}: ${s.detail}`);
+    return { entry, failures };
+  };
+
+  // Worker pool over the fixtures; results are kept in fixture order so the
+  // report reads the same at any --parallel.
+  const results = new Array(fixtures.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < fixtures.length) {
+      const i = nextIndex++;
+      results[i] = await runFixture(fixtures[i]);
+    }
+  };
+  console.log = sink;
+  console.warn = sink;
+  console.error = sink;
+  try {
+    await Promise.all(
+      Array.from({ length: Math.min(args.parallel, fixtures.length) }, () => worker())
+    );
+  } finally {
+    console.log = realLog;
+    console.warn = realWarn;
+    console.error = realErr;
+  }
+  for (const r of results) {
+    report.files.push(r.entry);
+    failures.push(...r.failures);
   }
 
   // ---- summary ----
@@ -1298,7 +1589,9 @@ async function main() {
   report.passed = failures.length === 0;
 
   console.log('\n=== SUMMARY ===');
-  console.log(`profile=${PROFILE}  llm=${llmEnabled ? 'on' : 'off'}  fixtures=${fixtures.length}`);
+  console.log(
+    `profile=${PROFILE}  llm=${llmEnabled ? 'on' : 'off'}  fixtures=${fixtures.length}  parallel=${args.parallel}`
+  );
   console.log('');
   console.log(
     'file'.padEnd(26) +
@@ -1391,4 +1684,14 @@ if (require.main === module) {
   });
 }
 
-module.exports = { FIXTURES, FIXTURE_DIR, PROFILE, startServer, scanFile, findViolations, mentions };
+module.exports = {
+  FIXTURES,
+  FIXTURE_DIR,
+  PROFILE,
+  DEFAULT_PARALLEL,
+  perFileTimeoutMs,
+  startServer,
+  scanFile,
+  findViolations,
+  mentions,
+};

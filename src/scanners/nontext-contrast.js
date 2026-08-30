@@ -197,8 +197,8 @@ class NonTextContrastScanner extends BaseScanner {
           if (renderedBorder && !compliantBorder) {
             const borderRgb = __parseRgb(renderedBorder.color);
             if (borderRgb && !alt.by) {
-              const flattened = __blendOver(borderRgb, backdrop);
-              const contrast = __getContrastRatio(flattened, backdrop);
+              const strongest = __strongestBoundary(styles, backdrop);
+              const contrast = strongest.ratio;
               if (contrast < contrastThreshold) {
                 violations.push({
                   type: config.borderType,
@@ -211,6 +211,7 @@ class NonTextContrastScanner extends BaseScanner {
                     borderSide: renderedBorder.side,
                     borderWidth: renderedBorder.width,
                     backgroundColor: rgbString(backdrop),
+                    strongestBoundary: strongest.boundary,
                     contrastRatio: Math.round(contrast * 100) / 100,
                     required: contrastThreshold,
                     tagName: element.tagName.toLowerCase(),
@@ -265,7 +266,8 @@ class NonTextContrastScanner extends BaseScanner {
         for (let i = 0; i < buttons.length; i++) {
           evaluateComponent(buttons[i], i, {
             borderType: 'insufficient-border-contrast',
-            borderDescription: 'Button border has insufficient contrast against background',
+            borderDescription:
+              'No boundary of the button reaches the 3:1 contrast SC 1.4.11 asks for: not its border against the page, not its border against its own fill, and not its fill against the page',
             borderImpact: 'Button boundaries are not clearly visible',
             checkFill: true,
           });
@@ -278,7 +280,8 @@ class NonTextContrastScanner extends BaseScanner {
         for (let i = 0; i < formControls.length; i++) {
           evaluateComponent(formControls[i], i, {
             borderType: 'insufficient-form-border-contrast',
-            borderDescription: 'Form control border has insufficient contrast',
+            borderDescription:
+              'No boundary of the form control reaches the 3:1 contrast SC 1.4.11 asks for: not its border against the page, not its border against its own fill, and not its fill against the page',
             borderImpact: 'Form control boundaries are not clearly visible',
             checkFill: false,
           });

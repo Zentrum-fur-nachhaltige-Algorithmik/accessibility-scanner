@@ -1,13 +1,14 @@
 {
-  "startedAt": "2026-08-28T17:00:47.962Z",
+  "startedAt": "2026-08-30T11:03:50.728Z",
   "profile": "standard",
   "llmEnabled": false,
   "perFileTimeoutMs": 600000,
+  "parallel": 3,
   "files": [
     {
       "file": "own-audit-ui.html",
       "source": "http://localhost:3111/audit (this repo's own Next.js frontend)",
-      "elapsedMs": 64079,
+      "elapsedMs": 71061,
       "timedOut": false,
       "totalViolations": 3,
       "band": [
@@ -43,7 +44,7 @@
     {
       "file": "med-theme.html",
       "source": "https://dr-mauermann-urologe.vercel.app",
-      "elapsedMs": 67735,
+      "elapsedMs": 73851,
       "timedOut": false,
       "totalViolations": 14,
       "band": [
@@ -87,12 +88,12 @@
     {
       "file": "beeproduced.html",
       "source": "https://beeproduced.com",
-      "elapsedMs": 98417,
+      "elapsedMs": 108601,
       "timedOut": false,
-      "totalViolations": 14,
+      "totalViolations": 6,
       "band": [
-        7,
-        28
+        3,
+        12
       ],
       "scannerErrors": [],
       "missingScanners": [],
@@ -125,7 +126,6 @@
       "bestPractices": 42,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 8,
         "input-purpose": 1,
         "responsive-design": 4,
         "accessibility-statement": 1
@@ -138,14 +138,19 @@
     {
       "file": "wiki-medical-de.html",
       "source": "https://de.wikipedia.org/wiki/Prostatakarzinom",
-      "elapsedMs": 307005,
+      "elapsedMs": 525781,
       "timedOut": false,
-      "totalViolations": 304,
+      "totalViolations": 217,
       "band": [
-        152,
-        608
+        108,
+        434
       ],
-      "scannerErrors": [],
+      "scannerErrors": [
+        {
+          "scanner": "predictable-navigation",
+          "error": "Navigation timeout of 45000 ms exceeded"
+        }
+      ],
       "missingScanners": [],
       "spotTruths": [
         {
@@ -182,7 +187,7 @@
       "bestPractices": 25,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 113,
+        "axe-core": 26,
         "error-handling": 3,
         "label-in-name": 4,
         "input-modalities": 180,
@@ -197,12 +202,12 @@
     {
       "file": "modern-commercial.html",
       "source": "https://www.mozilla.org/de/",
-      "elapsedMs": 160653,
+      "elapsedMs": 183106,
       "timedOut": false,
-      "totalViolations": 47,
+      "totalViolations": 46,
       "band": [
         23,
-        94
+        92
       ],
       "scannerErrors": [],
       "missingScanners": [],
@@ -257,7 +262,7 @@
     {
       "file": "gov-uk-guide.html",
       "source": "https://www.gov.uk/vehicle-tax",
-      "elapsedMs": 96210,
+      "elapsedMs": 109607,
       "timedOut": false,
       "totalViolations": 1,
       "band": [
@@ -311,12 +316,12 @@
     {
       "file": "webaim-article.html",
       "source": "https://webaim.org/techniques/skipnav/",
-      "elapsedMs": 108051,
+      "elapsedMs": 112663,
       "timedOut": false,
-      "totalViolations": 34,
+      "totalViolations": 15,
       "band": [
-        17,
-        68
+        7,
+        30
       ],
       "scannerErrors": [],
       "missingScanners": [],
@@ -349,7 +354,6 @@
       "bestPractices": 1,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 19,
         "nontext-contrast": 3,
         "input-modalities": 10,
         "responsive-design": 1,
@@ -363,12 +367,12 @@
     {
       "file": "govuk-design-system.html",
       "source": "https://design-system.service.gov.uk/components/text-input/",
-      "elapsedMs": 156809,
+      "elapsedMs": 183067,
       "timedOut": false,
-      "totalViolations": 18,
+      "totalViolations": 16,
       "band": [
-        9,
-        36
+        8,
+        32
       ],
       "scannerErrors": [],
       "missingScanners": [],
@@ -395,7 +399,6 @@
       "bestPractices": 12,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 1,
         "page-structure": 1,
         "advanced-aria": 16
       },
@@ -407,7 +410,7 @@
     {
       "file": "a11y-project-checklist.html",
       "source": "https://www.a11yproject.com/checklist/",
-      "elapsedMs": 139092,
+      "elapsedMs": 169051,
       "timedOut": false,
       "totalViolations": 5,
       "band": [
@@ -451,12 +454,12 @@
     {
       "file": "broadcaster-news.html",
       "source": "https://www.bbc.com/news",
-      "elapsedMs": 152124,
+      "elapsedMs": 180393,
       "timedOut": false,
-      "totalViolations": 68,
+      "totalViolations": 67,
       "band": [
-        34,
-        136
+        33,
+        134
       ],
       "scannerErrors": [],
       "missingScanners": [],
@@ -480,10 +483,10 @@
           "detail": null
         }
       ],
-      "bestPractices": 6,
+      "bestPractices": 7,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 4,
+        "axe-core": 3,
         "input-modalities": 62,
         "accessibility-statement": 2
       },
@@ -495,7 +498,7 @@
     {
       "file": "wiki-accessibility-en.html",
       "source": "https://en.wikipedia.org/wiki/Web_accessibility",
-      "elapsedMs": 394785,
+      "elapsedMs": 589339,
       "timedOut": false,
       "totalViolations": 19,
       "band": [
@@ -506,6 +509,10 @@
         {
           "scanner": "axe-core",
           "error": "Page/Frame is not ready"
+        },
+        {
+          "scanner": "keyboard-navigation",
+          "error": "Navigation timeout of 45000 ms exceeded"
         }
       ],
       "missingScanners": [],
@@ -534,15 +541,220 @@
       "bandOk": true,
       "slow": true,
       "noise": []
+    },
+    {
+      "file": "maler-staepke.html",
+      "source": "https://www.maler-staepke.de/de.html",
+      "elapsedMs": 56575,
+      "timedOut": false,
+      "totalViolations": 13,
+      "band": [
+        6,
+        26
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: the document declares no language",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: menu text over a background image that does not load",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 5,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 4,
+        "multiple-ways": 1,
+        "input-modalities": 2,
+        "responsive-design": 5,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "muenchen-portal.html",
+      "source": "https://www.muenchen.de/",
+      "elapsedMs": 165864,
+      "timedOut": false,
+      "totalViolations": 13,
+      "band": [
+        6,
+        26
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: two teaser images carry no alt attribute",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: the A to Z index links are not unnamed links",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 5,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 9,
+        "advanced-aria": 1,
+        "input-purpose": 1,
+        "nontext-contrast": 1,
+        "focus-management": 1
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "spiegel-news.html",
+      "source": "https://www.spiegel.de/",
+      "elapsedMs": 150168,
+      "timedOut": false,
+      "totalViolations": 26,
+      "band": [
+        13,
+        52
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: role=listitem elements whose parent has no list role",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: a silent looping motion graphic needs no captions",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 23,
+      "scannerCount": 26,
+      "perScanner": {
+        "axe-core": 22,
+        "focus-management": 1,
+        "input-modalities": 2,
+        "accessibility-statement": 1
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "oesterreich-gv.html",
+      "source": "https://www.oesterreich.gv.at/",
+      "elapsedMs": 115984,
+      "timedOut": false,
+      "totalViolations": 0,
+      "band": [
+        0,
+        0
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REGRESSION: card text over a single-colour gradient fill",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: an icon inside an aria-labelled button is not a missing alternative",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 2,
+      "scannerCount": 26,
+      "perScanner": {
+        "page-structure": 3
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
+    },
+    {
+      "file": "hilfsgemeinschaft.html",
+      "source": "https://www.hilfsgemeinschaft.at/",
+      "elapsedMs": 159114,
+      "timedOut": false,
+      "totalViolations": 4,
+      "band": [
+        2,
+        8
+      ],
+      "scannerErrors": [],
+      "missingScanners": [],
+      "spotTruths": [
+        {
+          "name": "REAL: the search field is bounded only by a 2.85:1 border",
+          "kind": "must-detect",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "name": "REGRESSION: a slider track that pans is not a reflow failure",
+          "kind": "must-not-flag",
+          "ok": true,
+          "detail": null
+        }
+      ],
+      "bestPractices": 7,
+      "scannerCount": 26,
+      "perScanner": {
+        "nontext-contrast": 1,
+        "focus-management": 1,
+        "accessibility-statement": 2
+      },
+      "expectedScannerCount": 26,
+      "bandOk": true,
+      "slow": false,
+      "noise": []
     }
   ],
-  "finishedAt": "2026-08-28T17:29:52.946Z",
+  "finishedAt": "2026-08-30T11:22:00.008Z",
   "failures": [
+    {
+      "layer": "no-crash",
+      "file": "wiki-medical-de.html",
+      "scanner": "predictable-navigation",
+      "detail": "Navigation timeout of 45000 ms exceeded"
+    },
     {
       "layer": "no-crash",
       "file": "wiki-accessibility-en.html",
       "scanner": "axe-core",
       "detail": "Page/Frame is not ready"
+    },
+    {
+      "layer": "no-crash",
+      "file": "wiki-accessibility-en.html",
+      "scanner": "keyboard-navigation",
+      "detail": "Navigation timeout of 45000 ms exceeded"
     }
   ],
   "passed": false

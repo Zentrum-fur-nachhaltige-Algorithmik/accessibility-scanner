@@ -7,6 +7,7 @@
  * Usage:
  *   node scripts/capture-realworld.js            # capture all
  *   node scripts/capture-realworld.js --only med-theme
+ *   node scripts/capture-realworld.js --url https://example.org --name example-org --purpose "..."
  *
  * The `own-audit-ui` target needs the repo's own Next.js frontend running:
  *   npx next start frontend -p 3111     (or: npx next dev frontend -p 3111)
@@ -36,7 +37,7 @@ const RESOURCE_SELECTOR = 'img, script, link, video, audio, source, iframe';
 
 // Per-stylesheet ceiling for inlining, so one framework bundle cannot blow the
 // snapshot past the size the corpus is meant to stay within.
-const MAX_INLINE_CSS_BYTES = 400000;
+const MAX_INLINE_CSS_BYTES = 2000000;
 
 const TARGETS = [
   {
@@ -328,8 +329,23 @@ async function main() {
   const args = process.argv.slice(2);
   const onlyIdx = args.indexOf('--only');
   const only = onlyIdx !== -1 ? args[onlyIdx + 1] : null;
+  // An ad-hoc target for widening the corpus: --url <url> --name <file stem> [--purpose <text>].
+  const argOf = (flag) => {
+    const i = args.indexOf(flag);
+    return i !== -1 ? args[i + 1] : null;
+  };
+  const adHoc =
+    argOf('--url') && argOf('--name')
+      ? [
+          {
+            name: argOf('--name'),
+            url: argOf('--url'),
+            purpose: argOf('--purpose') || 'corpus widening',
+          },
+        ]
+      : null;
 
-  const targets = only ? TARGETS.filter((t) => t.name === only) : TARGETS;
+  const targets = adHoc || (only ? TARGETS.filter((t) => t.name === only) : TARGETS);
   if (targets.length === 0) {
     console.error(
       `No target matching --only ${only}. Known: ${TARGETS.map((t) => t.name).join(', ')}`
@@ -367,7 +383,7 @@ async function main() {
   }
 
   console.log('\n=== CAPTURE SUMMARY ===');
-  for (const t of TARGETS) {
+  for (const t of adHoc || TARGETS) {
     const f = path.join(OUT_DIR, `${t.name}.html`);
     if (fs.existsSync(f)) {
       console.log(`  ${t.name.padEnd(20)} ${String(fs.statSync(f).size).padStart(9)} bytes`);

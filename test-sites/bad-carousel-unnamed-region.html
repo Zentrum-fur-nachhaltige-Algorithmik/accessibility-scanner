@@ -1,0 +1,41 @@
+<!-- WCAG-TEST
+criterion: 4.1.2
+level: A
+title: A carousel region without an accessible name
+test_type: bad
+expected_violations: 1
+testable_by: dom
+scanners: advanced-aria
+description: div[role="region"][aria-roledescription="carousel"] holds three slides and prev/next controls and carries no aria-label, no aria-labelledby and no title. It is announced as a carousel region with no name of its own; the aria-label of the section that wraps it names that section, not this component. WCAG 4.1.2.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 0; background: #ffffff; color: #1a1a1a; }
+  main { max-width: 44rem; margin: 0 auto; padding: 1rem; }
+  .splide-track { display: flex; gap: .5rem; }
+  .splide-slide { border: 1px solid #595959; padding: .5rem 1rem; }
+  button { background: #0b4f9e; color: #ffffff; border: none; padding: .5rem 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Home</h1>
+  <section class="intro-slider" aria-label="Carousel with content">
+    <div class="splide" role="region" aria-roledescription="carousel">
+      <div class="splide-track">
+        <div class="splide-slide">First slide</div>
+        <div class="splide-slide">Second slide</div>
+        <div class="splide-slide">Third slide</div>
+      </div>
+      <button type="button">Previous slide</button>
+      <button type="button">Next slide</button>
+    </div>
+  </section>
+</main>
+</body>
+</html>

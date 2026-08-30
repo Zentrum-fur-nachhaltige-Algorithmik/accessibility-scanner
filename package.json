@@ -32,6 +32,7 @@
     "harness:realworld": "node scripts/harness/realworld.js",
     "precision:check": "node scripts/precision-check.js",
     "sr-agent": "node src/agent/run.js",
+    "sr-agent:barrier": "node src/agent/barrier-score.js",
     "blind-mode": "node src/agent/blind-mode/server/index.js",
     "lint": "eslint . && sh scripts/check-no-emdash.sh",
     "lint:fix": "eslint . --fix",

@@ -70,6 +70,7 @@ module.exports = [
       'scripts/**/*.js',
       'eslint.config.js',
       'src/agent/run.js',
+      'src/agent/barrier-score.js',
       'src/agent/generate-tasks.js',
       'src/agent/validate-nopt.js',
       'src/agent/blind-mode/server/recompute-nopt.js',

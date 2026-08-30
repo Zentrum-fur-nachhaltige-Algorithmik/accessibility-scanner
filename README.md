@@ -247,6 +247,24 @@ and the default `--agent llm` is the model. The greedy agent answers "how far
 does a user get who can only match words, without understanding" and needs no
 API key.
 
+R still mixes two things: how weak the agent is and how much the page hides
+from it. `--observation privileged` separates them. It runs the same LLM agent
+with the same prompt, commands and costs, but hands it the sighted page view
+(landmarks, headings, every control with its name and target, the main text)
+on every turn. It still has to navigate with the screen reader; it only knows
+where to go. With `nPriv` from that run,
+
+```
+nOpt / nSr = (nOpt / nPriv) * (nPriv / nSr)
+Q = nOpt / nPriv    the agent: how close it gets when information is no problem
+B = nPriv / nSr     the barrier: what the same agent loses for hearing only
+```
+
+`B` is the score to report for a site; `Q` says whether the agent can be
+trusted on it. `barrier-score.js` prints both from a blind and a privileged
+result over the same tasks; a task the privileged agent never solved is
+agent-limited and stays out of `B`.
+
 A run on gov.uk with generated tasks:
 
 ```
@@ -264,6 +282,8 @@ export OPENROUTER_API_KEY=...
 npm run sr-agent -- https://example.com --generate --out result.json
 npm run sr-agent -- https://example.com --tasks tasks.json --k 3
 npm run sr-agent -- https://example.com --tasks tasks.json --agent greedy   # no LLM
+npm run sr-agent -- https://example.com --tasks tasks.json --k 3 --observation privileged --out priv.json
+npm run sr-agent:barrier -- result.json priv.json
 node src/agent/validate-nopt.js https://example.com --tasks tasks.json
 ```
 

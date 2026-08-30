@@ -13,8 +13,10 @@
 // Wording heuristics lifted from the screen-reader agent branch
 // (src/agent/generic-tasks.js), English and German, matched case-insensitively.
 const CONTAINER_PATTERN = 'cookie|consent|gdpr|dsgvo|datenschutz-?banner|cmp';
+// ok needs its word boundary: a bare `ok` is a substring of "cookie" and would
+// send the click to a "Cookie-Einstellungen" settings control.
 const ACCEPT_PATTERN =
-  'akzeptieren|accept|zustimmen|alle .*(erlauben|akzeptieren)|agree|allow all|ok';
+  'accept|allow|agree|ok\\b|got it|akzeptieren|zustimmen|einverstanden|verstanden|erlauben';
 
 /**
  * Find the consent overlay and its accept control.

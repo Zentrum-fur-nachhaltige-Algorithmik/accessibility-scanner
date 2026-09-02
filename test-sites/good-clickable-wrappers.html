@@ -6,7 +6,7 @@ test_type: good
 expected_violations: 0
 testable_by: dom
 scanners: keyboard-navigation
-description: Patterns that the old class-name and cursor:pointer heuristic reported as mouse-only: a span.btn inside a link, a label.btn that operates a radio, a card div with cursor:pointer wrapping a real link, a td with cursor:pointer in a table sorted by a header button, and a div with an onclick handler whose only job is to forward the click to the button inside it. Every one of them is operable from the keyboard, so not-keyboard-accessible must stay silent.
+description: Patterns that the old class-name and cursor:pointer heuristic reported as mouse-only: a span.btn inside a link, a label.btn that operates a radio, a card div with cursor:pointer wrapping a real link, a td with cursor:pointer in a table sorted by a header button, a div with an onclick handler whose only job is to forward the click to the button inside it, and a span with its own onclick handler sitting inside a <button>, where the keyboard route is the button above it rather than anything inside it. Every one of them is operable from the keyboard, so not-keyboard-accessible must stay silent.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -64,6 +64,11 @@ description: Patterns that the old class-name and cursor:pointer heuristic repor
   <div id="forwarder" onclick="document.getElementById('inner').click()">
     <button type="button" id="inner">Show details</button>
   </div>
+
+  <h2>Click handler on a span inside a button</h2>
+  <button type="button" id="expandAll">
+    <span class="btn" onclick="document.getElementById('expandAll').dataset.clicked = '1'">Expand all</span>
+  </button>
 
   <p id="buy">Checkout section.</p>
   <p id="article">Article section.</p>

@@ -36,6 +36,7 @@ const pageGlobals = Object.fromEntries(
     '__isFocusable',
     '__isKeyboardReachable',
     'isRovingTabindexItem',
+    '__closeCandidates',
     '__a11ySnapshot',
     '__a11ySelector',
     '__a11yIndicator',

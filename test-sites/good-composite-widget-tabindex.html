@@ -6,7 +6,7 @@ test_type: good
 expected_violations: 0
 testable_by: dom
 scanners: keyboard-navigation
-description: tabindex values the ARIA authoring practices prescribe and the old check reported anyway: a menu whose items all carry tabindex="-1" and wait for arrow keys, a tabpanel with tabindex="0", a named section used as a route change focus target, and a chevron button with tabindex="-1" inside a card that is already a link. focusable-element and tabindex must stay silent.
+description: tabindex values the ARIA authoring practices prescribe and the old check reported anyway: a menu whose items all carry tabindex="-1" and wait for arrow keys, a tabpanel with tabindex="0", a named section used as a route change focus target, a chevron button with tabindex="-1" inside a card that is already a link, and an unnamed tabindex="0" div the router focuses after a view change, which removes no functionality from a keyboard user and is asked about under 4.1.2 instead. focusable-element must report no violation here.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -60,6 +60,13 @@ description: tabindex values the ARIA authoring practices prescribe and the old 
     <h3><a href="#offer">Winter offer</a></h3>
     <p>Everything on the card leads to the offer.</p>
     <button type="button" tabindex="-1" aria-hidden="true">More</button>
+  </div>
+
+  <h2>Unnamed focus stop a router uses</h2>
+  <div id="routeTarget" tabindex="0">
+    <h3>Winter campaign</h3>
+    <p>The router moves focus here after a view change; the stop carries no role
+      and no name, which is a question about 4.1.2, not a keyboard failure.</p>
   </div>
 
   <p id="offer">Offer section.</p>

@@ -1,0 +1,58 @@
+<!-- WCAG-TEST
+criterion: 2.1.4
+level: A
+title: Character Key Shortcuts, a keydown listener that only writes an attribute
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: A document-level keydown listener that records the last key in a data attribute and marks the body with a class while a key is down, the way analytics and keyboard-user detection scripts do. Nothing is shown, nothing is cancelled and nothing navigates, so no single character key operates a function and 2.1.4 does not apply. The page also names no shortcut control, so the exemption cannot hide the finding. The old probe watched attribute mutations too, so every probe key looked like a shortcut. character-key-shortcut must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keydown analytics without a shortcut (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  body.using-keyboard :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  a { color: #0b4f6c; }
+  input { font: inherit; border: 2px solid #4a4a4a; padding: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Reading list</h1>
+
+  <p><label for="filter">Filter titles</label> <input type="text" id="filter"></p>
+
+  <ul>
+    <li><a href="#one">Designing for keyboard users</a></li>
+    <li><a href="#two">Focus order in long forms</a></li>
+    <li><a href="#three">Reading order in long documents</a></li>
+  </ul>
+
+  <h2 id="one">Designing for keyboard users</h2>
+  <p>The page binds no single character key to any function.</p>
+  <h2 id="two">Focus order in long forms</h2>
+  <p>Pressing j, k or / changes nothing that a user can see.</p>
+  <h2 id="three">Reading order in long documents</h2>
+  <p>Nothing here reacts to a bare letter key.</p>
+</main>
+
+<script>
+  // Keyboard-user detection and a last-key breadcrumb for analytics. Both write
+  // attributes only: no content changes, no default action is cancelled, and
+  // the page does not navigate.
+  document.addEventListener('keydown', function (e) {
+    document.body.classList.add('using-keyboard');
+    document.documentElement.setAttribute('data-last-key', e.key);
+  });
+  document.addEventListener('mousedown', function () {
+    document.body.classList.remove('using-keyboard');
+  });
+</script>
+</body>
+</html>

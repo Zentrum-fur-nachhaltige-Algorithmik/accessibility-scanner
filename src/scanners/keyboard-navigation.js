@@ -32,6 +32,9 @@ const rovingTabindexCode = `
     var selector = __COMPOSITE_ROLES.map(function (r) { return '[role="' + r + '"]'; }).join(', ');
     var composite = element.closest(selector);
     if (!composite) return false;
+    // The widget takes focus itself and moves it to its items from there
+    // (a listbox or a grid with tabindex="0").
+    if (composite !== element && composite.tabIndex >= 0) return true;
     // Some other item of the same widget is in the tab order, so the widget is
     // reachable and this item is reached with the arrow keys.
     var items = composite.querySelectorAll(
@@ -84,6 +87,7 @@ class KeyboardNavigationScanner extends BaseScanner {
       criteria: ['9.2.1.1', '9.2.1.2', '9.2.1.4'],
       passed: keyboardResults.violations.length === 0,
       violations: keyboardResults.violations,
+      needsReview: keyboardResults.needsReview,
       summary: {
         tabbableElements: keyboardResults.tabbableElements,
         keyboardInaccessible: keyboardResults.keyboardInaccessible,
@@ -101,6 +105,7 @@ class KeyboardNavigationScanner extends BaseScanner {
    */
   async performKeyboardAnalysis(page, scanDir, options) {
     const violations = [];
+    const needsReview = [];
     const tabOrder = [];
     const visualEvidence = [];
     let tabbableElements = 0;
@@ -168,78 +173,6 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     log.debug(`Found ${interactiveElements.length} potentially interactive elements`);
 
-    // 1b. Scrollable containers that no keyboard can scroll (WCAG 2.1.1).
-    // A container fails only when it is painted, when it really does hide
-    // content (a rounding pixel is not hidden content), and when neither it
-    // nor anything inside it can take focus, so no key press reaches the
-    // scroller. Chrome scrolls a focused container with the arrow keys.
-    const scrollableViolations = await page.evaluate((renderedHelpers) => {
-      eval(renderedHelpers);
-      const issues = [];
-      const MIN_HIDDEN_PX = 24;
-
-      function getSelector(el) {
-        const className =
-          el.className && typeof el.className === 'string'
-            ? el.className
-            : el.className && el.className.baseVal
-              ? el.className.baseVal
-              : '';
-        return (
-          el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (className ? `.${className.split(' ')[0]}` : '')
-        );
-      }
-
-      for (const el of document.querySelectorAll('*')) {
-        const style = window.getComputedStyle(el);
-
-        const hiddenY =
-          style.overflowY === 'auto' || style.overflowY === 'scroll'
-            ? el.scrollHeight - el.clientHeight
-            : 0;
-        const hiddenX =
-          style.overflowX === 'auto' || style.overflowX === 'scroll'
-            ? el.scrollWidth - el.clientWidth
-            : 0;
-        if (hiddenY < MIN_HIDDEN_PX && hiddenX < MIN_HIDDEN_PX) continue;
-
-        if (!__isRendered(el)) continue;
-        // The container itself takes focus (tabindex, contenteditable, a
-        // native control), so the arrow keys already scroll it.
-        if (__isFocusable(el)) continue;
-        // Focus can land inside it, and focusing a child scrolls it into view.
-        if ([...el.querySelectorAll('*')].some(__isFocusableRendered)) continue;
-
-        issues.push({
-          element: getSelector(el),
-          scrollableAxis:
-            hiddenY >= MIN_HIDDEN_PX && hiddenX >= MIN_HIDDEN_PX
-              ? 'both'
-              : hiddenY >= MIN_HIDDEN_PX
-                ? 'vertical'
-                : 'horizontal',
-          hiddenPx: Math.max(hiddenY, hiddenX),
-        });
-      }
-
-      return issues;
-    }, renderedCode);
-
-    for (const sv of scrollableViolations) {
-      violations.push({
-        criterion: '9.2.1.1',
-        element: sv.element,
-        issue: 'scrollable-content-not-keyboard-accessible',
-        description: `Scrollable container (${sv.scrollableAxis} overflow) hides ${Math.round(sv.hiddenPx)}px of content, cannot take focus and holds nothing focusable, so a keyboard cannot scroll it.`,
-        severity: 'moderate',
-        suggestion:
-          'Add tabindex="0" and an accessible role/label to make the scrollable region keyboard-navigable.',
-      });
-      keyboardInaccessible++;
-    }
-
     // 2. Test keyboard navigation with visual analysis
     await this.testKeyboardNavigation(
       page,
@@ -264,11 +197,8 @@ class KeyboardNavigationScanner extends BaseScanner {
     const shortcutResults = await this.testKeyboardShortcuts(page, violations);
     customShortcuts = shortcutResults.conflicts;
 
-    // 6. Skip links whose target is missing
-    await this.validateSkipLinks(page, violations);
-
-    // 7. Controls the tab order cannot reach, and focus stops with nothing on them
-    await this.validateFocusableElements(page, violations);
+    // 6. Controls the tab order cannot reach, and focus stops with nothing on them
+    await this.validateFocusableElements(page, violations, needsReview);
 
     // Calculate summary
     tabbableElements = tabOrder.length;
@@ -276,6 +206,7 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     return {
       violations,
+      needsReview,
       tabOrder,
       visualEvidence,
       tabbableElements,
@@ -394,14 +325,24 @@ class KeyboardNavigationScanner extends BaseScanner {
     await new Promise((resolve) => setTimeout(resolve, 100));
     if (!(await stillHere())) return;
 
+    // 2.1.2 asks for a way out, not for the Tab key. A component the user can
+    // leave with Escape or an arrow key is not a trap, so every documented exit
+    // a keyboard offers is tried before this is reported.
+    const OTHER_EXITS = ['Escape', 'ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'];
+    for (const key of OTHER_EXITS) {
+      await page.keyboard.press(key);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      if (!(await stillHere())) return;
+    }
+
     violations.push({
       criterion: '9.2.1.2',
       element: step.selector,
       issue: 'keyboard-trap',
       description:
-        'Focus stays on this element through four Tab presses and a Shift+Tab, so the keyboard cannot leave it',
+        'Focus stays on this element through four Tab presses, a Shift+Tab, Escape and the arrow keys, so no key leaves it',
       severity: 'serious',
-      keySequence: ['Tab', 'Tab', 'Tab', 'Tab', 'Shift+Tab'],
+      keySequence: ['Tab', 'Tab', 'Tab', 'Tab', 'Shift+Tab', ...OTHER_EXITS],
       suggestion:
         'Ensure all interactive elements allow focus to move to next element with Tab key',
     });
@@ -517,9 +458,9 @@ class KeyboardNavigationScanner extends BaseScanner {
               element: modal.label,
               issue: 'keyboard-trap',
               description:
-                'Focus cannot leave this dialog: Tab stays inside, Escape does not close it, and none of its own controls closes it from the keyboard',
+                'Focus cannot leave this dialog: Tab stays inside, Escape does not close it, and neither Enter nor Space on any of its own controls closes it',
               severity: 'serious',
-              keySequence: ['Tab', 'Escape', 'Enter on each control'],
+              keySequence: ['Tab', 'Escape', 'Enter and Space on each control'],
               suggestion:
                 'Provide Escape key handler or visible close button accessible via keyboard',
             });
@@ -541,60 +482,107 @@ class KeyboardNavigationScanner extends BaseScanner {
   }
 
   /**
-   * Press Enter on each keyboard reachable control inside a dialog and report
-   * whether one of them closes it. Used as the second escape route for SC
-   * 2.1.2, so that a dialog with a reachable close button is not reported as a
-   * trap just because it ignores Escape.
+   * Activate each control inside a dialog from the keyboard and report whether
+   * one of them closes it. The second escape route for SC 2.1.2, so that a
+   * dialog with a close control is not reported as a trap just because it
+   * ignores Escape.
+   * Both Enter and Space are tried on every candidate, because a `role="button"`
+   * is activated by either, and the candidate list includes `<a>` elements
+   * without an href: a close control written that way is what many dialogs
+   * ship, and missing it makes the dialog look inescapable.
    * @param {import('puppeteer').Page} page
    * @param {string} modalSelector marker selector of the dialog
    * @returns {Promise<boolean>} true when the dialog is gone afterwards
    */
   async closeDialogFromKeyboard(page, modalSelector) {
+    const candidatesCode = `
+      function __closeCandidates(modal) {
+        var all = [].slice.call(modal.querySelectorAll('*'));
+        var out = [];
+        for (var i = 0; i < all.length; i++) {
+          var el = all[i];
+          if (!__isRendered(el)) continue;
+          var isBareAnchor = el.tagName === 'A' && !el.hasAttribute('href');
+          if (__isFocusableRendered(el) || isBareAnchor) out.push(el);
+        }
+        return out;
+      }
+    `;
+
     const controlCount = await page.evaluate(
-      (renderedHelpers, sel) => {
+      (renderedHelpers, candidates, sel) => {
         eval(renderedHelpers);
+        eval(candidates);
         const modal = document.querySelector(sel);
         if (!modal) return 0;
-        return [...modal.querySelectorAll('*')].filter(__isFocusableRendered).length;
+        return __closeCandidates(modal).length;
       },
       renderedCode,
+      candidatesCode,
       modalSelector
     );
 
     for (let i = 0; i < Math.min(controlCount, 8); i++) {
+      // An <a> without href takes no focus of its own, so it is given a
+      // programmatic focus stop for the duration of the probe.
       const focused = await page.evaluate(
-        (renderedHelpers, sel, index) => {
+        (renderedHelpers, candidates, sel, index) => {
           eval(renderedHelpers);
+          eval(candidates);
           const modal = document.querySelector(sel);
           if (!modal) return false;
-          const controls = [...modal.querySelectorAll('*')].filter(__isFocusableRendered);
-          if (!controls[index]) return false;
-          controls[index].focus();
-          return document.activeElement === controls[index];
+          const controls = __closeCandidates(modal);
+          const el = controls[index];
+          if (!el) return false;
+          if (!el.hasAttribute('tabindex')) {
+            el.setAttribute('tabindex', '-1');
+            el.setAttribute('data-a11y-temp-tabindex', '1');
+          }
+          el.focus();
+          return document.activeElement === el;
         },
         renderedCode,
+        candidatesCode,
         modalSelector,
         i
       );
       if (!focused) continue;
 
-      await page.keyboard.press('Enter');
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      for (const key of ['Enter', ' ']) {
+        await page.keyboard.press(key);
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const gone = await page
-        .evaluate(
-          (renderedHelpers, sel) => {
-            eval(renderedHelpers);
-            const modal = document.querySelector(sel);
-            return !modal || !__isRendered(modal);
-          },
-          renderedCode,
-          modalSelector
-        )
-        .catch(() => true);
-      if (gone) return true;
+        const gone = await page
+          .evaluate(
+            (renderedHelpers, sel) => {
+              eval(renderedHelpers);
+              const modal = document.querySelector(sel);
+              return !modal || !__isRendered(modal);
+            },
+            renderedCode,
+            modalSelector
+          )
+          .catch(() => true);
+        if (gone) {
+          await this.clearTempTabindex(page);
+          return true;
+        }
+      }
     }
+    await this.clearTempTabindex(page);
     return false;
+  }
+
+  /** Removes the focus stops closeDialogFromKeyboard added to bare anchors. */
+  async clearTempTabindex(page) {
+    await page
+      .evaluate(() => {
+        document.querySelectorAll('[data-a11y-temp-tabindex]').forEach((el) => {
+          el.removeAttribute('tabindex');
+          el.removeAttribute('data-a11y-temp-tabindex');
+        });
+      })
+      .catch(() => {});
   }
 
   /**
@@ -694,10 +682,12 @@ class KeyboardNavigationScanner extends BaseScanner {
         const observer = new MutationObserver((records) => {
           probe.mutations += records.length;
         });
+        // childList and characterData only: an attribute write is how a page
+        // animates, lazy-loads and marks its own state, so counting it would
+        // attribute ordinary page activity to the key press.
         observer.observe(document.documentElement, {
           subtree: true,
           childList: true,
-          attributes: true,
           characterData: true,
         });
         window.__a11yKeyProbeObserver = observer;
@@ -732,12 +722,30 @@ class KeyboardNavigationScanner extends BaseScanner {
 
     const settle = () => new Promise((resolve) => setTimeout(resolve, 150));
 
-    // Idle baseline: what does this page do when no key is pressed?
-    await read();
-    consoleSeen = false;
-    await settle();
-    const idle = await read();
-    const noisy = idle.mutations > 0 || consoleSeen;
+    // Idle baseline: what does this page do when no key is pressed? Two
+    // windows, because a carousel or a poller can sit still through one of
+    // them. A single mutation in either window makes the page too noisy for
+    // this probe to attribute anything to a key press, so it reports nothing.
+    let noisy = false;
+    for (let i = 0; i < 2; i++) {
+      await read();
+      consoleSeen = false;
+      await settle();
+      const idle = await read();
+      if (idle.mutations > 0 || consoleSeen) noisy = true;
+    }
+    if (noisy) {
+      log.debug('  Page mutates on its own; the shortcut probe cannot attribute a change');
+      page.off('console', onConsole);
+      await page
+        .evaluate(() => {
+          if (window.__a11yKeyProbeObserver) window.__a11yKeyProbeObserver.disconnect();
+          delete window.__a11yKeyProbeObserver;
+          delete window.__a11yKeyProbe;
+        })
+        .catch(() => {});
+      return { conflicts: 0 };
+    }
 
     const handledKeys = [];
     try {
@@ -747,8 +755,9 @@ class KeyboardNavigationScanner extends BaseScanner {
         await page.keyboard.press(key);
         await settle();
         const after = await read();
-        const acted =
-          after.prevented || after.navigated || (!noisy && (after.mutations > 0 || consoleSeen));
+        // A change the page would not have made without the key press. Both
+        // idle windows were still, so a change now came from the key.
+        const acted = after.prevented || after.navigated || after.mutations > 0 || consoleSeen;
         if (acted) handledKeys.push(key);
         if (after.navigated) break; // the page under test is gone
       }
@@ -812,94 +821,20 @@ class KeyboardNavigationScanner extends BaseScanner {
   // CSP-independent keyboard checks (no script injection)
 
   /**
-   * Skip links whose fragment target does not exist (SC 2.4.1).
-   * Whether a page needs a skip link at all is not decided here: landmarks and
-   * headings satisfy 2.4.1 just as well, and axe reports the landmark advice
-   * as best practice, which axe-core.js filters out.
-   */
-  async validateSkipLinks(page, violations) {
-    log.debug('Validating skip links...');
-
-    const skipLinkIssues = await page.evaluate(() => {
-      // Helper function for element selector generation (browser context)
-      function getElementSelector(element) {
-        const tagName = element.tagName.toLowerCase();
-        const id = element.id ? `#${element.id}` : '';
-        const className =
-          element.className && typeof element.className === 'string'
-            ? `.${element.className.split(' ')[0]}`
-            : '';
-        return `${tagName}${id}${className}`;
-      }
-
-      const issues = [];
-
-      // A skip link moves focus within the same document, so only a fragment
-      // link can be one. A link to another page whose path happens to contain
-      // "skip" or "content" is ordinary navigation.
-      const potentialSkipLinks = Array.from(document.querySelectorAll('a[href^="#"]')).filter(
-        (link) => {
-          const href = link.getAttribute('href') || '';
-          const text = link.textContent.trim().toLowerCase();
-          return (
-            /skip|jump|bypass|springe|zum inhalt|direkt zum/.test(text) ||
-            /^#(main|content|maincontent|main-content|inhalt)/i.test(href)
-          );
-        }
-      );
-
-      potentialSkipLinks.forEach((link) => {
-        const href = link.getAttribute('href');
-        const selector = getElementSelector(link);
-
-        // Check if target exists. `#top` and an empty fragment are defined by
-        // HTML as the top of the document, and a named anchor is a target too.
-        const targetId = decodeURIComponent(href.slice(1));
-        const target =
-          targetId === '' ||
-          targetId.toLowerCase() === 'top' ||
-          document.getElementById(targetId) ||
-          document.querySelector(`a[name="${CSS.escape(targetId)}"]`);
-
-        if (!target) {
-          issues.push({
-            type: 'skip-link',
-            element: selector,
-            href: href,
-            description: `Skip link points to non-existent target: ${href}`,
-            severity: 'serious',
-            suggestion: 'Ensure skip link target exists and is accessible',
-          });
-        }
-      });
-
-      return issues;
-    });
-
-    // Create violations for skip link issues
-    skipLinkIssues.forEach((issue) => {
-      violations.push({
-        criterion: '9.2.4.1',
-        element: issue.element,
-        issue: issue.type,
-        description: issue.description,
-        severity: issue.severity,
-        suggestion: issue.suggestion,
-      });
-    });
-  }
-
-  /**
-   * Focusable elements (SC 2.1.1).
-   * Two findings: an interactive control the keyboard cannot reach at all, and
-   * a plain element put into the tab order without anything to operate.
-   * Items of a composite widget (menu items, options, tabs, tree items) are
-   * exempt from the first: the ARIA authoring practices give them
-   * `tabindex="-1"` and move focus with the arrow keys.
+   * Focusable elements.
+   * Two outcomes. An interactive control the keyboard cannot reach at all is a
+   * 2.1.1 violation, but only when no other route reaches the same function:
+   * items of a composite widget (menu items, options, tabs, tree items) are
+   * exempt, because the ARIA authoring practices give them `tabindex="-1"` and
+   * move focus with the arrow keys.
+   * A `tabindex="0"` element with no role and no name removes no functionality
+   * from a keyboard user, so it fails no 2.1.1 clause. Whether it is an unnamed
+   * control (4.1.2) or an intentional focus target cannot be decided from the
+   * page, so it becomes a needs-review question with the element's markup.
    * Positive tabindex is not reported here; focus-management measures whether
    * the tab order actually leaves the document order (SC 2.4.3).
    */
-  async validateFocusableElements(page, violations) {
+  async validateFocusableElements(page, violations, needsReview = []) {
     log.debug('Validating focusable elements...');
 
     const focusableIssues = await page.evaluate((injectedCode) => {
@@ -976,6 +911,7 @@ class KeyboardNavigationScanner extends BaseScanner {
         }
 
         issues.push({
+          kind: 'unreachable',
           type: 'focusable-element',
           element: getElementSelector(element),
           description:
@@ -1013,20 +949,58 @@ class KeyboardNavigationScanner extends BaseScanner {
         if (isScrollable) return;
 
         issues.push({
-          type: 'focusable-element',
+          kind: 'unnamed-stop',
+          type: 'focus-stop-without-name',
           element: getElementSelector(element),
+          html: element.outerHTML.slice(0, 300),
+          role: element.getAttribute('role') || '',
+          name: '',
+          hasClickHandler: element.hasAttribute('onclick') || typeof element.onclick === 'function',
+          textLength: (element.textContent || '').trim().length,
           description:
-            'Element is in the tab order with tabindex="0" but has no role, no accessible name and nothing to operate, so focus stops on it for no reason',
-          severity: 'minor',
-          suggestion: 'Only make interactive elements focusable, or add a role and a name',
+            'Element is in the tab order with tabindex="0" but has no role and no accessible name, so it cannot be decided from the page whether it is an unnamed control',
         });
       });
 
       return issues;
     }, `${renderedCode}\n${accnameUtils}\n${rovingTabindexCode}`);
 
-    // Create violations for focusable element issues
-    focusableIssues.forEach((issue) => {
+    for (const issue of focusableIssues) {
+      if (issue.kind === 'unnamed-stop') {
+        // 4.1.2, not the scanner's own 2.1.1: the question is whether this is a
+        // control that lacks a name, not whether a function is unreachable.
+        const question = this.formatViolation(
+          'focus-stop-without-name',
+          'minor',
+          issue.description,
+          [{ selector: issue.element, html: issue.html }],
+          'https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html',
+          'info',
+          {
+            verdict: 'needs-review',
+            dossier: {
+              question: `Is ${issue.element} a control, and if so what is its name?`,
+              element: {
+                selector: issue.element,
+                html: issue.html,
+                role: issue.role || null,
+                name: issue.name || null,
+              },
+              measurements: {
+                tabindex: 0,
+                hasRole: Boolean(issue.role),
+                hasAccessibleName: Boolean(issue.name),
+                hasClickHandler: issue.hasClickHandler,
+                textLength: issue.textLength,
+              },
+              context: { criterion: '4.1.2' },
+            },
+          }
+        );
+        question.wcagCriteria = ['4.1.2'];
+        needsReview.push(question);
+        continue;
+      }
       violations.push({
         criterion: '9.2.1.1',
         element: issue.element,
@@ -1035,7 +1009,7 @@ class KeyboardNavigationScanner extends BaseScanner {
         severity: issue.severity,
         suggestion: issue.suggestion,
       });
-    });
+    }
   }
 }
 

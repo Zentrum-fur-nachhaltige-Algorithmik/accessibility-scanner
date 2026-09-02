@@ -384,11 +384,12 @@ const HTML_SCANNER_MAPPING = {
 
   // Scrollable Content
   'bad-scrollable-content.html': {
-    expectedScanners: ['keyboard-navigation', 'focus-management'],
+    expectedScanners: ['focus-management'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
     wcagCriteria: ['2.1.1'],
-    description: 'Scrollable content regions not keyboard accessible',
+    description:
+      'Scrollable content regions not keyboard accessible: axe scrollable-region-focusable owns this, keyboard-navigation deleted its duplicate emit',
   },
 
   // Text Spacing
@@ -402,7 +403,7 @@ const HTML_SCANNER_MAPPING = {
 
   // Skip Links
   'bad-skip-links.html': {
-    expectedScanners: ['keyboard-navigation', 'page-structure'],
+    expectedScanners: ['page-structure'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
     wcagCriteria: ['2.4.1'],
@@ -585,7 +586,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-skip-links.html': {
     expectedScanners: [],
-    excludedScanners: ['keyboard-navigation', 'page-structure'],
+    excludedScanners: ['page-structure'],
     testType: 'good',
     wcagCriteria: ['2.4.1'],
     description: 'Functional skip navigation implementation',
@@ -1006,7 +1007,34 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['2.1.1'],
     description:
-      'Table wrapper with a two pixel overflow, a scroller full of links, a pre with tabindex="0" and a display:none drawer: scrollable-content-not-keyboard-accessible must stay silent',
+      'Table wrapper with a two pixel overflow, a scroller full of links, a pre with tabindex="0" and a display:none drawer: the deleted scrollable-content-not-keyboard-accessible rule must not come back',
+  },
+
+  'good-dialog-close-controls.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.2'],
+    description:
+      'Two modal dialogs that cycle Tab and ignore Escape, closed by a role="button" answering Space and by an <a> without href answering Enter: keyboard-trap must stay silent',
+  },
+
+  'good-widget-exit-by-escape.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.2'],
+    description:
+      'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
+  },
+
+  'good-keydown-analytics-attribute.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.4'],
+    description:
+      'A document keydown listener that only writes a class and a data attribute: character-key-shortcut must stay silent',
   },
 
   'good-composite-widget-tabindex.html': {
@@ -1015,7 +1043,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['2.1.1'],
     description:
-      'Menu items all at tabindex="-1", a tabpanel and a named section at tabindex="0", and a tabindex="-1" chevron inside a card link: focusable-element must stay silent',
+      'Menu items all at tabindex="-1", a tabpanel and a named section at tabindex="0", a tabindex="-1" chevron inside a card link, and an unnamed tabindex="0" route target that is a 4.1.2 question rather than a 2.1.1 failure: focusable-element must report no violation',
   },
 
   'good-accesskeys-and-widget-keys.html': {

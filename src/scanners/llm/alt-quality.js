@@ -2,7 +2,8 @@
  * LLM Alt-Text Quality Scanner
  * Covers 1.1.1 Non-text Content (Level A): the quality of existing alt text.
  * Hands the LLM each image's alt together with the context a human reviewer
- * would use (filename, nearby heading, figcaption, link text, size, role).
+ * would use (filename, nearby heading, figcaption, link text, size, role) and
+ * emits every finding as a needs-review question with that measurement on it.
  */
 
 const LLMBaseScanner = require('./base');
@@ -26,17 +27,11 @@ class LLMAltQualityScanner extends LLMBaseScanner {
     const images = await this._collectImages(page);
 
     if (images.length === 0) {
-      return {
-        scannerId: this.id,
-        passed: true,
-        violations: [],
-        summary: {
-          totalIssues: 0,
-          criteriaChecked: ['1.1.1'],
-          skipped: 'no images with an alt attribute to assess',
-          imagesInspected: 0,
-        },
-      };
+      return this.reviewResult([], {
+        criteriaChecked: ['1.1.1'],
+        skipped: 'no images with an alt attribute to assess',
+        imagesInspected: 0,
+      });
     }
 
     const prompt = `${PROMPT}
@@ -48,22 +43,53 @@ ${JSON.stringify(images, null, 1)}
 Return violations as JSON.`;
 
     const { violations: raw, ctx } = await analyzeCompat(this, page, prompt);
-    const violations = this.convertViolations(raw);
+    const described = await this.describeElements(
+      page,
+      raw.map((v) => v && v.selector)
+    );
+    const needsReview = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      bySelector: this._dossierData(images, described),
+    });
 
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['1.1.1'],
-        imagesInspected: images.length,
-        analyzedFraction: ctx.analyzedFraction,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
-    };
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['1.1.1'],
+      imagesInspected: images.length,
+      analyzedFraction: ctx.analyzedFraction,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
+  }
+
+  /**
+   * selector -> the measured image row plus what the page says about the
+   * element, so each question carries the evidence it was asked about.
+   */
+  _dossierData(images, described) {
+    const out = {};
+    for (const img of images) {
+      out[img.selector] = {
+        element: described[img.selector] || { role: img.role || null },
+        measurements: {
+          tag: img.tag,
+          alt: img.alt,
+          altIsEmpty: img.altIsEmpty,
+          filename: img.filename,
+          renderedSize: `${img.renderedSize.w}x${img.renderedSize.h}`,
+          insideLink: img.insideLink,
+          linkHref: img.linkHref,
+          linkHasOtherText: img.linkHasOtherText,
+          figcaption: img.figcaption,
+          nearestHeading: img.nearestHeading,
+          longdesc: img.longdesc,
+        },
+      };
+    }
+    for (const [selector, element] of Object.entries(described)) {
+      if (!out[selector]) out[selector] = { element, measurements: {} };
+    }
+    return out;
   }
 
   /**
@@ -184,6 +210,8 @@ Return violations as JSON.`;
 
 const PROMPT = `Check the alt text QUALITY of the images below against WCAG 2.2 criterion 1.1.1 (Non-text Content, Level A).
 
+Everything you report becomes a question for a human reviewer, never an automatic failure. Report only what you can evidence; do not report an alternative you merely find weak.
+
 Another tool already checks whether an alt attribute EXISTS. Your job is the part it cannot do: judge whether the alternative text actually serves the same purpose as the image for someone who cannot see it.
 
 Flag an image ONLY when one of these specific, evidenced failures applies:
@@ -192,8 +220,7 @@ Flag an image ONLY when one of these specific, evidenced failures applies:
 2. **Alt is a placeholder or a bare generic noun** that conveys nothing: "image", "photo", "picture", "graphic", "Bild", "Foto", "Grafik", "Abbildung", "banner", "icon", "spacer", "thumbnail", used alone, with no further description. A bare "logo" counts too. Cite the alt.
 3. **Alt duplicates adjacent visible text verbatim**: the alt is (nearly) identical to "figcaption", "nearestHeading" or the link's own text, so a screen-reader user hears the same sentence twice. Cite both strings.
 4. **An image that is the ONLY content of a link has an empty or meaningless alt**: "insideLink" is true, "linkHasOtherText" is false, and "alt" is empty or one of the generic values above, so the link has no usable purpose. Cite "linkHref".
-5. **A complex informative image is described by a single short phrase with no long description available.** Only when the evidence really points at a chart/diagram/map/infographic: "filename", "className", "figcaption", "nearestHeading" or "surroundingText" says so (e.g. "diagramm", "chart", "grafik-statistik", "infografik", "Abb. 3"), AND "alt" is under about 60 characters AND "longdesc" is null. Cite all three.
-6. **Alt text that is keyword stuffing or marketing copy** rather than a description: a comma/pipe-separated keyword list, or a string repeating the practice/product name several times. Cite the alt.
+5. **Alt text that is keyword stuffing or marketing copy** rather than a description: a comma/pipe-separated keyword list, or a string repeating the practice/product name several times. Cite the alt.
 
 Examples that are NOT violations (do NOT flag these):
 - \`altIsEmpty: true\` on a decorative image that is NOT the only content of a link: an empty alt is the CORRECT way to hide decoration. Never flag an empty alt on its own.
@@ -209,9 +236,9 @@ Examples that are NOT violations (do NOT flag these):
 
 Note on sizes: \`<area>\` elements inside an image map always report a rendered size of 0×0. Never treat that as "too small to matter": judge them by their alt text like any other image.
 
-Report at most 10 violations. If there are more, report the 10 most severe and say so in the summary: a long response risks being truncated and lost entirely.
+Report at most 10 findings. If there are more, report the 10 most severe and say so in the summary: a long response risks being truncated and lost entirely.
 
-CRITICAL: every violation you report must quote the exact measured values it rests on (the alt string, and the filename / figcaption / linkHref / size that makes it a failure) and name which of the six numbered failures applies. If you cannot quote that evidence, do not report it. Err strongly on the side of NOT flagging: a page full of adequate-but-plain alt text is compliant.
+CRITICAL: every violation you report must quote the exact measured values it rests on (the alt string, and the filename / figcaption / linkHref / size that makes it a failure) and name which of the five numbered failures applies. If you cannot quote that evidence, do not report it. Err strongly on the side of NOT flagging: a page full of adequate-but-plain alt text is compliant.
 
 Use criterion "1.1.1" and set "selector" to the image's measured "selector" value.`;
 

@@ -279,6 +279,15 @@ class ScanPipeline {
         for (const v of result.needsReview) {
           if (!v.scannerId) v.scannerId = result.scannerId;
           v.verdict = 'needs-review';
+          if (tier === 'experimental') {
+            v.experimental = true;
+            v.confidence = 'low';
+          }
+          // Same conformance-level stamp the violations get, so a report can
+          // say which open questions are advisory for an AA target.
+          const level = levelOfViolation(v);
+          if (level) v.wcagLevel = level;
+          if (level === 'AAA') v.aaa = true;
           needsReview.push(v);
         }
       }

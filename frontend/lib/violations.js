@@ -67,6 +67,19 @@ export function reviewMeasurements(violation) {
     .map(([key, value]) => [key, String(value)]);
 }
 
+/**
+ * What the producer said about the question: an LLM scanner's own evidence and
+ * the model id that wrote it. Flat [label, value] pairs, like the measurements.
+ */
+export function reviewContext(violation) {
+  const context = violation?.dossier?.context;
+  if (!context || typeof context !== 'object') return [];
+  const labels = { evidence: 'Evidence', model: 'Model', axeRuleId: 'axe rule' };
+  return Object.entries(context)
+    .filter(([, value]) => value !== null && value !== undefined && value !== '')
+    .map(([key, value]) => [labels[key] || key, String(value)]);
+}
+
 /** Mirrors normalizeSeverity() in src/report-generator.js. */
 export function normalizeSeverity(violation) {
   const raw = String(violation?.severity || violation?.impact || 'moderate').toLowerCase();

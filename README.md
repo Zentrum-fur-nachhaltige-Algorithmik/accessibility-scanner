@@ -95,6 +95,21 @@ Scanners whose measurement cannot reach an element (a component on an image
 or gradient, a canvas) return such items in `needsReview` rather than dropping
 them.
 
+The LLM scanners only ever ask. Every finding a model returns becomes a
+needs-review item with a dossier: the question, the element, what the scanner
+measured in code (the image row, the step structure, the help inventory, the
+focus state of the tab stop, the block metrics, the readability numbers) and
+the model's own evidence with its id. None of it reaches `violations`, so a
+scan with an API key scores exactly like a scan without one. An LLM scanner
+becomes `proven`, and so enters the default profiles, only on a recorded
+stability record (`tests/data/harness/harness-llm.json`, written by
+`npm run harness:llm -- --runs 3 --json`): every rule it claims needs at least
+three runs that agree to 0.9 and reach 0.9 precision against the fixture
+labels. Until that record exists they are all experimental, and their
+questions carry `confidence: low`. The one exception is
+`llm-incomplete-reviewer`, which is a reviewer rather than a producer: it
+answers axe's open questions and its `fail` is an adjudicated violation.
+
 The consent pre-step below skips controls that accept less than everything
 ("Accept necessary only", "Nur notwendige akzeptieren"): clicking one records
 a consent the page did not give.

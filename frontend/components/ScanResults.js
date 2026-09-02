@@ -12,6 +12,7 @@ import {
   normalizeSeverity,
   principleCounts,
   reviewMeasurements,
+  reviewContext,
   reviewQuestion,
   scannerLabel,
   scoreBand,
@@ -174,6 +175,7 @@ function Group({ group, mode, number }) {
 function ReviewItem({ item, number }) {
   const element = item?.dossier?.element?.selector || violationElement(item);
   const measurements = reviewMeasurements(item);
+  const context = reviewContext(item);
   const scanner = item?.scannerId ? scannerLabel(item.scannerId) : '';
 
   return (
@@ -200,6 +202,18 @@ function ReviewItem({ item, number }) {
             <dd>
               <ul className="pb-finding-details">
                 {measurements.map(([key, value]) => (
+                  <li key={key}>{`${key}: ${value}`}</li>
+                ))}
+              </ul>
+            </dd>
+          </>
+        )}
+        {context.length > 0 && (
+          <>
+            <dt>Reported by</dt>
+            <dd>
+              <ul className="pb-finding-details">
+                {context.map(([key, value]) => (
                   <li key={key}>{`${key}: ${value}`}</li>
                 ))}
               </ul>

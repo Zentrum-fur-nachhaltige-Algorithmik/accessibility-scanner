@@ -1,9 +1,14 @@
 /**
  * Predictable Navigation Scanner.
- * WCAG 3.2.1, 3.2.2, 3.2.3, 3.2.4 (EN 301 549 9.3.2.1 to 9.3.2.4).
- * Focuses every control and changes every setting to see whether the page
- * changes the user's context on its own, and compares the navigation blocks and
- * the repeated components of the page for consistency.
+ * WCAG 3.2.1, 3.2.2 (EN 301 549 9.3.2.1, 9.3.2.2), measured: the scanner
+ * focuses every control and changes every setting to see whether the page
+ * changes the user's context on its own.
+ *
+ * SC 3.2.3 and 3.2.4 are scoped to "a set of web pages". This scanner sees one
+ * document, so it cannot decide either. 3.2.3 is gone; what 3.2.4 can see
+ * inside one page (a repeated block naming a component differently, links to
+ * one kind of destination marked inconsistently) is asked as a needs-review
+ * question with the inventory a reviewer needs, never counted as a failure.
  */
 const fs = require('fs-extra');
 const path = require('path');
@@ -24,7 +29,7 @@ const SETTLE_MS = 120;
 class PredictableNavigationScanner extends BaseScanner {
   constructor() {
     super('predictable-navigation', {
-      wcagCriteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
+      wcagCriteria: ['3.2.1', '3.2.2'],
       wcagPrinciple: 'understandable',
     });
   }
@@ -47,7 +52,6 @@ class PredictableNavigationScanner extends BaseScanner {
     const scanOptions = {
       testOnFocus: true,
       testOnInput: true,
-      testConsistentNavigation: true,
       testConsistentIdentification: true,
       timeout: TIMEOUTS.scanner,
       ...options,
@@ -65,14 +69,14 @@ class PredictableNavigationScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ['9.3.2.1', '9.3.2.2', '9.3.2.3', '9.3.2.4'],
+      criteria: ['9.3.2.1', '9.3.2.2'],
       passed: navigationResults.violations.length === 0,
       violations: navigationResults.violations,
+      needsReview: navigationResults.needsReview,
       summary: {
         onFocusPredictable: navigationResults.onFocusPredictable,
         onInputPredictable: navigationResults.onInputPredictable,
-        navigationConsistent: navigationResults.navigationConsistent,
-        identificationConsistent: navigationResults.identificationConsistent,
+        identificationQuestions: navigationResults.needsReview.length,
       },
       screenshotPath: scanDir,
       visualEvidence: navigationResults.visualEvidence,
@@ -80,22 +84,20 @@ class PredictableNavigationScanner extends BaseScanner {
   }
 
   /**
-   * The two consistency checks only read the DOM, so they run before the
+   * The consistency inventory only reads the DOM, so it runs before the
    * probes, which operate the page's own controls.
    */
   async performPredictableNavigationAnalysis(page, scanDir, options) {
     const violations = [];
+    const needsReview = [];
 
     log.debug('Starting predictable navigation analysis...');
 
     const initialScreenshot = path.join(scanDir, 'predictable-navigation-analysis.png');
     await page.screenshot({ path: initialScreenshot, fullPage: true });
 
-    if (options.testConsistentNavigation) {
-      await this.analyzeConsistentNavigation(page, violations);
-    }
     if (options.testConsistentIdentification) {
-      await this.analyzeConsistentIdentification(page, violations);
+      await this.analyzeConsistentIdentification(page, needsReview);
     }
 
     let probeFindings = { onFocus: [], onInput: [] };
@@ -134,20 +136,18 @@ class PredictableNavigationScanner extends BaseScanner {
 
     return {
       violations,
+      needsReview,
       visualEvidence: [
         {
           type: 'predictable-navigation',
           screenshot: path.basename(initialScreenshot),
           onFocusPredictable: !has('9.3.2.1'),
           onInputPredictable: !has('9.3.2.2'),
-          navigationConsistent: !has('9.3.2.3'),
-          identificationConsistent: !has('9.3.2.4'),
+          identificationQuestions: needsReview.length,
         },
       ],
       onFocusPredictable: !has('9.3.2.1'),
       onInputPredictable: !has('9.3.2.2'),
-      navigationConsistent: !has('9.3.2.3'),
-      identificationConsistent: !has('9.3.2.4'),
     };
   }
 
@@ -162,7 +162,8 @@ class PredictableNavigationScanner extends BaseScanner {
    */
   async probeContextChanges(page, options) {
     const onRequest = (request) => {
-      const isMainNavigation = request.isNavigationRequest() && request.frame() === page.mainFrame();
+      const isMainNavigation =
+        request.isNavigationRequest() && request.frame() === page.mainFrame();
       const settle = isMainNavigation
         ? request.respond({ status: 204, body: '' })
         : request.continue();
@@ -184,14 +185,12 @@ class PredictableNavigationScanner extends BaseScanner {
             navigated: false,
             opened: false,
             submitted: false,
-            history: false,
             dialog: false,
           };
           const reset = () => {
             probe.navigated = false;
             probe.opened = false;
             probe.submitted = false;
-            probe.history = false;
             probe.dialog = false;
           };
 
@@ -238,12 +237,14 @@ class PredictableNavigationScanner extends BaseScanner {
             probe.dialog = true;
             return null;
           };
-          history.pushState = () => {
-            probe.history = true;
-          };
-          history.replaceState = () => {
-            probe.history = true;
-          };
+          // A change of context is a change of user agent, viewport, focus, or
+          // content that changes the meaning of the page. A URL rewritten with
+          // history.pushState / replaceState is none of them: a faceted filter
+          // that mirrors its state in the address bar changes nothing the user
+          // has to re-orient in. The calls are still swallowed so the probe
+          // cannot leave the page on another URL.
+          history.pushState = () => {};
+          history.replaceState = () => {};
 
           function selectorFor(el) {
             const className = typeof el.className === 'string' ? el.className : '';
@@ -259,17 +260,35 @@ class PredictableNavigationScanner extends BaseScanner {
           const openDialogs = () =>
             Array.from(
               document.querySelectorAll('dialog[open], [role="dialog"], [aria-modal="true"]')
-            ).filter(__isRendered).length;
+            ).filter(__isRendered);
+
+          /**
+           * A dialog that appeared and changed the user's context: it is modal
+           * (it takes the viewport) or it took the focus. A date picker or an
+           * autocomplete popover that opens under the field and leaves focus
+           * where it was changes neither viewport nor focus nor meaning, so it
+           * is not a change of context.
+           */
+          function tookOver(before) {
+            const seen = new Set(before);
+            for (const dialog of openDialogs()) {
+              if (seen.has(dialog)) continue;
+              const modal =
+                dialog.getAttribute('aria-modal') === 'true' ||
+                (typeof dialog.matches === 'function' && dialog.matches('dialog:modal'));
+              if (modal) return true;
+              if (document.activeElement && dialog.contains(document.activeElement)) return true;
+            }
+            return false;
+          }
 
           /** What the page did since the last reset, in the user's terms. */
           function whatHappened(dialogsBefore) {
             if (probe.navigated) return 'navigates to another page';
             if (probe.opened) return 'opens a new window';
             if (probe.submitted) return 'submits the form';
-            if (probe.history) return 'replaces the browser history entry';
-            if (probe.dialog || openDialogs() > dialogsBefore) {
-              return 'opens a modal dialog which takes focus';
-            }
+            if (probe.dialog) return 'opens a browser dialog';
+            if (tookOver(dialogsBefore)) return 'opens a modal dialog which takes focus';
             return null;
           }
 
@@ -404,111 +423,16 @@ class PredictableNavigationScanner extends BaseScanner {
   }
 
   /**
-   * Consistent navigation (SC 3.2.3).
-   *
-   * The only thing a single document can show is a navigational mechanism that
-   * is repeated inside it (header plus footer plus mobile menu). Two blocks
-   * that expose exactly the same destinations are the same mechanism, so they
-   * have to list them in the same relative order.
-   */
-  async analyzeConsistentNavigation(page, violations) {
-    log.debug('Analyzing consistent navigation...');
-
-    const issues = await page.evaluate(() => {
-      const MIN_SHARED_DESTINATIONS = 3;
-      const MAX_REPORTED_PAIRS = 5;
-      const found = [];
-
-      function selectorFor(el) {
-        const className = typeof el.className === 'string' ? el.className : '';
-        return (
-          el.tagName.toLowerCase() +
-          (el.id ? `#${el.id}` : '') +
-          (className ? `.${className.split(' ')[0]}` : '')
-        );
-      }
-
-      const allNavs = Array.from(
-        document.querySelectorAll('nav, [role="navigation"], .navigation, .nav-menu, .main-nav')
-      );
-
-      // Drop nested duplicates and hidden blocks, so the same markup is never
-      // compared against itself.
-      const navigationElements = allNavs.filter((nav) => {
-        if (nav.closest('[aria-hidden="true"]')) return false;
-        return !allNavs.some((other) => other !== nav && other.contains(nav));
-      });
-
-      function destinationsOf(nav) {
-        const seen = new Set();
-        const ordered = [];
-        nav.querySelectorAll('a[href]').forEach((link) => {
-          const name =
-            (link.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase() ||
-            (link.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().toLowerCase();
-          if (!name || seen.has(name)) return;
-          seen.add(name);
-          ordered.push(name);
-        });
-        return ordered;
-      }
-
-      const navProfiles = navigationElements
-        .map((nav) => ({ selector: selectorFor(nav), destinations: destinationsOf(nav) }))
-        .filter((profile) => profile.destinations.length >= MIN_SHARED_DESTINATIONS);
-
-      for (let i = 0; i < navProfiles.length && found.length < MAX_REPORTED_PAIRS; i++) {
-        for (let j = i + 1; j < navProfiles.length && found.length < MAX_REPORTED_PAIRS; j++) {
-          const a = navProfiles[i];
-          const b = navProfiles[j];
-
-          const setB = new Set(b.destinations);
-          const shared = a.destinations.filter((name) => setB.has(name));
-          if (shared.length < MIN_SHARED_DESTINATIONS) continue;
-
-          // Anything short of the same set of destinations is not demonstrably
-          // the same mechanism repeated: a footer menu that carries the main
-          // links plus "Impressum" is its own mechanism and may order them
-          // as it likes.
-          const isSameMechanism =
-            shared.length === a.destinations.length && shared.length === b.destinations.length;
-          if (!isSameMechanism) continue;
-
-          if (a.destinations.join('|') !== b.destinations.join('|')) {
-            found.push({
-              element: `${a.selector} vs ${b.selector}`,
-              evidence: `"${a.destinations.join(' > ')}" vs "${b.destinations.join(' > ')}"`,
-            });
-          }
-        }
-      }
-
-      return found;
-    });
-
-    for (const issue of issues) {
-      violations.push({
-        criterion: '9.3.2.3',
-        element: issue.element,
-        issue: 'inconsistent-nav-order',
-        description:
-          'Repeated navigation blocks list the same destinations in a different relative order',
-        severity: 'error',
-        evidence: issue.evidence,
-        suggestion:
-          'List the repeated navigation links in the same relative order everywhere the navigation is repeated',
-      });
-    }
-  }
-
-  /**
    * Consistent identification (SC 3.2.4).
    *
-   * Two things are measurable inside one document: a block of controls that is
-   * repeated and names one of its components differently in one copy, and a
-   * kind of destination that is marked on some links and not on others.
+   * "Components that have the same functionality WITHIN A SET OF WEB PAGES are
+   * identified consistently", and Understanding 3.2.4 says that consistency
+   * inside one page is best practice only. This scanner sees one page, so it
+   * inventories what a reviewer would compare (a repeated block that names a
+   * component differently, one kind of destination marked on some links and
+   * not on others) and asks the question instead of answering it.
    */
-  async analyzeConsistentIdentification(page, violations) {
+  async analyzeConsistentIdentification(page, needsReview) {
     log.debug('Analyzing consistent identification...');
 
     const issues = await page.evaluate(
@@ -539,8 +463,12 @@ class PredictableNavigationScanner extends BaseScanner {
         const CONTROL_SELECTOR = 'a[href], button, input, select, textarea, [role="button"]';
         const blocks = new Map();
 
-        for (const block of document.querySelectorAll('div, ul, ol, section, header, footer, nav')) {
-          const controls = Array.from(block.querySelectorAll(CONTROL_SELECTOR)).filter(__isRendered);
+        for (const block of document.querySelectorAll(
+          'div, ul, ol, section, header, footer, nav'
+        )) {
+          const controls = Array.from(block.querySelectorAll(CONTROL_SELECTOR)).filter(
+            __isRendered
+          );
           if (controls.length < MIN_CONTROLS) continue;
           // The same mechanism is rendered from the same component, so the
           // block itself has to match too: two menus that happen to list the
@@ -596,6 +524,10 @@ class PredictableNavigationScanner extends BaseScanner {
                 .map((pair) => `"${pair.name}" vs "${pair.otherName}"`)
                 .slice(0, 5)
                 .join(', '),
+              itemCount: differing.length,
+              items: differing
+                .slice(0, 8)
+                .map((pair) => ({ position: pair.i, here: pair.name, there: pair.otherName })),
             });
             if (found.length >= MAX_REPORTED_BLOCKS) break;
           }
@@ -610,8 +542,10 @@ class PredictableNavigationScanner extends BaseScanner {
           /\b(?:pdf|docx?|xlsx?|pptx?|word document|excel|powerpoint|external(?:\s+link)?|extern(?:er link)?|opens?\s+in\s+(?:a\s+)?new\s+(?:window|tab)|neues\s+fenster|neuer\s+tab|nouvelle\s+fen[ea]tre)\b/i;
         // The same phrase standing on its own, so a title or a bracket that
         // holds nothing but the marker counts and an article named
-        // "Wikipedia:External links" does not.
-        const INDICATOR_ONLY = new RegExp(`^[([\\s]*${INDICATOR.source}[^\\w]*$`, 'i');
+        // "Wikipedia:External links" does not. A file size may follow the type
+        // word: "(PDF, 2 MB)" tells the reader the same thing "(PDF)" does.
+        const SIZE = String.raw`(?:[\s,;/|-]*\d+(?:[.,]\d+)?\s*(?:bytes?|[kmg]b|[kmg]ib))?`;
+        const INDICATOR_ONLY = new RegExp(`^[([\\s]*${INDICATOR.source}${SIZE}[^\\w]*$`, 'i');
 
         /**
          * Does the reader perceive where this link goes? Only from what is
@@ -677,15 +611,21 @@ class PredictableNavigationScanner extends BaseScanner {
           if (links.length < 2) continue;
           const marked = links.filter(isMarked);
           if (marked.length === 0 || marked.length === links.length) continue;
+          const unmarked = links.filter((link) => !marked.includes(link));
           found.push({
             type: `${kind}-links-no-identification`,
             element: `${kind} links`,
             description: `Links to the same kind of destination are identified inconsistently: ${marked.length} of ${links.length} carry an indicator`,
-            evidence: links
-              .filter((link) => !marked.includes(link))
+            evidence: unmarked
               .slice(0, 5)
               .map((link) => `"${(__accessibleName(link) || '').trim()}"`)
               .join(', '),
+            itemCount: links.length,
+            items: links.slice(0, 12).map((link) => ({
+              name: (__accessibleName(link) || '').trim().slice(0, 80),
+              href: (link.getAttribute('href') || '').slice(0, 120),
+              marked: marked.includes(link),
+            })),
           });
         }
 
@@ -696,14 +636,32 @@ class PredictableNavigationScanner extends BaseScanner {
     );
 
     for (const issue of issues) {
-      violations.push({
+      needsReview.push({
+        ...this.formatViolation(
+          issue.type,
+          'minor',
+          issue.description,
+          [{ selector: issue.element }],
+          'https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification.html',
+          'info',
+          {
+            verdict: 'needs-review',
+            dossier: {
+              question: 'Are these identified consistently across the site?',
+              element: { selector: issue.element, html: null, role: null, name: null },
+              measurements: { itemsCompared: issue.itemCount },
+              context: {
+                found: issue.items,
+                suggestion: this.getIdentificationSuggestion(issue.type),
+              },
+            },
+          }
+        ),
         criterion: '9.3.2.4',
-        element: issue.element,
+        wcagCriteria: ['3.2.4'],
         issue: issue.type,
-        description: issue.description,
-        severity: 'warning',
+        element: issue.element,
         evidence: issue.evidence,
-        suggestion: this.getIdentificationSuggestion(issue.type),
       });
     }
   }

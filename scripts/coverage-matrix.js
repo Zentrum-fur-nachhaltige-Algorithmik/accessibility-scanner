@@ -148,6 +148,21 @@ const MANUAL_OVERRIDES = {
       'Pronunciation (AAA): whether a word is ambiguous in a way that changes meaning is ' +
       'a reading of the text in its language; the page carries no signal for it.',
   },
+  '3.2.3': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Consistent Navigation: the clause is scoped to navigational mechanisms "repeated on ' +
+      'multiple web pages within a set of web pages". One document is not that set, so two ' +
+      'navigation blocks inside one page decide nothing; a human compares page against page.',
+  },
+  '3.2.4': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Consistent Identification: scoped to components "within a set of web pages", and ' +
+      'Understanding 3.2.4 calls consistency inside one page best practice only. ' +
+      'predictable-navigation inventories the repeated blocks and the marked/unmarked links of ' +
+      'the one page it sees and asks about them as needs-review; the decision is a human one.',
+  },
   '3.2.5': {
     mechanism: MECHANISM.MANUAL,
     justification:

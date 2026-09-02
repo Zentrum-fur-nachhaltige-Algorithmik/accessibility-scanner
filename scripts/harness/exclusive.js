@@ -90,10 +90,12 @@ const EXCLUSIVE_SCANNERS = {
     criteria: ['4.1.3'],
   },
   // Focuses controls, changes their settings and answers navigation requests
-  // with 204, so it needs its own tab.
+  // with 204, so it needs its own tab. SC 3.2.3 and 3.2.4 are scoped to a set
+  // of web pages and are decided by a human (coverage-matrix MANUAL_OVERRIDES),
+  // so nothing is asserted for them here.
   'predictable-navigation': {
     module: '../../src/scanners/predictable-navigation',
-    criteria: ['3.2.1', '3.2.2', '3.2.3', '3.2.4'],
+    criteria: ['3.2.1', '3.2.2'],
   },
   // Clicks the page's own links and reports what a client-side route change
   // did to the title and to focus.

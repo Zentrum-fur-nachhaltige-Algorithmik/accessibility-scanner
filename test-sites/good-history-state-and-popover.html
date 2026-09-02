@@ -1,0 +1,86 @@
+<!-- WCAG-TEST
+criterion: 3.2.1, 3.2.2
+level: A
+title: URL rewritten with replaceState, and a date picker that opens on focus
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: predictable-navigation
+description: A faceted filter mirrors its state in the address bar with history.replaceState, a sort control does the same with pushState, and a date field opens a role=dialog picker below itself without moving focus. None of the three changes the user agent, the viewport, the focus or the meaning of the page, so neither focus-causes-context-change nor input-causes-context-change may fire.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search results</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 1rem; line-height: 1.5; }
+  .picker { position: absolute; border: 1px solid #767676; background: #ffffff; padding: .5rem; }
+  .picker[hidden] { display: none; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+  label { display: block; margin-top: .75rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Search results</h1>
+
+  <form id="facets" action="/search" method="get">
+    <label for="category">Category</label>
+    <select id="category" name="category">
+      <option value="all">All</option>
+      <option value="books">Books</option>
+      <option value="films">Films</option>
+    </select>
+
+    <label><input type="checkbox" name="instock" value="1"> In stock only</label>
+
+    <label for="sort">Sort by</label>
+    <select id="sort" name="sort">
+      <option value="relevance">Relevance</option>
+      <option value="date">Date</option>
+    </select>
+
+    <label for="from">From</label>
+    <input id="from" name="from" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"
+           aria-describedby="from-hint">
+    <span id="from-hint">Format YYYY-MM-DD. A calendar opens below the field.</span>
+    <div id="from-picker" class="picker" role="dialog" aria-label="Choose a date" hidden>
+      <button type="button">1</button>
+      <button type="button">2</button>
+      <button type="button">3</button>
+    </div>
+
+    <button type="submit">Apply</button>
+  </form>
+
+  <ul id="results">
+    <li>Result one</li>
+    <li>Result two</li>
+  </ul>
+</main>
+
+<script>
+  // The filters keep the address bar in step with the controls. The document,
+  // the viewport, the focus and the meaning of the page all stay as they were.
+  var form = document.getElementById('facets');
+  form.addEventListener('change', function (event) {
+    var params = new URLSearchParams(new FormData(form));
+    if (event.target.id === 'sort') {
+      history.pushState({ sort: event.target.value }, '', '?' + params.toString());
+    } else {
+      history.replaceState({}, '', '?' + params.toString());
+    }
+  });
+
+  // The picker opens under the field it belongs to and leaves focus in the
+  // field, so the user keeps typing.
+  var from = document.getElementById('from');
+  var picker = document.getElementById('from-picker');
+  from.addEventListener('focus', function () {
+    picker.hidden = false;
+  });
+</script>
+</body>
+</html>

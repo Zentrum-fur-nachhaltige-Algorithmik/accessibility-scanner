@@ -1108,6 +1108,15 @@ const HTML_SCANNER_MAPPING = {
       'Autofocus inside a dialog, a positive tabindex and controls whose change only rewrites text: no context change to report',
   },
 
+  'good-history-state-and-popover.html': {
+    expectedScanners: [],
+    excludedScanners: ['predictable-navigation'],
+    testType: 'good',
+    wcagCriteria: ['3.2.1', '3.2.2'],
+    description:
+      'Facet controls that rewrite the URL with history.pushState/replaceState and a date picker with role=dialog that opens on focus without taking focus: neither is a change of context',
+  },
+
   'good-repeated-cards-and-buttons.html': {
     expectedScanners: [],
     excludedScanners: ['predictable-navigation'],

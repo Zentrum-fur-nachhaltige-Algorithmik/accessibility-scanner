@@ -640,15 +640,6 @@ class AdvancedAriaScanner extends BaseScanner {
       });
     }
 
-    if (issueTypes.includes('missing-aria-controls')) {
-      recommendations.push({
-        priority: 'high',
-        issue: 'Widget relationships not properly defined',
-        solution: 'Use aria-controls to link the widget to the content it opens',
-        implementation: 'Ensure aria-controls IDs match existing controlled elements',
-      });
-    }
-
     if (issueTypes.includes('contradictory-live-region-politeness')) {
       recommendations.push({
         priority: 'medium',

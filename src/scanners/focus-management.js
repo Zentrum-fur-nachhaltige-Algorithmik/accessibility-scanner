@@ -279,6 +279,9 @@ class FocusManagementScanner extends BaseScanner {
           text: step.text,
           tag: step.tag,
           domOrderBack: step.domOrderBack === true,
+          regionPath: step.regionPath,
+          prevRegionPath: step.prevRegionPath,
+          prevRect: step.prevRect,
           // Stamped during the walk instead of before it: revealed by the page
           // itself, so it has no place in the document's static order.
           dynamic: String(step.tabId).startsWith('dyn-'),
@@ -326,16 +329,45 @@ class FocusManagementScanner extends BaseScanner {
   }
 
   /**
-   * Tab stops that were reached out of document order.
+   * Tab stops that were reached out of document order AND out of the order the
+   * page presents.
    * `domOrderBack` is measured inside the walk: the element that Tab landed on
    * comes BEFORE the previous tab stop in the document. Dynamically revealed
    * stops (a menu that opens during the walk) are left out, because their
    * position in the document says nothing about the order the user meets them.
+   *
+   * A backward DOM step alone is not a failure. 2.4.3 asks for an order that
+   * preserves meaning and operability, and a `tabindex="1"` search field that
+   * sits at the top of the page is reached first because that is where the user
+   * sees it. A step counts when it also carries the user out of the region they
+   * were in, or when it walks back up the page or back along a row of
+   * controls, against the order the page paints them in.
    * @param {object[]} sequence tab stops from testFocusSequence
    * @returns {object[]} the offending stops
    */
   findBackwardTabSteps(sequence) {
-    return sequence.filter((item, i) => i > 0 && item.domOrderBack && !item.dynamic);
+    const TOLERANCE_PX = 8;
+    return sequence.filter((item, i) => {
+      if (i === 0 || !item.domOrderBack || item.dynamic) return false;
+
+      // The step left the landmark or section the previous stop was in, so the
+      // user is carried out of the part of the page they were working in. A
+      // move between a region and a region around it is not leaving it, so the
+      // paths are compared and not the innermost region alone.
+      const here = item.regionPath || [];
+      const there = item.prevRegionPath || [];
+      const shared = Math.min(here.length, there.length);
+      const nested = here.slice(0, shared).join('>') === there.slice(0, shared).join('>');
+      if (item.prevRegionPath && !nested) return true;
+
+      // Otherwise the step has to break the order the page presents as well:
+      // back up the page, or back along a row of controls.
+      if (!item.prevRect) return false;
+      const movedUp = item.rect.y + TOLERANCE_PX < item.prevRect.y;
+      const sameRow = Math.abs(item.rect.y - item.prevRect.y) <= TOLERANCE_PX;
+      const movedLeft = item.rect.x + TOLERANCE_PX < item.prevRect.x;
+      return movedUp || (sameRow && movedLeft);
+    });
   }
 
   /**
@@ -379,14 +411,19 @@ class FocusManagementScanner extends BaseScanner {
 
     for (const [index, trigger] of triggers.entries()) {
       try {
-        const openBefore = await page.evaluate(
+        // Which dialogs were already on screen, remembered by node identity.
+        // Two dialogs from the same component library share the first 120
+        // characters of their markup, so comparing markup made one stand for
+        // the other.
+        await page.evaluate(
           (renderedHelpers, sel, triggerSel) => {
             eval(renderedHelpers);
             const el = document.querySelector(triggerSel);
             if (el) el.focus();
-            return [...document.querySelectorAll(sel)]
-              .filter(__isRendered)
-              .map((d) => d.outerHTML.slice(0, 120));
+            window.__a11yDialogsBefore = new WeakSet();
+            for (const dialog of document.querySelectorAll(sel)) {
+              if (__isRendered(dialog)) window.__a11yDialogsBefore.add(dialog);
+            }
           },
           renderedCode,
           dialogSelector,
@@ -396,18 +433,63 @@ class FocusManagementScanner extends BaseScanner {
         await page.keyboard.press('Enter');
         await new Promise((resolve) => setTimeout(resolve, 500));
 
+        // A dialog that fades or slides in gets its transition finished before
+        // anything is read: a library that moves focus in its own
+        // shown.bs.modal handler has not run yet while the dialog is still
+        // animating.
+        await page
+          .evaluate(
+            (renderedHelpers, sel) =>
+              new Promise((resolve) => {
+                eval(renderedHelpers);
+                const dialog = [...document.querySelectorAll(sel)].find(
+                  (d) => __isRendered(d) && !window.__a11yDialogsBefore.has(d)
+                );
+                if (!dialog) return resolve();
+                // The transition usually runs on the backdrop around the
+                // dialog, and a transitionend on an ancestor never reaches the
+                // dialog, so the animating element is found first.
+                let animating = null;
+                for (let node = dialog; node && node !== document.body; node = node.parentElement) {
+                  const cs = getComputedStyle(node);
+                  if (
+                    [cs.transitionDuration, cs.animationDuration].some((value) =>
+                      /[1-9]/.test(String(value))
+                    )
+                  ) {
+                    animating = node;
+                    break;
+                  }
+                }
+                if (!animating) return resolve();
+                let done = false;
+                const finish = () => {
+                  if (done) return;
+                  done = true;
+                  resolve();
+                };
+                animating.addEventListener('transitionend', finish, { once: true });
+                animating.addEventListener('animationend', finish, { once: true });
+                setTimeout(finish, 1500);
+              }),
+            renderedCode,
+            dialogSelector
+          )
+          .catch(() => {});
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
         await page.screenshot({
           path: path.join(scanDir, `modal-test-${index}-after.png`),
         });
 
         const opened = await page.evaluate(
-          (renderedHelpers, sel, before) => {
+          (renderedHelpers, sel) => {
             eval(renderedHelpers);
             const focused = document.activeElement;
             for (const dialog of document.querySelectorAll(sel)) {
               if (!__isRendered(dialog)) continue;
-              const key = dialog.outerHTML.slice(0, 120);
-              if (before.includes(key)) continue; // already open before the activation
+              // Already open before the activation.
+              if (window.__a11yDialogsBefore.has(dialog)) continue;
               return {
                 selector:
                   dialog.tagName.toLowerCase() +
@@ -421,8 +503,7 @@ class FocusManagementScanner extends BaseScanner {
             return null;
           },
           renderedCode,
-          dialogSelector,
-          openBefore
+          dialogSelector
         );
 
         if (opened && !opened.containsFocus) {
@@ -449,6 +530,7 @@ class FocusManagementScanner extends BaseScanner {
         document
           .querySelectorAll('[data-a11y-dialog-trigger]')
           .forEach((el) => el.removeAttribute('data-a11y-dialog-trigger'));
+        delete window.__a11yDialogsBefore;
       })
       .catch(() => {});
 

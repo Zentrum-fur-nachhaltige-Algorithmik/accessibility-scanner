@@ -1028,6 +1028,24 @@ const HTML_SCANNER_MAPPING = {
       'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
   },
 
+  'good-search-first-tabindex.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A header whose search field carries tabindex="1" and is painted first: the backwards DOM step preserves meaning and operability, so illogical-tab-order must stay silent',
+  },
+
+  'good-dialog-slow-transition.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A dialog that fades in over 1200 ms and moves focus in its transitionend handler: focus-lost must wait for the transition instead of reading focus at 500 ms',
+  },
+
   'good-map-canvas-gestures.html': {
     expectedScanners: [],
     excludedScanners: ['concurrent-input'],

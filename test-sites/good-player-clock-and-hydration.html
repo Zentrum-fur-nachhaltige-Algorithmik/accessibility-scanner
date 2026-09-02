@@ -1,0 +1,79 @@
+<!-- WCAG-TEST
+criterion: 2.2.1, 2.2.2
+level: A
+title: A media player clock and a page that hydrates after load
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: timing-controls
+description: The remaining time of a custom video player counts down every second, and the page rewrites its skeleton placeholders and injects a consent notice in the first second after load. Neither is a session time limit and neither is auto-updating information, so timeout-no-extend-option and auto-update-no-controls must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 0; line-height: 1.5; }
+  main { max-width: 56rem; margin: 0 auto; padding: 1rem; }
+  .player { border: 1px solid #767676; padding: .5rem; max-width: 32rem; }
+  .player .bar { display: flex; gap: .5rem; align-items: center; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Lecture: reading the standard</h1>
+  <p>
+    A recording of the seminar, with a transcript below. The page also loads its
+    figures after the first paint, which is why the placeholders below are
+    replaced once.
+  </p>
+
+  <div class="player">
+    <video width="320" height="180" poster="" muted>
+      <source src="/lecture.mp4" type="video/mp4">
+    </video>
+    <div class="bar">
+      <button type="button" id="play">Play</button>
+      <span>Remaining</span>
+      <!-- Not a session time limit: the remaining time of the track. -->
+      <span id="remaining">12:34</span>
+    </div>
+  </div>
+
+  <h2>Transcript</h2>
+  <p id="para-1">Loading the transcript...</p>
+  <p id="para-2">Loading the transcript...</p>
+  <p id="para-3">Loading the transcript...</p>
+  <div id="consent"></div>
+</main>
+
+<script>
+  // The player clock ticks for as long as the page is open.
+  var remaining = document.getElementById('remaining');
+  var left = 754;
+  setInterval(function () {
+    left = left > 0 ? left - 1 : 0;
+    var m = Math.floor(left / 60);
+    var s = left % 60;
+    remaining.textContent = m + ':' + (s < 10 ? '0' + s : s);
+  }, 1000);
+
+  // Hydration and the consent notice: the page settling in, once, right after
+  // load, and never again.
+  setTimeout(function () {
+    document.getElementById('para-1').textContent =
+      'Welcome. Today we read the timing criteria of WCAG 2.2 from the top.';
+    document.getElementById('para-2').textContent =
+      'The first one is 2.2.1, Timing Adjustable, and its three options.';
+    document.getElementById('para-3').textContent =
+      'The second one is 2.2.2, Pause, Stop, Hide, and the five seconds in it.';
+    var notice = document.createElement('p');
+    notice.textContent = 'This site uses no tracking cookies.';
+    document.getElementById('consent').appendChild(notice);
+  }, 400);
+</script>
+</body>
+</html>

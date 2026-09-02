@@ -1162,6 +1162,24 @@ const HTML_SCANNER_MAPPING = {
       'A login password, an e-mail and a date field with no format hint, aria-invalid="false" and groups named without a legend',
   },
 
+  'good-player-clock-and-hydration.html': {
+    expectedScanners: [],
+    excludedScanners: ['timing-controls'],
+    testType: 'good',
+    wcagCriteria: ['2.2.1', '2.2.2'],
+    description:
+      'The remaining time of a custom video player, and skeleton text plus a consent notice replaced right after load: neither a session time limit nor auto-updating information',
+  },
+
+  'good-session-countdown-far-control.html': {
+    expectedScanners: [],
+    excludedScanners: ['timing-controls'],
+    testType: 'good',
+    wcagCriteria: ['2.2.1'],
+    description:
+      'A session countdown in main and a "Rezept verlaengern" link in the footer: the page-wide name match no longer clears the countdown, and the mismatch is a question rather than a violation',
+  },
+
   'good-static-decorations.html': {
     expectedScanners: [],
     excludedScanners: ['timing-controls'],

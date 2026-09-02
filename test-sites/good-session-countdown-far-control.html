@@ -1,0 +1,52 @@
+<!-- WCAG-TEST
+criterion: 2.2.1
+level: A
+title: Session countdown with an extend control in another region
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: timing-controls
+description: A session countdown runs in the main region and the only control whose name offers more time is a "Rezept verlaengern" link in the footer, which belongs to a different function. The page-wide match no longer clears the countdown, and it is not a violation either: the scanner asks whether that control extends this limit.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezeptbestellung</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 0; line-height: 1.5; }
+  main, footer { max-width: 56rem; margin: 0 auto; padding: 1rem; }
+  footer { border-top: 1px solid #767676; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Rezeptbestellung</h1>
+  <p>Ihre Sitzung l&auml;uft ab in <span id="countdown">4:58</span> Minuten.</p>
+  <form action="/rezept" method="post">
+    <label for="medication">Medikament</label>
+    <input id="medication" name="medication" type="text">
+    <button type="submit">Bestellen</button>
+  </form>
+</main>
+<footer>
+  <ul>
+    <li><a href="/rezept-verlaengern.html">Rezept verl&auml;ngern</a></li>
+    <li><a href="/impressum.html">Impressum</a></li>
+  </ul>
+</footer>
+
+<script>
+  var el = document.getElementById('countdown');
+  var left = 298;
+  setInterval(function () {
+    left = left > 0 ? left - 1 : 0;
+    var m = Math.floor(left / 60);
+    var s = left % 60;
+    el.textContent = m + ':' + (s < 10 ? '0' + s : s);
+  }, 1000);
+</script>
+</body>
+</html>

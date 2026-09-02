@@ -41,6 +41,10 @@ class AdvancedAriaScanner extends BaseScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Watch the live regions before anything touches the page, so an update
+    // the page makes by itself or under the interactions below is recorded.
+    await this._watchLiveRegions(page);
+
     if (scanOptions.jsInteraction) {
       await BaseScanner.triggerCommonInteractions(page);
     }
@@ -521,11 +525,14 @@ class AdvancedAriaScanner extends BaseScanner {
   /**
    * Analyze live region implementation
    */
-  async analyzeLiveRegions(page, options = {}) {
-    // A politeness contradiction costs nobody anything until the region
-    // actually says something, so the region is watched first: the page is
-    // given the interactions it offers and every mutation of a live region is
-    // recorded.
+  /**
+   * Record every mutation of a live region from now on. A politeness
+   * contradiction costs nobody anything until the region actually says
+   * something, and only a page that was watched from the start can show that.
+   * The scan never interacts with the page from here: the shared page is
+   * measured by the other concurrent scanners at the same time.
+   */
+  async _watchLiveRegions(page) {
     await page
       .evaluate(() => {
         if (window.__a11yLiveUpdates) return;
@@ -533,8 +540,10 @@ class AdvancedAriaScanner extends BaseScanner {
         window.__a11yLiveUpdates = updated;
         const observer = new MutationObserver((records) => {
           for (const record of records) {
-            const region = record.target.closest
-              ? record.target.closest('[role="status"], [role="alert"], [role="log"], [aria-live]')
+            const target =
+              record.target.nodeType === 1 ? record.target : record.target.parentElement;
+            const region = target
+              ? target.closest('[role="status"], [role="alert"], [role="log"], [aria-live]')
               : null;
             if (region) updated.add(region);
           }
@@ -546,10 +555,10 @@ class AdvancedAriaScanner extends BaseScanner {
         });
       })
       .catch(() => {});
+  }
 
-    if (options.jsInteraction) {
-      await BaseScanner.triggerCommonInteractions(page).catch(() => {});
-    }
+  async analyzeLiveRegions(page, options = {}) {
+    // Give a page that announces something by itself the time to do it.
     await new Promise((r) => setTimeout(r, options.observationTime ?? 500));
 
     return await page.evaluate((visScript) => {

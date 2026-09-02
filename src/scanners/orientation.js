@@ -73,7 +73,12 @@ class OrientationScanner extends BaseScanner {
       const url = page.url();
       if (!url || !/^https?:/i.test(url)) return false;
       await page.evaluateOnNewDocument(INSTRUMENTATION);
-      await page.reload({ waitUntil: 'networkidle0', timeout: options.timeout || 30000 });
+      // domcontentloaded, not networkidle0: the pipeline gives every exclusive
+      // scanner its own navigation already, and a second full load of a heavy
+      // page costs more than the lock call is worth. Scripts that call the API
+      // run at parse time or from the load handler, which the settle below
+      // covers.
+      await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeout || 30000 });
       // Deferred scripts and load handlers register and fire after DOMContentLoaded.
       await new Promise((r) => setTimeout(r, 500));
       return await page.evaluate(() => Boolean(window.__a11yOrientationLog));
@@ -99,6 +104,11 @@ class OrientationScanner extends BaseScanner {
   /** Give the page its first interaction and see whether it locks then. */
   async _firstInteraction(page) {
     try {
+      // Nothing to provoke on a page that ships no script.
+      const scripted = await page.evaluate(
+        () => document.scripts.length > 0 || !!document.querySelector('[onclick]')
+      );
+      if (!scripted) return;
       const target = await page.$(
         'button, [role="button"], summary, a[href], input[type="button"], input[type="submit"]'
       );

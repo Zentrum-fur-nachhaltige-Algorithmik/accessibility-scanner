@@ -32,6 +32,41 @@ export const SEVERITY_TONE = {
   info: 'neutral',
 };
 
+/**
+ * A finding the scanners could not decide (verdict 'needs-review'). It carries
+ * an evidence dossier instead of a verdict, is never a failure, and is never
+ * counted or scored.
+ */
+export function isNeedsReview(violation) {
+  return violation?.verdict === 'needs-review';
+}
+
+/** Only findings the scanners could prove. */
+export function onlyViolations(violations) {
+  const list = Array.isArray(violations) ? violations : [];
+  return list.filter((violation) => !isNeedsReview(violation));
+}
+
+/** The open questions of a scan result, whatever list they arrive in. */
+export function needsReviewItems(result) {
+  const list = Array.isArray(result?.needsReview) ? result.needsReview : [];
+  return list;
+}
+
+/** The one decision a reviewer has to make about a needs-review finding. */
+export function reviewQuestion(violation) {
+  return violation?.dossier?.question || violationText(violation);
+}
+
+/** Flat [label, value] pairs of what the scanner did measure. */
+export function reviewMeasurements(violation) {
+  const measurements = violation?.dossier?.measurements;
+  if (!measurements || typeof measurements !== 'object') return [];
+  return Object.entries(measurements)
+    .filter(([, value]) => value !== null && value !== undefined)
+    .map(([key, value]) => [key, String(value)]);
+}
+
 /** Mirrors normalizeSeverity() in src/report-generator.js. */
 export function normalizeSeverity(violation) {
   const raw = String(violation?.severity || violation?.impact || 'moderate').toLowerCase();
@@ -120,7 +155,7 @@ export function principleCounts(violations) {
     other: 0,
   };
 
-  for (const violation of list) counts[violationPrinciple(violation)] += 1;
+  for (const violation of onlyViolations(list)) counts[violationPrinciple(violation)] += 1;
 
   const rows = WCAG_PRINCIPLES.map(([key, label]) => ({
     key,
@@ -214,7 +249,7 @@ export function scannerLabel(scannerId) {
 /** Counts per severity, ordered worst-first, zero buckets omitted. */
 export function severityCounts(violations) {
   const counts = {};
-  for (const violation of violations) {
+  for (const violation of onlyViolations(violations)) {
     const severity = normalizeSeverity(violation);
     counts[severity] = (counts[severity] || 0) + 1;
   }
@@ -264,7 +299,7 @@ function criterionLabel(violation) {
  *   `items` in criterion mode.
  */
 export function groupViolations(violations, mode = 'criterion') {
-  const list = Array.isArray(violations) ? violations : [];
+  const list = onlyViolations(violations);
   const buckets = new Map();
 
   for (const violation of list) {

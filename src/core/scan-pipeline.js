@@ -7,6 +7,7 @@
  */
 const puppeteer = require('puppeteer');
 const { classifyWcagPrinciple } = require('../utils/wcag-principle');
+const { dismissConsent } = require('./consent');
 
 /**
  * Navigate and wait for the network to go quiet; when it never does inside
@@ -92,10 +93,15 @@ class ScanPipeline {
 
     const passedOptions = { ...scannerOptions, screenshotDir, timeout };
     const allResults = [];
+    let consent = null;
 
     try {
       // Navigate once for concurrent scanners
       await this.navigateWithCSPFallback(page, url, { timeout });
+
+      // Accept the consent overlay before anything measures the page: a
+      // scanner looking at a cookie dialog measures the dialog.
+      consent = await dismissConsent(page);
 
       // Run concurrent scanners in parallel. LLM scanners get a warm-up
       // stagger: they all send an identical shared page-context prefix, so
@@ -151,6 +157,8 @@ class ScanPipeline {
             await tab.setViewport({ width: 1920, height: 1080 });
             try {
               await gotoSettled(tab, url, timeout);
+              // Every tab is a fresh navigation, so the banner is back.
+              await dismissConsent(tab);
               return await scanner.scan(tab, passedOptions);
             } finally {
               await tab.close().catch(() => {});
@@ -178,7 +186,7 @@ class ScanPipeline {
       await this.recycleBrowserIfDue();
     }
 
-    return this.assembleResult(url, allResults);
+    return this.assembleResult(url, allResults, consent);
   }
 
   /**
@@ -200,14 +208,14 @@ class ScanPipeline {
   /**
    * Assemble individual scanner results into a unified pipeline result.
    */
-  assembleResult(url, scannerResults) {
+  assembleResult(url, scannerResults, consent = null) {
     const allViolations = [];
     // Advice a scanner offers about criteria nothing fails (the Deque best
     // practice rules). Reported, never counted and never scored.
     const bestPractices = [];
-    // Nodes whose criterion the scanner could not decide from the page.
-    // Reported, never counted and never scored, so an unknown is never a
-    // failure and never disappears either.
+    // Findings the scanner could not decide from the page (verdict
+    // 'needs-review'). Reported with their evidence dossier, never counted and
+    // never scored, so an unknown is never a failure and never disappears.
     const needsReview = [];
     const scannerSummaries = {};
 
@@ -238,9 +246,16 @@ class ScanPipeline {
             v.originalSeverity = v.severity ?? null;
             v.severity = 'info';
             v.aaa = true;
+            v.verdict = 'needs-review';
             needsReview.push(v);
             continue;
           }
+          // A scanner that could only suspect this finding says so itself.
+          if (v.verdict === 'needs-review') {
+            needsReview.push(v);
+            continue;
+          }
+          v.verdict = 'violation';
           allViolations.push(v);
         }
       }
@@ -252,6 +267,10 @@ class ScanPipeline {
             v.experimental = true;
             v.confidence = 'low';
           }
+          if (v.verdict === 'needs-review') {
+            needsReview.push(v);
+            continue;
+          }
           bestPractices.push(v);
         }
       }
@@ -259,6 +278,7 @@ class ScanPipeline {
       if (Array.isArray(result.needsReview)) {
         for (const v of result.needsReview) {
           if (!v.scannerId) v.scannerId = result.scannerId;
+          v.verdict = 'needs-review';
           needsReview.push(v);
         }
       }
@@ -273,50 +293,80 @@ class ScanPipeline {
       };
     }
 
-    const violations = this.dedupeProcedureFindings(
-      this.reconcileIncompleteReviews(allViolations, scannerResults)
-    );
+    const violations = this.dedupeProcedureFindings(allViolations);
+    const { kept, reviewLog } = this.reconcileIncompleteReviews(needsReview, scannerResults);
     const categories = this.categorizeViolations(violations);
 
-    return {
+    const result = {
       url,
       timestamp: new Date().toISOString(),
       accessibilityScore: this.computeViolationWeightedScore(violations),
       totalViolations: violations.length,
       violations,
       bestPractices,
-      needsReview,
+      needsReview: kept,
       scanners: scannerSummaries,
       categories,
     };
+    if (reviewLog.length > 0) result.reviewLog = reviewLog;
+    // Absent when no overlay was seen.
+    if (consent && consent.detected) result.consent = consent;
+    return result;
   }
 
   /**
-   * Drop the axe-core `incomplete` placeholders that the LLM incomplete
-   * reviewer has since decided are compliant.
+   * Close the needs-review items a reviewer has since decided.
    *
-   * `AxeCoreAdapter` forwards every `incomplete` node as a `severity: 'info'`
-   * "Manual review required" line. `llm-incomplete-reviewer` re-examines those
-   * nodes with measured evidence and records the ones it cleared in
-   * `summary.suppressed`. Without this reconciliation the reader sees both the
-   * adjudicated verdict AND the original to-do item for the same element.
+   * A needs-review finding is an open question. `llm-incomplete-reviewer`
+   * answers some of them and lists every attempt in `summary.decided` as
+   * {axeRuleId, selector, verdict: pass|fail|uncertain, reason}. A `pass`
+   * leaves the reader's list for the review log; a `fail` leaves it too,
+   * because the reviewer's own adjudicated violation now stands for it;
+   * an `uncertain` stays and carries the attempt, so the reader sees that
+   * the question was tried and what was measured.
    *
-   * Only axe's own informational entries are ever removed. A real axe
-   * violation, or any finding from another scanner, is untouched.
+   * Identity is (ruleId|selector), so any scanner's needs-review item can be
+   * decided, not only axe's. The dossier selector is read as well as the
+   * finding's own, so a supplier that only fills the dossier still matches.
+   *
+   * @returns {{kept: Object[], reviewLog: Object[]}}
    */
-  reconcileIncompleteReviews(violations, scannerResults) {
+  reconcileIncompleteReviews(needsReview, scannerResults) {
     const reviewer = scannerResults.find((r) => r.scannerId === 'llm-incomplete-reviewer');
-    const suppressed = reviewer?.summary?.suppressed;
-    if (!Array.isArray(suppressed) || suppressed.length === 0) return violations;
+    const decided = Array.isArray(reviewer?.summary?.decided)
+      ? reviewer.summary.decided
+      : (reviewer?.summary?.suppressed || []).map((s) => ({ ...s, verdict: 'pass' }));
+    if (decided.length === 0) {
+      return { kept: needsReview, reviewLog: [] };
+    }
 
-    const keys = new Set(suppressed.map((s) => `${s.axeRuleId}|${s.selector}`));
+    const decisions = new Map(decided.map((d) => [`${d.axeRuleId}|${d.selector}`, d]));
+    const by = 'llm-incomplete-reviewer';
 
-    return violations.filter((v) => {
-      if (v.source !== 'axe-core') return true;
-      if ((v.severity || '') !== 'info') return true;
-      const selector = v.nodes?.[0]?.selector || '';
-      return !keys.has(`${v.ruleId}|${selector}`);
-    });
+    const kept = [];
+    const reviewLog = [];
+    for (const v of needsReview) {
+      const ruleId = v.ruleId || v.axeRuleId || '';
+      const selectors = [v.nodes?.[0]?.selector, v.element, v.dossier?.element?.selector].filter(
+        Boolean
+      );
+      const decision = selectors.map((sel) => decisions.get(`${ruleId}|${sel}`)).find(Boolean);
+      if (!decision || decision.verdict === 'uncertain') {
+        if (decision) {
+          v.review = { by, verdict: 'uncertain', reason: decision.reason || null };
+        }
+        kept.push(v);
+        continue;
+      }
+      reviewLog.push({
+        ruleId: ruleId || null,
+        selector: selectors[0] || '',
+        verdict: decision.verdict,
+        reason: decision.reason || null,
+        by,
+      });
+    }
+    return { kept, reviewLog };
   }
 
   /**

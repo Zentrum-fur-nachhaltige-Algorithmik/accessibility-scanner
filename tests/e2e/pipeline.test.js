@@ -86,6 +86,25 @@ describe('ScanPipeline', () => {
     expect(result.scanners['mock-exclusive']).toBeUndefined();
   });
 
+  it('dismisses a consent overlay and records it', async () => {
+    const url = `${getBaseUrl()}/consent-cookie-banner.html`;
+    const result = await pipeline.scan(url, { scannerIds: ['mock-concurrent'] });
+
+    expect(result.consent).toEqual({
+      detected: true,
+      dismissed: true,
+      containerSelector: '#cookie-consent-banner',
+      buttonLabel: 'Alle akzeptieren',
+    });
+  });
+
+  it('records no consent field on a page without an overlay', async () => {
+    const url = `${getBaseUrl()}/good-accessibility.html`;
+    const result = await pipeline.scan(url, { scannerIds: ['mock-concurrent'] });
+
+    expect(result.consent).toBeUndefined();
+  });
+
   it('throws when no scanners match', async () => {
     const emptyPipeline = new ScanPipeline();
     await expect(emptyPipeline.scan('http://localhost:1/nope')).rejects.toThrow('No scanners');

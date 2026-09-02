@@ -33,11 +33,18 @@ function normalizeSeverity(violation) {
   return mapWord(violation.severity) || mapWord(violation.impact) || 'moderate';
 }
 
+/** A finding the scanner could not decide is not a failure, whatever its severity. */
+function isNeedsReview(violation) {
+  return violation?.verdict === 'needs-review';
+}
+
 function severityWeight(violation) {
+  if (isNeedsReview(violation)) return 0;
   return SEVERITY_WEIGHTS[normalizeSeverity(violation)] || 0;
 }
 
 function isHardViolation(violation) {
+  if (isNeedsReview(violation)) return false;
   const sev = normalizeSeverity(violation);
   return sev !== 'best-practice' && sev !== 'info';
 }
@@ -80,6 +87,7 @@ const BREADTH_SCALE = 0.5;
 function violationPenalty(violations) {
   const groups = new Map();
   for (const v of violations || []) {
+    if (isNeedsReview(v)) continue; // an undecided finding never moves the score
     const severity = normalizeSeverity(v);
     const weight = SEVERITY_WEIGHTS[severity] || 0;
     if (weight === 0) continue; // info / best-practice never move the score
@@ -115,6 +123,7 @@ module.exports = {
   normalizeSeverity,
   severityWeight,
   isHardViolation,
+  isNeedsReview,
   ruleKey,
   violationPenalty,
   scoreFromPenalty,

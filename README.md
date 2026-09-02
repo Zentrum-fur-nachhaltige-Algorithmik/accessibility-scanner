@@ -61,6 +61,53 @@ viewport, send input or navigate, so the pipeline runs them one at a time and
 reloads the URL in between. LLM scanners register only when
 `OPENROUTER_API_KEY` is set.
 
+### Verdicts: violation or needs review
+
+Scanners measure. What a scanner can prove is a `violation`; what it can only
+suspect is a `needs-review` finding, and every finding carries its verdict.
+
+A needs-review finding stays out of `violations`, out of the score and out of
+the category counts. It lands in `needsReview` on the result with an evidence
+dossier a reviewer decides on:
+
+```
+dossier: {
+  question,                                  // the one decision to make
+  element: { selector, html, role, name },
+  measurements,                              // flat map of measured values
+  context                                    // short surrounding facts
+}
+```
+
+Report and UI show them in their own "Needs review" section, never among the
+findings. AAA findings take the same route: they are advisory for an AA target
+and appear there, not among the violations.
+
+A reviewer (today only `llm-incomplete-reviewer`) answers a question with
+`pass`, `fail` or `uncertain`. Pass and fail close it: the item leaves
+`needsReview` and is recorded in the result's `reviewLog` as
+`{ ruleId, selector, verdict, reason, by }`; a fail is represented by the
+reviewer's own violation, marked `adjudicated: true`. An uncertain item stays
+open for a human and carries the attempt as `review: { by, verdict, reason }`.
+A reviewer never invents a finding for a question it could not answer.
+
+Scanners whose measurement cannot reach an element (a component on an image
+or gradient, a canvas) return such items in `needsReview` rather than dropping
+them.
+
+The consent pre-step below skips controls that accept less than everything
+("Accept necessary only", "Nur notwendige akzeptieren"): clicking one records
+a consent the page did not give.
+
+### Consent pre-step
+
+Before any scanner looks at the page, the pipeline detects a cookie/consent
+overlay, clicks its accept control and waits for it to go, on the shared page
+and on every exclusive tab. A scan of a covered page would otherwise measure
+the dialog. What was seen is recorded as `consent` on the result; the field is
+absent when no overlay was found. The pre-step only dismisses: scanning the
+overlay as a page state of its own comes with the state-scans work.
+
 ## Quick start
 
 Docker:

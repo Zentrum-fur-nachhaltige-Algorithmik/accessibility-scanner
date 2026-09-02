@@ -127,23 +127,20 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
           impact: d.impact || 'moderate',
           severity: 'violation',
           confidence: 'high',
+          adjudicated: true,
           description:
             `${d.help}: text colour ${d.measured.contrast.color} against every stop of the gradient ` +
             `background is below ${threshold}:1 (best stop ${g.max}:1, computed).`,
         });
       } else {
-        uncertain.push({ axeRuleId: d.axeRuleId, selector: d.selector });
-        violations.push({
-          ...common,
-          impact: 'minor',
-          severity: 'info',
-          confidence: 'low',
-          description:
-            `[Needs human review] ${d.help}: gradient/image background` +
-            (g
-              ? ` (contrast ranges ${g.min}:1 to ${g.max}:1 across stops, threshold ${threshold}:1)`
-              : ' could not be resolved') +
-            '.',
+        // Still open: the axe question stays in needsReview, annotated with
+        // what was measured. No finding is invented for an undecided item.
+        uncertain.push({
+          axeRuleId: d.axeRuleId,
+          selector: d.selector,
+          reason: g
+            ? `gradient background: contrast ranges ${g.min}:1 to ${g.max}:1 across stops, threshold ${threshold}:1`
+            : 'gradient/image background could not be resolved',
         });
       }
     }
@@ -193,6 +190,7 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
             wcagCriteria: criteria,
             source: 'llm-incomplete-reviewer',
             confidence: 'medium',
+            adjudicated: true,
             reviewedAxeRule: d.axeRuleId,
             reviewedSelector: d.selector,
           });
@@ -203,41 +201,45 @@ class LLMIncompleteReviewerScanner extends LLMBaseScanner {
             reason: evidence,
           });
         } else {
-          uncertain.push({ axeRuleId: d.axeRuleId, selector: d.selector });
-          violations.push({
-            scannerId: this.id,
-            ruleId: d.axeRuleId,
-            impact: 'minor',
-            severity: 'info',
-            description:
-              `[Needs human review] ${d.help}: automated review could not decide` +
-              (evidence ? `: ${evidence}` : '.'),
-            nodes: [{ selector: d.selector }],
-            helpUrl: d.helpUrl,
-            wcagCriteria: criteria,
-            source: 'llm-incomplete-reviewer',
-            confidence: 'low',
-            reviewedAxeRule: d.axeRuleId,
-            reviewedSelector: d.selector,
+          // Undecided: the item stays a needs-review question for a human.
+          // The pipeline annotates it with this attempt; nothing is emitted.
+          uncertain.push({
+            axeRuleId: d.axeRuleId,
+            selector: d.selector,
+            reason: evidence || 'automated review could not decide',
           });
         }
       }
     }
 
+    // Every reviewed item with its outcome, so the pipeline can close the
+    // question it answered: pass and fail leave needsReview, uncertain stays.
+    const decided = [
+      ...suppressed.map((s) => ({ ...s, verdict: 'pass' })),
+      ...violations.map((v) => ({
+        axeRuleId: v.reviewedAxeRule,
+        selector: v.reviewedSelector,
+        verdict: 'fail',
+        reason: v.description,
+      })),
+      ...uncertain.map((u) => ({ ...u, verdict: 'uncertain' })),
+    ];
+
     return {
       scannerId: this.id,
-      passed: violations.filter((v) => v.severity !== 'info').length === 0,
+      passed: violations.length === 0,
       violations,
       summary: {
-        totalIssues: violations.filter((v) => v.severity !== 'info').length,
+        totalIssues: violations.length,
         llmModel,
         incompleteRules: incomplete.length,
         incompleteNodes: reviewable.length,
         reviewedNodes: allDossiers.length,
         decidedInCode,
         cappedAt: reviewable.length > MAX_NODES ? MAX_NODES : null,
-        promoted: violations.filter((v) => v.severity !== 'info').length,
+        promoted: violations.length,
         suppressed,
+        decided,
         stillUncertain: uncertain.length,
         failedBatches,
         criteriaChecked: [...criteriaSeen].sort(),

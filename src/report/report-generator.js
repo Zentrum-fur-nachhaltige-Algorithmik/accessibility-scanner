@@ -813,6 +813,10 @@ class ReportGenerator {
       (v.description || v.type || v.issue || '').trim()
     );
     if (meaningfulOther.length > 0) sub += `<li><a href="#s-4-5">4.5 Other Findings</a></li>\n`;
+    if ((data.needsReview || []).length > 0) {
+      const n = (data.violations || []).length === 0 ? 1 : meaningfulOther.length > 0 ? 6 : 5;
+      sub += `<li><a href="#s-4-${n}">4.${n} Needs review</a></li>\n`;
+    }
 
     return `
 <nav class="toc" aria-labelledby="toc-heading">
@@ -890,7 +894,8 @@ class ReportGenerator {
 
   generateMethodologySection(data) {
     const hasLlm = data.scanners && Object.keys(data.scanners).some((s) => s.startsWith('llm-'));
-    const hasAaa = (data.violations || []).some((v) => v.wcagLevel === 'AAA');
+    // AAA findings are routed to needsReview by the pipeline, never to violations.
+    const hasAaa = (data.needsReview || []).some((v) => v.aaa || v.wcagLevel === 'AAA');
     const levelLabel = hasAaa ? 'Level AA (with AAA advisories)' : 'Level AA';
     let html = `<p>Assessment conducted via automated scanning against WCAG 2.2 ${levelLabel} success criteria per EN 301 549.</p>`;
     if (hasLlm) {
@@ -940,13 +945,19 @@ class ReportGenerator {
 
   generateFindingsSection(data) {
     if (!data.violations || data.violations.length === 0) {
-      return '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>';
+      const needsReview = this.generateNeedsReviewSection(data, 4, 1);
+      this._tableCounter = needsReview ? 5 : 4;
+      return (
+        '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>\n<p>No violations identified.</p>' +
+        needsReview
+      );
     }
 
-    const aaa = data.violations.filter((v) => v.wcagLevel === 'AAA');
-    const conformance = data.violations.filter((v) => v.wcagLevel !== 'AAA');
-    const groups = this.groupViolationsByPrinciple(conformance);
-    const totalViolations = conformance.length;
+    // Everything in data.violations has verdict 'violation'; AAA advisories and
+    // open questions arrive in data.needsReview and are rendered after the
+    // per-principle tables.
+    const groups = this.groupViolationsByPrinciple(data.violations);
+    const totalViolations = data.violations.length;
     let html = '<h2 id="s-4"><span class="sn">4</span> Detailed Findings</h2>';
     html += `<p>The following ${totalViolations} findings are grouped by WCAG 2.2 principle. Each sub-section lists violations ordered by severity.</p>`;
 
@@ -981,15 +992,78 @@ class ReportGenerator {
       tableCounter++;
     }
 
-    if (aaa.length > 0) {
-      html += `<h3 id="s-4-6"><span class="sn">4.6</span> Hinweise (AAA)</h3>`;
-      html += `<p>${aaa.length} findings concern WCAG 2.2 Level AAA criteria. They are advisory for an AA conformance target and do not affect the score.</p>`;
-      html += this.renderViolationTable(aaa, tableCounter, 'Level AAA advisories');
+    const needsReview = this.generateNeedsReviewSection(
+      data,
+      tableCounter,
+      meaningfulOther.length > 0 ? 6 : 5
+    );
+    if (needsReview) {
+      html += needsReview;
       tableCounter++;
     }
 
     this._tableCounter = tableCounter;
     return html;
+  }
+
+  /**
+   * The findings the scanners could not decide from the page.
+   *
+   * Each carries the question a reviewer has to answer plus the values the
+   * scanner did measure. They are not violations: they appear in no count, no
+   * severity distribution and no per-principle table, only here.
+   */
+  generateNeedsReviewSection(data, tableCounter, subsection) {
+    const items = Array.isArray(data.needsReview) ? data.needsReview : [];
+    if (items.length === 0) return '';
+
+    const aaa = items.filter((v) => v.aaa || v.wcagLevel === 'AAA').length;
+    let html = `<h3 id="s-4-${subsection}"><span class="sn">4.${subsection}</span> Needs review</h3>`;
+    html += `<p>${items.length} findings could not be decided automatically. They are not counted as violations and do not affect the score; a reviewer has to answer the question stated for each.`;
+    if (aaa > 0) {
+      html += ` ${aaa} of them concern WCAG 2.2 Level AAA criteria and are advisory for an AA conformance target.`;
+    }
+    html += '</p>';
+    html += this.renderNeedsReviewTable(items, tableCounter, 'Findings needing review');
+    return html;
+  }
+
+  renderNeedsReviewTable(items, tableNum, captionText) {
+    let html = `<div class="table-responsive" tabindex="0" role="region" aria-label="${this.esc(captionText)}">\n<table>\n`;
+    html += `<caption>Table ${this.esc(tableNum)}: ${this.esc(captionText)}</caption>\n`;
+    html += `<thead><tr><th scope="col" class="col-num">#</th><th scope="col" class="col-criterion">Criterion</th><th scope="col" class="col-source">Source</th><th scope="col">Question</th><th scope="col">Element</th><th scope="col">Measurements</th></tr></thead>\n<tbody>`;
+
+    items.forEach((item, i) => {
+      const dossier = item.dossier || {};
+      const criterion = item.criterion || item.wcagCriteria || item.clause || '';
+      const question = dossier.question || item.description || item.issue || '\u2014';
+      const selector = dossier.element?.selector || this.violationSelector(item);
+      const source = this._classifyViolationSource(item);
+      const sourceBadge = `<span class="source-badge source-${source.key}" title="${source.title}">${source.label}</span>`;
+      const attempt =
+        item.review?.verdict === 'uncertain'
+          ? ` <em>(reviewed by ${this.esc(item.review.by || 'reviewer')}, undecided${item.review.reason ? `: ${this.esc(item.review.reason)}` : ''})</em>`
+          : '';
+      html += `<tr class="row-info"><th scope="row">${i + 1}</th><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${sourceBadge}</td><td>${this.esc(question)}${attempt}</td><td>${selector ? `<code>${this.esc(selector)}</code>` : '\u2014'}</td><td>${this.renderMeasurements(dossier.measurements)}</td></tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  /** Flat "key: value" list of what a scanner measured, escaped. */
+  renderMeasurements(measurements) {
+    if (!measurements || typeof measurements !== 'object') return '\u2014';
+    const entries = Object.entries(measurements).filter(([, v]) => v !== null && v !== undefined);
+    if (entries.length === 0) return '\u2014';
+    return entries
+      .map(([key, value]) => `${this.esc(key)}: ${this.esc(String(value))}`)
+      .join('<br>');
+  }
+
+  /** First selector a finding names, whatever shape it came in. */
+  violationSelector(v) {
+    return v?.element || v?.selector || v?.nodes?.[0]?.selector || '';
   }
 
   renderViolationTable(violations, tableNum, captionText) {
@@ -1005,11 +1079,8 @@ class ReportGenerator {
       const descText = v.description || v.type || v.issue || '';
       const isIncomplete = sev === 'info';
       const desc = this.esc(descText) + (isIncomplete ? ' <em>(Manual review required)</em>' : '');
-      const el = v.element
-        ? `<code>${this.esc(v.element)}</code>`
-        : v.nodes && v.nodes[0] && v.nodes[0].selector
-          ? `<code>${this.esc(v.nodes[0].selector)}</code>`
-          : '\u2014';
+      const selector = this.violationSelector(v);
+      const el = selector ? `<code>${this.esc(selector)}</code>` : '\u2014';
       const rec = this.esc(v.recommendation || v.suggestion || v.axeHelp || '\u2014');
       const source = this._classifyViolationSource(v);
       const sourceBadge = `<span class="source-badge source-${source.key}" title="${source.title}">${source.label}</span>`;

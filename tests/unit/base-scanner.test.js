@@ -78,7 +78,32 @@ describe('BaseScanner', () => {
       nodes: ['img#logo'],
       helpUrl: '',
       wcagCriteria: ['1.1.1'],
+      verdict: 'violation',
     });
+  });
+
+  it('formatViolation carries a needs-review verdict and its dossier', () => {
+    const scanner = new TestScanner();
+    const dossier = {
+      question: 'Is this image decorative?',
+      element: { selector: 'img#logo', html: '<img id="logo">', role: null, name: null },
+      measurements: { width: 40, height: 40 },
+      context: { nearbyText: 'Home' },
+    };
+    const v = scanner.formatViolation(
+      'rule-1',
+      'minor',
+      'Alt text unclear',
+      ['img#logo'],
+      '',
+      'info',
+      {
+        verdict: 'needs-review',
+        dossier,
+      }
+    );
+    expect(v.verdict).toBe('needs-review');
+    expect(v.dossier).toEqual(dossier);
   });
 
   it('scan() can be called on subclass', async () => {

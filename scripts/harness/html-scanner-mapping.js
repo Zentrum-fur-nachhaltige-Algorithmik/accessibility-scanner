@@ -1028,6 +1028,15 @@ const HTML_SCANNER_MAPPING = {
       'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
   },
 
+  'good-map-canvas-gestures.html': {
+    expectedScanners: [],
+    excludedScanners: ['concurrent-input'],
+    testType: 'good',
+    wcagCriteria: ['2.5.6'],
+    description:
+      'A full-screen map canvas with touch-action:none on the body and pan/zoom buttons beside it, plus touchstart listeners whose preventDefault belongs to a nested handler: global-touch-suppressed and touch-only-interaction must stay silent',
+  },
+
   'good-spa-filter-and-tabbar.html': {
     expectedScanners: [],
     excludedScanners: ['dynamic-spa'],

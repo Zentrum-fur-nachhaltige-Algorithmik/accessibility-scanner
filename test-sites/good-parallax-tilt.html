@@ -1,0 +1,56 @@
+<!-- WCAG-TEST
+criterion: 2.5.4
+level: A
+title: Motion Actuation, a parallax header that tilts with the device
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: A hero image whose layers shift with deviceorientation and a card that tilts with devicemotion. Both write a transform into a style attribute and nothing else: no text changes, nothing is shown or hidden and the page does not navigate, so no function is operated by moving the device and 2.5.4 does not apply. The old rule compared document.body.innerHTML.length, which a style attribute write changes. motion-actuation-without-alternative must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .hero { position: relative; height: 220px; overflow: hidden; background: #eef4f7; }
+  .layer { position: absolute; inset: 0; background: linear-gradient(120deg, #cfe0e8, #eef4f7); }
+  .card { border: 2px solid #0b4f6c; padding: 24px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <div class="layer" id="layerBack"></div>
+    <div class="layer" id="layerFront"></div>
+  </div>
+
+  <h1>Studio</h1>
+  <p>Photography, film and sound in one house.</p>
+
+  <div class="card" id="card">
+    <h2>Bookings</h2>
+    <p>Write to bookings@example.org.</p>
+  </div>
+</main>
+
+<script>
+  // Decoration only: a transform written into a style attribute. Nothing the
+  // page says or shows depends on how the device is held.
+  window.addEventListener('deviceorientation', function (event) {
+    var gamma = event.gamma || 0;
+    document.getElementById('layerBack').style.transform = 'translateX(' + gamma * 0.4 + 'px)';
+    document.getElementById('layerFront').style.transform = 'translateX(' + gamma * 0.9 + 'px)';
+  });
+  window.addEventListener('devicemotion', function (event) {
+    var a = event.accelerationIncludingGravity || { x: 0, y: 0 };
+    document.getElementById('card').style.transform =
+      'rotate(' + (a.x || 0) * 0.1 + 'deg)';
+  });
+</script>
+</body>
+</html>

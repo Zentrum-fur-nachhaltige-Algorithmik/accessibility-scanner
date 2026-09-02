@@ -1028,6 +1028,42 @@ const HTML_SCANNER_MAPPING = {
       'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
   },
 
+  'good-swipe-carousel-with-buttons.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.1'],
+    description:
+      'Touch handlers that only make a tap responsive, with the carousel arrows outside the track parent: complex-gesture-only needs an observed path gesture',
+  },
+
+  'good-press-preview-and-ripple.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.2'],
+    description:
+      'A press-and-hold preview undone on the up event and a ripple removed after 400 ms: down-event-activation must stay silent',
+  },
+
+  'good-parallax-tilt.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.4'],
+    description:
+      'Parallax layers and a tilting card that only write a transform: no user-visible state changes, so no function is operated by motion',
+  },
+
+  'good-icon-link-with-equivalent.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'A 16x16 bookmark link beside a large headline link to the same article: the Equivalent exception applies, so target-too-small must stay silent',
+  },
+
   'good-search-first-tabindex.html': {
     expectedScanners: [],
     excludedScanners: ['focus-management'],

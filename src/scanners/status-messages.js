@@ -46,6 +46,7 @@ class StatusMessagesScanner extends BaseScanner {
     const stopDismissingDialogs = BaseScanner.dismissDialogs(page);
 
     let violations;
+    let questions;
     try {
       // The observer has to exist before anything is clicked, or the mutations
       // the clicks cause are not witnessed.
@@ -59,7 +60,9 @@ class StatusMessagesScanner extends BaseScanner {
         await new Promise((resolve) => setTimeout(resolve, this.getObservationWindow(scanOptions)));
       }
 
-      violations = await this.analyzeStatusRegions(page);
+      const analysis = await this.analyzeStatusRegions(page);
+      violations = analysis.violations;
+      questions = analysis.questions;
     } finally {
       stopDismissingDialogs();
     }
@@ -69,6 +72,7 @@ class StatusMessagesScanner extends BaseScanner {
       criteria: ['4.1.3'],
       passed: violations.length === 0,
       violations: violations,
+      needsReview: questions.map((q) => this.toErrorSlotQuestion(q)),
       summary: {
         errorMessageIssues: violations.filter((v) => v.category === 'error-message').length,
         successMessageIssues: violations.filter((v) => v.category === 'success-message').length,
@@ -122,25 +126,55 @@ class StatusMessagesScanner extends BaseScanner {
         window.__a11yStatusStep = 0;
         // Element -> Set of interaction steps in which it changed.
         const mutations = new Map();
+        // Element -> Set of steps in which its TEXT changed. A status message
+        // is text a user reads; a class flip, a re-ordered wrapper or an
+        // inserted empty node changes no message, so the token rules read this
+        // map and not the one above.
+        const textMutations = new Map();
 
-        function record(node) {
+        function into(map, node) {
           if (!node || node.nodeType !== 1) return;
           const tag = node.tagName;
           if (tag === 'HTML' || tag === 'HEAD' || tag === 'BODY') return;
-          if (!mutations.has(node)) mutations.set(node, new Set());
-          mutations.get(node).add(window.__a11yStatusStep);
+          if (!map.has(node)) map.set(node, new Set());
+          map.get(node).add(window.__a11yStatusStep);
+        }
+
+        function record(node) {
+          into(mutations, node);
+        }
+
+        function recordText(node) {
+          into(mutations, node);
+          into(textMutations, node);
+        }
+
+        function carriesText(node) {
+          if (!node) return false;
+          return !!(node.textContent || '').trim();
         }
 
         const observer = new MutationObserver((records) => {
           for (const m of records) {
             if (m.type === 'characterData') {
-              record(m.target.parentElement);
+              recordText(m.target.parentElement);
+              continue;
+            }
+            if (m.type === 'childList') {
+              // Text was written or taken away only when a node carrying text
+              // came or went.
+              let textChanged = false;
+              for (const added of m.addedNodes) if (carriesText(added)) textChanged = true;
+              for (const removed of m.removedNodes) if (carriesText(removed)) textChanged = true;
+              if (textChanged) recordText(m.target);
+              else record(m.target);
+              for (const added of m.addedNodes) {
+                if (carriesText(added)) recordText(added);
+                else record(added);
+              }
               continue;
             }
             record(m.target);
-            if (m.type === 'childList') {
-              for (const added of m.addedNodes) record(added);
-            }
           }
         });
         observer.observe(document.documentElement, {
@@ -196,8 +230,8 @@ class StatusMessagesScanner extends BaseScanner {
           // Evidence: the element changed in at least one step in which no
           // live region was updated and focus did not land on or inside it.
           // A message the user is taken to is not a status message.
-          unannouncedChange(element, announced) {
-            const steps = mutations.get(element);
+          unannouncedChange(element, announced, textOnly) {
+            const steps = (textOnly ? textMutations : mutations).get(element);
             if (!steps) return false;
             for (const step of steps) {
               if (announced.has(step)) continue;
@@ -222,11 +256,17 @@ class StatusMessagesScanner extends BaseScanner {
           // it.
           isDescribedbyErrorSlot(element) {
             if (!element || !element.id || element.textContent.trim()) return false;
-            const referrer = document.querySelector(
+            if (!this.errorSlotReferrer(element)) return false;
+            return !document.querySelector(LIVE_SELECTOR);
+          },
+
+          // The control that points at the slot, so a reviewer sees the field
+          // the message belongs to.
+          errorSlotReferrer(element) {
+            if (!element || !element.id) return null;
+            return document.querySelector(
               '[aria-describedby~="' + element.id + '"], [aria-errormessage="' + element.id + '"]'
             );
-            if (!referrer) return false;
-            return !document.querySelector(LIVE_SELECTOR);
           },
         };
       })();
@@ -287,8 +327,28 @@ class StatusMessagesScanner extends BaseScanner {
         }
       }
 
-      const buttons = await page.$$('button:not([type="submit"]), [role="button"]');
+      // Controls that change the view rather than report on an action. A tab
+      // switch, an accordion, a menu and a "load more" all insert content, and
+      // none of it is a status message: expanded/collapsed state and new page
+      // content are both outside 4.1.3. Clicking them and then reporting what
+      // appeared is how a tab bar became an unannounced notification.
+      const buttons = await page.$$(
+        'button:not([type="submit"]):not([aria-expanded]):not([aria-haspopup]):not([role="tab"]), ' +
+          '[role="button"]:not([aria-expanded]):not([aria-haspopup])'
+      );
+      const VIEW_CONTROL_NAME =
+        /load\s*more|show\s*more|mehr\s*(laden|anzeigen)|weitere|next|previous|zur(ü|ue)ck|weiter|tab|men(u|ü)|toggle|(auf|zu)klappen|expand|collapse|filter|sortier|sort/i;
       for (const button of buttons.slice(0, 10)) {
+        const isViewControl = await button
+          .evaluate(
+            (el, pattern) =>
+              new RegExp(pattern.source, pattern.flags).test(
+                (el.getAttribute('aria-label') || el.textContent || '').trim()
+              ),
+            { source: VIEW_CONTROL_NAME.source, flags: VIEW_CONTROL_NAME.flags }
+          )
+          .catch(() => false);
+        if (isViewControl) continue;
         try {
           await nextStep();
           await button.click();
@@ -321,6 +381,9 @@ class StatusMessagesScanner extends BaseScanner {
       ${BaseScanner.visibilityFilterScript}
       (function () {
         const violations = [];
+        // Suspects the page cannot settle: an empty error slot that has shown
+        // nothing yet. Returned as needs-review questions, never as violations.
+        const questions = [];
         const helpers = window.__a11yStatusHelpers;
         const announced = helpers.announcedSteps();
         const reported = new Set();
@@ -350,7 +413,10 @@ class StatusMessagesScanner extends BaseScanner {
         const CATEGORIES = [
           {
             category: 'error-message',
-            words: ['error', 'errors', 'invalid', 'danger'],
+            // 'danger' and 'invalid' are Bootstrap decoration: .alert-danger
+            // colours a static box and .invalid-feedback wraps a field whether
+            // or not an error was ever shown.
+            words: ['error', 'errors'],
             severity: 'serious',
             description: 'Error message appeared without being announced in a live region',
             impact: 'Error messages are not announced to screen readers',
@@ -358,7 +424,9 @@ class StatusMessagesScanner extends BaseScanner {
           },
           {
             category: 'success-message',
-            words: ['success', 'confirmation', 'confirmed', 'saved', 'submitted'],
+            // 'confirmation' and 'saved' also name a confirmation page section
+            // and a saved-items list, neither of which is a message.
+            words: ['success', 'confirmed', 'submitted'],
             severity: 'moderate',
             description: 'Success message appeared without being announced in a live region',
             impact: 'Success confirmations are not announced to screen readers',
@@ -374,18 +442,13 @@ class StatusMessagesScanner extends BaseScanner {
           },
           {
             category: 'dynamic-content',
-            words: [
-              'notification',
-              'notifications',
-              'toast',
-              'alert',
-              'message',
-              'notice',
-              'status',
-              'result',
-              'results',
-              'feedback',
-            ],
+            // 'result', 'results' and 'message' name the inserted content
+            // itself, which Understanding 4.1.3 excludes: the search results
+            // are not a status message, the sentence describing the search is.
+            words: ['notification', 'notifications', 'toast', 'alert', 'notice', 'status', 'feedback'],
+            // and the container has to read like a message rather than be the
+            // result list (see looksLikeMessage below).
+            messageTextOnly: true,
             severity: 'moderate',
             description: 'Notification appeared without being announced in a live region',
             impact: 'Notifications are not announced to screen readers',
@@ -415,6 +478,15 @@ class StatusMessagesScanner extends BaseScanner {
           });
         }
 
+        // Content a user reads as a message: a short run of text, not the list,
+        // table or set of cards a query returned. Understanding 4.1.3 keeps the
+        // inserted results out of scope and only counts the text that describes
+        // their arrival ("18 results returned").
+        function looksLikeMessage(element) {
+          if (element.querySelector('ul, ol, table, article, li, form')) return false;
+          return element.textContent.trim().length <= 200;
+        }
+
         const named = Array.from(document.querySelectorAll('[class], [id]'));
 
         for (const meta of CATEGORIES) {
@@ -430,12 +502,29 @@ class StatusMessagesScanner extends BaseScanner {
             if (!__isRendered(element)) continue;
 
             const hasText = !!element.textContent.trim();
-            const changed = hasText && helpers.unannouncedChange(element, announced);
-            const errorSlot =
-              meta.category === 'error-message' && helpers.isDescribedbyErrorSlot(element);
-            if (!changed && !errorSlot) continue;
+            const changed = hasText && helpers.unannouncedChange(element, announced, true);
+            if (changed && meta.messageTextOnly && !looksLikeMessage(element)) continue;
 
-            report(element, meta, { unannouncedChange: changed, describedbyErrorSlot: errorSlot });
+            if (changed) {
+              report(element, meta, { unannouncedChange: true, describedbyErrorSlot: false });
+              continue;
+            }
+
+            // An empty slot a field points at with aria-describedby has shown
+            // nothing yet, so nothing has failed 4.1.3. What is written into it
+            // later, and whether the page moves focus there, is the question.
+            if (meta.category === 'error-message' && helpers.isDescribedbyErrorSlot(element)) {
+              const referrer = helpers.errorSlotReferrer(element);
+              questions.push({
+                type: 'error-slot-not-announced',
+                element: getElementSelector(element),
+                html: element.outerHTML.slice(0, 200),
+                field: referrer ? getElementSelector(referrer) : null,
+                fieldHtml: referrer ? referrer.outerHTML.slice(0, 200) : null,
+                slotId: element.id,
+                pageHasLiveRegion: false,
+              });
+            }
           }
         }
 
@@ -448,6 +537,18 @@ class StatusMessagesScanner extends BaseScanner {
           if (helpers.hasLiveRegionAttributes(progress)) continue;
           if (progress.hasAttribute('aria-describedby')) continue;
           if (!__isRendered(progress)) continue;
+          // Role plus property already exposes the progress the clause asks
+          // for: a native <progress value> and a role="progressbar" carrying
+          // aria-valuenow or aria-valuetext are read out by assistive
+          // technology without a live region. What is left is a progress drawn
+          // on screen with no programmatic value at all.
+          if (progress.tagName === 'PROGRESS' && progress.hasAttribute('value')) continue;
+          if (
+            progress.hasAttribute('aria-valuenow') ||
+            progress.hasAttribute('aria-valuetext')
+          ) {
+            continue;
+          }
           if (!helpers.unannouncedChange(progress, announced)) continue;
 
           report(
@@ -464,9 +565,38 @@ class StatusMessagesScanner extends BaseScanner {
           );
         }
 
-        return violations;
+        return { violations, questions };
       })();
     `);
+  }
+
+  /**
+   * An empty error slot a field points at: the page has not shown a message
+   * there, so nothing has failed yet. The reviewer answers what happens when
+   * the field is wrong.
+   */
+  toErrorSlotQuestion(q) {
+    return this.formatViolation(
+      'error-slot-not-announced',
+      'moderate',
+      `The field ${q.field || 'on this page'} points at the empty container ${q.element} for its error message, and the page carries no live region`,
+      [{ selector: q.element, html: q.html }],
+      'https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html',
+      'info',
+      {
+        verdict: 'needs-review',
+        dossier: {
+          question: `Does an error appear in ${q.element} without focus moving to it, and is it announced?`,
+          element: { selector: q.element, html: q.html, role: null, name: null },
+          measurements: {
+            slotEmptyAtLoad: true,
+            slotId: q.slotId,
+            pageHasLiveRegion: q.pageHasLiveRegion,
+          },
+          context: { field: q.field, fieldHtml: q.fieldHtml },
+        },
+      }
+    );
   }
 
   /**

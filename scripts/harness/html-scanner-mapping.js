@@ -1028,6 +1028,33 @@ const HTML_SCANNER_MAPPING = {
       'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
   },
 
+  'good-bootstrap-error-decoration.html': {
+    expectedScanners: [],
+    excludedScanners: ['status-messages'],
+    testType: 'good',
+    wcagCriteria: ['4.1.3'],
+    description:
+      'A static .alert-danger box, an .invalid-feedback wrapper that only gains a class, and an empty aria-describedby error slot that becomes a needs-review question: missing-live-region must report nothing',
+  },
+
+  'good-search-results-and-tabs.html': {
+    expectedScanners: [],
+    excludedScanners: ['status-messages'],
+    testType: 'good',
+    wcagCriteria: ['4.1.3'],
+    description:
+      'Inserted search results, a tab switch swapping a .notification-panel and a saved-items list: none of them is a status message',
+  },
+
+  'good-progress-with-value.html': {
+    expectedScanners: [],
+    excludedScanners: ['status-messages'],
+    testType: 'good',
+    wcagCriteria: ['4.1.3'],
+    description:
+      'A native <progress value> and a role="progressbar" with aria-valuenow and aria-valuetext: role plus property already exposes the progress',
+  },
+
   'good-keydown-analytics-attribute.html': {
     expectedScanners: [],
     excludedScanners: ['keyboard-navigation'],

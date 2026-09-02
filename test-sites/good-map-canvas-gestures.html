@@ -1,0 +1,94 @@
+<!-- WCAG-TEST
+criterion: 2.5.6
+level: AAA
+title: Concurrent Input Mechanisms, a full-screen map canvas
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: concurrent-input
+description: A map application that is one canvas filling the viewport and sets touch-action:none on the body so its own panning and zooming work, with buttons beside it that pan and zoom from mouse and keyboard. The restriction is essential to the function, which 2.5.6 exempts. The page also carries two touchstart listeners whose preventDefault sits in a nested function belonging to another event: the map installs a touchmove handler, and the legend installs a keydown handler. Neither outer listener cancels the touch it was called for. global-touch-suppressed and touch-only-interaction must both stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Route planner (GOOD)</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { font-family: Arial, sans-serif; color: #1b1b1b; background: #fff; touch-action: none; }
+  #map { display: block; width: 100vw; height: 100vh; background: #dbe7ec; }
+  .controls { position: fixed; top: 12px; left: 12px; background: #fff; border: 2px solid #0b4f6c; padding: 8px; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 12px; margin: 2px; cursor: pointer; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<canvas id="map" width="1200" height="800" role="img" aria-label="Map of the planned route"></canvas>
+
+<div class="controls">
+  <h1>Route planner</h1>
+  <p>
+    <button type="button" id="panLeft">Pan left</button>
+    <button type="button" id="panRight">Pan right</button>
+    <button type="button" id="zoomIn">Zoom in</button>
+    <button type="button" id="zoomOut">Zoom out</button>
+  </p>
+  <div id="legend" tabindex="0" role="button">Show the legend</div>
+</div>
+
+<script>
+  var map = document.getElementById('map');
+  var ctx = map.getContext('2d');
+  var offset = 0;
+  var scale = 1;
+
+  function draw() {
+    ctx.clearRect(0, 0, map.width, map.height);
+    ctx.strokeStyle = '#0b4f6c';
+    ctx.lineWidth = 6 * scale;
+    ctx.beginPath();
+    ctx.moveTo(100 + offset, 100);
+    ctx.lineTo(500 + offset, 400);
+    ctx.lineTo(900 + offset, 200);
+    ctx.stroke();
+  }
+  draw();
+
+  // The outer listener installs the move handler; the preventDefault belongs to
+  // that nested handler, not to this one.
+  map.addEventListener('touchstart', function () {
+    map.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+      offset += 1;
+      draw();
+    });
+  });
+
+  // The same panning from a click, so no modality is taken away.
+  map.addEventListener('click', function () {
+    offset += 20;
+    draw();
+  });
+
+  // A legend that opens on a tap. Its touchstart handler cancels nothing: the
+  // preventDefault below belongs to the keyboard handler it registers, which is
+  // a different function and a different event.
+  var legend = document.getElementById('legend');
+  legend.addEventListener('touchstart', function () {
+    legend.setAttribute('data-open', 'true');
+    legend.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        legend.setAttribute('data-open', 'true');
+      }
+    });
+  });
+
+  document.getElementById('panLeft').addEventListener('click', function () { offset -= 40; draw(); });
+  document.getElementById('panRight').addEventListener('click', function () { offset += 40; draw(); });
+  document.getElementById('zoomIn').addEventListener('click', function () { scale += 0.2; draw(); });
+  document.getElementById('zoomOut').addEventListener('click', function () { scale = Math.max(0.2, scale - 0.2); draw(); });
+</script>
+</body>
+</html>

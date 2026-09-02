@@ -1,0 +1,97 @@
+<!-- WCAG-TEST
+criterion: 2.4.2, 2.4.3
+level: A
+title: Page Titled, a filter that writes the query string and a tab bar without links
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: dynamic-spa
+description: A product list whose filter links call history.pushState to record the selection in location.search and relabel the h1, keeping the same page, the same main region and the same title, and a tab bar built from div.nav-link elements with a data-route attribute and no href that does the same. A query string is not a new page and an element with a router class and no href is not a link, so neither is a view change. missing-page-title-update and no-focus-management-route-change must both stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bicycle parts</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; line-height: 1.5; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  a { color: #0b4f6c; }
+  .nav-link { display: inline-block; padding: 8px 14px; background: #e7eef2; color: #16323f; cursor: pointer; margin-right: 4px; }
+  .nav-link[aria-selected="true"] { background: #0b4f6c; color: #fff; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<nav aria-label="Main">
+  <a href="/good-spa-filter-and-tabbar.html">Parts</a>
+</nav>
+
+<main id="shell">
+  <h1>Bicycle parts</h1>
+
+  <div role="tablist" aria-label="Categories">
+    <div class="nav-link" role="tab" tabindex="0" data-route="brakes" aria-selected="true" aria-controls="panel">Brakes</div>
+    <div class="nav-link" role="tab" tabindex="-1" data-route="wheels" aria-selected="false" aria-controls="panel">Wheels</div>
+  </div>
+
+  <div id="panel" role="tabpanel">
+    <p>Brake pads, cables and levers.</p>
+  </div>
+
+  <h2>Filter</h2>
+  <p>
+    <a href="?filter=instock" data-filter="instock">In stock</a>
+    <a href="?filter=all" data-filter="all">All</a>
+  </p>
+  <ul id="list">
+    <li>Brake pad set</li>
+    <li>Brake cable</li>
+  </ul>
+</main>
+
+<script>
+  // The filter records the selection in the query string and relabels the
+  // heading. The page, its main region and its title are the same page they
+  // were, so the title is right as it stands and no focus was destroyed.
+  document.querySelectorAll('[data-filter]').forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      var filter = link.dataset.filter;
+      history.pushState({ filter: filter }, '', '?filter=' + filter);
+      document.querySelector('h1').textContent =
+        filter === 'instock' ? 'Bicycle parts, in stock' : 'Bicycle parts';
+      var list = document.getElementById('list');
+      list.innerHTML =
+        filter === 'instock'
+          ? '<li>Brake pad set</li>'
+          : '<li>Brake pad set</li><li>Brake cable</li>';
+    });
+  });
+
+  // A tab bar. The tabs carry a router class and a data-route attribute but no
+  // href, so they are not links; they record the open tab in the query string
+  // and relabel the heading, and the page stays the page it was.
+  var panel = document.getElementById('panel');
+  document.querySelectorAll('.nav-link').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.nav-link').forEach(function (t) {
+        t.setAttribute('aria-selected', 'false');
+        t.tabIndex = -1;
+      });
+      tab.setAttribute('aria-selected', 'true');
+      tab.tabIndex = 0;
+      history.pushState({ tab: tab.dataset.route }, '', '?tab=' + tab.dataset.route);
+      document.querySelector('h1').textContent =
+        tab.dataset.route === 'wheels' ? 'Bicycle wheels' : 'Bicycle parts';
+      panel.innerHTML =
+        tab.dataset.route === 'wheels'
+          ? '<p>Rims, spokes and hubs.</p>'
+          : '<p>Brake pads, cables and levers.</p>';
+    });
+  });
+</script>
+</body>
+</html>

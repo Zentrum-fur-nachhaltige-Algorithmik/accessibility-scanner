@@ -384,11 +384,12 @@ const HTML_SCANNER_MAPPING = {
 
   // Scrollable Content
   'bad-scrollable-content.html': {
-    expectedScanners: ['keyboard-navigation', 'focus-management'],
+    expectedScanners: ['focus-management'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
     wcagCriteria: ['2.1.1'],
-    description: 'Scrollable content regions not keyboard accessible',
+    description:
+      'Scrollable content regions not keyboard accessible: axe scrollable-region-focusable owns this, keyboard-navigation deleted its duplicate emit',
   },
 
   // Text Spacing
@@ -402,7 +403,7 @@ const HTML_SCANNER_MAPPING = {
 
   // Skip Links
   'bad-skip-links.html': {
-    expectedScanners: ['keyboard-navigation', 'page-structure'],
+    expectedScanners: ['page-structure'],
     excludedScanners: ['color-contrast', 'use-of-color'],
     testType: 'bad',
     wcagCriteria: ['2.4.1'],
@@ -585,7 +586,7 @@ const HTML_SCANNER_MAPPING = {
 
   'good-skip-links.html': {
     expectedScanners: [],
-    excludedScanners: ['keyboard-navigation', 'page-structure'],
+    excludedScanners: ['page-structure'],
     testType: 'good',
     wcagCriteria: ['2.4.1'],
     description: 'Functional skip navigation implementation',
@@ -1024,7 +1025,133 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['2.1.1'],
     description:
-      'Table wrapper with a two pixel overflow, a scroller full of links, a pre with tabindex="0" and a display:none drawer: scrollable-content-not-keyboard-accessible must stay silent',
+      'Table wrapper with a two pixel overflow, a scroller full of links, a pre with tabindex="0" and a display:none drawer: the deleted scrollable-content-not-keyboard-accessible rule must not come back',
+  },
+
+  'good-dialog-close-controls.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.2'],
+    description:
+      'Two modal dialogs that cycle Tab and ignore Escape, closed by a role="button" answering Space and by an <a> without href answering Enter: keyboard-trap must stay silent',
+  },
+
+  'good-widget-exit-by-escape.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.2'],
+    description:
+      'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
+  },
+
+  'good-swipe-carousel-with-buttons.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.1'],
+    description:
+      'Touch handlers that only make a tap responsive, with the carousel arrows outside the track parent: complex-gesture-only needs an observed path gesture',
+  },
+
+  'good-press-preview-and-ripple.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.2'],
+    description:
+      'A press-and-hold preview undone on the up event and a ripple removed after 400 ms: down-event-activation must stay silent',
+  },
+
+  'good-parallax-tilt.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.4'],
+    description:
+      'Parallax layers and a tilting card that only write a transform: no user-visible state changes, so no function is operated by motion',
+  },
+
+  'good-icon-link-with-equivalent.html': {
+    expectedScanners: [],
+    excludedScanners: ['input-modalities'],
+    testType: 'good',
+    wcagCriteria: ['2.5.8'],
+    description:
+      'A 16x16 bookmark link beside a large headline link to the same article: the Equivalent exception applies, so target-too-small must stay silent',
+  },
+
+  'good-search-first-tabindex.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A header whose search field carries tabindex="1" and is painted first: the backwards DOM step preserves meaning and operability, so illogical-tab-order must stay silent',
+  },
+
+  'good-dialog-slow-transition.html': {
+    expectedScanners: [],
+    excludedScanners: ['focus-management'],
+    testType: 'good',
+    wcagCriteria: ['2.4.3'],
+    description:
+      'A dialog that fades in over 1200 ms and moves focus in its transitionend handler: focus-lost must wait for the transition instead of reading focus at 500 ms',
+  },
+
+  'good-map-canvas-gestures.html': {
+    expectedScanners: [],
+    excludedScanners: ['concurrent-input'],
+    testType: 'good',
+    wcagCriteria: ['2.5.6'],
+    description:
+      'A full-screen map canvas with touch-action:none on the body and pan/zoom buttons beside it, plus touchstart listeners whose preventDefault belongs to a nested handler: global-touch-suppressed and touch-only-interaction must stay silent',
+  },
+
+  'good-spa-filter-and-tabbar.html': {
+    expectedScanners: [],
+    excludedScanners: ['dynamic-spa'],
+    testType: 'good',
+    wcagCriteria: ['2.4.2', '2.4.3'],
+    description:
+      'A filter that writes location.search and relabels the h1, and a tab bar of div.nav-link elements without href: neither is a view change, so missing-page-title-update must stay silent',
+  },
+
+  'good-bootstrap-error-decoration.html': {
+    expectedScanners: [],
+    excludedScanners: ['status-messages'],
+    testType: 'good',
+    wcagCriteria: ['4.1.3'],
+    description:
+      'A static .alert-danger box, an .invalid-feedback wrapper that only gains a class, and an empty aria-describedby error slot that becomes a needs-review question: missing-live-region must report nothing',
+  },
+
+  'good-search-results-and-tabs.html': {
+    expectedScanners: [],
+    excludedScanners: ['status-messages'],
+    testType: 'good',
+    wcagCriteria: ['4.1.3'],
+    description:
+      'Inserted search results, a tab switch swapping a .notification-panel and a saved-items list: none of them is a status message',
+  },
+
+  'good-progress-with-value.html': {
+    expectedScanners: [],
+    excludedScanners: ['status-messages'],
+    testType: 'good',
+    wcagCriteria: ['4.1.3'],
+    description:
+      'A native <progress value> and a role="progressbar" with aria-valuenow and aria-valuetext: role plus property already exposes the progress',
+  },
+
+  'good-keydown-analytics-attribute.html': {
+    expectedScanners: [],
+    excludedScanners: ['keyboard-navigation'],
+    testType: 'good',
+    wcagCriteria: ['2.1.4'],
+    description:
+      'A document keydown listener that only writes a class and a data attribute: character-key-shortcut must stay silent',
   },
 
   'good-composite-widget-tabindex.html': {
@@ -1033,7 +1160,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['2.1.1'],
     description:
-      'Menu items all at tabindex="-1", a tabpanel and a named section at tabindex="0", and a tabindex="-1" chevron inside a card link: focusable-element must stay silent',
+      'Menu items all at tabindex="-1", a tabpanel and a named section at tabindex="0", a tabindex="-1" chevron inside a card link, and an unnamed tabindex="0" route target that is a 4.1.2 question rather than a 2.1.1 failure: focusable-element must report no violation',
   },
 
   'good-accesskeys-and-widget-keys.html': {

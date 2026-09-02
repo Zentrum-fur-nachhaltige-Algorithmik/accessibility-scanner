@@ -1,0 +1,91 @@
+<!-- WCAG-TEST
+criterion: 2.5.1
+level: A
+title: Pointer Gestures, a tap-responsive carousel with arrow buttons
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: A carousel track that registers touchstart, touchmove and touchend to make a tap responsive and to keep the browser's own scrolling, without acting on the path: swiping it does nothing a tap does not. Its previous and next buttons sit in the carousel beside the track's own viewport, not inside the track's parent, which is where a component keeps them. A second box carries the same three handlers with no control anywhere in its section. The old rule read the co-occurrence of the three touch events as a path gesture and looked for an alternative in parentElement only. complex-gesture-only must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offers carousel (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .carousel { border: 2px solid #0b4f6c; padding: 12px; }
+  .carousel-controls { margin-bottom: 8px; }
+  .track { display: flex; gap: 12px; overflow-x: auto; }
+  .slide { min-width: 220px; background: #eef4f7; padding: 16px; }
+  .stamp { border: 2px dashed #4a4a4a; padding: 32px; text-align: center; }
+  .is-touched { background: #eef4f7; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Offers</h1>
+
+  <section class="carousel" aria-label="Offers">
+    <div class="carousel-controls">
+      <button type="button" id="prev" aria-controls="track">Previous offer</button>
+      <button type="button" id="next" aria-controls="track">Next offer</button>
+    </div>
+    <div class="viewport">
+    <div class="track" id="track">
+      <div class="slide"><h2>Winter tyres</h2><p>Fitted while you wait.</p></div>
+      <div class="slide"><h2>Brake service</h2><p>Pads and discs checked.</p></div>
+      <div class="slide"><h2>Battery test</h2><p>Free with every service.</p></div>
+    </div>
+    </div>
+  </section>
+
+  <section aria-label="Signature">
+    <h2>Signature preview</h2>
+    <p>Touch the box to see the signature. There is nothing to swipe.</p>
+    <div class="stamp" id="stamp">Signature</div>
+  </section>
+</main>
+
+<script>
+  var track = document.getElementById('track');
+
+  // Touch handlers that keep a tap responsive and leave the browser's own
+  // scrolling alone. Nothing here reads a path: a swipe does what a tap does.
+  track.ontouchstart = function () {
+    track.classList.add('is-touched');
+  };
+  track.ontouchmove = function () {
+    track.classList.add('is-touched');
+  };
+  track.ontouchend = function () {
+    track.classList.remove('is-touched');
+  };
+
+  // The same three handlers on a box that has no control anywhere near it. A
+  // swipe over it still does exactly what a tap does.
+  var stamp = document.getElementById('stamp');
+  stamp.ontouchstart = function () {
+    stamp.classList.add('is-touched');
+  };
+  stamp.ontouchmove = function () {
+    stamp.classList.add('is-touched');
+  };
+  stamp.ontouchend = function () {
+    stamp.classList.remove('is-touched');
+  };
+
+  document.getElementById('prev').addEventListener('click', function () {
+    track.scrollLeft -= 232;
+  });
+  document.getElementById('next').addEventListener('click', function () {
+    track.scrollLeft += 232;
+  });
+</script>
+</body>
+</html>

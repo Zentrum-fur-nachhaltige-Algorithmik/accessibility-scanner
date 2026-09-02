@@ -1,0 +1,93 @@
+<!-- WCAG-TEST
+criterion: 2.1.2
+level: A
+title: No Keyboard Trap, dialogs whose close control is not an Enter-activated button
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: Two dialogs that are open from the first paint, cycle Tab inside themselves and ignore Escape, which is the correct modal pattern. The first is closed by a role="button" close control that answers the Space key, the second by an <a> without href that answers Enter. The old probe pressed Enter on keyboard-focusable controls only, so it saw no way out and reported both as keyboard traps. keyboard-trap must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dialog close controls (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .dialog { border: 2px solid #0b4f6c; padding: 16px; margin: 24px 0; max-width: 520px; }
+  .dialog h2 { margin-top: 0; }
+  input, button, .btn { font: inherit; }
+  input { border: 2px solid #4a4a4a; padding: 6px; }
+  button, .btn { background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  .btn { display: inline-block; }
+  a { color: #0b4f6c; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dialogs with a close control the keyboard reaches</h1>
+
+  <div class="dialog" id="spaceDialog" role="dialog" aria-modal="true" aria-labelledby="spaceTitle">
+    <h2 id="spaceTitle">Newsletter</h2>
+    <label for="mail">Email address</label>
+    <input type="email" id="mail">
+    <p>
+      <button type="button" id="subscribe">Subscribe</button>
+      <span class="btn" role="button" tabindex="0" id="spaceClose">Close</span>
+    </p>
+  </div>
+
+  <div class="dialog" id="anchorDialog" role="dialog" aria-modal="true" aria-labelledby="anchorTitle">
+    <h2 id="anchorTitle">Cookie settings</h2>
+    <label for="analytics"><input type="checkbox" id="analytics"> Allow analytics</label>
+    <p>
+      <button type="button" id="save">Save</button>
+      <a class="btn" id="anchorClose" role="button">Close</a>
+    </p>
+  </div>
+
+  <p><a href="#spaceTitle">Back to the newsletter dialog</a></p>
+</main>
+
+<script>
+  // Both dialogs cycle Tab inside themselves, which is what a modal dialog is
+  // supposed to do, and neither listens for Escape.
+  function trap(dialog) {
+    dialog.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var items = [].slice.call(dialog.querySelectorAll('input, button, [tabindex="0"]'));
+      if (items.length === 0) return;
+      var i = items.indexOf(document.activeElement);
+      var next = e.shiftKey ? i - 1 : i + 1;
+      if (next < 0) next = items.length - 1;
+      if (next >= items.length) next = 0;
+      e.preventDefault();
+      items[next].focus();
+    });
+  }
+  var spaceDialog = document.getElementById('spaceDialog');
+  var anchorDialog = document.getElementById('anchorDialog');
+  trap(spaceDialog);
+  trap(anchorDialog);
+
+  // Close control that answers Space, the key a role="button" is operated with.
+  var spaceClose = document.getElementById('spaceClose');
+  spaceClose.addEventListener('click', function () { spaceDialog.remove(); });
+  spaceClose.addEventListener('keydown', function (e) {
+    if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); spaceDialog.remove(); }
+  });
+
+  // Close control written as an <a> without href, which takes no focus of its
+  // own but is operated with Enter once focus is on it.
+  var anchorClose = document.getElementById('anchorClose');
+  anchorClose.addEventListener('click', function () { anchorDialog.remove(); });
+  anchorClose.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); anchorDialog.remove(); }
+  });
+</script>
+</body>
+</html>

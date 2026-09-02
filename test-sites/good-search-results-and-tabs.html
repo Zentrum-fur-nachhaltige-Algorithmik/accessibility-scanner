@@ -1,0 +1,100 @@
+<!-- WCAG-TEST
+criterion: 4.1.3
+level: AA
+title: Status Messages, inserted results, a tab switch and a saved-items list
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: status-messages
+description: A search that inserts its result list into a .results-status container without any sentence describing it, a tab bar whose tabs swap a .notification-panel, and a "Save this search" button that appends a line to a .saved-items list. Understanding 4.1.3 keeps the inserted results themselves out of scope, keeps expanded and collapsed state out of scope, and a saved-items list is not a confirmation message. missing-live-region must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search results, tabs and saved items (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  [role="tab"] { background: #e7eef2; color: #16323f; margin-right: 4px; }
+  [role="tab"][aria-selected="true"] { background: #0b4f6c; color: #fff; }
+  input { font: inherit; border: 2px solid #4a4a4a; padding: 6px; width: 240px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Course catalogue</h1>
+
+  <form id="searchForm">
+    <label for="q">Search courses</label>
+    <input type="text" id="q" value="statistics">
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="results-status" id="resultsStatus">
+    <ul id="resultList"></ul>
+  </div>
+
+  <h2>Updates</h2>
+  <div role="tablist" aria-label="Update channels">
+    <button type="button" role="tab" id="tabCourses" aria-selected="true" aria-controls="notificationPanel">Courses</button>
+    <button type="button" role="tab" id="tabExams" aria-selected="false" aria-controls="notificationPanel" tabindex="-1">Exams</button>
+  </div>
+  <div class="notification-panel" id="notificationPanel" role="tabpanel" aria-labelledby="tabCourses">
+    <p>Two new courses opened for registration this week.</p>
+  </div>
+
+  <h2>Saved searches</h2>
+  <p><button type="button" id="saveSearch">Save this search</button></p>
+  <div class="saved-items" id="savedItems">
+    <p>Nothing saved yet.</p>
+  </div>
+</main>
+
+<script>
+  // The result list is inserted and nothing else appears. Understanding 4.1.3
+  // keeps the results themselves out of scope: only a sentence describing the
+  // completion of the search would be a status message, and there is none.
+  document.getElementById('searchForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var list = document.getElementById('resultList');
+    list.innerHTML = '';
+    ['Statistics I', 'Statistics II', 'Applied statistics'].forEach(function (name) {
+      var li = document.createElement('li');
+      li.textContent = name;
+      list.appendChild(li);
+    });
+  });
+
+  // A tab switch changes which panel is shown. Expanded and collapsed state is
+  // outside 4.1.3.
+  var panel = document.getElementById('notificationPanel');
+  [['tabCourses', 'Two new courses opened for registration this week.', 'Courses'],
+   ['tabExams', 'Exam results for the winter term are published on Monday.', 'Exams']]
+    .forEach(function (entry) {
+      document.getElementById(entry[0]).addEventListener('click', function () {
+        document.querySelectorAll('[role="tab"]').forEach(function (t) {
+          t.setAttribute('aria-selected', 'false');
+          t.tabIndex = -1;
+        });
+        this.setAttribute('aria-selected', 'true');
+        this.tabIndex = 0;
+        panel.setAttribute('aria-labelledby', entry[0]);
+        panel.innerHTML = '<p>' + entry[1] + '</p>';
+      });
+    });
+
+  // Saving appends a line to a list of saved searches. The list is content, not
+  // a confirmation message.
+  document.getElementById('saveSearch').addEventListener('click', function () {
+    var box = document.getElementById('savedItems');
+    box.innerHTML = '<ul><li>statistics</li></ul>';
+  });
+</script>
+</body>
+</html>

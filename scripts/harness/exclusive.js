@@ -108,7 +108,11 @@ const EXCLUSIVE_SCANNERS = {
   'dynamic-spa': {
     module: '../../src/scanners/dynamic-spa',
     criteria: ['2.4.2', '2.4.3'],
-    files: ['good-spa-route-change.html', 'bad-spa-route-change.html'],
+    files: [
+      'good-spa-route-change.html',
+      'good-spa-filter-and-tabbar.html',
+      'bad-spa-route-change.html',
+    ],
   },
 };
 
@@ -123,6 +127,18 @@ for (const [id, def] of Object.entries(EXCLUSIVE_SCANNERS)) {
     CRITERION_TO_SCANNER[c] = id;
   }
 }
+
+/**
+ * Fixtures whose declared criterion an axe rule owns, listed against the
+ * exclusive scanner the criterion would otherwise route them to. The pair is
+ * left out of the plan: scoring a scanner on a defect it deliberately does not
+ * emit measures nothing.
+ * bad-scrollable-content.html fails 2.1.1 through axe `scrollable-region-focusable`,
+ * which runs in every profile; keyboard-navigation dropped its duplicate emit.
+ */
+const AXE_OWNED_FIXTURES = {
+  'bad-scrollable-content.html': ['keyboard-navigation'],
+};
 
 /** Fixture file -> the scanners that claim it. */
 const FILE_TO_SCANNERS = {};
@@ -188,6 +204,7 @@ async function main() {
     }
 
     for (const sid of scannerIds) {
+      if ((AXE_OWNED_FIXTURES[file] || []).includes(sid)) continue;
       testPlan.push({
         file,
         scanner: sid,

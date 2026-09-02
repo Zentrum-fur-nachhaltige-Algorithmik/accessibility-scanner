@@ -3,10 +3,10 @@ criterion: 2.4.2, 2.4.3
 level: A
 title: Client side routing that keeps the old title and destroys focus
 test_type: bad
-expected_violations: 2
+expected_violations: 1
 testable_by: dom
 scanners: dynamic-spa
-description: A router that calls history.pushState, re-renders the whole application shell including the navigation, never touches document.title and moves focus nowhere. The activated link is removed from the document, so focus falls back to the body.
+description: A router that calls history.pushState onto a new pathname, re-renders the whole application shell including the navigation and its main region, never touches document.title and moves focus nowhere. The activated link is removed from the document, so focus falls back to the body: the title is the 2.4.2 violation, and where focus landed is the needs-review question.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +31,7 @@ description: A router that calls history.pushState, re-renders the whole applica
 
   function render(route) {
     var nav = ROUTES.map(function (name) {
-      return '<a href="?route=' + name + '" data-route="' + name + '">' + LABELS[name] + '</a>';
+      return '<a href="/spa/' + name + '" data-route="' + name + '">' + LABELS[name] + '</a>';
     }).join('');
     // The whole shell is replaced, so the link that was activated (and had
     // focus) is removed from the document.
@@ -47,15 +47,15 @@ description: A router that calls history.pushState, re-renders the whole applica
       link.addEventListener('click', function (event) {
         event.preventDefault();
         var route = link.getAttribute('data-route');
-        history.pushState({ route: route }, '', '?route=' + route);
+        history.pushState({ route: route }, '', '/spa/' + route);
         render(route);
       });
     });
   }
 
   window.addEventListener('popstate', function () {
-    var params = new URLSearchParams(location.search);
-    render(params.get('route') || 'home');
+    var match = location.pathname.match(/\/spa\/(\w+)/);
+    render(match ? match[1] : 'home');
   });
 
   render('home');

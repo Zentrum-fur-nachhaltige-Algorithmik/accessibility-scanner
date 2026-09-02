@@ -148,7 +148,7 @@ class InputModalitiesScanner extends BaseScanner {
   async analyzePointerGestures(page, violations) {
     log.debug('Analyzing pointer gestures...');
 
-    const gestureAnalysis = await page.evaluate((renderedSrc) => {
+    const gestureAnalysis = await page.evaluate(async (renderedSrc) => {
       eval(renderedSrc);
       const issues = [];
       let accessible = true;
@@ -181,6 +181,14 @@ class InputModalitiesScanner extends BaseScanner {
       /** A rendered control exposed to assistive technology, in or around the element. */
       const exposed = (el) =>
         el && __isRendered(el) && __isInteractiveTarget(el) && !el.closest('[aria-hidden="true"]');
+      // The component the element belongs to: a carousel's arrows sit beside
+      // the track, not inside its parent, so the whole section is searched.
+      const componentOf = (el) =>
+        el.closest(
+          'main, section, article, form, nav, aside, [role="region"], [role="group"], [class*="carousel"], [class*="slider"], [class*="gallery"]'
+        ) ||
+        el.parentElement ||
+        document.body;
       const hasSinglePointerAlternative = (el) => {
         if (el.onclick || el.hasAttribute('onclick') || __isInteractiveTarget(el)) return true;
         if (Array.from(el.querySelectorAll('*')).some(exposed)) return true;
@@ -188,9 +196,67 @@ class InputModalitiesScanner extends BaseScanner {
           const bound = document.querySelector(`[aria-controls~="${CSS.escape(el.id)}"]`);
           if (exposed(bound)) return true;
         }
-        const parent = el.parentElement;
-        if (!parent) return false;
-        return Array.from(parent.querySelectorAll('*')).some((c) => !el.contains(c) && exposed(c));
+        const component = componentOf(el);
+        if (!component) return false;
+        return Array.from(component.querySelectorAll('*')).some(
+          (c) => !el.contains(c) && exposed(c)
+        );
+      };
+
+      // What the element and the block around it look like, so a change a
+      // gesture caused can be told from one a tap caused.
+      const settle = () => new Promise((resolve) => setTimeout(resolve, 60));
+      const fingerprint = (el) => {
+        const scope = componentOf(el);
+        return [
+          scope.innerHTML.length,
+          typeof el.className === 'string' ? el.className : '',
+          el.getAttribute('aria-expanded'),
+          el.getAttribute('aria-selected'),
+          Math.round(el.scrollLeft),
+          Math.round(el.scrollTop),
+          Math.round(el.getBoundingClientRect().left),
+        ].join('|');
+      };
+      const touchEvent = (type, el, x, y) => {
+        const point = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+        const list = type === 'touchend' ? [] : [point];
+        return new TouchEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          touches: list,
+          targetTouches: list,
+          changedTouches: [point],
+        });
+      };
+
+      /**
+       * Does a path gesture do something a tap does not? A tap is sent first,
+       * then a swipe; only a change the swipe made and the tap did not is
+       * evidence of a path gesture. The co-occurrence of touchstart, touchmove
+       * and touchend proves nothing: it is how a tap is made responsive.
+       */
+      const observePathGesture = async (el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 2 || rect.height < 2) return false;
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        try {
+          el.dispatchEvent(touchEvent('touchstart', el, cx, cy));
+          el.dispatchEvent(touchEvent('touchend', el, cx, cy));
+          await settle();
+          const afterTap = fingerprint(el);
+
+          el.dispatchEvent(touchEvent('touchstart', el, cx, cy));
+          for (let step = 1; step <= 3; step++) {
+            el.dispatchEvent(touchEvent('touchmove', el, cx + step * 40, cy));
+          }
+          el.dispatchEvent(touchEvent('touchend', el, cx + 120, cy));
+          await settle();
+          return fingerprint(el) !== afterTap;
+        } catch (e) {
+          return false;
+        }
       };
 
       const candidates = new Set();
@@ -211,14 +277,18 @@ class InputModalitiesScanner extends BaseScanner {
           declares(element, 'gesturestart') ||
           declares(element, 'gesturechange') ||
           declares(element, 'gestureend');
-        const path =
+        const declaresPath =
           declares(element, 'touchstart') &&
           declares(element, 'touchmove') &&
           (declares(element, 'touchend') || declares(element, 'touchcancel'));
         const multipoint = TOUCH_EVENTS.some((name) => MULTIPOINT.test(sourceOf(element, name)));
 
-        if (!webkitGesture && !path && !multipoint) continue;
+        if (!webkitGesture && !declaresPath && !multipoint) continue;
         if (hasSinglePointerAlternative(element)) continue;
+        // A declared touchmove handler is not a path gesture until the path
+        // does something the tap did not.
+        const path = declaresPath ? await observePathGesture(element) : false;
+        if (!webkitGesture && !path && !multipoint) continue;
 
         // SVG/MathML elements expose className as an SVGAnimatedString, not a string
         const className = typeof element.className === 'string' ? element.className : '';
@@ -280,12 +350,22 @@ class InputModalitiesScanner extends BaseScanner {
 
         const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         let dialogCalls = 0;
-        // The page without the pressed control itself. 2.5.2 allows the
-        // down-event to show that the control is pressed, so a change confined
-        // to the target's own markup (a `pressed` or `dragging` class) is
-        // feedback, not a function that ran.
-        const fingerprint = (el) =>
-          `${document.body.innerHTML.length - (el ? el.outerHTML.length : 0)}|${document.querySelectorAll('*').length}|${location.href}|${dialogCalls}`;
+        // What the press did around and inside the control: the nodes and the
+        // text of the control's subtree and of its siblings. Attributes are not
+        // read, because 2.5.2 allows the down-event to show that the control is
+        // pressed, and a `pressed` or `dragging` class is that feedback.
+        const fingerprint = (el) => {
+          const scope = (el && el.parentElement) || document.body;
+          const own = el || document.body;
+          return [
+            scope.querySelectorAll('*').length,
+            scope.textContent.length,
+            own.querySelectorAll('*').length,
+            own.textContent.length,
+            location.href,
+            dialogCalls,
+          ].join('|');
+        };
 
         // alert()/confirm()/prompt() block the renderer; recording the call is
         // the observation this probe needs and never stalls the page.
@@ -357,30 +437,30 @@ class InputModalitiesScanner extends BaseScanner {
             if (afterDown === before) continue; // the down-event did nothing
 
             // Abort the press: the pointer leaves the target and is released
-            // somewhere else. A control that implements Abort or Undo reacts
-            // to that; one that already ran its function does not.
-            el.dispatchEvent(
-              new PointerEvent('pointermove', { ...pointerInit, clientX: 0, clientY: 0 })
-            );
-            el.dispatchEvent(new PointerEvent('pointercancel', { ...pointerInit, buttons: 0 }));
-            el.dispatchEvent(
-              new MouseEvent('mouseleave', { ...pointerInit, clientX: 0, clientY: 0, buttons: 0 })
-            );
-            document.documentElement.dispatchEvent(
-              new PointerEvent('pointerup', {
-                ...pointerInit,
-                clientX: 0,
-                clientY: 0,
-                buttons: 0,
-              })
-            );
-            document.documentElement.dispatchEvent(
-              new MouseEvent('mouseup', { ...pointerInit, clientX: 0, clientY: 0, buttons: 0 })
-            );
-            await wait(60);
+            // outside it. The up-event is dispatched ON the control, away from
+            // its box, because that is what Up Reversal is: the same control
+            // sees the release and undoes what the press started. Sending it to
+            // the documentElement instead meant no control could ever be seen
+            // to reverse anything.
+            const outsideX = rect.right + 50;
+            const outsideY = rect.bottom + 50;
+            const away = { ...pointerInit, clientX: outsideX, clientY: outsideY, buttons: 0 };
+            el.dispatchEvent(new PointerEvent('pointermove', { ...away, buttons: 1 }));
+            el.dispatchEvent(new MouseEvent('mouseleave', away));
+            el.dispatchEvent(new PointerEvent('pointerout', away));
+            el.dispatchEvent(new PointerEvent('pointerup', away));
+            el.dispatchEvent(new MouseEvent('mouseup', away));
+            el.dispatchEvent(new PointerEvent('pointercancel', away));
+            document.documentElement.dispatchEvent(new PointerEvent('pointerup', away));
+            document.documentElement.dispatchEvent(new MouseEvent('mouseup', away));
+            // Long enough for a ripple span or a press-and-hold preview to take
+            // itself away again: a node that is gone half a second later never
+            // completed a function.
+            await wait(500);
 
             const after = fingerprint(el);
             if (after !== afterDown) continue; // the page reacted to the abort
+            if (after === before) continue; // nothing of the press is left
 
             const className = typeof el.className === 'string' ? el.className : '';
             issues.push({
@@ -434,21 +514,49 @@ class InputModalitiesScanner extends BaseScanner {
   async analyzeMotionActuation(page, violations) {
     log.debug('Analyzing motion actuation...');
 
-    const motionAnalysis = await page.evaluate(async () => {
+    const motionAnalysis = await page.evaluate(async (renderedSrc) => {
+      eval(renderedSrc);
       const issues = [];
       let alternativesProvided = true;
 
       const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-      const fingerprint = () =>
-        `${document.body.innerHTML.length}|${document.querySelectorAll('*').length}|${location.href}`;
 
-      const idle = fingerprint();
+      // What a user can see of an element: its text, how many children it has
+      // and whether it is painted. A style attribute write is not read: a
+      // parallax layer and a tilting card are decoration, and 2.5.4 is about a
+      // function that is operated, not about a picture that moves.
+      const stateOf = (el) =>
+        [
+          el.childElementCount,
+          (el.textContent || '').length,
+          el.offsetWidth > 0 || el.offsetHeight > 0 ? 1 : 0,
+          el.hidden || el.getAttribute('aria-hidden') === 'true' ? 1 : 0,
+        ].join('|');
+      const snapshot = () => {
+        const map = new Map();
+        for (const el of document.body.querySelectorAll('*')) map.set(el, stateOf(el));
+        return map;
+      };
+      // The smallest elements that changed: an ancestor changes whenever its
+      // child does, and the child is what the function acted on.
+      const changedElements = (before, after) => {
+        const changed = new Set();
+        for (const [el, value] of after) {
+          if (before.has(el) && before.get(el) !== value) changed.add(el);
+        }
+        return [...changed].filter(
+          (el) => ![...el.querySelectorAll('*')].some((child) => changed.has(child))
+        );
+      };
+
+      const idle = snapshot();
       await wait(150);
-      if (fingerprint() !== idle) {
+      if (changedElements(idle, snapshot()).length > 0) {
         return { issues, alternativesProvided, skipped: 'page mutates on its own' };
       }
 
-      const before = fingerprint();
+      const beforeHref = location.href;
+      const before = snapshot();
 
       if (typeof DeviceMotionEvent === 'function') {
         try {
@@ -480,19 +588,58 @@ class InputModalitiesScanner extends BaseScanner {
       }
       await wait(120);
 
-      if (fingerprint() !== before) {
+      const changed = changedElements(before, snapshot());
+      const navigated = location.href !== beforeHref;
+      if (changed.length === 0 && !navigated) {
+        return { issues, alternativesProvided };
+      }
+
+      /**
+       * Is the same function on offer as a user interface component? The
+       * control has to be bound to what the motion changed: inside it, the
+       * element itself, or pointed at it with aria-controls. A "Submit" button
+       * somewhere else in the section does not operate a tilting ball.
+       */
+      const operableWithoutMotion = (el) => {
+        const usable = (node) =>
+          node &&
+          __isRendered(node) &&
+          __isInteractiveTarget(node) &&
+          !node.closest('[aria-hidden="true"]');
+        if (usable(el)) return true;
+        if ([...el.querySelectorAll('*')].some(usable)) return true;
+        if (el.id) {
+          const bound = [
+            ...document.querySelectorAll(
+              `[aria-controls~="${CSS.escape(el.id)}"], [data-target="#${CSS.escape(el.id)}"]`
+            ),
+          ];
+          if (bound.some(usable)) return true;
+        }
+        return false;
+      };
+
+      const targets = changed.length > 0 ? changed : [document.body];
+      for (const el of targets) {
+        if (!navigated && operableWithoutMotion(el)) continue;
+
+        const className = typeof el.className === 'string' ? el.className : '';
         issues.push({
           type: 'motion-actuation-without-alternative',
-          element: 'document',
-          description:
-            'The page changed in response to a synthetic device motion event, so a function is operated by moving the device',
+          element:
+            el.tagName.toLowerCase() +
+            (el.id ? `#${el.id}` : '') +
+            (className ? `.${className.trim().split(/\s+/)[0]}` : ''),
+          description: navigated
+            ? 'Moving the device navigated the page, and no control does the same'
+            : 'Moving the device changed what this element shows, and no control operates the same function',
           severity: 'moderate',
         });
         alternativesProvided = false;
       }
 
       return { issues, alternativesProvided };
-    });
+    }, renderedCode);
 
     motionAnalysis.issues.forEach((issue) => {
       violations.push({
@@ -597,6 +744,58 @@ class InputModalitiesScanner extends BaseScanner {
         return hasNonTargetText;
       }
 
+      /**
+       * What a target does, so two targets that do the same job can be told
+       * apart from two that do not: a resolved href, or a form's action plus
+       * the control's name.
+       */
+      function actionOf(el) {
+        if (el.tagName === 'A' || el.tagName === 'AREA') {
+          const href = el.getAttribute('href');
+          if (!href || href.startsWith('#')) return null;
+          try {
+            return 'href:' + new URL(el.href, location.href).href;
+          } catch (e) {
+            return 'href:' + href;
+          }
+        }
+        const form = el.form || el.closest('form');
+        if (form && el.matches('button, input[type="submit"], input[type="image"]')) {
+          return (
+            'action:' + (form.getAttribute('action') || location.pathname) + '|' + (el.name || '')
+          );
+        }
+        return null;
+      }
+
+      /**
+       * 2.5.8 "Equivalent" exception: another target on the same page does the
+       * same thing and is big enough. This is the teaser card pattern, where a
+       * small icon link sits beside the headline link to the same page.
+       */
+      function hasEquivalentTarget(t, all) {
+        if (!t.action) return false;
+        return all.some(
+          (o) =>
+            o !== t &&
+            o.action === t.action &&
+            o.rect.width >= MIN_SIZE &&
+            o.rect.height >= MIN_SIZE
+        );
+      }
+
+      /**
+       * 2.5.8 "Essential" exception, taken only where the markup declares it
+       * and never guessed: an <area> of an image map, whose shape is the
+       * information, and a target inside a role="application" surface, where
+       * the author has told assistive technology that the region is a
+       * self-contained application. No size heuristic decides essentialness.
+       */
+      function isDeclaredEssential(el) {
+        if (el.tagName === 'AREA') return true;
+        return !!el.closest('[role="application"]');
+      }
+
       /** 2.5.8 "User agent control" exception: size set by the UA, not the author. */
       function isUaSizedControl(el, rect) {
         const tag = el.tagName.toLowerCase();
@@ -663,10 +862,24 @@ class InputModalitiesScanner extends BaseScanner {
           p = p.parentElement;
         }
         if (nested) continue;
-        const painted = el.getBoundingClientRect();
+        // The pointer target is the box the element paints, not the union of
+        // the fragments it is broken into: a link that wraps onto a second line
+        // is two targets on screen, and the union spans both lines and the
+        // whole column, which is a box nobody can click.
+        const fragments = [...el.getClientRects()].filter((r) => r.width > 0 && r.height > 0);
+        const painted =
+          fragments.length > 1
+            ? fragments.reduce((a, b) => (a.width * a.height >= b.width * b.height ? a : b))
+            : el.getBoundingClientRect();
         if (painted.width === 0 || painted.height === 0) continue;
         const rect = reservedRect(el, painted);
-        targets.push({ el, rect, selector: selectorOf(el), style: window.getComputedStyle(el) });
+        targets.push({
+          el,
+          rect,
+          selector: selectorOf(el),
+          style: window.getComputedStyle(el),
+          action: actionOf(el),
+        });
       }
 
       function center(r) {
@@ -683,6 +896,8 @@ class InputModalitiesScanner extends BaseScanner {
         if (rect.width >= MIN_SIZE && rect.height >= MIN_SIZE) continue;
         if (isInlineTextTarget(el, style)) continue;
         if (isUaSizedControl(el, rect)) continue;
+        if (isDeclaredEssential(el)) continue;
+        if (hasEquivalentTarget(t, targets)) continue;
 
         // Spacing exception: the 24px circle centred on this target must not
         // intersect any other target or any other undersized target's circle.

@@ -1,0 +1,53 @@
+<!-- WCAG-TEST
+criterion: 2.4.3
+level: A
+title: Focus Order, a search field with tabindex="1" that is visually first
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: A header whose search field carries tabindex="1" and is painted above everything else in the header, so the first Tab reaches what the user sees first and the next Tab continues downward through the same header. The step back through the document preserves both meaning and operability, which is what 2.4.3 asks for; the old rule reported every backwards DOM step. illogical-tab-order must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library catalogue (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  header { display: flex; flex-direction: column; padding: 16px 24px; border-bottom: 2px solid #0b4f6c; }
+  /* The search row is painted first, the brand and the navigation below it. */
+  .search-row { order: 1; margin-bottom: 12px; }
+  .brand { order: 2; margin-bottom: 8px; }
+  .site-nav { order: 3; }
+  .site-nav a { margin-right: 16px; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  input { font: inherit; border: 2px solid #4a4a4a; padding: 6px; width: 260px; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  a { color: #0b4f6c; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <p class="brand"><a href="/">City library</a></p>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/catalogue">Catalogue</a>
+    <a href="/opening-hours">Opening hours</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <form class="search-row" role="search" action="/search">
+    <label for="q">Search the catalogue</label>
+    <input type="search" id="q" name="q" tabindex="1">
+    <button type="submit" tabindex="1">Search</button>
+  </form>
+</header>
+
+<main>
+  <h1>Catalogue</h1>
+  <p>Three million titles, borrowable with a library card.</p>
+  <p><a href="/card">Apply for a library card</a></p>
+</main>
+</body>
+</html>

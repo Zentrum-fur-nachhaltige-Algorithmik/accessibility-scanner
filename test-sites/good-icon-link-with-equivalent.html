@@ -1,0 +1,43 @@
+<!-- WCAG-TEST
+criterion: 2.5.8
+level: AA
+title: Target Size (Minimum), a small icon link with an equivalent target
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: A teaser card whose 16 by 16 bookmark icon links to the same article as the headline link beside it, which is far larger than 24 by 24. 2.5.8 exempts a target when an equivalent target on the same page is big enough, which is what the headline link is. target-too-small must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journal (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 800px; margin: 0 auto; padding: 24px; }
+  .card { border: 2px solid #0b4f6c; padding: 16px; margin-bottom: 24px; }
+  .card h2 { margin: 0 0 8px; font-size: 1.4rem; }
+  .card h2 a { display: inline-block; padding: 8px 4px; }
+  .row { display: flex; align-items: center; gap: 2px; }
+  .bookmark { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; }
+  a { color: #0b4f6c; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Journal</h1>
+
+  <div class="card">
+    <div class="row">
+      <h2><a href="/articles/tide-tables">Reading the tide tables</a></h2>
+      <a class="bookmark" href="/articles/tide-tables" aria-label="Bookmark: Reading the tide tables">*</a>
+    </div>
+    <p>How the harbour master reads a tide table, and why the numbers move.</p>
+  </div>
+
+</main>
+</body>
+</html>

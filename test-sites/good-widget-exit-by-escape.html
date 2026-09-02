@@ -1,0 +1,65 @@
+<!-- WCAG-TEST
+criterion: 2.1.2
+level: A
+title: No Keyboard Trap, a component the user leaves with Escape
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: keyboard-navigation
+description: A code editor that swallows Tab so that Tab inserts an indent, the pattern every in-page editor ships, and hands focus back to the page on Escape and on the arrow keys. The instructions say so above the field. SC 2.1.2 permits a non-Tab exit as long as the user is advised of it; the old tab walk reported a trap after four Tab presses and a Shift+Tab without ever trying another key. keyboard-trap must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor with a documented exit key (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px; }
+  textarea { width: 100%; min-height: 140px; font-family: monospace; font-size: 1rem; border: 2px solid #4a4a4a; padding: 8px; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .hint { background: #eef4f7; border-left: 4px solid #0b4f6c; padding: 8px 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Snippet editor</h1>
+
+  <p><button type="button" id="before">Load example</button></p>
+
+  <p class="hint" id="editorHint">
+    Inside the editor the Tab key inserts an indent. Press Escape or an arrow key to
+    move focus out of the editor and back to the page.
+  </p>
+
+  <label for="editor">Snippet</label>
+  <textarea id="editor" aria-describedby="editorHint">function hello() {
+  return "hi";
+}</textarea>
+
+  <p><button type="button" id="after">Run snippet</button></p>
+</main>
+
+<script>
+  var editor = document.getElementById('editor');
+  var after = document.getElementById('after');
+
+  editor.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab') {
+      // Tab indents instead of leaving, which is why the exit key is documented.
+      e.preventDefault();
+      var start = editor.selectionStart;
+      editor.value = editor.value.slice(0, start) + '  ' + editor.value.slice(editor.selectionEnd);
+      editor.selectionStart = editor.selectionEnd = start + 2;
+      return;
+    }
+    if (e.key === 'Escape' || e.key.indexOf('Arrow') === 0) {
+      e.preventDefault();
+      after.focus();
+    }
+  });
+</script>
+</body>
+</html>

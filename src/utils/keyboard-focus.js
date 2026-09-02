@@ -305,17 +305,22 @@ async function cleanupTabWalk(page) {
   await page
     .evaluate((ATTR) => {
       for (const el of document.querySelectorAll('[' + ATTR + ']')) el.removeAttribute(ATTR);
+      for (const el of document.querySelectorAll('[data-a11y-region]')) {
+        el.removeAttribute('data-a11y-region');
+      }
       const st = document.getElementById('__a11y-no-smooth');
       if (st) st.remove();
       delete window.__a11yTabSnapshots;
       delete window.__a11yPrevTabEl;
+      delete window.__a11yRegionCount;
     }, TAB_ATTR)
     .catch(() => {});
 }
 
 /**
  * Walk the page with real Tab key presses and yield one step per focused element:
- * { tabId, selector, tag, rect, before, after, indicator, stuck, rendered, domOrderBack }
+ * { tabId, selector, tag, rect, before, after, indicator, stuck, rendered, domOrderBack,
+ *   regionPath, prevRegionPath, prevRect }
  * where before/after are computed-style snapshots (unfocused/focused) and
  * indicator is { visible, reasons[], lowContrast, ratio, backdrop, baselineKnown, confirmed }.
  * Stops at the end of the document, on a cycle, on a stuck Tab, or at maxSteps.
@@ -369,9 +374,52 @@ async function* tabWalk(page, opts = {}) {
           prev !== el &&
           el.compareDocumentPosition(prev) & Node.DOCUMENT_POSITION_FOLLOWING
         );
+        // Where the step happened, so a caller can ask whether it broke
+        // anything: the region the stop belongs to, the form it belongs to,
+        // and where the previous stop was painted.
+        const REGION_SELECTOR =
+          'main, nav, header, footer, aside, form, section, article, ' +
+          '[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"], ' +
+          '[role="complementary"], [role="search"], [role="form"], [role="region"]';
+        const keyOf = (region) => {
+          let key = region.getAttribute('data-a11y-region');
+          if (!key) {
+            key = 'r' + (window.__a11yRegionCount = (window.__a11yRegionCount || 0) + 1);
+            region.setAttribute('data-a11y-region', key);
+          }
+          return key;
+        };
+        // Outermost region first. A step from a search form into the header
+        // around it stays in the header, so a caller compares paths and not
+        // the innermost region alone.
+        const regionPathOf = (node) => {
+          const path = [];
+          for (
+            let region = node && node.closest ? node.closest(REGION_SELECTOR) : null;
+            region;
+            region = region.parentElement ? region.parentElement.closest(REGION_SELECTOR) : null
+          ) {
+            path.unshift(keyOf(region));
+          }
+          return path;
+        };
+        const prevRectRaw = prev && prev.isConnected ? prev.getBoundingClientRect() : null;
+        const prevRect = prevRectRaw
+          ? {
+              x: prevRectRaw.x + window.scrollX,
+              y: prevRectRaw.y + window.scrollY,
+              width: prevRectRaw.width,
+              height: prevRectRaw.height,
+            }
+          : null;
+        const regionPath = regionPathOf(el);
+        const prevRegionPath = prev && prev.isConnected ? regionPathOf(prev) : null;
         window.__a11yPrevTabEl = el;
         return {
           domOrderBack,
+          regionPath,
+          prevRegionPath,
+          prevRect,
           tabIndexValue: el.tabIndex,
           tabId: id,
           tag: el.tagName.toLowerCase(),

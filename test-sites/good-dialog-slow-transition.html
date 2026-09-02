@@ -1,0 +1,79 @@
+<!-- WCAG-TEST
+criterion: 2.4.3
+level: A
+title: Focus Order, a dialog that moves focus when its transition ends
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: focus-management
+description: A dialog that fades in over 1200 ms and moves focus to its first control in its own transitionend handler, which is what Bootstrap does in shown.bs.modal. Focus does reach the dialog, only later than half a second after the click. The old probe read focus 500 ms after the activation and reported the dialog as one that never takes focus. focus-lost must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 800px; margin: 0 auto; padding: 24px; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 8px 14px; cursor: pointer; }
+  input { font: inherit; border: 2px solid #4a4a4a; padding: 6px; }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+  .backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: opacity 1200ms linear, visibility 0s linear 1200ms;
+  }
+  .backdrop.is-open { opacity: 1; visibility: visible; transition: opacity 1200ms linear, visibility 0s; }
+  .dialog { background: #fff; padding: 24px; max-width: 420px; border: 2px solid #0b4f6c; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Consulting hours</h1>
+  <p>Choose a slot and confirm it in the dialog.</p>
+  <p><button type="button" id="open" aria-haspopup="dialog">Book an appointment</button></p>
+</main>
+
+<div class="backdrop" id="backdrop">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <h2 id="dialogTitle">Book an appointment</h2>
+    <label for="slot">Preferred time</label>
+    <input type="text" id="slot" value="09:00">
+    <p>
+      <button type="button" id="confirm">Confirm</button>
+      <button type="button" id="cancel">Cancel</button>
+    </p>
+  </div>
+</div>
+
+<script>
+  var backdrop = document.getElementById('backdrop');
+  var openButton = document.getElementById('open');
+  var slot = document.getElementById('slot');
+
+  openButton.addEventListener('click', function () {
+    backdrop.classList.add('is-open');
+  });
+
+  // Focus moves into the dialog once it has finished fading in, the way a
+  // component library announces "shown" only after its transition.
+  backdrop.addEventListener('transitionend', function (event) {
+    if (event.propertyName !== 'opacity') return;
+    if (backdrop.classList.contains('is-open')) slot.focus();
+  });
+
+  function close() {
+    backdrop.classList.remove('is-open');
+    openButton.focus();
+  }
+  document.getElementById('cancel').addEventListener('click', close);
+  document.getElementById('confirm').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+</script>
+</body>
+</html>

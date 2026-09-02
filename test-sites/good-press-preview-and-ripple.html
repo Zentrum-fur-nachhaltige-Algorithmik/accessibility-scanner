@@ -1,0 +1,77 @@
+<!-- WCAG-TEST
+criterion: 2.5.2
+level: A
+title: Pointer Cancellation, a press-and-hold preview and a ripple
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: input-modalities
+description: A thumbnail that shows a larger preview while the pointer is held down and takes it away again when the pointer is released, which is the Up Reversal the criterion allows, and a Material-style button that paints a ripple span on pointerdown and removes it 400 ms later. Neither completes a function on the down-event. The old probe released the pointer at the documentElement, so no control ever saw the release, and it read the page 60 ms after the abort, while the ripple was still in the DOM. down-event-activation must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery (GOOD)</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #1b1b1b; background: #fff; }
+  main { max-width: 800px; margin: 0 auto; padding: 24px; }
+  button { font: inherit; background: #0b4f6c; color: #fff; border: none; padding: 12px 18px; cursor: pointer; position: relative; }
+  .preview { border: 2px solid #0b4f6c; padding: 16px; margin-top: 12px; }
+  .ripple { position: absolute; inset: 0; background: rgba(255,255,255,0.25); }
+  :focus-visible { outline: 3px solid #0b4f6c; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Gallery</h1>
+
+  <h2>Press and hold to preview</h2>
+  <p><button type="button" id="thumb">Coast at dawn</button></p>
+  <div id="previewSlot"></div>
+
+  <h2>Save</h2>
+  <p><button type="button" id="save">Save the album</button></p>
+  <p id="saveState">Not saved.</p>
+</main>
+
+<script>
+  var thumb = document.getElementById('thumb');
+  var slot = document.getElementById('previewSlot');
+
+  // The preview appears while the pointer is down and is taken away when it is
+  // released or the press is abandoned: Abort or Undo, on the control itself.
+  function showPreview() {
+    if (slot.firstChild) return;
+    var box = document.createElement('div');
+    box.className = 'preview';
+    box.textContent = 'Coast at dawn, 4000 by 3000 pixels';
+    slot.appendChild(box);
+  }
+  function hidePreview() {
+    slot.innerHTML = '';
+  }
+  thumb.addEventListener('pointerdown', showPreview);
+  thumb.addEventListener('pointerup', hidePreview);
+  thumb.addEventListener('pointercancel', hidePreview);
+  thumb.addEventListener('pointerout', hidePreview);
+
+  // A ripple that paints on the press and takes itself away again. It is
+  // feedback, not a function.
+  var save = document.getElementById('save');
+  save.addEventListener('pointerdown', function () {
+    var ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    save.appendChild(ripple);
+    setTimeout(function () {
+      ripple.remove();
+    }, 400);
+  });
+  // The album is saved on the click, which is the up-event.
+  save.addEventListener('click', function () {
+    document.getElementById('saveState').textContent = 'Saved.';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!-- WCAG-TEST
+criterion: 1.3.4
+level: AA
+title: Orientation
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: orientation
+description: A compact card list and a wide table hold the same data, and an orientation media query hides whichever of the two does not suit the orientation. Nothing is unavailable in either orientation, so orientation-lock-css must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: a duplicate hidden per orientation</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  table { border-collapse: collapse; }
+  th, td { border: 1px solid #767676; padding: 0.5rem 0.75rem; text-align: left; }
+  .card { border: 1px solid #767676; padding: 0.75rem; margin-bottom: 0.5rem; }
+
+  /* The same three departures, laid out twice. Each orientation shows one of
+     the two; neither orientation loses the information. */
+  @media (orientation: portrait) {
+    .as-table { display: none; }
+  }
+  @media (orientation: landscape) {
+    .as-cards { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Departures</h1>
+
+  <div class="as-table">
+    <table>
+      <caption>Departures</caption>
+      <thead>
+        <tr><th scope="col">Line</th><th scope="col">Departure</th><th scope="col">Platform</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>S1</td><td>08:14</td><td>3</td></tr>
+        <tr><td>S4</td><td>08:22</td><td>1</td></tr>
+        <tr><td>RE9</td><td>08:31</td><td>7</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="as-cards">
+    <div class="card">S1, 08:14, platform 3</div>
+    <div class="card">S4, 08:22, platform 1</div>
+    <div class="card">RE9, 08:31, platform 7</div>
+  </div>
+
+  <p>Both layouts list the same departures, so rotating the device changes the
+  presentation and never the content.</p>
+</main>
+</body>
+</html>

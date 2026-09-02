@@ -295,12 +295,22 @@ async function main() {
         const relevant = allViolations.filter((v) =>
           matchesCriteria(v, t.criteria, scannerCriteria[scannerId])
         );
+        // A scanner that can find the suspect but not decide it reports a
+        // needs-review question instead of a violation. On a bad file that
+        // question IS the detection: the scanner saw the case. It is never
+        // counted against a good file, where only a violation is a false
+        // positive, because an open question costs no conformance claim.
+        const openQuestions = (result.needsReview || []).filter((v) =>
+          matchesCriteria(v, t.criteria, scannerCriteria[scannerId])
+        );
         matched = relevant.length;
 
-        const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
+        const ok = t.expectViolations
+          ? relevant.length + openQuestions.length > 0
+          : relevant.length === 0;
         const label = t.expectViolations ? 'TRUE-POS' : 'FALSE-POS';
         detail = t.expectViolations
-          ? `${relevant.length} violations`
+          ? `${relevant.length} violations, ${openQuestions.length} needs-review`
           : `${relevant.length} false positives`;
         status = ok ? 'PASS' : 'FAIL';
 
@@ -326,9 +336,12 @@ async function main() {
         // aggregate `matched` count above: a single test can carry several
         // intersected criteria).
         for (const c of t.criteria) {
-          const matchedForC = allViolations.some((v) =>
-            matchesCriteria(v, [c], scannerCriteria[scannerId])
-          );
+          const matchedForC =
+            allViolations.some((v) => matchesCriteria(v, [c], scannerCriteria[scannerId])) ||
+            (t.expectViolations &&
+              (result.needsReview || []).some((v) =>
+                matchesCriteria(v, [c], scannerCriteria[scannerId])
+              ));
           if (!criterionStats[c])
             criterionStats[c] = { truePositive: false, falsePositiveHit: false };
           if (t.expectViolations) {

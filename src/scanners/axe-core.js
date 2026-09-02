@@ -65,6 +65,32 @@ function mapImpactToSeverity(impact) {
   }
 }
 
+/**
+ * The tag list the audit asks axe for. `wcag22a` unlocks no rule in axe-core
+ * 4.11.2 (SC 3.2.6 and 3.3.7 have none), and is listed so a future axe release
+ * that adds one is picked up instead of being dropped in silence.
+ *
+ * What axe does NOT run, and deliberately so: axe's own `tagExclude` defaults
+ * to ['experimental', 'deprecated'] and this adapter does not override it, so
+ * `label-content-name-mismatch` (2.5.3), `css-orientation-lock` (1.3.4),
+ * `p-as-heading`, `table-fake-caption`, `td-has-header` (1.3.1),
+ * `audio-caption` (1.2.1) and `aria-roledescription` never run. That is the
+ * user's decision of 2026-09-02: those rules are experimental or deprecated
+ * upstream and are not enabled here. Nothing in this repo may defer to them,
+ * and scripts/coverage-matrix.js drops them from the coverage it credits
+ * (neverRunAxeRules), so the criteria they would have covered are measured by
+ * this repo's own scanners or reported as a gap.
+ */
+const AXE_TAGS = [
+  'wcag2a',
+  'wcag2aa',
+  'wcag21a',
+  'wcag21aa',
+  'wcag22a',
+  'wcag22aa',
+  'best-practice',
+];
+
 class AxeCoreAdapter extends BaseScanner {
   constructor() {
     super('axe-core', {
@@ -286,7 +312,7 @@ class AxeCoreAdapter extends BaseScanner {
     await this._ensurePageReady(page);
 
     const axeBuilder = new AxePuppeteer(page)
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'])
+      .withTags(AXE_TAGS)
       .options({ resultTypes: ['violations', 'incomplete'] });
 
     const axeResults = await axeBuilder.analyze();
@@ -341,13 +367,12 @@ class AxeCoreAdapter extends BaseScanner {
           const target =
             Array.isArray(node.target) && node.target.length === 1 ? node.target[0] : null;
           const state = target ? mediaStates.get(target) : null;
-          if (
-            state &&
-            (state.audio === 'silent' || (state.decorative && state.audio !== 'audio'))
-          ) {
-            log.debug(
-              `[axe-core] ${rule.id} ${target}: no audio track (${state.audio}), criterion does not apply`
-            );
+          // Only a video that is PROVEN silent is outside 1.2.2 and 1.4.2. An
+          // autoplay-loop video whose audio track could not be read looks
+          // decorative but may carry sound, so it stays an open question
+          // instead of disappearing.
+          if (state && state.audio === 'silent') {
+            log.debug(`[axe-core] ${rule.id} ${target}: no audio track, criterion does not apply`);
             continue;
           }
         }
@@ -513,3 +538,4 @@ class AxeCoreAdapter extends BaseScanner {
 }
 
 module.exports = AxeCoreAdapter;
+module.exports.AXE_TAGS = AXE_TAGS;

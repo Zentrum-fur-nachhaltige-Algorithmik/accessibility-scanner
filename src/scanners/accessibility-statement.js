@@ -1,12 +1,17 @@
 /**
  * Accessibility Statement Scanner.
- * EN 301 549 clause 12.2.2 (the accessibility statement of the European
- * Accessibility Act / Directive (EU) 2016/2102).
- * Answers two questions: does the site link a statement, and does that
- * statement carry the three declarations the clause asks for (conformance
- * status, feedback contact point, preparation or review date). Everything is
- * read on the statement page itself; no other page of the site is audited as
- * if it were the statement.
+ * Directive (EU) 2016/2102 Art. 7(1) and its national EAA transpositions
+ * (AT BaFG, DE BFSG), which oblige a site to publish an accessibility
+ * statement. Two different questions live here:
+ *
+ *   1. Is a statement linked at all? Measurable, so it is a violation.
+ *   2. Does the statement say what the law asks it to say (conformance status,
+ *      feedback contact, review date)? Reading a legal declaration is not a
+ *      measurement, so every finding about the CONTENT of a statement is a
+ *      needs-review question carrying the text a reviewer needs.
+ *
+ * Everything is read on the statement page itself; no other page of the site is
+ * audited as if it were the statement.
  */
 const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
@@ -15,6 +20,11 @@ const {
   findStatementLink,
   missingStatementViolation,
 } = require('../utils/accessibility-statement');
+
+/** The clause every finding of this scanner is charged to. */
+const STATEMENT_CRITERION = 'EAA-Statement (2016/2102 Art. 7)';
+
+const HELP_URL = 'https://eur-lex.europa.eu/eli/dir/2016/2102/oj';
 
 /** Twelve months, the review interval the directive asks for. */
 function isOlderThanAYear(date) {
@@ -26,6 +36,9 @@ function isOlderThanAYear(date) {
 class AccessibilityStatementScanner extends BaseScanner {
   constructor() {
     super('accessibility-statement', {
+      // Not a WCAG success criterion: the coverage matrix reads only "x.y.z"
+      // entries, so this scanner claims no criterion there and is never
+      // credited with WCAG coverage it does not have.
       wcagCriteria: ['EN 301 549 12.1'],
       wcagPrinciple: 'robust',
     });
@@ -45,9 +58,10 @@ class AccessibilityStatementScanner extends BaseScanner {
 
     return {
       scannerId: this.id,
-      criteria: ['EAA-Statement', 'EN-301-549-12.1.1'],
+      criteria: [STATEMENT_CRITERION],
       passed: results.violations.length === 0,
       violations: results.violations,
+      needsReview: results.needsReview,
       summary: {
         statementExists: results.statementExists,
         statementAccessible: results.statementAccessible,
@@ -60,10 +74,42 @@ class AccessibilityStatementScanner extends BaseScanner {
   }
 
   /**
+   * A question about the content of a statement, with the evidence a reviewer
+   * needs in order to answer it without opening the page again.
+   */
+  question(ruleId, description, question, dossier) {
+    return {
+      ...this.formatViolation(
+        ruleId,
+        'moderate',
+        description,
+        [{ selector: dossier.selector }],
+        HELP_URL,
+        'info',
+        {
+          verdict: 'needs-review',
+          dossier: {
+            question,
+            element: { selector: dossier.selector, html: null, role: null, name: null },
+            measurements: dossier.measurements || {},
+            context: dossier.context || {},
+          },
+        }
+      ),
+      criterion: STATEMENT_CRITERION,
+      // The scanner's own field name for a rule id; the harnesses and the
+      // precision check read it.
+      issue: ruleId,
+      element: dossier.selector,
+    };
+  }
+
+  /**
    * Find the statement, read it where it lives, and report what it omits.
    */
   async analyzeAccessibilityStatement(page, options) {
     const violations = [];
+    const needsReview = [];
     const empty = {
       statementExists: false,
       statementAccessible: false,
@@ -76,12 +122,12 @@ class AccessibilityStatementScanner extends BaseScanner {
     const statementLink = await findStatementLink(page);
 
     if (!statementLink.found) {
-      // Exactly ONE finding, and not `critical`. Every other rule of this
-      // scanner describes a property OF the statement (missing contact,
-      // missing review date, missing conformance status) and is undecidable
-      // while no statement exists. See src/utils/accessibility-statement.js.
+      // Exactly ONE finding. Every other rule of this scanner describes a
+      // property OF the statement (missing contact, missing review date,
+      // missing conformance status) and is undecidable while no statement
+      // exists. See src/utils/accessibility-statement.js.
       violations.push(missingStatementViolation());
-      return { violations, ...empty };
+      return { violations, needsReview, ...empty };
     }
 
     const sameDocument = this.isSameDocument(page.url(), statementLink.url);
@@ -102,7 +148,7 @@ class AccessibilityStatementScanner extends BaseScanner {
         });
         // An error page still loads, and its body would then be measured for a
         // review date and a conformance level it can never contain. A broken
-        // link is one finding about the link, not three about its content.
+        // link is one question about the link, not three about its content.
         const status = response ? response.status() : 0;
         if (status >= 400) throw new Error(`HTTP ${status}`);
       } catch (error) {
@@ -112,23 +158,31 @@ class AccessibilityStatementScanner extends BaseScanner {
         // Only a status code, or a failure on the origin that was just
         // scanned successfully, is evidence about the link.
         if (!/^HTTP \d/.test(error.message) && !this.isSameOrigin(page.url(), statementUrl)) {
-          return { violations, ...empty, statementExists: true, statementUrl };
+          return { violations, needsReview, ...empty, statementExists: true, statementUrl };
         }
         // The path was only ever resolved against a loopback address or a
-        // file, so its status says nothing about the site's statement.
-        // Unverifiable is not broken.
+        // file, so its status says nothing about the site's statement: a
+        // single-page snapshot serves no other path of the site. Unverifiable
+        // is an artefact of the scan, not a finding about the page.
         if (!this.isRealOrigin(statementUrl)) {
-          return { violations, ...empty, statementExists: true, statementUrl };
+          return { violations, needsReview, ...empty, statementExists: true, statementUrl };
         }
-        violations.push({
-          criterion: 'EAA-Statement',
-          issue: 'inaccessible-statement',
-          description: `Accessibility statement link found but page is not accessible: ${error.message}`,
-          element: statementLink.selector,
-          suggestion: 'Ensure accessibility statement page loads correctly and is accessible',
-          severity: 'serious',
-        });
-        return { violations, ...empty, statementExists: true };
+        // Even with a status code, a fetch is one attempt from one network:
+        // whether the statement is reachable for the public is a question, not
+        // a measurement this scan can close.
+        needsReview.push(
+          this.question(
+            'inaccessible-statement',
+            `The linked accessibility statement did not load: ${error.message}`,
+            'Is the linked accessibility statement reachable for the public?',
+            {
+              selector: statementLink.selector,
+              measurements: { statementUrl, error: error.message },
+              context: { linkText: statementLink.text, scannedFrom: page.url() },
+            }
+          )
+        );
+        return { violations, needsReview, ...empty, statementExists: true };
       }
     }
 
@@ -143,47 +197,67 @@ class AccessibilityStatementScanner extends BaseScanner {
     // which is one finding, rather than a statement missing all of its parts.
     if (!content.selfIdentifies && !content.conformanceStatus) {
       violations.push(missingStatementViolation());
-      return { violations, ...empty };
+      return { violations, needsReview, ...empty };
     }
 
+    const evidence = {
+      selector: 'main',
+      context: {
+        statementUrl,
+        headings: content.headings,
+        excerpt: content.excerpt,
+        datesFound: content.dateFindings,
+        contactCandidates: content.contactCandidates,
+      },
+    };
+
     if (!content.conformanceStatus) {
-      violations.push({
-        criterion: 'EAA-Statement',
-        issue: 'incomplete-content',
-        description: 'Accessibility statement lacks required information: compliance level',
-        element: 'main',
-        suggestion: 'Add compliance level (A, AA, AAA, partial, or non-compliant)',
-        severity: 'major',
-      });
+      needsReview.push(
+        this.question(
+          'incomplete-content',
+          'No conformance status (fully / partially / not compliant, or a WCAG level) was found in the statement',
+          'Does the statement declare a conformance status?',
+          { ...evidence, measurements: { conformanceStatusFound: false } }
+        )
+      );
     }
 
     if (!content.contactMechanism) {
-      violations.push({
-        criterion: 'EAA-Statement',
-        issue: 'missing-contact',
-        description: 'No contact mechanism provided for accessibility issues',
-        element: 'main',
-        suggestion:
-          'Add contact information (email, phone, or feedback form) for accessibility issues',
-        severity: 'serious',
-      });
+      needsReview.push(
+        this.question(
+          'missing-contact',
+          'No feedback contact for accessibility problems was found in the statement',
+          'Does the statement name a feedback contact?',
+          {
+            ...evidence,
+            measurements: { contactCandidates: content.contactCandidates.length },
+          }
+        )
+      );
     }
 
     if (!lastUpdated || isOlderThanAYear(lastUpdated)) {
-      violations.push({
-        criterion: 'EAA-Statement',
-        issue: 'outdated-statement',
-        description: lastUpdated
-          ? `The statement was last reviewed on ${lastUpdated.toISOString().slice(0, 10)}, more than twelve months ago`
-          : 'The statement names no preparation or review date',
-        element: 'main',
-        suggestion: 'Add last updated date and ensure statement is reviewed at least annually',
-        severity: 'major',
-      });
+      needsReview.push(
+        this.question(
+          'outdated-statement',
+          lastUpdated
+            ? `The newest review date read from the statement is ${lastUpdated.toISOString().slice(0, 10)}, more than twelve months ago`
+            : 'No preparation or review date was read from the statement',
+          'When was this statement prepared or last reviewed?',
+          {
+            ...evidence,
+            measurements: {
+              newestDateFound: lastUpdated ? lastUpdated.toISOString().slice(0, 10) : null,
+              dateCandidates: content.dateFindings.length,
+            },
+          }
+        )
+      );
     }
 
     return {
       violations,
+      needsReview,
       statementExists: true,
       statementAccessible: true,
       statementUrl,
@@ -257,11 +331,18 @@ class AccessibilityStatementScanner extends BaseScanner {
   }
 
   /**
-   * Read the three declarations clause 12.2.2 asks for off the statement page.
+   * Read the declarations the directive asks for off the statement page, and
+   * collect the evidence a reviewer needs to decide the ones that are missing.
    */
   async analyzeStatementContent(page) {
     return page.evaluate(() => {
       const text = (document.body.textContent || '').replace(/\s+/g, ' ');
+
+      // The region the statement itself lives in. A <time> in the site footer
+      // or in a "latest news" rail is not the review date of the statement.
+      const region =
+        document.querySelector('main, [role="main"], article, .accessibility-statement') ||
+        document.body;
 
       // Conformance status: a WCAG or EN 301 549 level, or one of the three
       // status words the model statement uses, in English or German.
@@ -275,8 +356,8 @@ class AccessibilityStatementScanner extends BaseScanner {
       const conformance = CONFORMANCE.map((re) => text.match(re)).find(Boolean);
 
       // Does the page call itself a statement? A declaration usually says so
-      // in its heading, and it is the one part of clause 12.2.2 that a guide
-      // or a marketing page about accessibility never carries.
+      // in its heading, and it is the one part of the model statement that a
+      // guide or a marketing page about accessibility never carries.
       const selfIdentifies =
         /accessibility statement|accessibility policy|erkl[äa]e?rung zur barrierefreiheit|barrierefreiheitserkl[äa]e?rung|d[ée]claration d'accessibilit[ée]|verklaring toegankelijkheid/i.test(
           text
@@ -284,54 +365,145 @@ class AccessibilityStatementScanner extends BaseScanner {
 
       // Feedback contact point: a way to reach somebody, not the word
       // "contact" somewhere in a sentence.
-      const contactMechanism =
-        document.querySelector('a[href^="mailto:"], a[href^="tel:"]') !== null ||
-        document.querySelector('form') !== null ||
-        Array.from(document.querySelectorAll('a[href]')).some((a) =>
-          /kontakt|contact|feedback|barriere\s*melden|report/i.test(
-            `${a.textContent} ${a.getAttribute('href')}`
-          )
-        );
+      const contactCandidates = [];
+      for (const a of document.querySelectorAll('a[href]')) {
+        const href = a.getAttribute('href') || '';
+        const label = (a.textContent || '').replace(/\s+/g, ' ').trim();
+        if (/^(mailto:|tel:)/i.test(href)) {
+          contactCandidates.push({ kind: href.split(':')[0].toLowerCase(), text: label, href });
+        } else if (/kontakt|contact|feedback|barriere\s*melden|report/i.test(`${label} ${href}`)) {
+          contactCandidates.push({ kind: 'link', text: label, href });
+        }
+        if (contactCandidates.length >= 8) break;
+      }
+      if (document.querySelector('form')) {
+        contactCandidates.push({ kind: 'form', text: '', href: '' });
+      }
+      const contactMechanism = contactCandidates.length > 0;
 
-      // Preparation / review date. A <time datetime> is the machine readable
-      // one; otherwise a date has to sit next to wording that says it is the
-      // review date, so a copyright year or an article date is not mistaken
-      // for one.
+      // Preparation / review date. A <time datetime> inside the statement
+      // region is the machine readable one; otherwise a date has to sit next
+      // to wording that says it is the review date, so a copyright year or an
+      // article date is not mistaken for one.
       const dates = [];
-      const pushDate = (value) => {
+      const dateFindings = [];
+      const pushDate = (value, source, context) => {
         const d = new Date(value);
-        if (!isNaN(d.getTime())) dates.push(d);
+        if (isNaN(d.getTime())) return;
+        dates.push(d);
+        if (dateFindings.length < 8) {
+          dateFindings.push({ date: d.toISOString().slice(0, 10), source, context });
+        }
       };
 
-      for (const time of document.querySelectorAll('time[datetime]')) {
-        pushDate(time.getAttribute('datetime'));
+      for (const time of region.querySelectorAll('time[datetime]')) {
+        if (time.closest('footer, [role="contentinfo"]')) continue;
+        pushDate(
+          time.getAttribute('datetime'),
+          'time[datetime]',
+          (time.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80)
+        );
       }
 
+      const MONTHS = {
+        januar: 1,
+        jänner: 1,
+        january: 1,
+        jan: 1,
+        februar: 2,
+        february: 2,
+        feb: 2,
+        märz: 3,
+        maerz: 3,
+        march: 3,
+        mar: 3,
+        mrz: 3,
+        april: 4,
+        apr: 4,
+        mai: 5,
+        may: 5,
+        juni: 6,
+        june: 6,
+        jun: 6,
+        juli: 7,
+        july: 7,
+        jul: 7,
+        august: 8,
+        aug: 8,
+        september: 9,
+        sept: 9,
+        sep: 9,
+        oktober: 10,
+        october: 10,
+        okt: 10,
+        oct: 10,
+        november: 11,
+        nov: 11,
+        dezember: 12,
+        december: 12,
+        dez: 12,
+        dec: 12,
+      };
+      const monthNames = Object.keys(MONTHS).join('|');
+      // "12. Mai 2025", "12 May 2025", "May 12, 2025".
+      const DMY_WORD = new RegExp(`(\\d{1,2})\\.?\\s+(${monthNames})\\.?\\s+(\\d{4})`, 'i');
+      const MDY_WORD = new RegExp(`(${monthNames})\\.?\\s+(\\d{1,2}),?\\s+(\\d{4})`, 'i');
+      const iso2 = (n) => String(n).padStart(2, '0');
+
+      // `stand` only on a word boundary: "Zustand des Gebäudes ... 01.01.2024"
+      // is not a review date.
       const REVIEW_WORDING =
-        /(last\s+(updated|reviewed|review)|updated\s+on|reviewed\s+on|prepared\s+on|erstellt\s+am|zuletzt\s+(gepr[üu]ft|[üu]berpr[üu]ft|aktualisiert)|letzte\s+([üu]berpr[üu]fung|aktualisierung)|stand)/gi;
+        /(last\s+(updated|reviewed|review)|updated\s+on|reviewed\s+on|prepared\s+on|erstellt\s+am|erstellt|zuletzt\s+(gepr[üu]ft|[üu]berpr[üu]ft|aktualisiert)|letzte\s+([üu]berpr[üu]fung|aktualisierung)|\bstand\b)/gi;
       let match;
       while ((match = REVIEW_WORDING.exec(text)) !== null) {
-        const context = text.slice(match.index, match.index + 120);
+        // The date can stand before the wording ("wurde am 12. Mai 2025
+        // erstellt") as well as after it, so the window reaches both ways.
+        const context = text.slice(Math.max(0, match.index - 90), match.index + 120);
         const iso = context.match(/(\d{4})-(\d{2})-(\d{2})/);
         if (iso) {
-          pushDate(`${iso[1]}-${iso[2]}-${iso[3]}`);
+          pushDate(`${iso[1]}-${iso[2]}-${iso[3]}`, 'iso', context.slice(0, 80));
           continue;
         }
         const dmy = context.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
         if (dmy) {
+          pushDate(`${dmy[3]}-${iso2(dmy[2])}-${iso2(dmy[1])}`, 'numeric', context.slice(0, 80));
+          continue;
+        }
+        const dmyWord = context.match(DMY_WORD);
+        if (dmyWord) {
           pushDate(
-            `${dmy[3]}-${String(dmy[2]).padStart(2, '0')}-${String(dmy[1]).padStart(2, '0')}`
+            `${dmyWord[3]}-${iso2(MONTHS[dmyWord[2].toLowerCase()])}-${iso2(dmyWord[1])}`,
+            'month-name',
+            context.slice(0, 80)
+          );
+          continue;
+        }
+        const mdyWord = context.match(MDY_WORD);
+        if (mdyWord) {
+          pushDate(
+            `${mdyWord[3]}-${iso2(MONTHS[mdyWord[1].toLowerCase()])}-${iso2(mdyWord[2])}`,
+            'month-name',
+            context.slice(0, 80)
           );
         }
       }
 
       const newest = dates.length ? new Date(Math.max(...dates.map((d) => d.getTime()))) : null;
 
+      const headings = Array.from(region.querySelectorAll('h1, h2, h3, [role="heading"]'))
+        .slice(0, 12)
+        .map((h) => (h.textContent || '').replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
+
       return {
         conformanceStatus: conformance ? conformance[0].trim() : null,
         selfIdentifies,
         contactMechanism,
+        contactCandidates,
         lastUpdated: newest ? newest.toISOString() : null,
+        dateFindings,
+        headings,
+        excerpt: (region.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 600),
       };
     });
   }

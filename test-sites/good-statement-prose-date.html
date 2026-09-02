@@ -1,0 +1,53 @@
+<!-- WCAG-TEST
+criterion: EN 301 549 12.1
+level: AA
+title: Statement whose review date is a spelled-out month in prose
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: accessibility-statement
+description: A complete declaration whose only date is written as "12. Mai 2026" in a sentence, with an unrelated time element in the footer and the word Zustand in the body text. The date parser reads the month name, ignores the footer time and does not take Zustand for "Stand", so no question about the review date is raised.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erkl&auml;rung zur Barrierefreiheit</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 0; line-height: 1.6; }
+  main, footer { max-width: 56rem; margin: 0 auto; padding: 1rem; }
+  footer { border-top: 1px solid #767676; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Erkl&auml;rung zur Barrierefreiheit</h1>
+  <p>
+    Diese Website ist mit WCAG 2.2 Stufe AA teilweise konform.
+  </p>
+
+  <h2>Zustand des Geb&auml;udes</h2>
+  <p>
+    Der Zustand des Ordinationsgeb&auml;udes wurde zuletzt bei der Sanierung 01.01.2019
+    dokumentiert. Das betrifft die R&auml;umlichkeiten, nicht diese Website.
+  </p>
+
+  <h2>Erstellung dieser Erkl&auml;rung</h2>
+  <p>
+    Diese Erkl&auml;rung wurde am 12. Mai 2026 erstellt.
+  </p>
+
+  <h2>Feedback</h2>
+  <p>
+    Melden Sie Barrieren an
+    <a href="mailto:barrierefreiheit@musterpraxis.at">barrierefreiheit@musterpraxis.at</a>.
+  </p>
+</main>
+<footer>
+  <p>Gegr&uuml;ndet <time datetime="1998-03-01">M&auml;rz 1998</time>.</p>
+  <a href="/impressum.html">Impressum</a>
+  <a href="/good-statement-prose-date.html">Erkl&auml;rung zur Barrierefreiheit</a>
+</footer>
+</body>
+</html>

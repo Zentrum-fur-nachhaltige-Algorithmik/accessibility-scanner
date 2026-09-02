@@ -1,0 +1,36 @@
+<!-- WCAG-TEST
+criterion: EN 301 549 12.1
+level: AA
+title: Statement link chosen over an article about accessibility
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: accessibility-statement
+description: The page links a blog article whose text carries the word Barrierefreiheit before it links the real declaration in the footer. The statement is the footer link, so no missing-accessibility-statement is reported.
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aktuelles</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 1rem; }
+  footer { margin-top: 2rem; border-top: 1px solid #767676; padding-top: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Aktuelles aus der Ordination</h1>
+  <ul>
+    <li><a href="/good-accessibility-marketing-page.html">Barrierefreiheit im Web: unser Beitrag zum Thema</a></li>
+    <li><a href="/good-contact-page-no-statement.html">Neue Sprechzeiten ab September</a></li>
+  </ul>
+</main>
+<footer>
+  <a href="/impressum.html">Impressum</a>
+  <a href="/datenschutz.html">Datenschutz</a>
+  <a href="/good-accessibility-statement-complete.html">Erkl&auml;rung zur Barrierefreiheit</a>
+</footer>
+</body>
+</html>

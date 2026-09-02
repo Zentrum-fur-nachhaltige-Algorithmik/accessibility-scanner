@@ -856,6 +856,24 @@ const HTML_SCANNER_MAPPING = {
       'Guide page about BGStG/BaFG/WZG linked as "Barrierefreiheit": one missing-accessibility-statement is the whole EAA verdict for this page',
   },
 
+  'good-statement-link-among-articles.html': {
+    expectedScanners: [],
+    excludedScanners: ['accessibility-statement'],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1'],
+    description:
+      'A blog link carrying the word Barrierefreiheit before the footer declaration: the ranked candidate list picks the footer link, so missing-accessibility-statement stays silent',
+  },
+
+  'good-statement-prose-date.html': {
+    expectedScanners: [],
+    excludedScanners: ['accessibility-statement'],
+    testType: 'good',
+    wcagCriteria: ['EN 301 549 12.1'],
+    description:
+      'A statement dated "12. Mai 2026" in prose, an unrelated time element in the footer and the word Zustand in the body: no question about the review date',
+  },
+
   'good-accessibility-statement-complete.html': {
     expectedScanners: [],
     excludedScanners: ['accessibility-statement'],

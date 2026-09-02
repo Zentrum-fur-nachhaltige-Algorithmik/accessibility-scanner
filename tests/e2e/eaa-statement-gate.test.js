@@ -55,20 +55,52 @@ describe('EAA statement gate', () => {
     }
 
     expect(violations.map(rule)).toEqual([MISSING_STATEMENT_RULE]);
-    expect(violations.every((v) => v.severity === 'serious')).toBe(true);
+    // A documentation duty, not a barrier: it must not weigh as much as one.
+    expect(violations.every((v) => v.severity === 'moderate')).toBe(true);
   }, 120000);
 
-  it('detects an existing but incomplete statement', async () => {
+  it('asks about an existing but incomplete statement instead of failing it', async () => {
     const page = await getPage(`${getBaseUrl()}/statement-incomplete.html`);
     try {
       const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });
-      const rules = (result.violations || []).map(rule);
-      expect(rules).not.toContain(MISSING_STATEMENT_RULE);
-      // no compliance level, no contact, no review date
+      expect((result.violations || []).map(rule)).toEqual([]);
+      const open = result.needsReview || [];
+      const rules = open.map(rule);
+      // no compliance level, no contact, no review date: three questions
       expect(rules).toContain('incomplete-content');
       expect(rules).toContain('missing-contact');
       expect(rules).toContain('outdated-statement');
+      // every question carries the evidence a reviewer needs
+      for (const item of open) {
+        expect(item.verdict).toBe('needs-review');
+        expect(item.dossier.question).toBeTruthy();
+        expect(item.dossier.context.statementUrl).toBeTruthy();
+        expect(typeof item.dossier.context.excerpt).toBe('string');
+      }
       expect(result.summary.statementExists).toBe(true);
+    } finally {
+      await page.close();
+    }
+  }, 120000);
+
+  it('prefers the footer declaration over an article about accessibility', async () => {
+    const page = await getPage(`${getBaseUrl()}/good-statement-link-among-articles.html`);
+    try {
+      const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });
+      expect((result.violations || []).map(rule)).toEqual([]);
+      expect(result.summary.statementUrl).toContain('good-accessibility-statement-complete.html');
+    } finally {
+      await page.close();
+    }
+  }, 120000);
+
+  it('reads a review date written as a month name, and no date from the footer', async () => {
+    const page = await getPage(`${getBaseUrl()}/good-statement-prose-date.html`);
+    try {
+      const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });
+      expect((result.violations || []).map(rule)).toEqual([]);
+      expect((result.needsReview || []).map(rule)).toEqual([]);
+      expect(result.summary.lastUpdated.toISOString().slice(0, 10)).toBe('2026-05-12');
     } finally {
       await page.close();
     }
@@ -78,7 +110,7 @@ describe('EAA statement gate', () => {
     const page = await getPage(`${getBaseUrl()}/good-statement-link-unresolvable.html`);
     try {
       const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });
-      const rules = (result.violations || []).map(rule);
+      const rules = [...(result.violations || []), ...(result.needsReview || [])].map(rule);
       expect(rules).not.toContain('inaccessible-statement');
       expect(rules).not.toContain(MISSING_STATEMENT_RULE);
       expect(result.summary.statementExists).toBe(true);
@@ -102,6 +134,7 @@ describe('EAA statement gate', () => {
     try {
       const result = await new AccessibilityStatementScanner().scan(page, { timeout: 20000 });
       expect(result.violations).toEqual([]);
+      expect(result.needsReview).toEqual([]);
       expect(result.summary.conformanceStatus).toBeTruthy();
     } finally {
       await page.close();

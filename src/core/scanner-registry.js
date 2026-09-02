@@ -205,9 +205,9 @@ function allScannerIds() {
  * Resolve a profile name to scanner ids and merged options.
  *
  * Membership is TRUST-TIERED: the profile list above states the speed/scope
- * intent, and this filters it to axe-core + the LLM scanners + the custom
- * scanners currently rated `proven` in `src/core/scanner-trust.json` (derived from
- * the recorded battery results by `scripts/derive-scanner-trust.js`).
+ * intent, and this filters it to axe-core + the LLM scanners (they only ask)
+ * + the custom scanners currently rated `proven` in `src/core/scanner-trust.json`
+ * (derived from the recorded battery results by `scripts/derive-scanner-trust.js`).
  *
  * Quarantined scanners stay registered; pass `{ includeExperimental: true }`
  * to run them. Their findings are tagged `confidence: 'low'` by the pipeline so
@@ -217,6 +217,11 @@ function allScannerIds() {
  * @param {{ includeExperimental?: boolean }} [opts]
  * @returns {{ scannerIds: string[], options: object, excluded: string[] }}
  */
+/** Scanners whose every finding is a needs-review question. */
+function asksOnly(scannerId) {
+  return scannerId.startsWith('llm-');
+}
+
 function getProfile(name, opts = {}) {
   if (!Object.hasOwn(PROFILES, name)) {
     throw new Error(
@@ -227,7 +232,11 @@ function getProfile(name, opts = {}) {
   const requested = PROFILES[name] || allScannerIds();
   const { isProven } = require('./scanner-trust');
 
-  const scannerIds = opts.includeExperimental ? requested : requested.filter((id) => isProven(id));
+  // An LLM scanner only asks questions (needs-review, never counted), so its
+  // trust tier gates what its answers may do, not whether it runs.
+  const scannerIds = opts.includeExperimental
+    ? requested
+    : requested.filter((id) => isProven(id) || asksOnly(id));
   const excluded = requested.filter((id) => !scannerIds.includes(id));
 
   return {

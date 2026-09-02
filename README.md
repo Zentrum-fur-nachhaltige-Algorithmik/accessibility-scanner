@@ -100,15 +100,17 @@ needs-review item with a dossier: the question, the element, what the scanner
 measured in code (the image row, the step structure, the help inventory, the
 focus state of the tab stop, the block metrics, the readability numbers) and
 the model's own evidence with its id. None of it reaches `violations`, so a
-scan with an API key scores exactly like a scan without one. An LLM scanner
-becomes `proven`, and so enters the default profiles, only on a recorded
-stability record (`tests/data/harness/harness-llm.json`, written by
-`npm run harness:llm -- --runs 3 --json`): every rule it claims needs at least
-three runs that agree to 0.9 and reach 0.9 precision against the fixture
-labels. Until that record exists they are all experimental, and their
-questions carry `confidence: low`. The one exception is
-`llm-incomplete-reviewer`, which is a reviewer rather than a producer: it
-answers axe's open questions and its `fail` is an adjudicated violation.
+scan with an API key scores exactly like a scan without one. Because they
+only ask, LLM scanners stay in their profiles whatever their trust tier; the
+tier says what their answers may do. An LLM scanner becomes `proven` only on
+a recorded stability record (`tests/data/harness/harness-llm.json`, written
+by `npm run harness:llm -- --runs 3 --json`): every rule it claims needs at
+least three runs that agree to 0.9 and reach 0.9 precision against the
+fixture labels. Until that record exists they are all experimental, and
+their questions carry `confidence: low`. `llm-incomplete-reviewer` is a
+reviewer rather than a producer: it answers axe's open questions. While it is
+experimental its `fail` stays attached to the open question as an opinion;
+once proven, its `fail` closes the question as an adjudicated violation.
 
 The consent pre-step below skips controls that accept less than everything
 ("Accept necessary only", "Nur notwendige akzeptieren"): clicking one records

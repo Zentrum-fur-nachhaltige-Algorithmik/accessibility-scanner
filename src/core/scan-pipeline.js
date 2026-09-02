@@ -237,6 +237,10 @@ class ScanPipeline {
             v.experimental = true;
             v.confidence = 'low';
           }
+          // A reviewer without a stability record may not close a question:
+          // its fail is attached to the open item by reconcileIncompleteReviews
+          // (from summary.decided) and never counted as a violation.
+          if (v.adjudicated && tier === 'experimental') continue;
           // Conformance level. A finding whose every criterion is AAA is not a
           // failure of the AA conformance this profile audits, so it is
           // reported beside the findings instead of among them.
@@ -303,7 +307,9 @@ class ScanPipeline {
     }
 
     const violations = this.dedupeProcedureFindings(allViolations);
-    const { kept, reviewLog } = this.reconcileIncompleteReviews(needsReview, scannerResults);
+    const { kept, reviewLog } = this.reconcileIncompleteReviews(needsReview, scannerResults, {
+      reviewerProven: trustTier('llm-incomplete-reviewer') === 'proven',
+    });
     const categories = this.categorizeViolations(violations);
 
     const result = {
@@ -329,19 +335,25 @@ class ScanPipeline {
    * A needs-review finding is an open question. `llm-incomplete-reviewer`
    * answers some of them and lists every attempt in `summary.decided` as
    * {axeRuleId, selector, verdict: pass|fail|uncertain, reason}. A `pass`
-   * leaves the reader's list for the review log; a `fail` leaves it too,
-   * because the reviewer's own adjudicated violation now stands for it;
-   * an `uncertain` stays and carries the attempt, so the reader sees that
-   * the question was tried and what was measured.
+   * leaves the reader's list for the review log. A `fail` leaves it too when
+   * the reviewer is proven, because its own adjudicated violation then stands
+   * for it; from an experimental reviewer a fail is an opinion, so the item
+   * stays open with the verdict attached. An `uncertain` stays and carries
+   * the attempt, so the reader sees that the question was tried.
    *
+   * @param {{reviewerProven?: boolean}} [opts] - defaults to the reviewer's trust tier
    * Identity is (ruleId|selector), so any scanner's needs-review item can be
    * decided, not only axe's. The dossier selector is read as well as the
    * finding's own, so a supplier that only fills the dossier still matches.
    *
    * @returns {{kept: Object[], reviewLog: Object[]}}
    */
-  reconcileIncompleteReviews(needsReview, scannerResults) {
+  reconcileIncompleteReviews(needsReview, scannerResults, opts = {}) {
     const reviewer = scannerResults.find((r) => r.scannerId === 'llm-incomplete-reviewer');
+    const reviewerProven =
+      typeof opts.reviewerProven === 'boolean'
+        ? opts.reviewerProven
+        : require('./scanner-trust').trustTier('llm-incomplete-reviewer') === 'proven';
     const decided = Array.isArray(reviewer?.summary?.decided)
       ? reviewer.summary.decided
       : (reviewer?.summary?.suppressed || []).map((s) => ({ ...s, verdict: 'pass' }));
@@ -360,9 +372,12 @@ class ScanPipeline {
         Boolean
       );
       const decision = selectors.map((sel) => decisions.get(`${ruleId}|${sel}`)).find(Boolean);
-      if (!decision || decision.verdict === 'uncertain') {
+      const closes =
+        decision &&
+        (decision.verdict === 'pass' || (decision.verdict === 'fail' && reviewerProven));
+      if (!closes) {
         if (decision) {
-          v.review = { by, verdict: 'uncertain', reason: decision.reason || null };
+          v.review = { by, verdict: decision.verdict, reason: decision.reason || null };
         }
         kept.push(v);
         continue;

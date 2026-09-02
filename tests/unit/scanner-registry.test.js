@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
-import { createAllScanners } from '../../src/core/scanner-registry';
+import { createAllScanners, getProfile } from '../../src/core/scanner-registry';
 
 const SCANNERS_DIR = path.resolve(__dirname, '../../src/scanners');
 const SUPPORT = new Set(['llm/base.js', 'llm/page-context.js', 'llm/analyze-compat.js']);
@@ -35,6 +35,17 @@ describe('scanner registry', () => {
     for (const s of scanners) {
       const file = s.id.startsWith('llm-') ? `llm/${s.id.slice(4)}.js` : `${s.id}.js`;
       expect(fs.existsSync(path.join(SCANNERS_DIR, file)), `${s.id} -> ${file}`).toBe(true);
+    }
+  });
+
+  it('keeps the LLM scanners in their profiles whatever their trust tier', () => {
+    const standard = getProfile('standard');
+    expect(standard.scannerIds).toContain('llm-incomplete-reviewer');
+    expect(standard.scannerIds).toContain('llm-sensory-characteristics');
+    expect(standard.excluded.filter((id) => id.startsWith('llm-'))).toEqual([]);
+    const full = getProfile('full');
+    for (const id of ids.filter((id) => id.startsWith('llm-'))) {
+      expect(full.scannerIds, id).toContain(id);
     }
   });
 

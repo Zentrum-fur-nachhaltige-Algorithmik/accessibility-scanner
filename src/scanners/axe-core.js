@@ -333,9 +333,9 @@ class AxeCoreAdapter extends BaseScanner {
       }
     }
 
-    // Convert incomplete results as info severity
+    // Incomplete results are questions, not findings: they all go to
+    // needsReview with a dossier, whatever the rule's tags say.
     for (const rule of axeResults.incomplete || []) {
-      const bucket = isBestPracticeOnly(rule.tags) ? bestPractices : violations;
       for (const node of rule.nodes) {
         if (rule.id === 'video-caption' || rule.id === 'no-autoplay-audio') {
           const target =
@@ -371,14 +371,14 @@ class AxeCoreAdapter extends BaseScanner {
           needsReview.push(this._convertNode(rule, node, 'incomplete', decision));
           continue;
         }
-        bucket.push(this._convertNode(rule, node, 'incomplete'));
+        needsReview.push(this._convertNode(rule, node, 'incomplete'));
       }
     }
 
     return {
       scannerId: this.id,
-      // 'info' (axe incomplete) does not make a page fail, the same rule the
-      // score uses.
+      // Only proven violations make a page fail; needs-review items are
+      // questions, the same rule the score uses.
       passed: violations.filter(isHardViolation).length === 0,
       violations,
       bestPractices,
@@ -407,8 +407,9 @@ class AxeCoreAdapter extends BaseScanner {
   _convertNode(rule, node, resultType, measured = null) {
     const wcagCriteria = extractWcagCriteria(rule.tags);
     const isIncomplete = resultType === 'incomplete';
+    const selector = Array.isArray(node.target) ? node.target.join(' ') : String(node.target);
 
-    return {
+    const finding = {
       measured,
       // Core fields
       scannerId: this.id,
@@ -420,10 +421,11 @@ class AxeCoreAdapter extends BaseScanner {
           ? 'best-practice'
           : mapImpactToSeverity(node.impact || rule.impact),
       description: isIncomplete ? `[Needs manual review] ${rule.help}` : rule.help,
-      nodes: [
-        { selector: Array.isArray(node.target) ? node.target.join(' ') : String(node.target) },
-      ],
+      nodes: [{ selector }],
       wcagCriteria,
+      // What axe could prove is a violation; what it left `incomplete` is a
+      // question for a reviewer, carried with the evidence axe did produce.
+      verdict: isIncomplete ? 'needs-review' : 'violation',
 
       // axe-core specific fields
       axeRuleId: rule.id,
@@ -441,6 +443,52 @@ class AxeCoreAdapter extends BaseScanner {
       // Metadata
       source: 'axe-core',
       confidence: isIncomplete ? 'low' : 'high',
+    };
+
+    if (isIncomplete) {
+      finding.dossier = this._buildDossier(rule, node, selector, wcagCriteria, measured);
+    }
+
+    return finding;
+  }
+
+  /**
+   * Evidence dossier for an `incomplete` node: the question a reviewer has to
+   * answer, the element, and everything axe (or our own measurement pass)
+   * already measured about it.
+   */
+  _buildDossier(rule, node, selector, wcagCriteria, measured) {
+    const criteria = wcagCriteria.join(', ');
+    const question = criteria
+      ? `Does this element meet WCAG ${criteria} (${rule.help})?`
+      : `Does this element meet the check "${rule.help}"?`;
+
+    const measurements = { axeImpact: node.impact || rule.impact || 'moderate' };
+    for (const [key, value] of Object.entries(measured || {})) {
+      const t = typeof value;
+      if (t === 'number' || t === 'boolean' || t === 'string') measurements[key] = value;
+    }
+
+    const checkMessages = ['any', 'all', 'none']
+      .flatMap((k) => node[k] || [])
+      .map((check) => check.message)
+      .filter(Boolean);
+
+    return {
+      question,
+      element: {
+        selector,
+        html: (node.html || '').slice(0, 400),
+        role: node.role || null,
+        name: node.name || null,
+      },
+      measurements,
+      context: {
+        axeRuleId: rule.id,
+        undecidedChecks: checkMessages.slice(0, 5),
+        failureSummary: (node.failureSummary || '').slice(0, 400),
+        helpUrl: rule.helpUrl || '',
+      },
     };
   }
 

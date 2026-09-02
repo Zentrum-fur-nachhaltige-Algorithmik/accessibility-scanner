@@ -1,0 +1,57 @@
+<!-- Fixture for the consent pre-step (src/core/consent.js), not a WCAG fixture:
+     a fixed cookie banner that covers the page until its accept button is
+     clicked. No WCAG-TEST block, so the harnesses skip it. -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Cookie-Banner (consent pre-step)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        #cookie-consent-banner {
+            position: fixed;
+            inset: 0;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 24px;
+            z-index: 9999;
+        }
+        #cookie-consent-banner button {
+            font-size: 1rem;
+            padding: 8px 16px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Beispielseite mit Cookie-Hinweis</h1>
+    <p>Der eigentliche Seiteninhalt liegt unter dem Banner und ist erst nach dem Zustimmen sichtbar.</p>
+    <p><a href="#main">Zum Inhalt</a></p>
+    <main id="main">
+        <h2>Inhalt</h2>
+        <p>Dieser Absatz wird gescannt, sobald der Hinweis geschlossen ist.</p>
+    </main>
+
+    <div id="cookie-consent-banner" role="dialog" aria-label="Cookie-Hinweis">
+        <h2>Datenschutz</h2>
+        <p>Wir verwenden Cookies, um die Website zu verbessern.</p>
+        <button type="button" id="cookie-settings">Cookie-Einstellungen verwalten</button>
+        <button type="button" id="accept-all">Alle akzeptieren</button>
+        <button type="button" id="reject-all">Ablehnen</button>
+    </div>
+
+    <script>
+        document.getElementById('accept-all').addEventListener('click', function () {
+            document.getElementById('cookie-consent-banner').remove();
+        });
+        document.getElementById('reject-all').addEventListener('click', function () {
+            document.getElementById('cookie-consent-banner').remove();
+        });
+    </script>
+</body>
+</html>

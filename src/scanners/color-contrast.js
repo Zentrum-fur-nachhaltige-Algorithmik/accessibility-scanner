@@ -208,9 +208,30 @@ class ColorContrastScanner extends BaseScanner {
       passed: contrastResults.violations.length === 0,
       violations: contrastResults.violations,
       // Elements whose rendered background could not be determined from CSS
-      // (gradients/background images). Not violations: an unknown is not a
-      // failure.
-      incomplete: contrastResults.incomplete,
+      // (gradients/background images). Not violations: an unknown is a
+      // question for a reviewer, carried with what was measured.
+      needsReview: contrastResults.incomplete.map((item) =>
+        this.formatViolation(
+          'text-contrast-indeterminate-background',
+          'moderate',
+          item.description,
+          [{ selector: item.element }],
+          'https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html',
+          'info',
+          {
+            verdict: 'needs-review',
+            dossier: {
+              question: `Does the text in ${item.element} reach ${item.requiredRatio}:1 against the image or gradient it is painted on (WCAG 1.4.6)?`,
+              element: { selector: item.element, html: null, role: null, name: null },
+              measurements: {
+                foregroundColor: item.foregroundColor,
+                requiredRatio: item.requiredRatio,
+              },
+              context: { backgroundImage: item.backgroundImage },
+            },
+          }
+        )
+      ),
       summary: {
         totalElements: contrastResults.totalElements,
         failedElements: contrastResults.failedElements,

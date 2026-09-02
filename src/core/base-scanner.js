@@ -57,10 +57,35 @@ class BaseScanner {
 
   /**
    * Helper to build a standardized violation object.
+   *
+   * A scanner MEASURES. What it can prove is a `violation`; what it can only
+   * suspect is a `needs-review` finding, which never counts and never scores,
+   * and which carries a dossier so a reviewer can decide it later.
+   *
+   * Dossier shape, used by every scanner that emits one:
+   *   {
+   *     question: string,       // the one decision the reviewer must make
+   *     element: { selector, html, role, name },
+   *     measurements: {},       // flat map of values the scanner DID measure
+   *     context: {}             // short surrounding text / DOM facts
+   *   }
+   * No screenshots yet; the field may be absent.
+   *
    * @param {string} severity - 'violation' | 'best-practice' | 'info'
+   * @param {Object} [extra]
+   * @param {'violation'|'needs-review'} [extra.verdict] - defaults to 'violation'
+   * @param {Object} [extra.dossier] - evidence for a 'needs-review' finding
    */
-  formatViolation(ruleId, impact, description, nodes = [], helpUrl = '', severity = 'violation') {
-    return {
+  formatViolation(
+    ruleId,
+    impact,
+    description,
+    nodes = [],
+    helpUrl = '',
+    severity = 'violation',
+    extra = {}
+  ) {
+    const finding = {
       scannerId: this.id,
       ruleId,
       impact,
@@ -69,7 +94,10 @@ class BaseScanner {
       nodes,
       helpUrl,
       wcagCriteria: this.wcagCriteria,
+      verdict: extra.verdict === 'needs-review' ? 'needs-review' : 'violation',
     };
+    if (extra.dossier) finding.dossier = extra.dossier;
+    return finding;
   }
 
   /**

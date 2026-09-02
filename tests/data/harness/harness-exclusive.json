@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-29T20:09:12.416Z",
+  "generatedAt": "2026-09-02T15:06:40.518Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 105,
+    "passed": 100,
     "failed": 0
   },
   "results": [
@@ -67,26 +67,6 @@
       "status": "PASS"
     },
     {
-      "file": "bad-consistent-identification.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.4"
-      ],
-      "matched": 1,
-      "status": "PASS"
-    },
-    {
-      "file": "bad-consistent-navigation.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.3"
-      ],
-      "matched": 1,
-      "status": "PASS"
-    },
-    {
       "file": "bad-context-change.html",
       "scanner": "predictable-navigation",
       "expectViolations": true,
@@ -98,42 +78,11 @@
       "status": "PASS"
     },
     {
-      "file": "bad-external-link-identification.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": true,
-      "criteria": [
-        "3.2.1",
-        "3.2.4"
-      ],
-      "matched": 1,
-      "status": "PASS"
-    },
-    {
       "file": "good-auto-submitting-form.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
       "criteria": [
         "3.2.2"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-consistent-identification.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "3.2.4"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-consistent-navigation.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "3.2.3"
       ],
       "matched": 0,
       "status": "PASS"
@@ -150,22 +99,22 @@
       "status": "PASS"
     },
     {
-      "file": "good-external-links-icons-only.html",
+      "file": "good-focus-reveal-external-links.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
       "criteria": [
-        "3.2.4"
+        "3.2.1"
       ],
       "matched": 0,
       "status": "PASS"
     },
     {
-      "file": "good-focus-reveal-external-links.html",
+      "file": "good-history-state-and-popover.html",
       "scanner": "predictable-navigation",
       "expectViolations": false,
       "criteria": [
         "3.2.1",
-        "3.2.4"
+        "3.2.2"
       ],
       "matched": 0,
       "status": "PASS"
@@ -177,16 +126,6 @@
       "criteria": [
         "3.2.1",
         "3.2.2"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-repeated-cards-and-buttons.html",
-      "scanner": "predictable-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "3.2.4"
       ],
       "matched": 0,
       "status": "PASS"
@@ -801,6 +740,16 @@
         "2.4.5"
       ],
       "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "good-multiple-ways-collapsed-search.html",
+      "scanner": "multiple-ways",
+      "expectViolations": false,
+      "criteria": [
+        "2.4.5"
+      ],
+      "matched": 0,
       "status": "PASS"
     },
     {

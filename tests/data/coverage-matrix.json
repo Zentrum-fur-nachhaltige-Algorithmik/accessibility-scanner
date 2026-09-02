@@ -772,7 +772,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 15,
+        "runs": 27,
         "from": [
           "concurrent"
         ]
@@ -1589,7 +1589,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -1631,7 +1631,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "concurrent"
         ]
@@ -2047,7 +2047,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2834,7 +2834,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 6,
         "from": [
           "exclusive"
         ]
@@ -2862,14 +2862,7 @@
         ]
       },
       "harness": [],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 2,
-        "from": [
-          "exclusive"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.2.4",
@@ -2897,14 +2890,7 @@
         ]
       },
       "harness": [],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 6,
-        "from": [
-          "exclusive"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.2.5",
@@ -2993,7 +2979,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 6,
         "from": [
           "concurrent"
         ]
@@ -3040,7 +3026,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 9,
+        "runs": 8,
         "from": [
           "concurrent"
         ]
@@ -3071,14 +3057,7 @@
         ]
       },
       "harness": [],
-      "outcome": {
-        "tp": true,
-        "fpClean": true,
-        "runs": 5,
-        "from": [
-          "concurrent"
-        ]
-      }
+      "outcome": null
     },
     {
       "sc": "3.3.4",

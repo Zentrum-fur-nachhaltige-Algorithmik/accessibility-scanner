@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-29T20:14:29.553Z",
+  "generatedAt": "2026-09-02T15:12:41.128Z",
   "harness": "concurrent",
   "totals": {
-    "passed": 84,
+    "passed": 90,
     "failed": 9,
     "errored": 0
   },
@@ -74,7 +74,8 @@
     },
     "1.3.1": {
       "scanners": [
-        "screen-reader"
+        "screen-reader",
+        "error-handling"
       ],
       "truePositive": true,
       "falsePositiveClean": true,
@@ -86,6 +87,7 @@
           "bad-complex-data-tables.html",
           "bad-form-grouping.html",
           "bad-form-labels.html",
+          "bad-group-and-format.html",
           "bad-landmarks.html"
         ],
         "good": [
@@ -93,6 +95,7 @@
           "good-cognitive-accessibility.html",
           "good-complex-data-tables.html",
           "good-form-grouping.html",
+          "good-group-heading-and-error-text.html",
           "good-hidden-modal.html",
           "good-landing-page.html",
           "good-landmarks.html",
@@ -209,6 +212,8 @@
           "bad-timing-controls.html"
         ],
         "good": [
+          "good-player-clock-and-hydration.html",
+          "good-session-countdown-far-control.html",
           "good-static-decorations.html",
           "good-timing-controls.html"
         ]
@@ -225,6 +230,7 @@
           "bad-timing-controls.html"
         ],
         "good": [
+          "good-player-clock-and-hydration.html",
           "good-static-decorations.html",
           "good-static-live-wording.html",
           "good-timing-controls.html"
@@ -311,7 +317,7 @@
       "scanners": [
         "error-handling"
       ],
-      "truePositive": false,
+      "truePositive": true,
       "falsePositiveClean": true,
       "files": {
         "bad": [
@@ -321,6 +327,7 @@
           "good-error-tokens-not-error-messages.html",
           "good-form-errors.html",
           "good-form-fields-without-hints.html",
+          "good-group-heading-and-error-text.html",
           "good-js-validation.html"
         ]
       }
@@ -336,32 +343,16 @@
           "bad-beeproduced-real-issues.html",
           "bad-cognitive-accessibility.html",
           "bad-form-grouping.html",
-          "bad-form-labels.html"
+          "bad-form-labels.html",
+          "bad-group-and-format.html"
         ],
         "good": [
           "good-cognitive-accessibility.html",
           "good-form-fields-without-hints.html",
           "good-form-grouping.html",
+          "good-group-heading-and-error-text.html",
           "good-js-validation.html",
           "good-landing-page.html"
-        ]
-      }
-    },
-    "3.3.3": {
-      "scanners": [
-        "error-handling"
-      ],
-      "truePositive": true,
-      "falsePositiveClean": true,
-      "files": {
-        "bad": [
-          "bad-form-errors.html"
-        ],
-        "good": [
-          "good-error-tokens-not-error-messages.html",
-          "good-form-errors.html",
-          "good-form-fields-without-hints.html",
-          "good-icon-button-and-honeypot.html"
         ]
       }
     },
@@ -859,6 +850,17 @@
       "detail": "0 false positives"
     },
     {
+      "file": "good-group-heading-and-error-text.html",
+      "scanner": "screen-reader",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
       "file": "good-hidden-modal.html",
       "scanner": "screen-reader",
       "expectViolations": false,
@@ -921,155 +923,6 @@
       "expectViolations": false,
       "criteria": [
         "2.4.1"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "bad-beeproduced-real-issues.html",
-      "scanner": "error-handling",
-      "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 2,
-      "status": "PASS",
-      "detail": "2 violations"
-    },
-    {
-      "file": "bad-cognitive-accessibility.html",
-      "scanner": "error-handling",
-      "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 1,
-      "status": "PASS",
-      "detail": "1 violations"
-    },
-    {
-      "file": "bad-form-errors.html",
-      "scanner": "error-handling",
-      "expectViolations": true,
-      "criteria": [
-        "3.3.1",
-        "3.3.3"
-      ],
-      "matched": 4,
-      "status": "PASS",
-      "detail": "4 violations"
-    },
-    {
-      "file": "bad-form-grouping.html",
-      "scanner": "error-handling",
-      "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 4,
-      "status": "PASS",
-      "detail": "4 violations"
-    },
-    {
-      "file": "bad-form-labels.html",
-      "scanner": "error-handling",
-      "expectViolations": true,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 17,
-      "status": "PASS",
-      "detail": "17 violations"
-    },
-    {
-      "file": "good-cognitive-accessibility.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-error-tokens-not-error-messages.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-form-errors.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-form-fields-without-hints.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.2",
-        "3.3.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-form-grouping.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-icon-button-and-honeypot.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.3"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-js-validation.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.1",
-        "3.3.2"
-      ],
-      "matched": 0,
-      "status": "PASS",
-      "detail": "0 false positives"
-    },
-    {
-      "file": "good-landing-page.html",
-      "scanner": "error-handling",
-      "expectViolations": false,
-      "criteria": [
-        "3.3.2"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1147,6 +1000,191 @@
       "expectViolations": false,
       "criteria": [
         "1.4.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "bad-form-errors.html",
+      "scanner": "error-handling",
+      "expectViolations": true,
+      "criteria": [
+        "3.3.1"
+      ],
+      "matched": 1,
+      "status": "PASS",
+      "detail": "1 violations"
+    },
+    {
+      "file": "bad-form-grouping.html",
+      "scanner": "error-handling",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1",
+        "3.3.2"
+      ],
+      "matched": 2,
+      "status": "PASS",
+      "detail": "2 violations"
+    },
+    {
+      "file": "bad-group-and-format.html",
+      "scanner": "error-handling",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.1",
+        "3.3.2"
+      ],
+      "matched": 3,
+      "status": "PASS",
+      "detail": "3 violations"
+    },
+    {
+      "file": "good-accessibility.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-cognitive-accessibility.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1",
+        "3.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-complex-data-tables.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-error-tokens-not-error-messages.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "3.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-form-errors.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "3.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-form-fields-without-hints.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "3.3.1",
+        "3.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-form-grouping.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1",
+        "3.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-group-heading-and-error-text.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1",
+        "3.3.1",
+        "3.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-hidden-modal.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-js-validation.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "3.3.1",
+        "3.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-landing-page.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1",
+        "3.3.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-landmarks.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-redundant-aria.html",
+      "scanner": "error-handling",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.1"
       ],
       "matched": 0,
       "status": "PASS",
@@ -1408,6 +1446,29 @@
       "matched": 4,
       "status": "PASS",
       "detail": "4 violations"
+    },
+    {
+      "file": "good-player-clock-and-hydration.html",
+      "scanner": "timing-controls",
+      "expectViolations": false,
+      "criteria": [
+        "2.2.1",
+        "2.2.2"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
+    },
+    {
+      "file": "good-session-countdown-far-control.html",
+      "scanner": "timing-controls",
+      "expectViolations": false,
+      "criteria": [
+        "2.2.1"
+      ],
+      "matched": 0,
+      "status": "PASS",
+      "detail": "0 false positives"
     },
     {
       "file": "good-static-decorations.html",

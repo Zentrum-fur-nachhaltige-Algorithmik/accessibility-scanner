@@ -1,0 +1,63 @@
+<!-- WCAG-TEST
+criterion: 2.4.5
+level: AA
+title: Search collapsed behind a toggle, beside the main navigation
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: multiple-ways
+description: The site offers a navigation menu and a search form, but the search panel is closed until its toggle is pressed and its field is a plain text input named q. Presence, not rendering, decides whether the site offers the mechanism, so the page carries two ways and raises no question.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 0; line-height: 1.5; }
+  header, main { max-width: 56rem; margin: 0 auto; padding: 1rem; }
+  nav ul { list-style: none; display: flex; gap: 1rem; padding: 0; }
+  #search-panel[hidden] { display: none; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <nav aria-label="Main">
+    <ul>
+      <li><a href="/index.html">Home</a></li>
+      <li><a href="/services.html">Services</a></li>
+      <li><a href="/team.html">Team</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <button type="button" aria-expanded="false" aria-controls="search-panel" id="search-toggle">
+    Search
+  </button>
+  <div id="search-panel" hidden>
+    <form action="/search" method="get" role="search">
+      <label for="q">Search this site</label>
+      <input id="q" name="q" type="text">
+      <button type="submit">Go</button>
+    </form>
+  </div>
+</header>
+
+<main>
+  <h1>Services</h1>
+  <p>What we do, and how to reach the rest of the site.</p>
+</main>
+
+<script>
+  var toggle = document.getElementById('search-toggle');
+  var panel = document.getElementById('search-panel');
+  toggle.addEventListener('click', function () {
+    var open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    panel.hidden = open;
+  });
+</script>
+</body>
+</html>

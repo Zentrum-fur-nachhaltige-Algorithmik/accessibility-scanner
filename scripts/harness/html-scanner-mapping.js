@@ -1108,6 +1108,15 @@ const HTML_SCANNER_MAPPING = {
       'Autofocus inside a dialog, a positive tabindex and controls whose change only rewrites text: no context change to report',
   },
 
+  'good-multiple-ways-collapsed-search.html': {
+    expectedScanners: [],
+    excludedScanners: ['multiple-ways'],
+    testType: 'good',
+    wcagCriteria: ['2.4.5'],
+    description:
+      'A search form closed behind its toggle, with a plain text input named q: presence decides, so the page carries navigation plus search',
+  },
+
   'good-history-state-and-popover.html': {
     expectedScanners: [],
     excludedScanners: ['predictable-navigation'],

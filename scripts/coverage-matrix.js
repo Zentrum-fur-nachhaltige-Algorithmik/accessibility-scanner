@@ -39,6 +39,18 @@ const HOW = {
   MANUAL: 'manual',
 };
 
+/**
+ * Criteria whose deterministic scanner asks rather than decides: it emits a
+ * needs-review question with a dossier and never a violation, so the row is
+ * `adjudicated`, not `measured`. The mechanism stays what it is; only the kind
+ * of answer differs.
+ */
+const ADJUDICATED_BY_DETERMINISTIC = new Set([
+  // 2.4.5 Multiple Ways is scoped to a set of web pages; multiple-ways counts
+  // the mechanisms of the one page it sees and hands the count to a reviewer.
+  '2.4.5',
+]);
+
 /** LLM scanners that judge the page as a whole rather than named elements. */
 const PAGE_JUDGEMENT_SCANNERS = new Set(['llm-reading-level', 'llm-semantic-text']);
 
@@ -502,8 +514,11 @@ function collectHarnessOutcomes() {
  *
  * @returns {string} one of HOW
  */
-function howOf({ isManual, axeRules, det, llm }) {
+function howOf({ sc, isManual, axeRules, det, llm }) {
   if (isManual) return HOW.MANUAL;
+  if (axeRules.length === 0 && det.length > 0 && ADJUDICATED_BY_DETERMINISTIC.has(sc)) {
+    return HOW.ADJUDICATED;
+  }
   if (axeRules.length > 0 || det.length > 0) return HOW.MEASURED;
   if (llm.some((s) => !PAGE_JUDGEMENT_SCANNERS.has(s.id))) return HOW.ADJUDICATED;
   if (llm.length > 0) return HOW.PAGE_JUDGEMENT;
@@ -585,7 +600,7 @@ function buildRows() {
       level,
       title,
       mechanism,
-      how: howOf({ isManual, axeRules, det, llm }),
+      how: howOf({ sc, isManual, axeRules, det, llm }),
       supporting,
       justification,
       isManual,

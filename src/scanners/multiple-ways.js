@@ -1,8 +1,12 @@
 /**
  * Multiple Ways Scanner.
  * WCAG 2.4.5 (EN 301 549 9.2.4.5).
- * Counts the navigation mechanisms a page offers and reports a page that
- * belongs to a larger site, is not a step in a process, and offers fewer than two.
+ *
+ * "More than one way is available to locate a web page WITHIN A SET OF WEB
+ * PAGES". The set is the subject of the clause and this scan sees one page, so
+ * the criterion cannot be decided here: a compliant site may serve a page that
+ * itself carries only one mechanism. The scanner counts what this page offers
+ * and asks the question with the inventory attached.
  */
 
 const BaseScanner = require('../core/base-scanner');
@@ -39,10 +43,16 @@ class MultipleWaysScanner extends BaseScanner {
         }
       }
 
-      // 2. A search input.
+      // 2. A search field. Presence, not rendering: a search behind a header
+      // toggle is a mechanism the site offers, and so is a plain text input
+      // named q or suche, which is how most search forms are written.
       const searchFields = Array.from(
-        document.querySelectorAll('input[type="search"], [role="search"] input, [role="search"]')
-      ).filter(__isRendered);
+        document.querySelectorAll(
+          'input[type="search"], [role="search"], [role="search"] input, ' +
+            'input[name="q"], input[name="s"], input[name="search"], input[name="suche"], ' +
+            'input[name="query"], form[role="search"] input, form[action*="search"] input[type="text"]'
+        )
+      );
       if (searchFields.length > 0) mechanisms.push({ type: 'search' });
 
       // 3. A link to a sitemap. The mechanism is named by its destination, so
@@ -155,26 +165,41 @@ class MultipleWaysScanner extends BaseScanner {
       options.singlePageContext === true || options.skipMultiPageCriteria === true;
     const applies = !singlePageContext && data.hasEvidenceOfLargerSite && !data.isProcessStep;
 
-    const violations = [];
+    const needsReview = [];
     if (applies && data.count < 2) {
-      violations.push(
+      needsReview.push(
         this.formatViolation(
           '2.4.5',
-          data.count === 0 ? 'serious' : 'moderate',
-          `Page provides ${data.count} navigation mechanism(s) (${data.uniqueTypes.join(', ') || 'none'}). ` +
-            'WCAG 2.4.5 requires at least 2 ways to locate a page (e.g. navigation menu, search, sitemap, table of contents, breadcrumb).',
+          'moderate',
+          `This page offers ${data.count} way(s) to locate a page of the site (${data.uniqueTypes.join(', ') || 'none'}). ` +
+            'WCAG 2.4.5 asks for more than one way within the set of pages, which a single page cannot show.',
           [],
-          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html'
+          'https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html',
+          'info',
+          {
+            verdict: 'needs-review',
+            dossier: {
+              question: 'Does the site offer a second way to reach its pages?',
+              element: { selector: 'document', html: null, role: null, name: null },
+              measurements: {
+                mechanismCount: data.count,
+                mechanisms: data.uniqueTypes.join(', ') || 'none',
+                isProcessStep: data.isProcessStep,
+              },
+              context: { found: data.mechanisms },
+            },
+          }
         )
       );
     }
 
     return {
       scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
+      passed: true,
+      violations: [],
+      needsReview,
       summary: {
-        totalIssues: violations.length,
+        openQuestions: needsReview.length,
         mechanisms: data.uniqueTypes,
         mechanismCount: data.count,
         isProcessStep: data.isProcessStep,

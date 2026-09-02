@@ -3,6 +3,9 @@
 /**
  * exclusive.js: true/false-positive harness for the exclusive (non-LLM) scanners.
  * Bad files must produce a violation for the target criterion, good files must not.
+ * For a criterion a scanner only ADJUDICATES (listed in its `adjudicated`), the
+ * bad file is detected by a needs-review question instead; a good file is still
+ * judged on violations alone, because an open question is not a false positive.
  * Each scanner gets its own fresh page (exclusive access).
  *
  * Usage:
@@ -69,9 +72,12 @@ const EXCLUSIVE_SCANNERS = {
     module: '../../src/scanners/seizure-prevention',
     criteria: ['2.3.1', '2.3.2', '2.3.3'],
   },
+  // 2.4.5 is scoped to a set of web pages, so this scanner asks rather than
+  // decides: on a bad file its needs-review question counts as the detection.
   'multiple-ways': {
     module: '../../src/scanners/multiple-ways',
     criteria: ['2.4.5'],
+    adjudicated: ['2.4.5'],
   },
   'concurrent-input': {
     module: '../../src/scanners/concurrent-input',
@@ -288,10 +294,18 @@ async function main() {
         const targetCriteria = t.criteria.filter((c) => scannerDef.criteria.includes(c));
         const relevant = allViolations.filter((v) => matchesCriteria(v, targetCriteria));
 
-        const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
+        // A criterion the scanner only asks about: the question, with its
+        // dossier, is what detection means there.
+        const adjudicates = (scannerDef.adjudicated || []).some((c) => targetCriteria.includes(c));
+        const questions = adjudicates
+          ? (result.needsReview || []).filter((v) => matchesCriteria(v, targetCriteria))
+          : [];
+
+        const found = relevant.length + questions.length;
+        const ok = t.expectViolations ? found > 0 : relevant.length === 0;
         const label = t.expectViolations ? 'TRUE-POS' : 'FALSE-POS';
         const detail = t.expectViolations
-          ? `${relevant.length} violations for ${targetCriteria.join(',')}`
+          ? `${relevant.length} violations, ${questions.length} questions for ${targetCriteria.join(',')}`
           : `${relevant.length} false positives for ${targetCriteria.join(',')}`;
 
         jsonResults.push({
@@ -299,7 +313,7 @@ async function main() {
           scanner: scannerId,
           expectViolations: t.expectViolations,
           criteria: targetCriteria,
-          matched: relevant.length,
+          matched: t.expectViolations ? found : relevant.length,
           status: ok ? 'PASS' : 'FAIL',
         });
 

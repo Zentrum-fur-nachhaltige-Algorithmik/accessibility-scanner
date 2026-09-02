@@ -70,6 +70,28 @@ describe('ReportGenerator needs-review section', () => {
     expect(Object.values(principles).flat()).toHaveLength(1);
   });
 
+  it('badges an LLM question and names the model that asked it', () => {
+    const llmQuestion = {
+      scannerId: 'llm-alt-quality',
+      source: 'llm-alt-quality',
+      ruleId: '1.1.1',
+      severity: 'info',
+      verdict: 'needs-review',
+      wcagCriteria: ['1.1.1'],
+      dossier: {
+        question: 'Does the element `img#hero` meet Non-text Content (WCAG 1.1.1)?',
+        element: { selector: 'img#hero', html: null, role: null, name: null },
+        measurements: { alt: 'IMG_2043.JPG' },
+        context: { evidence: 'The alt repeats the filename.', model: 'google/gemini-3.7-flash' },
+      },
+    };
+    const html = generator.generateFindingsSection({ violations: [], needsReview: [llmQuestion] });
+    expect(html).toContain('source-llm');
+    expect(html).toContain('model: google/gemini-3.7-flash');
+    expect(html).toContain('The alt repeats the filename.');
+    expect(html).toContain('alt: IMG_2043.JPG');
+  });
+
   it('escapes dossier values', () => {
     const hostile = {
       ...review,

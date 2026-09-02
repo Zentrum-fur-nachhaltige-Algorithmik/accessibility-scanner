@@ -385,6 +385,7 @@ class ReportGenerator {
   .source-axe { background: transparent; color: #1B3A6B; border-color: #1B3A6B; }
   .source-puppeteer { background: transparent; color: #4A5560; border-color: #A6AEB8; }
   .source-llm { background: transparent; color: #14181D; border-color: #4A5560; }
+  .review-context { display: block; margin-top: 0.25rem; color: #4A5560; font-size: 0.8125rem; font-style: normal; }
   tr.row-critical td { border-left: 3px solid #7D1408; }
   tr.row-serious td  { border-left: 3px solid #A62117; }
   tr.row-moderate td { border-left: 3px solid #8A5A00; }
@@ -523,6 +524,7 @@ class ReportGenerator {
     .source-axe { background: #1a3a5e; color: #c4dafd; border-color: #4a6a8e; }
     .source-puppeteer { background: #5e4a1a; color: #fcdfa0; border-color: #8e7a4a; }
     .source-llm { background: #4a1a5e; color: #dfc0fc; border-color: #7a4a8e; }
+    .review-context { color: #A6AEB8; }
     .doc-footer { background: #1a1a2e; border-top-color: #4A5560; color: #aaa; }
     .scope-note { border-left-color: #4A5560; color: #aaa; }
     .table-note { color: #aaa; }
@@ -1044,11 +1046,25 @@ class ReportGenerator {
         item.review?.verdict === 'uncertain'
           ? ` <em>(reviewed by ${this.esc(item.review.by || 'reviewer')}, undecided${item.review.reason ? `: ${this.esc(item.review.reason)}` : ''})</em>`
           : '';
-      html += `<tr class="row-info"><th scope="row">${i + 1}</th><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${sourceBadge}</td><td>${this.esc(question)}${attempt}</td><td>${selector ? `<code>${this.esc(selector)}</code>` : '\u2014'}</td><td>${this.renderMeasurements(dossier.measurements)}</td></tr>`;
+      html += `<tr class="row-info"><th scope="row">${i + 1}</th><td>${this.esc(String(criterion)) || '\u2014'}</td><td>${sourceBadge}</td><td>${this.esc(question)}${attempt}${this.renderReviewContext(dossier.context)}</td><td>${selector ? `<code>${this.esc(selector)}</code>` : '\u2014'}</td><td>${this.renderMeasurements(dossier.measurements)}</td></tr>`;
     });
 
     html += '</tbody></table></div>';
     return html;
+  }
+
+  /**
+   * What the producer of the question said about it: an LLM scanner's own
+   * evidence and the model id that wrote it, so a reader can weigh the
+   * question without leaving the table.
+   */
+  renderReviewContext(context) {
+    if (!context || typeof context !== 'object') return '';
+    const parts = [];
+    if (context.evidence) parts.push(this.esc(String(context.evidence)));
+    if (context.model) parts.push(`model: ${this.esc(String(context.model))}`);
+    if (context.axeRuleId) parts.push(`axe rule: ${this.esc(String(context.axeRuleId))}`);
+    return parts.length ? ` <em class="review-context">${parts.join('; ')}</em>` : '';
   }
 
   /** Flat "key: value" list of what a scanner measured, escaped. */
@@ -1104,7 +1120,7 @@ class ReportGenerator {
         title: 'Static DOM analysis via axe-core (high confidence)',
       };
     }
-    if (scannerId.startsWith('llm-') || v.source === 'llm') {
+    if (scannerId.startsWith('llm-') || String(v.source || '').startsWith('llm')) {
       return {
         key: 'llm',
         label: 'LLM',

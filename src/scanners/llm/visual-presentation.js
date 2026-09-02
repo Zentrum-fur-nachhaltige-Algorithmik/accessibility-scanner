@@ -1,17 +1,30 @@
 /**
  * LLM Visual Presentation Scanner
- * Covers 1.4.7 Low or No Background Audio, 1.4.8 Visual Presentation and
- * 1.4.9 Images of Text (No Exception) (all AAA).
+ * Covers 1.4.8 Visual Presentation and 1.4.9 Images of Text (No Exception),
+ * both AAA. 1.4.7 Low or No Background Audio is manual: whether speech has
+ * background sound behind it is a property of the audio track, not of the page.
+ *
+ * The 1.4.8 clauses that are numbers (at most 80 characters per line, line
+ * spacing of at least 1.5) are measured here in code and travel with the
+ * question; the model is asked only what a measurement cannot answer, namely
+ * which blocks are body text and whether the page offers the user a way to
+ * choose colours and width.
  */
 
 const LLMBaseScanner = require('./base');
+
+/** 1.4.8 clause: no more than 80 characters per line. */
+const MAX_CHARS_PER_LINE = 80;
+
+/** 1.4.8 clause: line spacing at least 1.5 within a paragraph. */
+const MIN_LINE_HEIGHT_RATIO = 1.5;
 
 class LLMVisualPresentationScanner extends LLMBaseScanner {
   constructor(llmClient) {
     super(
       'llm-visual-presentation',
       {
-        wcagCriteria: ['1.4.7', '1.4.8', '1.4.9'],
+        wcagCriteria: ['1.4.8', '1.4.9'],
         wcagPrinciple: 'perceivable',
       },
       llmClient
@@ -19,8 +32,98 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
   }
 
   async scan(page, options = {}) {
-    // Pre-compute the style facts the LLM cannot derive from raw HTML.
-    const styleData = await page.evaluate(() => {
+    const styleData = await this._measure(page);
+    const clauses = this.clauseSummary(styleData.blocks);
+
+    const prompt = `Judge this page against WCAG 2.2 criteria 1.4.8 and 1.4.9 (both AAA). Everything you report becomes a question for a human reviewer, never an automatic failure.
+
+The presentation data below was MEASURED in the browser: the characters per line come from the rendered line boxes, the line spacing from computed styles. Never re-estimate those numbers and never report a block the data does not show.
+
+**Measured text blocks (${styleData.blocks.length}):**
+${JSON.stringify(styleData.blocks, null, 1)}
+
+**Measured against the 1.4.8 clauses:** ${clauses.blocksOverLineLength} block(s) render more than ${MAX_CHARS_PER_LINE} characters per line without a max-width, ${clauses.blocksUnderLineHeight} block(s) have line spacing below ${MIN_LINE_HEIGHT_RATIO}, ${clauses.justifiedBlocks} block(s) are justified.
+
+**Visible images (${styleData.images.length}):**
+${JSON.stringify(styleData.images)}
+
+**Colour/theme selection mechanism detected:** ${styleData.hasThemeMechanism}
+
+1. **1.4.8 Visual Presentation**: the criterion applies to BLOCKS OF TEXT, not to navigation, buttons, badges, code samples or headings. Say which measured blocks are blocks of text, and raise a question for those where the measurement above already shows a failed clause (line length, line spacing, justification), or where the user is given no mechanism to select foreground and background colours. Do not restate the numbers; name the block and which clause it concerns.
+
+2. **1.4.9 Images of Text (No Exception)**: ask only about images where the evidence is strong that the image renders text: alt text that duplicates a heading or reads as a sentence, or a filename clearly indicating rendered text (e.g. "headline.png", "quote-banner.jpg"). Logotypes, favicons and icons are exempt: never ask about them. Photographs with descriptive alt text are not images of text.
+
+Do NOT report:
+- Anything for which the measured data above shows no evidence
+- Blocks you cannot see in the data (the data is authoritative; the HTML excerpt may be truncated)
+- Missing zoom or resize capability (that is 1.4.4, not checked here)
+
+Each finding must cite the measured block or image it rests on. Return violations as JSON.`;
+
+    const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
+    const described = await this.describeElements(
+      page,
+      raw.map((v) => v && v.selector)
+    );
+    const needsReview = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      measurements: {
+        ...clauses,
+        maxCharsPerLineClause: MAX_CHARS_PER_LINE,
+        minLineHeightRatioClause: MIN_LINE_HEIGHT_RATIO,
+        colourSelectionMechanism: styleData.hasThemeMechanism,
+      },
+      bySelector: Object.fromEntries(
+        Object.entries(described).map(([selector, element]) => [selector, { element }])
+      ),
+    });
+
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['1.4.8', '1.4.9'],
+      measuredBlocks: styleData.blocks.length,
+      themeMechanism: styleData.hasThemeMechanism,
+      clauses,
+      analyzedFraction: ctx.analyzedFraction,
+      rawChars: ctx.rawChars,
+      skeletonChars: ctx.skeletonChars,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
+  }
+
+  /**
+   * The 1.4.8 clauses this scanner decides in code, over the measured blocks.
+   *
+   * @param {Object[]} blocks
+   * @returns {Object} flat counts and extremes
+   */
+  clauseSummary(blocks) {
+    const perLine = blocks.map((b) => b.charsPerLine).filter((n) => typeof n === 'number' && n > 0);
+    const ratios = blocks.map((b) => b.lineHeightRatio).filter((n) => typeof n === 'number');
+    return {
+      blocksMeasured: blocks.length,
+      maxCharsPerLine: perLine.length ? Math.max(...perLine) : null,
+      blocksOverLineLength: blocks.filter(
+        (b) => b.charsPerLine > MAX_CHARS_PER_LINE && !b.hasMaxWidth
+      ).length,
+      minLineHeightRatio: ratios.length ? Math.min(...ratios) : null,
+      blocksUnderLineHeight: blocks.filter((b) => b.lineHeightRatio < MIN_LINE_HEIGHT_RATIO).length,
+      justifiedBlocks: blocks.filter((b) => b.textAlign === 'justify').length,
+    };
+  }
+
+  /**
+   * Measure each text block's rendered presentation.
+   *
+   * Characters per line come from a Range over the block's contents: its
+   * client rects are the rendered line boxes, so dividing the text length by
+   * the number of lines is the page's real line length. Deriving it from the
+   * container width and half the font size, as this scanner used to, assumes a
+   * glyph width no proportional font has.
+   */
+  async _measure(page) {
+    return page.evaluate(() => {
       const isVisible = (el) => {
         const s = window.getComputedStyle(el);
         return (
@@ -28,10 +131,21 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
         );
       };
 
-      // Text blocks: measured presentation properties (1.4.8)
+      /** Rendered line count of an element, from the line boxes of a Range. */
+      const renderedLines = (el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const tops = new Set();
+        for (const r of range.getClientRects()) {
+          if (r.width === 0 && r.height === 0) continue;
+          tops.add(Math.round(r.top));
+        }
+        range.detach && range.detach();
+        return tops.size;
+      };
+
       const blocks = [];
-      const candidates = document.querySelectorAll('p, li, dd, blockquote');
-      for (const el of candidates) {
+      for (const el of document.querySelectorAll('p, li, dd, blockquote')) {
         if (blocks.length >= 30) break;
         const text = el.textContent.replace(/\s+/g, ' ').trim();
         if (text.length < 80 || !isVisible(el)) continue;
@@ -39,6 +153,7 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
         const fontSize = parseFloat(s.fontSize) || 16;
         const lineHeightPx =
           s.lineHeight === 'normal' ? fontSize * 1.2 : parseFloat(s.lineHeight) || fontSize * 1.2;
+        const lines = renderedLines(el);
         blocks.push({
           tag: el.tagName.toLowerCase(),
           textStart: text.slice(0, 60),
@@ -46,23 +161,12 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
           lineHeightRatio: Math.round((lineHeightPx / fontSize) * 100) / 100,
           textAlign: s.textAlign,
           containerWidthPx: Math.round(el.clientWidth),
-          // Average glyph width in body text is roughly 0.5em.
-          approxCharsPerLine: Math.round(el.clientWidth / (fontSize * 0.5)),
+          renderedLines: lines,
+          charsPerLine: lines > 0 ? Math.round(text.length / lines) : null,
           hasMaxWidth: s.maxWidth !== 'none',
         });
       }
 
-      // Media elements (1.4.7)
-      const media = Array.from(document.querySelectorAll('audio, video')).map((el) => ({
-        tag: el.tagName.toLowerCase(),
-        src: el.currentSrc || el.getAttribute('src') || '',
-        autoplay: el.hasAttribute('autoplay'),
-        controls: el.hasAttribute('controls'),
-        muted: el.hasAttribute('muted'),
-        loop: el.hasAttribute('loop'),
-      }));
-
-      // Images that might contain text (1.4.9)
       const images = Array.from(document.querySelectorAll('img'))
         .filter(isVisible)
         .slice(0, 20)
@@ -73,7 +177,6 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
           height: el.clientHeight,
         }));
 
-      // Color-change mechanism (1.4.8 bullet 1)
       const hasThemeMechanism = !!document.querySelector(
         '[class*="theme-toggle" i], [id*="theme-toggle" i], ' +
           '[class*="dark-mode" i], [id*="dark-mode" i], ' +
@@ -81,84 +184,8 @@ class LLMVisualPresentationScanner extends LLMBaseScanner {
           '[aria-label*="dark mode" i], [aria-label*="theme" i]'
       );
 
-      return { blocks, media, images, hasThemeMechanism };
+      return { blocks, images, hasThemeMechanism };
     });
-
-    const prompt = `Check this HTML for WCAG 2.2 AAA visual presentation criteria.
-
-You are given MEASURED computed-style data below. Base every 1.4.8 judgment on
-this data, never on guesses from class names or raw CSS.
-
-**Measured text blocks (${styleData.blocks.length}):**
-${JSON.stringify(styleData.blocks, null, 1)}
-
-**Media elements (${styleData.media.length}):**
-${JSON.stringify(styleData.media)}
-
-**Visible images (${styleData.images.length}):**
-${JSON.stringify(styleData.images)}
-
-**Theme/contrast switch mechanism detected:** ${styleData.hasThemeMechanism}
-
-1. **1.4.7 Low or No Background Audio**: Flag ONLY audio/video elements listed
-   above where the markup evidences speech content with background audio and no
-   way to turn the background off, in practice: autoplay audio without
-   controls, or explicit markup describing background music behind narration.
-   If the media list is empty, there is NOTHING to flag for 1.4.7.
-
-2. **1.4.8 Visual Presentation**: flag only what the measured data shows:
-   - Line length: THREE or more text blocks with approxCharsPerLine > 80 and
-     hasMaxWidth=false. One or two long blocks are not a pattern, do not flag.
-   - Justified text: text blocks with textAlign="justify" (flag each block).
-   - Line spacing: THREE or more body-text blocks with lineHeightRatio < 1.5.
-   - Color mechanism: do NOT flag a missing theme switcher on its own: pages
-     using default/inherited colors satisfy this via user-agent settings. Only
-     mention it (as "moderate") when the page ALSO fails another 1.4.8 bullet
-     and hard-codes colors throughout.
-
-3. **1.4.9 Images of Text (No Exception)**: Flag ONLY images where the evidence
-   is strong that the image renders text: alt text that duplicates a heading or
-   sentence-length wording, or a filename clearly indicating rendered text
-   (e.g. "headline.png", "quote-banner.jpg"). Logotypes (logos containing the
-   brand name) are EXEMPT: never flag logos, favicons, or icons. Photographs
-   with descriptive alt text are NOT images of text.
-
-Do NOT flag:
-- Anything for which the measured data above shows no evidence
-- Blocks you cannot see in the data (the data is authoritative; the HTML
-  excerpt may be truncated)
-- Navigation, buttons, badges, code snippets, or headings for line-length or
-  line-height rules: those rules apply to body text blocks only
-- Missing zoom/resize capability (that is 1.4.4, not checked here)
-
-IMPORTANT: Err on the side of NOT flagging. Each violation must cite the
-specific measured values or attributes that prove it (e.g. "3 blocks with
-approxCharsPerLine 96-112 and no max-width"). If you cannot cite measured
-evidence, do not report the violation.
-
-Return violations as JSON.`;
-
-    const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
-    const violations = this.convertViolations(raw);
-
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['1.4.7', '1.4.8', '1.4.9'],
-        measuredBlocks: styleData.blocks.length,
-        mediaElements: styleData.media.length,
-        themeMechanism: styleData.hasThemeMechanism,
-        analyzedFraction: ctx.analyzedFraction,
-        rawChars: ctx.rawChars,
-        skeletonChars: ctx.skeletonChars,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
-    };
   }
 }
 

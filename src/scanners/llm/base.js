@@ -7,7 +7,14 @@
 
 const BaseScanner = require('../../core/base-scanner');
 const { getPageContextPack } = require('./page-context');
+const CRITERIA = require('../../data/wcag22-criteria.json');
 const log = require('../../utils/logger').createLogger('llm-base');
+
+/** Criterion number to its WCAG title, for the reviewer's question. */
+const CRITERION_TITLES = new Map(CRITERIA.map((c) => [c.sc, c.title]));
+
+/** Elements described from the page per scan, so one bad response cannot stall it. */
+const MAX_DESCRIBED_ELEMENTS = 40;
 
 /**
  * System prompt shared by `analyzeWithLLM` and `analyzePageChunked`. Module
@@ -380,21 +387,33 @@ class LLMBaseScanner extends BaseScanner {
   }
 
   /**
-   * Convert LLM violation objects to standard scanner violations.
+   * Convert the model's findings into needs-review items with an evidence
+   * dossier. An LLM scanner never asserts a violation: it asks a question a
+   * reviewer (or a human) answers, so a scan with an API key scores exactly
+   * like a scan without one.
    *
-   * Filters out any violation whose `criterion` is not one this scanner is
-   * responsible for (`this.wcagCriteria`). The system prompt already asks
-   * the LLM to restrict itself to the requested criteria; off-list violations
-   * are dropped here (and logged) rather than passed through, so prompt drift
-   * is observable instead of polluting reports.
+   * Findings for a criterion this scanner is not responsible for
+   * (`this.wcagCriteria`) are dropped and logged, so prompt drift stays
+   * observable instead of polluting the report.
    *
    * @param {Object[]} llmViolations - from LLM response
-   * @returns {Object[]} Standard violation format, off-criterion entries removed
+   * @param {Object} [options]
+   * @param {string} [options.model] - model id that produced the findings
+   * @param {Object} [options.measurements] - values measured in code for the
+   *   whole page; merged into every dossier
+   * @param {Object|Map} [options.bySelector] - selector -> { measurements, element }
+   *   for scanners that collected a per-element measurement table
+   * @returns {Object[]} needs-review findings, off-criterion entries removed
    */
-  convertViolations(llmViolations) {
+  convertViolations(llmViolations, options = {}) {
     if (!Array.isArray(llmViolations)) return [];
 
     const allowed = new Set(this.wcagCriteria || []);
+    const bySelector =
+      options.bySelector instanceof Map
+        ? options.bySelector
+        : new Map(Object.entries(options.bySelector || {}));
+    const pageMeasurements = options.measurements || {};
     const converted = [];
 
     for (const v of llmViolations) {
@@ -403,24 +422,127 @@ class LLMBaseScanner extends BaseScanner {
       if (!normalized || !allowed.has(normalized)) {
         this.droppedViolationCount++;
         log.warn(
-          `${this.id}: dropping off-list violation for criterion "${v.criterion ?? 'undefined'}" ` +
+          `${this.id}: dropping off-list finding for criterion "${v.criterion ?? 'undefined'}" ` +
             `(scanner covers: ${this.wcagCriteria.join(', ') || 'none'})`
         );
         continue;
       }
 
-      converted.push(
-        this.formatViolation(
-          normalized,
-          v.impact || 'moderate',
-          v.description || 'LLM-detected accessibility issue',
-          v.selector ? [{ selector: v.selector }] : [],
-          v.helpUrl || ''
-        )
+      const selector =
+        typeof v.selector === 'string' && v.selector.trim() ? v.selector.trim() : null;
+      const measured = bySelector.get(selector) || {};
+      const element = measured.element || {};
+
+      const finding = this.formatViolation(
+        normalized,
+        v.impact || 'moderate',
+        v.description || 'LLM-detected accessibility question',
+        selector ? [{ selector }] : [],
+        v.helpUrl || '',
+        'info',
+        {
+          verdict: 'needs-review',
+          dossier: {
+            question: this.buildQuestion(normalized, selector),
+            element: {
+              selector,
+              html: element.html ?? null,
+              role: element.role ?? null,
+              name: element.name ?? null,
+            },
+            measurements: { ...pageMeasurements, ...(measured.measurements || {}) },
+            context: {
+              evidence: v.description ? String(v.description).slice(0, 400) : null,
+              model: options.model || 'unknown',
+            },
+          },
+        }
       );
+      // Report badge and UI read the producing layer off this.
+      finding.source = this.id;
+      converted.push(finding);
     }
 
     return converted;
+  }
+
+  /**
+   * The one decision the reviewer has to make, from the criterion and the
+   * element the model named.
+   *
+   * @param {string} criterion - normalized "X.Y.Z"
+   * @param {string|null} selector
+   * @returns {string}
+   */
+  buildQuestion(criterion, selector) {
+    const title = CRITERION_TITLES.get(criterion);
+    const subject = selector ? `the element \`${selector}\`` : 'this page';
+    return `Does ${subject} meet ${title ? `${title} ` : ''}(WCAG ${criterion})?`;
+  }
+
+  /**
+   * Read `html`, `role` and `name` off the page for the selectors the model
+   * named, so a dossier describes a real element rather than a string.
+   * Never throws: an unusable selector simply yields no entry.
+   *
+   * @param {import('puppeteer').Page} page
+   * @param {string[]} selectors
+   * @returns {Promise<Object>} selector -> { html, role, name }
+   */
+  async describeElements(page, selectors) {
+    const list = [...new Set((selectors || []).filter(Boolean))].slice(0, MAX_DESCRIBED_ELEMENTS);
+    if (list.length === 0) return {};
+    try {
+      return await page.evaluate((sels) => {
+        const out = {};
+        for (const sel of sels) {
+          let el = null;
+          try {
+            el = document.querySelector(sel);
+          } catch {
+            continue; // the model's selector is not valid CSS
+          }
+          if (!el) continue;
+          const labelledby = (el.getAttribute('aria-labelledby') || '')
+            .split(/\s+/)
+            .map((id) => document.getElementById(id))
+            .filter(Boolean)
+            .map((n) => n.textContent.trim())
+            .join(' ');
+          const name =
+            el.getAttribute('aria-label') ||
+            labelledby ||
+            el.getAttribute('alt') ||
+            (el.textContent || '').replace(/\s+/g, ' ').trim() ||
+            el.getAttribute('title') ||
+            null;
+          out[sel] = {
+            html: (el.outerHTML || '').slice(0, 400),
+            role: el.getAttribute('role') || null,
+            name: name ? name.slice(0, 120) : null,
+          };
+        }
+        return out;
+      }, list);
+    } catch {
+      return {};
+    }
+  }
+
+  /**
+   * Standard result of an LLM scanner: questions, never failures.
+   *
+   * @param {Object[]} needsReview
+   * @param {Object} summary
+   */
+  reviewResult(needsReview, summary = {}) {
+    return {
+      scannerId: this.id,
+      passed: true,
+      violations: [],
+      needsReview,
+      summary: { openQuestions: needsReview.length, ...summary },
+    };
   }
 }
 

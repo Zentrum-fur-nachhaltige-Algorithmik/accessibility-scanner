@@ -23,6 +23,25 @@ const OUT_JSON = path.join(ROOT, 'tests', 'data', 'coverage-matrix.json');
 // Mechanism vocabulary
 // ---------------------------------------------------------------------------
 
+/**
+ * How a criterion is decided, one value per row:
+ *   measured        a deterministic scanner or an axe violation rule decides it
+ *   adjudicated     a scanner asks a needs-review question with a dossier that
+ *                   a reviewer or a human answers (axe incomplete, and the LLM
+ *                   scanners that carry a measurement table)
+ *   page-judgement  a reading of the whole page, always needs-review
+ *   manual          no mechanism; a human has to look
+ */
+const HOW = {
+  MEASURED: 'measured',
+  ADJUDICATED: 'adjudicated',
+  PAGE_JUDGEMENT: 'page-judgement',
+  MANUAL: 'manual',
+};
+
+/** LLM scanners that judge the page as a whole rather than named elements. */
+const PAGE_JUDGEMENT_SCANNERS = new Set(['llm-reading-level', 'llm-semantic-text']);
+
 const MECHANISM = {
   AXE: 'axe-core',
   DETERMINISTIC: 'deterministic',
@@ -31,6 +50,29 @@ const MECHANISM = {
   MANUAL: 'MANUAL',
   NOT_APPLICABLE: 'NOT-APPLICABLE-STATIC',
 };
+
+/**
+ * axe rules that carry a WCAG tag and never execute: axe ships its
+ * `deprecated` rules disabled, excludes its `experimental` tag by default, and
+ * disables a few others (target-size, color-contrast-enhanced,
+ * identical-links-same-purpose, meta-refresh-no-exceptions). Crediting a
+ * criterion to one of them claims coverage that never runs. They stay
+ * disabled: the fix is a mechanism that runs, not a noisier axe profile.
+ *
+ * @returns {Set<string>} rule ids
+ */
+function neverRunAxeRules() {
+  const axe = require('axe-core');
+  const specs = new Map(axe._audit.rules.map((r) => [r.id, r]));
+  const out = new Set();
+  for (const [id, spec] of specs) {
+    const tags = spec.tags || [];
+    if (spec.enabled === false || tags.includes('experimental') || tags.includes('deprecated')) {
+      out.add(id);
+    }
+  }
+  return out;
+}
 
 /**
  * Criteria that no single-page static scan can decide, with the one-line
@@ -45,6 +87,84 @@ const MANUAL_OVERRIDES = {
     justification:
       'Captions (Live): requires a running live stream; a static page ' +
       'exposes no signal about whether a future broadcast will be captioned.',
+  },
+  '1.2.6': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Sign Language (Recorded) (AAA): whether a recording carries a sign language ' +
+      'interpretation is a property of the media track, not of the page markup.',
+  },
+  '1.2.7': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Extended Audio Description (AAA): whether the pauses in a video carry enough ' +
+      'description is a property of the audio track, not of the page markup.',
+  },
+  '1.2.8': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Media Alternative (Recorded) (AAA): whether a linked document is a full ' +
+      'alternative for the recording can only be decided by reading both.',
+  },
+  '1.2.9': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Audio-only (Live) (AAA): requires a running live stream; a static page exposes ' +
+      'no signal about whether a future broadcast carries a text alternative.',
+  },
+  '1.4.7': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Low or No Background Audio (AAA): whether speech has background sound behind it, ' +
+      'and 20 dB below it, is a property of the audio signal, not of the page.',
+  },
+  '2.2.3': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'No Timing (AAA): a time limit on user activity shows up while the page runs; ' +
+      'it needs state interaction and observation, not a reading of the markup.',
+  },
+  '2.2.4': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Interruptions (AAA): whether an interruption can be postponed is runtime ' +
+      'behaviour; axe ships meta-refresh-no-exceptions disabled, so nothing runs for it.',
+  },
+  '2.2.5': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Re-authentication (AAA): whether data survives a re-login is server and session ' +
+      'behaviour that a single page load does not expose.',
+  },
+  '2.2.6': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Timeouts (AAA): whether an inactivity timeout discards user data needs state ' +
+      'interaction over time, not a static reading.',
+  },
+  '3.1.6': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Pronunciation (AAA): whether a word is ambiguous in a way that changes meaning is ' +
+      'a reading of the text in its language; the page carries no signal for it.',
+  },
+  '3.2.5': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Change on Request (AAA): an automatic context change happens at runtime; axe ships ' +
+      'meta-refresh-no-exceptions disabled, so nothing runs for it either.',
+  },
+  '3.3.5': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Help (AAA): whether help is context-sensitive for the field that needs it is a ' +
+      'judgement about the process, and the help may live behind an interaction.',
+  },
+  '1.3.6': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Identify Purpose (AAA): asks for personalization semantics (WAI-ADAPT style ' +
+      'annotations) that no scanner here measures; landmark structure is 1.3.1, not this.',
   },
   '1.3.2': {
     mechanism: MECHANISM.MANUAL,
@@ -148,9 +268,12 @@ function collectAxeCriteria() {
     'best-practice',
   ]);
 
+  const neverRun = neverRunAxeRules();
+
   /** @type {Map<string, string[]>} criterion → axe rule ids */
   const byCriterion = new Map();
   for (const rule of rules) {
+    if (neverRun.has(rule.ruleId)) continue;
     for (const tag of rule.tags || []) {
       const m = tag.match(/^wcag(\d)(\d)(\d+)$/);
       if (!m) continue;
@@ -345,6 +468,24 @@ function collectHarnessOutcomes() {
 // Assembly
 // ---------------------------------------------------------------------------
 
+/**
+ * How this criterion is decided. Mechanism says WHICH component covers it;
+ * `how` says what kind of answer that component gives, which is what a reader
+ * of the matrix needs in order to plan the manual part of an audit.
+ *
+ * Trust tier is deliberately not consulted: a quarantined scanner still
+ * decides the criterion the same way.
+ *
+ * @returns {string} one of HOW
+ */
+function howOf({ isManual, axeRules, det, llm }) {
+  if (isManual) return HOW.MANUAL;
+  if (axeRules.length > 0 || det.length > 0) return HOW.MEASURED;
+  if (llm.some((s) => !PAGE_JUDGEMENT_SCANNERS.has(s.id))) return HOW.ADJUDICATED;
+  if (llm.length > 0) return HOW.PAGE_JUDGEMENT;
+  return HOW.MANUAL;
+}
+
 function buildRows() {
   const criteria = parseCriteria();
   const scanners = collectScanners();
@@ -420,6 +561,7 @@ function buildRows() {
       level,
       title,
       mechanism,
+      how: howOf({ isManual, axeRules, det, llm }),
       supporting,
       justification,
       isManual,
@@ -448,6 +590,14 @@ function validate(rows) {
       errors.push(
         `${r.sc} (${r.level}) "${r.title}" is UNMAPPED: no axe rule, no scanner, and ` +
           `no MANUAL_OVERRIDES entry. Add a scanner or an override with a justification.`
+      );
+      continue;
+    }
+
+    if (!Object.values(HOW).includes(r.how)) {
+      errors.push(
+        `${r.sc} carries no valid "how" (${r.how ?? 'missing'}); expected one of ` +
+          `${Object.values(HOW).join(', ')}.`
       );
       continue;
     }
@@ -532,6 +682,18 @@ function renderSummary(rows) {
   const n = (lvl) => rows.filter((r) => r.level === lvl).length;
   L.push(`| total | ${rows.length} | ${n('A')} | ${n('AA')} | ${n('AAA')} | ${n('REMOVED')} |`);
   L.push('');
+  L.push('| How it is decided | Criteria | A | AA | AAA | Removed |');
+  L.push('|---|---:|---:|---:|---:|---:|');
+  const howAt = (lvl, how) => rows.filter((r) => r.level === lvl && r.how === how).length;
+  for (const how of Object.values(HOW)) {
+    const total = rows.filter((r) => r.how === how).length;
+    if (!total) continue;
+    L.push(
+      `| ${how} | ${total} | ${howAt('A', how)} | ${howAt('AA', how)} | ${howAt('AAA', how)} | ` +
+        `${howAt('REMOVED', how)} |`
+    );
+  }
+  L.push('');
   const aa = rows.filter((r) => r.level === 'A' || r.level === 'AA');
   const automated = aa.filter((r) => !r.isManual && !r.isExperimentalOnly).length;
   const manual = aa.filter((r) => r.isManual).length;
@@ -603,4 +765,12 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { buildRows, validate, parseCriteria, MANUAL_OVERRIDES, mechanismBucket };
+module.exports = {
+  buildRows,
+  validate,
+  parseCriteria,
+  MANUAL_OVERRIDES,
+  mechanismBucket,
+  neverRunAxeRules,
+  HOW,
+};

@@ -119,43 +119,56 @@ describe('reconcileIncompleteReviews', () => {
     expect(reviewLog).toHaveLength(0);
   });
 
-  it('closes a question the reviewer answered fail, and keeps the adjudicated violation', () => {
+  const reviewerFail = {
+    ruleId: 'video-caption',
+    severity: 'violation',
+    impact: 'serious',
+    description: 'confirmed: spoken dialogue, no captions',
+    nodes: [{ selector: 'video#intro' }],
+    wcagCriteria: ['1.2.2'],
+    adjudicated: true,
+    reviewedAxeRule: 'video-caption',
+    reviewedSelector: 'video#intro',
+  };
+  const failDecision = {
+    axeRuleId: 'video-caption',
+    selector: 'video#intro',
+    verdict: 'fail',
+    reason: 'confirmed: spoken dialogue, no captions',
+  };
+
+  it('keeps the question open with the verdict attached while the reviewer is experimental', () => {
+    // llm-incomplete-reviewer has no stability record in scanner-trust.json.
     const p = new ScanPipeline();
     const result = p.assembleResult('http://x', [
       { scannerId: 'axe-core', passed: false, violations: [suspected] },
       {
         scannerId: 'llm-incomplete-reviewer',
         passed: false,
-        violations: [
-          {
-            ruleId: 'video-caption',
-            severity: 'violation',
-            impact: 'serious',
-            description: 'confirmed: spoken dialogue, no captions',
-            nodes: [{ selector: 'video#intro' }],
-            wcagCriteria: ['1.2.2'],
-            adjudicated: true,
-            reviewedAxeRule: 'video-caption',
-            reviewedSelector: 'video#intro',
-          },
-        ],
-        summary: {
-          decided: [
-            {
-              axeRuleId: 'video-caption',
-              selector: 'video#intro',
-              verdict: 'fail',
-              reason: 'confirmed: spoken dialogue, no captions',
-            },
-          ],
-        },
+        violations: [reviewerFail],
+        summary: { decided: [failDecision] },
       },
     ]);
 
-    expect(result.needsReview).toHaveLength(0);
-    expect(result.violations).toHaveLength(1);
-    expect(result.violations[0].adjudicated).toBe(true);
-    expect(result.reviewLog[0].verdict).toBe('fail');
+    expect(result.violations).toHaveLength(0);
+    expect(result.needsReview).toHaveLength(1);
+    expect(result.needsReview[0].review).toEqual({
+      by: 'llm-incomplete-reviewer',
+      verdict: 'fail',
+      reason: 'confirmed: spoken dialogue, no captions',
+    });
+    expect(result.reviewLog).toBeUndefined();
+  });
+
+  it('closes a question a proven reviewer answered fail', () => {
+    const p = new ScanPipeline();
+    const { kept, reviewLog } = p.reconcileIncompleteReviews(
+      [suspected],
+      [{ scannerId: 'llm-incomplete-reviewer', summary: { decided: [failDecision] } }],
+      { reviewerProven: true }
+    );
+    expect(kept).toHaveLength(0);
+    expect(reviewLog[0].verdict).toBe('fail');
   });
 
   it('keeps an uncertain item open and annotates the attempt', () => {

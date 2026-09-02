@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 
 /**
- * llm.js: single-run smoke test for the LLM scanners against good/bad fixtures (including a
- * German pair each), a prompt-injection fixture and a long-page fixture. A bad file counts as
- * detected only when a violation matches a criterion the file declares and the scanner claims.
+ * llm.js: measures the LLM scanners against good/bad fixtures (including a German pair each),
+ * a prompt-injection fixture and a long-page fixture. LLM scanners emit questions, so a bad
+ * file counts as detected when a needs-review finding names a criterion the file declares and
+ * the scanner claims.
+ *
+ * With --runs N each fixture is scanned N times and the record keeps, per rule, how often the
+ * runs agreed and how precise the findings were against the fixture labels. That record is what
+ * scripts/derive-scanner-trust.js reads to decide whether an LLM scanner may be `proven`; it is
+ * written only with --json, because every run costs money.
  *
  * Usage:
  *   node scripts/harness/llm.js
- *   node scripts/harness/llm.js --only llm-behavioral
+ *   node scripts/harness/llm.js --only llm-alt-quality
  *   node scripts/harness/llm.js --skip-german     # cheap iteration
  *   node scripts/harness/llm.js --skip-robustness
- *   node scripts/harness/llm.js --json out.json
- *
- * No repetition, no majority voting: runs cost money.
+ *   node scripts/harness/llm.js --runs 3 --json   # writes tests/data/harness/harness-llm.json
+ *   node scripts/harness/llm.js --runs 3 --json out.json
  */
 
 const path = require('path');
@@ -22,6 +27,15 @@ const { parseWcagMetadata } = require('./wcag-metadata-parser');
 
 // Load .env if present
 const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
+const DEFAULT_JSON = path.join(
+  __dirname,
+  '..',
+  '..',
+  'tests',
+  'data',
+  'harness',
+  'harness-llm.json'
+);
 const envPath = path.join(__dirname, '..', '..', '.env');
 if (fs.existsSync(envPath)) {
   const envContent = fs.readFileSync(envPath, 'utf-8');
@@ -54,7 +68,7 @@ const SCANNER_TESTS = {
     bad: ['bad-language-aaa.html', 'bad-navigation-aaa.html'],
     good: ['good-language-aaa.html', 'good-navigation-aaa.html'],
     german: { bad: 'bad-semantic-text-de.html', good: 'good-semantic-text-de.html' },
-    criteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
+    criteria: ['3.1.3', '3.1.4', '2.4.10'],
   },
   'llm-auth': {
     module: '../../src/scanners/llm/auth',
@@ -63,26 +77,12 @@ const SCANNER_TESTS = {
     german: { bad: 'bad-accessible-auth-de.html', good: 'good-accessible-auth-de.html' },
     criteria: ['3.3.8', '3.3.9'],
   },
-  'llm-media-alternatives': {
-    module: '../../src/scanners/llm/media-alternatives',
-    bad: ['bad-media-aaa.html', 'bad-media-alternatives.html'],
-    good: ['good-media-aaa.html', 'good-accessibility.html'],
-    german: { bad: 'bad-media-alternatives-de.html', good: 'good-media-alternatives-de.html' },
-    criteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
-  },
   'llm-visual-presentation': {
     module: '../../src/scanners/llm/visual-presentation',
-    bad: ['bad-visual-presentation.html', 'bad-low-background-audio.html'],
-    good: ['good-visual-presentation.html', 'good-low-background-audio.html'],
+    bad: ['bad-visual-presentation.html'],
+    good: ['good-visual-presentation.html'],
     german: { bad: 'bad-visual-presentation-de.html', good: 'good-visual-presentation-de.html' },
-    criteria: ['1.4.7', '1.4.8', '1.4.9'],
-  },
-  'llm-behavioral': {
-    module: '../../src/scanners/llm/behavioral',
-    bad: ['bad-timing-aaa.html', 'bad-change-on-request.html'],
-    good: ['good-timing-aaa.html', 'good-change-on-request.html'],
-    german: { bad: 'bad-behavioral-de.html', good: 'good-behavioral-de.html' },
-    criteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
+    criteria: ['1.4.8', '1.4.9'],
   },
   'llm-focus-appearance': {
     module: '../../src/scanners/llm/focus-appearance',
@@ -175,12 +175,86 @@ function expectedCriteriaFor(filePath, scannerCriteria) {
   return intersect.length > 0 ? intersect : scannerCriteria;
 }
 
+/**
+ * Fold one fixture's runs into the per-rule stability record.
+ *
+ * A rule is one criterion of one scanner. Agreement is how often the runs
+ * agree about whether that rule fires on this fixture; precision is measured
+ * against the fixture labels: a finding on a bad file for a criterion that
+ * file declares is true, anything else (a criterion the file does not declare,
+ * or any finding on a good file) is false.
+ *
+ * @param {Map} labels - accumulator
+ * @param {string} scannerId
+ * @param {string[]} scannerCriteria
+ * @param {Object[][]} perRun - findings of each run
+ * @param {string[]} expected - criteria this fixture declares
+ * @param {'bad'|'good'} kind
+ */
+function recordFindings(labels, scannerId, scannerCriteria, perRun, expected, kind) {
+  for (const criterion of scannerCriteria) {
+    const key = `${scannerId}/${criterion}`;
+    const bucket = labels.get(key) || {
+      rule: key,
+      scanner: scannerId,
+      criterion,
+      agreements: [],
+      truePositives: 0,
+      falsePositives: 0,
+    };
+
+    const fired = perRun.map((findings) =>
+      findings.some((v) => String(v.ruleId) === criterion || String(v.criterion) === criterion)
+    );
+    const yes = fired.filter(Boolean).length;
+    bucket.agreements.push(Math.max(yes, fired.length - yes) / fired.length);
+
+    for (const findings of perRun) {
+      for (const v of findings) {
+        if (String(v.ruleId) !== criterion && String(v.criterion) !== criterion) continue;
+        if (kind === 'bad' && expected.includes(criterion)) bucket.truePositives++;
+        else bucket.falsePositives++;
+      }
+    }
+
+    labels.set(key, bucket);
+  }
+}
+
+/** Reduce the accumulator to the rows scripts/derive-scanner-trust.js reads. */
+function stabilityRules(labels, runs) {
+  const round = (n) => Math.round(n * 100) / 100;
+  return [...labels.values()].map((b) => {
+    const judged = b.truePositives + b.falsePositives;
+    return {
+      rule: b.rule,
+      scanner: b.scanner,
+      criterion: b.criterion,
+      runs,
+      fixtures: b.agreements.length,
+      agreement: b.agreements.length
+        ? round(b.agreements.reduce((a, c) => a + c, 0) / b.agreements.length)
+        : null,
+      truePositives: b.truePositives,
+      falsePositives: b.falsePositives,
+      precision: judged > 0 ? round(b.truePositives / judged) : null,
+    };
+  });
+}
+
 async function main() {
   const argv = process.argv.slice(2);
   const only = argv.includes('--only') ? argv[argv.indexOf('--only') + 1] : null;
   const skipGerman = argv.includes('--skip-german');
   const skipRobustness = argv.includes('--skip-robustness');
-  const jsonPath = argv.includes('--json') ? argv[argv.indexOf('--json') + 1] : null;
+  const runsArg = argv.includes('--runs') ? parseInt(argv[argv.indexOf('--runs') + 1], 10) : 1;
+  const runs = Number.isFinite(runsArg) && runsArg > 0 ? runsArg : 1;
+  const jsonArg = argv.includes('--json') ? argv[argv.indexOf('--json') + 1] : null;
+  const jsonPath = argv.includes('--json')
+    ? jsonArg && !jsonArg.startsWith('-')
+      ? jsonArg
+      : DEFAULT_JSON
+    : null;
 
   if (!process.env.OPENROUTER_API_KEY) {
     console.error('OPENROUTER_API_KEY not set. Cannot test LLM scanners.');
@@ -227,6 +301,8 @@ async function main() {
 
   const results = {};
   const records = [];
+  /** rule key -> run agreement and label counts, reduced to `rules` below. */
+  const labels = new Map();
   let totalTests = 0;
   let totalPassed = 0;
 
@@ -260,7 +336,30 @@ async function main() {
       if (!goodFiles.includes(testConfig.german.good)) goodFiles.push(testConfig.german.good);
     }
 
-    // ---- bad files: violation-level ground truth ------------------------
+    /** Every finding of one scan, whichever list the scanner puts it in. */
+    const findingsOf = (result) => [
+      ...(result?.needsReview || []),
+      // llm-incomplete-reviewer keeps the judge contract and answers in
+      // violations; every other LLM scanner leaves that list empty.
+      ...(result?.violations || []),
+    ];
+
+    /** Run one fixture `runs` times and return the findings of each run. */
+    const scanRuns = async (file) => {
+      const out = [];
+      for (let i = 0; i < runs; i++) {
+        out.push(findingsOf(await withPage(file, (p) => scanner.scan(p))));
+      }
+      return out;
+    };
+
+    /** Share of runs that agree with the majority outcome. */
+    const agreementOf = (outcomes) => {
+      const yes = outcomes.filter(Boolean).length;
+      return Math.max(yes, outcomes.length - yes) / outcomes.length;
+    };
+
+    // ---- bad files: criterion-level ground truth ------------------------
     for (const file of badFiles) {
       const filePath = path.join(TEST_SITES, file);
       if (!fs.existsSync(filePath)) {
@@ -270,32 +369,32 @@ async function main() {
       totalTests++;
       const expected = expectedCriteriaFor(filePath, testConfig.criteria);
       try {
-        const result = await withPage(file, (p) => scanner.scan(p));
-        const matched = (result.violations || []).filter((v) => matchesCriteria(v, expected));
-        const detected = matched.length > 0;
+        const perRun = await scanRuns(file);
+        const outcomes = perRun.map((f) => f.some((v) => matchesCriteria(v, expected)));
+        const detected = outcomes.filter(Boolean).length * 2 > runs;
+        const agreement = agreementOf(outcomes);
+        const matched = perRun[0].filter((v) => matchesCriteria(v, expected));
         if (detected) totalPassed++;
+        recordFindings(labels, scannerId, testConfig.criteria, perRun, expected, 'bad');
         console.log(
           `  [BAD]  ${file}: ${detected ? 'PASS' : 'FAIL'} ` +
-            `(${matched.length}/${result.violations.length} matching ${expected.join(',')})`
+            `(${matched.length}/${perRun[0].length} matching ${expected.join(',')}` +
+            `${runs > 1 ? `, agreement ${agreement.toFixed(2)} over ${runs} runs` : ''})`
         );
         for (const v of matched.slice(0, 2)) {
-          console.log(`         - ${v.ruleId}: ${String(v.description).slice(0, 90)}`);
-        }
-        if (!detected && result.violations.length > 0) {
           console.log(
-            `         off-target: ${result.violations
-              .slice(0, 3)
-              .map((v) => v.ruleId)
-              .join(', ')}`
+            `         - ${v.ruleId}: ${String(v.dossier?.question || v.description).slice(0, 90)}`
           );
         }
-        results[scannerId].bad.push({ file, detected, matched: matched.length });
+        results[scannerId].bad.push({ file, detected, matched: matched.length, agreement });
         records.push({
           scannerId,
           file,
           kind: 'bad',
           expected,
           matched: matched.length,
+          agreement,
+          runs,
           pass: detected,
         });
       } catch (err) {
@@ -305,7 +404,7 @@ async function main() {
       }
     }
 
-    // ---- good files: no false positives on the file's own criteria ------
+    // ---- good files: no question on the file's own criteria -------------
     for (const file of goodFiles) {
       const filePath = path.join(TEST_SITES, file);
       if (!fs.existsSync(filePath)) {
@@ -315,26 +414,30 @@ async function main() {
       totalTests++;
       const expected = expectedCriteriaFor(filePath, testConfig.criteria);
       try {
-        const result = await withPage(file, (p) => scanner.scan(p));
-        const relevant = (result.violations || []).filter((v) => matchesCriteria(v, expected));
-        const clean = relevant.length === 0;
+        const perRun = await scanRuns(file);
+        const outcomes = perRun.map((f) => !f.some((v) => matchesCriteria(v, expected)));
+        const clean = outcomes.filter(Boolean).length * 2 > runs;
+        const agreement = agreementOf(outcomes);
+        const relevant = perRun[0].filter((v) => matchesCriteria(v, expected));
         if (clean) totalPassed++;
-        const filtered = (result.violations || []).length - relevant.length;
+        recordFindings(labels, scannerId, testConfig.criteria, perRun, [], 'good');
         console.log(
           `  [GOOD] ${file}: ${clean ? 'PASS' : 'FAIL'} ` +
-            `(${relevant.length} relevant / ${(result.violations || []).length} total` +
-            `${filtered > 0 ? `, ${filtered} out-of-scope filtered` : ''})`
+            `(${relevant.length} relevant / ${perRun[0].length} total` +
+            `${runs > 1 ? `, agreement ${agreement.toFixed(2)} over ${runs} runs` : ''})`
         );
         for (const v of relevant.slice(0, 2)) {
           console.log(`         - FALSE POS: ${v.ruleId}: ${String(v.description).slice(0, 90)}`);
         }
-        results[scannerId].good.push({ file, clean, violations: relevant.length });
+        results[scannerId].good.push({ file, clean, violations: relevant.length, agreement });
         records.push({
           scannerId,
           file,
           kind: 'good',
           expected,
           matched: relevant.length,
+          agreement,
+          runs,
           pass: clean,
         });
       } catch (err) {
@@ -351,12 +454,11 @@ async function main() {
       totalTests++;
       try {
         const result = await withPage(file, (p) => scanner.scan(p));
-        const ok = result && Array.isArray(result.violations);
+        const ok =
+          result && (Array.isArray(result.needsReview) || Array.isArray(result.violations));
         if (ok) totalPassed++;
         console.log(
-          `  [RUNS] ${file}: ${ok ? 'PASS' : 'FAIL'} ` +
-            `(${result?.violations?.length ?? '-'} findings; ` +
-            `${JSON.stringify(result?.summary?.suppressed?.length ?? 0)} suppressed)`
+          `  [RUNS] ${file}: ${ok ? 'PASS' : 'FAIL'} (${findingsOf(result).length} findings)`
         );
         results[scannerId].lenient.push({ file, ok });
         records.push({ scannerId, file, kind: 'lenient', pass: ok });
@@ -377,31 +479,30 @@ async function main() {
         }
         totalTests++;
         try {
-          const result = await withPage(file, (p) => scanner.scan(p));
-          const violations = result.violations || [];
+          const findings = findingsOf(await withPage(file, (p) => scanner.scan(p)));
           let pass;
           let detail;
 
           if (file === 'bad-prompt-injection.html') {
             // The page begs the scanner to return an empty violations array.
-            // Robust behaviour = still report the genuine 1.3.3 problem.
-            pass = violations.some((v) => matchesCriteria(v, ['1.3.3']));
-            detail = `${violations.length} violations; injection ${pass ? 'resisted' : 'OBEYED'}`;
+            // Robust behaviour = still ask the genuine 1.3.3 question.
+            pass = findings.some((v) => matchesCriteria(v, ['1.3.3']));
+            detail = `${findings.length} findings; injection ${pass ? 'resisted' : 'OBEYED'}`;
           } else {
             // A violation is seeded past character 27,000 of the body markup;
             // finding it proves the extraction covers the whole page.
-            const below = violations.some((v) =>
+            const below = findings.some((v) =>
               /rund|symbol|überweisung|uberweisung|seeded-below/i.test(
                 `${v.description || ''} ${JSON.stringify(v.nodes || [])}`
               )
             );
             pass = below;
-            detail = `${violations.length} violations; below-cutoff violation ${below ? 'FOUND' : 'MISSED'}`;
+            detail = `${findings.length} findings; below-cutoff finding ${below ? 'FOUND' : 'MISSED'}`;
           }
 
           if (pass) totalPassed++;
           console.log(`  [ROBUST] ${file}: ${pass ? 'PASS' : 'FAIL'} (${detail})`);
-          for (const v of violations.slice(0, 3)) {
+          for (const v of findings.slice(0, 3)) {
             console.log(`         - ${v.ruleId}: ${String(v.description).slice(0, 100)}`);
           }
           results[scannerId].robustness.push({ file, pass, detail });
@@ -458,14 +559,35 @@ async function main() {
     }
   }
 
+  const rules = stabilityRules(labels, runs);
+  if (rules.length > 0) {
+    console.log('\nPer-rule stability (agreement across runs / precision against labels):');
+    for (const r of rules) {
+      console.log(
+        `  ${r.rule}: agreement ${r.agreement ?? '-'}, precision ${r.precision ?? '-'} ` +
+          `(${r.truePositives} true, ${r.falsePositives} false, ${runs} runs)`
+      );
+    }
+  }
+
   if (jsonPath) {
+    fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
     fs.writeFileSync(
       jsonPath,
       JSON.stringify(
-        { generatedAt: new Date().toISOString(), totalTests, totalPassed, records, results },
+        {
+          harness: 'llm',
+          generatedAt: new Date().toISOString(),
+          runs,
+          totalTests,
+          totalPassed,
+          rules,
+          records,
+          results,
+        },
         null,
         2
-      )
+      ) + '\n'
     );
     console.log(`\nWrote ${jsonPath}`);
   }
@@ -474,7 +596,13 @@ async function main() {
 // Exported so `scripts/coverage-matrix.js` can read the real scanner-to-criteria
 // table instead of regex-scraping this file. Guarded so requiring it never
 // launches a browser or spends money.
-module.exports = { SCANNER_TESTS, matchesCriteria, expectedCriteriaFor };
+module.exports = {
+  SCANNER_TESTS,
+  matchesCriteria,
+  expectedCriteriaFor,
+  recordFindings,
+  stabilityRules,
+};
 
 if (require.main === module) {
   main().catch((err) => {

@@ -38,38 +38,59 @@ ${JSON.stringify(form, null, 1)}
 Return violations as JSON.`;
 
     const { violations: raw, ctx } = await analyzeCompat(this, page, prompt);
-    const violations = this.convertViolations(raw);
+    const described = await this.describeElements(
+      page,
+      raw.map((v) => v && v.selector)
+    );
+    const needsReview = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      measurements: this._measurements(form),
+      bySelector: Object.fromEntries(
+        Object.entries(described).map(([selector, element]) => [selector, { element }])
+      ),
+    });
 
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['3.3.7'],
-        sections: form.sections.length,
-        totalFields: form.totalFields,
-        analyzedFraction: ctx.analyzedFraction,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['3.3.7'],
+      sections: form.sections.length,
+      totalFields: form.totalFields,
+      analyzedFraction: ctx.analyzedFraction,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
+  }
+
+  /**
+   * The measured step structure as flat evidence: which labels each step asks
+   * for, which of them already carry a value, and what each step offers to
+   * reuse an earlier answer. That table is the whole basis of the question.
+   */
+  _measurements(form) {
+    const out = {
+      sections: form.sections.length,
+      totalFields: form.totalFields,
+      autofillTokens: form.pageHasAutofillTokens,
     };
+    for (const s of form.sections) {
+      const fields = s.fields
+        .map((f) => `${f.label}${f.hasValue ? ' (prefilled)' : ''}`)
+        .join(', ');
+      out[`step: ${s.section}`] = fields || '(no fields)';
+      out[`reuse controls in "${s.section}"`] = s.reuseControls.length
+        ? s.reuseControls.join(', ')
+        : 'none';
+    }
+    return out;
   }
 
   _empty(form, reason) {
-    return {
-      scannerId: this.id,
-      passed: true,
-      violations: [],
-      summary: {
-        totalIssues: 0,
-        criteriaChecked: ['3.3.7'],
-        skipped: reason,
-        sections: form.sections.length,
-        totalFields: form.totalFields,
-      },
-    };
+    return this.reviewResult([], {
+      criteriaChecked: ['3.3.7'],
+      skipped: reason,
+      sections: form.sections.length,
+      totalFields: form.totalFields,
+    });
   }
 
   /**
@@ -195,6 +216,8 @@ Return violations as JSON.`;
 }
 
 const PROMPT = `Check this page for WCAG 2.2 criterion 3.3.7 (Redundant Entry, Level A).
+
+Everything you report becomes a question for a human reviewer, never an automatic failure.
 
 The criterion: information the user already entered earlier IN THE SAME PROCESS must not have to be entered again: it must be auto-populated, or offered for selection. It applies to multi-step processes (checkout, registration, booking, application forms) presented as steps or sections.
 

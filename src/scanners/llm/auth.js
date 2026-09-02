@@ -31,12 +31,7 @@ class LLMAuthScanner extends LLMBaseScanner {
     });
 
     if (!hasAuth) {
-      return {
-        scannerId: this.id,
-        passed: true,
-        violations: [],
-        summary: { totalIssues: 0, note: 'No authentication elements detected' },
-      };
+      return this.reviewResult([], { note: 'No authentication elements detected' });
     }
 
     const prompt = `Check this HTML for WCAG 2.2 authentication accessibility:
@@ -56,23 +51,26 @@ Check for: onpaste handlers, autocomplete attributes, CAPTCHA elements, cognitiv
 Return violations as JSON.`;
 
     const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
-    const violations = this.convertViolations(raw);
+    const described = await this.describeElements(
+      page,
+      raw.map((v) => v && v.selector)
+    );
+    const needsReview = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      bySelector: Object.fromEntries(
+        Object.entries(described).map(([selector, element]) => [selector, { element }])
+      ),
+    });
 
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['3.3.8', '3.3.9'],
-        analyzedFraction: ctx.analyzedFraction,
-        rawChars: ctx.rawChars,
-        skeletonChars: ctx.skeletonChars,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
-    };
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['3.3.8', '3.3.9'],
+      analyzedFraction: ctx.analyzedFraction,
+      rawChars: ctx.rawChars,
+      skeletonChars: ctx.skeletonChars,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
   }
 }
 

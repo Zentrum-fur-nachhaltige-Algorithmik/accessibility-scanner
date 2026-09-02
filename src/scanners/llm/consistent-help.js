@@ -91,39 +91,58 @@ ${JSON.stringify(views, null, 1)}
 Return violations as JSON.`;
 
     const { violations: raw, ctx } = await analyzeCompat(this, page, prompt);
-    const violations = this.convertViolations(raw);
+    const described = await this.describeElements(
+      page,
+      raw.map((v) => v && v.selector)
+    );
+    const needsReview = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      measurements: this._measurements(views, mode),
+      bySelector: Object.fromEntries(
+        Object.entries(described).map(([selector, element]) => [selector, { element }])
+      ),
+    });
 
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['3.2.6'],
-        comparisonMode: mode,
-        viewsCompared: views.length,
-        viewsWithHelp: withHelp,
-        analyzedFraction: ctx.analyzedFraction,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
-    };
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['3.2.6'],
+      comparisonMode: mode,
+      viewsCompared: views.length,
+      viewsWithHelp: withHelp,
+      analyzedFraction: ctx.analyzedFraction,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
+  }
+
+  /**
+   * The measured help inventory per view, flattened: what was found, in which
+   * container, and where in that container. The reviewer decides equivalence
+   * and whether a difference in position matters; the positions are measured.
+   */
+  _measurements(views, mode) {
+    const out = { comparisonMode: mode, viewsCompared: views.length };
+    for (const v of views) {
+      out[`help on ${v.view}`] = v.help.length
+        ? v.help
+            .map(
+              (h) =>
+                `${h.name || h.kind} [${h.kind}] in ${h.container}` +
+                (h.positionRatio == null ? '' : ` at ${h.positionRatio}`)
+            )
+            .join('; ')
+        : 'none';
+    }
+    return out;
   }
 
   _empty(reason, mode, viewCount) {
-    return {
-      scannerId: this.id,
-      passed: true,
-      violations: [],
-      summary: {
-        totalIssues: 0,
-        criteriaChecked: ['3.2.6'],
-        skipped: reason,
-        comparisonMode: mode,
-        viewsCompared: viewCount,
-      },
-    };
+    return this.reviewResult([], {
+      criteriaChecked: ['3.2.6'],
+      skipped: reason,
+      comparisonMode: mode,
+      viewsCompared: viewCount,
+    });
   }
 
   /** Same-origin sub-pages, preferring primary navigation links. */
@@ -280,6 +299,8 @@ Return violations as JSON.`;
 }
 
 const PROMPT = `Check these page views for WCAG 2.2 criterion 3.2.6 (Consistent Help, Level A).
+
+Everything you report becomes a question for a human reviewer, never an automatic failure.
 
 The criterion: if a set of pages offers a help mechanism, that is human contact details (phone, e-mail, postal address), a human contact mechanism (contact form, chat with a person), a self-help option (FAQ, help page, "Häufige Fragen"), or a fully automated contact mechanism (chatbot), then at least one such mechanism must appear in the SAME RELATIVE ORDER on every page in the set.
 

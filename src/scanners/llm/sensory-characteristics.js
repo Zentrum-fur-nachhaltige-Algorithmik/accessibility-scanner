@@ -48,23 +48,26 @@ CRITICAL: Only flag actual instructions that would leave a non-visual user unabl
 Return violations as JSON.`;
 
     const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
-    const violations = this.convertViolations(raw);
+    const described = await this.describeElements(
+      page,
+      raw.map((v) => v && v.selector)
+    );
+    const needsReview = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      bySelector: Object.fromEntries(
+        Object.entries(described).map(([selector, element]) => [selector, { element }])
+      ),
+    });
 
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['1.3.3'],
-        analyzedFraction: ctx.analyzedFraction,
-        rawChars: ctx.rawChars,
-        skeletonChars: ctx.skeletonChars,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
-    };
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['1.3.3'],
+      analyzedFraction: ctx.analyzedFraction,
+      rawChars: ctx.rawChars,
+      skeletonChars: ctx.skeletonChars,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
   }
 }
 

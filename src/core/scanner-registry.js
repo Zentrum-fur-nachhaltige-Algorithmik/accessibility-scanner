@@ -47,9 +47,7 @@ function createLLMScanners({ llmClient } = {}) {
   const { LLMClient } = require('../llm/client');
   const LLMSemanticTextScanner = require('../scanners/llm/semantic-text');
   const LLMAuthScanner = require('../scanners/llm/auth');
-  const LLMMediaAlternativesScanner = require('../scanners/llm/media-alternatives');
   const LLMVisualPresentationScanner = require('../scanners/llm/visual-presentation');
-  const LLMBehavioralScanner = require('../scanners/llm/behavioral');
   const LLMFocusAppearanceScanner = require('../scanners/llm/focus-appearance');
   const LLMSensoryCharacteristicsScanner = require('../scanners/llm/sensory-characteristics');
   const LLMReadingLevelScanner = require('../scanners/llm/reading-level');
@@ -64,9 +62,7 @@ function createLLMScanners({ llmClient } = {}) {
   return [
     new LLMSemanticTextScanner(client),
     new LLMAuthScanner(client),
-    new LLMMediaAlternativesScanner(client),
     new LLMVisualPresentationScanner(client),
-    new LLMBehavioralScanner(client),
     new LLMFocusAppearanceScanner(client),
     new LLMSensoryCharacteristicsScanner(client),
     new LLMReadingLevelScanner(client),

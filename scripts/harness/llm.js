@@ -54,7 +54,7 @@ const SCANNER_TESTS = {
     bad: ['bad-language-aaa.html', 'bad-navigation-aaa.html'],
     good: ['good-language-aaa.html', 'good-navigation-aaa.html'],
     german: { bad: 'bad-semantic-text-de.html', good: 'good-semantic-text-de.html' },
-    criteria: ['3.1.3', '3.1.4', '3.1.6', '2.4.9', '2.4.10', '1.3.6'],
+    criteria: ['3.1.3', '3.1.4', '2.4.10'],
   },
   'llm-auth': {
     module: '../../src/scanners/llm/auth',
@@ -63,26 +63,12 @@ const SCANNER_TESTS = {
     german: { bad: 'bad-accessible-auth-de.html', good: 'good-accessible-auth-de.html' },
     criteria: ['3.3.8', '3.3.9'],
   },
-  'llm-media-alternatives': {
-    module: '../../src/scanners/llm/media-alternatives',
-    bad: ['bad-media-aaa.html', 'bad-media-alternatives.html'],
-    good: ['good-media-aaa.html', 'good-accessibility.html'],
-    german: { bad: 'bad-media-alternatives-de.html', good: 'good-media-alternatives-de.html' },
-    criteria: ['1.2.6', '1.2.7', '1.2.8', '1.2.9'],
-  },
   'llm-visual-presentation': {
     module: '../../src/scanners/llm/visual-presentation',
-    bad: ['bad-visual-presentation.html', 'bad-low-background-audio.html'],
-    good: ['good-visual-presentation.html', 'good-low-background-audio.html'],
+    bad: ['bad-visual-presentation.html'],
+    good: ['good-visual-presentation.html'],
     german: { bad: 'bad-visual-presentation-de.html', good: 'good-visual-presentation-de.html' },
-    criteria: ['1.4.7', '1.4.8', '1.4.9'],
-  },
-  'llm-behavioral': {
-    module: '../../src/scanners/llm/behavioral',
-    bad: ['bad-timing-aaa.html', 'bad-change-on-request.html'],
-    good: ['good-timing-aaa.html', 'good-change-on-request.html'],
-    german: { bad: 'bad-behavioral-de.html', good: 'good-behavioral-de.html' },
-    criteria: ['2.2.3', '2.2.4', '2.2.5', '2.2.6', '3.2.5', '3.3.5'],
+    criteria: ['1.4.8', '1.4.9'],
   },
   'llm-focus-appearance': {
     module: '../../src/scanners/llm/focus-appearance',

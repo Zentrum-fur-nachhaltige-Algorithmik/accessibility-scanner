@@ -1,0 +1,56 @@
+<!-- WCAG-TEST
+criterion: 1.4.5
+level: AA
+title: Images of Text
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: images-of-text
+description: A chart whose axis labels are SVG text, a brand mark in the header painting the site name, a font specimen, and a badge whose words are repeated as real text beside it. SC 1.4.5 exempts a logotype and text whose presentation is essential, so image-of-text must report none of them.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Northwind Sensors</title>
+<meta property="og:site_name" content="Northwind Sensors">
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main, header { padding: 1rem 2rem; }
+  .badge { width: 120px; height: 32px; display: inline-block; vertical-align: middle;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 32"><rect width="120" height="32" fill="%231f4e79"/><text x="60" y="21" text-anchor="middle" fill="white" font-size="14">In stock</text></svg>'); }
+</style>
+</head>
+<body>
+<header>
+  <!-- A brand mark inside the header, painting the site's own name. -->
+  <img src="brand.svg" alt="Northwind Sensors" width="180" height="40">
+</header>
+<main>
+  <h1>Sales</h1>
+
+  <figure>
+    <svg role="img" aria-label="Sales per quarter" width="320" height="180" viewBox="0 0 320 180">
+      <line x1="40" y1="10" x2="40" y2="150" stroke="#1a1a1a"></line>
+      <line x1="40" y1="150" x2="300" y2="150" stroke="#1a1a1a"></line>
+      <rect x="60" y="90" width="40" height="60" fill="#1f4e79"></rect>
+      <rect x="120" y="60" width="40" height="90" fill="#1f4e79"></rect>
+      <rect x="180" y="40" width="40" height="110" fill="#1f4e79"></rect>
+      <path d="M60 90 L120 60 L180 40" fill="none" stroke="#b03a2e"></path>
+      <text x="75" y="168" font-size="12">Q1</text>
+      <text x="135" y="168" font-size="12">Q2</text>
+      <text x="195" y="168" font-size="12">Q3</text>
+    </svg>
+    <figcaption>Sales per quarter, in millions.</figcaption>
+  </figure>
+
+  <figure>
+    <img class="specimen" src="specimen.svg" alt="Typeface specimen of Inter" width="300" height="80">
+    <figcaption>Font specimen: the typeface Inter at 48 point.</figcaption>
+  </figure>
+
+  <p><span class="badge"></span> In stock, ships tomorrow.</p>
+</main>
+</body>
+</html>

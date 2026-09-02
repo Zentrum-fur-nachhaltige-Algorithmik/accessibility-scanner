@@ -16,10 +16,34 @@ const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
 const http = require('http');
 const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
-const { FILE_TO_SCANNERS } = require('./exclusive');
+const { FILE_TO_SCANNERS, CRITERION_TO_SCANNER } = require('./exclusive');
 
 /** Fixtures an exclusive scanner claims by name; the concurrent plan skips them. */
 const CLAIMED_FILES = new Set(Object.keys(FILE_TO_SCANNERS));
+
+/**
+ * A criterion an exclusive scanner owns is that scanner's to detect. A
+ * concurrent scanner may carry a secondary rule under the same criterion
+ * (advanced-aria reports a tree no keyboard can enter under 2.1.1, which is
+ * keyboard-navigation's criterion), and it must not be scored against the
+ * owner's fixtures for it.
+ */
+const EXCLUSIVELY_OWNED = new Set(Object.keys(CRITERION_TO_SCANNER));
+
+/**
+ * Fixture and criterion pairs no rule claims any more, with the reason. The
+ * plan skips them and the run prints them, so a deliberate deletion is a
+ * recorded coverage gap instead of a silent harness failure.
+ */
+const UNCLAIMED = {
+  'bad-css-background-info.html': {
+    criteria: ['1.4.1'],
+    reason:
+      'The status dots that convey online/offline by colour alone were use-of-color ' +
+      'color-coded-indicator, deleted as unfalsifiable (claims-audit fix-list 1). ' +
+      'No rule measures them, and the SVG-in-CSS text on the page is 1.4.5, not 1.4.1.',
+  },
+};
 
 async function loadPuppeteer() {
   try {
@@ -177,8 +201,12 @@ async function main() {
     // alone (see FILE_TO_SCANNERS in exclusive.js).
     if (CLAIMED_FILES.has(file)) continue;
 
+    const unclaimed = new Set(UNCLAIMED[file] ? UNCLAIMED[file].criteria : []);
+
     for (const [sid, criteria] of Object.entries(scannerCriteria)) {
-      const intersection = intersectCriteria(metadata.criterion, criteria);
+      const intersection = intersectCriteria(metadata.criterion, criteria).filter(
+        (c) => !EXCLUSIVELY_OWNED.has(c) && !unclaimed.has(c)
+      );
       if (intersection.length === 0) continue;
 
       testPlan.push({
@@ -192,8 +220,12 @@ async function main() {
   }
 
   console.log(
-    `Test plan: ${testPlan.length} tests across ${new Set(testPlan.map((t) => t.scanner)).size} scanners\n`
+    `Test plan: ${testPlan.length} tests across ${new Set(testPlan.map((t) => t.scanner)).size} scanners`
   );
+  for (const [file, gap] of Object.entries(UNCLAIMED)) {
+    console.log(`GAP ${file} ${gap.criteria.join(', ')}: ${gap.reason}`);
+  }
+  console.log('');
 
   // ---- Group files by criterion for byCriterion.files (independent of routing) ----
   const filesByCriterion = {};

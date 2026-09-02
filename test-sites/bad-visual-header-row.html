@@ -1,0 +1,49 @@
+<!-- WCAG-TEST
+criterion: 1.3.1
+level: A
+title: Info and Relationships
+test_type: bad
+expected_violations: 2
+testable_by: browser
+scanners: screen-reader
+description: Two data tables whose header axis is drawn but not marked up: one with a bold, shaded first row, one with a shaded first column. Every cell is a td, so the relationship a sighted reader sees is exposed to nobody.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad: a header row the markup does not carry</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  table { border-collapse: collapse; margin-bottom: 2rem; }
+  td { border: 1px solid #767676; padding: 0.4rem 0.75rem; }
+  .grid tr:first-child td { font-weight: 700; background: #d8d8d8; }
+  .sideways td:first-child { font-weight: 700; background: #d8d8d8; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Revenue</h1>
+
+  <table class="grid">
+    <caption>By region and quarter</caption>
+    <tbody>
+      <tr><td>Region</td><td>Q1</td><td>Q2</td></tr>
+      <tr><td>North</td><td>4.2</td><td>4.8</td></tr>
+      <tr><td>South</td><td>3.1</td><td>3.4</td></tr>
+    </tbody>
+  </table>
+
+  <table class="sideways">
+    <caption>By product, one row each</caption>
+    <tbody>
+      <tr><td>Sensors</td><td>1.2</td><td>1.4</td></tr>
+      <tr><td>Controllers</td><td>2.0</td><td>2.3</td></tr>
+      <tr><td>Cables</td><td>0.8</td><td>0.9</td></tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

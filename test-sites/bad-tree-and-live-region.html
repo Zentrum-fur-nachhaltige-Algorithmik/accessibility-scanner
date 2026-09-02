@@ -1,0 +1,60 @@
+<!-- WCAG-TEST
+criterion: 4.1.2
+level: A
+title: Name, Role, Value
+test_type: bad
+expected_violations: 4
+testable_by: browser
+scanners: advanced-aria
+description: A tree whose items are operated by a click handler and whose subtrees are collapsed, with no name, no item in the tab order and no aria-expanded, beside a role="status" region with aria-live="off" that a script updates. The tree is announced as a bare "tree", the keyboard cannot enter it, the collapsed state is never conveyed, and the status message is never announced.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad: an unreachable tree and a suppressed status region</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  ul { list-style: none; padding-left: 1rem; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Documents</h1>
+
+  <ul role="tree">
+    <li role="treeitem" aria-selected="false" onclick="openNode(this)">
+      Reports
+      <ul role="group" hidden>
+        <li role="treeitem" aria-selected="false" onclick="openNode(this)">2025</li>
+        <li role="treeitem" aria-selected="false" onclick="openNode(this)">2024</li>
+      </ul>
+    </li>
+    <li role="treeitem" aria-selected="false" onclick="openNode(this)">
+      Invoices
+      <ul role="group" hidden>
+        <li role="treeitem" aria-selected="false" onclick="openNode(this)">Open</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p id="status" role="status" aria-live="off">Ready.</p>
+</main>
+<script>
+  // The nodes are operated with the mouse only: no item is in the tab order,
+  // the tree has neither tabindex nor aria-activedescendant.
+  function openNode(node) {
+    var group = node.querySelector('[role="group"]');
+    if (group) group.hidden = !group.hidden;
+  }
+
+  // The region does update, and the update is suppressed by aria-live="off".
+  setTimeout(function () {
+    document.getElementById('status').textContent = 'Three documents were archived.';
+  }, 100);
+</script>
+</body>
+</html>

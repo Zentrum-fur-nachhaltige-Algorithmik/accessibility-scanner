@@ -1,0 +1,46 @@
+<!-- WCAG-TEST
+criterion: 4.1.2
+level: A
+title: Name, Role, Value
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: advanced-aria
+description: A tree of plain labels with no functionality and no collapsible subtree, and a role="status" region with aria-live="off" that never updates. Nothing here is operated, collapsed or announced, so tree-not-keyboard-reachable, missing-aria-expanded and the politeness contradiction must all stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: a static tree and a silent status region</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  ul { list-style: none; padding-left: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Site map</h1>
+
+  <ul role="tree" aria-label="Site map">
+    <li role="treeitem">
+      Products
+      <ul role="group">
+        <li role="treeitem">Sensors</li>
+        <li role="treeitem">Controllers</li>
+      </ul>
+    </li>
+    <li role="treeitem">
+      Service
+      <ul role="group">
+        <li role="treeitem">Repairs</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p role="status" aria-live="off">Everything is up to date.</p>
+</main>
+</body>
+</html>

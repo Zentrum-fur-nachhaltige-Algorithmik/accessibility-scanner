@@ -244,7 +244,7 @@ const SCANNER_NAMES = {
   'axe-core': 'axe-core',
 };
 
-/** 'label-in-name' -> 'Label in name'; 'llm-behavioral' -> 'LLM behavioral'. */
+/** 'label-in-name' -> 'Label in name'; 'llm-alt-quality' -> 'LLM alt quality'. */
 export function scannerLabel(scannerId) {
   if (!scannerId) return 'No module assigned';
   if (SCANNER_NAMES[scannerId]) return SCANNER_NAMES[scannerId];

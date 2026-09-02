@@ -1028,6 +1028,15 @@ const HTML_SCANNER_MAPPING = {
       'A snippet editor that indents on Tab and releases focus on Escape and the arrow keys, with the exit key documented above the field: keyboard-trap must stay silent',
   },
 
+  'good-spa-filter-and-tabbar.html': {
+    expectedScanners: [],
+    excludedScanners: ['dynamic-spa'],
+    testType: 'good',
+    wcagCriteria: ['2.4.2', '2.4.3'],
+    description:
+      'A filter that writes location.search and relabels the h1, and a tab bar of div.nav-link elements without href: neither is a view change, so missing-page-title-update must stay silent',
+  },
+
   'good-bootstrap-error-decoration.html': {
     expectedScanners: [],
     excludedScanners: ['status-messages'],

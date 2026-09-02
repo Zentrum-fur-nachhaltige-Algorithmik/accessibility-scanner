@@ -21,8 +21,14 @@ const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS } = require('../core/constants');
 const log = require('../utils/logger').createLogger('dynamic-spa');
 
-/** Navigation links to activate, and how many of them. */
-const LINK_SELECTOR = 'a[href], .nav-link, .route-link, [data-route]';
+/**
+ * Navigation links to activate, and how many of them. A link is an <a> with an
+ * href or an element that says role="link"; a div carrying a router class or a
+ * data-route attribute and no href is a button, a tab or a card, and clicking
+ * everything shaped like that turned a JS-only tab bar into a route change.
+ */
+const LINK_SELECTOR =
+  'a[href], [role="link"], .nav-link[href], .route-link[href], [data-route][href]';
 const MAX_LINKS = 5;
 
 /**
@@ -71,8 +77,9 @@ class DynamicSpaScanner extends BaseScanner {
     const stopDismissingDialogs = BaseScanner.dismissDialogs(page);
 
     let violations = [];
+    const questions = [];
     try {
-      violations = await this.testRouteChanges(page, scanOptions, state);
+      violations = await this.testRouteChanges(page, scanOptions, state, questions);
     } catch (error) {
       log.warn('Error during route change testing:', error.message);
     } finally {
@@ -85,15 +92,45 @@ class DynamicSpaScanner extends BaseScanner {
       criteria: ['2.4.2', '2.4.3'],
       passed: violations.length === 0,
       violations,
+      needsReview: questions.map((q) => this.toFocusQuestion(q)),
       summary: {
         linksActivated: state.linksActivated,
         routeChangesObserved: state.routeChanges,
         navigations: state.navigations,
         documentLoads: state.documentLoads,
         titleIssues: violations.filter((v) => v.type === 'missing-page-title-update').length,
-        focusIssues: violations.filter((v) => v.type === 'no-focus-management-route-change').length,
+        focusQuestions: questions.length,
       },
     };
+  }
+
+  /**
+   * Where focus went after a route change: an observation, not a failure.
+   * The reviewer decides whether the new focus position is meaningful.
+   */
+  toFocusQuestion(q) {
+    const question = this.formatViolation(
+      'no-focus-management-route-change',
+      'moderate',
+      `The route changed from ${q.routeBefore} to ${q.routeAfter}, the element that had focus was removed, and focus is now on ${q.focusNow}`,
+      [{ selector: q.focusNow }],
+      'https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html',
+      'info',
+      {
+        verdict: 'needs-review',
+        dossier: {
+          question: `After this route change, does focus land somewhere meaningful?`,
+          element: { selector: q.focusNow, html: q.focusedHtml, role: null, name: null },
+          measurements: {
+            previouslyFocusedRemoved: true,
+            mainRegionReplaced: true,
+          },
+          context: { routeBefore: q.routeBefore, routeAfter: q.routeAfter },
+        },
+      }
+    );
+    question.wcagCriteria = ['2.4.3'];
+    return question;
   }
 
   /**
@@ -135,13 +172,28 @@ class DynamicSpaScanner extends BaseScanner {
     return await page.evaluate(() => {
       const previous = window.__a11ySpaFocused;
       const heading = document.querySelector('h1') || document.querySelector('h2, h3, h4, h5, h6');
+      const main = document.querySelector('main, [role="main"]');
+      const h1 = document.querySelector('h1');
+      const wasMain = window.__a11ySpaMain;
+      const wasH1 = window.__a11ySpaH1;
       return {
         title: document.title,
         heading: heading ? heading.textContent.trim() : '',
         route: location.pathname + location.search,
+        pathname: location.pathname,
         transitions: (window.__a11ySpaRoutes || []).length,
         focusedIsBody: !document.activeElement || document.activeElement === document.body,
         focusedStillConnected: !!(previous && previous.isConnected),
+        focusedHtml: previous && previous.outerHTML ? previous.outerHTML.slice(0, 200) : null,
+        activeElementSelector: document.activeElement
+          ? document.activeElement.tagName.toLowerCase() +
+            (document.activeElement.id ? '#' + document.activeElement.id : '')
+          : null,
+        // The view was replaced, not just relabelled: the element that carried
+        // the previous view is gone or is a different node now.
+        mainReplaced: !!wasMain && (!wasMain.isConnected || wasMain !== main),
+        h1Replaced: !!wasH1 && (!wasH1.isConnected || wasH1 !== h1),
+        hasMain: !!main,
       };
     });
   }
@@ -161,7 +213,9 @@ class DynamicSpaScanner extends BaseScanner {
           if (el.hasAttribute('download')) return false;
           if (el.target && el.target !== '_self') return false;
           const href = el.getAttribute('href');
-          if (href === null) return true;
+          // Only a declared link without an href stays in: role="link" says
+          // what the element is, a class name does not.
+          if (href === null) return el.getAttribute('role') === 'link';
           if (/^(mailto:|tel:|javascript:)/i.test(href)) return false;
           try {
             return new URL(el.href, location.href).origin === location.origin;
@@ -179,7 +233,7 @@ class DynamicSpaScanner extends BaseScanner {
    * Activate up to MAX_LINKS navigation links and report what a client-side
    * route change did to the title and to focus.
    */
-  async testRouteChanges(page, options, state) {
+  async testRouteChanges(page, options, state, questions = []) {
     const violations = [];
     // One router behaves one way, so each rule is reported once however many
     // of its links demonstrate it.
@@ -206,6 +260,8 @@ class DynamicSpaScanner extends BaseScanner {
         await link.focus().catch(() => {});
         await page.evaluate(() => {
           window.__a11ySpaFocused = document.activeElement;
+          window.__a11ySpaMain = document.querySelector('main, [role="main"]');
+          window.__a11ySpaH1 = document.querySelector('h1');
         });
 
         const before = await this.readState(page);
@@ -231,6 +287,13 @@ class DynamicSpaScanner extends BaseScanner {
         const routeChanged = after.transitions > before.transitions && after.route !== before.route;
         if (!routeChanged) continue;
         state.routeChanges += 1;
+
+        // A new view, not a new query. A filter or a sort writes
+        // location.search and leaves the page the user is on, and the view is
+        // only new when the region that carried it was replaced.
+        const viewChanged =
+          after.pathname !== before.pathname && (after.mainReplaced || after.h1Replaced);
+        if (!viewChanged) continue;
 
         // The heading has to have changed as well. A router that re-enters the
         // route it is already on changes the URL without presenting a
@@ -260,26 +323,22 @@ class DynamicSpaScanner extends BaseScanner {
           });
         }
 
+        // 2.4.3 constrains the order in which components receive focus; focus
+        // dropping to the body puts no component out of order, and no WCAG 2.2
+        // criterion requires focus management on a route change. The
+        // observation is worth a reviewer's time, so it is asked, not counted.
         if (
           after.focusedIsBody &&
           !after.focusedStillConnected &&
+          after.mainReplaced &&
           !reported.has('no-focus-management-route-change')
         ) {
           reported.add('no-focus-management-route-change');
-          violations.push({
-            type: 'no-focus-management-route-change',
-            category: 'route-change',
-            severity: 'serious',
-            element: 'body',
-            description: 'Focus was destroyed by a client-side route change and not moved',
-            details: {
-              routeBefore: before.route,
-              routeAfter: after.route,
-            },
-            wcagCriteria: '2.4.3',
-            impact: 'Keyboard and screen reader users are returned to the top of the document',
-            recommendation:
-              'Move focus to the heading or the main region of the new route when the route changes',
+          questions.push({
+            routeBefore: before.route,
+            routeAfter: after.route,
+            focusedHtml: before.focusedHtml || after.focusedHtml,
+            focusNow: after.activeElementSelector || 'body',
           });
         }
 

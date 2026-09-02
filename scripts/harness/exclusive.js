@@ -100,7 +100,11 @@ const EXCLUSIVE_SCANNERS = {
   'dynamic-spa': {
     module: '../../src/scanners/dynamic-spa',
     criteria: ['2.4.2', '2.4.3'],
-    files: ['good-spa-route-change.html', 'bad-spa-route-change.html'],
+    files: [
+      'good-spa-route-change.html',
+      'good-spa-filter-and-tabbar.html',
+      'bad-spa-route-change.html',
+    ],
   },
 };
 

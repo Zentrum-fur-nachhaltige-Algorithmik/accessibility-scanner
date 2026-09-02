@@ -50,11 +50,41 @@ const CONCURRENT_SCANNERS = {
   },
   'use-of-color': { module: '../../src/scanners/use-of-color' },
   'images-of-text': { module: '../../src/scanners/images-of-text' },
-  'screen-reader': { module: '../../src/scanners/screen-reader' },
+  'screen-reader': {
+    module: '../../src/scanners/screen-reader',
+    // A form-grouping fixture: its 1.3.1 defect is a group of controls with no
+    // programmatic name, which error-handling owns.
+    notOurs: { '1.3.1': ['bad-group-and-format.html'] },
+  },
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
   orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
-  'error-handling': { module: '../../src/scanners/error-handling' },
+  // `notOurs`: fixtures that declare a criterion this scanner does not own the
+  // defect for. Routing is by criterion, so without it a scanner is scored
+  // against a defect another mechanism reports: the unnamed controls of
+  // bad-form-labels are axe `label` / `select-name` / `aria-input-field-name`
+  // since field-no-label was deleted, and the 1.3.1 of a data table or a
+  // landmark set is nothing this scanner looks at. The criterion is still
+  // asserted on those files, by the axe e2e run and by the scanner that owns
+  // them.
+  'error-handling': {
+    module: '../../src/scanners/error-handling',
+    notOurs: {
+      '1.3.1': [
+        'bad-beeproduced-real-issues.html',
+        'bad-cognitive-accessibility.html',
+        'bad-complex-aria.html',
+        'bad-complex-data-tables.html',
+        'bad-form-labels.html',
+        'bad-landmarks.html',
+      ],
+      '3.3.2': [
+        'bad-beeproduced-real-issues.html',
+        'bad-cognitive-accessibility.html',
+        'bad-form-labels.html',
+      ],
+    },
+  },
   'page-structure': { module: '../../src/scanners/page-structure' },
   'label-in-name': { module: '../../src/scanners/label-in-name' },
   'advanced-aria': { module: '../../src/scanners/advanced-aria' },
@@ -179,7 +209,10 @@ async function main() {
     if (CLAIMED_FILES.has(file)) continue;
 
     for (const [sid, criteria] of Object.entries(scannerCriteria)) {
-      const intersection = intersectCriteria(metadata.criterion, criteria);
+      const notOurs = (CONCURRENT_SCANNERS[sid] || {}).notOurs || {};
+      const intersection = intersectCriteria(metadata.criterion, criteria).filter(
+        (c) => !(notOurs[c] || []).includes(file)
+      );
       if (intersection.length === 0) continue;
 
       testPlan.push({

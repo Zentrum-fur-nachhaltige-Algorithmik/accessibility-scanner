@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 249,
+  "fixtureCount": 257,
   "scanners": [
     {
       "id": "axe-core",
@@ -108,9 +108,7 @@
       "id": "predictable-navigation",
       "criteria": [
         "3.2.1",
-        "3.2.2",
-        "3.2.3",
-        "3.2.4"
+        "3.2.2"
       ],
       "kind": "deterministic",
       "exclusive": true,
@@ -120,9 +118,9 @@
     {
       "id": "error-handling",
       "criteria": [
+        "1.3.1",
         "3.3.1",
-        "3.3.2",
-        "3.3.3"
+        "3.3.2"
       ],
       "kind": "deterministic",
       "exclusive": false,
@@ -720,7 +718,7 @@
       "sc": "1.3.1",
       "level": "A",
       "title": "Info and Relationships",
-      "mechanism": "axe-core",
+      "mechanism": "hybrid:axe-core+error-handling",
       "how": "measured",
       "supporting": [
         "screen-reader (experimental)"
@@ -740,7 +738,8 @@
         "th-has-data-cells"
       ],
       "deterministic": [
-        "screen-reader"
+        "screen-reader",
+        "error-handling"
       ],
       "llm": [],
       "fixtures": {
@@ -749,6 +748,7 @@
           "good-cognitive-accessibility.html",
           "good-complex-data-tables.html",
           "good-form-grouping.html",
+          "good-group-heading-and-error-text.html",
           "good-hidden-modal.html",
           "good-landing-page.html",
           "good-landmarks.html",
@@ -761,6 +761,7 @@
           "bad-complex-data-tables.html",
           "bad-form-grouping.html",
           "bad-form-labels.html",
+          "bad-group-and-format.html",
           "bad-landmarks.html"
         ]
       },
@@ -1572,6 +1573,8 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-player-clock-and-hydration.html",
+          "good-session-countdown-far-control.html",
           "good-static-decorations.html",
           "good-timing-controls.html"
         ],
@@ -1612,6 +1615,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-player-clock-and-hydration.html",
           "good-static-decorations.html",
           "good-static-live-wording.html",
           "good-timing-controls.html"
@@ -2016,7 +2020,7 @@
       "level": "AA",
       "title": "Multiple Ways",
       "mechanism": "deterministic:multiple-ways",
-      "how": "measured",
+      "how": "adjudicated",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2028,6 +2032,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-multiple-ways-collapsed-search.html",
           "good-multiple-ways-process-step.html",
           "good-multiple-ways-standalone.html",
           "good-multiple-ways.html"
@@ -2777,11 +2782,11 @@
         "good": [
           "good-context-change.html",
           "good-focus-reveal-external-links.html",
+          "good-history-state-and-popover.html",
           "good-predictable-controls.html"
         ],
         "bad": [
-          "bad-context-change.html",
-          "bad-external-link-identification.html"
+          "bad-context-change.html"
         ]
       },
       "harness": [
@@ -2815,6 +2820,7 @@
         "good": [
           "good-auto-submitting-form.html",
           "good-context-change.html",
+          "good-history-state-and-popover.html",
           "good-predictable-controls.html"
         ],
         "bad": [
@@ -2838,16 +2844,14 @@
       "sc": "3.2.3",
       "level": "AA",
       "title": "Consistent Navigation",
-      "mechanism": "deterministic:predictable-navigation",
-      "how": "measured",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Consistent Navigation: the clause is scoped to navigational mechanisms \"repeated on multiple web pages within a set of web pages\". One document is not that set, so two navigation blocks inside one page decide nothing; a human compares page against page.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "predictable-navigation"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2857,9 +2861,7 @@
           "bad-consistent-navigation.html"
         ]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": [],
       "outcome": {
         "tp": true,
         "fpClean": true,
@@ -2873,16 +2875,14 @@
       "sc": "3.2.4",
       "level": "AA",
       "title": "Consistent Identification",
-      "mechanism": "deterministic:predictable-navigation",
-      "how": "measured",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Consistent Identification: scoped to components \"within a set of web pages\", and Understanding 3.2.4 calls consistency inside one page best practice only. predictable-navigation inventories the repeated blocks and the marked/unmarked links of the one page it sees and asks about them as needs-review; the decision is a human one.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "predictable-navigation"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -2896,9 +2896,7 @@
           "bad-external-link-identification.html"
         ]
       },
-      "harness": [
-        "exclusive"
-      ],
+      "harness": [],
       "outcome": {
         "tp": true,
         "fpClean": true,
@@ -2982,6 +2980,7 @@
           "good-error-tokens-not-error-messages.html",
           "good-form-errors.html",
           "good-form-fields-without-hints.html",
+          "good-group-heading-and-error-text.html",
           "good-js-validation.html"
         ],
         "bad": [
@@ -3022,6 +3021,7 @@
           "good-cognitive-accessibility.html",
           "good-form-fields-without-hints.html",
           "good-form-grouping.html",
+          "good-group-heading-and-error-text.html",
           "good-js-validation.html",
           "good-landing-page.html"
         ],
@@ -3029,7 +3029,8 @@
           "bad-beeproduced-real-issues.html",
           "bad-cognitive-accessibility.html",
           "bad-form-grouping.html",
-          "bad-form-labels.html"
+          "bad-form-labels.html",
+          "bad-group-and-format.html"
         ]
       },
       "harness": [
@@ -3049,16 +3050,14 @@
       "sc": "3.3.3",
       "level": "AA",
       "title": "Error Suggestion",
-      "mechanism": "deterministic:error-handling",
-      "how": "measured",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Error Suggestion: the clause starts at \"If an input error is automatically detected\", and no scanner here enters data, submits a form or reads a validity state, so the antecedent is never reached. An unstated required format is a missing instruction under 3.3.2 (technique G89) and is reported there; the suggestion after a detected error needs a state scan or a human.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
-      "deterministic": [
-        "error-handling"
-      ],
+      "deterministic": [],
       "llm": [],
       "fixtures": {
         "good": [
@@ -3071,9 +3070,7 @@
           "bad-form-errors.html"
         ]
       },
-      "harness": [
-        "concurrent"
-      ],
+      "harness": [],
       "outcome": {
         "tp": true,
         "fpClean": true,
